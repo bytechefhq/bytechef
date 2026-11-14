@@ -25,7 +25,7 @@ public interface DataTableStorageService {
 
     DataTableStorageUsage getUsage();
 
-    long getTableBytes(String baseName, long environmentId);
+    long getTableBytes(long dataTableId, long environmentId);
 
     void checkLimit(long incomingBytes);
 }

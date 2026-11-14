@@ -20,9 +20,9 @@ import com.bytechef.commons.data.jdbc.DatabaseDialect;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.data.table.domain.DataTableStorageUsage;
 import com.bytechef.platform.data.table.exception.DataTableStorageLimitExceededException;
+import com.bytechef.platform.data.table.util.DataTablePhysicalNameUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Pattern;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -65,12 +65,12 @@ public class DataTableStorageServiceImpl implements DataTableStorageService {
     }
 
     @Override
-    public long getTableBytes(String baseName, long environmentId) {
+    public long getTableBytes(long dataTableId, long environmentId) {
         if (databaseDialect.isH2(jdbcTemplate)) {
             return 0;
         }
 
-        return getLiveTableBytes("dt_" + environmentId + "_" + baseName.toLowerCase(Locale.ROOT));
+        return getLiveTableBytes(DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableId));
     }
 
     @Override

@@ -35,21 +35,18 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 
 /**
- * Coordinates the platform {@code DataTableService} with the workspace relation, exposing the workspace-scoped
- * create/list operations the web layer needs.
- *
  * @author Ivica Cardic
  */
 public interface WorkspaceDataTableFacade {
 
     void addColumn(long dataTableId, ColumnSpec columnSpec, long environmentId);
 
-    void createTable(
-        String baseName, String description, List<ColumnSpec> columnSpecs, long workspaceId, long environmentId);
+    long createTable(
+        String name, String description, List<ColumnSpec> columnSpecs, long workspaceId, long environmentId);
 
     void dropTable(long dataTableId, long environmentId);
 
-    void duplicateTable(long dataTableId, String newBaseName, long environmentId);
+    long duplicateTable(long dataTableId, String newName, long environmentId);
 
     List<Tag> getDataTableTags(long workspaceId);
 
@@ -61,7 +58,7 @@ public interface WorkspaceDataTableFacade {
 
     void renameColumn(long dataTableId, String fromColumnName, String newName, long environmentId);
 
-    void renameTable(long dataTableId, String newBaseName, long environmentId);
+    void renameTable(long dataTableId, String newName);
 
     List<DataTableRow> listRows(long dataTableId, int limit, int offset, long environmentId);
 

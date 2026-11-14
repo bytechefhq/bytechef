@@ -18,19 +18,22 @@ package com.bytechef.automation.data.table.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 
 import com.bytechef.automation.data.table.config.AutomationDataTableIntTestConfiguration;
-import com.bytechef.automation.data.table.configuration.domain.WorkspaceDataTable;
-import com.bytechef.automation.data.table.configuration.service.WorkspaceDataTableService;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.exception.DataTableStorageLimitExceededException;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import com.bytechef.platform.data.table.execution.service.DataTableStorageService;
+import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
@@ -72,9 +75,6 @@ class WorkspaceDataTableFacadeIntTest {
     @Autowired
     private WorkspaceDataTableFacade workspaceDataTableFacade;
 
-    @Autowired
-    private WorkspaceDataTableService workspaceDataTableService;
-
     private long originalMaxSizeBytes;
 
     @BeforeEach
@@ -86,6 +86,8 @@ class WorkspaceDataTableFacadeIntTest {
         dropTestTables();
 
         for (long workspaceId : List.of(WORKSPACE_ID, SECOND_WORKSPACE_ID)) {
+            jdbcTemplate.update("DELETE FROM workspace WHERE id = ?", workspaceId);
+
             jdbcTemplate.update(
                 "INSERT INTO workspace " +
                     "(id, name, created_date, created_by, last_modified_date, last_modified_by, version) " +
@@ -101,76 +103,88 @@ class WorkspaceDataTableFacadeIntTest {
         dropTestTables();
 
         for (long workspaceId : List.of(WORKSPACE_ID, SECOND_WORKSPACE_ID)) {
-            jdbcTemplate.update("DELETE FROM workspace_data_table WHERE workspace_id = ?", workspaceId);
             jdbcTemplate.update("DELETE FROM workspace WHERE id = ?", workspaceId);
         }
     }
 
     @Test
     void testCreateTableAssignsTableToWorkspace() {
-        workspaceDataTableFacade.createTable("events", "Events", COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+        long dataTableId = workspaceDataTableFacade.createTable(
+            "events", "Events", COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
 
-        long dataTableId = dataTableService.getIdByBaseName("events");
-
-        assertThat(workspaceDataTableService.getDataTableWorkspaceDataTables(dataTableId))
-            .extracting(WorkspaceDataTable::getWorkspaceId)
-            .containsExactly(WORKSPACE_ID);
+        assertThat(workspaceDataTableFacade.getWorkspaceId(dataTableId)).isEqualTo(WORKSPACE_ID);
         assertThat(workspaceDataTableFacade.listTables(WORKSPACE_ID, DEV_ENVIRONMENT_ID))
-            .extracting(DataTableInfo::baseName)
-            .containsExactly("events");
+            .extracting(DataTableInfo::id, DataTableInfo::name)
+            .containsExactly(tuple(dataTableId, "events"));
     }
 
     @Test
-    void testDropTableRemovesWorkspaceAssignment() {
-        workspaceDataTableFacade.createTable("dropped", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+    void testTwoWorkspacesCreateTheSameName() {
+        long firstDataTableId = workspaceDataTableFacade.createTable(
+            "events", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+        long secondDataTableId = workspaceDataTableFacade.createTable(
+            "events", null, COLUMN_SPECS, SECOND_WORKSPACE_ID, DEV_ENVIRONMENT_ID);
 
-        long dataTableId = dataTableService.getIdByBaseName("dropped");
-
-        assertThat(workspaceDataTableService.getDataTableWorkspaceDataTables(dataTableId)).hasSize(1);
-
-        dataTableService.dropTable("dropped", DEV_ENVIRONMENT_ID);
-
-        assertThat(workspaceDataTableService.getDataTableWorkspaceDataTables(dataTableId)).isEmpty();
-        assertThat(workspaceDataTableService.getWorkspaceDataTables(WORKSPACE_ID)).isEmpty();
+        assertThat(secondDataTableId).isNotEqualTo(firstDataTableId);
+        assertThat(workspaceDataTableFacade.listTables(WORKSPACE_ID, DEV_ENVIRONMENT_ID))
+            .extracting(DataTableInfo::id)
+            .containsExactly(firstDataTableId);
+        assertThat(workspaceDataTableFacade.listTables(SECOND_WORKSPACE_ID, DEV_ENVIRONMENT_ID))
+            .extracting(DataTableInfo::id)
+            .containsExactly(secondDataTableId);
     }
 
     @Test
-    void testDropTableKeepsWorkspaceAssignmentWhileAnotherEnvironmentHasTheTable() {
-        workspaceDataTableFacade.createTable("dropped", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
-        workspaceDataTableFacade.createTable("dropped", null, COLUMN_SPECS, WORKSPACE_ID, STAGE_ENVIRONMENT_ID);
+    void testDropTableInTheLastEnvironmentRemovesTheTableFromTheWorkspace() {
+        long dataTableId = workspaceDataTableFacade.createTable(
+            "dropped", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
 
-        long dataTableId = dataTableService.getIdByBaseName("dropped");
+        workspaceDataTableFacade.dropTable(dataTableId, DEV_ENVIRONMENT_ID);
 
-        dataTableService.dropTable("dropped", DEV_ENVIRONMENT_ID);
+        assertThat(dataTableService.getWorkspaceDataTables(WORKSPACE_ID)).isEmpty();
+        assertThatThrownBy(() -> workspaceDataTableFacade.getWorkspaceId(dataTableId))
+            .isInstanceOf(DataTableException.class);
+    }
 
-        assertThat(workspaceDataTableService.getDataTableWorkspaceDataTables(dataTableId))
-            .extracting(WorkspaceDataTable::getWorkspaceId)
-            .containsExactly(WORKSPACE_ID);
+    @Test
+    void testDropTableKeepsTheTableWhileAnotherEnvironmentHasIt() {
+        long dataTableId = workspaceDataTableFacade.createTable(
+            "dropped", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+        long stageDataTableId = workspaceDataTableFacade.createTable(
+            "dropped", null, COLUMN_SPECS, WORKSPACE_ID, STAGE_ENVIRONMENT_ID);
+
+        assertThat(stageDataTableId).isEqualTo(dataTableId);
+
+        workspaceDataTableFacade.dropTable(dataTableId, DEV_ENVIRONMENT_ID);
+
+        assertThat(workspaceDataTableFacade.getWorkspaceId(dataTableId)).isEqualTo(WORKSPACE_ID);
+        assertThat(workspaceDataTableFacade.listTables(WORKSPACE_ID, DEV_ENVIRONMENT_ID)).isEmpty();
         assertThat(workspaceDataTableFacade.listTables(WORKSPACE_ID, STAGE_ENVIRONMENT_ID))
-            .extracting(DataTableInfo::baseName)
+            .extracting(DataTableInfo::name)
             .containsExactly("dropped");
     }
 
     @Test
     void testDuplicateTableIsListedInSourceWorkspace() {
-        workspaceDataTableFacade.createTable("original", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+        long originalDataTableId = workspaceDataTableFacade.createTable(
+            "original", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
 
-        long originalDataTableId = dataTableService.getIdByBaseName("original");
+        long copyDataTableId = workspaceDataTableFacade.duplicateTable(originalDataTableId, "copy", DEV_ENVIRONMENT_ID);
 
-        workspaceDataTableFacade.duplicateTable(originalDataTableId, "copy", DEV_ENVIRONMENT_ID);
-
+        assertThat(copyDataTableId).isNotEqualTo(originalDataTableId);
+        assertThat(workspaceDataTableFacade.getWorkspaceId(copyDataTableId)).isEqualTo(WORKSPACE_ID);
         assertThat(workspaceDataTableFacade.listTables(WORKSPACE_ID, DEV_ENVIRONMENT_ID))
-            .extracting(DataTableInfo::baseName)
+            .extracting(DataTableInfo::name)
             .containsExactlyInAnyOrder("original", "copy");
+        assertThat(workspaceDataTableFacade.listTables(SECOND_WORKSPACE_ID, DEV_ENVIRONMENT_ID)).isEmpty();
     }
 
     @Test
     void testDuplicateTableIsRejectedWhenTheCopyWouldExceedTheStorageLimit() {
-        workspaceDataTableFacade.createTable("original", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+        long originalDataTableId = workspaceDataTableFacade.createTable(
+            "original", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
 
-        dataTableRowService.insertRow("original", Map.of("title", "first"), DEV_ENVIRONMENT_ID);
-
-        long originalDataTableId = dataTableService.getIdByBaseName("original");
+        dataTableRowService.insertRow(originalDataTableId, Map.of("title", "first"), DEV_ENVIRONMENT_ID);
 
         limitStorageToLiveBytesPlus(0);
 
@@ -179,60 +193,61 @@ class WorkspaceDataTableFacadeIntTest {
                 .isInstanceOf(DataTableStorageLimitExceededException.class);
 
         assertThat(workspaceDataTableFacade.listTables(WORKSPACE_ID, DEV_ENVIRONMENT_ID))
-            .extracting(DataTableInfo::baseName)
+            .extracting(DataTableInfo::name)
             .containsExactly("original");
     }
 
     @Test
-    void testDuplicateTableAssignsCopyToSourceWorkspace() {
-        workspaceDataTableFacade.createTable("events", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+    void testDuplicateTableWithoutSourceWorkspaceLeavesTheCopyWithoutWorkspace() {
+        long eventsDataTableId = dataTableService.createTable(null, "events", null, COLUMN_SPECS, DEV_ENVIRONMENT_ID);
 
-        long eventsDataTableId = dataTableService.getIdByBaseName("events");
+        long eventsCopyDataTableId = workspaceDataTableFacade.duplicateTable(
+            eventsDataTableId, "events_copy", DEV_ENVIRONMENT_ID);
 
-        workspaceDataTableFacade.duplicateTable(eventsDataTableId, "events_copy", DEV_ENVIRONMENT_ID);
+        DataTable eventsCopyDataTable = dataTableService.getDataTable(eventsCopyDataTableId);
 
-        long eventsCopyDataTableId = dataTableService.getIdByBaseName("events_copy");
-
-        assertThat(eventsCopyDataTableId).isNotEqualTo(eventsDataTableId);
-        assertThat(workspaceDataTableService.getDataTableWorkspaceDataTables(eventsCopyDataTableId))
-            .extracting(WorkspaceDataTable::getWorkspaceId)
-            .containsExactly(WORKSPACE_ID);
-    }
-
-    @Test
-    void testDuplicateTableAssignsCopyToEverySourceWorkspace() {
-        workspaceDataTableFacade.createTable("events", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
-
-        long eventsDataTableId = dataTableService.getIdByBaseName("events");
-
-        workspaceDataTableService.assignDataTableToWorkspace(eventsDataTableId, SECOND_WORKSPACE_ID);
-
-        workspaceDataTableFacade.duplicateTable(eventsDataTableId, "events_copy", DEV_ENVIRONMENT_ID);
-
-        long eventsCopyDataTableId = dataTableService.getIdByBaseName("events_copy");
-
-        assertThat(workspaceDataTableService.getDataTableWorkspaceDataTables(eventsCopyDataTableId))
-            .extracting(WorkspaceDataTable::getWorkspaceId)
-            .containsExactlyInAnyOrder(WORKSPACE_ID, SECOND_WORKSPACE_ID);
-        assertThat(workspaceDataTableFacade.listTables(SECOND_WORKSPACE_ID, DEV_ENVIRONMENT_ID))
-            .extracting(DataTableInfo::baseName)
-            .containsExactlyInAnyOrder("events", "events_copy");
-    }
-
-    @Test
-    void testDuplicateTableWithoutSourceWorkspaceAssignsNothing() {
-        dataTableService.createTable("events", null, COLUMN_SPECS, DEV_ENVIRONMENT_ID);
-
-        long eventsDataTableId = dataTableService.getIdByBaseName("events");
-
-        workspaceDataTableFacade.duplicateTable(eventsDataTableId, "events_copy", DEV_ENVIRONMENT_ID);
-
-        long eventsCopyDataTableId = dataTableService.getIdByBaseName("events_copy");
-
-        assertThat(dataTableService.listTables(DEV_ENVIRONMENT_ID))
-            .extracting(DataTableInfo::baseName)
+        assertThat(eventsCopyDataTable.getWorkspaceId()).isNull();
+        assertThat(dataTableService.listTables(null, DEV_ENVIRONMENT_ID))
+            .extracting(DataTableInfo::name)
             .contains("events", "events_copy");
-        assertThat(workspaceDataTableService.getDataTableWorkspaceDataTables(eventsCopyDataTableId)).isEmpty();
+    }
+
+    @Test
+    void testRenameTableKeepsItsRowsAndWorkspace() {
+        long dataTableId = workspaceDataTableFacade.createTable(
+            "events", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+
+        dataTableRowService.insertRow(dataTableId, Map.of("title", "first"), DEV_ENVIRONMENT_ID);
+
+        workspaceDataTableFacade.renameTable(dataTableId, "renamed_events");
+
+        DataTableInfo dataTableInfo = workspaceDataTableFacade.getTable(dataTableId, DEV_ENVIRONMENT_ID);
+
+        assertThat(dataTableInfo.name()).isEqualTo("renamed_events");
+        assertThat(workspaceDataTableFacade.getWorkspaceId(dataTableId)).isEqualTo(WORKSPACE_ID);
+        assertThat(workspaceDataTableFacade.listRows(dataTableId, 10, 0, DEV_ENVIRONMENT_ID)).hasSize(1);
+    }
+
+    @Test
+    void testGetWorkspaceIdOfATableWithoutWorkspaceIsRejected() {
+        long dataTableId = dataTableService.createTable(null, "events", null, COLUMN_SPECS, DEV_ENVIRONMENT_ID);
+
+        assertThatThrownBy(() -> workspaceDataTableFacade.getWorkspaceId(dataTableId))
+            .isInstanceOf(DataTableException.class);
+    }
+
+    @Test
+    void testGetTagsByTableIdListsEveryWorkspaceTable() {
+        long eventsDataTableId = workspaceDataTableFacade.createTable(
+            "events", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+        long originalDataTableId = workspaceDataTableFacade.createTable(
+            "original", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+
+        workspaceDataTableFacade.createTable("copy", null, COLUMN_SPECS, SECOND_WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+
+        Map<Long, List<Tag>> tagsByTableId = workspaceDataTableFacade.getTagsByTableId(WORKSPACE_ID);
+
+        assertThat(tagsByTableId).containsOnlyKeys(eventsDataTableId, originalDataTableId);
     }
 
     @Test
@@ -241,11 +256,11 @@ class WorkspaceDataTableFacadeIntTest {
         workspaceDataTableFacade.createTable(
             "events_copy", null, COLUMN_SPECS, SECOND_WORKSPACE_ID, DEV_ENVIRONMENT_ID);
 
-        assertThat(dataTableService.listTables(DEV_ENVIRONMENT_ID))
-            .extracting(DataTableInfo::baseName)
+        assertThat(dataTableService.listAllTables(DEV_ENVIRONMENT_ID))
+            .extracting(DataTableInfo::name)
             .contains("events", "events_copy");
         assertThat(workspaceDataTableFacade.listTables(WORKSPACE_ID, DEV_ENVIRONMENT_ID))
-            .extracting(DataTableInfo::baseName)
+            .extracting(DataTableInfo::name)
             .containsExactly("events");
     }
 
@@ -260,7 +275,7 @@ class WorkspaceDataTableFacadeIntTest {
                 String[] physicalTableNameParts = physicalTableName.split("_", 3);
 
                 return dataTableStorageService.getTableBytes(
-                    physicalTableNameParts[2], Long.parseLong(physicalTableNameParts[1]));
+                    Long.parseLong(physicalTableNameParts[2]), Long.parseLong(physicalTableNameParts[1]));
             })
             .sum();
 
@@ -274,9 +289,18 @@ class WorkspaceDataTableFacadeIntTest {
     }
 
     private void dropTestTables() {
-        for (String baseName : List.of("dropped", "original", "copy", "events", "events_copy")) {
-            dataTableService.dropTable(baseName, DEV_ENVIRONMENT_ID);
-            dataTableService.dropTable(baseName, STAGE_ENVIRONMENT_ID);
+        List<DataTable> dataTables = new ArrayList<>(dataTableService.getWorkspaceDataTables(WORKSPACE_ID));
+
+        dataTables.addAll(dataTableService.getWorkspaceDataTables(SECOND_WORKSPACE_ID));
+
+        dataTableService.fetchDataTable(null, "events")
+            .ifPresent(dataTables::add);
+        dataTableService.fetchDataTable(null, "events_copy")
+            .ifPresent(dataTables::add);
+
+        for (DataTable dataTable : dataTables) {
+            dataTableService.dropTable(dataTable.getId(), DEV_ENVIRONMENT_ID);
+            dataTableService.dropTable(dataTable.getId(), STAGE_ENVIRONMENT_ID);
         }
     }
 }

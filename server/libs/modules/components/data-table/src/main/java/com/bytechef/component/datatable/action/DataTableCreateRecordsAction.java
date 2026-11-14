@@ -33,7 +33,9 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -51,17 +53,22 @@ public class DataTableCreateRecordsAction {
 
     private final DataTableService dataTableService;
     private final DataTableRowService dataTableRowService;
+    private final DataTableWorkspaceResolver dataTableWorkspaceResolver;
 
     @SuppressFBWarnings("EI")
     public static ModifiableActionDefinition of(
-        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+        DataTableService dataTableService, DataTableRowService dataTableRowService,
+        DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
-        return new DataTableCreateRecordsAction(dataTableService, dataTableRowService).build();
+        return new DataTableCreateRecordsAction(dataTableService, dataTableRowService, dataTableWorkspaceResolver)
+            .build();
     }
 
-    private DataTableCreateRecordsAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
+    private DataTableCreateRecordsAction(DataTableService dataTableService, DataTableRowService dataTableRowService,
+        DataTableWorkspaceResolver dataTableWorkspaceResolver) {
         this.dataTableService = dataTableService;
         this.dataTableRowService = dataTableRowService;
+        this.dataTableWorkspaceResolver = dataTableWorkspaceResolver;
     }
 
     private ModifiableActionDefinition build() {
@@ -75,10 +82,11 @@ public class DataTableCreateRecordsAction {
                     .label("Table")
                     .resourceReference(ResourceType.DATA_TABLE)
                     .required(true)
-                    .options(DataTableUtils.getActionTableOptions(dataTableService)),
-                dynamicProperties(RECORDS, DataTableUtils.createDynamicProperties(dataTableService, false))
-                    .propertiesLookupDependsOn(TABLE)
-                    .required(true))
+                    .options(DataTableUtils.getActionTableOptions(dataTableService, dataTableWorkspaceResolver)),
+                dynamicProperties(RECORDS,
+                    DataTableUtils.createDynamicProperties(dataTableService, dataTableWorkspaceResolver, false))
+                        .propertiesLookupDependsOn(TABLE)
+                        .required(true))
             .output(this::output)
             .help("", "https://docs.bytechef.io/reference/components/data-table_v1#create-records")
             .perform(this::perform);
@@ -88,11 +96,16 @@ public class DataTableCreateRecordsAction {
     private OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        String baseName = inputParameters.getRequiredString(TABLE);
+        String name = inputParameters.getRequiredString(TABLE);
 
-        var rowSchema = DataTableUtils.rowObjectSchema(dataTableService, DEVELOPMENT, baseName);
+        long workspaceId = DataTableUtils.resolveWorkspaceId(dataTableWorkspaceResolver, actionContext);
 
-        List<DataTableRow> rows = dataTableRowService.listRows(baseName, 1, 0, DEVELOPMENT.ordinal());
+        DataTableInfo dataTableInfo = DataTableUtils.resolveDataTable(
+            dataTableService, workspaceId, name, DEVELOPMENT.ordinal());
+
+        var rowSchema = DataTableUtils.rowObjectSchema(dataTableInfo);
+
+        List<DataTableRow> rows = dataTableRowService.listRows(dataTableInfo.id(), 1, 0, DEVELOPMENT.ordinal());
 
         if (rows.isEmpty()) {
             return OutputResponse.of(array().items((Property.ValueProperty<?>) rowSchema));
@@ -101,7 +114,7 @@ public class DataTableCreateRecordsAction {
         DataTableRow firstRow = rows.getFirst();
 
         Map<String, Object> sampleOutput = DataTableUtils.createSampleOutput(
-            dataTableService, DEVELOPMENT, baseName, firstRow.id(), firstRow.values());
+            dataTableInfo, firstRow.id(), firstRow.values());
 
         return OutputResponse.of(array().items((Property.ValueProperty<?>) rowSchema), List.of(sampleOutput));
     }
@@ -114,7 +127,10 @@ public class DataTableCreateRecordsAction {
 
         ActionContextAware actionContextAware = (ActionContextAware) actionContext;
 
-        String baseName = inputParameters.getRequiredString(TABLE);
+        String name = inputParameters.getRequiredString(TABLE);
+
+        long dataTableId = DataTableUtils.resolveDataTableId(
+            dataTableService, dataTableWorkspaceResolver, actionContext, name);
 
         Map<String, Object> recordsMap = inputParameters.getRequiredMap(RECORDS, Object.class);
         Object valuesObj = recordsMap.get(VALUES);
@@ -135,7 +151,7 @@ public class DataTableCreateRecordsAction {
         }
 
         List<DataTableRow> createdDataTableRows = dataTableRowService.insertRows(
-            baseName, rowValues, Objects.requireNonNull(actionContextAware.getEnvironmentId()));
+            dataTableId, rowValues, Objects.requireNonNull(actionContextAware.getEnvironmentId()));
 
         return DataTableUtils.flattenRows(createdDataTableRows);
     }

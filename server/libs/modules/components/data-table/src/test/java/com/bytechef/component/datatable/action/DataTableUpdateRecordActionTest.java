@@ -19,7 +19,6 @@ package com.bytechef.component.datatable.action;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -34,16 +33,27 @@ class DataTableUpdateRecordActionTest extends AbstractDataTableActionTest {
 
     @Test
     void testPerformEmitsFlatRow() throws Exception {
-        when(dataTableRowFacade.updateRow(anyString(), anyLong(), anyMap(), anyLong()))
+        when(dataTableRowFacade.updateRow(anyLong(), anyLong(), anyMap(), anyLong()))
             .thenReturn(new DataTableRow(7, Map.of("status", "BOT")));
 
         ModifiableActionDefinition actionDefinition = DataTableUpdateRecordAction.of(
-            dataTableService, dataTableRowFacade, dataTableRowService);
+            dataTableService, dataTableRowFacade, dataTableRowService, dataTableWorkspaceResolver);
 
         assertEquals(
             Map.of("id", 7L, "status", "BOT"),
             perform(
                 actionDefinition,
                 Map.of("table", "conversations", "id", 7, "values", Map.of("status", "BOT"))));
+    }
+
+    @Override
+    protected ModifiableActionDefinition createActionDefinition() {
+        return DataTableUpdateRecordAction.of(
+            dataTableService, dataTableRowFacade, dataTableRowService, dataTableWorkspaceResolver);
+    }
+
+    @Override
+    protected Map<String, Object> createInputParameters(String tableName) {
+        return Map.of("table", tableName, "id", 7, "values", Map.of("status", "BOT"));
     }
 }

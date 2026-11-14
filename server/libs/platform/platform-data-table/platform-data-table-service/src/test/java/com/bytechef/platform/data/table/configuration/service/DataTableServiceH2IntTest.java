@@ -16,12 +16,17 @@
 
 package com.bytechef.platform.data.table.configuration.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
+import com.bytechef.platform.data.table.config.DataTableIntTestUtils;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
@@ -30,10 +35,12 @@ import com.bytechef.test.config.h2.H2DataSourceConfiguration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * @author Ivica Cardic
@@ -43,6 +50,8 @@ import org.springframework.context.annotation.Import;
 class DataTableServiceH2IntTest {
 
     private static final long DEV_ENVIRONMENT_ID = 0;
+    private static final long STAGE_ENVIRONMENT_ID = 1;
+    private static final long WORKSPACE_ID = 1L;
 
     @Autowired
     private DataTableService dataTableService;
@@ -50,79 +59,161 @@ class DataTableServiceH2IntTest {
     @Autowired
     private DataTableRowService dataTableRowService;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @BeforeEach
+    void beforeEach() {
+        DataTableIntTestUtils.dropAll(jdbcTemplate);
+    }
+
+    @Test
+    void testTwoWorkspacesCanOwnTheSameName() {
+        long firstId = dataTableService.createTable(
+            1L, "orders", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+        long secondId = dataTableService.createTable(
+            2L, "orders", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+
+        dataTableRowService.insertRow(firstId, Map.of("title", "first"), DEV_ENVIRONMENT_ID);
+        dataTableRowService.insertRow(secondId, Map.of("title", "second"), DEV_ENVIRONMENT_ID);
+
+        assertThat(firstId).isNotEqualTo(secondId);
+        assertThat(dataTableService.fetchDataTable(1L, "orders")).map(DataTable::getId)
+            .contains(firstId);
+        assertThat(dataTableService.fetchDataTable(2L, "orders")).map(DataTable::getId)
+            .contains(secondId);
+        assertThat(dataTableRowService.listRows(secondId, 10, 0, DEV_ENVIRONMENT_ID))
+            .extracting(dataTableRow -> dataTableRow.values()
+                .get("title"))
+            .containsExactly("second");
+    }
+
+    @Test
+    void testCreatingTheSameNameTwiceInOneEnvironmentIsRejected() {
+        createTable("orders");
+
+        assertThatThrownBy(() -> createTable("orders"))
+            .isInstanceOf(DataTableException.class)
+            .hasMessage("Data table 'orders' already exists in this environment");
+    }
+
+    @Test
+    void testRenamingOntoAnExistingNameInTheWorkspaceIsRejected() {
+        createTable("orders");
+
+        long invoicesId = createTable("invoices");
+
+        assertThatThrownBy(() -> dataTableService.renameTable(invoicesId, "orders"))
+            .isInstanceOf(DataTableException.class)
+            .hasMessage("Data table 'orders' already exists in this workspace");
+    }
+
+    @Test
+    void testDuplicateLandsInTheSourceWorkspaceAndRejectsAnExistingName() {
+        long ordersId = createTable("orders");
+
+        long copyId = dataTableService.duplicateTable(ordersId, "orders_copy", DEV_ENVIRONMENT_ID);
+
+        assertEquals(WORKSPACE_ID, dataTableService.getDataTable(copyId)
+            .getWorkspaceId());
+        assertThatThrownBy(() -> dataTableService.duplicateTable(ordersId, "orders_copy", DEV_ENVIRONMENT_ID))
+            .isInstanceOf(DataTableException.class)
+            .hasMessage("Data table 'orders_copy' already exists in this workspace");
+    }
+
+    @Test
+    void testRenameKeepsEveryEnvironmentReachable() {
+        long ordersId = createTable("orders");
+
+        dataTableService.createTable(
+            WORKSPACE_ID, "orders", null, List.of(new ColumnSpec("title", ColumnType.STRING)), STAGE_ENVIRONMENT_ID);
+
+        dataTableRowService.insertRow(ordersId, Map.of("title", "staged"), STAGE_ENVIRONMENT_ID);
+
+        dataTableService.renameTable(ordersId, "purchases");
+
+        assertThat(dataTableService.fetchDataTable(WORKSPACE_ID, "purchases")).map(DataTable::getId)
+            .contains(ordersId);
+        assertThat(dataTableRowService.listRows(ordersId, 10, 0, STAGE_ENVIRONMENT_ID)).hasSize(1);
+    }
+
     @Test
     void testCreateTableAndListTables() {
-        dataTableService.createTable(
-            "created", "a description", List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+        long createdId = dataTableService.createTable(
+            WORKSPACE_ID, "created", "a description", List.of(new ColumnSpec("title", ColumnType.STRING)),
+            DEV_ENVIRONMENT_ID);
 
-        List<DataTableInfo> dataTableInfos = dataTableService.listTables(DEV_ENVIRONMENT_ID);
+        List<DataTableInfo> dataTableInfos = dataTableService.listTables(WORKSPACE_ID, DEV_ENVIRONMENT_ID);
 
         assertTrue(
             dataTableInfos.stream()
-                .anyMatch(dataTableInfo -> "created".equals(dataTableInfo.baseName())));
+                .anyMatch(dataTableInfo -> dataTableInfo.id() == createdId && "created".equals(dataTableInfo.name())));
     }
 
     @Test
     void testAddRenameAndRemoveColumn() {
-        dataTableService.createTable(
-            "columns", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+        long columnsId = createTable("columns");
 
-        dataTableService.addColumn("columns", new ColumnSpec("amount", ColumnType.NUMBER), DEV_ENVIRONMENT_ID);
-        dataTableService.renameColumn("columns", "amount", "total", DEV_ENVIRONMENT_ID);
+        dataTableService.addColumn(columnsId, new ColumnSpec("amount", ColumnType.NUMBER), DEV_ENVIRONMENT_ID);
+        dataTableService.renameColumn(columnsId, "amount", "total", DEV_ENVIRONMENT_ID);
 
         DataTableRow dataTableRow = dataTableRowService.insertRow(
-            "columns", Map.of("title", "renamed", "total", 12), DEV_ENVIRONMENT_ID);
+            columnsId, Map.of("title", "renamed", "total", 12), DEV_ENVIRONMENT_ID);
 
         assertTrue(dataTableRow.values()
             .containsKey("total"));
 
-        dataTableService.removeColumn("columns", "total", DEV_ENVIRONMENT_ID);
+        dataTableService.removeColumn(columnsId, "total", DEV_ENVIRONMENT_ID);
     }
 
     @Test
     void testInsertUpdateAndReadRows() {
-        dataTableService.createTable(
-            "rows", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+        long rowsId = createTable("rows");
 
         DataTableRow insertedDataTableRow = dataTableRowService.insertRow(
-            "rows", Map.of("title", "first"), DEV_ENVIRONMENT_ID);
+            rowsId, Map.of("title", "first"), DEV_ENVIRONMENT_ID);
 
         assertNotNull(insertedDataTableRow);
         assertEquals("first", insertedDataTableRow.values()
             .get("title"));
 
         DataTableRow updatedDataTableRow = dataTableRowService.updateRow(
-            "rows", insertedDataTableRow.id(), Map.of("title", "second"), DEV_ENVIRONMENT_ID);
+            rowsId, insertedDataTableRow.id(), Map.of("title", "second"), DEV_ENVIRONMENT_ID);
 
         assertEquals("second", updatedDataTableRow.values()
             .get("title"));
 
         DataTableRow fetchedDataTableRow = Objects.requireNonNull(
-            dataTableRowService.getRow("rows", insertedDataTableRow.id(), DEV_ENVIRONMENT_ID));
+            dataTableRowService.getRow(rowsId, insertedDataTableRow.id(), DEV_ENVIRONMENT_ID));
 
         assertEquals("second", fetchedDataTableRow.values()
             .get("title"));
 
-        assertEquals(1, dataTableRowService.listRows("rows", 10, 0, DEV_ENVIRONMENT_ID)
+        assertEquals(1, dataTableRowService.listRows(rowsId, 10, 0, DEV_ENVIRONMENT_ID)
             .size());
 
-        assertTrue(dataTableRowService.deleteRow("rows", insertedDataTableRow.id(), DEV_ENVIRONMENT_ID));
+        assertTrue(dataTableRowService.deleteRow(rowsId, insertedDataTableRow.id(), DEV_ENVIRONMENT_ID));
     }
 
     @Test
     void testDuplicateAndRenameTable() {
-        dataTableService.createTable(
-            "source", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+        long sourceId = createTable("source");
 
-        dataTableRowService.insertRow("source", Map.of("title", "copied"), DEV_ENVIRONMENT_ID);
+        dataTableRowService.insertRow(sourceId, Map.of("title", "copied"), DEV_ENVIRONMENT_ID);
 
-        dataTableService.duplicateTable("source", "duplicate", DEV_ENVIRONMENT_ID);
+        long duplicateId = dataTableService.duplicateTable(sourceId, "duplicate", DEV_ENVIRONMENT_ID);
 
-        assertEquals(1, dataTableRowService.listRows("duplicate", 10, 0, DEV_ENVIRONMENT_ID)
+        assertEquals(1, dataTableRowService.listRows(duplicateId, 10, 0, DEV_ENVIRONMENT_ID)
             .size());
 
-        dataTableService.renameTable("duplicate", "renamed", DEV_ENVIRONMENT_ID);
+        dataTableService.renameTable(duplicateId, "renamed");
 
-        assertEquals("renamed", dataTableService.getBaseNameById(dataTableService.getIdByBaseName("renamed")));
+        assertEquals("renamed", dataTableService.getDataTable(duplicateId)
+            .getName());
+    }
+
+    private long createTable(String name) {
+        return dataTableService.createTable(
+            WORKSPACE_ID, name, null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
     }
 }

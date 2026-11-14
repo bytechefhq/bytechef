@@ -40,7 +40,7 @@ class DataTableWebhookEventTest {
         Map<String, Object> values = new HashMap<>(Map.of("tags", tags));
 
         DataTableWebhookEvent dataTableWebhookEvent = new DataTableWebhookEvent(
-            "items", DataTableWebhookType.RECORD_CREATED, List.of(new DataTableRow(1L, values)), 0);
+            7L, DataTableWebhookType.RECORD_CREATED, List.of(new DataTableRow(1L, values)), 0);
 
         tags.add("changed");
         nestedMap.put("name", "Banana");
@@ -71,7 +71,7 @@ class DataTableWebhookEventTest {
 
         assertThrows(
             NullPointerException.class,
-            () -> new DataTableWebhookEvent("items", DataTableWebhookType.RECORD_CREATED, rows, 0));
+            () -> new DataTableWebhookEvent(7L, DataTableWebhookType.RECORD_CREATED, rows, 0));
     }
 
     @Test
@@ -80,6 +80,6 @@ class DataTableWebhookEventTest {
 
         assertThrows(
             IllegalArgumentException.class,
-            () -> new DataTableWebhookEvent("items", DataTableWebhookType.RECORD_CREATED, rows, 0));
+            () -> new DataTableWebhookEvent(7L, DataTableWebhookType.RECORD_CREATED, rows, 0));
     }
 }

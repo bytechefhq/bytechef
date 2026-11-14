@@ -17,12 +17,13 @@
 package com.bytechef.automation.data.table.search;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.automation.data.table.configuration.domain.WorkspaceDataTable;
-import com.bytechef.automation.data.table.configuration.service.WorkspaceDataTableService;
-import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import java.util.List;
 import java.util.Set;
@@ -33,32 +34,38 @@ import org.junit.jupiter.api.Test;
  */
 class DataTableSearchAssetProviderTest {
 
+    private final DataTableService dataTableService = mock(DataTableService.class);
+
+    private final DataTableSearchAssetProvider dataTableSearchAssetProvider =
+        new DataTableSearchAssetProvider(dataTableService);
+
     @Test
     void testReturnsOnlyCallerWorkspaceDataTablesUpToLimit() {
-        DataTableService dataTableService = mock(DataTableService.class);
-        WorkspaceDataTableService workspaceDataTableService = mock(WorkspaceDataTableService.class);
-
-        WorkspaceDataTable ownDataTable = mock(WorkspaceDataTable.class);
-        WorkspaceDataTable ownDataTable2 = mock(WorkspaceDataTable.class);
-
-        when(ownDataTable.getDataTableId()).thenReturn(3L);
-        when(ownDataTable2.getDataTableId()).thenReturn(4L);
-        when(workspaceDataTableService.getWorkspaceDataTables(10L)).thenReturn(List.of(ownDataTable, ownDataTable2));
-        when(dataTableService.listTables(1L)).thenReturn(
-            List.of(
-                createDataTableInfo(1L, "orders_foreign"), createDataTableInfo(2L, "orders_foreign_2"),
-                createDataTableInfo(3L, "orders_own"), createDataTableInfo(4L, "orders_own_2")));
-
-        DataTableSearchAssetProvider dataTableSearchAssetProvider = new DataTableSearchAssetProvider(
-            dataTableService, workspaceDataTableService);
+        when(dataTableService.getWorkspaceDataTables(10L)).thenReturn(
+            List.of(new DataTable(3L, "orders_own"), new DataTable(4L, "orders_own_2"), new DataTable(5L, "users")));
 
         List<DataTableSearchResult> results = dataTableSearchAssetProvider.search("orders", 1, Set.of(10L));
 
         assertThat(results).extracting(DataTableSearchResult::id)
             .containsExactly(3L);
+
+        verify(dataTableService, never()).getWorkspaceDataTables(20L);
     }
 
-    private static DataTableInfo createDataTableInfo(long id, String baseName) {
-        return new DataTableInfo(id, baseName, null, List.of(), null);
+    @Test
+    void testMatchesNamesIgnoringCaseAcrossEveryCallerWorkspace() {
+        when(dataTableService.getWorkspaceDataTables(10L)).thenReturn(List.of(new DataTable(3L, "Orders")));
+        when(dataTableService.getWorkspaceDataTables(20L)).thenReturn(List.of(new DataTable(7L, "orders")));
+
+        List<DataTableSearchResult> results = dataTableSearchAssetProvider.search("ORD", 10, Set.of(10L, 20L));
+
+        assertThat(results).extracting(DataTableSearchResult::id, DataTableSearchResult::name)
+            .containsExactly(
+                tuple(3L, "Orders"), tuple(7L, "orders"));
+    }
+
+    @Test
+    void testReturnsNothingWithoutCallerWorkspaces() {
+        assertThat(dataTableSearchAssetProvider.search("orders", 10, Set.of())).isEmpty();
     }
 }

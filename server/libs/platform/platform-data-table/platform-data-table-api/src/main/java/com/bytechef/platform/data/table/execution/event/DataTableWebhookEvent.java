@@ -36,16 +36,16 @@ import org.springframework.context.ApplicationEvent;
  */
 public final class DataTableWebhookEvent extends ApplicationEvent {
 
-    private final String baseName;
+    private final long dataTableId;
     private final long environmentId;
     @SuppressFBWarnings(value = "SE_BAD_FIELD", justification = "Published in-process only, never serialized")
     private final List<DataTableRow> rows;
     private final DataTableWebhookType type;
 
     public DataTableWebhookEvent(
-        String baseName, DataTableWebhookType type, List<DataTableRow> rows, long environmentId) {
+        long dataTableId, DataTableWebhookType type, List<DataTableRow> rows, long environmentId) {
 
-        super(Objects.requireNonNull(baseName, "baseName must not be null"));
+        super(dataTableId);
 
         Objects.requireNonNull(rows, "rows must not be null");
 
@@ -53,7 +53,7 @@ public final class DataTableWebhookEvent extends ApplicationEvent {
             throw new IllegalArgumentException("rows must not be empty");
         }
 
-        this.baseName = baseName;
+        this.dataTableId = dataTableId;
         this.environmentId = environmentId;
         this.type = Objects.requireNonNull(type, "type must not be null");
         this.rows = rows.stream()
@@ -66,8 +66,8 @@ public final class DataTableWebhookEvent extends ApplicationEvent {
             .toList();
     }
 
-    public String getBaseName() {
-        return baseName;
+    public long getDataTableId() {
+        return dataTableId;
     }
 
     public long getEnvironmentId() {
@@ -86,7 +86,7 @@ public final class DataTableWebhookEvent extends ApplicationEvent {
     @Override
     public String toString() {
         return "DataTableWebhookEvent{" +
-            "baseName='" + baseName + '\'' +
+            "dataTableId=" + dataTableId +
             ", environmentId=" + environmentId +
             ", rowCount=" + rows.size() +
             ", type=" + type +

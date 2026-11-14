@@ -23,10 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
-import com.bytechef.platform.data.table.configuration.domain.DataTable;
+import com.bytechef.platform.data.table.config.DataTableIntTestUtils;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhook;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
-import com.bytechef.platform.data.table.configuration.repository.DataTableRepository;
 import com.bytechef.platform.data.table.configuration.repository.DataTableWebhookRepository;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
@@ -41,6 +40,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * @author Ivica Cardic
@@ -59,33 +59,36 @@ class DataTableWebhookServiceIntTest {
     private DataTableService dataTableService;
 
     @Autowired
-    private DataTableRepository dataTableRepository;
-
-    @Autowired
     private DataTableWebhookRepository dataTableWebhookRepository;
 
     @Autowired
     private DataTableWebhookService dataTableWebhookService;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    private long hooksId;
+
     @AfterEach
     void afterEach() {
-        dataTableService.dropTable("hooks", DEV_ENVIRONMENT_ID);
+        DataTableIntTestUtils.dropAll(jdbcTemplate);
     }
 
     @BeforeEach
     void beforeEach() {
-        dataTableService.dropTable("hooks", DEV_ENVIRONMENT_ID);
-        dataTableService.createTable(
-            "hooks", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+        DataTableIntTestUtils.dropAll(jdbcTemplate);
+
+        hooksId = dataTableService.createTable(
+            null, "hooks", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
     }
 
     @Test
     void testAddWebhookStoresTheWorkflowExecutionId() {
         long webhookId = dataTableWebhookService.addWebhook(
-            "hooks", WORKFLOW_EXECUTION_ID, WEBHOOK_URL, DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID);
+            hooksId, WORKFLOW_EXECUTION_ID, WEBHOOK_URL, DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID);
 
         assertTrue(
-            dataTableWebhookService.listWebhooks("hooks", DEV_ENVIRONMENT_ID)
+            dataTableWebhookService.listWebhooks(hooksId, DEV_ENVIRONMENT_ID)
                 .stream()
                 .anyMatch(webhook -> webhook.id() == webhookId &&
                     WORKFLOW_EXECUTION_ID.equals(webhook.workflowExecutionId())));
@@ -94,7 +97,7 @@ class DataTableWebhookServiceIntTest {
     @Test
     void testAddWebhookAlsoStoresTheWebhookUrlSoThePreviousVersionCanDeliverAfterARollback() {
         long webhookId = dataTableWebhookService.addWebhook(
-            "hooks", WORKFLOW_EXECUTION_ID, WEBHOOK_URL, DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID);
+            hooksId, WORKFLOW_EXECUTION_ID, WEBHOOK_URL, DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID);
 
         DataTableWebhook dataTableWebhook = dataTableWebhookRepository.findById(webhookId)
             .orElseThrow();
@@ -108,12 +111,9 @@ class DataTableWebhookServiceIntTest {
         "http://bytechef_server/webhooks/{id}#fragment"
     })
     void testAWebhookRegisteredByThePreviousVersionIsListedWithTheIdFromItsUrl(String urlTemplate) {
-        DataTable dataTable = dataTableRepository.findByName("hooks")
-            .orElseThrow();
-
         DataTableWebhook dataTableWebhook = new DataTableWebhook();
 
-        dataTableWebhook.setDataTableId(dataTable.getId());
+        dataTableWebhook.setDataTableId(hooksId);
         dataTableWebhook.setEnvironment(Environment.DEVELOPMENT);
         dataTableWebhook.setType(DataTableWebhookType.RECORD_CREATED);
         dataTableWebhook.setUrl(urlTemplate.replace("{id}", WORKFLOW_EXECUTION_ID));
@@ -122,7 +122,7 @@ class DataTableWebhookServiceIntTest {
 
         assertEquals(
             List.of(WORKFLOW_EXECUTION_ID),
-            dataTableWebhookService.listWebhooks("hooks", DEV_ENVIRONMENT_ID)
+            dataTableWebhookService.listWebhooks(hooksId, DEV_ENVIRONMENT_ID)
                 .stream()
                 .map(DataTableWebhookService.Webhook::workflowExecutionId)
                 .toList());
@@ -136,12 +136,23 @@ class DataTableWebhookServiceIntTest {
         IllegalArgumentException illegalArgumentException = assertThrows(
             IllegalArgumentException.class,
             () -> dataTableWebhookService.addWebhook(
-                "hooks", workflowExecutionId, WEBHOOK_URL, DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID));
+                hooksId, workflowExecutionId, WEBHOOK_URL, DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID));
 
         assertTrue(illegalArgumentException.getMessage()
             .contains("workflow execution id"));
         assertTrue(
-            dataTableWebhookService.listWebhooks("hooks", DEV_ENVIRONMENT_ID)
+            dataTableWebhookService.listWebhooks(hooksId, DEV_ENVIRONMENT_ID)
                 .isEmpty());
+    }
+
+    @Test
+    void testAddWebhookRejectsAnUnknownDataTable() {
+        IllegalArgumentException illegalArgumentException = assertThrows(
+            IllegalArgumentException.class,
+            () -> dataTableWebhookService.addWebhook(
+                hooksId + 1000, WORKFLOW_EXECUTION_ID, WEBHOOK_URL, DataTableWebhookType.RECORD_CREATED,
+                DEV_ENVIRONMENT_ID));
+
+        assertEquals("Data table with id=" + (hooksId + 1000) + " not found", illegalArgumentException.getMessage());
     }
 }

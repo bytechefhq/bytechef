@@ -26,6 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockingDetails;
 
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
+import com.bytechef.platform.data.table.config.DataTableIntTestUtils;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
 import com.bytechef.platform.data.table.configuration.exception.DataTableException;
@@ -104,18 +105,21 @@ class DataTableRowServiceH2IntTest {
     @Autowired
     private DataSource dataSource;
 
+    private long itemsId;
+
+    private long typedId;
+
     @AfterEach
     void afterEach() {
-        dataTableService.dropTable("items", DEV_ENVIRONMENT_ID);
-        dataTableService.dropTable("items", STAGE_ENVIRONMENT_ID);
-        dataTableService.dropTable("typed", DEV_ENVIRONMENT_ID);
+        DataTableIntTestUtils.dropAll(new JdbcTemplate(dataSource));
     }
 
     @BeforeEach
     void beforeEach() {
-        dataTableService.dropTable("items", DEV_ENVIRONMENT_ID);
-        dataTableService.createTable(
-            "items", null,
+        DataTableIntTestUtils.dropAll(new JdbcTemplate(dataSource));
+
+        itemsId = dataTableService.createTable(
+            null, "items", null,
             List.of(new ColumnSpec("title", ColumnType.STRING), new ColumnSpec("amount", ColumnType.INTEGER)),
             DEV_ENVIRONMENT_ID);
     }
@@ -134,7 +138,7 @@ class DataTableRowServiceH2IntTest {
             IllegalArgumentException updateValuesException = assertThrows(
                 IllegalArgumentException.class,
                 () -> dataTableRowService.updateRows(
-                    "items", toConditions(List.of(new DataTableRowFilter("title", Operation.EQUALS, "Apple"))),
+                    itemsId, toConditions(List.of(new DataTableRowFilter("title", Operation.EQUALS, "Apple"))),
                     Map.of(columnName, "x"), DEV_ENVIRONMENT_ID));
 
             assertTrue(
@@ -153,7 +157,7 @@ class DataTableRowServiceH2IntTest {
         IllegalArgumentException illegalArgumentException = assertThrows(
             IllegalArgumentException.class,
             () -> dataTableRowService.insertRows(
-                "items", List.of(Map.of("title", "Pear", "amount", 1), Map.of("title", "Plum", "amount", "abc")),
+                itemsId, List.of(Map.of("title", "Pear", "amount", 1), Map.of("title", "Plum", "amount", "abc")),
                 DEV_ENVIRONMENT_ID));
 
         assertTrue(
@@ -169,7 +173,7 @@ class DataTableRowServiceH2IntTest {
         DataIntegrityViolationException dataIntegrityViolationException = assertThrows(
             DataIntegrityViolationException.class,
             () -> dataTableRowService.insertRows(
-                "items", List.of(Map.of("title", "Pear"), Map.of("title", "x".repeat(300))), DEV_ENVIRONMENT_ID));
+                itemsId, List.of(Map.of("title", "Pear"), Map.of("title", "x".repeat(300))), DEV_ENVIRONMENT_ID));
 
         String message = dataIntegrityViolationException.getMessage();
 
@@ -219,23 +223,23 @@ class DataTableRowServiceH2IntTest {
             List.of(new DataTableRowFilter("amount", Operation.GREATER, 10)));
 
         List<DataTableRow> updatedDataTableRows = dataTableRowService.updateRows(
-            "items", conditions, Map.of("title", "sold"), DEV_ENVIRONMENT_ID);
+            itemsId, conditions, Map.of("title", "sold"), DEV_ENVIRONMENT_ID);
 
         assertEquals(List.of(bananaId, cherryId), getIds(updatedDataTableRows));
         assertEquals("sold", updatedDataTableRows.getFirst()
             .values()
             .get("title"));
         assertEquals(
-            "Apple", Objects.requireNonNull(dataTableRowService.getRow("items", appleId, DEV_ENVIRONMENT_ID))
+            "Apple", Objects.requireNonNull(dataTableRowService.getRow(itemsId, appleId, DEV_ENVIRONMENT_ID))
                 .values()
                 .get("title"));
 
         List<DataTableRow> deletedDataTableRows = dataTableRowService.deleteRows(
-            "items", conditions, DEV_ENVIRONMENT_ID);
+            itemsId, conditions, DEV_ENVIRONMENT_ID);
 
         assertEquals(List.of(bananaId, cherryId), getIds(deletedDataTableRows));
-        assertEquals(List.of(appleId), getIds(dataTableRowService.listRows("items", 100, 0, DEV_ENVIRONMENT_ID)));
-        assertEquals(List.of(), dataTableRowService.deleteRows("items", conditions, DEV_ENVIRONMENT_ID));
+        assertEquals(List.of(appleId), getIds(dataTableRowService.listRows(itemsId, 100, 0, DEV_ENVIRONMENT_ID)));
+        assertEquals(List.of(), dataTableRowService.deleteRows(itemsId, conditions, DEV_ENVIRONMENT_ID));
 
         assertEquals(List.of(bananaId, cherryId), getWebhookEventIds(DataTableWebhookType.RECORD_UPDATED));
         assertEquals(List.of(bananaId, cherryId), getWebhookEventIds(DataTableWebhookType.RECORD_DELETED));
@@ -249,10 +253,10 @@ class DataTableRowServiceH2IntTest {
         assertEquals(
             List.of(),
             dataTableRowService.updateRows(
-                "items", DataTableRowConditions.of(List.of(new DataTableRowFilter("amount", Operation.GREATER, 100))),
+                itemsId, DataTableRowConditions.of(List.of(new DataTableRowFilter("amount", Operation.GREATER, 100))),
                 Map.of("title", "sold"), DEV_ENVIRONMENT_ID));
         assertEquals(
-            "Apple", Objects.requireNonNull(dataTableRowService.getRow("items", appleId, DEV_ENVIRONMENT_ID))
+            "Apple", Objects.requireNonNull(dataTableRowService.getRow(itemsId, appleId, DEV_ENVIRONMENT_ID))
                 .values()
                 .get("title"));
         assertEquals(List.of(), getWebhookEvents(DataTableWebhookType.RECORD_UPDATED));
@@ -266,7 +270,7 @@ class DataTableRowServiceH2IntTest {
         long offerId = insertItem("100%_off", 30);
 
         List<DataTableRow> updatedDataTableRows = dataTableRowService.updateRows(
-            "items",
+            itemsId,
             DataTableRowConditions.anyOf(
                 List.of(
                     List.of(new DataTableRowFilter("amount", Operation.IN, List.of(5, 20))),
@@ -396,10 +400,10 @@ class DataTableRowServiceH2IntTest {
             List.of(appleId, cherryId),
             getIds(
                 dataTableRowService.updateRows(
-                    "items", DataTableRowConditions.of(filters), Map.of("amount", 1), DEV_ENVIRONMENT_ID)));
+                    itemsId, DataTableRowConditions.of(filters), Map.of("amount", 1), DEV_ENVIRONMENT_ID)));
         assertEquals(
             List.of(appleId, cherryId),
-            getIds(dataTableRowService.deleteRows("items", DataTableRowConditions.of(filters), DEV_ENVIRONMENT_ID)));
+            getIds(dataTableRowService.deleteRows(itemsId, DataTableRowConditions.of(filters), DEV_ENVIRONMENT_ID)));
         assertEquals(List.of(bananaId), findItemIds(List.of(), null));
     }
 
@@ -423,8 +427,8 @@ class DataTableRowServiceH2IntTest {
 
         assertEquals(
             List.of(appleId),
-            getIds(dataTableRowService.updateRows("items", conditions, Map.of("amount", 1), DEV_ENVIRONMENT_ID)));
-        assertEquals(List.of(appleId), getIds(dataTableRowService.deleteRows("items", conditions, DEV_ENVIRONMENT_ID)));
+            getIds(dataTableRowService.updateRows(itemsId, conditions, Map.of("amount", 1), DEV_ENVIRONMENT_ID)));
+        assertEquals(List.of(appleId), getIds(dataTableRowService.deleteRows(itemsId, conditions, DEV_ENVIRONMENT_ID)));
         assertEquals(List.of(bananaId, cherryId), findItemIds(List.of(), null));
         assertEquals(
             List.of(cherryId), findItemIds(List.of(new DataTableRowFilter("amount", Operation.EQUALS, 30)), null));
@@ -501,7 +505,7 @@ class DataTableRowServiceH2IntTest {
 
         assertEquals(
             List.of(),
-            dataTableRowService.findRows("items", DataTableRowConditions.matchAll(), List.of(), 0, 0,
+            dataTableRowService.findRows(itemsId, DataTableRowConditions.matchAll(), List.of(), 0, 0,
                 DEV_ENVIRONMENT_ID));
     }
 
@@ -517,18 +521,18 @@ class DataTableRowServiceH2IntTest {
                 .append(",1\n");
         }
 
-        dataTableRowService.importCsv("items", csv.toString(), DEV_ENVIRONMENT_ID);
+        dataTableRowService.importCsv(itemsId, csv.toString(), DEV_ENVIRONMENT_ID);
 
         long bananaId = insertItem("Banana", 20);
 
         List<DataTableRow> updatedDataTableRows = dataTableRowService.updateRows(
-            "items", toConditions(List.of(new DataTableRowFilter("amount", Operation.EQUALS, 1))),
+            itemsId, toConditions(List.of(new DataTableRowFilter("amount", Operation.EQUALS, 1))),
             Map.of("amount", 2), DEV_ENVIRONMENT_ID);
 
         assertEquals(rowCount, updatedDataTableRows.size());
 
         List<DataTableRow> deletedDataTableRows = dataTableRowService.deleteRows(
-            "items", toConditions(List.of(new DataTableRowFilter("amount", Operation.EQUALS, 2))),
+            itemsId, toConditions(List.of(new DataTableRowFilter("amount", Operation.EQUALS, 2))),
             DEV_ENVIRONMENT_ID);
 
         assertEquals(rowCount, deletedDataTableRows.size());
@@ -541,7 +545,7 @@ class DataTableRowServiceH2IntTest {
 
         IllegalArgumentException compactDateException = assertThrows(
             IllegalArgumentException.class,
-            () -> dataTableRowService.insertRow("typed", Map.of("due", "20260131"), DEV_ENVIRONMENT_ID));
+            () -> dataTableRowService.insertRow(typedId, Map.of("due", "20260131"), DEV_ENVIRONMENT_ID));
 
         assertTrue(
             compactDateException.getMessage()
@@ -550,7 +554,7 @@ class DataTableRowServiceH2IntTest {
 
         IllegalArgumentException epochSecondsException = assertThrows(
             IllegalArgumentException.class,
-            () -> dataTableRowService.insertRow("typed", Map.of("created", 1769846400L), DEV_ENVIRONMENT_ID));
+            () -> dataTableRowService.insertRow(typedId, Map.of("created", 1769846400L), DEV_ENVIRONMENT_ID));
 
         assertTrue(
             epochSecondsException.getMessage()
@@ -560,13 +564,14 @@ class DataTableRowServiceH2IntTest {
     }
 
     @Test
-    void testMissingTableIsReportedByItsName() {
+    void testMissingTableIsReportedByItsId() {
         IllegalArgumentException illegalArgumentException = assertThrows(
             IllegalArgumentException.class,
             () -> dataTableRowService.findRows(
-                "missing", DataTableRowConditions.matchAll(), List.of(), 100, 0, DEV_ENVIRONMENT_ID));
+                itemsId, DataTableRowConditions.matchAll(), List.of(), 100, 0, STAGE_ENVIRONMENT_ID));
 
-        assertEquals("Table 'missing' not found", illegalArgumentException.getMessage());
+        assertEquals(
+            "Data table " + itemsId + " not found in this environment", illegalArgumentException.getMessage());
     }
 
     @Test
@@ -656,7 +661,7 @@ class DataTableRowServiceH2IntTest {
 
         List<DataTableRow> insertedDataTableRows = transactionTemplate.execute(
             transactionStatus -> transactionDataTableRowService.insertRows(
-                "items", List.of(Map.of("title", "Pear", "amount", 1), Map.of("title", "Plum", "amount", 2)),
+                itemsId, List.of(Map.of("title", "Pear", "amount", 1), Map.of("title", "Plum", "amount", 2)),
                 DEV_ENVIRONMENT_ID));
 
         assertEquals(2, Objects.requireNonNull(insertedDataTableRows)
@@ -696,9 +701,9 @@ class DataTableRowServiceH2IntTest {
             mock(ApplicationEventPublisher.class), new JdbcTemplate(failingDataSource));
 
         List<DataTableRow> firstInsertedDataTableRows = failingDataTableRowService.insertRows(
-            "items", List.of(Map.of("title", "Pear", "amount", 1)), DEV_ENVIRONMENT_ID);
+            itemsId, List.of(Map.of("title", "Pear", "amount", 1)), DEV_ENVIRONMENT_ID);
         List<DataTableRow> secondInsertedDataTableRows = failingDataTableRowService.insertRows(
-            "items", List.of(Map.of("title", "Plum", "amount", 2)), DEV_ENVIRONMENT_ID);
+            itemsId, List.of(Map.of("title", "Plum", "amount", 2)), DEV_ENVIRONMENT_ID);
 
         assertEquals(1, firstInsertedDataTableRows.size());
         assertEquals(1, secondInsertedDataTableRows.size());
@@ -707,7 +712,7 @@ class DataTableRowServiceH2IntTest {
 
     @Test
     void testInsertRowsOfNoRowsInsertsNothingAndPublishesNoEvent() {
-        assertEquals(List.of(), dataTableRowService.insertRows("items", List.of(), DEV_ENVIRONMENT_ID));
+        assertEquals(List.of(), dataTableRowService.insertRows(itemsId, List.of(), DEV_ENVIRONMENT_ID));
         assertEquals(0, applicationEvents.stream(DataTableWebhookEvent.class)
             .count());
     }
@@ -727,7 +732,7 @@ class DataTableRowServiceH2IntTest {
             findTypedIds(new DataTableRowFilter("created", Operation.EQUALS, "2026-02-10T08:00:00Z")));
 
         dataTableRowService.updateRows(
-            "typed", DataTableRowConditions.of(List.of(new DataTableRowFilter("active", Operation.EQUALS, true))),
+            typedId, DataTableRowConditions.of(List.of(new DataTableRowFilter("active", Operation.EQUALS, true))),
             Map.of("created", "2026-03-01T11:30:00+02:00"), DEV_ENVIRONMENT_ID);
 
         assertEquals(
@@ -746,7 +751,7 @@ class DataTableRowServiceH2IntTest {
             TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
 
             dataTableRowService.updateRows(
-                "typed", DataTableRowConditions.of(List.of(new DataTableRowFilter("active", Operation.EQUALS, true))),
+                typedId, DataTableRowConditions.of(List.of(new DataTableRowFilter("active", Operation.EQUALS, true))),
                 Map.of("created", "2026-03-29T02:30:00Z"), DEV_ENVIRONMENT_ID);
 
             assertEquals(
@@ -764,47 +769,46 @@ class DataTableRowServiceH2IntTest {
     void testDeleteRowsAndUpdateRowsLeaveOtherEnvironmentsUnchanged() {
         insertItem("Apple", 5);
 
-        dataTableService.dropTable("items", STAGE_ENVIRONMENT_ID);
         dataTableService.createTable(
-            "items", null,
+            null, "items", null,
             List.of(new ColumnSpec("title", ColumnType.STRING), new ColumnSpec("amount", ColumnType.INTEGER)),
             STAGE_ENVIRONMENT_ID);
 
         DataTableRow stageDataTableRow = dataTableRowService.insertRow(
-            "items", Map.of("title", "Stage", "amount", 50), STAGE_ENVIRONMENT_ID);
+            itemsId, Map.of("title", "Stage", "amount", 50), STAGE_ENVIRONMENT_ID);
 
         DataTableRowConditions conditions = DataTableRowConditions.of(
             List.of(new DataTableRowFilter("amount", Operation.GREATER, 0)));
 
-        dataTableRowService.updateRows("items", conditions, Map.of("title", "changed"), DEV_ENVIRONMENT_ID);
-        dataTableRowService.deleteRows("items", conditions, DEV_ENVIRONMENT_ID);
+        dataTableRowService.updateRows(itemsId, conditions, Map.of("title", "changed"), DEV_ENVIRONMENT_ID);
+        dataTableRowService.deleteRows(itemsId, conditions, DEV_ENVIRONMENT_ID);
 
-        assertEquals(List.of(), dataTableRowService.listRows("items", 10, 0, DEV_ENVIRONMENT_ID));
-        assertEquals(List.of(stageDataTableRow), dataTableRowService.listRows("items", 10, 0, STAGE_ENVIRONMENT_ID));
+        assertEquals(List.of(), dataTableRowService.listRows(itemsId, 10, 0, DEV_ENVIRONMENT_ID));
+        assertEquals(List.of(stageDataTableRow), dataTableRowService.listRows(itemsId, 10, 0, STAGE_ENVIRONMENT_ID));
     }
 
     @Test
     void testImportCsvRejectsHeaderThatMatchesNoColumnWithoutImportingAnyRow() {
         IllegalArgumentException illegalArgumentException = assertThrows(
             IllegalArgumentException.class,
-            () -> dataTableRowService.importCsv("items", "title;amount\nPear;1\n", DEV_ENVIRONMENT_ID));
+            () -> dataTableRowService.importCsv(itemsId, "title;amount\nPear;1\n", DEV_ENVIRONMENT_ID));
 
         assertTrue(illegalArgumentException.getMessage()
-            .startsWith("CSV header [title;amount] matches no column of table 'items'"));
+            .startsWith("CSV header [title;amount] matches no column of data table " + itemsId));
         assertTrue(illegalArgumentException.getMessage()
             .endsWith("; no row was imported"));
-        assertEquals(List.of(), dataTableRowService.listRows("items", 10, 0, DEV_ENVIRONMENT_ID));
+        assertEquals(List.of(), dataTableRowService.listRows(itemsId, 10, 0, DEV_ENVIRONMENT_ID));
     }
 
     @Test
     void testImportCsvRejectsInvalidCellWithoutImportingAnyRow() {
         IllegalArgumentException illegalArgumentException = assertThrows(
             IllegalArgumentException.class,
-            () -> dataTableRowService.importCsv("items", "title,amount\nPear,1\nPlum,abc\n", DEV_ENVIRONMENT_ID));
+            () -> dataTableRowService.importCsv(itemsId, "title,amount\nPear,1\nPlum,abc\n", DEV_ENVIRONMENT_ID));
 
         assertTrue(illegalArgumentException.getMessage()
             .startsWith("CSV line 3: Value 'abc' is not a valid integer for column 'amount'"));
-        assertEquals(List.of(), dataTableRowService.listRows("items", 10, 0, DEV_ENVIRONMENT_ID));
+        assertEquals(List.of(), dataTableRowService.listRows(itemsId, 10, 0, DEV_ENVIRONMENT_ID));
     }
 
     @Test
@@ -812,20 +816,19 @@ class DataTableRowServiceH2IntTest {
         DataIntegrityViolationException dataIntegrityViolationException = assertThrows(
             DataIntegrityViolationException.class,
             () -> dataTableRowService.importCsv(
-                "items", "title,amount\nPear,1\n" + "x".repeat(300) + ",2\n", DEV_ENVIRONMENT_ID));
+                itemsId, "title,amount\nPear,1\n" + "x".repeat(300) + ",2\n", DEV_ENVIRONMENT_ID));
 
         String message = dataIntegrityViolationException.getMessage();
 
         assertTrue(message.startsWith("CSV line 3: "), message);
         assertTrue(message.endsWith("; no row was imported"), message);
-        assertEquals(List.of(), dataTableRowService.listRows("items", 10, 0, DEV_ENVIRONMENT_ID));
+        assertEquals(List.of(), dataTableRowService.listRows(itemsId, 10, 0, DEV_ENVIRONMENT_ID));
     }
 
     @Test
     void testExportCsvCanBeImportedAgain() {
-        dataTableService.dropTable("typed", DEV_ENVIRONMENT_ID);
-        dataTableService.createTable(
-            "typed", null,
+        typedId = dataTableService.createTable(
+            null, "typed", null,
             List.of(
                 new ColumnSpec("active", ColumnType.BOOLEAN), new ColumnSpec("price", ColumnType.NUMBER),
                 new ColumnSpec("due", ColumnType.DATE), new ColumnSpec("created", ColumnType.DATE_TIME)),
@@ -834,11 +837,11 @@ class DataTableRowServiceH2IntTest {
         insertTyped(true, "1.5", "2026-01-10", "2026-01-10T08:00:00");
         insertTyped(false, "2.5", "2026-02-10", "2026-02-10T08:00:30.250");
 
-        String csv = dataTableRowService.exportCsv("typed", DEV_ENVIRONMENT_ID);
+        String csv = dataTableRowService.exportCsv(typedId, DEV_ENVIRONMENT_ID);
 
-        dataTableRowService.importCsv("typed", csv, DEV_ENVIRONMENT_ID);
+        dataTableRowService.importCsv(typedId, csv, DEV_ENVIRONMENT_ID);
 
-        List<DataTableRow> dataTableRows = dataTableRowService.listRows("typed", 10, 0, DEV_ENVIRONMENT_ID);
+        List<DataTableRow> dataTableRows = dataTableRowService.listRows(typedId, 10, 0, DEV_ENVIRONMENT_ID);
 
         assertEquals(4, dataTableRows.size());
         assertEquals(
@@ -856,9 +859,9 @@ class DataTableRowServiceH2IntTest {
     @Test
     void testDeleteRowPublishesTheDeletedRowValues() {
         DataTableRow dataTableRow = dataTableRowService.insertRow(
-            "items", Map.of("title", "Apple", "amount", 5), DEV_ENVIRONMENT_ID);
+            itemsId, Map.of("title", "Apple", "amount", 5), DEV_ENVIRONMENT_ID);
 
-        assertTrue(dataTableRowService.deleteRow("items", dataTableRow.id(), DEV_ENVIRONMENT_ID));
+        assertTrue(dataTableRowService.deleteRow(itemsId, dataTableRow.id(), DEV_ENVIRONMENT_ID));
 
         List<DataTableWebhookEvent> dataTableWebhookEvents = getWebhookEvents(DataTableWebhookType.RECORD_DELETED);
 
@@ -873,7 +876,7 @@ class DataTableRowServiceH2IntTest {
         createTypedTable();
 
         DataTableRow dataTableRow = dataTableRowService.insertRow(
-            "typed", Map.of("active", true, "price", "1.5", "due", "2026-01-10", "created", "2026-01-10T08:00:00"),
+            typedId, Map.of("active", true, "price", "1.5", "due", "2026-01-10", "created", "2026-01-10T08:00:00"),
             DEV_ENVIRONMENT_ID);
 
         Map<String, Object> values = dataTableRow.values();
@@ -881,7 +884,7 @@ class DataTableRowServiceH2IntTest {
         assertEquals(Set.of("active", "price", "due", "created"), values.keySet());
         assertEquals(true, values.get("active"));
         assertEquals(0, new BigDecimal("1.5").compareTo(new BigDecimal(String.valueOf(values.get("price")))));
-        assertEquals(dataTableRowService.getRow("typed", dataTableRow.id(), DEV_ENVIRONMENT_ID), dataTableRow);
+        assertEquals(dataTableRowService.getRow(typedId, dataTableRow.id(), DEV_ENVIRONMENT_ID), dataTableRow);
 
         List<DataTableWebhookEvent> dataTableWebhookEvents = getWebhookEvents(DataTableWebhookType.RECORD_CREATED);
 
@@ -894,10 +897,10 @@ class DataTableRowServiceH2IntTest {
     void testDeleteAllRowsDeletesEveryRowAndPublishesOneEvent() {
         List<Long> ids = List.of(insertItem("Apple", 5), insertItem("Banana", 20));
 
-        List<DataTableRow> deletedDataTableRows = dataTableRowService.deleteAllRows("items", DEV_ENVIRONMENT_ID);
+        List<DataTableRow> deletedDataTableRows = dataTableRowService.deleteAllRows(itemsId, DEV_ENVIRONMENT_ID);
 
         assertEquals(ids, getIds(deletedDataTableRows));
-        assertEquals(List.of(), dataTableRowService.listRows("items", 10, 0, DEV_ENVIRONMENT_ID));
+        assertEquals(List.of(), dataTableRowService.listRows(itemsId, 10, 0, DEV_ENVIRONMENT_ID));
 
         List<DataTableWebhookEvent> dataTableWebhookEvents = getWebhookEvents(DataTableWebhookType.RECORD_DELETED);
 
@@ -912,7 +915,7 @@ class DataTableRowServiceH2IntTest {
 
     @Test
     void testDeleteRowOfMissingRowReturnsFalseAndPublishesNothing() {
-        assertFalse(dataTableRowService.deleteRow("items", Long.MAX_VALUE, DEV_ENVIRONMENT_ID));
+        assertFalse(dataTableRowService.deleteRow(itemsId, Long.MAX_VALUE, DEV_ENVIRONMENT_ID));
 
         assertTrue(getWebhookEvents(DataTableWebhookType.RECORD_DELETED).isEmpty());
     }
@@ -925,7 +928,7 @@ class DataTableRowServiceH2IntTest {
         long cherryId = insertItem("Cherry", 30);
 
         List<DataTableRow> updatedDataTableRows = dataTableRowService.updateRows(
-            "items", DataTableRowConditions.of(List.of(new DataTableRowFilter("amount", Operation.GREATER, 10))),
+            itemsId, DataTableRowConditions.of(List.of(new DataTableRowFilter("amount", Operation.GREATER, 10))),
             Map.of("amount", 0), DEV_ENVIRONMENT_ID);
 
         assertEquals(List.of(bananaId, cherryId), getIds(updatedDataTableRows));
@@ -941,7 +944,7 @@ class DataTableRowServiceH2IntTest {
         insertItem("Banana", 20);
 
         DataTableRow updatedDataTableRow = dataTableRowService.updateRow(
-            "items", appleId, Map.of("title", "Green Apple"), DEV_ENVIRONMENT_ID);
+            itemsId, appleId, Map.of("title", "Green Apple"), DEV_ENVIRONMENT_ID);
 
         assertEquals(appleId, updatedDataTableRow.id());
         assertEquals("Green Apple", updatedDataTableRow.values()
@@ -950,7 +953,7 @@ class DataTableRowServiceH2IntTest {
             .get("amount")).longValue());
 
         DataTableRow fetchedDataTableRow = Objects.requireNonNull(
-            dataTableRowService.getRow("items", appleId, DEV_ENVIRONMENT_ID));
+            dataTableRowService.getRow(itemsId, appleId, DEV_ENVIRONMENT_ID));
 
         assertEquals("Green Apple", fetchedDataTableRow.values()
             .get("title"));
@@ -963,7 +966,7 @@ class DataTableRowServiceH2IntTest {
         long bananaId = insertItem("Banana", 20);
 
         DataTableRow dataTableRow = dataTableRowService.updateRow(
-            "items", appleId, Map.of("amount", "  ", "title", ""), DEV_ENVIRONMENT_ID);
+            itemsId, appleId, Map.of("amount", "  ", "title", ""), DEV_ENVIRONMENT_ID);
 
         assertNull(dataTableRow.values()
             .get("amount"));
@@ -974,7 +977,7 @@ class DataTableRowServiceH2IntTest {
 
         values.put("amount", null);
 
-        dataTableRow = dataTableRowService.updateRow("items", bananaId, values, DEV_ENVIRONMENT_ID);
+        dataTableRow = dataTableRowService.updateRow(itemsId, bananaId, values, DEV_ENVIRONMENT_ID);
 
         assertNull(dataTableRow.values()
             .get("amount"));
@@ -985,29 +988,29 @@ class DataTableRowServiceH2IntTest {
     @Test
     void testExternalIdIsUniquePerTable() {
         DataTableRow dataTableRow = dataTableRowService.insertRow(
-            "items", Map.of("title", "Apple"), "SKU-1", DEV_ENVIRONMENT_ID);
+            itemsId, Map.of("title", "Apple"), "SKU-1", DEV_ENVIRONMENT_ID);
 
         assertEquals("SKU-1", dataTableRow.externalId());
 
         DataTableException dataTableException = assertThrows(
             DataTableException.class,
-            () -> dataTableRowService.insertRow("items", Map.of("title", "Pear"), "SKU-1", DEV_ENVIRONMENT_ID));
+            () -> dataTableRowService.insertRow(itemsId, Map.of("title", "Pear"), "SKU-1", DEV_ENVIRONMENT_ID));
 
         assertEquals(DataTableErrorType.ROW_EXTERNAL_ID_CONFLICT, dataTableException.getErrorType());
         assertTrue(
-            dataTableRowService.fetchRowByExternalId("items", "SKU-1", DEV_ENVIRONMENT_ID)
+            dataTableRowService.fetchRowByExternalId(itemsId, "SKU-1", DEV_ENVIRONMENT_ID)
                 .isPresent());
     }
 
     @Test
     void testUpsertRowCreatesThenMerges() {
         UpsertResult createdUpsertResult = dataTableRowService.upsertRow(
-            "items", "SKU-1", Map.of("title", "Apple", "amount", 1), DEV_ENVIRONMENT_ID);
+            itemsId, "SKU-1", Map.of("title", "Apple", "amount", 1), DEV_ENVIRONMENT_ID);
 
         assertTrue(createdUpsertResult.created());
 
         UpsertResult updatedUpsertResult = dataTableRowService.upsertRow(
-            "items", "SKU-1", Map.of("amount", 2), DEV_ENVIRONMENT_ID);
+            itemsId, "SKU-1", Map.of("amount", 2), DEV_ENVIRONMENT_ID);
 
         assertFalse(updatedUpsertResult.created());
         assertEquals(
@@ -1022,19 +1025,19 @@ class DataTableRowServiceH2IntTest {
             2L, ((Number) updatedUpsertResult.row()
                 .values()
                 .get("amount")).longValue());
-        assertEquals(1, dataTableRowService.countRows("items", DataTableRowConditions.matchAll(), DEV_ENVIRONMENT_ID));
+        assertEquals(1, dataTableRowService.countRows(itemsId, DataTableRowConditions.matchAll(), DEV_ENVIRONMENT_ID));
     }
 
     @Test
     void testInsertRowsUpsertsKeyedRows() {
-        dataTableRowService.insertRow("items", Map.of("title", "old"), "SKU-1", DEV_ENVIRONMENT_ID);
+        dataTableRowService.insertRow(itemsId, Map.of("title", "old"), "SKU-1", DEV_ENVIRONMENT_ID);
 
         List<DataTableRow> dataTableRows = dataTableRowService.insertRows(
-            "items", List.of(new NewRow(Map.of("title", "new"), "SKU-1"), new NewRow(Map.of("title", "x"), "SKU-2")),
+            itemsId, List.of(new NewRow(Map.of("title", "new"), "SKU-1"), new NewRow(Map.of("title", "x"), "SKU-2")),
             CreateStrategy.UPSERT, DEV_ENVIRONMENT_ID);
 
         assertEquals(2, dataTableRows.size());
-        assertEquals(2, dataTableRowService.countRows("items", DataTableRowConditions.matchAll(), DEV_ENVIRONMENT_ID));
+        assertEquals(2, dataTableRowService.countRows(itemsId, DataTableRowConditions.matchAll(), DEV_ENVIRONMENT_ID));
         assertEquals(2, getWebhookEventIds(DataTableWebhookType.RECORD_CREATED).size());
         assertEquals(1, getWebhookEventIds(DataTableWebhookType.RECORD_UPDATED).size());
     }
@@ -1048,13 +1051,13 @@ class DataTableRowServiceH2IntTest {
     private List<Long> findItemIds(List<DataTableRowFilter> filters, DataTableRowSort sort) {
         return getIds(
             dataTableRowService.findRows(
-                "items", toConditions(filters), sort == null ? List.of() : List.of(sort), 100, 0, DEV_ENVIRONMENT_ID));
+                itemsId, toConditions(filters), sort == null ? List.of() : List.of(sort), 100, 0, DEV_ENVIRONMENT_ID));
     }
 
     private List<Long> findTypedIds(DataTableRowFilter filter) {
         return getIds(
             dataTableRowService.findRows(
-                "typed", DataTableRowConditions.of(List.of(filter)), List.of(), 100, 0, DEV_ENVIRONMENT_ID));
+                typedId, DataTableRowConditions.of(List.of(filter)), List.of(), 100, 0, DEV_ENVIRONMENT_ID));
     }
 
     private List<DataTableWebhookEvent> getWebhookEvents(DataTableWebhookType dataTableWebhookType) {
@@ -1073,9 +1076,8 @@ class DataTableRowServiceH2IntTest {
     }
 
     private void createTypedTable() {
-        dataTableService.dropTable("typed", DEV_ENVIRONMENT_ID);
-        dataTableService.createTable(
-            "typed", null,
+        typedId = dataTableService.createTable(
+            null, "typed", null,
             List.of(
                 new ColumnSpec("active", ColumnType.BOOLEAN), new ColumnSpec("price", ColumnType.NUMBER),
                 new ColumnSpec("due", ColumnType.DATE), new ColumnSpec("created", ColumnType.DATE_TIME)),
@@ -1090,7 +1092,7 @@ class DataTableRowServiceH2IntTest {
         values.put("due", due);
         values.put("created", created);
 
-        DataTableRow dataTableRow = dataTableRowService.insertRow("typed", values, DEV_ENVIRONMENT_ID);
+        DataTableRow dataTableRow = dataTableRowService.insertRow(typedId, values, DEV_ENVIRONMENT_ID);
 
         return dataTableRow.id();
     }
@@ -1101,7 +1103,7 @@ class DataTableRowServiceH2IntTest {
         values.put("title", title);
         values.put("amount", amount);
 
-        DataTableRow dataTableRow = dataTableRowService.insertRow("items", values, DEV_ENVIRONMENT_ID);
+        DataTableRow dataTableRow = dataTableRowService.insertRow(itemsId, values, DEV_ENVIRONMENT_ID);
 
         return dataTableRow.id();
     }
@@ -1126,13 +1128,13 @@ class DataTableRowServiceH2IntTest {
 
             clearInvocations(jdbcTemplate);
 
-            dataTableRowService.updateRow("items", appleId, Map.of("title", "Banana"), DEV_ENVIRONMENT_ID);
+            dataTableRowService.updateRow(itemsId, appleId, Map.of("title", "Banana"), DEV_ENVIRONMENT_ID);
 
             assertTrue(countUpdates() > 0);
 
             clearInvocations(jdbcTemplate);
 
-            dataTableRowService.deleteRow("items", appleId, DEV_ENVIRONMENT_ID);
+            dataTableRowService.deleteRow(itemsId, appleId, DEV_ENVIRONMENT_ID);
 
             assertTrue(countUpdates() > 0);
         }

@@ -29,44 +29,44 @@ import org.springframework.stereotype.Component;
 public class RemoteDataTableRowFacadeClient implements DataTableRowFacade {
 
     @Override
-    public int importCsv(String baseName, String csv, long environmentId) {
+    public int importCsv(long dataTableId, String csv, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public DataTableRow insertRow(String baseName, Map<String, Object> values, long environmentId) {
+    public DataTableRow insertRow(long dataTableId, Map<String, Object> values, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId) {
+    public DataTableRow updateRow(long dataTableId, long id, Map<String, Object> values, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public DataTableRow insertRow(
-        String baseName, Map<String, Object> values, @Nullable String externalId, long environmentId) {
+        long dataTableId, Map<String, Object> values, @Nullable String externalId, long environmentId) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<DataTableRow> insertRows(
-        String baseName, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId) {
+        long dataTableId, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public DataTableRow updateRow(
-        String baseName, long id, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
+        long dataTableId, long id, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
         long environmentId) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public UpsertResult upsertRow(String baseName, String externalId, Map<String, Object> values, long environmentId) {
+    public UpsertResult upsertRow(long dataTableId, String externalId, Map<String, Object> values, long environmentId) {
         throw new UnsupportedOperationException();
     }
 }

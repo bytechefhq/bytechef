@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
+import com.bytechef.platform.data.table.config.DataTableIntTestUtils;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
@@ -50,9 +51,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
 class DataTableStorageServiceIntTest {
 
-    private static final String BASE_NAME = "storage";
     private static final long DEV_ENVIRONMENT_ID = 0;
-    private static final String PHYSICAL_NAME = "dt_0_storage";
 
     @Autowired
     private ApplicationProperties applicationProperties;
@@ -69,25 +68,31 @@ class DataTableStorageServiceIntTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    private long dataTableId;
+
     private long originalMaxSizeBytes;
+
+    private String physicalName;
 
     @BeforeEach
     void beforeEach() {
         originalMaxSizeBytes = getDataTable().getMaxSizeBytes();
 
-        dataTableService.dropTable(BASE_NAME, DEV_ENVIRONMENT_ID);
-        dataTableService.createTable(
-            BASE_NAME, null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+        DataTableIntTestUtils.dropAll(jdbcTemplate);
+
+        dataTableId = dataTableService.createTable(
+            null, "storage", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+        physicalName = "dt_" + DEV_ENVIRONMENT_ID + "_" + dataTableId;
 
         jdbcTemplate.execute(
-            "ALTER TABLE \"" + PHYSICAL_NAME + "\" SET (autovacuum_enabled = false, toast.autovacuum_enabled = false)");
+            "ALTER TABLE \"" + physicalName + "\" SET (autovacuum_enabled = false, toast.autovacuum_enabled = false)");
     }
 
     @AfterEach
     void afterEach() {
         setLimit(originalMaxSizeBytes);
 
-        dataTableService.dropTable(BASE_NAME, DEV_ENVIRONMENT_ID);
+        DataTableIntTestUtils.dropAll(jdbcTemplate);
     }
 
     @Test
@@ -183,24 +188,17 @@ class DataTableStorageServiceIntTest {
 
     @Test
     void testGetTableBytesMeasuresTheLiveRowsOfTheTable() {
-        assertEquals(0, dataTableStorageService.getTableBytes(BASE_NAME, DEV_ENVIRONMENT_ID));
+        assertEquals(0, dataTableStorageService.getTableBytes(dataTableId, DEV_ENVIRONMENT_ID));
 
-        dataTableRowService.insertRows(BASE_NAME, List.of(Map.of("title", "x")), DEV_ENVIRONMENT_ID);
+        dataTableRowService.insertRows(dataTableId, List.of(Map.of("title", "x")), DEV_ENVIRONMENT_ID);
 
-        long oneRowBytes = dataTableStorageService.getTableBytes(BASE_NAME, DEV_ENVIRONMENT_ID);
+        long oneRowBytes = dataTableStorageService.getTableBytes(dataTableId, DEV_ENVIRONMENT_ID);
 
         assertTrue(oneRowBytes > 0);
 
-        dataTableRowService.insertRows(BASE_NAME, List.of(Map.of("title", "y".repeat(250))), DEV_ENVIRONMENT_ID);
+        dataTableRowService.insertRows(dataTableId, List.of(Map.of("title", "y".repeat(250))), DEV_ENVIRONMENT_ID);
 
-        assertTrue(dataTableStorageService.getTableBytes(BASE_NAME, DEV_ENVIRONMENT_ID) > oneRowBytes + 250);
-    }
-
-    @Test
-    void testGetTableBytesRejectsAnInvalidTableName() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> dataTableStorageService.getTableBytes("orders\"; DROP TABLE x; --", DEV_ENVIRONMENT_ID));
+        assertTrue(dataTableStorageService.getTableBytes(dataTableId, DEV_ENVIRONMENT_ID) > oneRowBytes + 250);
     }
 
     private long getAllocatedBytes() {
@@ -226,7 +224,7 @@ class DataTableStorageServiceIntTest {
         String[] physicalTableNameParts = physicalTableName.split("_", 3);
 
         return dataTableStorageService.getTableBytes(
-            physicalTableNameParts[2], Long.parseLong(physicalTableNameParts[1]));
+            Long.parseLong(physicalTableNameParts[2]), Long.parseLong(physicalTableNameParts[1]));
     }
 
     private void insertRows(int count) {
@@ -234,14 +232,14 @@ class DataTableStorageServiceIntTest {
             .<Map<String, Object>>mapToObj(index -> Map.of("title", index + "-" + "x".repeat(200)))
             .toList();
 
-        dataTableRowService.insertRows(BASE_NAME, rowValues, DEV_ENVIRONMENT_ID);
+        dataTableRowService.insertRows(dataTableId, rowValues, DEV_ENVIRONMENT_ID);
     }
 
     private void insertRowsAndDeleteAllButTheLast() {
         insertRows(500);
 
         jdbcTemplate.update(
-            "DELETE FROM \"" + PHYSICAL_NAME + "\" WHERE id < (SELECT MAX(id) FROM \"" + PHYSICAL_NAME + "\")");
+            "DELETE FROM \"" + physicalName + "\" WHERE id < (SELECT MAX(id) FROM \"" + physicalName + "\")");
     }
 
     private void setLimit(long maxSizeBytes) {

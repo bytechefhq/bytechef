@@ -53,29 +53,29 @@ public class DataTableRowFacadeImpl implements DataTableRowFacade {
     }
 
     @Override
-    public int importCsv(String baseName, String csv, long environmentId) {
+    public int importCsv(long dataTableId, String csv, long environmentId) {
         dataTableStorageService.checkLimit(csv == null ? 0 : csv.getBytes(StandardCharsets.UTF_8).length);
 
-        return dataTableRowService.importCsv(baseName, csv, environmentId);
+        return dataTableRowService.importCsv(dataTableId, csv, environmentId);
     }
 
     @Override
-    public DataTableRow insertRow(String baseName, Map<String, Object> values, long environmentId) {
-        return insertRow(baseName, values, null, environmentId);
+    public DataTableRow insertRow(long dataTableId, Map<String, Object> values, long environmentId) {
+        return insertRow(dataTableId, values, null, environmentId);
     }
 
     @Override
     public DataTableRow insertRow(
-        String baseName, Map<String, Object> values, @Nullable String externalId, long environmentId) {
+        long dataTableId, Map<String, Object> values, @Nullable String externalId, long environmentId) {
 
         dataTableStorageService.checkLimit(getEstimatedRowBytes(values, externalId));
 
-        return dataTableRowService.insertRow(baseName, values, externalId, environmentId);
+        return dataTableRowService.insertRow(dataTableId, values, externalId, environmentId);
     }
 
     @Override
     public List<DataTableRow> insertRows(
-        String baseName, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId) {
+        long dataTableId, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId) {
 
         long estimatedBytes = 0;
 
@@ -85,17 +85,17 @@ public class DataTableRowFacadeImpl implements DataTableRowFacade {
 
         dataTableStorageService.checkLimit(estimatedBytes);
 
-        return dataTableRowService.insertRows(baseName, newRows, createStrategy, environmentId);
+        return dataTableRowService.insertRows(dataTableId, newRows, createStrategy, environmentId);
     }
 
     @Override
-    public DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId) {
-        return updateRow(baseName, id, values, null, environmentId);
+    public DataTableRow updateRow(long dataTableId, long id, Map<String, Object> values, long environmentId) {
+        return updateRow(dataTableId, id, values, null, environmentId);
     }
 
     @Override
     public DataTableRow updateRow(
-        String baseName, long id, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
+        long dataTableId, long id, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
         long environmentId) {
 
         long incomingBytes = getEstimatedValuesBytes(values);
@@ -103,7 +103,7 @@ public class DataTableRowFacadeImpl implements DataTableRowFacade {
         try {
             dataTableStorageService.checkLimit(incomingBytes);
         } catch (DataTableStorageLimitExceededException dataTableStorageLimitExceededException) {
-            DataTableRow currentDataTableRow = dataTableRowService.getRow(baseName, id, environmentId);
+            DataTableRow currentDataTableRow = dataTableRowService.getRow(dataTableId, id, environmentId);
 
             if (currentDataTableRow == null) {
                 throw dataTableStorageLimitExceededException;
@@ -122,14 +122,14 @@ public class DataTableRowFacadeImpl implements DataTableRowFacade {
             }
         }
 
-        return dataTableRowService.updateRow(baseName, id, values, externalIdPatch, environmentId);
+        return dataTableRowService.updateRow(dataTableId, id, values, externalIdPatch, environmentId);
     }
 
     @Override
-    public UpsertResult upsertRow(String baseName, String externalId, Map<String, Object> values, long environmentId) {
+    public UpsertResult upsertRow(long dataTableId, String externalId, Map<String, Object> values, long environmentId) {
         dataTableStorageService.checkLimit(getEstimatedRowBytes(values, externalId));
 
-        return dataTableRowService.upsertRow(baseName, externalId, values, environmentId);
+        return dataTableRowService.upsertRow(dataTableId, externalId, values, environmentId);
     }
 
     private static long getEstimatedRowBytes(Map<String, Object> values, @Nullable String externalId) {

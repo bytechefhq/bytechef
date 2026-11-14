@@ -31,7 +31,6 @@ public interface DataTableWebhookService {
      * Adds a new webhook for the specified data table, enabling notifications for external systems when certain events
      * occur on the data table.
      *
-     * @param baseName            The name of the data table to which the webhook will be associated.
      * @param workflowExecutionId The workflow execution id of the trigger that the data table events start.
      * @param url                 The webhook URL of the trigger, stored so that the previous version can still deliver
      *                            the events after a rollback.
@@ -41,17 +40,16 @@ public interface DataTableWebhookService {
      * @return The unique identifier of the newly created webhook.
      */
     long addWebhook(
-        String baseName, String workflowExecutionId, String url, DataTableWebhookType type, long environmentId);
+        long dataTableId, String workflowExecutionId, String url, DataTableWebhookType type, long environmentId);
 
     /**
      * Retrieves a list of webhooks associated with the specified data table. Webhooks provide external systems with
      * notifications about certain events occurring within the data table.
      *
-     * @param baseName      The name of the data table for which the webhooks should be listed.
      * @param environmentId The environment ID for which to list webhooks.
      * @return A list of webhooks associated with the specified data table.
      */
-    List<Webhook> listWebhooks(String baseName, long environmentId);
+    List<Webhook> listWebhooks(long dataTableId, long environmentId);
 
     /**
      * Removes an existing webhook identified by its unique identifier. This action stops data table events from

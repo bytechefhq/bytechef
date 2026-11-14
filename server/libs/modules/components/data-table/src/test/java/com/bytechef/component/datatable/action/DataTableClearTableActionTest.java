@@ -19,11 +19,11 @@ package com.bytechef.component.datatable.action;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import java.util.List;
 import java.util.Map;
@@ -36,15 +36,26 @@ class DataTableClearTableActionTest extends AbstractDataTableActionTest {
 
     @Test
     void testPerformDeletesAllRowsInOneStep() throws Exception {
-        when(dataTableRowService.deleteAllRows("conversations", 1L))
+        when(dataTableRowService.deleteAllRows(DATA_TABLE_ID, 1L))
             .thenReturn(List.of(new DataTableRow(1, Map.of()), new DataTableRow(2, Map.of())));
 
         assertEquals(
             Map.of("deletedCount", 2),
             perform(
-                DataTableClearTableAction.of(dataTableService, dataTableRowService), Map.of("table", "conversations")));
+                DataTableClearTableAction.of(dataTableService, dataTableRowService, dataTableWorkspaceResolver),
+                Map.of("table", "conversations")));
 
-        verify(dataTableRowService, never()).listRows(anyString(), anyInt(), anyInt(), anyLong());
-        verify(dataTableRowService, never()).deleteRow(anyString(), anyLong(), anyLong());
+        verify(dataTableRowService, never()).listRows(anyLong(), anyInt(), anyInt(), anyLong());
+        verify(dataTableRowService, never()).deleteRow(anyLong(), anyLong(), anyLong());
+    }
+
+    @Override
+    protected ModifiableActionDefinition createActionDefinition() {
+        return DataTableClearTableAction.of(dataTableService, dataTableRowService, dataTableWorkspaceResolver);
+    }
+
+    @Override
+    protected Map<String, Object> createInputParameters(String tableName) {
+        return Map.of("table", tableName);
     }
 }

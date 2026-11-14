@@ -33,6 +33,7 @@ import com.bytechef.platform.data.table.execution.domain.ExternalIdPatch;
 import com.bytechef.platform.data.table.execution.domain.NewRow;
 import com.bytechef.platform.data.table.execution.domain.UpsertResult;
 import com.bytechef.platform.data.table.execution.event.DataTableWebhookEvent;
+import com.bytechef.platform.data.table.util.DataTablePhysicalNameUtils;
 import de.siegmar.fastcsv.reader.CsvReader;
 import de.siegmar.fastcsv.reader.CsvRow;
 import de.siegmar.fastcsv.writer.CsvWriter;
@@ -139,73 +140,54 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    /**
-     * Deletes a row from a data table by ID.
-     *
-     * <p>
-     * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because all identifiers are validated
-     * through {@link #escapeIdentifier(String)} and {@link #validateBaseName(String)} which enforce a strict allowlist
-     * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection.
-     */
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
-    public boolean deleteRow(String baseName, long id, long environmentId) {
-        validateBaseName(baseName);
+    public boolean deleteRow(long dataTableId, long id, long environmentId) {
+        String physicalName = DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableId);
 
-        String physicalName = buildPhysicalName(environmentId, baseName);
-
-        checkHasId(baseName, physicalName);
+        checkHasId(dataTableId, physicalName);
 
         DataTableRow deletedDataTableRow;
 
         if (isReturningSupported()) {
             deletedDataTableRow = deleteRowReturningValues(physicalName, id);
         } else {
-            deletedDataTableRow = deleteRowAfterReadingValues(baseName, physicalName, id, environmentId);
+            deletedDataTableRow = deleteRowAfterReadingValues(dataTableId, physicalName, id, environmentId);
         }
 
         if (deletedDataTableRow == null) {
             return false;
         }
 
-        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_DELETED, List.of(deletedDataTableRow), environmentId);
+        publishWebhookEvent(dataTableId, DataTableWebhookType.RECORD_DELETED, List.of(deletedDataTableRow),
+            environmentId);
 
         return true;
     }
 
     @Override
     @Transactional
-    public List<DataTableRow> deleteAllRows(String baseName, long environmentId) {
-        return deleteMatchingRows(baseName, DataTableRowConditions.matchAll(), environmentId);
+    public List<DataTableRow> deleteAllRows(long dataTableId, long environmentId) {
+        return deleteMatchingRows(dataTableId, DataTableRowConditions.matchAll(), environmentId);
     }
 
     @Override
     @Transactional
-    public List<DataTableRow> deleteRows(String baseName, DataTableRowConditions conditions, long environmentId) {
+    public List<DataTableRow> deleteRows(long dataTableId, DataTableRowConditions conditions, long environmentId) {
         Objects.requireNonNull(conditions, "conditions");
 
         conditions.requireAtLeastOneCondition();
 
-        return deleteMatchingRows(baseName, conditions, environmentId);
+        return deleteMatchingRows(dataTableId, conditions, environmentId);
     }
 
-    /**
-     * Deletes every row of a data table matching the given OR groups of AND conditions.
-     *
-     * <p>
-     * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because filter columns must match an
-     * existing column and all identifiers are validated through {@link #escapeIdentifier(String)} and
-     * {@link #validateBaseName(String)}. Filter values use parameterized queries.
-     */
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     private List<DataTableRow> deleteMatchingRows(
-        String baseName, DataTableRowConditions conditions, long environmentId) {
+        long dataTableId, DataTableRowConditions conditions, long environmentId) {
 
-        validateBaseName(baseName);
+        String physicalName = DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableId);
 
-        String physicalName = buildPhysicalName(environmentId, baseName);
-
-        checkHasId(baseName, physicalName);
+        checkHasId(dataTableId, physicalName);
 
         List<ColumnSpec> columnSpecs = listColumns(physicalName);
 
@@ -240,27 +222,17 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         List<DataTableRow> sortedDataTableRows = sortById(deletedDataTableRows);
 
-        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_DELETED, sortedDataTableRows, environmentId);
+        publishWebhookEvent(dataTableId, DataTableWebhookType.RECORD_DELETED, sortedDataTableRows, environmentId);
 
         return sortedDataTableRows;
     }
 
-    /**
-     * Gets a single row from a data table by ID.
-     *
-     * <p>
-     * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because all identifiers are validated
-     * through {@link #escapeIdentifier(String)} and {@link #validateBaseName(String)} which enforce a strict allowlist
-     * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection.
-     */
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
-    public @Nullable DataTableRow getRow(String baseName, long id, long environmentId) {
-        validateBaseName(baseName);
+    public @Nullable DataTableRow getRow(long dataTableId, long id, long environmentId) {
+        String physicalName = DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableId);
 
-        String physicalName = buildPhysicalName(environmentId, baseName);
-
-        checkHasId(baseName, physicalName);
+        checkHasId(dataTableId, physicalName);
 
         List<String> columnNames = listColumns(physicalName).stream()
             .map(ColumnSpec::name)
@@ -281,12 +253,10 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     }
 
     @Override
-    public String exportCsv(String baseName, long environmentId) {
-        validateBaseName(baseName);
+    public String exportCsv(long dataTableId, long environmentId) {
+        String physicalName = DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableId);
 
-        String physicalName = buildPhysicalName(environmentId, baseName);
-
-        checkHasId(baseName, physicalName);
+        checkHasId(dataTableId, physicalName);
 
         List<ColumnSpec> columnSpecs = listColumns(physicalName);
         List<String> columnNames = columnSpecs.stream()
@@ -302,7 +272,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         // Header
         csvWriter.writeRow(columnNames);
 
-        List<DataTableRow> dataTableRows = listRows(baseName, Integer.MAX_VALUE, 0, environmentId);
+        List<DataTableRow> dataTableRows = listRows(dataTableId, Integer.MAX_VALUE, 0, environmentId);
 
         for (DataTableRow dataTableRow : dataTableRows) {
             List<String> curValues = new ArrayList<>();
@@ -332,12 +302,10 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     @Override
     @Transactional
-    public int importCsv(String baseName, String csv, long environmentId) {
-        validateBaseName(baseName);
+    public int importCsv(long dataTableId, String csv, long environmentId) {
+        String physicalName = DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableId);
 
-        String physicalName = buildPhysicalName(environmentId, baseName);
-
-        checkHasId(baseName, physicalName);
+        checkHasId(dataTableId, physicalName);
 
         if (csv == null) {
             return 0;
@@ -390,8 +358,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                         List<String> tableColumnNames = getUserColumnNames(columnSpecs);
 
                         throw new IllegalArgumentException(
-                            "CSV header %s matches no column of table '%s'; its columns are %s; no row was imported"
-                                .formatted(headers, baseName, tableColumnNames));
+                            "CSV header %s matches no column of data table %d; its columns are %s; no row was imported"
+                                .formatted(headers, dataTableId, tableColumnNames));
                     }
 
                     continue;
@@ -422,7 +390,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                 try {
                     insertedDataTableRows.add(
                         insertRowWithoutEvent(
-                            baseName, physicalName, columnSpecs, values, externalId, environmentId,
+                            dataTableId, physicalName, columnSpecs, values, externalId, environmentId,
                             new HashSet<>()));
                 } catch (DataTableException dataTableException) {
                     throw new DataTableException(
@@ -444,56 +412,44 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             throw new RuntimeException("Failed to import CSV", exception);
         }
 
-        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_CREATED, insertedDataTableRows, environmentId);
+        publishWebhookEvent(dataTableId, DataTableWebhookType.RECORD_CREATED, insertedDataTableRows, environmentId);
 
         return insertedDataTableRows.size();
     }
 
-    /**
-     * Inserts a new row into a data table.
-     *
-     * <p>
-     * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because all identifiers are validated
-     * through {@link #escapeIdentifier(String)} and {@link #validateBaseName(String)} which enforce a strict allowlist
-     * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection. User-provided row values use parameterized queries.
-     */
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
-    public DataTableRow insertRow(String baseName, Map<String, Object> values, long environmentId) {
-        return insertRow(baseName, values, null, environmentId);
+    public DataTableRow insertRow(long dataTableId, Map<String, Object> values, long environmentId) {
+        return insertRow(dataTableId, values, null, environmentId);
     }
 
     @Override
     public DataTableRow insertRow(
-        String baseName, Map<String, Object> values, @Nullable String externalId, long environmentId) {
+        long dataTableId, Map<String, Object> values, @Nullable String externalId, long environmentId) {
 
-        validateBaseName(baseName);
+        String physicalName = DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableId);
 
-        String physicalName = buildPhysicalName(environmentId, baseName);
-
-        checkHasId(baseName, physicalName);
+        checkHasId(dataTableId, physicalName);
 
         Set<String> ignoredColumnNames = new LinkedHashSet<>();
 
         DataTableRow dataTableRow = insertRowWithoutEvent(
-            baseName, physicalName, listColumns(physicalName), values, externalId, environmentId,
+            dataTableId, physicalName, listColumns(physicalName), values, externalId, environmentId,
             ignoredColumnNames);
 
-        logIgnoredColumnNames(baseName, environmentId, ignoredColumnNames);
+        logIgnoredColumnNames(dataTableId, environmentId, ignoredColumnNames);
 
-        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_CREATED, List.of(dataTableRow), environmentId);
+        publishWebhookEvent(dataTableId, DataTableWebhookType.RECORD_CREATED, List.of(dataTableRow), environmentId);
 
         return dataTableRow;
     }
 
     @Override
     @Transactional
-    public List<DataTableRow> insertRows(String baseName, List<Map<String, Object>> rowValues, long environmentId) {
-        validateBaseName(baseName);
+    public List<DataTableRow> insertRows(long dataTableId, List<Map<String, Object>> rowValues, long environmentId) {
+        String physicalName = DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableId);
 
-        String physicalName = buildPhysicalName(environmentId, baseName);
-
-        checkHasId(baseName, physicalName);
+        checkHasId(dataTableId, physicalName);
 
         List<ColumnSpec> columnSpecs = listColumns(physicalName);
         List<DataTableRow> insertedDataTableRows = new ArrayList<>();
@@ -503,7 +459,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             try {
                 insertedDataTableRows.add(
                     insertRowWithoutEvent(
-                        baseName, physicalName, columnSpecs, rowValues.get(index), null, environmentId,
+                        dataTableId, physicalName, columnSpecs, rowValues.get(index), null, environmentId,
                         ignoredColumnNames));
             } catch (IllegalArgumentException exception) {
                 IllegalArgumentException illegalArgumentException = new IllegalArgumentException(
@@ -518,9 +474,9 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             }
         }
 
-        logIgnoredColumnNames(baseName, environmentId, ignoredColumnNames);
+        logIgnoredColumnNames(dataTableId, environmentId, ignoredColumnNames);
 
-        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_CREATED, insertedDataTableRows, environmentId);
+        publishWebhookEvent(dataTableId, DataTableWebhookType.RECORD_CREATED, insertedDataTableRows, environmentId);
 
         return insertedDataTableRows;
     }
@@ -528,7 +484,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Override
     @Transactional
     public List<DataTableRow> insertRows(
-        String baseName, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId) {
+        long dataTableId, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId) {
 
         Objects.requireNonNull(createStrategy, "createStrategy");
 
@@ -540,11 +496,9 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                 DataTableErrorType.ROW_EXTERNAL_ID_REQUIRED);
         }
 
-        validateBaseName(baseName);
+        String physicalName = DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableId);
 
-        String physicalName = buildPhysicalName(environmentId, baseName);
-
-        checkHasId(baseName, physicalName);
+        checkHasId(dataTableId, physicalName);
 
         List<ColumnSpec> columnSpecs = listColumns(physicalName);
         List<DataTableRow> dataTableRows = new ArrayList<>();
@@ -558,7 +512,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             try {
                 if (createStrategy == CreateStrategy.UPSERT) {
                     UpsertResult upsertResult = upsertRowWithoutEvent(
-                        baseName, physicalName, columnSpecs, newRow.externalId(), newRow.values(), environmentId,
+                        dataTableId, physicalName, columnSpecs, newRow.externalId(), newRow.values(), environmentId,
                         ignoredColumnNames);
 
                     dataTableRows.add(upsertResult.row());
@@ -570,7 +524,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                     }
                 } else {
                     DataTableRow dataTableRow = insertRowWithoutEvent(
-                        baseName, physicalName, columnSpecs, newRow.values(), newRow.externalId(), environmentId,
+                        dataTableId, physicalName, columnSpecs, newRow.values(), newRow.externalId(), environmentId,
                         ignoredColumnNames);
 
                     dataTableRows.add(dataTableRow);
@@ -593,10 +547,10 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             }
         }
 
-        logIgnoredColumnNames(baseName, environmentId, ignoredColumnNames);
+        logIgnoredColumnNames(dataTableId, environmentId, ignoredColumnNames);
 
-        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_CREATED, createdDataTableRows, environmentId);
-        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_UPDATED, updatedDataTableRows, environmentId);
+        publishWebhookEvent(dataTableId, DataTableWebhookType.RECORD_CREATED, createdDataTableRows, environmentId);
+        publishWebhookEvent(dataTableId, DataTableWebhookType.RECORD_UPDATED, updatedDataTableRows, environmentId);
 
         return dataTableRows;
     }
@@ -629,7 +583,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     private DataTableRow insertRowWithoutEvent(
-        String baseName, String physicalName, List<ColumnSpec> columnSpecs, Map<String, Object> values,
+        long dataTableId, String physicalName, List<ColumnSpec> columnSpecs, Map<String, Object> values,
         @Nullable String externalId, long environmentId, Set<String> ignoredColumnNames) {
 
         List<String> allColumnNames = getColumnNames(columnSpecs);
@@ -638,7 +592,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             getColumnValues(columnSpecs, values, ValuePolicy.SINGLE_ROW, ignoredColumnNames));
 
         if (externalId != null) {
-            columnValues.add(toExternalIdColumnValue(baseName, columnSpecs, externalId));
+            columnValues.add(toExternalIdColumnValue(dataTableId, columnSpecs, externalId));
         }
 
         String columnsClause = columnValues.stream()
@@ -664,7 +618,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                     physicalName, valuesClause, allColumnNames, preparedStatementSetter);
             } else {
                 result = insertRowAfterInserting(
-                    baseName, physicalName, valuesClause, environmentId, preparedStatementSetter);
+                    dataTableId, physicalName, valuesClause, environmentId, preparedStatementSetter);
             }
         } catch (DuplicateKeyException duplicateKeyException) {
             throw toExternalIdConflict(externalId, duplicateKeyException);
@@ -678,22 +632,14 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     }
 
     @Override
-    public List<DataTableRow> listRows(String baseName, int limit, int offset, long environmentId) {
-        return findRows(baseName, DataTableRowConditions.matchAll(), List.of(), limit, offset, environmentId);
+    public List<DataTableRow> listRows(long dataTableId, int limit, int offset, long environmentId) {
+        return findRows(dataTableId, DataTableRowConditions.matchAll(), List.of(), limit, offset, environmentId);
     }
 
-    /**
-     * Finds rows of a data table matching the given OR groups of AND conditions.
-     *
-     * <p>
-     * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because filter and sort columns must
-     * match an existing column and all identifiers are validated through {@link #escapeIdentifier(String)} and
-     * {@link #validateBaseName(String)}. Filter values use parameterized queries.
-     */
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public List<DataTableRow> findRows(
-        String baseName, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int limit,
+        long dataTableId, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int limit,
         int offset, long environmentId) {
 
         Objects.requireNonNull(conditions, "conditions");
@@ -704,11 +650,9 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                 "limit and offset must not be negative, got limit=%d and offset=%d".formatted(limit, offset));
         }
 
-        validateBaseName(baseName);
+        String physicalName = DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableId);
 
-        String physicalName = buildPhysicalName(environmentId, baseName);
-
-        checkHasId(baseName, physicalName);
+        checkHasId(dataTableId, physicalName);
 
         List<ColumnSpec> columnSpecs = listColumns(physicalName);
 
@@ -743,14 +687,12 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
-    public long countRows(String baseName, DataTableRowConditions conditions, long environmentId) {
+    public long countRows(long dataTableId, DataTableRowConditions conditions, long environmentId) {
         Objects.requireNonNull(conditions, "conditions");
 
-        validateBaseName(baseName);
+        String physicalName = DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableId);
 
-        String physicalName = buildPhysicalName(environmentId, baseName);
-
-        checkHasId(baseName, physicalName);
+        checkHasId(dataTableId, physicalName);
 
         WhereClause whereClause = buildWhereClause(listColumns(physicalName), conditions);
 
@@ -769,32 +711,30 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     }
 
     @Override
-    public Optional<DataTableRow> fetchRowByExternalId(String baseName, String externalId, long environmentId) {
+    public Optional<DataTableRow> fetchRowByExternalId(long dataTableId, String externalId, long environmentId) {
         Assert.hasText(externalId, "externalId must not be empty");
 
         List<DataTableRow> dataTableRows = findRows(
-            baseName, externalIdConditions(externalId), List.of(), 1, 0, environmentId);
+            dataTableId, externalIdConditions(externalId), List.of(), 1, 0, environmentId);
 
         return dataTableRows.stream()
             .findFirst();
     }
 
     @Override
-    public DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId) {
-        return updateRow(baseName, id, values, null, environmentId);
+    public DataTableRow updateRow(long dataTableId, long id, Map<String, Object> values, long environmentId) {
+        return updateRow(dataTableId, id, values, null, environmentId);
     }
 
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public DataTableRow updateRow(
-        String baseName, long id, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
+        long dataTableId, long id, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
         long environmentId) {
 
-        validateBaseName(baseName);
+        String physicalName = DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableId);
 
-        String physicalName = buildPhysicalName(environmentId, baseName);
-
-        checkHasId(baseName, physicalName);
+        checkHasId(dataTableId, physicalName);
 
         List<ColumnSpec> columnSpecs = listColumns(physicalName);
 
@@ -806,13 +746,13 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             getColumnValues(columnSpecs, values, ValuePolicy.SINGLE_ROW, ignoredColumnNames));
 
         if (externalIdPatch != null) {
-            columnValues.add(toExternalIdColumnValue(baseName, columnSpecs, externalIdPatch.externalId()));
+            columnValues.add(toExternalIdColumnValue(dataTableId, columnSpecs, externalIdPatch.externalId()));
         }
 
-        logIgnoredColumnNames(baseName, environmentId, ignoredColumnNames);
+        logIgnoredColumnNames(dataTableId, environmentId, ignoredColumnNames);
 
         if (columnValues.isEmpty()) {
-            DataTableRow dataTableRow = getRow(baseName, id, environmentId);
+            DataTableRow dataTableRow = getRow(dataTableId, id, environmentId);
 
             if (dataTableRow == null) {
                 throw new IllegalArgumentException("Row not found: id=" + id);
@@ -837,7 +777,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                     physicalName, setClause, allColumnNames, preparedStatementSetter);
             } else {
                 updatedDataTableRow = updateRowAfterUpdating(
-                    baseName, physicalName, setClause, id, environmentId, preparedStatementSetter);
+                    dataTableId, physicalName, setClause, id, environmentId, preparedStatementSetter);
             }
         } catch (DuplicateKeyException duplicateKeyException) {
             throw toExternalIdConflict(
@@ -848,7 +788,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             throw new IllegalArgumentException("Row not found: id=" + id);
         }
 
-        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_UPDATED, List.of(updatedDataTableRow), environmentId);
+        publishWebhookEvent(dataTableId, DataTableWebhookType.RECORD_UPDATED, List.of(updatedDataTableRow),
+            environmentId);
 
         return updatedDataTableRow;
     }
@@ -856,24 +797,22 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Override
     @Transactional
     public UpsertResult upsertRow(
-        String baseName, String externalId, Map<String, Object> values, long environmentId) {
+        long dataTableId, String externalId, Map<String, Object> values, long environmentId) {
 
-        validateBaseName(baseName);
+        String physicalName = DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableId);
 
-        String physicalName = buildPhysicalName(environmentId, baseName);
-
-        checkHasId(baseName, physicalName);
+        checkHasId(dataTableId, physicalName);
 
         Set<String> ignoredColumnNames = new LinkedHashSet<>();
 
         UpsertResult upsertResult = upsertRowWithoutEvent(
-            baseName, physicalName, listColumns(physicalName), externalId, values, environmentId,
+            dataTableId, physicalName, listColumns(physicalName), externalId, values, environmentId,
             ignoredColumnNames);
 
-        logIgnoredColumnNames(baseName, environmentId, ignoredColumnNames);
+        logIgnoredColumnNames(dataTableId, environmentId, ignoredColumnNames);
 
         publishWebhookEvent(
-            baseName,
+            dataTableId,
             upsertResult.created() ? DataTableWebhookType.RECORD_CREATED : DataTableWebhookType.RECORD_UPDATED,
             List.of(upsertResult.row()), environmentId);
 
@@ -882,7 +821,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     private UpsertResult upsertRowWithoutEvent(
-        String baseName, String physicalName, List<ColumnSpec> columnSpecs, @Nullable String externalId,
+        long dataTableId, String physicalName, List<ColumnSpec> columnSpecs, @Nullable String externalId,
         Map<String, Object> values, long environmentId, Set<String> ignoredColumnNames) {
 
         if (externalId == null || externalId.isBlank()) {
@@ -890,20 +829,20 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                 "An upsert needs an external id", DataTableErrorType.ROW_EXTERNAL_ID_REQUIRED);
         }
 
-        ColumnValue externalIdColumnValue = toExternalIdColumnValue(baseName, columnSpecs, externalId);
+        ColumnValue externalIdColumnValue = toExternalIdColumnValue(dataTableId, columnSpecs, externalId);
 
         List<ColumnValue> columnValues = getColumnValues(
             columnSpecs, values, ValuePolicy.SINGLE_ROW, ignoredColumnNames);
 
         if (!isReturningSupported()) {
             Optional<DataTableRow> existingDataTableRow = findRows(
-                baseName, externalIdConditions(externalId), List.of(), 1, 0, environmentId).stream()
+                dataTableId, externalIdConditions(externalId), List.of(), 1, 0, environmentId).stream()
                     .findFirst();
 
             if (existingDataTableRow.isEmpty()) {
                 return new UpsertResult(
                     insertRowWithoutEvent(
-                        baseName, physicalName, columnSpecs, values, externalId, environmentId, ignoredColumnNames),
+                        dataTableId, physicalName, columnSpecs, values, externalId, environmentId, ignoredColumnNames),
                     true);
             }
 
@@ -916,7 +855,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             String setClause = buildSetClause(columnValues);
 
             DataTableRow updatedDataTableRow = updateRowAfterUpdating(
-                baseName, physicalName, setClause, dataTableRow.id(), environmentId, preparedStatement -> {
+                dataTableId, physicalName, setClause, dataTableRow.id(), environmentId, preparedStatement -> {
                     int index = setColumnValues(preparedStatement, 1, columnValues);
 
                     preparedStatement.setLong(index, dataTableRow.id());
@@ -969,29 +908,19 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         return Objects.requireNonNull(upsertResult, "upsertResult");
     }
 
-    /**
-     * Updates every row of a data table matching the given OR groups of AND conditions in one transaction.
-     *
-     * <p>
-     * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because filter and updated columns must
-     * match an existing column and all identifiers are validated through {@link #escapeIdentifier(String)} and
-     * {@link #validateBaseName(String)}. Filter and row values use parameterized queries.
-     */
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     @Transactional
     public List<DataTableRow> updateRows(
-        String baseName, DataTableRowConditions conditions, Map<String, Object> values, long environmentId) {
+        long dataTableId, DataTableRowConditions conditions, Map<String, Object> values, long environmentId) {
 
         Objects.requireNonNull(conditions, "conditions");
 
         conditions.requireAtLeastOneCondition();
 
-        validateBaseName(baseName);
+        String physicalName = DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableId);
 
-        String physicalName = buildPhysicalName(environmentId, baseName);
-
-        checkHasId(baseName, physicalName);
+        checkHasId(dataTableId, physicalName);
 
         List<ColumnSpec> columnSpecs = listColumns(physicalName);
 
@@ -1045,7 +974,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         List<DataTableRow> sortedDataTableRows = sortById(updatedDataTableRows);
 
-        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_UPDATED, sortedDataTableRows, environmentId);
+        publishWebhookEvent(dataTableId, DataTableWebhookType.RECORD_UPDATED, sortedDataTableRows, environmentId);
 
         return sortedDataTableRows;
     }
@@ -1165,11 +1094,11 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         return columnValues;
     }
 
-    private static void logIgnoredColumnNames(String baseName, long environmentId, Set<String> ignoredColumnNames) {
+    private static void logIgnoredColumnNames(long dataTableId, long environmentId, Set<String> ignoredColumnNames) {
         if (!ignoredColumnNames.isEmpty()) {
             log.warn(
-                "Ignored values for unknown column(s) {} of data table '{}' in environment {}",
-                String.join(", ", ignoredColumnNames), baseName, environmentId);
+                "Ignored values for unknown column(s) {} of data table {} in environment {}",
+                String.join(", ", ignoredColumnNames), dataTableId, environmentId);
         }
     }
 
@@ -1202,11 +1131,11 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     }
 
     private static ColumnValue toExternalIdColumnValue(
-        String baseName, List<ColumnSpec> columnSpecs, @Nullable String externalId) {
+        long dataTableId, List<ColumnSpec> columnSpecs, @Nullable String externalId) {
 
         ColumnSpec externalIdColumnSpec = findColumnSpec(columnSpecs, ReservedColumns.EXTERNAL_ID)
             .orElseThrow(() -> new IllegalStateException(
-                "Table '%s' has no external_id column".formatted(baseName)));
+                "Data table %d has no external_id column".formatted(dataTableId)));
 
         if (externalId != null && (externalId.isBlank() || externalId.length() > MAX_EXTERNAL_ID_LENGTH)) {
             throw new DataTableException(
@@ -1241,7 +1170,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     }
 
     private void publishWebhookEvent(
-        String baseName, DataTableWebhookType dataTableWebhookType, List<DataTableRow> dataTableRows,
+        long dataTableId, DataTableWebhookType dataTableWebhookType, List<DataTableRow> dataTableRows,
         long environmentId) {
 
         List<DataTableRow> publishedDataTableRows = dataTableRows;
@@ -1257,7 +1186,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         }
 
         applicationEventPublisher.publishEvent(
-            new DataTableWebhookEvent(baseName, dataTableWebhookType, publishedDataTableRows, environmentId));
+            new DataTableWebhookEvent(dataTableId, dataTableWebhookType, publishedDataTableRows, environmentId));
     }
 
     private static boolean hasValues(DataTableRow dataTableRow) {
@@ -1383,21 +1312,6 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         return dataTableRows.stream()
             .sorted(Comparator.comparingLong(DataTableRow::id))
             .toList();
-    }
-
-    private void validateBaseName(String baseName) {
-        Assert.hasText(baseName, "baseName must not be empty");
-
-        String normalizedName = baseName.toLowerCase(Locale.ROOT);
-
-        Assert.isTrue(!normalizedName.startsWith("dt_"), "baseName must not start with 'dt_'");
-        Assert.isTrue(normalizedName.matches("[a-z_][a-z0-9_]*"), "Invalid base name: " + baseName);
-    }
-
-    private String buildPhysicalName(long environmentId, String baseName) {
-        String normalizedName = baseName.toLowerCase(Locale.ROOT);
-
-        return "dt_" + environmentId + "_" + normalizedName;
     }
 
     private String buildCondition(
@@ -1745,7 +1659,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                     columnName, String.join(", ", getColumnNames(columnSpecs)))));
     }
 
-    private void checkHasId(String baseName, String physicalName) {
+    private void checkHasId(long dataTableId, String physicalName) {
         String sql =
             "SELECT 1 FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = ? AND " +
                 "column_name = 'id'";
@@ -1760,7 +1674,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         List<ColumnSpec> columnSpecs = listColumns(physicalName);
 
         if (columnSpecs.isEmpty()) {
-            throw new IllegalArgumentException("Table '%s' not found".formatted(baseName));
+            throw new IllegalArgumentException("Data table %d not found in this environment".formatted(dataTableId));
         }
 
         throw new IllegalStateException("Table does not have primary key column 'id': " + physicalName);
@@ -2001,9 +1915,9 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     private DataTableRow deleteRowAfterReadingValues(
-        String baseName, String physicalName, long id, long environmentId) {
+        long dataTableId, String physicalName, long id, long environmentId) {
 
-        DataTableRow dataTableRow = getRow(baseName, id, environmentId);
+        DataTableRow dataTableRow = getRow(dataTableId, id, environmentId);
 
         if (dataTableRow == null) {
             return null;
@@ -2055,7 +1969,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     }
 
     private DataTableRow insertRowAfterInserting(
-        String baseName, String physicalName, String valuesClause, long environmentId,
+        long dataTableId, String physicalName, String valuesClause, long environmentId,
         PreparedStatementSetter preparedStatementSetter) {
 
         String sql = "INSERT INTO " + escapeIdentifier(physicalName) + valuesClause;
@@ -2071,7 +1985,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             return null;
         }
 
-        return getRow(baseName, generatedKey.longValue(), environmentId);
+        return getRow(dataTableId, generatedKey.longValue(), environmentId);
     }
 
     private Optional<Boolean> resolveReturningSupported() {
@@ -2095,7 +2009,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     private DataTableRow updateRowAfterUpdating(
-        String baseName, String physicalName, String setClause, long id, long environmentId,
+        long dataTableId, String physicalName, String setClause, long id, long environmentId,
         PreparedStatementSetter preparedStatementSetter) {
 
         String sql = "UPDATE " + escapeIdentifier(physicalName) + " SET " + setClause + " WHERE \"id\" = ?";
@@ -2106,7 +2020,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             return null;
         }
 
-        return getRow(baseName, id, environmentId);
+        return getRow(dataTableId, id, environmentId);
     }
 
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")

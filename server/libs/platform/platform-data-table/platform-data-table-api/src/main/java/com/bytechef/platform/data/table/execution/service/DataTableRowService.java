@@ -43,30 +43,27 @@ public interface DataTableRowService {
     /**
      * Deletes a row by id.
      *
-     * @param baseName      the logical table base name
      * @param id            the row id
      * @param environmentId the environment ID
      * @return true if a row was deleted, false if no row with that id exists
      */
-    boolean deleteRow(String baseName, long id, long environmentId);
+    boolean deleteRow(long dataTableId, long id, long environmentId);
 
     /**
      * Deletes every row of the table in one transaction. One deleted event holding every deleted row is published;
      * webhooks are called once the transaction commits. When the table is empty, nothing is published and an empty list
      * is returned.
      *
-     * @param baseName      the logical table base name
      * @param environmentId the environment ID
      * @return the deleted rows ordered by id
      */
-    List<DataTableRow> deleteAllRows(String baseName, long environmentId);
+    List<DataTableRow> deleteAllRows(long dataTableId, long environmentId);
 
     /**
      * Deletes every row that satisfies the given conditions in one transaction. One deleted event holding every deleted
      * row is published; webhooks are called once the transaction commits. When no row matches, nothing is deleted and
      * an empty list is returned.
      *
-     * @param baseName      the logical table base name
      * @param conditions    the conditions selecting the rows to delete; must contain at least one condition
      * @param environmentId the environment ID
      * @return the deleted rows ordered by id
@@ -74,23 +71,21 @@ public interface DataTableRowService {
      *                                  value that is not valid for the column type, or uses a text operation on a
      *                                  non-text column
      */
-    List<DataTableRow> deleteRows(String baseName, DataTableRowConditions conditions, long environmentId);
+    List<DataTableRow> deleteRows(long dataTableId, DataTableRowConditions conditions, long environmentId);
 
     /**
      * Gets a single row by its id.
      *
-     * @param baseName      the logical table base name
      * @param id            the row id
      * @param environmentId the environment ID
      * @return the row if found, null otherwise
      */
     @Nullable
-    DataTableRow getRow(String baseName, long id, long environmentId);
+    DataTableRow getRow(long dataTableId, long id, long environmentId);
 
     /**
      * Inserts a row with provided values. Returns the created row including generated id.
      *
-     * @param baseName      the logical table base name
      * @param values        column name to value map; an id key and keys naming no column are ignored, a null value
      *                      stores null and a blank value stores an empty string in a text column and null otherwise
      * @param environmentId the environment ID
@@ -98,36 +93,33 @@ public interface DataTableRowService {
      * @throws IllegalArgumentException if a value is not valid for the column type, or there are keys other than id and
      *                                  none of them names a column
      */
-    DataTableRow insertRow(String baseName, Map<String, Object> values, long environmentId);
+    DataTableRow insertRow(long dataTableId, Map<String, Object> values, long environmentId);
 
     /**
      * Inserts rows in one transaction: a row that is not valid stops the insert and no row is inserted. One created
      * event holding every inserted row is published; webhooks are called once the transaction commits.
      *
-     * @param baseName      the logical table base name
      * @param rowValues     one column name to value map per row, with the same rules as {@link #insertRow}
      * @param environmentId the environment ID
      * @return the created rows with generated ids, in the given order
      * @throws IllegalArgumentException if a value is not valid for the column type; the message names the row
      */
-    List<DataTableRow> insertRows(String baseName, List<Map<String, Object>> rowValues, long environmentId);
+    List<DataTableRow> insertRows(long dataTableId, List<Map<String, Object>> rowValues, long environmentId);
 
     /**
      * Lists rows of a dynamic table ordered by id ascending, with pagination.
      *
-     * @param baseName      the logical table base name
      * @param limit         maximum number of rows to return; must not be negative
      * @param offset        number of rows to skip; must not be negative
      * @param environmentId the environment ID
      * @return list of rows with their data
      * @throws IllegalArgumentException if limit or offset is negative
      */
-    List<DataTableRow> listRows(String baseName, int limit, int offset, long environmentId);
+    List<DataTableRow> listRows(long dataTableId, int limit, int offset, long environmentId);
 
     /**
      * Lists rows of a dynamic table that satisfy the given conditions, ordered by the given sort, with pagination.
      *
-     * @param baseName      the logical table base name
      * @param conditions    the conditions a row must satisfy; {@link DataTableRowConditions#matchAll()} returns every
      *                      row
      * @param sorts         the sort order, column by column; empty to order by id ascending
@@ -140,34 +132,33 @@ public interface DataTableRowService {
      *                                  uses a text operation on a non-text column
      */
     List<DataTableRow> findRows(
-        String baseName, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int limit,
+        long dataTableId, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int limit,
         int offset, long environmentId);
 
-    long countRows(String baseName, DataTableRowConditions conditions, long environmentId);
+    long countRows(long dataTableId, DataTableRowConditions conditions, long environmentId);
 
-    Optional<DataTableRow> fetchRowByExternalId(String baseName, String externalId, long environmentId);
+    Optional<DataTableRow> fetchRowByExternalId(long dataTableId, String externalId, long environmentId);
 
     DataTableRow
-        insertRow(String baseName, Map<String, Object> values, @Nullable String externalId, long environmentId);
+        insertRow(long dataTableId, Map<String, Object> values, @Nullable String externalId, long environmentId);
 
     List<DataTableRow> insertRows(
-        String baseName, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId);
+        long dataTableId, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId);
 
     DataTableRow updateRow(
-        String baseName, long id, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
+        long dataTableId, long id, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
         long environmentId);
 
-    UpsertResult upsertRow(String baseName, String externalId, Map<String, Object> values, long environmentId);
+    UpsertResult upsertRow(long dataTableId, String externalId, Map<String, Object> values, long environmentId);
 
     /**
      * Exports the entire table (excluding the primary key column 'id' in the header) as CSV text. The first row is a
      * header with column names in their physical order.
      *
-     * @param baseName      the logical table base name
      * @param environmentId the environment ID
      * @return CSV text representation of all rows
      */
-    String exportCsv(String baseName, long environmentId);
+    String exportCsv(long dataTableId, long environmentId);
 
     /**
      * Imports CSV text into the table. The CSV must contain a header row with column names matching existing columns
@@ -175,19 +166,17 @@ public interface DataTableRowService {
      * column keys each row. The import runs in one transaction: a cell that is not valid for its column type stops the
      * import and no row is imported.
      *
-     * @param baseName      the logical table base name
      * @param csv           CSV text with header row
      * @param environmentId the environment ID
      * @return the number of imported rows
      * @throws IllegalArgumentException if the header matches no column of the table, or a cell is not valid for its
      *                                  column type; the message names the CSV line
      */
-    int importCsv(String baseName, String csv, long environmentId);
+    int importCsv(long dataTableId, String csv, long environmentId);
 
     /**
      * Updates a row by its stable id. Returns the updated row.
      *
-     * @param baseName      the logical table base name
      * @param id            the row id
      * @param values        column name to value map (only provided columns will be updated); an id key and keys naming
      *                      no column are ignored, a null value sets the column to null and a blank value clears it,
@@ -197,14 +186,13 @@ public interface DataTableRowService {
      * @throws IllegalArgumentException if a value is not valid for the column type, there are keys other than id and
      *                                  none of them names a column, or no row with that id exists
      */
-    DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId);
+    DataTableRow updateRow(long dataTableId, long id, Map<String, Object> values, long environmentId);
 
     /**
      * Updates every row that satisfies the given conditions in one transaction. One updated event holding every updated
      * row is published; webhooks are called once the transaction commits. When no row matches, nothing is updated and
      * an empty list is returned.
      *
-     * @param baseName      the logical table base name
      * @param conditions    the conditions selecting the rows to update; must contain at least one condition
      * @param values        column name to value map; at least one column is required, and values must not be null or
      *                      blank
@@ -215,5 +203,5 @@ public interface DataTableRowService {
      *                                  valid for the column type
      */
     List<DataTableRow> updateRows(
-        String baseName, DataTableRowConditions conditions, Map<String, Object> values, long environmentId);
+        long dataTableId, DataTableRowConditions conditions, Map<String, Object> values, long environmentId);
 }

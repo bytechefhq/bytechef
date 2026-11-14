@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.data.table.remote.client.service;
 
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
@@ -26,67 +27,75 @@ import org.springframework.stereotype.Component;
 public class RemoteDataTableServiceClient implements DataTableService {
 
     @Override
-    public void createTable(String baseName, List<ColumnSpec> columnSpecs, long environmentId) {
+    public void addColumn(long dataTableId, ColumnSpec columnSpec, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void createTable(String baseName, String description, List<ColumnSpec> columnSpecs, long environmentId) {
+    public long createTable(
+        @Nullable Long workspaceId, String name, @Nullable String description, List<ColumnSpec> columnSpecs,
+        long environmentId) {
+
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void addColumn(String baseName, ColumnSpec columnSpec, long environmentId) {
+    public boolean dropTable(long dataTableId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void removeColumn(String baseName, String columnName, long environmentId) {
+    public long duplicateTable(long dataTableId, String newName, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void renameColumn(String baseName, String fromColumnName, String toColumnName, long environmentId) {
+    public Optional<DataTable> fetchDataTable(@Nullable Long workspaceId, String name) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean dropTable(String baseName, long environmentId) {
+    public Optional<DataTableInfo> fetchDataTableInfo(long dataTableId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<DataTableInfo> listTables(long environmentId) {
+    public DataTable getDataTable(long dataTableId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public String getBaseNameById(long id) {
+    public List<DataTable> getWorkspaceDataTables(long workspaceId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public long getIdByBaseName(String baseName) {
+    public List<DataTableInfo> listAllTables(long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void renameTable(String fromBaseName, String toBaseName, long environmentId) {
+    public List<DataTableInfo> listTables(@Nullable Long workspaceId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void duplicateTable(String fromBaseName, String toBaseName, long environmentId) {
+    public void removeColumn(long dataTableId, String columnName, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Optional<DataTableInfo> fetchDataTableInfo(String baseName, long environmentId) {
+    public void renameColumn(long dataTableId, String fromColumnName, String toColumnName, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void updateDescription(String baseName, @Nullable String description) {
+    public void renameTable(long dataTableId, String newName) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void updateDescription(long dataTableId, @Nullable String description) {
         throw new UnsupportedOperationException();
     }
 }

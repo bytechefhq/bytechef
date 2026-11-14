@@ -32,7 +32,9 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.facade.DataTableRowFacade;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
@@ -50,23 +52,26 @@ public class DataTableUpdateRecordAction {
 
     private final DataTableRowFacade dataTableRowFacade;
     private final DataTableRowService dataTableRowService;
+    private final DataTableWorkspaceResolver dataTableWorkspaceResolver;
     private final DataTableService dataTableService;
 
     @SuppressFBWarnings("EI")
     public static ModifiableActionDefinition of(
         DataTableService dataTableService, DataTableRowFacade dataTableRowFacade,
-        DataTableRowService dataTableRowService) {
+        DataTableRowService dataTableRowService, DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
-        return new DataTableUpdateRecordAction(dataTableService, dataTableRowFacade, dataTableRowService).build();
+        return new DataTableUpdateRecordAction(dataTableService, dataTableRowFacade, dataTableRowService,
+            dataTableWorkspaceResolver).build();
     }
 
     private DataTableUpdateRecordAction(
         DataTableService dataTableService, DataTableRowFacade dataTableRowFacade,
-        DataTableRowService dataTableRowService) {
+        DataTableRowService dataTableRowService, DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
         this.dataTableRowFacade = dataTableRowFacade;
         this.dataTableRowService = dataTableRowService;
         this.dataTableService = dataTableService;
+        this.dataTableWorkspaceResolver = dataTableWorkspaceResolver;
     }
 
     private ModifiableActionDefinition build() {
@@ -78,13 +83,14 @@ public class DataTableUpdateRecordAction {
                     .label("Table")
                     .resourceReference(ResourceType.DATA_TABLE)
                     .required(true)
-                    .options(DataTableUtils.getActionTableOptions(dataTableService)),
+                    .options(DataTableUtils.getActionTableOptions(dataTableService, dataTableWorkspaceResolver)),
                 integer(ID)
                     .label("Record ID")
                     .required(true),
-                dynamicProperties(VALUES, DataTableUtils.createDynamicProperties(dataTableService, true))
-                    .propertiesLookupDependsOn(TABLE)
-                    .required(true))
+                dynamicProperties(VALUES,
+                    DataTableUtils.createDynamicProperties(dataTableService, dataTableWorkspaceResolver, true))
+                        .propertiesLookupDependsOn(TABLE)
+                        .required(true))
             .output(this::output)
             .help("", "https://docs.bytechef.io/reference/components/data-table_v1#update-record")
             .perform(this::perform);
@@ -94,11 +100,16 @@ public class DataTableUpdateRecordAction {
     private OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        String baseName = inputParameters.getRequiredString(TABLE);
+        String name = inputParameters.getRequiredString(TABLE);
 
-        var rowSchema = DataTableUtils.rowObjectSchema(dataTableService, DEVELOPMENT, baseName);
+        long workspaceId = DataTableUtils.resolveWorkspaceId(dataTableWorkspaceResolver, actionContext);
 
-        List<DataTableRow> rows = dataTableRowService.listRows(baseName, 1, 0, DEVELOPMENT.ordinal());
+        DataTableInfo dataTableInfo = DataTableUtils.resolveDataTable(
+            dataTableService, workspaceId, name, DEVELOPMENT.ordinal());
+
+        var rowSchema = DataTableUtils.rowObjectSchema(dataTableInfo);
+
+        List<DataTableRow> rows = dataTableRowService.listRows(dataTableInfo.id(), 1, 0, DEVELOPMENT.ordinal());
 
         if (rows.isEmpty()) {
             return OutputResponse.of(rowSchema);
@@ -107,7 +118,7 @@ public class DataTableUpdateRecordAction {
         DataTableRow firstRow = rows.getFirst();
 
         Map<String, Object> sampleOutput = DataTableUtils.createSampleOutput(
-            dataTableService, DEVELOPMENT, baseName, firstRow.id(), firstRow.values());
+            dataTableInfo, firstRow.id(), firstRow.values());
 
         return OutputResponse.of(rowSchema, sampleOutput);
     }
@@ -120,12 +131,15 @@ public class DataTableUpdateRecordAction {
 
         ActionContextAware actionContextAware = (ActionContextAware) actionContext;
 
-        String baseName = inputParameters.getRequiredString(TABLE);
+        String name = inputParameters.getRequiredString(TABLE);
+
+        long dataTableId = DataTableUtils.resolveDataTableId(
+            dataTableService, dataTableWorkspaceResolver, actionContext, name);
         long id = inputParameters.getRequiredLong(ID);
         Map<String, Object> values = (Map<String, Object>) inputParameters.getRequired(VALUES, Map.class);
 
         return DataTableUtils.flattenRow(
             dataTableRowFacade.updateRow(
-                baseName, id, values, Objects.requireNonNull(actionContextAware.getEnvironmentId())));
+                dataTableId, id, values, Objects.requireNonNull(actionContextAware.getEnvironmentId())));
     }
 }

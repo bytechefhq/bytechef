@@ -22,7 +22,9 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.component.trigger.WebhookRequest.WebhookBodyImpl;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
+import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.event.DataTableWebhookEvent;
@@ -65,6 +67,7 @@ public class DataTableWebhookEventListener {
     private static final Logger log = LoggerFactory.getLogger(DataTableWebhookEventListener.class);
 
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final DataTableService dataTableService;
     private final DataTableWebhookService dataTableWebhookService;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final TransactionTemplate lookupTransactionTemplate;
@@ -73,12 +76,14 @@ public class DataTableWebhookEventListener {
 
     @SuppressFBWarnings("EI")
     public DataTableWebhookEventListener(
-        DataTableWebhookService dataTableWebhookService, ApplicationEventPublisher applicationEventPublisher,
+        DataTableService dataTableService, DataTableWebhookService dataTableWebhookService,
+        ApplicationEventPublisher applicationEventPublisher,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         PlatformTransactionManager platformTransactionManager,
         WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade) {
 
         this.applicationEventPublisher = applicationEventPublisher;
+        this.dataTableService = dataTableService;
         this.dataTableWebhookService = dataTableWebhookService;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.workflowNodeTestOutputFacade = workflowNodeTestOutputFacade;
@@ -94,7 +99,7 @@ public class DataTableWebhookEventListener {
 
     @EventListener
     public void onDataTableWebhookEvent(DataTableWebhookEvent event) {
-        String baseName = event.getBaseName();
+        long dataTableId = event.getDataTableId();
         long environmentId = event.getEnvironmentId();
         List<DataTableRow> rows = event.getRows();
         DataTableWebhookType type = event.getType();
@@ -102,11 +107,27 @@ public class DataTableWebhookEventListener {
         List<DataTableWebhookService.Webhook> hooks;
 
         try {
-            hooks = lookupTransactionTemplate.execute(status -> listWebhooks(baseName, environmentId, type));
+            hooks = lookupTransactionTemplate.execute(status -> listWebhooks(dataTableId, environmentId, type));
         } catch (RuntimeException runtimeException) {
             log.error(
-                "Data table webhooks for {} on table '{}' in environment {} could not be listed; {} rows were not sent",
-                type, baseName, environmentId, rows.size(), runtimeException);
+                "Data table webhooks for {} on table {} in environment {} could not be listed; {} rows were not sent",
+                type, dataTableId, environmentId, rows.size(), runtimeException);
+
+            return;
+        }
+
+        if (hooks.isEmpty()) {
+            return;
+        }
+
+        String tableName;
+
+        try {
+            tableName = lookupTransactionTemplate.execute(status -> getTableName(dataTableId));
+        } catch (RuntimeException runtimeException) {
+            log.error(
+                "Data table {} could not be read; {} rows were not sent for {}", dataTableId, rows.size(), type,
+                runtimeException);
 
             return;
         }
@@ -125,7 +146,7 @@ public class DataTableWebhookEventListener {
             }
 
             if (workflowExecutionId.getJobPrincipalId() == EDITOR_TEST_JOB_PRINCIPAL_ID) {
-                saveTestOutputs(hook, workflowExecutionId, environmentId, type, baseName, rows);
+                saveTestOutputs(hook, workflowExecutionId, environmentId, type, tableName, rows);
 
                 continue;
             }
@@ -136,7 +157,7 @@ public class DataTableWebhookEventListener {
 
             for (DataTableRow row : rows) {
                 WebhookRequest webhookRequest = createWebhookRequest(
-                    hook.workflowExecutionId(), createBody(type, baseName, row));
+                    hook.workflowExecutionId(), createBody(type, tableName, row));
 
                 applicationEventPublisher.publishEvent(
                     new TriggerWebhookEvent(new WebhookParameters(workflowExecutionId, webhookRequest)));
@@ -173,12 +194,12 @@ public class DataTableWebhookEventListener {
 
     private void saveTestOutputs(
         DataTableWebhookService.Webhook hook, WorkflowExecutionId workflowExecutionId, long environmentId,
-        DataTableWebhookType type, String baseName, List<DataTableRow> rows) {
+        DataTableWebhookType type, String tableName, List<DataTableRow> rows) {
 
         List<WebhookRequest> webhookRequests = new ArrayList<>();
 
         for (DataTableRow row : rows) {
-            webhookRequests.add(createWebhookRequest(hook.workflowExecutionId(), createBody(type, baseName, row)));
+            webhookRequests.add(createWebhookRequest(hook.workflowExecutionId(), createBody(type, tableName, row)));
         }
 
         Runnable saveRunnable = () -> {
@@ -207,16 +228,22 @@ public class DataTableWebhookEventListener {
         }
     }
 
-    private List<DataTableWebhookService.Webhook> listWebhooks(
-        String baseName, long environmentId, DataTableWebhookType type) {
+    private String getTableName(long dataTableId) {
+        DataTable dataTable = dataTableService.getDataTable(dataTableId);
 
-        return dataTableWebhookService.listWebhooks(baseName, environmentId)
+        return dataTable.getName();
+    }
+
+    private List<DataTableWebhookService.Webhook> listWebhooks(
+        long dataTableId, long environmentId, DataTableWebhookType type) {
+
+        return dataTableWebhookService.listWebhooks(dataTableId, environmentId)
             .stream()
             .filter(webhook -> webhook.type() == type)
             .toList();
     }
 
-    private static Map<String, Object> createBody(DataTableWebhookType type, String baseName, DataTableRow row) {
+    private static Map<String, Object> createBody(DataTableWebhookType type, String tableName, DataTableRow row) {
         Map<String, Object> body = new LinkedHashMap<>();
         Map<String, Object> payload = new LinkedHashMap<>();
 
@@ -224,7 +251,7 @@ public class DataTableWebhookEventListener {
         payload.put("values", toPayloadValues(row.values()));
 
         body.put("type", type.name());
-        body.put("table", baseName);
+        body.put("table", tableName);
         body.put("timestamp", String.valueOf(Instant.now()));
         body.put("payload", payload);
 

@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
+import com.bytechef.platform.data.table.config.DataTableIntTestUtils;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
@@ -48,7 +49,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @Import(PostgreSQLContainerConfiguration.class)
 class DataTableRowFacadeIntTest {
 
-    private static final String BASE_NAME = "rows";
     private static final long DEV_ENVIRONMENT_ID = 0;
     private static final String TABLE_NAMES_SQL =
         "SELECT tablename FROM pg_tables WHERE schemaname = current_schema() AND tablename LIKE 'dt\\_%' ESCAPE '\\'";
@@ -71,6 +71,8 @@ class DataTableRowFacadeIntTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    private long dataTableId;
+
     private long originalMaxSizeBytes;
 
     @BeforeEach
@@ -79,16 +81,17 @@ class DataTableRowFacadeIntTest {
 
         originalMaxSizeBytes = dataTable.getMaxSizeBytes();
 
-        dataTableService.dropTable(BASE_NAME, DEV_ENVIRONMENT_ID);
-        dataTableService.createTable(
-            BASE_NAME, null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+        DataTableIntTestUtils.dropAll(jdbcTemplate);
+
+        dataTableId = dataTableService.createTable(
+            null, "rows", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
     }
 
     @AfterEach
     void afterEach() {
         setLimit(originalMaxSizeBytes);
 
-        dataTableService.dropTable(BASE_NAME, DEV_ENVIRONMENT_ID);
+        DataTableIntTestUtils.dropAll(jdbcTemplate);
     }
 
     @Test
@@ -97,7 +100,7 @@ class DataTableRowFacadeIntTest {
 
         assertThrows(
             DataTableStorageLimitExceededException.class,
-            () -> dataTableRowFacade.insertRow(BASE_NAME, Map.of("title", "first"), DEV_ENVIRONMENT_ID));
+            () -> dataTableRowFacade.insertRow(dataTableId, Map.of("title", "first"), DEV_ENVIRONMENT_ID));
 
         assertTrue(listRows().isEmpty());
     }
@@ -108,10 +111,10 @@ class DataTableRowFacadeIntTest {
 
         assertThrows(
             DataTableStorageLimitExceededException.class,
-            () -> dataTableRowFacade.insertRow(BASE_NAME, Map.of("title", "x".repeat(200)), DEV_ENVIRONMENT_ID));
+            () -> dataTableRowFacade.insertRow(dataTableId, Map.of("title", "x".repeat(200)), DEV_ENVIRONMENT_ID));
 
         DataTableRow dataTableRow = dataTableRowFacade.insertRow(
-            BASE_NAME, Map.of("title", "first"), DEV_ENVIRONMENT_ID);
+            dataTableId, Map.of("title", "first"), DEV_ENVIRONMENT_ID);
 
         assertStoredRow(dataTableRow, "first");
         assertEquals(1, listRows().size());
@@ -120,14 +123,14 @@ class DataTableRowFacadeIntTest {
     @Test
     void testUpdateRowIsRejectedPastTheStorageLimit() {
         DataTableRow dataTableRow = dataTableRowFacade.insertRow(
-            BASE_NAME, Map.of("title", "first"), DEV_ENVIRONMENT_ID);
+            dataTableId, Map.of("title", "first"), DEV_ENVIRONMENT_ID);
 
         limitStorageToLiveBytesPlus(0);
 
         assertThrows(
             DataTableStorageLimitExceededException.class,
             () -> dataTableRowFacade.updateRow(
-                BASE_NAME, dataTableRow.id(), Map.of("title", "second"), DEV_ENVIRONMENT_ID));
+                dataTableId, dataTableRow.id(), Map.of("title", "second"), DEV_ENVIRONMENT_ID));
 
         assertStoredRow(dataTableRow, "first");
     }
@@ -135,12 +138,12 @@ class DataTableRowFacadeIntTest {
     @Test
     void testUpdateRowNearTheStorageLimitChecksOnlyTheGrowthOfTheRow() {
         DataTableRow dataTableRow = dataTableRowFacade.insertRow(
-            BASE_NAME, Map.of("title", "x".repeat(100)), DEV_ENVIRONMENT_ID);
+            dataTableId, Map.of("title", "x".repeat(100)), DEV_ENVIRONMENT_ID);
 
         limitStorageToLiveBytesPlus(50);
 
         DataTableRow updatedDataTableRow = dataTableRowFacade.updateRow(
-            BASE_NAME, dataTableRow.id(), Map.of("title", "y".repeat(140)), DEV_ENVIRONMENT_ID);
+            dataTableId, dataTableRow.id(), Map.of("title", "y".repeat(140)), DEV_ENVIRONMENT_ID);
 
         assertStoredRow(updatedDataTableRow, "y".repeat(140));
     }
@@ -148,14 +151,14 @@ class DataTableRowFacadeIntTest {
     @Test
     void testUpdateRowGrowingPastTheStorageLimitIsRejected() {
         DataTableRow dataTableRow = dataTableRowFacade.insertRow(
-            BASE_NAME, Map.of("title", "x".repeat(100)), DEV_ENVIRONMENT_ID);
+            dataTableId, Map.of("title", "x".repeat(100)), DEV_ENVIRONMENT_ID);
 
         limitStorageToLiveBytesPlus(50);
 
         assertThrows(
             DataTableStorageLimitExceededException.class,
             () -> dataTableRowFacade.updateRow(
-                BASE_NAME, dataTableRow.id(), Map.of("title", "y".repeat(200)), DEV_ENVIRONMENT_ID));
+                dataTableId, dataTableRow.id(), Map.of("title", "y".repeat(200)), DEV_ENVIRONMENT_ID));
 
         assertStoredRow(dataTableRow, "x".repeat(100));
     }
@@ -163,12 +166,12 @@ class DataTableRowFacadeIntTest {
     @Test
     void testUpdateRowThatShrinksTheRowPassesAtTheStorageLimit() {
         DataTableRow dataTableRow = dataTableRowFacade.insertRow(
-            BASE_NAME, Map.of("title", "x".repeat(250)), DEV_ENVIRONMENT_ID);
+            dataTableId, Map.of("title", "x".repeat(250)), DEV_ENVIRONMENT_ID);
 
         limitStorageToLiveBytesPlus(0);
 
         DataTableRow updatedDataTableRow = dataTableRowFacade.updateRow(
-            BASE_NAME, dataTableRow.id(), Map.of("title", "y"), DEV_ENVIRONMENT_ID);
+            dataTableId, dataTableRow.id(), Map.of("title", "y"), DEV_ENVIRONMENT_ID);
 
         assertStoredRow(updatedDataTableRow, "y");
     }
@@ -179,7 +182,7 @@ class DataTableRowFacadeIntTest {
 
         assertThrows(
             DataTableStorageLimitExceededException.class,
-            () -> dataTableRowFacade.importCsv(BASE_NAME, "title\nfirst\n", DEV_ENVIRONMENT_ID));
+            () -> dataTableRowFacade.importCsv(dataTableId, "title\nfirst\n", DEV_ENVIRONMENT_ID));
 
         assertTrue(listRows().isEmpty());
     }
@@ -188,7 +191,7 @@ class DataTableRowFacadeIntTest {
     void testImportCsvWithinTheStorageLimitImportsTheRows() {
         limitStorageToLiveBytesPlus(1_000);
 
-        dataTableRowFacade.importCsv(BASE_NAME, "title\nfirst\n", DEV_ENVIRONMENT_ID);
+        dataTableRowFacade.importCsv(dataTableId, "title\nfirst\n", DEV_ENVIRONMENT_ID);
 
         List<DataTableRow> dataTableRows = listRows();
 
@@ -203,7 +206,7 @@ class DataTableRowFacadeIntTest {
             .get("title"));
 
         DataTableRow fetchedDataTableRow = Objects.requireNonNull(
-            dataTableRowService.getRow(BASE_NAME, dataTableRow.id(), DEV_ENVIRONMENT_ID));
+            dataTableRowService.getRow(dataTableId, dataTableRow.id(), DEV_ENVIRONMENT_ID));
 
         assertEquals(expectedTitle, fetchedDataTableRow.values()
             .get("title"));
@@ -217,7 +220,7 @@ class DataTableRowFacadeIntTest {
                 String[] physicalTableNameParts = physicalTableName.split("_", 3);
 
                 return dataTableStorageService.getTableBytes(
-                    physicalTableNameParts[2], Long.parseLong(physicalTableNameParts[1]));
+                    Long.parseLong(physicalTableNameParts[2]), Long.parseLong(physicalTableNameParts[1]));
             })
             .sum();
 
@@ -225,7 +228,7 @@ class DataTableRowFacadeIntTest {
     }
 
     private List<DataTableRow> listRows() {
-        return dataTableRowService.listRows(BASE_NAME, 10, 0, DEV_ENVIRONMENT_ID);
+        return dataTableRowService.listRows(dataTableId, 10, 0, DEV_ENVIRONMENT_ID);
     }
 
     private void setLimit(long maxSizeBytes) {
