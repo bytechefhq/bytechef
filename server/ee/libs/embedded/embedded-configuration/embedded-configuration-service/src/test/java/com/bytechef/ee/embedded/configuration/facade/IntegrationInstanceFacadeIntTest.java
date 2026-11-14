@@ -161,6 +161,13 @@ class IntegrationInstanceFacadeIntTest {
         "tasks":[]}
         """;
 
+    private static final String INTERNAL_ONLY_INPUT_WORKFLOW_DEFINITION = """
+        {"label":"Internal only input","inputs":[\
+        {"name":"accountId","type":"string","internalOnly":true},{"name":"region","type":"string"}],\
+        "triggers":[{"name":"trigger_1","type":"slack/v1/newMessage","parameters":{"account":"=accountId"}}],\
+        "tasks":[]}
+        """;
+
     private static final String TWO_TRIGGER_WORKFLOW_DEFINITION = """
         {"label":"Two triggers","inputs":[],"triggers":[\
         {"name":"trigger_1","type":"slack/v1/newMessage"},{"name":"trigger_2","type":"slack/v1/newMessage"}],\
@@ -487,6 +494,76 @@ class IntegrationInstanceFacadeIntTest {
     }
 
     @Test
+    void testUpdateIntegrationInstanceWorkflowKeepsTheStoredInternalOnlyInputOverAConnectedUsersValue() {
+        String internalOnlyInputWorkflowId = createInternalOnlyInputWorkflow(Map.of());
+
+        storeIntegrationInstanceWorkflowInputs(
+            internalOnlyInputWorkflowId, Map.of("accountId", "vendor-account", "region", "eu"));
+
+        authenticate(createConnectedUserAuthentication(Environment.PRODUCTION, connectedUserA));
+
+        integrationInstanceFacade.updateIntegrationInstanceWorkflow(
+            integrationInstanceAId, internalOnlyInputWorkflowId,
+            Map.of("accountId", "user-account", "region", "us"));
+
+        assertThat(
+            integrationInstanceWorkflowService.getIntegrationInstanceWorkflow(
+                integrationInstanceAId, internalOnlyInputWorkflowId)
+                .getInputs()).isEqualTo(Map.of("accountId", "vendor-account", "region", "us"));
+    }
+
+    @Test
+    void testUpdateIntegrationInstanceWorkflowDropsAnInternalOnlyInputSetByAConnectedUser() {
+        String internalOnlyInputWorkflowId = createInternalOnlyInputWorkflow(Map.of());
+
+        authenticate(createConnectedUserAuthentication(Environment.PRODUCTION, connectedUserA));
+
+        integrationInstanceFacade.updateIntegrationInstanceWorkflow(
+            integrationInstanceAId, internalOnlyInputWorkflowId,
+            Map.of("accountId", "user-account", "region", "us"));
+
+        assertThat(
+            integrationInstanceWorkflowService.getIntegrationInstanceWorkflow(
+                integrationInstanceAId, internalOnlyInputWorkflowId)
+                .getInputs()).isEqualTo(Map.of("region", "us"));
+    }
+
+    @Test
+    void testUpdateIntegrationInstanceWorkflowLetsTheApiKeyAuthenticatedVendorSetAnInternalOnlyInput() {
+        String internalOnlyInputWorkflowId = createInternalOnlyInputWorkflow(Map.of());
+
+        authenticate(
+            new EmbeddedApiKeyAuthenticationToken(
+                Environment.PRODUCTION.ordinal(), connectedUserA.getId(), new User(externalUserAId, "", List.of()),
+                true));
+
+        integrationInstanceFacade.updateIntegrationInstanceWorkflow(
+            integrationInstanceAId, internalOnlyInputWorkflowId,
+            Map.of("accountId", "vendor-account", "region", "us"));
+
+        assertThat(
+            integrationInstanceWorkflowService.getIntegrationInstanceWorkflow(
+                integrationInstanceAId, internalOnlyInputWorkflowId)
+                .getInputs()).isEqualTo(Map.of("accountId", "vendor-account", "region", "us"));
+    }
+
+    @Test
+    void testEnableIntegrationInstanceWorkflowPassesTheConfigurationValueOfAnInternalOnlyInputToTheTrigger() {
+        String internalOnlyInputWorkflowId = createInternalOnlyInputWorkflow(Map.of("accountId", "vendor-account"));
+
+        storeIntegrationInstanceWorkflowInputs(internalOnlyInputWorkflowId, Map.of("accountId", "user-account"));
+
+        authenticate(createTenantAdminAuthentication());
+
+        integrationInstanceFacade.enableIntegrationInstanceWorkflow(
+            integrationInstanceAId, internalOnlyInputWorkflowId, true);
+
+        verify(triggerLifecycleFacade).executeTriggerEnable(
+            eq(internalOnlyInputWorkflowId), any(), any(), eq(Map.of("account", "vendor-account")), any(),
+            anyString(), anyLong());
+    }
+
+    @Test
     void testUpdateIntegrationInstanceWorkflowAllowsTenantAdminOnAnyInstance() {
         authenticate(createTenantAdminAuthentication());
 
@@ -564,6 +641,42 @@ class IntegrationInstanceFacadeIntTest {
 
         assertThat(recordingDataStorage.getAttempts()).isPositive();
         assertThat(integrationInstanceService.getIntegrationInstances(List.of(integrationInstanceAId))).isEmpty();
+    }
+
+    private String createInternalOnlyInputWorkflow(Map<String, ?> configurationInputs) {
+        Workflow internalOnlyInputWorkflow = workflowService.create(
+            INTERNAL_ONLY_INPUT_WORKFLOW_DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC);
+
+        String internalOnlyInputWorkflowId = internalOnlyInputWorkflow.getId();
+
+        integrationWorkflowService.addWorkflow(integrationId, 1, internalOnlyInputWorkflowId);
+
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            new IntegrationInstanceConfigurationWorkflow();
+
+        integrationInstanceConfigurationWorkflow.setEnabled(true);
+        integrationInstanceConfigurationWorkflow.setInputs(configurationInputs);
+        integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
+            integrationInstanceConfigurationId);
+        integrationInstanceConfigurationWorkflow.setWorkflowId(internalOnlyInputWorkflowId);
+
+        integrationInstanceConfigurationWorkflowService.create(integrationInstanceConfigurationWorkflow);
+
+        return internalOnlyInputWorkflowId;
+    }
+
+    private void storeIntegrationInstanceWorkflowInputs(String workflowId, Map<String, ?> inputs) {
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                integrationInstanceConfigurationId, workflowId);
+
+        IntegrationInstanceWorkflow integrationInstanceWorkflow =
+            integrationInstanceWorkflowService.createIntegrationInstanceWorkflow(
+                integrationInstanceAId, integrationInstanceConfigurationWorkflow.getId());
+
+        integrationInstanceWorkflow.setInputs(inputs);
+
+        integrationInstanceWorkflowService.update(integrationInstanceWorkflow);
     }
 
     private static void authenticate(Authentication authentication) {

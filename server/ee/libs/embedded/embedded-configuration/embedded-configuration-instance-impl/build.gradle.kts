@@ -7,7 +7,10 @@ dependencies {
 
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
 
+    testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
     testImplementation("org.springframework.data:spring-data-jdbc")
+    testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
+    testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:core:commons:commons-data"))
