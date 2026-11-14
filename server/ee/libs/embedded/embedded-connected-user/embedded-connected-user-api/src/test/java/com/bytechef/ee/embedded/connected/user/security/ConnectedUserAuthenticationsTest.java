@@ -139,6 +139,26 @@ class ConnectedUserAuthenticationsTest {
     }
 
     @Test
+    void testIsConnectedUserTokenAuthenticatedIsTrueOnlyForAConnectedUserTokenNotAuthenticatedByApiKey() {
+        assertThat(ConnectedUserAuthentications.isConnectedUserTokenAuthenticated()).isFalse();
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(new UsernamePasswordAuthenticationToken("admin", "", List.of()));
+
+        assertThat(ConnectedUserAuthentications.isConnectedUserTokenAuthenticated()).isFalse();
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(TestConnectedUserAuthentication.apiKey("external-user"));
+
+        assertThat(ConnectedUserAuthentications.isConnectedUserTokenAuthenticated()).isFalse();
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(TestConnectedUserAuthentication.of("external-user"));
+
+        assertThat(ConnectedUserAuthentications.isConnectedUserTokenAuthenticated()).isTrue();
+    }
+
+    @Test
     void testIsConnectionDialogAllowedFollowsTheConnectedUserToken() {
         SecurityContextHolder.getContext()
             .setAuthentication(TestConnectedUserAuthentication.of("external-user"));

@@ -62,6 +62,14 @@ public final class ConnectedUserAuthentications {
             .orElse(false);
     }
 
+    public static boolean isConnectedUserTokenAuthenticated() {
+        Optional<ConnectedUserAuthentication> connectedUserAuthentication = fetchCurrent();
+
+        return connectedUserAuthentication
+            .map(currentConnectedUserAuthentication -> !currentConnectedUserAuthentication.apiKeyAuthenticated())
+            .orElse(false);
+    }
+
     public static boolean isConnectionDialogAllowed() {
         Optional<ConnectedUserAuthentication> connectedUserAuthentication = fetchCurrent();
 
