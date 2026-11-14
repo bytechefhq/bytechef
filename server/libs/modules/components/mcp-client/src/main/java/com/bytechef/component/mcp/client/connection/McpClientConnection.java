@@ -86,6 +86,28 @@ public class McpClientConnection {
                         .label("Scopes")
                         .description("Optional comma-delimited list of scopes")
                         .controlType(ControlType.TEXT_AREA)),
+            authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE)
+                .title("OAuth2 Authorization Code with PKCE")
+                .properties(
+                    string(AUTHORIZATION_URL)
+                        .label("Authorization URL")
+                        .required(true),
+                    string(TOKEN_URL)
+                        .label("Token URL")
+                        .required(true),
+                    string(CLIENT_ID)
+                        .label("Client Id")
+                        .required(true),
+                    string(CLIENT_SECRET)
+                        .label("Client Secret")
+                        .description("Leave empty when the MCP server registered ByteChef as a public client."),
+                    string(HEADER_PREFIX)
+                        .label("Header Prefix")
+                        .defaultValue(Authorization.BEARER),
+                    string(SCOPES)
+                        .label("Scopes")
+                        .description("Optional comma-delimited list of scopes")
+                        .controlType(ControlType.TEXT_AREA)),
             authorization(AuthorizationType.OAUTH2_CLIENT_CREDENTIALS)
                 .title("OAuth2 Client Credentials")
                 .properties(
