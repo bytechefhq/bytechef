@@ -7,6 +7,8 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
@@ -20,10 +22,14 @@ import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfig
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.component.constant.WorkflowConstants;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +50,7 @@ public class ConnectedUserMcpAutomationResolverImpl implements ConnectedUserMcpA
     private final ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService;
     private final ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
     private final WorkflowConnectionSlot workflowConnectionSlot;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserMcpAutomationResolverImpl(
@@ -52,7 +59,7 @@ public class ConnectedUserMcpAutomationResolverImpl implements ConnectedUserMcpA
         ConnectedUserProjectService connectedUserProjectService,
         ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService,
         ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager,
-        WorkflowConnectionSlot workflowConnectionSlot) {
+        WorkflowConnectionSlot workflowConnectionSlot, WorkflowService workflowService) {
 
         this.automationProjectConfigurationService = automationProjectConfigurationService;
         this.connectedUserProjectConfigurationService = connectedUserProjectConfigurationService;
@@ -60,6 +67,7 @@ public class ConnectedUserMcpAutomationResolverImpl implements ConnectedUserMcpA
         this.connectedUserProjectWorkflowService = connectedUserProjectWorkflowService;
         this.connectedUserReferenceDeploymentManager = connectedUserReferenceDeploymentManager;
         this.workflowConnectionSlot = workflowConnectionSlot;
+        this.workflowService = workflowService;
     }
 
     @Override
@@ -115,10 +123,12 @@ public class ConnectedUserMcpAutomationResolverImpl implements ConnectedUserMcpA
         String missingConnectionComponentName = workflowConnectionSlot.findMissingRequiredComponentName(
             row.getWorkflowId(), row.getConnections());
 
+        Workflow workflow = workflowService.getWorkflow(row.getWorkflowId());
+
         return Optional.of(
             new CallableAutomationDTO(
                 reference.getId(), projectDeploymentId, row.getWorkflowId(), row.getInputs(),
-                missingConnectionComponentName));
+                missingConnectionComponentName, getWorkflowCallTriggerName(workflow)));
     }
 
     @Override
@@ -161,5 +171,19 @@ public class ConnectedUserMcpAutomationResolverImpl implements ConnectedUserMcpA
         }
 
         return Optional.empty();
+    }
+
+    private static @Nullable String getWorkflowCallTriggerName(Workflow workflow) {
+        for (WorkflowTrigger workflowTrigger : WorkflowTrigger.ofEnabled(workflow)) {
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+
+            if (Objects.equals(workflowNodeType.name(), WorkflowConstants.WORKFLOW) &&
+                Objects.equals(workflowNodeType.operation(), WorkflowConstants.NEW_WORKFLOW_CALL)) {
+
+                return workflowTrigger.getName();
+            }
+        }
+
+        return null;
     }
 }

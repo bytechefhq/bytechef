@@ -373,20 +373,20 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             return null;
         }
 
-        Workflow workflow = workflowService.getWorkflow(callableAutomation.workflowId());
+        String triggerName = callableAutomation.workflowCallTriggerName();
 
-        WorkflowTrigger trigger = getMcpToolCallableTrigger(workflow);
-
-        if (trigger == null) {
+        if (triggerName == null) {
             return null;
         }
+
+        Workflow workflow = workflowService.getWorkflow(callableAutomation.workflowId());
 
         Map<String, ?> workflowParameters = mcpAutomationProjectConfigurationWorkflow.getParameters();
 
         return createWorkflowToolCallback(
             workflow, workflowParameters,
             toolName -> getAutomationToolCallbackFunction(
-                toolName, externalUserId, connectedUserId, callableAutomation, trigger.getName(), workflowParameters,
+                toolName, externalUserId, connectedUserId, callableAutomation, triggerName, workflowParameters,
                 mcpAutomationProjectConfiguration.getMcpServerId(), environment));
     }
 

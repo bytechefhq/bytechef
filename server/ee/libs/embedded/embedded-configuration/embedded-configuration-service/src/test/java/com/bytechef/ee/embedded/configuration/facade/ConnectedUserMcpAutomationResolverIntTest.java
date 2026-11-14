@@ -141,6 +141,12 @@ class ConnectedUserMcpAutomationResolverIntTest {
          "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
         """;
 
+    private static final String SLACK_WORKFLOW_WITH_WORKFLOW_CALL_DEFINITION = """
+        {"label":"Post","inputs":[{"name":"channel","label":"Channel","type":"string","required":true}],
+         "triggers":[{"name":"newWorkflowCall_1","type":"workflow/v1/newWorkflowCall","parameters":{}}],
+         "tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
+        """;
+
     @Autowired
     private AutomationProjectConfigurationResolver automationProjectConfigurationResolver;
 
@@ -235,7 +241,31 @@ class ConnectedUserMcpAutomationResolverIntTest {
         assertThat(callableAutomation).contains(
             new CallableAutomationDTO(
                 reference.getId(), reference.getProjectDeploymentId(), deployedWorkflowId, Map.of("channel", "#a"),
-                null));
+                null, null));
+    }
+
+    @Test
+    void testResolveReportsNotToolCallableWithoutWorkflowCallTrigger() {
+        Fixture fixture = provisionFixture("Resolver Not Tool Callable");
+
+        assertThat(fetchCallableAutomation(fixture))
+            .get()
+            .satisfies(callableAutomation -> {
+                assertThat(callableAutomation.workflowCallTriggerName()).isNull();
+                assertThat(callableAutomation.isToolCallable()).isFalse();
+            });
+    }
+
+    @Test
+    void testResolveReportsToolCallableWithWorkflowCallTrigger() {
+        Fixture fixture = provisionFixture("Resolver Tool Callable", SLACK_WORKFLOW_WITH_WORKFLOW_CALL_DEFINITION);
+
+        assertThat(fetchCallableAutomation(fixture))
+            .get()
+            .satisfies(callableAutomation -> {
+                assertThat(callableAutomation.workflowCallTriggerName()).isEqualTo("newWorkflowCall_1");
+                assertThat(callableAutomation.isToolCallable()).isTrue();
+            });
     }
 
     @Test
@@ -408,8 +438,11 @@ class ConnectedUserMcpAutomationResolverIntTest {
     }
 
     private String addWorkflow(long automationProjectId) {
-        return automationProjectFacade.createProjectWorkflow(
-            automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION, null);
+        return addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+    }
+
+    private String addWorkflow(long automationProjectId, String definition) {
+        return automationProjectFacade.createProjectWorkflow(automationProjectId, definition, null);
     }
 
     private String createAssignedConnectedUser(
@@ -458,9 +491,13 @@ class ConnectedUserMcpAutomationResolverIntTest {
     }
 
     private Fixture provisionFixture(String name) {
+        return provisionFixture(name, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+    }
+
+    private Fixture provisionFixture(String name, String definition) {
         long automationProjectId = createAutomationProject(name);
 
-        String workflowUuid = addWorkflow(automationProjectId);
+        String workflowUuid = addWorkflow(automationProjectId, definition);
 
         automationProjectFacade.publishProject(automationProjectId);
 

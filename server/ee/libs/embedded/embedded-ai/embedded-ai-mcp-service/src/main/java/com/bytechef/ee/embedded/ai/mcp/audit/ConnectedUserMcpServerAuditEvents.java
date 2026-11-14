@@ -14,6 +14,8 @@ package com.bytechef.ee.embedded.ai.mcp.audit;
  */
 public final class ConnectedUserMcpServerAuditEvents {
 
+    public static final String CONNECTED_USER_MCP_AUTOMATION_ENABLED_UPDATED =
+        "CONNECTED_USER_MCP_AUTOMATION_ENABLED_UPDATED";
     public static final String CONNECTED_USER_MCP_SERVER_DELETED = "CONNECTED_USER_MCP_SERVER_DELETED";
     public static final String CONNECTED_USER_MCP_SERVER_ENABLED_UPDATED =
         "CONNECTED_USER_MCP_SERVER_ENABLED_UPDATED";

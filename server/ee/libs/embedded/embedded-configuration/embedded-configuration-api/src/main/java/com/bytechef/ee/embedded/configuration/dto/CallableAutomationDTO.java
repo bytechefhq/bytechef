@@ -21,6 +21,9 @@ import org.jspecify.annotations.Nullable;
  * @param inputs                         the deployment workflow's input values, by input name
  * @param missingConnectionComponentName the name of a component whose required connection the deployment workflow
  *                                       lacks, or null when every required connection is set
+ * @param workflowCallTriggerName        the name of the enabled {@code workflow/v1/newWorkflowCall} trigger of the
+ *                                       workflow at the deployment's project version, or null when it has none and so
+ *                                       cannot be called as a tool
  *
  * @version ee
  *
@@ -29,5 +32,9 @@ import org.jspecify.annotations.Nullable;
 @SuppressFBWarnings("EI")
 public record CallableAutomationDTO(
     long connectedUserProjectWorkflowId, long projectDeploymentId, String workflowId, Map<String, ?> inputs,
-    @Nullable String missingConnectionComponentName) {
+    @Nullable String missingConnectionComponentName, @Nullable String workflowCallTriggerName) {
+
+    public boolean isToolCallable() {
+        return workflowCallTriggerName != null;
+    }
 }

@@ -50,6 +50,7 @@ import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -148,6 +149,7 @@ class EmbeddedMcpToolFacadeAutomationIntTest {
     private long connectedUserProjectId;
     private McpAutomationProjectConfiguration mcpAutomationProjectConfiguration;
     private long mcpServerId;
+    private final Map<String, String> workflowCallTriggerNameByWorkflowId = new HashMap<>();
 
     @BeforeEach
     void beforeEach() {
@@ -360,6 +362,28 @@ class EmbeddedMcpToolFacadeAutomationIntTest {
         addAutomationTool(
             Map.of(), insertWorkflow(WORKFLOW_LABEL, WORKFLOW_DESCRIPTION, "webhook_1", "webhook/v1/newWebhook"),
             true, null);
+
+        assertThat(getAutomationToolCallbacks(EXTERNAL_USER_ID)).isEmpty();
+    }
+
+    @Test
+    void testAutomationToolHiddenWhenResolverReportsNotToolCallable() {
+        String workflowId = callableWorkflowId();
+
+        AutomationTool automationTool = addAutomationTool(Map.of(), workflowId, true, null);
+
+        CallableAutomationDTO callableAutomation = connectedUserMcpAutomationResolver
+            .fetchCallableAutomation(connectedUserId, automationProjectConfigurationId, automationTool.workflowUuid())
+            .orElseThrow();
+
+        when(connectedUserMcpAutomationResolver.fetchCallableAutomation(
+            connectedUserId, automationProjectConfigurationId, automationTool.workflowUuid()))
+                .thenReturn(
+                    Optional.of(
+                        new CallableAutomationDTO(
+                            callableAutomation.connectedUserProjectWorkflowId(),
+                            callableAutomation.projectDeploymentId(), workflowId, callableAutomation.inputs(), null,
+                            null)));
 
         assertThat(getAutomationToolCallbacks(EXTERNAL_USER_ID)).isEmpty();
     }
@@ -667,6 +691,10 @@ class EmbeddedMcpToolFacadeAutomationIntTest {
                 """,
             workflowId, JsonUtils.write(workflowDefinition));
 
+        if (WORKFLOW_CALL_TRIGGER_TYPE.equals(triggerType)) {
+            workflowCallTriggerNameByWorkflowId.put(workflowId, triggerName);
+        }
+
         return workflowId;
     }
 
@@ -686,7 +714,8 @@ class EmbeddedMcpToolFacadeAutomationIntTest {
                     Optional.of(
                         new CallableAutomationDTO(
                             connectedUserProjectWorkflowId, PROJECT_DEPLOYMENT_ID, workflowId,
-                            Map.of("channel", "#general"), missingConnectionComponentName)));
+                            Map.of("channel", "#general"), missingConnectionComponentName,
+                            workflowCallTriggerNameByWorkflowId.get(workflowId))));
     }
 
     private static Job job(Job.Status status) {
