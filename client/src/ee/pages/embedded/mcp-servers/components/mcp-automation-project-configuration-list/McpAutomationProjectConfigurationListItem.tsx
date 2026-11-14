@@ -7,6 +7,7 @@ import {useState} from 'react';
 
 import McpAutomationProjectConfigurationDialog from './McpAutomationProjectConfigurationDialog';
 import McpAutomationProjectConfigurationListItemDropdownMenu from './McpAutomationProjectConfigurationListItemDropdownMenu';
+import McpAutomationProjectConfigurationWorkflowListItem from './McpAutomationProjectConfigurationWorkflowListItem';
 import {McpAutomationProjectConfigurationItemType} from './hooks/useMcpAutomationProjectConfigurationList';
 
 interface McpAutomationProjectConfigurationListItemProps {
@@ -60,19 +61,7 @@ const McpAutomationProjectConfigurationListItem = ({
                 <CollapsibleContent>
                     <div className="flex flex-col gap-1 border-t border-border/50 px-3 py-2 pl-10">
                         {mcpAutomationProjectConfiguration.workflows.map((workflow) => (
-                            <div
-                                className="flex items-center gap-2 text-sm"
-                                data-available={String(workflow.available)}
-                                key={workflow.id}
-                            >
-                                <span className="min-w-0 flex-1 truncate">
-                                    {workflow.label || workflow.workflowUuid}
-                                </span>
-
-                                {!workflow.available && (
-                                    <Badge label="Not available" styleType="secondary-filled" weight="semibold" />
-                                )}
-                            </div>
+                            <McpAutomationProjectConfigurationWorkflowListItem key={workflow.id} workflow={workflow} />
                         ))}
                     </div>
                 </CollapsibleContent>

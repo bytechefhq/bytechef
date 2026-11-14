@@ -2,11 +2,13 @@ import Switch from '@/components/Switch/Switch';
 import {Label} from '@/components/ui/label';
 import {Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import {WorkflowIcon} from 'lucide-react';
+import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 interface McpIntegrationWorkflowsListProps {
     enabledWorkflowIds: string[];
     onSelectedWorkflowIdsChange: (selectedWorkflowIds: string[]) => void;
+    renderSelectedWorkflowExtra?: (workflow: Workflow) => ReactNode;
     selectedWorkflowIds: string[];
     workflows: Workflow[];
 }
@@ -14,6 +16,7 @@ interface McpIntegrationWorkflowsListProps {
 const McpIntegrationWorkflowsList = ({
     enabledWorkflowIds,
     onSelectedWorkflowIdsChange,
+    renderSelectedWorkflowExtra,
     selectedWorkflowIds,
     workflows,
 }: McpIntegrationWorkflowsListProps) => (
@@ -25,54 +28,58 @@ const McpIntegrationWorkflowsList = ({
 
             return (
                 <div
-                    className="flex items-center rounded-lg border border-stroke-neutral-secondary bg-surface-main p-2"
+                    className="rounded-lg border border-stroke-neutral-secondary bg-surface-main p-2"
                     key={workflow.id}
                 >
-                    <Label
-                        className={twMerge(
-                            'flex w-full cursor-pointer items-center gap-2 text-base font-normal',
-                            selected && 'font-semibold'
-                        )}
-                        htmlFor={`mcp-workflow-${workflow.id}`}
-                    >
-                        <div
+                    <div className="flex items-center">
+                        <Label
                             className={twMerge(
-                                'rounded-lg bg-surface-neutral-tertiary p-2',
-                                selected && 'bg-surface-brand-secondary'
+                                'flex w-full cursor-pointer items-center gap-2 text-base font-normal',
+                                selected && 'font-semibold'
                             )}
+                            htmlFor={`mcp-workflow-${workflow.id}`}
                         >
-                            <WorkflowIcon
+                            <div
                                 className={twMerge(
-                                    'size-4 text-content-neutral-secondary transition-colors',
-                                    selected && 'text-content-brand-primary'
+                                    'rounded-lg bg-surface-neutral-tertiary p-2',
+                                    selected && 'bg-surface-brand-secondary'
                                 )}
-                            />
-                        </div>
+                            >
+                                <WorkflowIcon
+                                    className={twMerge(
+                                        'size-4 text-content-neutral-secondary transition-colors',
+                                        selected && 'text-content-brand-primary'
+                                    )}
+                                />
+                            </div>
 
-                        <span className="flex flex-col">
-                            {label}
+                            <span className="flex flex-col">
+                                {label}
 
-                            {disabled && (
-                                <span className="text-xs font-normal text-content-neutral-secondary">
-                                    Turned off in the configuration
-                                </span>
-                            )}
-                        </span>
-                    </Label>
+                                {disabled && (
+                                    <span className="text-xs font-normal text-content-neutral-secondary">
+                                        Turned off in the configuration
+                                    </span>
+                                )}
+                            </span>
+                        </Label>
 
-                    <Switch
-                        aria-label={label}
-                        checked={selected}
-                        disabled={disabled}
-                        id={`mcp-workflow-${workflow.id}`}
-                        onCheckedChange={(checked) =>
-                            onSelectedWorkflowIdsChange(
-                                checked
-                                    ? [...selectedWorkflowIds, workflow.id!]
-                                    : selectedWorkflowIds.filter((workflowId) => workflowId !== workflow.id)
-                            )
-                        }
-                    />
+                        <Switch
+                            aria-label={label}
+                            checked={selected}
+                            disabled={disabled}
+                            id={`mcp-workflow-${workflow.id}`}
+                            onCheckedChange={(checked) =>
+                                onSelectedWorkflowIdsChange(
+                                    checked
+                                        ? [...selectedWorkflowIds, workflow.id!]
+                                        : selectedWorkflowIds.filter((workflowId) => workflowId !== workflow.id)
+                                )
+                            }
+                        />
+                    </div>
+
+                    {selected && renderSelectedWorkflowExtra?.(workflow)}
                 </div>
             );
         })}

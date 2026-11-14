@@ -2,7 +2,6 @@ import Button from '@/components/Button/Button';
 import McpToolListSkeleton from '@/pages/platform/mcp-servers/components/McpToolListSkeleton';
 import {McpServer} from '@/shared/middleware/graphql';
 import {PlusIcon} from 'lucide-react';
-import {useState} from 'react';
 
 import McpAutomationProjectConfigurationDialog from './McpAutomationProjectConfigurationDialog';
 import McpAutomationProjectConfigurationListItem from './McpAutomationProjectConfigurationListItem';
@@ -13,8 +12,6 @@ interface McpAutomationProjectConfigurationListProps {
 }
 
 const McpAutomationProjectConfigurationList = ({mcpServer}: McpAutomationProjectConfigurationListProps) => {
-    const [showAddDialog, setShowAddDialog] = useState(false);
-
     const {isLoading, mcpAutomationProjectConfigurations} = useMcpAutomationProjectConfigurationList(mcpServer.id);
 
     return (
@@ -22,12 +19,9 @@ const McpAutomationProjectConfigurationList = ({mcpServer}: McpAutomationProject
             <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold">Automations</h3>
 
-                <Button
-                    icon={<PlusIcon />}
-                    label="Add Automations"
-                    onClick={() => setShowAddDialog(true)}
-                    size="sm"
-                    variant="secondary"
+                <McpAutomationProjectConfigurationDialog
+                    mcpServer={mcpServer}
+                    triggerNode={<Button icon={<PlusIcon />} label="Add Automations" size="sm" variant="secondary" />}
                 />
             </div>
 
@@ -45,13 +39,6 @@ const McpAutomationProjectConfigurationList = ({mcpServer}: McpAutomationProject
                         mcpServer={mcpServer}
                     />
                 ))}
-
-            {showAddDialog && (
-                <McpAutomationProjectConfigurationDialog
-                    mcpServer={mcpServer}
-                    onClose={() => setShowAddDialog(false)}
-                />
-            )}
         </section>
     );
 };

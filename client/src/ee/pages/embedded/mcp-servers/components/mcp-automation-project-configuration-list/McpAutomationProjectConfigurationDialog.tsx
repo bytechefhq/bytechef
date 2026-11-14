@@ -17,6 +17,7 @@ import {ReactNode, useMemo, useState} from 'react';
 
 import McpIntegrationWorkflowsList from '../McpIntegrationWorkflowsList';
 import {McpAutomationProjectConfigurationItemType} from './hooks/useMcpAutomationProjectConfigurationList';
+import {buildMcpAutomationToolParameters, getMcpAutomationToolText} from './mcpAutomationToolParameters';
 
 interface McpAutomationProjectConfigurationDialogProps {
     mcpAutomationProjectConfiguration?: McpAutomationProjectConfigurationItemType;
@@ -40,6 +41,16 @@ const McpAutomationProjectConfigurationDialog = ({
     );
     const [selectedWorkflowUuids, setSelectedWorkflowUuids] = useState<string[]>(
         () => mcpAutomationProjectConfiguration?.workflows.map((workflow) => workflow.workflowUuid) ?? []
+    );
+
+    const [parametersByWorkflowUuid, setParametersByWorkflowUuid] = useState<Record<string, Record<string, unknown>>>(
+        () =>
+            Object.fromEntries(
+                (mcpAutomationProjectConfiguration?.workflows ?? []).map((workflow) => [
+                    workflow.workflowUuid,
+                    (workflow.parameters as Record<string, unknown> | null) ?? {},
+                ])
+            )
     );
 
     const queryClient = useQueryClient();
@@ -103,17 +114,30 @@ const McpAutomationProjectConfigurationDialog = ({
     const createMutation = useCreateMcpAutomationProjectConfigurationMutation({onSuccess: invalidateAndClose});
     const updateMutation = useUpdateMcpAutomationProjectConfigurationMutation({onSuccess: invalidateAndClose});
 
+    const handleToolTextChange = (workflowUuid: string, key: 'toolDescription' | 'toolName', value: string) =>
+        setParametersByWorkflowUuid((current) => ({
+            ...current,
+            [workflowUuid]: buildMcpAutomationToolParameters(current[workflowUuid], key, value),
+        }));
+
+    const workflowConfigurations = selectedWorkflowUuids.map((workflowUuid) => {
+        const parameters = parametersByWorkflowUuid[workflowUuid];
+
+        return parameters && Object.keys(parameters).length > 0 ? {parameters, workflowUuid} : {workflowUuid};
+    });
+
     const handleComplete = () => {
         if (isEditMode) {
             updateMutation.mutate({
                 id: mcpAutomationProjectConfiguration.id,
-                input: {workflowUuids: selectedWorkflowUuids},
+                input: {workflowConfigurations, workflowUuids: selectedWorkflowUuids},
             });
         } else {
             createMutation.mutate({
                 input: {
                     automationProjectConfigurationId: configurationId!,
                     mcpServerId: mcpServer.id,
+                    workflowConfigurations,
                     workflowUuids: selectedWorkflowUuids,
                 },
             });
@@ -215,6 +239,33 @@ const McpAutomationProjectConfigurationDialog = ({
                         <McpIntegrationWorkflowsList
                             enabledWorkflowIds={enabledWorkflowUuids}
                             onSelectedWorkflowIdsChange={setSelectedWorkflowUuids}
+                            renderSelectedWorkflowExtra={(workflow) => (
+                                <fieldset className="mt-2 space-y-2 border-0 p-0">
+                                    <Input
+                                        aria-label={`${workflow.label || workflow.id} tool name`}
+                                        onChange={(event) =>
+                                            handleToolTextChange(workflow.id!, 'toolName', event.target.value)
+                                        }
+                                        placeholder="Tool name (defaults to the workflow name)"
+                                        value={getMcpAutomationToolText(
+                                            parametersByWorkflowUuid[workflow.id!],
+                                            'toolName'
+                                        )}
+                                    />
+
+                                    <Input
+                                        aria-label={`${workflow.label || workflow.id} tool description`}
+                                        onChange={(event) =>
+                                            handleToolTextChange(workflow.id!, 'toolDescription', event.target.value)
+                                        }
+                                        placeholder="Tool description (defaults to the workflow description)"
+                                        value={getMcpAutomationToolText(
+                                            parametersByWorkflowUuid[workflow.id!],
+                                            'toolDescription'
+                                        )}
+                                    />
+                                </fieldset>
+                            )}
                             selectedWorkflowIds={selectedWorkflowUuids}
                             workflows={workflows}
                         />
