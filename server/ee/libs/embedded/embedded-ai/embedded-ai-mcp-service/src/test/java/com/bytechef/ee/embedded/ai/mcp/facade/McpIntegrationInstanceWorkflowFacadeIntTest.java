@@ -16,6 +16,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
+import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.ai.mcp.audit.McpIntegrationInstanceAuditEvents;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpAuditIntTestConfiguration;
@@ -82,7 +83,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
         McpIntegrationInstanceWorkflowFacadeIntTest.FacadeIntTestConfiguration.class
     },
     properties = {
-        "bytechef.edition=ee", "bytechef.audit.enabled=true"
+        "bytechef.edition=ee", "bytechef.audit.enabled=true", "bytechef.workflow.repository.jdbc.enabled=true"
     })
 class McpIntegrationInstanceWorkflowFacadeIntTest {
 
@@ -91,6 +92,11 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
     private static final String FOREIGN_EXTERNAL_USER_ID = "user-2";
     private static final String WORKFLOW_ID = "5eed0000-0000-0000-0000-0000000000d1";
     private static final String WORKFLOW_UUID = "5eed0000-0000-0000-0000-0000000000e1";
+    private static final String WORKFLOW_DEFINITION = """
+        {"label":"Send Email","inputs":[\
+        {"name":"accountId","type":"string","internalOnly":true},{"name":"region","type":"string"}],\
+        "triggers":[],"tasks":[]}
+        """;
 
     @MockitoBean
     private ComponentDefinitionFacade componentDefinitionFacade;
@@ -185,9 +191,9 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
             """
                 INSERT INTO workflow (id, definition, format, created_date, created_by, last_modified_date,
                     last_modified_by, version)
-                VALUES (?, '{"label":"Send Email","triggers":[],"tasks":[]}', 0, now(), 'system', now(), 'system', 0)
+                VALUES (?, ?, 0, now(), 'system', now(), 'system', 0)
                 """,
-            WORKFLOW_ID);
+            WORKFLOW_ID, WORKFLOW_DEFINITION);
 
         integrationWorkflowRepository.save(
             new IntegrationWorkflow(integrationId, INTEGRATION_VERSION, WORKFLOW_ID, UUID.fromString(WORKFLOW_UUID)));
@@ -365,6 +371,47 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
         assertThat(integrationInstanceWorkflow.getInputs()).isEqualTo(Map.of("key", "value"));
     }
 
+    @Test
+    void testUpdateMcpIntegrationInstanceWorkflowKeepsTheStoredInternalOnlyInputOverAConnectedUsersValue() {
+        IntegrationInstanceWorkflow integrationInstanceWorkflow = getIntegrationInstanceWorkflow(integrationInstanceId);
+
+        integrationInstanceWorkflow.setInputs(Map.of("accountId", "vendor-account", "region", "eu"));
+
+        integrationInstanceWorkflowService.update(integrationInstanceWorkflow);
+
+        mcpIntegrationInstanceWorkflowFacade.updateMcpIntegrationInstanceWorkflow(
+            integrationInstanceId, WORKFLOW_UUID, Map.of("accountId", "user-account", "region", "us"));
+
+        assertThat(getIntegrationInstanceWorkflow(integrationInstanceId).getInputs())
+            .isEqualTo(Map.of("accountId", "vendor-account", "region", "us"));
+    }
+
+    @Test
+    void testUpdateMcpIntegrationInstanceWorkflowDropsAnInternalOnlyInputSetByAConnectedUser() {
+        deleteOwnIntegrationInstanceWorkflow();
+
+        mcpIntegrationInstanceWorkflowFacade.updateMcpIntegrationInstanceWorkflow(
+            integrationInstanceId, WORKFLOW_UUID, Map.of("accountId", "user-account", "region", "us"));
+
+        assertThat(getIntegrationInstanceWorkflow(integrationInstanceId).getInputs())
+            .isEqualTo(Map.of("region", "us"));
+    }
+
+    @Test
+    void testUpdateMcpIntegrationInstanceWorkflowLetsTheApiKeyAuthenticatedVendorSetAnInternalOnlyInput() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new EmbeddedApiKeyAuthenticationToken(
+                    Environment.DEVELOPMENT.ordinal(), ownConnectedUserId,
+                    new User(OWN_EXTERNAL_USER_ID, "", List.of()), true));
+
+        mcpIntegrationInstanceWorkflowFacade.updateMcpIntegrationInstanceWorkflow(
+            integrationInstanceId, WORKFLOW_UUID, Map.of("accountId", "vendor-account", "region", "us"));
+
+        assertThat(getIntegrationInstanceWorkflow(integrationInstanceId).getInputs())
+            .isEqualTo(Map.of("accountId", "vendor-account", "region", "us"));
+    }
+
     private void deleteOwnIntegrationInstanceWorkflow() {
         jdbcTemplate.update(
             "DELETE FROM integration_instance_workflow WHERE integration_instance_id = ?", integrationInstanceId);
@@ -458,7 +505,7 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
         IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class,
         IntegrationWorkflowServiceImpl.class, McpComponentServiceImpl.class,
         McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpIntegrationInstanceToolFacadeImpl.class,
-        McpIntegrationInstanceWorkflowFacadeImpl.class, McpServerServiceImpl.class,
+        McpIntegrationInstanceWorkflowFacadeImpl.class, McpServerServiceImpl.class, WorkflowServiceImpl.class,
         EmbeddedMcpAuditIntTestConfiguration.class
     })
     static class FacadeIntTestConfiguration {

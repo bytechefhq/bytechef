@@ -32,7 +32,6 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.embedded.configuration.util.IntegrationWorkflowInputUtils;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
-import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentication;
 import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.evaluator.Evaluator;
@@ -327,7 +326,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 //        Workflow workflow = workflowService.getWorkflow(workflowId);
 //        validateInputs(inputs, workflow);
 
-        if (isConnectedUserTokenAuthenticated()) {
+        if (ConnectedUserAuthentications.isConnectedUserTokenAuthenticated()) {
             integrationInstanceWorkflow.setInputs(
                 IntegrationWorkflowInputUtils.preserveInternalOnlyInputs(
                     workflowService.getWorkflow(workflowId), inputs == null ? Map.of() : inputs,
@@ -641,14 +640,6 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         } catch (RuntimeException enableException) {
             exception.addSuppressed(enableException);
         }
-    }
-
-    private static boolean isConnectedUserTokenAuthenticated() {
-        Optional<ConnectedUserAuthentication> connectedUserAuthentication = ConnectedUserAuthentications.fetchCurrent();
-
-        return connectedUserAuthentication
-            .map(currentConnectedUserAuthentication -> !currentConnectedUserAuthentication.apiKeyAuthenticated())
-            .orElse(false);
     }
 
     private void validateCurrentPrincipalIntegrationInstanceOwnership(long integrationInstanceId) {
