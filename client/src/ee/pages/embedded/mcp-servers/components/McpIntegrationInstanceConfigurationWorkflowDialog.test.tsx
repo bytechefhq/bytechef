@@ -37,9 +37,11 @@ vi.mock('@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries'
             integrationInstanceConfigurationWorkflows: [
                 {
                     connections: [{connectionId: 9, workflowConnectionKey: 'slack', workflowNodeName: 'slack_1'}],
+                    enabled: true,
                     inputs: {subject: 'Hello'},
                     workflowId: 'w1',
                 },
+                {enabled: false, inputs: {}, workflowId: 'w2'},
             ],
             integrationVersion: 1,
         },
@@ -66,6 +68,7 @@ vi.mock('@/ee/shared/queries/embedded/integrationWorkflows.queries', () => ({
                 ],
                 triggers: [],
             },
+            {id: 'w2', inputs: [], label: 'Workflow Two', tasks: [], triggers: []},
         ],
     }),
 }));
@@ -154,5 +157,25 @@ describe('McpIntegrationInstanceConfigurationWorkflowDialog', () => {
                 ],
             },
         });
+    });
+
+    it('rendersDisabledWorkflowAsNotSelectable', () => {
+        hoisted.eligibleResult.data = {
+            toolEligibleIntegrationInstanceConfigurationWorkflows: [
+                {id: 'w1', label: 'Workflow One'},
+                {id: 'w2', label: 'Workflow Two'},
+            ],
+        };
+
+        render(
+            <McpIntegrationInstanceConfigurationWorkflowDialog
+                mcpIntegrationInstanceConfiguration={makeEditConfig([])}
+                mcpServer={mcpServer}
+            />
+        );
+
+        expect(screen.getByRole('switch', {name: 'Workflow Two'})).toBeDisabled();
+        expect(screen.getByText('Turned off in the configuration')).toBeInTheDocument();
+        expect(screen.getByRole('switch', {name: 'Workflow One'})).toBeEnabled();
     });
 });

@@ -11,6 +11,8 @@ import {useShallow} from 'zustand/react/shallow';
 export interface IntegrationInstanceConfigurationDialogWorkflowListItemProps {
     componentName: string;
     control: Control<IntegrationInstanceConfiguration>;
+    disabled?: boolean;
+    disabledMessage?: string;
     enabled?: boolean;
     formState: FormState<IntegrationInstanceConfiguration>;
     label: string;
@@ -24,6 +26,8 @@ export interface IntegrationInstanceConfigurationDialogWorkflowListItemProps {
 const IntegrationInstanceConfigurationDialogWorkflowsStepItem = ({
     componentName,
     control,
+    disabled,
+    disabledMessage,
     enabled,
     formState,
     label,
@@ -85,6 +89,8 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItem = ({
                     workflowIndex={workflowIndex}
                 />
             }
+            disabled={disabled}
+            disabledMessage={disabledMessage}
             enabled={workflowEnabled}
             inputCount={inputs.length}
             inputsContent={

@@ -8,6 +8,8 @@ import {twMerge} from 'tailwind-merge';
 interface WorkflowConfigurationCardProps {
     connectionCount: number;
     connectionsContent: ReactNode;
+    disabled?: boolean;
+    disabledMessage?: string;
     enabled: boolean;
     inputCount: number;
     inputsContent: ReactNode;
@@ -20,6 +22,8 @@ interface WorkflowConfigurationCardProps {
 const WorkflowConfigurationCard = ({
     connectionCount,
     connectionsContent,
+    disabled = false,
+    disabledMessage,
     enabled,
     inputCount,
     inputsContent,
@@ -57,10 +61,24 @@ const WorkflowConfigurationCard = ({
                         />
                     </div>
 
-                    {label}
+                    <span className="flex flex-col">
+                        {label}
+
+                        {disabled && disabledMessage && (
+                            <span className="text-xs font-normal text-content-neutral-secondary">
+                                {disabledMessage}
+                            </span>
+                        )}
+                    </span>
                 </Label>
 
-                <Switch aria-label={label} checked={enabled} id={switchId} onCheckedChange={onEnabledChange} />
+                <Switch
+                    aria-label={label}
+                    checked={enabled}
+                    disabled={disabled}
+                    id={switchId}
+                    onCheckedChange={onEnabledChange}
+                />
             </div>
         )}
 

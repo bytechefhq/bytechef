@@ -6,6 +6,7 @@ import {UseFormReturn} from 'react-hook-form';
 
 interface McpIntegrationWorkflowsListProps {
     componentName: string;
+    enabledWorkflowIds: string[];
     form: UseFormReturn<IntegrationInstanceConfiguration>;
     onSelectedWorkflowIdsChange: (selectedWorkflowIds: string[]) => void;
     selectedWorkflowIds: string[];
@@ -14,6 +15,7 @@ interface McpIntegrationWorkflowsListProps {
 
 const McpIntegrationWorkflowsList = ({
     componentName,
+    enabledWorkflowIds,
     form,
     onSelectedWorkflowIdsChange,
     selectedWorkflowIds,
@@ -26,6 +28,10 @@ const McpIntegrationWorkflowsList = ({
                     <IntegrationInstanceConfigurationDialogWorkflowsStepItem
                         componentName={componentName}
                         control={form.control}
+                        disabled={
+                            !enabledWorkflowIds.includes(workflow.id!) && !selectedWorkflowIds.includes(workflow.id!)
+                        }
+                        disabledMessage="Turned off in the configuration"
                         enabled={selectedWorkflowIds.includes(workflow.id!)}
                         formState={form.formState}
                         key={workflow.id}

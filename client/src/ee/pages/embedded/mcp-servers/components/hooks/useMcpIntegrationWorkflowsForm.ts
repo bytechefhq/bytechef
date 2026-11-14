@@ -53,6 +53,18 @@ export default function useMcpIntegrationWorkflowsForm({
         return integrationVersionWorkflows.filter((workflow) => eligibleWorkflowIds.includes(workflow.id!));
     }, [eligibleWorkflowIds, integrationVersionWorkflows]);
 
+    const enabledWorkflowIds = useMemo(
+        () =>
+            (integrationInstanceConfiguration?.integrationInstanceConfigurationWorkflows ?? []).flatMap(
+                (integrationInstanceConfigurationWorkflow) =>
+                    integrationInstanceConfigurationWorkflow.enabled &&
+                    integrationInstanceConfigurationWorkflow.workflowId
+                        ? [integrationInstanceConfigurationWorkflow.workflowId]
+                        : []
+            ),
+        [integrationInstanceConfiguration?.integrationInstanceConfigurationWorkflows]
+    );
+
     const getWorkflowConfigurations = useCallback(
         (selectedWorkflowIds: string[]): WorkflowConfigurationInput[] => {
             const formWorkflows = form.getValues('integrationInstanceConfigurationWorkflows') ?? [];
@@ -141,5 +153,5 @@ export default function useMcpIntegrationWorkflowsForm({
         form.reset({integrationInstanceConfigurationWorkflows});
     }, [componentName, form, integrationInstanceConfiguration, workflows]);
 
-    return {componentName, form, getWorkflowConfigurations, workflows};
+    return {componentName, enabledWorkflowIds, form, getWorkflowConfigurations, workflows};
 }
