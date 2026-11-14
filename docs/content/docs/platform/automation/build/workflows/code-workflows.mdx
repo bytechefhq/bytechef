@@ -182,6 +182,10 @@ function perform(input, context) {
 
 See the [Script component reference](/reference/components/script_v1) for the full walkthrough.
 
+A Script step runs inside the server by default. Its **Task Runner** property can send it to a child
+process, a Docker container, a Kubernetes pod or an AWS Batch job instead, with input files, output
+files and environment variables; see [Task runners](/platform/automation/build/workflows/task-runners).
+
 ### Beyond a plain step
 
 The Script component also contributes cluster elements in the same three languages: **tools**, which

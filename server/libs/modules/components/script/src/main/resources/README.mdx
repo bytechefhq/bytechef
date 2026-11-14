@@ -95,37 +95,45 @@ Datastream item processors and AI skill scripts receive an empty `connection`. A
 
 ### Task Runners
 
-Each action runs in the environment selected by its **Task Runner** property. The runners available in a given deployment depend on what the operator has enabled with `bytechef.script.runners.<type>.enabled`, so this list may be shorter in your installation.
+Each action runs in the environment its **Task Runner** property selects. The runners an installation offers depend on what the operator enabled with `bytechef.script.runners.<type>.enabled`, so the **Type** list in your editor may be shorter than this table. The [Task Runners](/platform/automation/build/workflows/task-runners) guide documents every runner, property and operator setting in full.
 
-| Runner | Type | What it does |
-| --- | --- | --- |
-| GraalVM | `graalvm` | Runs the script inside the server process, in a GraalVM polyglot context. The only runner where `context.component.*` is available. |
-| Process | `process` | Runs the script in a child process on the same host. The server's own environment is cleared before the script starts — only `PATH`, `HOME` and the runner's own `BYTECHEF_*` names are put back — so the script cannot read the server's credentials by name. Enable with `bytechef.script.runners.process.enabled=true`. |
-| Docker | `docker` | Runs the script in a single-use container, on the operator's daemon or — when the operator allows it — on the daemon the task names. The task chooses the image, CPU, memory and network; the operator caps only how long the server waits and how much it transfers. Enable with `bytechef.script.runners.docker.enabled=true`. This is the same runner the **Commands** component uses; its README documents every property. |
-| Kubernetes | `kubernetes` | Enterprise. Runs the script as a pod on the cluster the task's **Kubernetes** connection names. Enable with `bytechef.script.runners.kubernetes.enabled=true`; the **Commands** component's README documents its properties, RBAC and resume behaviour. |
-| AWS Batch | `aws-batch` | Enterprise. Runs the script as an AWS Batch job in the account the task's **AWS** connection names. Enable with `bytechef.script.runners.aws-batch.enabled=true`; the **Commands** component's README documents its properties, sizing, IAM and resume behaviour. |
+| Runner | Type | Edition | What it does |
+| --- | --- | --- | --- |
+| GraalVM | `graalvm` | Community | Runs the script inside the server process, in the [script sandbox](/platform/use-bytechef/self-hosted/configuration/script-sandbox). The only runner where `context.component.*` is available. Enabled in the shipped configuration. |
+| Process | `process` | Community | Runs the script in a child process on the server's host. The server's environment is cleared first: only `PATH` is kept, `HOME` is set to the working directory, and the task's **Environment** and the `BYTECHEF_*` variables are added. |
+| Docker | `docker` | Community | Runs the script in a single-use container. The task chooses the image, CPU, memory, user and network; the operator chooses the daemon. |
+| Kubernetes | `kubernetes` | Enterprise | Runs the script as a single-use pod on the cluster the task's **Kubernetes** connection names. |
+| AWS Batch | `aws-batch` | Enterprise | Runs the script as an AWS Batch job in the account the task's **AWS** connection names. |
 
-The `Script Task Runners Demo` sample workflow (`demo/script-runners.json` in `automation-demo-config`, seeded into
-the Demo project on a `demo` profile install) shows this authoring shape as one `javascript` action: a workflow
-input passed through **Input**, a `perform(input, connection, context)` that would receive the task's connections
-under any runner, and a computed value returned from `perform()`. It runs unchanged under the shipped
-configuration because it leaves **Task Runner** unset, which falls back to GraalVM - the one runner every
-installation has enabled. The same task runs unchanged under `process` or `docker` too: once an operator enables one
-of them, setting the task's `taskRunner.type` to `process` or `docker` is the only edit needed, and the only thing
-that changes about the result is the shape described next - the bare returned value becomes the five-key map.
+When **Task Runner** is left unset, the **JavaScript** and **Python** actions run on GraalVM, so existing Script steps keep working unchanged. The **Bash** action has no GraalVM fallback; see **The Bash Action**.
 
-The GraalVM runner has two modes:
+The `Script Task Runners Demo` sample workflow (`demo/script-runners.json` in `automation-demo-config`, seeded into the Demo project on a `demo` profile install) is a single `javascript` action that takes a workflow input through **Input**, declares `perform(input, connection, context)`, and returns a computed value. It leaves **Task Runner** unset, so it runs on GraalVM under the shipped configuration. Once an operator enables `process` or `docker`, setting the task's `taskRunner.type` to it is the only edit needed, and the result changes to the five-key map described under **Result Shape**.
 
-- **Strict** (default) — no file system, no environment, no process creation, and CPU and memory ceilings. Use this unless you have a specific reason not to.
-- **Trusted** — every restriction lifted. The script runs inside the server process with full reflection, so it can reach anything the server can, including other tenants' data. Enable it only on a single-tenant deployment you control, with `bytechef.script.runners.graalvm.properties.trusted-enabled=true`. Until an operator sets that flag the Trusted option is not offered at all.
+#### The GraalVM Runner's Modes
+
+- **Strict** (default): no file system, no environment, no process creation, and the CPU and heap limits of `bytechef.script.sandbox`. Use this unless you have a specific reason not to.
+- **Trusted**: every restriction lifted. The script runs inside the server process with full reflection, so it can reach anything the server can, including other tenants' data. It has no CPU or heap limit, and a wall-clock timeout of 5 minutes unless the task sets `timeout`. The option is offered only after an operator sets `bytechef.script.runners.graalvm.properties.trusted-enabled=true`; enable it only on a single-tenant deployment you control.
+
+The GraalVM runner does not accept **Environment**, **Input Files** or **Output Files**, and its strict mode does not accept a **Timeout**: strict already runs under CPU and heap limits, and a wall clock would kill a script that is only waiting on a slow component call.
+
+#### Input Files, Output Files, Environment And Timeout
+
+These properties appear for every runner except GraalVM.
+
+- **Input Files**: file name to content, inline text or a file entry, written into the working directory before the script starts. `BYTECHEF_WORKING_DIR` holds the directory's path.
+- **Output Files**: glob patterns matched against `BYTECHEF_OUTPUT_DIR` after the run. Every match is stored and returned in `outputFiles`, keyed by its relative path.
+- **Environment**: variables the script sees. Their values are evaluated as workflow expressions.
+- **Timeout (seconds)**: how long the script may run. Without one, the Process runner allows 5 minutes and the Docker, Kubernetes and AWS Batch runners their `waitUntilCompletion` (default `PT1H`), capped by the operator's `max-wait`.
+
+`BYTECHEF_INPUT_FILE` names `input.json`, which holds the **Input** values as JSON.
 
 Workflow data reaches a script through the **Input** property, not by interpolating expressions into the source.
 
 ### Connections In External Runners
 
-Under Process, Docker, Kubernetes and AWS Batch the connections a task declares (except `taskRunner`) are written to `connections.json` in the working directory, beside the input file, as one JSON object that maps each connection's name to its parameters - the same map a GraalVM script receives. `BYTECHEF_CONNECTIONS_FILE` holds its path (inside the container on Docker, Kubernetes and AWS Batch), and the task's own `env` cannot override it. No connection parameter is exported as an environment variable, and the file lies outside the output directory, so it never comes back in `outputFiles`.
+Under Process, Docker, Kubernetes and AWS Batch the connections a task declares (except `taskRunner`) are written to `connections.json` in the working directory, beside the input file, as one JSON object that maps each connection's name to its parameters: the same map a GraalVM script receives. `BYTECHEF_CONNECTIONS_FILE` holds its path (inside the container on Docker, Kubernetes and AWS Batch), and the task's own **Environment** cannot override it. No connection parameter is exported as an environment variable, and the file lies outside the output directory, so it never comes back in `outputFiles`.
 
-The appended bootstrap loads the file and passes the map to `perform` when `perform` declares three or more required parameters - in Python, required positional parameters, counted with `inspect.signature` - and otherwise calls `perform(input, context)` as before:
+The appended bootstrap loads the file and passes the map to `perform` when `perform` declares three or more required parameters (in Python, required positional parameters, counted with `inspect.signature`), and otherwise calls `perform(input, context)` as before:
 
 ```python
 def perform(input, connection, context):
@@ -142,9 +150,11 @@ function perform(input, connection, context) {
 }
 ```
 
-A shell script or a command of the **Commands** component reads the file itself, for example `jq -r '.slack.token' "$BYTECHEF_CONNECTIONS_FILE"`.
+On these runners `context` is a placeholder: reading any member of it, such as `context.component`, fails with an error saying it is not available under that runner. A JavaScript `perform` may be `async`; the bootstrap awaits it.
 
-Values of 6 or more characters, each connection's JSON form and the whole file's JSON are replaced by `******` in `stdout`, `stderr`, failure messages and the server log, except the top-level parameters named authorizationType, region, baseUri, baseUrl, url, uri, instanceUrl, endpoint, host, hostname, port and domain, which are delivered but never masked; very long lines (over 8192 characters) are split before logging, so a secret crossing that split may appear in fragments in the server log. Masking is best effort, and `vars` and `outputFiles` are not masked. With `bytechef.script.inject-connections` off no file is written and `connection` is an empty map. The **Commands** component's README has the exposure table for each runner.
+A Bash script, or a command of the **Commands** component, reads the file itself, for example `jq -r '.slack.token' "$BYTECHEF_CONNECTIONS_FILE"`.
+
+Values of 6 or more characters, each connection's JSON form and the whole file's JSON are replaced by `******` in `stdout`, `stderr`, failure messages and the server log, except the top-level parameters named authorizationType, region, baseUri, baseUrl, url, uri, instanceUrl, endpoint, host, hostname, port and domain, which are delivered but never masked. Very long lines (over 8192 characters) are split before logging, so a secret crossing that split may appear in fragments in the server log. Masking is best effort, and `vars` and `outputFiles` are not masked. With `bytechef.script.inject-connections` off, no file is written and `connection` is an empty map. The **Commands** component's documentation has the exposure table for each runner.
 
 ### Result Shape
 
@@ -152,7 +162,7 @@ The shape of an action's result depends on which runner ran it, and this is the 
 
 Under **GraalVM**, the action returns exactly what the script's `perform()` function returned.
 
-Under **Process**, **Docker**, **Kubernetes** or **AWS Batch**, the action instead always returns this map:
+Under **Process**, **Docker**, **Kubernetes** or **AWS Batch**, the action always returns this map:
 
 ```json
 {
@@ -164,37 +174,53 @@ Under **Process**, **Docker**, **Kubernetes** or **AWS Batch**, the action inste
 }
 ```
 
-`vars` is `perform()`'s return value — the appended bootstrap serializes it to `output.json` in the working directory, and the runner reads that file back into `vars`. So a script that returns `{"total": 42}` is read as `${myScript.total}` under GraalVM, and as `${myScript.vars.total}` under Process or Docker. Moving a script between GraalVM and an external runner means updating every downstream reference to its output, not just the Task Runner property.
+`vars` is `perform()`'s return value: the appended bootstrap serializes it to `output.json` in the output directory, and the runner reads that file back into `vars`. So a script that returns `{"total": 42}` is read as `${myScript.total}` under GraalVM, and as `${myScript.vars.total}` under the other runners. Moving a script between GraalVM and an external runner means updating every downstream reference to its output, not just the Task Runner property.
+
+A non-zero exit code, including an exception thrown out of `perform`, fails the task with the tails of `stdout` and `stderr` in the message, so a returned result always carries `exitCode` `0`.
 
 ### Language Support By Runner
 
-The Process and Docker runners can only start an interpreter for JavaScript, Python and shell. Ruby, Java and R remain GraalVM-only, and are rejected by the runner's own validation before anything starts — the failure names the language, for example *"Language 'ruby' cannot be executed by an external task runner."*
+The Process, Docker, Kubernetes and AWS Batch runners can only start an interpreter for JavaScript, Python, Bash and shell. Any other language is rejected by the runner's own validation before anything starts, with a message that names the language, for example *"Language 'ruby' cannot be executed by an external task runner."*
 
-That check is deliberately not enforced earlier, in the editor: the **Task Runner** select is built from what each enabled runner declares it can do, not from what languages it can run, so an action written in a GraalVM-only language still lists Process and Docker as choices alongside GraalVM.
+That check is deliberately not enforced earlier, in the editor: the **Task Runner** select is built from what each enabled runner declares it can do, not from what languages it can run.
 
-In the current build this only matters for JavaScript and Python, the two languages this component ships — both resolve externally. The Ruby, Java and R actions exist in the codebase but are not registered on this component for reasons unrelated to task runners; the mismatch above becomes reachable once they are.
+In the current build this only matters for JavaScript, Python and Bash, the three languages this component's actions ship, and all three run on the external runners. The Ruby, Java and R actions exist in the codebase but are not registered on this component, for reasons unrelated to task runners.
 
 ### The Bash Action
 
-The **Bash** action runs its script with `bash`, so it needs the Process, Docker, Kubernetes or AWS Batch runner; GraalVM cannot run it. Each **Input** value is exported as `INPUT_<name>`, a string as it is and any other value as JSON. A name that is not a valid shell variable name is not exported, but every value is also in the JSON file named by `BYTECHEF_INPUT_FILE`. Writing a JSON object to `$BYTECHEF_OUTPUT_DIR/output.json` returns it in `vars`.
+The **Bash** action runs its script with `bash`, so it needs the Process, Docker, Kubernetes or AWS Batch runner; GraalVM cannot run it. When **Task Runner** is left unset, it uses the first enabled runner that can run it, in alphabetical order of type; if none is enabled, the task fails with a message naming `bytechef.script.runners.process.enabled=true`.
+
+- Each **Input** value is exported as `INPUT_<name>`: a string as it is, any other value as JSON, `null` as an empty string. A name that is not a valid shell variable name is not exported, but every value is also in the JSON file named by `BYTECHEF_INPUT_FILE`. An **Environment** entry of the same name wins.
+- Writing a JSON object to `$BYTECHEF_OUTPUT_DIR/output.json` returns it in `vars`.
+- The default script starts with `set -euo pipefail`, so the first failing command fails the task.
+
+```bash
+set -euo pipefail
+
+echo "Hello, $INPUT_name"
+
+printf '{"greeted": "%s"}' "$INPUT_name" > "$BYTECHEF_OUTPUT_DIR/output.json"
+```
 
 Under Docker, Kubernetes and AWS Batch the default image is `ubuntu:24.04`. It has `bash` but not `jq`, `python3` or `curl`, so a script that needs them, including one that reads `BYTECHEF_INPUT_FILE` or `BYTECHEF_CONNECTIONS_FILE` with `jq`, must set the runner's **Image** to one that ships them. The Process runner uses whatever the host has on its `PATH`.
 
+The Bash action replaces the deprecated **Bash** component, which runs its script directly on the server with the server's own environment and no timeout. The [Task Runners](/platform/automation/build/workflows/task-runners#migrating-from-the-bash-component) guide has a step-by-step migration.
+
 ### Inheriting The Host Environment
 
-The Process runner clears the environment before the script starts and re-seeds only `PATH`, `HOME` and its own `BYTECHEF_*` names — the server process holds datasource passwords and cloud credentials, and a script must not be able to read them by name.
+The Process runner clears the environment before the script starts and keeps only `PATH`: the server process holds datasource passwords and cloud credentials, and a script must not be able to read them by name.
 
-A workflow author can ask for the server's full environment instead, through the runner's **Inherit Environment** option. It is off by default; turning it on hands the child process everything the server process holds, including datasource passwords and cloud credentials, so use it only on a deployment where workflow authors are trusted with the server itself.
+A workflow author can ask for the server's full environment instead, through the runner's **Inherit Environment** option. It is off by default; turning it on hands the child process everything the server process holds, including datasource passwords and cloud credentials, so use it only on a deployment where workflow authors are trusted with the server itself. It does not affect connections, which arrive in `connections.json` either way.
 
 ### Limitations
 
-**Workflow expressions are not evaluated in script source.** A `${…}` written in the **JavaScript Code** or **Python Code** field reaches the interpreter exactly as you typed it. A JavaScript template literal such as `` `Hi ${name}` `` is your code, not a workflow expression, and this holds under every runner.
+**Workflow expressions are not evaluated in script source.** A `${…}` written in the **JavaScript Code**, **Python Code** or **Bash Script** field reaches the interpreter exactly as you typed it. A JavaScript template literal such as `` `Hi ${name}` `` is your code, not a workflow expression, and this holds under every runner.
 
-Previously the source was passed through the workflow expression evaluator, and that is a breaking change if you relied on it: a bare `${name}` was substituted whenever the workflow context happened to carry a matching name, and anything more involved — `` `Total: ${a + b}` ``, a ternary, a function call — failed the whole task with `Invalid expression`, naming neither the script nor the property. Such a script now runs, and a script that did rely on the substitution receives a literal `${name}` instead of a value.
+Previously the source was passed through the workflow expression evaluator, and that is a breaking change if you relied on it: a bare `${name}` was substituted whenever the workflow context happened to carry a matching name, and anything more involved, such as `` `Total: ${a + b}` ``, a ternary or a function call, failed the whole task with `Invalid expression`, naming neither the script nor the property. Such a script now runs, and a script that did rely on the substitution receives a literal `${name}` instead of a value.
 
-Workflow data reaches a script through the **Input** property, whose values *are* evaluated normally — declare the value as an input and read it from `input` inside `perform()`.
+Workflow data reaches a script through the **Input** property, whose values *are* evaluated normally: declare the value as an input and read it from `input` inside `perform()`.
 
-Two limitations of the Process and Docker runners are deliberate trade-offs, not oversights:
+Two limitations of the external runners are deliberate trade-offs, not oversights:
 
-- **A backgrounded descendant is not reaped under the Process runner.** A script whose shell command ends in something like `sleep 600 &` outlives the task: the task itself is bounded — the wait for its output has a ceiling — but the orphaned descendant keeps running after the task ends. Reaping it would need a process group, which this runner does not implement. The Docker runner does not have this problem: removing the container takes everything running inside it with it.
-- **`stdout` and `stderr` in the result are truncated.** Only the first 32 KiB and the last 32 KiB of each stream are kept, with the number of elided bytes written between them. The full, untruncated stream still reaches the server log, line by line, as it is produced — nothing is lost, it is just not all in the task's own result.
+- **A backgrounded descendant is not reaped under the Process runner.** A script whose shell command ends in something like `sleep 600 &` outlives the task: the task itself is bounded, since the wait for its output has a ceiling, but the orphaned descendant keeps running after the task ends. On a timeout the runner kills the process and its descendants. The Docker runner does not have this problem: removing the container takes everything running inside it with it.
+- **`stdout` and `stderr` in the result are truncated.** Each stream keeps the first and the last half of a byte budget, with the number of elided bytes written between them: 64 KiB per stream on the Process runner, and the operator's `max-log-bytes` (1 MB by default) on Docker, Kubernetes and AWS Batch. The full, untruncated stream still reaches the server log, line by line, as it is produced.

@@ -4,6 +4,10 @@ where Script executes inline `perform(input, context)` source with access to `co
 plain interpreter commands with none of that in-process access, and gets a plain process's environment, timeout and
 file handling in exchange.
 
+The [Task Runners](/platform/automation/build/workflows/task-runners) guide covers every runner, its operator settings,
+the working directory contract and worked examples. For a single Bash script with structured input, the **Script**
+component's **Bash** action is the closer fit; it also replaces the deprecated **Bash** component.
+
 ## Available actions
 
 The three actions - Shell, Python and Node - differ only in the interpreter they hand the commands to; their
@@ -64,7 +68,7 @@ bytechef:
         enabled: false
       kubernetes:
         enabled: false
-      inject-connections: true
+    inject-connections: true
     runner-limits:
       max-wait: PT1H
       max-log-bytes: 1MB
@@ -97,15 +101,16 @@ anything else under them takes effect. What each key costs to turn on:
   most log bytes it keeps, and the most bytes it moves in or out; any runner may override them under its own
   `properties`.
 
-**The published property list below is configuration-dependent, and this page's is not necessarily yours.** The
-`taskRunner` property's schema on this reference page - the JSON-derived `{type, interpreter}` shown in the
-**Properties** table above and in the JSON example - is assembled by `TaskRunnerPropertyFactory` from whichever
-runners were enabled in the registry that generated this page's snapshot, filtered to the ones declaring the
-Commands capability. That registry enables only `process`, so this page's generated table shows the `process`
-runner's own shape and never Docker's (`image`, `cpu`, `memory`, `networkMode`, ...) - not because Docker is
-unsupported, but because it was not enabled when the snapshot was captured. Your own deployment's editor renders the
-select and properties for whichever runners *you* enabled, which may add or omit entries this page shows. The
-Docker runner's actual properties are documented by hand below, not derived from the snapshot.
+Every key can also be set as an environment variable, for example `BYTECHEF_SCRIPT_RUNNERS_PROCESS_ENABLED=true`. Drop
+the dash in the `aws-batch` type (`BYTECHEF_SCRIPT_RUNNERS_AWSBATCH_ENABLED`); a dash in a property name may be written
+as an underscore (`BYTECHEF_SCRIPT_RUNNERS_GRAALVM_PROPERTIES_TRUSTED_ENABLED`).
+
+**The property list in the Properties tables above is configuration-dependent, and this page's is not necessarily
+yours.** The `taskRunner` property's schema is assembled from whichever runners were enabled in the registry that
+generated this page, filtered to the ones declaring the Commands capability. That registry enabled `process` and
+`docker`, so the tables show those two runners' properties and nothing of Kubernetes or AWS Batch, which are
+documented by hand below. Your own deployment's editor shows the select and properties for the runners *you* enabled,
+which may add or omit entries this page shows.
 
 Each action's default interpreter, when the Process runner's `interpreter` property is left blank:
 
@@ -503,10 +508,21 @@ Every action returns:
 runner, Commands has no in-process runner to fall back to, so this five-key map is always the result shape - there
 is no bare-value variant.
 
-`stdout` and `stderr` are **truncated**: the first 32 KiB and the last 32 KiB of each stream are kept - 64 KiB in
-all - and anything between them is replaced by a `... N bytes elided ...` marker. Both ends are kept because the
-head carries what the run started doing and the tail carries how it ended. An execution that writes less than that
-is stored whole.
+`stdout` and `stderr` are **truncated**: each stream keeps the first half and the last half of a byte budget, and
+anything between them is replaced by a `... N bytes elided ...` marker. The budget is 64 KiB per stream on the Process
+runner (32 KiB at each end), and the operator's `max-log-bytes` (1 MB by default) on Docker, Kubernetes and AWS Batch.
+Both ends are kept because the head carries what the run started doing and the tail carries how it ended. An
+execution that writes less than that is stored whole.
+
+A non-zero exit code fails the task, with the tails of both streams in the error message, so a returned result always
+carries `exitCode` `0`. To read structured output, write a JSON value to `$BYTECHEF_OUTPUT_DIR/output.json`; it comes
+back as `vars`:
+
+```yaml
+commands:
+  - echo "counting"
+  - printf '{"files": %d}' "$(ls | wc -l)" > "$BYTECHEF_OUTPUT_DIR/output.json"
+```
 
 ## Log volume
 

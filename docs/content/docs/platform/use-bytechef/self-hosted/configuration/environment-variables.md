@@ -527,6 +527,31 @@ System administrator is used for accessing protected data reachable through /act
 | `BYTECHEF_SCHEDULER_QUARTZ_CLUSTERED` | Run Quartz in clustered mode. Required when more than one coordinator runs (EE) | `false` |
 | `BYTECHEF_SCHEDULER_QUARTZ_CLUSTER_CHECKIN_INTERVAL` | How often a clustered Quartz scheduler checks in, in milliseconds | `15000` |
 
+## Script Task Runner Configuration
+
+Settings of the [task runners](/platform/automation/build/workflows/task-runners) that Script and Commands tasks run in. Every runner except GraalVM is disabled until enabled here.
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_SCRIPT_RUNNERS_GRAALVM_ENABLED` | Enable the in-process GraalVM runner, which Script JavaScript and Python steps use when they name no runner | `true` |
+| `BYTECHEF_SCRIPT_RUNNERS_PROCESS_ENABLED` | Enable the Process runner: tasks run as child processes on the server's host, as the server's OS user | `false` |
+| `BYTECHEF_SCRIPT_RUNNERS_DOCKER_ENABLED` | Enable the Docker runner: tasks run in single-use containers | `false` |
+| `BYTECHEF_SCRIPT_RUNNERS_DOCKER_PROPERTIES_HOST` | Docker API the Docker runner uses, such as `tcp://docker:2375`. Empty means `DOCKER_HOST`, else the local socket | - |
+| `BYTECHEF_SCRIPT_RUNNERS_KUBERNETES_ENABLED` | Enable the Kubernetes runner (Enterprise): tasks run as pods on the cluster their `kubernetes` connection names | `false` |
+| `BYTECHEF_SCRIPT_RUNNERS_AWSBATCH_ENABLED` | Enable the AWS Batch runner (Enterprise): tasks run as Batch jobs in the account their `aws` connection names. Write the type without its dash; `AWS_BATCH` is ignored | `false` |
+| `BYTECHEF_SCRIPT_RUNNERS_GRAALVM_PROPERTIES_TRUSTED_ENABLED` | Offer the GraalVM runner's Trusted mode, which runs scripts with full host access and no resource limits. Single-tenant installations only | `false` |
+| `BYTECHEF_SCRIPT_RUNNERS_DOCKER_PROPERTIES_ALLOW_TASK_HOST` | Let a Docker task name its own Docker API | `false` |
+| `BYTECHEF_SCRIPT_RUNNERS_DOCKER_PROPERTIES_ALLOW_VOLUME_MOUNTS` | Let a Docker task bind-mount host paths | `false` |
+| `BYTECHEF_SCRIPT_RUNNERS_<TYPE>_PROPERTIES_MAX_WAIT` | Per-runner override of `runner-limits.max-wait`, as an ISO-8601 duration | - |
+| `BYTECHEF_SCRIPT_RUNNERS_<TYPE>_PROPERTIES_MAX_LOG_BYTES` | Per-runner override of `runner-limits.max-log-bytes` | - |
+| `BYTECHEF_SCRIPT_RUNNERS_<TYPE>_PROPERTIES_MAX_TRANSFER_BYTES` | Per-runner override of `runner-limits.max-transfer-bytes` | - |
+| `BYTECHEF_SCRIPT_INJECT_CONNECTIONS` | Deliver a task's connections to the Process, Docker, Kubernetes and AWS Batch runners in `connections.json` and mask their values in the output. `true` in the shipped `application-bytechef.yml`; without that file the default is `false` | `true` |
+| `BYTECHEF_SCRIPT_RUNNER_LIMITS_MAX_WAIT` | Longest a worker waits on one Docker, Kubernetes or AWS Batch execution; caps the task's timeout | `PT1H` |
+| `BYTECHEF_SCRIPT_RUNNER_LIMITS_MAX_LOG_BYTES` | Bytes of each of stdout and stderr a Docker, Kubernetes or AWS Batch result keeps | `1MB` |
+| `BYTECHEF_SCRIPT_RUNNER_LIMITS_MAX_TRANSFER_BYTES` | Bytes that may move in or out of one Docker, Kubernetes or AWS Batch execution | `512MB` |
+
+When a runner is configured both in a YAML file and through environment variables, the two are merged and the environment variable wins.
+
 ## Session Configuration
 
 | Environment Variable | Description | Default Value |
