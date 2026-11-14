@@ -77,11 +77,21 @@ export interface IntegrationWorkflowType {
     workflowUuid: string;
 }
 
+export type InputTypeNameType =
+    | 'BOOLEAN'
+    | 'DATE'
+    | 'DATE_TIME'
+    | 'FIELD_MAPPING'
+    | 'INTEGER'
+    | 'NUMBER'
+    | 'STRING'
+    | 'TIME';
+
 export interface PropertyType {
     defaultValue?: string;
     name: string;
     label: string;
-    type: 'string' | 'number' | 'boolean' | 'object' | 'array';
+    type: InputTypeNameType;
     required?: boolean;
     options?: OptionType[];
     placeholder?: string;
@@ -131,7 +141,7 @@ export interface WorkflowInputType {
     name: string;
     label: string;
     objectName?: string;
-    type: 'string' | 'number' | 'boolean' | 'object' | 'array' | 'field_mapping';
+    type: InputTypeNameType;
     componentReference?: ComponentInputReferenceType;
     defaultValue?: unknown;
     internalOnly?: boolean;

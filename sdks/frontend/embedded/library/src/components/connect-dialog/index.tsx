@@ -21,7 +21,7 @@ import {
     TokenPayloadI,
     WorkflowInputType,
 } from './types';
-import {decodeJwtSubject, mergeWorkflowInputs} from './utils';
+import {decodeJwtSubject, mergeWorkflowInputs, normalizeInputType} from './utils';
 import useExecuteAction from './useExecuteAction';
 
 const OAUTH2_TYPES = ['OAUTH2_AUTHORIZATION_CODE', 'OAUTH2_AUTHORIZATION_CODE_PKCE'];
@@ -182,6 +182,7 @@ export default function useConnectDialog({
 
                           return {
                               ...input,
+                              type: normalizeInputType(input.type),
                               value: overrideValue ?? serverValue ?? (isGroupInput ? {} : ''),
                           };
                       })
@@ -250,6 +251,7 @@ export default function useConnectDialog({
 
                           return {
                               ...input,
+                              type: normalizeInputType(input.type),
                               value: overrideValue ?? serverValue ?? (isGroupInput ? {} : ''),
                           };
                       })
