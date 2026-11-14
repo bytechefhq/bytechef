@@ -851,3 +851,59 @@ describe('useConnectDialog - onClose', () => {
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 });
+
+describe('useConnectDialog - workflow input types', () => {
+    beforeEach(() => {
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    it('hands the dialog upper-case input types whatever casing the server sends', async () => {
+        const workflowUuid = '44444444-4444-4444-4444-444444444444';
+
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: vi.fn().mockResolvedValue({
+                integrationInstances: [{id: 55, workflows: [{enabled: true, workflowUuid}]}],
+                mcpWorkflows: [
+                    {inputs: [{label: 'Count', name: 'count', type: 'integer'}], label: 'MCP 1', workflowUuid},
+                ],
+                name: 'Test Integration',
+                workflows: [
+                    {
+                        inputs: [
+                            {label: 'Mapping', name: 'mapping', objectName: 'Contacts', type: 'FIELD_MAPPING'},
+                            {label: 'Legacy', name: 'legacy', type: 'field_mapping'},
+                        ],
+                        label: 'Workflow 1',
+                        workflowUuid,
+                    },
+                ],
+            }),
+        });
+
+        const renderMock = vi.fn();
+
+        vi.mocked(createRoot).mockReturnValue({
+            render: renderMock,
+            unmount: vi.fn(),
+        });
+
+        const {result} = renderHook(() =>
+            useConnectDialog({...defaultConnectDialogProps, integrationInstanceId: '55'})
+        );
+
+        await act(async () => result.current.openDialog());
+
+        const props = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
+
+        expect(props.mergedWorkflows[0].inputs.map((input: {type: string}) => input.type)).toEqual([
+            'FIELD_MAPPING',
+            'FIELD_MAPPING',
+        ]);
+        expect(props.mergedMcpWorkflows[0].inputs[0].type).toBe('INTEGER');
+    });
+});

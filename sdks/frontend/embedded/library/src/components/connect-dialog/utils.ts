@@ -1,3 +1,5 @@
+import type {InputTypeNameType} from './types';
+
 const isPlainObject = (value: unknown): value is Record<string, unknown> =>
     typeof value === 'object' && value !== null && !Array.isArray(value);
 
@@ -90,3 +92,6 @@ export const mergeWorkflowInputs = (
 
     return mergedInputs;
 };
+
+export const normalizeInputType = (type: string | undefined): InputTypeNameType =>
+    (type ? type.toUpperCase() : 'STRING') as InputTypeNameType;
