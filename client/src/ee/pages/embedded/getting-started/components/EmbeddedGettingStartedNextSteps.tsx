@@ -1,7 +1,7 @@
 import {
     EMBEDDED_AUTOMATION_HUB_DOCUMENTATION_URL,
-    EMBEDDED_CONNECT_DIALOG_DOCUMENTATION_URL,
     EMBEDDED_MCP_SERVERS_DOCUMENTATION_URL,
+    EMBEDDED_SDK_SETUP_DOCUMENTATION_URL,
     EMBEDDED_SIGNING_KEYS_DOCUMENTATION_URL,
     EMBEDDED_WORKFLOWS_DOCUMENTATION_URL,
 } from '@/ee/pages/embedded/embeddedDocumentationUrls';
@@ -18,7 +18,7 @@ const NEXT_STEPS: NextStepI[] = [
     {
         description: 'Let your users connect their apps from your product with the frontend SDK.',
         external: true,
-        href: EMBEDDED_CONNECT_DIALOG_DOCUMENTATION_URL,
+        href: EMBEDDED_SDK_SETUP_DOCUMENTATION_URL,
         title: 'Connect popup',
     },
     {
