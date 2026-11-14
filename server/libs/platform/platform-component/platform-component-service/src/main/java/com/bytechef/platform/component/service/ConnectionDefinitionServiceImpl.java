@@ -76,6 +76,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -545,7 +546,13 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
 
             builder.query("client_id", clientIdFunction.apply(connectionParameters, context));
-            builder.query("client_secret", clientSecretFunction.apply(connectionParameters, context));
+
+            String clientSecret = clientSecretFunction.apply(connectionParameters, context);
+
+            if (StringUtils.isNotBlank(clientSecret)) {
+                builder.query("client_secret", clientSecret);
+            }
+
             builder.query("code", code);
             builder.query("grant_type", "authorization_code");
             builder.query("redirect_uri", redirectUri);
@@ -610,7 +617,13 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
 
             builder.query("client_id", clientIdFunction.apply(connectionParameters, context));
-            builder.query("client_secret", clientSecretFunction.apply(connectionParameters, context));
+
+            String clientSecret = clientSecretFunction.apply(connectionParameters, context);
+
+            if (StringUtils.isNotBlank(clientSecret)) {
+                builder.query("client_secret", clientSecret);
+            }
+
             builder.query("refresh_token", refreshTokenFunction.apply(connectionParameters, context));
             builder.query("grant_type", "refresh_token");
 
@@ -663,7 +676,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     private static String getDefaultClientSecret(Parameters connectionParameters) {
-        return MapUtils.getRequiredString(connectionParameters, Authorization.CLIENT_SECRET);
+        return MapUtils.getString(connectionParameters, Authorization.CLIENT_SECRET);
     }
 
     private static String getDefaultRefreshToken(Parameters connectionParameters) {
