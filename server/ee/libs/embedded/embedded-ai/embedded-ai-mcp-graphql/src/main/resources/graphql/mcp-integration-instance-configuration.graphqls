@@ -29,10 +29,8 @@ input CreateMcpIntegrationInstanceConfigurationInput {
     mcpServerId: ID!
     integrationInstanceConfigurationId: ID!
     selectedWorkflowIds: [String!]!
-    workflowConfigurations: [WorkflowConfigurationInput!]
 }
 
 input UpdateMcpIntegrationInstanceConfigurationInput {
     selectedWorkflowIds: [String!]!
-    workflowConfigurations: [WorkflowConfigurationInput!]
 }
