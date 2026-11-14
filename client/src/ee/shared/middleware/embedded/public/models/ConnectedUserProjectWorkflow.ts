@@ -95,6 +95,10 @@ export interface ConnectedUserProjectWorkflow {
      */
     inputValues?: { [key: string]: any; };
     /**
+     * For REFERENCE rows, the id of the connection each component uses, keyed by component name: the same shape as the connections of a provision request. Components whose connection the configuration provides are left out. Empty for COPY rows.
+     */
+    connections?: { [key: string]: number; };
+    /**
      * Why the automation needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input>, UPDATE_PENDING or INVALID_WORKFLOW:<errorCount>. A COPY only reports INVALID_WORKFLOW. Null when healthy.
      */
     attentionReason?: string;
@@ -143,6 +147,7 @@ export function ConnectedUserProjectWorkflowFromJSONTyped(json: any, ignoreDiscr
         'components': json['components'] == null ? undefined : ((json['components'] as Array<any>).map(AutomationProjectComponentFromJSON)),
         'inputs': json['inputs'] == null ? undefined : ((json['inputs'] as Array<any>).map(AutomationProjectWorkflowInputFromJSON)),
         'inputValues': json['inputValues'] == null ? undefined : json['inputValues'],
+        'connections': json['connections'] == null ? undefined : json['connections'],
         'attentionReason': json['attentionReason'] == null ? undefined : json['attentionReason'],
     };
 }
@@ -173,6 +178,7 @@ export function ConnectedUserProjectWorkflowToJSONTyped(value?: ConnectedUserPro
         'components': value['components'] == null ? undefined : ((value['components'] as Array<any>).map(AutomationProjectComponentToJSON)),
         'inputs': value['inputs'] == null ? undefined : ((value['inputs'] as Array<any>).map(AutomationProjectWorkflowInputToJSON)),
         'inputValues': value['inputValues'],
+        'connections': value['connections'],
         'attentionReason': value['attentionReason'],
     };
 }
