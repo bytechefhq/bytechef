@@ -9,7 +9,12 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import com.bytechef.ai.copilot.service.CopilotWorkflowGenerator;
 import com.bytechef.atlas.execution.facade.JobFacade;
@@ -28,6 +33,7 @@ import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.listener.AutomationProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectUserProjectRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -45,8 +51,10 @@ import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacad
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.githubproxy.client.GitHubProxyClient;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
@@ -64,6 +72,7 @@ import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CompletableFuture;
@@ -93,7 +102,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
         "bytechef.edition=EE",
         "bytechef.workflow.repository.jdbc.enabled=true",
         "bytechef.webhook-url=/webhooks/{id}",
-        "spring.liquibase.contexts=configuration,user",
+        "spring.liquibase.contexts=configuration,connection,user",
         "spring.main.allow-bean-definition-overriding=true"
     })
 @Import(PostgreSQLContainerConfiguration.class)
@@ -101,7 +110,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
     ActionDefinitionFacade.class, ApiKeyFacade.class, ApiKeyService.class, AuthorityService.class,
     ClusterElementDefinitionService.class, ComponentConnectionFacade.class, ComponentDefinitionService.class,
     ConnectionDefinitionService.class, ConnectionFacade.class, ConnectionLifecycleFacade.class,
-    ConnectionService.class, EmbeddedPermissionEvaluator.class, EnvironmentService.class, GitHubProxyClient.class,
+    EmbeddedPermissionEvaluator.class, EnvironmentService.class, GitHubProxyClient.class,
     JobFacade.class, JobService.class, McpComponentService.class, McpIntegrationComponentService.class,
     McpIntegrationInstanceConfigurationService.class,
     McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceToolService.class,
@@ -123,6 +132,9 @@ class ConnectedUserProjectWorkflowManagerIntTest {
     private ConnectedUserConnectionFacade connectedUserConnectionFacade;
 
     @Autowired
+    private ConnectedUserConnectionService connectedUserConnectionService;
+
+    @Autowired
     private ConnectedUserProjectWorkflowManager connectedUserProjectWorkflowManager;
 
     @Autowired
@@ -134,8 +146,90 @@ class ConnectedUserProjectWorkflowManagerIntTest {
     @MockitoBean
     private CopilotWorkflowGenerator copilotWorkflowGenerator;
 
+    @Autowired
+    private ConnectionService connectionService;
+
     @MockitoSpyBean
     private ProjectService projectService;
+
+    @Autowired
+    private WorkflowTestConfigurationFacade workflowTestConfigurationFacade;
+
+    @Test
+    void testCreateProjectWorkflowDoesNotBindAnotherConnectedUsersConnection() {
+        String componentName = createComponentName();
+
+        ConnectedUser otherConnectedUser = connectedUserService.createConnectedUser(
+            "other-user-" + UUID.randomUUID(), Environment.PRODUCTION);
+
+        long otherConnectionId = createConnection(componentName, Environment.PRODUCTION);
+
+        connectedUserConnectionService.create(otherConnectedUser.getId(), otherConnectionId, null);
+
+        String externalUserId = "user-" + UUID.randomUUID();
+
+        connectedUserService.createConnectedUser(externalUserId, Environment.PRODUCTION);
+
+        connectedUserProjectWorkflowManager.createProjectWorkflow(
+            externalUserId, createDefinition(componentName), Environment.PRODUCTION);
+
+        verify(workflowTestConfigurationFacade, never()).saveWorkflowTestConfigurationConnection(
+            anyString(), anyString(), anyString(), anyLong(), anyLong());
+    }
+
+    @Test
+    void testCreateProjectWorkflowBindsOwnConnectionInTheSameEnvironment() {
+        String componentName = createComponentName();
+        String externalUserId = "user-" + UUID.randomUUID();
+
+        ConnectedUser connectedUser = connectedUserService.createConnectedUser(
+            externalUserId, Environment.PRODUCTION);
+
+        long developmentConnectionId = createConnection(componentName, Environment.DEVELOPMENT);
+
+        connectedUserConnectionService.create(connectedUser.getId(), developmentConnectionId, null);
+
+        ConnectedUser otherConnectedUser = connectedUserService.createConnectedUser(
+            "other-user-" + UUID.randomUUID(), Environment.PRODUCTION);
+
+        long otherConnectionId = createConnection(componentName, Environment.PRODUCTION);
+
+        connectedUserConnectionService.create(otherConnectedUser.getId(), otherConnectionId, null);
+
+        long ownConnectionId = createConnection(componentName, Environment.PRODUCTION);
+
+        connectedUserConnectionService.create(connectedUser.getId(), ownConnectionId, null);
+
+        connectedUserProjectWorkflowManager.createProjectWorkflow(
+            externalUserId, createDefinition(componentName), Environment.PRODUCTION);
+
+        verify(workflowTestConfigurationFacade).saveWorkflowTestConfigurationConnection(
+            anyString(), eq("trigger_1"), eq(componentName), eq(ownConnectionId),
+            eq((long) Environment.PRODUCTION.ordinal()));
+        verify(workflowTestConfigurationFacade, never()).saveWorkflowTestConfigurationConnection(
+            anyString(), anyString(), anyString(), eq(otherConnectionId), anyLong());
+        verify(workflowTestConfigurationFacade, never()).saveWorkflowTestConfigurationConnection(
+            anyString(), anyString(), anyString(), eq(developmentConnectionId), anyLong());
+    }
+
+    @Test
+    void testCreateProjectWorkflowBindsSharedConnection() {
+        String componentName = createComponentName();
+        String externalUserId = "user-" + UUID.randomUUID();
+
+        connectedUserService.createConnectedUser(externalUserId, Environment.PRODUCTION);
+
+        long sharedConnectionId = createConnection(componentName, Environment.PRODUCTION);
+
+        connectedUserConnectionService.updateShared(sharedConnectionId, true);
+
+        connectedUserProjectWorkflowManager.createProjectWorkflow(
+            externalUserId, createDefinition(componentName), Environment.PRODUCTION);
+
+        verify(workflowTestConfigurationFacade).saveWorkflowTestConfigurationConnection(
+            anyString(), eq("trigger_1"), eq(componentName), eq(sharedConnectionId),
+            eq((long) Environment.PRODUCTION.ordinal()));
+    }
 
     @Test
     void testConcurrentFirstGetOrCreateConnectedUserProjectCreatesOneProject() throws Exception {
@@ -168,6 +262,32 @@ class ConnectedUserProjectWorkflowManagerIntTest {
 
         assertThat(connectedUserProjects).hasSize(1);
         assertThat(secondConnectedUserProject.getId()).isEqualTo(firstConnectedUserProject.getId());
+    }
+
+    private static String createComponentName() {
+        return "component" + UUID.randomUUID()
+            .toString()
+            .replace("-", "");
+    }
+
+    private static String createDefinition(String componentName) {
+        return """
+            {
+                "label": "Workflow",
+                "description": "",
+                "triggers": [{"label": "Trigger", "name": "trigger_1", "parameters": {}, "type": "COMPONENT_NAME/v1/trigger"}],
+                "tasks": []
+            }
+            """
+            .replace("COMPONENT_NAME", componentName);
+    }
+
+    private long createConnection(String componentName, Environment environment) {
+        Connection connection = connectionService.create(
+            null, componentName, 1, environment.ordinal(), componentName + " connection", Map.of(),
+            PlatformType.EMBEDDED);
+
+        return connection.getId();
     }
 
     /**
