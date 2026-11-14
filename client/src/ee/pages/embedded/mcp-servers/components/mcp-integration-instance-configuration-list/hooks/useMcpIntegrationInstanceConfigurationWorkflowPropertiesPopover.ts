@@ -7,6 +7,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo} from 'react';
 import {useForm} from 'react-hook-form';
 
+import {getMcpToolPropertyFormDefaults, sanitizeMcpToolParameters} from '../../hooks/mcpToolPropertyForm';
 import {McpIntegrationInstanceConfigurationWorkflowItemType} from './useMcpIntegrationInstanceConfigurationList';
 
 export default function useMcpIntegrationInstanceConfigurationWorkflowPropertiesPopover(
@@ -40,30 +41,14 @@ export default function useMcpIntegrationInstanceConfigurationWorkflowProperties
         ) as unknown as PropertyAllType[];
     }, [propertiesData]);
 
-    const defaultValues = useMemo(() => {
-        const propertyDefaults: Record<string, unknown> = {};
-
-        for (const property of properties) {
-            const propertyRecord = property as unknown as Record<string, unknown>;
-
-            const resolvedDefault =
-                propertyRecord.defaultValue ??
-                propertyRecord.integerDefaultValue ??
-                propertyRecord.numberDefaultValue ??
-                propertyRecord.booleanDefaultValue ??
-                propertyRecord.arrayDefaultValue ??
-                propertyRecord.objectDefaultValue;
-
-            if (property.name && resolvedDefault !== undefined && resolvedDefault !== null) {
-                propertyDefaults[property.name] = resolvedDefault;
-            }
-        }
-
-        const savedParameters =
-            (mcpIntegrationInstanceConfigurationWorkflow.parameters as Record<string, unknown>) ?? {};
-
-        return {...propertyDefaults, ...savedParameters};
-    }, [mcpIntegrationInstanceConfigurationWorkflow.parameters, properties]);
+    const defaultValues = useMemo(
+        () =>
+            getMcpToolPropertyFormDefaults(
+                properties,
+                mcpIntegrationInstanceConfigurationWorkflow.parameters as Record<string, unknown> | null
+            ),
+        [mcpIntegrationInstanceConfigurationWorkflow.parameters, properties]
+    );
 
     const form = useForm({
         defaultValues,
@@ -76,29 +61,10 @@ export default function useMcpIntegrationInstanceConfigurationWorkflowProperties
     const {control, formState, handleSubmit} = form;
 
     const handleFormSubmit = (values: Record<string, unknown>) => {
-        const sanitizeValue = (value: unknown): unknown => {
-            if (value === '') {
-                return null;
-            }
-
-            if (Array.isArray(value)) {
-                return value.map((item) => sanitizeValue(item));
-            }
-
-            if (value && typeof value === 'object') {
-                return sanitize(value as Record<string, unknown>);
-            }
-
-            return value;
-        };
-
-        const sanitize = (record: Record<string, unknown>): Record<string, unknown> =>
-            Object.fromEntries(Object.entries(record).map(([key, value]) => [key, sanitizeValue(value)]));
-
         updateMcpIntegrationInstanceConfigurationWorkflowMutation.mutate({
             id: mcpIntegrationInstanceConfigurationWorkflow.id,
             input: {
-                parameters: sanitize(values),
+                parameters: sanitizeMcpToolParameters(values),
             },
         });
     };

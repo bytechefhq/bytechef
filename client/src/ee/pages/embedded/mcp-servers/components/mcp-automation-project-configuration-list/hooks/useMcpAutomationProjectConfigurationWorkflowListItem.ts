@@ -1,7 +1,4 @@
-import {
-    useUpdateMcpAutomationProjectConfigurationWorkflowEnabledMutation,
-    useUpdateMcpAutomationProjectConfigurationWorkflowParametersMutation,
-} from '@/shared/middleware/graphql';
+import {useUpdateMcpAutomationProjectConfigurationWorkflowEnabledMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 
@@ -22,24 +19,11 @@ const useMcpAutomationProjectConfigurationWorkflowListItem = (
         onSuccess: invalidateWorkflows,
     });
 
-    const parametersMutation = useUpdateMcpAutomationProjectConfigurationWorkflowParametersMutation({
-        onSuccess: () => {
-            invalidateWorkflows();
-
-            setShowPropertiesPopover(false);
-        },
-    });
-
     const handleEnabledChange = (enabled: boolean) => enabledMutation.mutate({enabled, id: workflow.id});
-
-    const handleParametersSave = (parameters: Record<string, unknown>) =>
-        parametersMutation.mutate({id: workflow.id, parameters});
 
     return {
         handleEnabledChange,
-        handleParametersSave,
         isEnablePending: enabledMutation.isPending,
-        isParametersPending: parametersMutation.isPending,
         setShowPropertiesPopover,
         showPropertiesPopover,
     };

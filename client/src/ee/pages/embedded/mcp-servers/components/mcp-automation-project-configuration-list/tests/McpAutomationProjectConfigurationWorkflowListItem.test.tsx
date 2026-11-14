@@ -1,4 +1,4 @@
-import {render, screen, waitFor} from '@/shared/util/test-utils';
+import {render, screen} from '@/shared/util/test-utils';
 import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -7,7 +7,6 @@ import {McpAutomationProjectConfigurationWorkflowItemType} from '../hooks/useMcp
 
 const hoisted = vi.hoisted(() => ({
     enabledMutate: vi.fn(),
-    parametersMutate: vi.fn(),
 }));
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
@@ -19,12 +18,12 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
             isPending: false,
             mutate: hoisted.enabledMutate,
         }),
-        useUpdateMcpAutomationProjectConfigurationWorkflowParametersMutation: () => ({
-            isPending: false,
-            mutate: hoisted.parametersMutate,
-        }),
     };
 });
+
+vi.mock('../McpAutomationProjectConfigurationWorkflowPropertiesPopover', () => ({
+    default: () => <div data-testid="properties-popover" />,
+}));
 
 const workflow = {
     available: true,
@@ -38,7 +37,6 @@ const workflow = {
 describe('McpAutomationProjectConfigurationWorkflowListItem', () => {
     beforeEach(() => {
         hoisted.enabledMutate.mockReset();
-        hoisted.parametersMutate.mockReset();
     });
 
     it('switchCallsEnabledMutation', async () => {
@@ -49,28 +47,11 @@ describe('McpAutomationProjectConfigurationWorkflowListItem', () => {
         expect(hoisted.enabledMutate).toHaveBeenCalledWith({enabled: false, id: 'w1'});
     });
 
-    it('toolParametersEditSubmitsParametersMutation', async () => {
+    it('configureOpensThePropertiesPopover', async () => {
         render(<McpAutomationProjectConfigurationWorkflowListItem workflow={workflow} />);
 
         await userEvent.click(screen.getByRole('button', {name: 'Configure Workflow One'}));
 
-        const toolNameInput = await screen.findByLabelText('Tool Name');
-
-        await userEvent.clear(toolNameInput);
-        await userEvent.type(toolNameInput, 'new_name');
-        await userEvent.type(screen.getByLabelText('Tool Description'), 'Does a thing');
-
-        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
-
-        await waitFor(() => expect(hoisted.parametersMutate).toHaveBeenCalledTimes(1));
-
-        expect(hoisted.parametersMutate.mock.calls[0][0]).toEqual({
-            id: 'w1',
-            parameters: {
-                customerId: 'fromAi(customerId)',
-                toolDescription: 'Does a thing',
-                toolName: 'new_name',
-            },
-        });
+        expect(await screen.findByTestId('properties-popover')).toBeInTheDocument();
     });
 });
