@@ -141,4 +141,54 @@ class IntegrationApiControllerIntTest {
         verify(connectedUserIntegrationFacade)
             .getConnectedUserIntegration(EXTERNAL_USER_ID, INTEGRATION_ID, true, Environment.PRODUCTION);
     }
+
+    @Test
+    @WithMockUser(username = EXTERNAL_USER_ID)
+    void testGetIntegrationReturnsInternalOnlyOnMcpWorkflowInputs() {
+        IntegrationDTO integrationDTO = new IntegrationDTO(
+            null, "slack", 1, null, null, "Slack integration", null, "slack-icon", INTEGRATION_ID, List.of(), List.of(),
+            null, null, null, null, 2, true, "slack", null, List.of(), "Slack", 0);
+
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
+            IntegrationInstanceConfigurationDTO.builder()
+                .integration(integrationDTO)
+                .integrationId(INTEGRATION_ID)
+                .integrationVersion(2)
+                .integrationInstanceConfigurationWorkflows(List.of())
+                .build();
+
+        ConnectedUserIntegrationDTO.McpWorkflowInfo mcpWorkflowInfo = new ConnectedUserIntegrationDTO.McpWorkflowInfo(
+            "Send Message", "Sends a message",
+            List.of(
+                new ConnectedUserIntegrationDTO.WorkflowInputInfo("apiKey", "API Key", true, "string", true),
+                new ConnectedUserIntegrationDTO.WorkflowInputInfo("channel", "Channel", false, "string", false)),
+            "mcp-workflow-uuid", true);
+
+        ConnectedUserIntegrationDTO connectedUserIntegrationDTO = new ConnectedUserIntegrationDTO(
+            null, integrationInstanceConfigurationDTO, List.of(), null, null, List.of(), List.of(mcpWorkflowInfo));
+
+        when(connectedUserIntegrationFacade.getConnectedUserIntegration(
+            EXTERNAL_USER_ID, INTEGRATION_ID, true, Environment.PRODUCTION))
+                .thenReturn(connectedUserIntegrationDTO);
+
+        webTestClient
+            .get()
+            .uri(INTEGRATION_PATH, EXTERNAL_USER_ID, INTEGRATION_ID)
+            .header("X-Environment", "PRODUCTION")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.mcpWorkflows[0].workflowUuid")
+            .isEqualTo("mcp-workflow-uuid")
+            .jsonPath("$.mcpWorkflows[0].inputs[0].name")
+            .isEqualTo("apiKey")
+            .jsonPath("$.mcpWorkflows[0].inputs[0].internalOnly")
+            .isEqualTo(true)
+            .jsonPath("$.mcpWorkflows[0].inputs[1].name")
+            .isEqualTo("channel")
+            .jsonPath("$.mcpWorkflows[0].inputs[1].internalOnly")
+            .isEqualTo(false);
+    }
 }

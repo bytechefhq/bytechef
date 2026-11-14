@@ -224,6 +224,7 @@ public interface ConnectedUserIntegrationMapper {
 
         default InputModel mapWorkflowInput(ConnectedUserIntegrationDTO.WorkflowInputInfo input) {
             return new InputModel()
+                .internalOnly(input.internalOnly())
                 .label(input.label())
                 .name(input.name())
                 .options(null)
