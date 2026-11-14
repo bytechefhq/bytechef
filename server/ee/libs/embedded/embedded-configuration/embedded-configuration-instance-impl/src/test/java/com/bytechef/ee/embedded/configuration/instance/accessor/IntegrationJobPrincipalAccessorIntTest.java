@@ -9,6 +9,8 @@ package com.bytechef.ee.embedded.configuration.instance.accessor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
@@ -41,12 +43,20 @@ import org.springframework.transaction.support.TransactionTemplate;
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = IntegrationJobPrincipalAccessorIntTestConfiguration.class)
+@SpringBootTest(
+    classes = IntegrationJobPrincipalAccessorIntTestConfiguration.class,
+    properties = "bytechef.workflow.repository.jdbc.enabled=true")
 @Import(PostgreSQLContainerConfiguration.class)
 class IntegrationJobPrincipalAccessorIntTest {
 
     private static final long CONNECTED_USER_ID = 1L;
     private static final long CONNECTION_ID = 1L;
+
+    private static final String WORKFLOW_DEFINITION = """
+        {"label":"Sync contacts","inputs":[\
+        {"name":"accountId","type":"string","internalOnly":true},{"name":"region","type":"string"}],\
+        "tasks":[]}
+        """;
 
     @Autowired
     private IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
@@ -75,6 +85,9 @@ class IntegrationJobPrincipalAccessorIntTest {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
+    @Autowired
+    private WorkflowService workflowService;
+
     private long integrationId;
     private String integrationName;
     private String workflowId;
@@ -91,7 +104,9 @@ class IntegrationJobPrincipalAccessorIntTest {
 
         integrationId = integration.getId();
         integrationName = integration.getName();
-        workflowId = "workflow-" + UUID.randomUUID();
+        Workflow workflow = workflowService.create(WORKFLOW_DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC);
+
+        workflowId = workflow.getId();
 
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.addWorkflow(integrationId, 1, workflowId);
 
@@ -157,6 +172,37 @@ class IntegrationJobPrincipalAccessorIntTest {
             .containsEntry("apiKey", "user-key")
             .containsEntry("region", "eu")
             .containsEntry("contactMapping", Map.of("objectType", "contacts", "mappings", List.of()));
+    }
+
+    @Test
+    void testGetInputMapKeepsTheConfigurationValueOfAnInternalOnlyInput() {
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(
+            true, true, Map.of("accountId", "vendor-account", "region", "eu"));
+
+        long integrationInstanceId = createIntegrationInstance(integrationInstanceConfigurationId);
+
+        createIntegrationInstanceWorkflow(
+            integrationInstanceConfigurationId, integrationInstanceId,
+            Map.of("accountId", "user-account", "region", "us"));
+
+        Map<String, ?> inputMap = integrationJobPrincipalAccessor.getInputMap(integrationInstanceId, workflowUuid);
+
+        assertThat(inputMap).isEqualTo(Map.of("accountId", "vendor-account", "region", "us"));
+    }
+
+    @Test
+    void testGetInputMapUsesTheInstanceValueOfAnInternalOnlyInputTheConfigurationLeavesUnset() {
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(
+            true, true, Map.of("region", "eu"));
+
+        long integrationInstanceId = createIntegrationInstance(integrationInstanceConfigurationId);
+
+        createIntegrationInstanceWorkflow(
+            integrationInstanceConfigurationId, integrationInstanceId, Map.of("accountId", "vendor-set-account"));
+
+        Map<String, ?> inputMap = integrationJobPrincipalAccessor.getInputMap(integrationInstanceId, workflowUuid);
+
+        assertThat(inputMap).isEqualTo(Map.of("accountId", "vendor-set-account", "region", "eu"));
     }
 
     @Test
@@ -230,6 +276,22 @@ class IntegrationJobPrincipalAccessorIntTest {
             CONNECTED_USER_ID, CONNECTION_ID, integrationInstanceConfigurationId);
 
         return integrationInstance.getId();
+    }
+
+    private void createIntegrationInstanceWorkflow(
+        long integrationInstanceConfigurationId, long integrationInstanceId, Map<String, ?> inputs) {
+
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                integrationInstanceConfigurationId, workflowId);
+
+        IntegrationInstanceWorkflow integrationInstanceWorkflow =
+            integrationInstanceWorkflowService.createIntegrationInstanceWorkflow(
+                integrationInstanceId, integrationInstanceConfigurationWorkflow.getId());
+
+        integrationInstanceWorkflow.setInputs(inputs);
+
+        integrationInstanceWorkflowService.update(integrationInstanceWorkflow);
     }
 
     private long createIntegrationInstanceConfiguration(

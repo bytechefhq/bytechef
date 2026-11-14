@@ -7,6 +7,10 @@
 
 package com.bytechef.ee.embedded.configuration.instance.config;
 
+import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
+import com.bytechef.atlas.configuration.repository.WorkflowRepository;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
@@ -29,6 +33,8 @@ import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -41,6 +47,7 @@ import tools.jackson.databind.ObjectMapper;
  * @author Ivica Cardic
  */
 @EnableAutoConfiguration
+@EnableCaching
 @Import({
     EmbeddedOwnerContributorConfiguration.class, EncryptionImpl.class,
     IntegrationInstanceConfigurationServiceImpl.class,
@@ -55,6 +62,14 @@ public class IntegrationJobPrincipalAccessorIntTestConfiguration {
     @Bean
     EncryptionKey encryptionKey() {
         return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+    }
+
+    @Bean
+    WorkflowService workflowService(
+        CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
+        List<WorkflowRepository> workflowRepositories) {
+
+        return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
     }
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")

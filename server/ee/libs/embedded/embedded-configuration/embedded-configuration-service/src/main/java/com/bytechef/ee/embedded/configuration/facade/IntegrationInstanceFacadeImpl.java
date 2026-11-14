@@ -12,7 +12,6 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.configuration.audit.IntegrationAuditEvents;
@@ -31,7 +30,10 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
+import com.bytechef.ee.embedded.configuration.util.IntegrationWorkflowInputUtils;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentication;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -325,7 +327,14 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 //        Workflow workflow = workflowService.getWorkflow(workflowId);
 //        validateInputs(inputs, workflow);
 
-        integrationInstanceWorkflow.setInputs(inputs);
+        if (isConnectedUserTokenAuthenticated()) {
+            integrationInstanceWorkflow.setInputs(
+                IntegrationWorkflowInputUtils.preserveInternalOnlyInputs(
+                    workflowService.getWorkflow(workflowId), inputs == null ? Map.of() : inputs,
+                    integrationInstanceWorkflow.getInputs()));
+        } else {
+            integrationInstanceWorkflow.setInputs(inputs);
+        }
 
         integrationInstanceWorkflowService.update(integrationInstanceWorkflow);
     }
@@ -337,7 +346,6 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
                 integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId()));
     }
 
-    @SuppressWarnings("unchecked")
     private void disableWorkflowTriggers(
         IntegrationInstanceWorkflow integrationInstanceWorkflow,
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
@@ -361,9 +369,9 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
             triggerLifecycleFacade.executeTriggerDisable(
                 workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
                 workflowTrigger.evaluateParameters(
-                    MapUtils.concat(
-                        (Map<String, Object>) integrationInstanceConfigurationWorkflow.getInputs(),
-                        (Map<String, Object>) integrationInstanceWorkflow.getInputs()),
+                    IntegrationWorkflowInputUtils.mergeInputs(
+                        workflow, integrationInstanceConfigurationWorkflow.getInputs(),
+                        integrationInstanceWorkflow.getInputs()),
                     evaluator),
                 getConnectionId(
                     integrationInstanceConfiguration.getIntegrationId(), integrationInstanceConfigurationWorkflow,
@@ -378,7 +386,6 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
                 integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId()));
     }
 
-    @SuppressWarnings("unchecked")
     private void enableWorkflowTriggers(
         IntegrationInstanceWorkflow integrationInstanceWorkflow,
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
@@ -407,9 +414,9 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
                 triggerLifecycleFacade.executeTriggerEnable(
                     workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
                     workflowTrigger.evaluateParameters(
-                        MapUtils.concat(
-                            (Map<String, Object>) integrationInstanceConfigurationWorkflow.getInputs(),
-                            (Map<String, Object>) integrationInstanceWorkflow.getInputs()),
+                        IntegrationWorkflowInputUtils.mergeInputs(
+                            workflow, integrationInstanceConfigurationWorkflow.getInputs(),
+                            integrationInstanceWorkflow.getInputs()),
                         evaluator),
                     getConnectionId(
                         integrationInstanceConfiguration.getIntegrationId(), integrationInstanceConfigurationWorkflow,
@@ -428,7 +435,6 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void disableEnabledWorkflowTriggers(
         IntegrationInstanceWorkflow integrationInstanceWorkflow,
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow,
@@ -444,9 +450,9 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
                 triggerLifecycleFacade.executeTriggerDisable(
                     workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(enabledWorkflowTrigger.getType()),
                     enabledWorkflowTrigger.evaluateParameters(
-                        MapUtils.concat(
-                            (Map<String, Object>) integrationInstanceConfigurationWorkflow.getInputs(),
-                            (Map<String, Object>) integrationInstanceWorkflow.getInputs()),
+                        IntegrationWorkflowInputUtils.mergeInputs(
+                            workflow, integrationInstanceConfigurationWorkflow.getInputs(),
+                            integrationInstanceWorkflow.getInputs()),
                         evaluator),
                     getConnectionId(
                         integrationInstanceConfiguration.getIntegrationId(), integrationInstanceConfigurationWorkflow,
@@ -635,6 +641,14 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         } catch (RuntimeException enableException) {
             exception.addSuppressed(enableException);
         }
+    }
+
+    private static boolean isConnectedUserTokenAuthenticated() {
+        Optional<ConnectedUserAuthentication> connectedUserAuthentication = ConnectedUserAuthentications.fetchCurrent();
+
+        return connectedUserAuthentication
+            .map(currentConnectedUserAuthentication -> !currentConnectedUserAuthentication.apiKeyAuthenticated())
+            .orElse(false);
     }
 
     private void validateCurrentPrincipalIntegrationInstanceOwnership(long integrationInstanceId) {
