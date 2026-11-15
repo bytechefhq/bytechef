@@ -18,6 +18,7 @@ package com.bytechef.platform.data.table.configuration.service;
 
 import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.domain.DataTableLinkColumn;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +46,8 @@ public interface DataTableService {
     DataTable getDataTable(long dataTableId);
 
     List<DataTable> getWorkspaceDataTables(long workspaceId);
+
+    List<DataTableLinkColumn> getLinksTo(long targetDataTableId, long environmentId);
 
     List<DataTableInfo> listAllTables(long environmentId);
 

@@ -24,18 +24,25 @@ import com.bytechef.platform.data.table.audit.DataTableAuditEvents;
 import com.bytechef.platform.data.table.audit.DataTableAuditMapper;
 import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.domain.DataTableLinkColumn;
 import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
 import com.bytechef.platform.data.table.configuration.exception.DataTableException;
+import com.bytechef.platform.data.table.configuration.repository.DataTableLinkColumnRepository;
 import com.bytechef.platform.data.table.configuration.repository.DataTableRepository;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.domain.DataTableNames;
+import com.bytechef.platform.data.table.domain.LinkDeleteRule;
+import com.bytechef.platform.data.table.domain.LinkSpec;
 import com.bytechef.platform.data.table.domain.ReservedColumns;
 import com.bytechef.platform.data.table.util.DataTablePhysicalNameUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
@@ -51,11 +58,16 @@ import org.springframework.util.Assert;
 @Service
 public class DataTableServiceImpl implements DataTableService {
 
+    private final DataTableLinkColumnRepository dataTableLinkColumnRepository;
     private final DataTableRepository dataTableRepository;
     private final JdbcTemplate jdbcTemplate;
 
     @SuppressFBWarnings("EI")
-    public DataTableServiceImpl(DataTableRepository dataTableRepository, JdbcTemplate jdbcTemplate) {
+    public DataTableServiceImpl(
+        DataTableLinkColumnRepository dataTableLinkColumnRepository, DataTableRepository dataTableRepository,
+        JdbcTemplate jdbcTemplate) {
+
+        this.dataTableLinkColumnRepository = dataTableLinkColumnRepository;
         this.dataTableRepository = dataTableRepository;
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -67,6 +79,7 @@ public class DataTableServiceImpl implements DataTableService {
         @AuditData(key = "columnType", value = "#columnSpec.type"),
         @AuditData(key = "environmentId", value = "#environmentId")
     })
+    @Transactional
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void addColumn(long dataTableId, ColumnSpec columnSpec, long environmentId) {
         Assert.notNull(columnSpec, "column must not be null");
@@ -83,10 +96,23 @@ public class DataTableServiceImpl implements DataTableService {
                 DataTableErrorType.COLUMN_ALREADY_EXISTS);
         }
 
+        LinkSpec linkSpec = columnSpec.link();
+
+        if (linkSpec != null) {
+            validateLink(dataTable, linkSpec, environmentId);
+        }
+
+        DataTableLinkColumn dataTableLinkColumn = linkSpec == null
+            ? null : saveLinkColumn(dataTableId, environmentId, columnSpec.name(), linkSpec);
+
         String sql = "ALTER TABLE " + escapeIdentifier(physicalName) + " ADD COLUMN " +
             escapeIdentifier(columnSpec.name()) + " " + sqlType(columnSpec.type());
 
         jdbcTemplate.execute(sql);
+
+        if (dataTableLinkColumn != null) {
+            addLinkConstraints(physicalName, dataTableLinkColumn);
+        }
     }
 
     @Override
@@ -115,7 +141,15 @@ public class DataTableServiceImpl implements DataTableService {
                 DataTableErrorType.DATA_TABLE_ALREADY_EXISTS);
         }
 
-        createPhysicalTable(physicalName, columnSpecs);
+        for (ColumnSpec columnSpec : columnSpecs) {
+            LinkSpec linkSpec = columnSpec.link();
+
+            if (linkSpec != null) {
+                validateLink(dataTable, linkSpec, environmentId);
+            }
+        }
+
+        createPhysicalTable(dataTable.getId(), environmentId, physicalName, columnSpecs);
 
         return dataTable.getId();
     }
@@ -134,11 +168,16 @@ public class DataTableServiceImpl implements DataTableService {
             return false;
         }
 
+        assertNotLinkedTo(dataTableId, environmentId);
+
         String physicalName = DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableId);
 
         boolean exists = physicalTableExists(physicalName);
 
         jdbcTemplate.execute("DROP TABLE IF EXISTS " + escapeIdentifier(physicalName));
+
+        dataTableLinkColumnRepository.deleteAll(
+            dataTableLinkColumnRepository.findAllByDataTableIdAndEnvironmentId(dataTableId, environmentId));
 
         if (!hasAnyPhysicalTable(dataTableId)) {
             dataTableRepository.deleteById(dataTableId);
@@ -166,13 +205,13 @@ public class DataTableServiceImpl implements DataTableService {
 
         String copyPhysicalName = DataTablePhysicalNameUtils.getPhysicalName(environmentId, copyDataTable.getId());
 
-        List<ColumnSpec> sourceColumnSpecs = listColumns(sourcePhysicalName);
+        List<ColumnSpec> sourceColumnSpecs = listColumns(dataTableId, environmentId);
 
         List<ColumnSpec> columnSpecs = sourceColumnSpecs.stream()
             .filter(columnSpec -> !ReservedColumns.isReserved(columnSpec.name()))
             .toList();
 
-        createPhysicalTable(copyPhysicalName, columnSpecs);
+        createPhysicalTable(copyDataTable.getId(), environmentId, copyPhysicalName, columnSpecs);
 
         List<String> copiedColumnNames = new ArrayList<>();
 
@@ -233,6 +272,13 @@ public class DataTableServiceImpl implements DataTableService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<DataTableLinkColumn> getLinksTo(long targetDataTableId, long environmentId) {
+        return dataTableLinkColumnRepository.findAllByTargetDataTableIdAndEnvironmentId(
+            targetDataTableId, environmentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<DataTableInfo> listAllTables(long environmentId) {
         List<DataTableInfo> dataTableInfos = new ArrayList<>();
 
@@ -265,6 +311,7 @@ public class DataTableServiceImpl implements DataTableService {
         @AuditData(key = "columnName", value = "#columnName"),
         @AuditData(key = "environmentId", value = "#environmentId")
     })
+    @Transactional
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void removeColumn(long dataTableId, String columnName, long environmentId) {
         validateColumnName(columnName);
@@ -279,9 +326,26 @@ public class DataTableServiceImpl implements DataTableService {
                 DataTableErrorType.COLUMN_NOT_FOUND);
         }
 
+        Optional<DataTableLinkColumn> linkColumnOptional =
+            dataTableLinkColumnRepository.findByDataTableIdAndEnvironmentIdAndColumnName(
+                dataTableId, environmentId, columnName.toLowerCase(Locale.ROOT));
+
+        if (linkColumnOptional.isPresent()) {
+            DataTableLinkColumn dataTableLinkColumn = linkColumnOptional.get();
+
+            jdbcTemplate.execute(
+                "ALTER TABLE " + escapeIdentifier(physicalName) + " DROP CONSTRAINT " +
+                    escapeIdentifier(getForeignKeyName(dataTableLinkColumn)));
+            jdbcTemplate.execute("DROP INDEX " + escapeIdentifier(getIndexName(dataTableLinkColumn)));
+        }
+
         String sql = "ALTER TABLE " + escapeIdentifier(physicalName) + " DROP COLUMN " + escapeIdentifier(columnName);
 
         jdbcTemplate.execute(sql);
+
+        linkColumnOptional.ifPresent(dataTableLinkColumnRepository::delete);
+
+        updateDisplayColumns(dataTableId, environmentId, columnName, null);
     }
 
     @Override
@@ -291,6 +355,7 @@ public class DataTableServiceImpl implements DataTableService {
         @AuditData(key = "toColumnName", value = "#toColumnName"),
         @AuditData(key = "environmentId", value = "#environmentId")
     })
+    @Transactional
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void renameColumn(long dataTableId, String fromColumnName, String toColumnName, long environmentId) {
         validateColumnName(fromColumnName);
@@ -316,6 +381,20 @@ public class DataTableServiceImpl implements DataTableService {
             escapeIdentifier(fromColumnName) + " TO " + escapeIdentifier(toColumnName);
 
         jdbcTemplate.execute(sql);
+
+        Optional<DataTableLinkColumn> linkColumnOptional =
+            dataTableLinkColumnRepository.findByDataTableIdAndEnvironmentIdAndColumnName(
+                dataTableId, environmentId, fromColumnName.toLowerCase(Locale.ROOT));
+
+        if (linkColumnOptional.isPresent()) {
+            DataTableLinkColumn dataTableLinkColumn = linkColumnOptional.get();
+
+            dataTableLinkColumn.setColumnName(toColumnName.toLowerCase(Locale.ROOT));
+
+            dataTableLinkColumnRepository.save(dataTableLinkColumn);
+        }
+
+        updateDisplayColumns(dataTableId, environmentId, fromColumnName, toColumnName.toLowerCase(Locale.ROOT));
     }
 
     @Override
@@ -409,11 +488,13 @@ public class DataTableServiceImpl implements DataTableService {
         return Optional.of(
             new DataTableInfo(
                 dataTable.getId(), dataTable.getName(), dataTable.getWorkspaceId(), dataTable.getDescription(),
-                listUserColumns(physicalName), dataTable.getLastModifiedDate()));
+                listUserColumns(dataTable.getId(), environmentId), dataTable.getLastModifiedDate()));
     }
 
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
-    private void createPhysicalTable(String physicalName, List<ColumnSpec> columnSpecs) {
+    private void createPhysicalTable(
+        long dataTableId, long environmentId, String physicalName, List<ColumnSpec> columnSpecs) {
+
         String userColumnsSql = columnSpecs.stream()
             .map(columnSpec -> escapeIdentifier(columnSpec.name()) + " " + sqlType(columnSpec.type()))
             .collect(Collectors.joining(", "));
@@ -426,6 +507,135 @@ public class DataTableServiceImpl implements DataTableService {
         jdbcTemplate.execute(
             "CREATE UNIQUE INDEX ON " + escapeIdentifier(physicalName) + " (" +
                 escapeIdentifier(ReservedColumns.EXTERNAL_ID) + ")");
+
+        for (ColumnSpec columnSpec : columnSpecs) {
+            LinkSpec linkSpec = columnSpec.link();
+
+            if (linkSpec != null) {
+                addLinkConstraints(
+                    physicalName, saveLinkColumn(dataTableId, environmentId, columnSpec.name(), linkSpec));
+            }
+        }
+    }
+
+    private DataTableLinkColumn saveLinkColumn(
+        long dataTableId, long environmentId, String columnName, LinkSpec linkSpec) {
+
+        String displayColumnName = linkSpec.displayColumnName();
+
+        LinkSpec normalizedLinkSpec = new LinkSpec(
+            linkSpec.targetDataTableId(), linkSpec.onDelete(),
+            displayColumnName == null ? null : displayColumnName.toLowerCase(Locale.ROOT));
+
+        return dataTableLinkColumnRepository.save(
+            new DataTableLinkColumn(dataTableId, environmentId, columnName.toLowerCase(Locale.ROOT),
+                normalizedLinkSpec));
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private void addLinkConstraints(String physicalName, DataTableLinkColumn dataTableLinkColumn) {
+        String onDeleteAction = dataTableLinkColumn.getOnDelete() == LinkDeleteRule.CLEAR ? "SET NULL" : "RESTRICT";
+
+        jdbcTemplate.execute(
+            "ALTER TABLE " + escapeIdentifier(physicalName) + " ADD CONSTRAINT " +
+                escapeIdentifier(getForeignKeyName(dataTableLinkColumn)) + " FOREIGN KEY (" +
+                escapeIdentifier(dataTableLinkColumn.getColumnName()) + ") REFERENCES " +
+                escapeIdentifier(
+                    DataTablePhysicalNameUtils.getPhysicalName(
+                        dataTableLinkColumn.getEnvironmentId(), dataTableLinkColumn.getTargetDataTableId()))
+                +
+                " (\"id\") ON DELETE " + onDeleteAction);
+
+        jdbcTemplate.execute(
+            "CREATE INDEX " + escapeIdentifier(getIndexName(dataTableLinkColumn)) + " ON " +
+                escapeIdentifier(physicalName) + " (" + escapeIdentifier(dataTableLinkColumn.getColumnName()) + ")");
+    }
+
+    private static String getForeignKeyName(DataTableLinkColumn dataTableLinkColumn) {
+        return "fk_dt_link_" + dataTableLinkColumn.getId();
+    }
+
+    private static String getIndexName(DataTableLinkColumn dataTableLinkColumn) {
+        return "ix_dt_link_" + dataTableLinkColumn.getId();
+    }
+
+    private void validateLink(DataTable sourceDataTable, LinkSpec linkSpec, long environmentId) {
+        long targetDataTableId = linkSpec.targetDataTableId();
+
+        if (targetDataTableId == sourceDataTable.getId()) {
+            throw new DataTableException(
+                "A link column cannot target its own table", DataTableErrorType.LINK_TARGET_INVALID);
+        }
+
+        Optional<DataTable> targetDataTableOptional = dataTableRepository.findById(targetDataTableId);
+
+        if (targetDataTableOptional.isEmpty()) {
+            throw new DataTableException(
+                "Link target table with id=" + targetDataTableId + " not found",
+                DataTableErrorType.LINK_TARGET_INVALID);
+        }
+
+        DataTable targetDataTable = targetDataTableOptional.get();
+
+        if (!Objects.equals(sourceDataTable.getWorkspaceId(), targetDataTable.getWorkspaceId())) {
+            throw new DataTableException(
+                "Link target table '" + targetDataTable.getName() + "' belongs to another workspace",
+                DataTableErrorType.LINK_TARGET_INVALID);
+        }
+
+        String targetPhysicalName = DataTablePhysicalNameUtils.getPhysicalName(environmentId, targetDataTableId);
+
+        if (!physicalTableExists(targetPhysicalName)) {
+            throw new DataTableException(
+                "Link target table '" + targetDataTable.getName() + "' does not exist in this environment",
+                DataTableErrorType.LINK_TARGET_INVALID);
+        }
+
+        String displayColumnName = linkSpec.displayColumnName();
+
+        if (displayColumnName != null &&
+            !containsColumn(listUserColumns(targetDataTableId, environmentId), displayColumnName)) {
+
+            throw new DataTableException(
+                "Display column '" + displayColumnName + "' not found on table '" + targetDataTable.getName() + "'",
+                DataTableErrorType.LINK_DISPLAY_COLUMN_INVALID);
+        }
+    }
+
+    private void assertNotLinkedTo(long dataTableId, long environmentId) {
+        List<DataTableLinkColumn> dataTableLinkColumns =
+            dataTableLinkColumnRepository.findAllByTargetDataTableIdAndEnvironmentId(dataTableId, environmentId);
+
+        if (dataTableLinkColumns.isEmpty()) {
+            return;
+        }
+
+        String linkedColumns = dataTableLinkColumns.stream()
+            .map(dataTableLinkColumn -> dataTableRepository.findById(dataTableLinkColumn.getDataTableId())
+                .map(DataTable::getName)
+                .orElse(String.valueOf(dataTableLinkColumn.getDataTableId())) + "." +
+                dataTableLinkColumn.getColumnName())
+            .collect(Collectors.joining(", "));
+
+        throw new DataTableException(
+            "Data table is still linked from " + linkedColumns + "; remove those link columns first",
+            DataTableErrorType.ROW_STILL_LINKED);
+    }
+
+    private void updateDisplayColumns(
+        long targetDataTableId, long environmentId, String fromColumnName, @Nullable String toColumnName) {
+
+        for (DataTableLinkColumn dataTableLinkColumn : dataTableLinkColumnRepository
+            .findAllByTargetDataTableIdAndEnvironmentId(targetDataTableId, environmentId)) {
+
+            String displayColumnName = dataTableLinkColumn.getDisplayColumnName();
+
+            if (displayColumnName != null && displayColumnName.equalsIgnoreCase(fromColumnName)) {
+                dataTableLinkColumn.setDisplayColumnName(toColumnName);
+
+                dataTableLinkColumnRepository.save(dataTableLinkColumn);
+            }
+        }
     }
 
     private static boolean containsColumn(List<ColumnSpec> columnSpecs, String columnName) {
@@ -437,8 +647,8 @@ public class DataTableServiceImpl implements DataTableService {
         return containsColumn(listColumns(physicalName), columnName);
     }
 
-    private List<ColumnSpec> listUserColumns(String physicalName) {
-        return listColumns(physicalName).stream()
+    private List<ColumnSpec> listUserColumns(long dataTableId, long environmentId) {
+        return listColumns(dataTableId, environmentId).stream()
             .filter(columnSpec -> !ReservedColumns.isReserved(columnSpec.name()))
             .toList();
     }
@@ -460,6 +670,38 @@ public class DataTableServiceImpl implements DataTableService {
         Assert.isTrue(normalized.matches("[a-z_][a-z0-9_]*"), "Invalid identifier: " + identifier);
 
         return '"' + normalized + '"';
+    }
+
+    private List<ColumnSpec> listColumns(long dataTableId, long environmentId) {
+        List<ColumnSpec> columnSpecs =
+            listColumns(DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableId));
+
+        Map<String, DataTableLinkColumn> linkColumnMap = new HashMap<>();
+
+        for (DataTableLinkColumn dataTableLinkColumn : dataTableLinkColumnRepository
+            .findAllByDataTableIdAndEnvironmentId(dataTableId, environmentId)) {
+
+            linkColumnMap.put(dataTableLinkColumn.getColumnName(), dataTableLinkColumn);
+        }
+
+        if (linkColumnMap.isEmpty()) {
+            return columnSpecs;
+        }
+
+        List<ColumnSpec> overlaidColumnSpecs = new ArrayList<>();
+
+        for (ColumnSpec columnSpec : columnSpecs) {
+            DataTableLinkColumn dataTableLinkColumn = linkColumnMap.get(columnSpec.name());
+
+            if (dataTableLinkColumn != null && columnSpec.type() == ColumnType.INTEGER) {
+                overlaidColumnSpecs.add(
+                    new ColumnSpec(columnSpec.name(), ColumnType.LINK, dataTableLinkColumn.toLinkSpec()));
+            } else {
+                overlaidColumnSpecs.add(columnSpec);
+            }
+        }
+
+        return overlaidColumnSpecs;
     }
 
     private List<ColumnSpec> listColumns(String physicalName) {

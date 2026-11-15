@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.data.table.remote.client.service;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.domain.DataTableLinkColumn;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import java.util.List;
@@ -66,6 +67,11 @@ public class RemoteDataTableServiceClient implements DataTableService {
 
     @Override
     public List<DataTable> getWorkspaceDataTables(long workspaceId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<DataTableLinkColumn> getLinksTo(long targetDataTableId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 

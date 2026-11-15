@@ -36,9 +36,10 @@ public final class DataTableIntTestUtils {
             String.class);
 
         for (String tableName : tableNames) {
-            jdbcTemplate.execute("DROP TABLE IF EXISTS \"" + tableName + "\"");
+            jdbcTemplate.execute("DROP TABLE IF EXISTS \"" + tableName + "\" CASCADE");
         }
 
+        jdbcTemplate.update("DELETE FROM data_table_link_column");
         jdbcTemplate.update("DELETE FROM data_table_webhook");
         jdbcTemplate.update("DELETE FROM data_table_tag");
         jdbcTemplate.update("DELETE FROM data_table");
