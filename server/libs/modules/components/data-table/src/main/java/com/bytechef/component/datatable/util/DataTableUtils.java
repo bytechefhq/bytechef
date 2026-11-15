@@ -169,6 +169,7 @@ public final class DataTableUtils {
                                         option("Equals Ignore Case", Operation.EQUALS_IGNORE_CASE.name()),
                                         option("Not Equals", Operation.NOT_EQUALS.name()),
                                         option("Contains", Operation.CONTAINS.name()),
+                                        option("Contains Ignore Case", Operation.CONTAINS_IGNORE_CASE.name()),
                                         option("Not Contains", Operation.NOT_CONTAINS.name()),
                                         option("Starts With", Operation.STARTS_WITH.name()),
                                         option("Ends With", Operation.ENDS_WITH.name()),

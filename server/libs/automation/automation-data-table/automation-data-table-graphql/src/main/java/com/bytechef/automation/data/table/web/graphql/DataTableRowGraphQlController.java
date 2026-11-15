@@ -17,11 +17,14 @@
 package com.bytechef.automation.data.table.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.automation.data.table.configuration.domain.DataTableLinkOption;
 import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -46,34 +49,47 @@ public class DataTableRowGraphQlController {
     }
 
     @QueryMapping
-    public List<Row> dataTableRows(@Argument Long environmentId, @Argument Long tableId) {
-        return workspaceDataTableFacade.listRows(tableId, Integer.MAX_VALUE, 0, environmentId)
+    public List<Row> dataTableRows(
+        @Argument Long environmentId, @Argument Long tableId, @Argument @Nullable List<String> expand) {
+
+        return workspaceDataTableFacade
+            .listRows(tableId, Integer.MAX_VALUE, 0, expand == null ? List.of() : expand, environmentId)
             .stream()
-            .map(dataTableRow -> new Row(dataTableRow.id(), dataTableRow.values()))
+            .map(DataTableRowGraphQlController::toRow)
             .toList();
     }
 
     @QueryMapping
     public RowPage dataTableRowsPage(
-        @Argument Long environmentId, @Argument Long tableId, @Argument Integer limit, @Argument Integer offset) {
+        @Argument Long environmentId, @Argument Long tableId, @Argument Integer limit, @Argument Integer offset,
+        @Argument @Nullable List<String> expand) {
 
         int pageSize = (limit == null || limit <= 0) ? 100 : Math.min(limit, Integer.MAX_VALUE - 1);
         int pageOffset = (offset == null || offset < 0) ? 0 : offset;
 
         List<DataTableRow> fetched = workspaceDataTableFacade.listRows(
-            tableId, pageSize + 1, pageOffset, environmentId);
+            tableId, pageSize + 1, pageOffset, expand == null ? List.of() : expand, environmentId);
 
         boolean hasMore = fetched.size() > pageSize;
 
         List<DataTableRow> pageItems = hasMore ? fetched.subList(0, pageSize) : fetched;
 
         List<Row> items = pageItems.stream()
-            .map(dataTableRow -> new Row(dataTableRow.id(), dataTableRow.values()))
+            .map(DataTableRowGraphQlController::toRow)
             .toList();
 
         Integer nextOffset = hasMore ? pageOffset + pageSize : null;
 
         return new RowPage(items, hasMore, nextOffset);
+    }
+
+    @QueryMapping
+    public List<DataTableLinkOption> dataTableLinkOptions(
+        @Argument Long environmentId, @Argument Long tableId, @Argument String columnName,
+        @Argument @Nullable String search, @Argument @Nullable Integer limit) {
+
+        return workspaceDataTableFacade.getLinkOptions(
+            tableId, columnName, search, limit == null ? 0 : limit, environmentId);
     }
 
     @MutationMapping
@@ -107,6 +123,30 @@ public class DataTableRowGraphQlController {
         workspaceDataTableFacade.importCsv(input.tableId(), input.csv(), input.environmentId());
 
         return true;
+    }
+
+    private static Row toRow(DataTableRow dataTableRow) {
+        Map<String, Object> values = new LinkedHashMap<>();
+
+        for (Map.Entry<String, Object> entry : dataTableRow.values()
+            .entrySet()) {
+
+            Object value = entry.getValue();
+
+            if (value instanceof DataTableRow linkedRow) {
+                Map<String, Object> linkedValue = new LinkedHashMap<>();
+
+                linkedValue.put("id", linkedRow.id());
+                linkedValue.put("externalId", linkedRow.externalId());
+                linkedValue.put("values", linkedRow.values());
+
+                value = linkedValue;
+            }
+
+            values.put(entry.getKey(), value);
+        }
+
+        return new Row(dataTableRow.id(), values);
     }
 
     public record Row(Long id, Map<String, Object> values) {

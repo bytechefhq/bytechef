@@ -128,8 +128,9 @@ class DataTableRowFilterTest {
         assertEquals(Arity.ONE, Operation.NOT_EQUALS.arity());
         assertEquals(
             List.of(
-                Operation.EQUALS_IGNORE_CASE, Operation.CONTAINS, Operation.NOT_CONTAINS, Operation.STARTS_WITH,
-                Operation.ENDS_WITH),
+                Operation.EQUALS_IGNORE_CASE, Operation.CONTAINS, Operation.CONTAINS_IGNORE_CASE,
+                Operation.NOT_CONTAINS,
+                Operation.STARTS_WITH, Operation.ENDS_WITH),
             Arrays.stream(Operation.values())
                 .filter(Operation::textOnly)
                 .toList());

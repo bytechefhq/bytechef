@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.data.table.configuration.facade;
 
+import com.bytechef.automation.data.table.configuration.domain.DataTableLinkOption;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.data.table.audit.DataTableAuditEvents;
@@ -28,7 +29,9 @@ import com.bytechef.platform.data.table.configuration.service.DataTableTagServic
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService.Webhook;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.domain.DataTableStorageUsage;
+import com.bytechef.platform.data.table.domain.LinkSpec;
 import com.bytechef.platform.data.table.execution.domain.CreateStrategy;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
@@ -43,6 +46,7 @@ import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import com.bytechef.platform.data.table.execution.service.DataTableStorageService;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -61,6 +65,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
+
+    private static final int DEFAULT_LINK_OPTIONS_LIMIT = 20;
+    private static final int MAX_LINK_OPTIONS_LIMIT = 100;
 
     private final DataTableRowFacade dataTableRowFacade;
     private final DataTableRowService dataTableRowService;
@@ -179,6 +186,81 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     public List<DataTableRow> listRows(long dataTableId, int limit, int offset, long environmentId) {
         return dataTableRowService.listRows(dataTableId, limit, offset,
             environmentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')")
+    public List<DataTableRow> listRows(
+        long dataTableId, int limit, int offset, List<String> expand, long environmentId) {
+
+        return dataTableRowService.findRows(
+            dataTableId, DataTableRowConditions.matchAll(), List.of(), limit, offset, expand, environmentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')")
+    public List<DataTableLinkOption> getLinkOptions(
+        long dataTableId, String columnName, @Nullable String search, int limit, long environmentId) {
+
+        DataTableInfo dataTableInfo = dataTableService.fetchDataTableInfo(dataTableId, environmentId)
+            .orElseThrow(() -> new DataTableException(
+                "Data table does not exist in this environment: id=" + dataTableId,
+                DataTableErrorType.DATA_TABLE_NOT_FOUND));
+
+        LinkSpec linkSpec = null;
+
+        for (ColumnSpec columnSpec : dataTableInfo.columns()) {
+            if (columnSpec.type() == ColumnType.LINK && columnSpec.name()
+                .equalsIgnoreCase(columnName)) {
+
+                linkSpec = columnSpec.link();
+
+                break;
+            }
+        }
+
+        if (linkSpec == null) {
+            throw new DataTableException(
+                "Link column does not exist: " + columnName, DataTableErrorType.COLUMN_NOT_FOUND);
+        }
+
+        String displayColumnName = linkSpec.displayColumnName();
+        DataTableRowConditions conditions = DataTableRowConditions.matchAll();
+
+        if (search != null && !search.isBlank() && displayColumnName != null
+            && isTextColumn(linkSpec.targetDataTableId(), displayColumnName, environmentId)) {
+
+            conditions = DataTableRowConditions.of(
+                List.of(new DataTableRowFilter(displayColumnName, Operation.CONTAINS_IGNORE_CASE, search.trim())));
+        }
+
+        int pageSize = limit <= 0 ? DEFAULT_LINK_OPTIONS_LIMIT : Math.min(limit, MAX_LINK_OPTIONS_LIMIT);
+
+        List<DataTableRow> targetRows = dataTableRowService.findRows(
+            linkSpec.targetDataTableId(), conditions, List.of(), pageSize, 0, environmentId);
+
+        List<DataTableLinkOption> dataTableLinkOptions = new ArrayList<>();
+
+        for (DataTableRow targetRow : targetRows) {
+            String label = "#" + targetRow.id();
+
+            if (displayColumnName != null) {
+                Map<String, Object> targetValues = targetRow.values();
+                Object displayValue = targetValues.get(displayColumnName);
+
+                if (displayValue != null && !displayValue.toString()
+                    .isEmpty()) {
+
+                    label = displayValue.toString();
+                }
+            }
+
+            dataTableLinkOptions.add(new DataTableLinkOption(targetRow.id(), label));
+        }
+
+        return dataTableLinkOptions;
     }
 
     @Override
@@ -386,5 +468,26 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
         }
 
         return workspaceId;
+    }
+
+    private boolean isTextColumn(long dataTableId, String columnName, long environmentId) {
+        Optional<DataTableInfo> dataTableInfoOptional = dataTableService.fetchDataTableInfo(
+            dataTableId, environmentId);
+
+        if (dataTableInfoOptional.isEmpty()) {
+            return false;
+        }
+
+        DataTableInfo dataTableInfo = dataTableInfoOptional.get();
+
+        for (ColumnSpec columnSpec : dataTableInfo.columns()) {
+            if (columnSpec.name()
+                .equalsIgnoreCase(columnName)) {
+
+                return columnSpec.type() == ColumnType.STRING;
+            }
+        }
+
+        return false;
     }
 }

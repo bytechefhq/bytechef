@@ -204,6 +204,12 @@ class DataTableRowServiceH2IntTest {
             List.of(offerId), findItemIds(List.of(new DataTableRowFilter("title", Operation.CONTAINS, "%_")), null));
         assertEquals(
             List.of(appleId),
+            findItemIds(List.of(new DataTableRowFilter("title", Operation.CONTAINS_IGNORE_CASE, "APP")), null));
+        assertEquals(
+            List.of(offerId),
+            findItemIds(List.of(new DataTableRowFilter("title", Operation.CONTAINS_IGNORE_CASE, "%_")), null));
+        assertEquals(
+            List.of(appleId),
             findItemIds(List.of(new DataTableRowFilter("title", Operation.STARTS_WITH, "App")), null));
         assertEquals(
             List.of(appleId, offerId),

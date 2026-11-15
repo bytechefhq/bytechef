@@ -150,6 +150,7 @@ public record DataTableRowFilter(String column, Operation operation, @Nullable O
         EQUALS_IGNORE_CASE(Arity.ONE, true),
         NOT_EQUALS(Arity.ONE, false),
         CONTAINS(Arity.ONE, true),
+        CONTAINS_IGNORE_CASE(Arity.ONE, true),
         NOT_CONTAINS(Arity.ONE, true),
         STARTS_WITH(Arity.ONE, true),
         ENDS_WITH(Arity.ONE, true),

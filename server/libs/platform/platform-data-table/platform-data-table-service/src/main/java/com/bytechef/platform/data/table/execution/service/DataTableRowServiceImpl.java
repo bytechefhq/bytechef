@@ -1608,10 +1608,11 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             case GREATER_EQUALS -> addComparison(column, ">=", columnSpec, filter, filterParameters);
             case LESS -> addComparison(column, "<", columnSpec, filter, filterParameters);
             case LESS_EQUALS -> addComparison(column, "<=", columnSpec, filter, filterParameters);
-            case CONTAINS -> addLike(column, "%", "%", false, columnSpec, filter, filterParameters);
-            case NOT_CONTAINS -> addLike(column, "%", "%", true, columnSpec, filter, filterParameters);
-            case STARTS_WITH -> addLike(column, "", "%", false, columnSpec, filter, filterParameters);
-            case ENDS_WITH -> addLike(column, "%", "", false, columnSpec, filter, filterParameters);
+            case CONTAINS -> addLike(column, "%", "%", false, false, columnSpec, filter, filterParameters);
+            case CONTAINS_IGNORE_CASE -> addLike(column, "%", "%", false, true, columnSpec, filter, filterParameters);
+            case NOT_CONTAINS -> addLike(column, "%", "%", true, false, columnSpec, filter, filterParameters);
+            case STARTS_WITH -> addLike(column, "", "%", false, false, columnSpec, filter, filterParameters);
+            case ENDS_WITH -> addLike(column, "%", "", false, false, columnSpec, filter, filterParameters);
             case IN -> {
                 List<Object> values = filter.values();
 
@@ -1670,7 +1671,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     }
 
     private String addLike(
-        String column, String prefix, String suffix, boolean negated, ColumnSpec columnSpec,
+        String column, String prefix, String suffix, boolean negated, boolean ignoreCase, ColumnSpec columnSpec,
         DataTableRowFilter filter, List<FilterParameter> filterParameters) {
 
         Object rawValue = filter.singleValue();
@@ -1681,6 +1682,10 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         if (negated) {
             return "(" + column + " IS NULL OR " + column + " NOT LIKE ? ESCAPE '\\')";
+        }
+
+        if (ignoreCase) {
+            return "LOWER(" + column + ") LIKE LOWER(?) ESCAPE '\\'";
         }
 
         return column + " LIKE ? ESCAPE '\\'";

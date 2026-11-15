@@ -29,6 +29,14 @@ type DataTableColumn {
     id: ID!
     name: String!
     type: ColumnType!
+    link: DataTableColumnLink
+}
+
+type DataTableColumnLink {
+    targetDataTableId: ID!
+    targetDataTableName: String!
+    onDelete: LinkDeleteRule!
+    displayColumnName: String
 }
 
 type DataTableStorageUsage {
@@ -50,6 +58,12 @@ enum ColumnType {
     DATE
     DATE_TIME
     BOOLEAN
+    LINK
+}
+
+enum LinkDeleteRule {
+    BLOCK
+    CLEAR
 }
 
 input CreateDataTableInput {
@@ -63,6 +77,13 @@ input CreateDataTableInput {
 input ColumnInput {
     name: String!
     type: ColumnType!
+    link: ColumnLinkInput
+}
+
+input ColumnLinkInput {
+    targetDataTableId: ID!
+    onDelete: LinkDeleteRule!
+    displayColumnName: String
 }
 
 input AddColumnInput {
