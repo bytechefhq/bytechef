@@ -16,18 +16,12 @@
 
 package com.bytechef.platform.data.table.configuration.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
-import com.bytechef.platform.data.table.configuration.domain.DataTable;
-import com.bytechef.platform.data.table.configuration.domain.DataTableWebhook;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
-import com.bytechef.platform.data.table.configuration.repository.DataTableRepository;
-import com.bytechef.platform.data.table.configuration.repository.DataTableWebhookRepository;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
@@ -53,16 +47,9 @@ class DataTableWebhookServiceIntTest {
     private static final String WORKFLOW_EXECUTION_ID = WorkflowExecutionId.of(
         PlatformType.AUTOMATION, 1, "workflow-uuid", "trigger_1")
         .toString();
-    private static final String WEBHOOK_URL = "http://localhost:9555/webhooks/" + WORKFLOW_EXECUTION_ID;
 
     @Autowired
     private DataTableService dataTableService;
-
-    @Autowired
-    private DataTableRepository dataTableRepository;
-
-    @Autowired
-    private DataTableWebhookRepository dataTableWebhookRepository;
 
     @Autowired
     private DataTableWebhookService dataTableWebhookService;
@@ -82,50 +69,13 @@ class DataTableWebhookServiceIntTest {
     @Test
     void testAddWebhookStoresTheWorkflowExecutionId() {
         long webhookId = dataTableWebhookService.addWebhook(
-            "hooks", WORKFLOW_EXECUTION_ID, WEBHOOK_URL, DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID);
+            "hooks", WORKFLOW_EXECUTION_ID, DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID);
 
         assertTrue(
             dataTableWebhookService.listWebhooks("hooks", DEV_ENVIRONMENT_ID)
                 .stream()
                 .anyMatch(webhook -> webhook.id() == webhookId &&
                     WORKFLOW_EXECUTION_ID.equals(webhook.workflowExecutionId())));
-    }
-
-    @Test
-    void testAddWebhookAlsoStoresTheWebhookUrlSoThePreviousVersionCanDeliverAfterARollback() {
-        long webhookId = dataTableWebhookService.addWebhook(
-            "hooks", WORKFLOW_EXECUTION_ID, WEBHOOK_URL, DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID);
-
-        DataTableWebhook dataTableWebhook = dataTableWebhookRepository.findById(webhookId)
-            .orElseThrow();
-
-        assertEquals(WEBHOOK_URL, dataTableWebhook.getUrl());
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {
-        "http://localhost:9555/webhooks/{id}", "https://example.com/proxy/webhooks/{id}?token=1",
-        "http://bytechef_server/webhooks/{id}#fragment"
-    })
-    void testAWebhookRegisteredByThePreviousVersionIsListedWithTheIdFromItsUrl(String urlTemplate) {
-        DataTable dataTable = dataTableRepository.findByName("hooks")
-            .orElseThrow();
-
-        DataTableWebhook dataTableWebhook = new DataTableWebhook();
-
-        dataTableWebhook.setDataTableId(dataTable.getId());
-        dataTableWebhook.setEnvironment(Environment.DEVELOPMENT);
-        dataTableWebhook.setType(DataTableWebhookType.RECORD_CREATED);
-        dataTableWebhook.setUrl(urlTemplate.replace("{id}", WORKFLOW_EXECUTION_ID));
-
-        dataTableWebhookRepository.save(dataTableWebhook);
-
-        assertEquals(
-            List.of(WORKFLOW_EXECUTION_ID),
-            dataTableWebhookService.listWebhooks("hooks", DEV_ENVIRONMENT_ID)
-                .stream()
-                .map(DataTableWebhookService.Webhook::workflowExecutionId)
-                .toList());
     }
 
     @ParameterizedTest
@@ -136,7 +86,7 @@ class DataTableWebhookServiceIntTest {
         IllegalArgumentException illegalArgumentException = assertThrows(
             IllegalArgumentException.class,
             () -> dataTableWebhookService.addWebhook(
-                "hooks", workflowExecutionId, WEBHOOK_URL, DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID));
+                "hooks", workflowExecutionId, DataTableWebhookType.RECORD_CREATED, DEV_ENVIRONMENT_ID));
 
         assertTrue(illegalArgumentException.getMessage()
             .contains("workflow execution id"));

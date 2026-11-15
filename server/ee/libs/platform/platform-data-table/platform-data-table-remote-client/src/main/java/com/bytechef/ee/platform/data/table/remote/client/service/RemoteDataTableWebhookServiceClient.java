@@ -24,7 +24,7 @@ public class RemoteDataTableWebhookServiceClient implements DataTableWebhookServ
 
     @Override
     public long addWebhook(
-        String baseName, String workflowExecutionId, String url, DataTableWebhookType type, long environmentId) {
+        String baseName, String workflowExecutionId, DataTableWebhookType type, long environmentId) {
 
         throw new UnsupportedOperationException();
     }

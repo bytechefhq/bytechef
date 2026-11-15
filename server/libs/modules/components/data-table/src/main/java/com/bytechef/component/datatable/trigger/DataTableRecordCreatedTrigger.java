@@ -109,7 +109,7 @@ public class DataTableRecordCreatedTrigger {
         String baseName = inputParameters.getRequiredString(TABLE);
 
         long webhookId = dataTableWebhookService.addWebhook(
-            baseName, workflowExecutionId, webhookUrl, DataTableWebhookType.RECORD_CREATED,
+            baseName, workflowExecutionId, DataTableWebhookType.RECORD_CREATED,
             Objects.requireNonNull(triggerContextAware.getEnvironmentId()));
 
         return new WebhookEnableOutput(Map.of("webhookId", webhookId), null);

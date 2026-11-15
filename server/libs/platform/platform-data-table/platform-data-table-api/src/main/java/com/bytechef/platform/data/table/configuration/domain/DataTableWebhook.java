@@ -37,9 +37,6 @@ public class DataTableWebhook {
     @Id
     private Long id;
 
-    @Column
-    private String url;
-
     @Column("workflow_execution_id")
     private String workflowExecutionId;
 
@@ -94,14 +91,6 @@ public class DataTableWebhook {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     public String getWorkflowExecutionId() {
@@ -180,7 +169,6 @@ public class DataTableWebhook {
     public String toString() {
         return "DataTableWebhook{" +
             "id=" + id +
-            ", url='" + url + '\'' +
             ", workflowExecutionId='" + workflowExecutionId + '\'' +
             ", type=" + type +
             ", dataTableId=" + dataTableId +

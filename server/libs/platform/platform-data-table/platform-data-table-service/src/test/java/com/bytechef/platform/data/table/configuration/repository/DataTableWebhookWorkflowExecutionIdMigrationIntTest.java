@@ -149,6 +149,30 @@ class DataTableWebhookWorkflowExecutionIdMigrationIntTest {
         assertThat(selectWorkflowExecutionIdsById()).containsExactly(entry(1L, null));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+        H2, POSTGRESQL
+    })
+    void testTheUrlColumnIsDroppedAfterTheWorkflowExecutionIdMigration(String database) throws Exception {
+        connect(database);
+        runChangelog(CHANGELOG_PATH + "00000000000001_platform_data_table_init.xml");
+
+        insertDataTable();
+        insertWebhook(1L, "https://example.com/webhooks/dGVuYW50");
+
+        runChangelog(CHANGELOG_PATH + "20261103000001_platform_data_table_webhook_workflow_execution_id.xml");
+
+        insertWebhook(2L, "https://example.com/webhooks/cm9sbGJhY2s=?token=1");
+        insertWebhook(3L, "https://example.com/hooks/abc");
+        insertWebhook(4L, "https://other-host/webhooks/dGVuYW50");
+
+        runChangelog(CHANGELOG_PATH + "20261104000001_platform_data_table_webhook_drop_url.xml");
+
+        assertThat(selectColumnNames()).doesNotContain("URL")
+            .contains("WORKFLOW_EXECUTION_ID");
+        assertThat(selectWorkflowExecutionIdsById()).containsExactly(entry(2L, "cm9sbGJhY2s="), entry(4L, "dGVuYW50"));
+    }
+
     private void connect(String database) throws SQLException {
         if (POSTGRESQL.equals(database)) {
             connection = DriverManager.getConnection(
