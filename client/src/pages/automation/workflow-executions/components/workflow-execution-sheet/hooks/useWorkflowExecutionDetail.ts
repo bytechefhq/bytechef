@@ -25,7 +25,11 @@ export interface FocusedExecutionI {
     path: string[];
 }
 
-const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolean) => {
+const useWorkflowExecutionDetail = (
+    workflowExecutionId: number,
+    enabled: boolean,
+    canViewExecutionDetails: boolean = true
+) => {
     const [activeTab, setActiveTab] = useState<TabValueType>('output');
     const [appliedFocus, setAppliedFocus] = useState<{focusPath: FocusPathElement[]; jobId: number} | undefined>(
         undefined
@@ -104,7 +108,7 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
         refetch: refetchFocusedTaskExecution,
     } = useGetWorkflowExecutionTaskExecutionQuery(
         {id: activeJobId, taskExecutionId: Number(focusPath.at(-1)?.taskExecutionId ?? 0)},
-        enabled && !!focusPath.length && !triggerExecutionFailed,
+        enabled && canViewExecutionDetails && !!focusPath.length && !triggerExecutionFailed,
         undefined,
         false
     );
@@ -112,12 +116,12 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
     const taskExecutionAttempts = useMemo(() => groupTaskExecutionAttempts(job?.taskExecutions || []), [job]);
 
     const focusedTopLevelTaskExecution = useMemo(() => {
-        if (!focusedTaskExecutionError || !focusPath.length) {
+        if ((canViewExecutionDetails && !focusedTaskExecutionError) || !focusPath.length) {
             return undefined;
         }
 
         return job?.taskExecutions?.find((taskExecution) => taskExecution.id === focusPath[0].taskExecutionId);
-    }, [focusPath, focusedTaskExecutionError, job]);
+    }, [canViewExecutionDetails, focusPath, focusedTaskExecutionError, job]);
 
     const focusedExecution = useMemo<FocusedExecutionI | undefined>(() => {
         if (triggerExecution?.error) {
@@ -134,7 +138,11 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
     }, [focusPath, focusedTaskExecution, focusedTopLevelTaskExecution, triggerExecution]);
 
     const focusResolved =
-        triggerExecutionFailed || !focusPath.length || !!focusedExecution || focusedTaskExecutionError;
+        triggerExecutionFailed ||
+        !canViewExecutionDetails ||
+        !focusPath.length ||
+        !!focusedExecution ||
+        focusedTaskExecutionError;
 
     const initialFocusPending = !!job && !focusApplied;
 
