@@ -229,6 +229,47 @@ class AnthropicChatActionTest {
         assertNull(anthropicChatOptions.getTopP());
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "claude-sonnet-5-5", "claude-sonnet-5", "claude-opus-5-5", "claude-opus-5", "claude-opus-4-8",
+        "claude-opus-4-7", "claude-fable-5-1", "claude-mythos-5", "claude-haiku-5-5"
+    })
+    void testCreateChatModelOmitsSamplingParametersForModelsThatRejectThem(String model) {
+        Parameters mockedInputParameters = MockParametersFactory.create(
+            Map.of(MODEL, model, MAX_TOKENS, 1000, TEMPERATURE, 0.2, TOP_K, 50));
+
+        AnthropicChatOptions anthropicChatOptions = createChatOptions(mockedInputParameters);
+
+        assertNull(anthropicChatOptions.getTemperature());
+        assertNull(anthropicChatOptions.getTopK());
+        assertNull(anthropicChatOptions.getTopP());
+    }
+
+    @Test
+    void testCreateChatModelOmitsTopPForModelsThatRejectSamplingParameters() {
+        Parameters mockedInputParameters = MockParametersFactory.create(
+            Map.of(MODEL, "claude-sonnet-5-5", MAX_TOKENS, 1000, TOP_P, 0.9));
+
+        AnthropicChatOptions anthropicChatOptions = createChatOptions(mockedInputParameters);
+
+        assertNull(anthropicChatOptions.getTopP());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "claude-3-5-sonnet-20241022", "claude-haiku-4-5", "claude-opus-4-1-20250805", "claude-opus-4-5",
+        "claude-opus-4-6", "claude-sonnet-4-5-20250929", "claude-sonnet-4-6", "claude-sonnet-4-20250514"
+    })
+    void testCreateChatModelKeepsSamplingParametersForModelsThatAcceptThem(String model) {
+        Parameters mockedInputParameters = MockParametersFactory.create(
+            Map.of(MODEL, model, MAX_TOKENS, 1000, TEMPERATURE, 0.2, TOP_K, 50));
+
+        AnthropicChatOptions anthropicChatOptions = createChatOptions(mockedInputParameters);
+
+        assertEquals(0.2, anthropicChatOptions.getTemperature());
+        assertEquals(50, anthropicChatOptions.getTopK());
+    }
+
     @Test
     void testCreateChatModelDisablesThinkingWhenThinkingIsOff() {
         Parameters mockedInputParameters = MockParametersFactory.create(

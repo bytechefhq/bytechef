@@ -69,7 +69,7 @@ public class AnthropicConstants {
         .label("Temperature")
         .description(
             "Controls randomness: higher values make the output more random, lower values make it more focused " +
-                "and deterministic. Set either Temperature or Top P, not both. Leave empty for Claude Opus 4.7, " +
+                "and deterministic. Set either Temperature or Top P, not both. Ignored by Claude Opus 4.7, " +
                 "Sonnet 5 and later models, which reject sampling parameters.")
         .minValue(0)
         .maxValue(1)
@@ -79,7 +79,7 @@ public class AnthropicConstants {
         .label("Top P")
         .description(
             "Nucleus sampling: the model considers tokens whose cumulative probability mass adds up to top_p. " +
-                "Set either Temperature or Top P, not both. Leave empty for Claude Opus 4.7, Sonnet 5 and later " +
+                "Set either Temperature or Top P, not both. Ignored by Claude Opus 4.7, Sonnet 5 and later " +
                 "models, which reject sampling parameters.")
         .minValue(0)
         .maxValue(1)
@@ -88,7 +88,7 @@ public class AnthropicConstants {
     public static final ModifiableIntegerProperty TOP_K_PROPERTY = integer(TOP_K)
         .label("Top K")
         .description(
-            "Only sample from the top K options for each subsequent token. Leave empty for Claude Opus 4.7, " +
+            "Only sample from the top K options for each subsequent token. Ignored by Claude Opus 4.7, " +
                 "Sonnet 5 and later models, which reject sampling parameters.")
         .minValue(1)
         .advancedOption(true);
