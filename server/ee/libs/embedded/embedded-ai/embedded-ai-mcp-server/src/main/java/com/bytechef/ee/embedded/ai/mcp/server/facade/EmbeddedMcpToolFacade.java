@@ -197,7 +197,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         this.workflowService = workflowService;
     }
 
-    public @Nullable FunctionToolCallback<Map<String, Object>, Object> getFunctionToolCallback(
+    public @Nullable ToolCallback getFunctionToolCallback(
         McpTool mcpTool, @Nullable String externalUserId, Environment environment, String tenantId) {
         if (!mcpTool.isEnabled()) {
             return null;
@@ -244,7 +244,17 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             builder.description(toolDescription);
         }
 
-        return builder.build();
+        ToolCallback toolCallback = builder.build();
+
+        Long toolIntegrationId = integrationId == null
+            ? fetchIntegrationId(mcpComponent.getComponentName())
+            : integrationId;
+
+        if (toolIntegrationId == null) {
+            return toolCallback;
+        }
+
+        return EmbeddedMcpToolCallback.ofIntegration(toolCallback, toolIntegrationId);
     }
 
     public List<ToolCallback> getFunctionToolCallbacks(
@@ -293,13 +303,14 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
             Map<String, ?> workflowParameters = mcpIntegrationInstanceConfigurationWorkflow.getParameters();
 
-            toolCallbacks.add(
-                createWorkflowToolCallback(
-                    workflow, workflowParameters,
-                    toolName -> getWorkflowToolCallbackFunction(
-                        toolName, externalUserId, integration.getComponentName(), integration.getId(),
-                        integrationInstanceConfigurationWorkflow, trigger.getName(), workflowParameters,
-                        mcpIntegrationInstanceConfiguration.getMcpServerId(), environment, tenantId)));
+            ToolCallback toolCallback = createWorkflowToolCallback(
+                workflow, workflowParameters,
+                toolName -> getWorkflowToolCallbackFunction(
+                    toolName, externalUserId, integration.getComponentName(), integration.getId(),
+                    integrationInstanceConfigurationWorkflow, trigger.getName(), workflowParameters,
+                    mcpIntegrationInstanceConfiguration.getMcpServerId(), environment, tenantId));
+
+            toolCallbacks.add(EmbeddedMcpToolCallback.ofIntegration(toolCallback, integration.getId()));
         }
 
         return toolCallbacks;
@@ -592,13 +603,23 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         };
     }
 
-    private long getIntegrationId(String componentName) {
+    private @Nullable Long fetchIntegrationId(String componentName) {
         return integrationService.getIntegrations()
             .stream()
             .filter(integration -> componentName.equals(integration.getComponentName()))
             .map(Integration::getId)
             .findFirst()
-            .orElseThrow(() -> new IllegalStateException("No integration found for component: " + componentName));
+            .orElse(null);
+    }
+
+    private long getIntegrationId(String componentName) {
+        Long integrationId = fetchIntegrationId(componentName);
+
+        if (integrationId == null) {
+            throw new IllegalStateException("No integration found for component: " + componentName);
+        }
+
+        return integrationId;
     }
 
     private Function<Map<String, Object>, Object> getWorkflowToolCallbackFunction(

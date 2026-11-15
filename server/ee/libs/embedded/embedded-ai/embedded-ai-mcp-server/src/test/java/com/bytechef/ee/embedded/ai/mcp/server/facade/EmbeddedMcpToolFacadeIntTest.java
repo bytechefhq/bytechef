@@ -7,8 +7,10 @@
 
 package com.bytechef.ee.embedded.ai.mcp.server.facade;
 
+import static com.bytechef.ee.embedded.ai.mcp.server.facade.EmbeddedMcpToolCallback.INTEGRATION_ID_META_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -90,7 +92,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
-import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
@@ -263,7 +264,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
     @Test
     void testClusterElementToolCallReadsMcpServerWithoutWorkspacePermissionChecks() {
-        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = getClusterElementToolCallback(
+        ToolCallback functionToolCallback = getClusterElementToolCallback(
             Map.of(), UNCONNECTED_EXTERNAL_USER_ID);
 
         boolean[] executedSkippingChecks = {
@@ -297,7 +298,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
     @Test
     void testAnonymousCallOfConnectionRequiringClusterElementToolFailsWithClearError() {
-        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = getClusterElementToolCallback(
+        ToolCallback functionToolCallback = getClusterElementToolCallback(
             Map.of(), null);
 
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
@@ -316,7 +317,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
     @Test
     void testAnonymousCallOfConnectionlessClusterElementToolExecutes() {
-        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = getClusterElementToolCallback(
+        ToolCallback functionToolCallback = getClusterElementToolCallback(
             Map.of(), null);
 
         when(componentDefinitionService.getComponentDefinition("httpClient", 1))
@@ -619,6 +620,40 @@ class EmbeddedMcpToolFacadeIntTest {
     }
 
     @Test
+    void testClusterElementToolCarriesTheIntegrationOfItsComponent() {
+        long integrationId = insertIntegration("httpClient");
+
+        ToolCallback toolCallback = getClusterElementToolCallback(Map.of(), UNCONNECTED_EXTERNAL_USER_ID);
+
+        assertThat(toolCallback).isInstanceOfSatisfying(
+            EmbeddedMcpToolCallback.class,
+            embeddedMcpToolCallback -> assertThat(embeddedMcpToolCallback.meta())
+                .containsExactly(entry(INTEGRATION_ID_META_KEY, integrationId)));
+    }
+
+    @Test
+    void testClusterElementToolOfAComponentWithoutAnIntegrationCarriesNoIntegration() {
+        ToolCallback toolCallback = getClusterElementToolCallback(Map.of(), UNCONNECTED_EXTERNAL_USER_ID);
+
+        assertThat(toolCallback).isNotInstanceOf(EmbeddedMcpToolCallback.class);
+    }
+
+    @Test
+    void testWorkflowToolCarriesTheIntegrationOfItsConfiguration() {
+        List<ToolCallback> toolCallbacks = getWorkflowToolCallbacks(
+            Map.of(), List.of(), CONNECTED_EXTERNAL_USER_ID, true, false);
+
+        Long integrationId = jdbcTemplate.queryForObject(
+            "SELECT id FROM integration WHERE name = 'myComponent'", Long.class);
+
+        assertThat(toolCallbacks).singleElement()
+            .isInstanceOfSatisfying(
+                EmbeddedMcpToolCallback.class,
+                embeddedMcpToolCallback -> assertThat(embeddedMcpToolCallback.meta())
+                    .containsExactly(entry(INTEGRATION_ID_META_KEY, integrationId)));
+    }
+
+    @Test
     void testBoundClusterElementToolIsListedWhenTheUserHasANewerInstanceOfAnotherIntegrationOnTheSameComponent() {
         McpTool mcpTool = saveMcpTool("post", Map.of(), true);
 
@@ -662,7 +697,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
         mockPostClusterElementDefinition();
 
-        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
+        ToolCallback functionToolCallback =
             embeddedMcpToolFacade.getFunctionToolCallback(
                 mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant");
 
@@ -695,7 +730,7 @@ class EmbeddedMcpToolFacadeIntTest {
         when(componentDefinition.isConnectionRequired()).thenReturn(true);
         when(componentDefinitionService.getComponentDefinition("httpClient", 1)).thenReturn(componentDefinition);
 
-        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
+        ToolCallback functionToolCallback =
             embeddedMcpToolFacade.getFunctionToolCallback(
                 mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant");
 
@@ -761,7 +796,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
         mockPostClusterElementDefinition();
 
-        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
+        ToolCallback functionToolCallback =
             embeddedMcpToolFacade.getFunctionToolCallback(
                 mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant");
 
@@ -794,7 +829,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
     @Test
     void testFailedClusterElementToolCallIsRecordedAsAnError() {
-        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = getClusterElementToolCallback(
+        ToolCallback functionToolCallback = getClusterElementToolCallback(
             Map.of(), UNCONNECTED_EXTERNAL_USER_ID);
 
         when(componentDefinitionService.getComponentDefinition("httpClient", 1))
@@ -834,7 +869,7 @@ class EmbeddedMcpToolFacadeIntTest {
         when(componentDefinition.isConnectionRequired()).thenReturn(true);
         when(componentDefinitionService.getComponentDefinition("httpClient", 1)).thenReturn(componentDefinition);
 
-        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
+        ToolCallback functionToolCallback =
             embeddedMcpToolFacade.getFunctionToolCallback(
                 mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant");
 
@@ -949,13 +984,13 @@ class EmbeddedMcpToolFacadeIntTest {
     }
 
     private ToolDefinition getClusterElementToolDefinition(Map<String, Object> parameters) {
-        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = getClusterElementToolCallback(
+        ToolCallback functionToolCallback = getClusterElementToolCallback(
             parameters, UNCONNECTED_EXTERNAL_USER_ID);
 
         return functionToolCallback.getToolDefinition();
     }
 
-    private FunctionToolCallback<Map<String, Object>, Object> getClusterElementToolCallback(
+    private ToolCallback getClusterElementToolCallback(
         Map<String, Object> parameters, @Nullable String externalUserId) {
 
         McpTool mcpTool = saveMcpTool("post", parameters, true);
@@ -969,7 +1004,7 @@ class EmbeddedMcpToolFacadeIntTest {
         when(clusterElementDefinitionService.getClusterElementDefinition("httpClient", 1, "post"))
             .thenReturn(clusterElementDefinition);
 
-        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
+        ToolCallback functionToolCallback =
             embeddedMcpToolFacade.getFunctionToolCallback(mcpTool, externalUserId, Environment.PRODUCTION, "tenant");
 
         assertThat(functionToolCallback).isNotNull();

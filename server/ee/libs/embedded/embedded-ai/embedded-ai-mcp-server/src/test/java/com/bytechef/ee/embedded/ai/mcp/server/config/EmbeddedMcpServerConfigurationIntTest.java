@@ -7,13 +7,16 @@
 
 package com.bytechef.ee.embedded.ai.mcp.server.config;
 
+import static com.bytechef.ee.embedded.ai.mcp.server.facade.EmbeddedMcpToolCallback.INTEGRATION_ID_META_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.embedded.ai.mcp.server.facade.EmbeddedMcpToolCallback;
 import com.bytechef.ee.embedded.ai.mcp.server.facade.EmbeddedMcpToolFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpAutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpAutomationProjectConfigurationWorkflowService;
@@ -45,9 +48,14 @@ import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import io.modelcontextprotocol.common.McpTransportContext;
+import io.modelcontextprotocol.server.McpServerFeatures;
+import io.modelcontextprotocol.spec.McpSchema;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -144,5 +152,38 @@ class EmbeddedMcpServerConfigurationIntTest {
         ApplicationContextRunner applicationContextRunner, Class<T> beanType) {
 
         return applicationContextRunner.withBean(beanType, () -> mock(beanType));
+    }
+
+    @Test
+    void testToolSpecificationCarriesTheMetaOfAnEmbeddedToolCallback() {
+        McpServerFeatures.AsyncToolSpecification toolSpecification =
+            EmbeddedMcpServerConfiguration.toAsyncToolSpecification(
+                EmbeddedMcpToolCallback.ofIntegration(createToolCallback(), 7L));
+
+        McpSchema.Tool tool = toolSpecification.tool();
+
+        assertThat(tool.name()).isEqualTo("myTool");
+        assertThat(tool.description()).isEqualTo("My tool");
+        assertThat(tool.meta()).containsExactly(entry(INTEGRATION_ID_META_KEY, 7L));
+    }
+
+    @Test
+    void testToolSpecificationOfAPlainToolCallbackHasNoMeta() {
+        McpServerFeatures.AsyncToolSpecification toolSpecification =
+            EmbeddedMcpServerConfiguration.toAsyncToolSpecification(createToolCallback());
+
+        McpSchema.Tool tool = toolSpecification.tool();
+
+        assertThat(tool.meta()).isNull();
+    }
+
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    private static ToolCallback createToolCallback() {
+        return FunctionToolCallback.builder("myTool", (Map<String, Object> input) -> "ok")
+            .inputType(Map.class)
+            .description("My tool")
+            .build();
     }
 }
