@@ -147,9 +147,9 @@ public class ConnectionDefinitionServiceTest {
                 "mcp", 1, AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE, getCallbackParameters(null),
                 "http://localhost/callback"));
 
-        Map<String, ?> result = authorizationCallbackResponse.result();
-
-        assertThat(result.get(Authorization.ACCESS_TOKEN)).isEqualTo("new-access");
+        assertThat(authorizationCallbackResponse.result())
+            .extractingByKey(Authorization.ACCESS_TOKEN)
+            .isEqualTo("new-access");
 
         tokenServer.verify(
             postRequestedFor(urlPathEqualTo("/token"))
