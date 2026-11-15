@@ -76,6 +76,10 @@ const AutomationProjectListItem = ({
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showUsageSheet, setShowUsageSheet] = useState(false);
 
+    const canCreateConfiguration = useHasEmbeddedScope(
+        'INTEGRATION_INSTANCE_CONFIGURATION_CREATE',
+        DEVELOPMENT_ENVIRONMENT
+    );
     const canCreateProject = useHasEmbeddedScope('INTEGRATION_CREATE', UNION_ENVIRONMENT_ID);
     const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
     const canDeleteProject = useHasEmbeddedScope('INTEGRATION_DELETE', UNION_ENVIRONMENT_ID);
@@ -394,27 +398,33 @@ const AutomationProjectListItem = ({
                                     )}
                                 </DropdownMenuGroup>
 
-                                <DropdownMenuSeparator />
+                                {canCreateConfiguration && (
+                                    <>
+                                        <DropdownMenuSeparator />
 
-                                <DropdownMenuGroup aria-label="Configuration Actions">
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <span className="block">
-                                                <DropdownMenuItem
-                                                    aria-label="New Configuration"
-                                                    disabled={!project.published}
-                                                    icon={<Settings2Icon />}
-                                                    label="New Configuration"
-                                                    onClick={() => onCreateConfiguration(project)}
-                                                />
-                                            </span>
-                                        </TooltipTrigger>
+                                        <DropdownMenuGroup aria-label="Configuration Actions">
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <span className="block">
+                                                        <DropdownMenuItem
+                                                            aria-label="New Configuration"
+                                                            disabled={!project.published}
+                                                            icon={<Settings2Icon />}
+                                                            label="New Configuration"
+                                                            onClick={() => onCreateConfiguration(project)}
+                                                        />
+                                                    </span>
+                                                </TooltipTrigger>
 
-                                        {!project.published && (
-                                            <TooltipContent>Publish the project before configuring it.</TooltipContent>
-                                        )}
-                                    </Tooltip>
-                                </DropdownMenuGroup>
+                                                {!project.published && (
+                                                    <TooltipContent>
+                                                        Publish the project before configuring it.
+                                                    </TooltipContent>
+                                                )}
+                                            </Tooltip>
+                                        </DropdownMenuGroup>
+                                    </>
+                                )}
 
                                 {canDeleteProject && (
                                     <>
