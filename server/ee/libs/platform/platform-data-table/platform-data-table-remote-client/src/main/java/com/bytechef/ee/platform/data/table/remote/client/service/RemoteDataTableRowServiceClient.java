@@ -44,6 +44,14 @@ public class RemoteDataTableRowServiceClient implements DataTableRowService {
     }
 
     @Override
+    public List<DataTableRow> findRows(
+        long dataTableId, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int limit,
+        int offset, List<String> expand, long environmentId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public DataTableRow insertRow(long dataTableId, Map<String, Object> values, long environmentId) {
         throw new UnsupportedOperationException();
     }
@@ -84,6 +92,11 @@ public class RemoteDataTableRowServiceClient implements DataTableRowService {
 
     @Override
     public DataTableRow getRow(long dataTableId, long id, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public DataTableRow getRow(long dataTableId, long id, List<String> expand, long environmentId) {
         throw new UnsupportedOperationException();
     }
 

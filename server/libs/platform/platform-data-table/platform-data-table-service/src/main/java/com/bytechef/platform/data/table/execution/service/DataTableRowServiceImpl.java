@@ -285,9 +285,20 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public @Nullable DataTableRow getRow(long dataTableId, long id, long environmentId) {
+        return getRow(dataTableId, id, List.of(), environmentId);
+    }
+
+    @Override
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    public @Nullable DataTableRow getRow(long dataTableId, long id, List<String> expand, long environmentId) {
+        Objects.requireNonNull(expand, "expand");
+
         String physicalName = DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableId);
 
         checkHasId(dataTableId, physicalName);
+
+        Map<String, LinkSpec> expandLinkSpecs = resolveExpandLinkSpecs(
+            dataTableId, physicalName, expand, environmentId);
 
         List<String> columnNames = listPhysicalColumns(physicalName).stream()
             .map(ColumnSpec::name)
@@ -304,7 +315,11 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             sql, preparedStatement -> preparedStatement.setLong(1, id),
             (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
 
-        return rows.isEmpty() ? null : rows.getFirst();
+        if (rows.isEmpty()) {
+            return null;
+        }
+
+        return expandLinks(rows, expandLinkSpecs, environmentId).getFirst();
     }
 
     @Override
@@ -716,8 +731,18 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         long dataTableId, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int limit,
         int offset, long environmentId) {
 
+        return findRows(dataTableId, conditions, sorts, limit, offset, List.of(), environmentId);
+    }
+
+    @Override
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    public List<DataTableRow> findRows(
+        long dataTableId, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int limit,
+        int offset, List<String> expand, long environmentId) {
+
         Objects.requireNonNull(conditions, "conditions");
         Objects.requireNonNull(sorts, "sorts");
+        Objects.requireNonNull(expand, "expand");
 
         if (limit < 0 || offset < 0) {
             throw new IllegalArgumentException(
@@ -731,6 +756,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         List<ColumnSpec> columnSpecs = listColumns(dataTableId, physicalName, environmentId);
 
         List<String> columnNames = getNonIdColumnNames(columnSpecs);
+
+        Map<String, LinkSpec> expandLinkSpecs = resolveExpandLinkSpecs(columnSpecs, expand);
 
         WhereClause whereClause = buildWhereClause(columnSpecs, conditions);
 
@@ -751,12 +778,14 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         String sql = "SELECT " + buildSelectColumns(columnNames) + " FROM " + escapeIdentifier(physicalName) +
             whereClause.sql() + orderByClause + " LIMIT ? OFFSET ?";
 
-        return jdbcTemplate.query(sql, preparedStatement -> {
+        List<DataTableRow> dataTableRows = jdbcTemplate.query(sql, preparedStatement -> {
             int index = setFilterParameters(preparedStatement, 1, whereClause.filterParameters());
 
             preparedStatement.setInt(index++, limit);
             preparedStatement.setInt(index, offset);
         }, (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
+
+        return expandLinks(dataTableRows, expandLinkSpecs, environmentId);
     }
 
     @Override
@@ -2247,15 +2276,121 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
             List<Long> sourceRowIds = clearedLink.rowIds();
 
-            List<DataTableRow> sourceDataTableRows = jdbcTemplate.query(
-                "SELECT " + buildSelectColumns(columnNames) + " FROM " + escapeIdentifier(sourcePhysicalName) +
-                    " WHERE " + buildAnyCondition("\"id\"", sourceRowIds.size()) + " ORDER BY \"id\"",
-                (PreparedStatementSetter) preparedStatement -> setIds(preparedStatement, 1, sourceRowIds),
-                (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
+            List<DataTableRow> sourceDataTableRows = selectRowsByIds(sourcePhysicalName, columnNames, sourceRowIds);
 
             publishWebhookEvent(
                 sourceDataTableId, DataTableWebhookType.RECORD_UPDATED, sourceDataTableRows, environmentId);
         }
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private List<DataTableRow> selectRowsByIds(String physicalName, List<String> columnNames, List<Long> rowIds) {
+        return jdbcTemplate.query(
+            "SELECT " + buildSelectColumns(columnNames) + " FROM " + escapeIdentifier(physicalName) + " WHERE " +
+                buildAnyCondition("\"id\"", rowIds.size()) + " ORDER BY \"id\"",
+            (PreparedStatementSetter) preparedStatement -> setIds(preparedStatement, 1, rowIds),
+            (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
+    }
+
+    private Map<String, LinkSpec> resolveExpandLinkSpecs(
+        long dataTableId, String physicalName, List<String> expand, long environmentId) {
+
+        if (expand.isEmpty()) {
+            return Map.of();
+        }
+
+        return resolveExpandLinkSpecs(listColumns(dataTableId, physicalName, environmentId), expand);
+    }
+
+    private static Map<String, LinkSpec> resolveExpandLinkSpecs(List<ColumnSpec> columnSpecs, List<String> expand) {
+        if (expand.isEmpty()) {
+            return Map.of();
+        }
+
+        Map<String, LinkSpec> expandLinkSpecs = new LinkedHashMap<>();
+
+        for (String columnName : expand) {
+            Optional<ColumnSpec> columnSpecOptional = findColumnSpec(columnSpecs, columnName);
+
+            if (columnSpecOptional.isEmpty() || columnSpecOptional.get()
+                .type() != ColumnType.LINK) {
+
+                throw new DataTableException(
+                    "Column '" + columnName + "' is not a link column", DataTableErrorType.COLUMN_NOT_FOUND);
+            }
+
+            ColumnSpec columnSpec = columnSpecOptional.get();
+
+            expandLinkSpecs.put(columnSpec.name(), columnSpec.link());
+        }
+
+        return expandLinkSpecs;
+    }
+
+    private List<DataTableRow> expandLinks(
+        List<DataTableRow> dataTableRows, Map<String, LinkSpec> expandLinkSpecs, long environmentId) {
+
+        if (expandLinkSpecs.isEmpty() || dataTableRows.isEmpty()) {
+            return dataTableRows;
+        }
+
+        List<Map<String, Object>> expandedValues = new ArrayList<>(dataTableRows.size());
+
+        for (DataTableRow dataTableRow : dataTableRows) {
+            expandedValues.add(new HashMap<>(dataTableRow.values()));
+        }
+
+        for (Map.Entry<String, LinkSpec> entry : expandLinkSpecs.entrySet()) {
+            String columnName = entry.getKey();
+
+            Set<Long> targetRowIds = new LinkedHashSet<>();
+
+            for (DataTableRow dataTableRow : dataTableRows) {
+                if (dataTableRow.values()
+                    .get(columnName) instanceof Number number) {
+
+                    targetRowIds.add(number.longValue());
+                }
+            }
+
+            Map<Long, DataTableRow> targetDataTableRows = new HashMap<>();
+
+            if (!targetRowIds.isEmpty()) {
+                String targetPhysicalName = DataTablePhysicalNameUtils.getPhysicalName(
+                    environmentId, entry.getValue()
+                        .targetDataTableId());
+
+                List<String> targetColumnNames = getNonIdColumnNames(listPhysicalColumns(targetPhysicalName));
+
+                for (DataTableRow targetDataTableRow : selectRowsByIds(
+                    targetPhysicalName, targetColumnNames, new ArrayList<>(targetRowIds))) {
+
+                    targetDataTableRows.put(targetDataTableRow.id(), targetDataTableRow);
+                }
+            }
+
+            for (int index = 0; index < dataTableRows.size(); index++) {
+                Object linkValue = dataTableRows.get(index)
+                    .values()
+                    .get(columnName);
+
+                expandedValues.get(index)
+                    .put(
+                        columnName,
+                        linkValue instanceof Number number ? targetDataTableRows.get(number.longValue()) : null);
+            }
+        }
+
+        List<DataTableRow> expandedDataTableRows = new ArrayList<>(dataTableRows.size());
+
+        for (int index = 0; index < dataTableRows.size(); index++) {
+            DataTableRow dataTableRow = dataTableRows.get(index);
+
+            expandedDataTableRows.add(
+                new DataTableRow(dataTableRow.id(), dataTableRow.externalId(), expandedValues.get(index)));
+        }
+
+        return expandedDataTableRows;
     }
 
     private static RuntimeException toRowStillLinked(
