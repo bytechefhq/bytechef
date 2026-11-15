@@ -1799,6 +1799,7 @@ export type McpAutomationProjectConfigurationWorkflow = {
   id: Scalars['ID']['output'];
   label?: Maybe<Scalars['String']['output']>;
   parameters?: Maybe<Scalars['Map']['output']>;
+  workflowId?: Maybe<Scalars['String']['output']>;
   workflowUuid: Scalars['String']['output'];
 };
 
@@ -2054,6 +2055,7 @@ export type Mutation = {
   deleteKnowledgeBaseDocument?: Maybe<Scalars['Boolean']['output']>;
   deleteKnowledgeBaseDocumentChunk?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpAutomationProjectConfiguration?: Maybe<Scalars['Boolean']['output']>;
+  deleteMcpAutomationProjectConfigurationWorkflow?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpComponent?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpIntegrationInstanceConfiguration?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpIntegrationInstanceConfigurationWorkflow?: Maybe<Scalars['Boolean']['output']>;
@@ -2535,6 +2537,11 @@ export type MutationDeleteKnowledgeBaseDocumentChunkArgs = {
 
 
 export type MutationDeleteMcpAutomationProjectConfigurationArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteMcpAutomationProjectConfigurationWorkflowArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -3739,6 +3746,7 @@ export type Query = {
   taskDispatcherDefinitionVersions: Array<TaskDispatcherDefinition>;
   taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
   taskExecutionFileLogs: Array<LogEntry>;
+  toolEligibleAutomationProjectConfigurationWorkflowProperties?: Maybe<Array<Maybe<Property>>>;
   toolEligibleIntegrationInstanceConfigurationWorkflowProperties?: Maybe<Array<Maybe<Property>>>;
   toolEligibleIntegrationInstanceConfigurationWorkflows: Array<IntegrationWorkflow>;
   toolEligibleIntegrationVersionWorkflows: Array<IntegrationWorkflow>;
@@ -4581,6 +4589,12 @@ export type QueryTaskDispatcherDefinitionVersionsArgs = {
 export type QueryTaskExecutionFileLogsArgs = {
   jobId: Scalars['ID']['input'];
   taskExecutionId: Scalars['ID']['input'];
+};
+
+
+export type QueryToolEligibleAutomationProjectConfigurationWorkflowPropertiesArgs = {
+  automationProjectConfigurationId: Scalars['ID']['input'];
+  workflowUuid: Scalars['String']['input'];
 };
 
 
