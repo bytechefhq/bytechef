@@ -90,7 +90,13 @@ public interface WorkspaceDataTableFacade {
         long dataTableId, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int pageNumber,
         int pageSize, long environmentId);
 
+    Page<DataTableRow> listRows(
+        long dataTableId, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int pageNumber,
+        int pageSize, List<String> expand, long environmentId);
+
     DataTableRow getRow(long dataTableId, long rowId, long environmentId);
+
+    DataTableRow getRow(long dataTableId, long rowId, List<String> expand, long environmentId);
 
     Optional<DataTableRow> fetchRowByExternalId(long dataTableId, String externalId, long environmentId);
 

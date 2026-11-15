@@ -331,6 +331,16 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
         long dataTableId, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int pageNumber,
         int pageSize, long environmentId) {
 
+        return listRows(dataTableId, conditions, sorts, pageNumber, pageSize, List.of(), environmentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')")
+    public Page<DataTableRow> listRows(
+        long dataTableId, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int pageNumber,
+        int pageSize, List<String> expand, long environmentId) {
+
         PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
 
         long total = dataTableRowService.countRows(dataTableId, conditions, environmentId);
@@ -341,7 +351,7 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
         }
 
         List<DataTableRow> dataTableRows = dataTableRowService.findRows(
-            dataTableId, conditions, sorts, pageSize, (int) offset, environmentId);
+            dataTableId, conditions, sorts, pageSize, (int) offset, expand, environmentId);
 
         return new PageImpl<>(dataTableRows, pageRequest, total);
     }
@@ -352,6 +362,19 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     public DataTableRow getRow(long dataTableId, long rowId, long environmentId) {
         DataTableRow dataTableRow = dataTableRowService.getRow(
             dataTableId, rowId, environmentId);
+
+        if (dataTableRow == null) {
+            throw new DataTableException("Row not found: id=" + rowId, DataTableErrorType.ROW_NOT_FOUND);
+        }
+
+        return dataTableRow;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')")
+    public DataTableRow getRow(long dataTableId, long rowId, List<String> expand, long environmentId) {
+        DataTableRow dataTableRow = dataTableRowService.getRow(dataTableId, rowId, expand, environmentId);
 
         if (dataTableRow == null) {
             throw new DataTableException("Row not found: id=" + rowId, DataTableErrorType.ROW_NOT_FOUND);
