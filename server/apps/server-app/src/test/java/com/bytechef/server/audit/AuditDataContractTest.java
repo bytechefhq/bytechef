@@ -87,7 +87,6 @@ class AuditDataContractTest {
     private static final String TRIGGER_INTERNAL = "trigger bookkeeping of an audited enable";
     private static final String WORKFLOW_INPUTS = "workflow input or connection values";
     private static final Map<String, String> UNAUDITED_GUARDED_CLASSES = Map.of(
-        "IntegrationInstanceAdminFacadeImpl", DELEGATES,
         "WebhookTriggerTestAdminFacadeImpl", "editor-time webhook trigger test");
     private static final Map<String, String> UNAUDITED_GUARDED_METHODS = Map.ofEntries(
         Map.entry("A2aProjectWorkflowFacadeImpl.updateA2aProjectWorkflowSkill", TOOL_SETTING),
@@ -112,8 +111,10 @@ class AuditDataContractTest {
         Map.entry("IntegrationInstanceConfigurationFacadeImpl.updateIntegrationInstanceConfigurationWorkflow",
             WORKFLOW_INPUTS),
         Map.entry("IntegrationInstanceFacadeImpl.enableIntegrationInstanceWorkflowTriggers", TRIGGER_INTERNAL),
+        Map.entry("IntegrationInstanceFacadeImpl.provisionIntegrationInstance", DELEGATES),
         Map.entry("IntegrationInstanceFacadeImpl.updateIntegrationInstanceConfigurationWorkflowTriggers",
             TRIGGER_INTERNAL),
+        Map.entry("IntegrationInstanceFacadeImpl.updateIntegrationInstanceCredentials", DELEGATES),
         Map.entry("IntegrationInstanceFacadeImpl.updateIntegrationInstanceWorkflow", WORKFLOW_INPUTS),
         Map.entry("IntegrationTagFacadeImpl.updateIntegrationTags", TAGS),
         Map.entry("IntegrationWorkflowFacadeImpl.updateWorkflow", DEFINITION_EDIT),

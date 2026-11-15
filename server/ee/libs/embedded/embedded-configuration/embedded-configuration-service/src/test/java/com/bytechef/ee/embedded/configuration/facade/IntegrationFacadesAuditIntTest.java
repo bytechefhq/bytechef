@@ -140,9 +140,6 @@ class IntegrationFacadesAuditIntTest {
     private IntegrationFacade integrationFacade;
 
     @Autowired
-    private IntegrationInstanceAdminFacade integrationInstanceAdminFacade;
-
-    @Autowired
     private IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
 
     @Autowired
@@ -772,7 +769,7 @@ class IntegrationFacadesAuditIntTest {
 
             stubOwnedConnection(connectionId);
 
-            integrationInstanceAdminFacade.updateIntegrationInstanceCredentials(
+            integrationInstanceFacade.updateIntegrationInstanceCredentials(
                 integrationInstance.getId(), Map.of("token", "s3cr3t"), 2);
 
             verify(connectionFacade).updateCredentials(eq(connectionId), any(), eq(2));
@@ -803,7 +800,7 @@ class IntegrationFacadesAuditIntTest {
                 .updateCredentials(eq(connectionId), any(), anyInt());
 
             assertThatThrownBy(
-                () -> integrationInstanceAdminFacade.updateIntegrationInstanceCredentials(
+                () -> integrationInstanceFacade.updateIntegrationInstanceCredentials(
                     integrationInstance.getId(), Map.of("token", "s3cr3t"), 2))
                         .isInstanceOf(ConfigurationException.class);
 
