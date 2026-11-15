@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.audit.WorkspaceConnectionAuditEvents;
+import com.bytechef.automation.configuration.audit.WorkspaceConnectionAuditMapper;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
@@ -36,7 +37,6 @@ import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.exception.ConfigurationException;
-import com.bytechef.platform.annotation.ConditionalOnCEVersion;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
@@ -84,7 +84,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-@ConditionalOnCEVersion
 public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade {
 
     private static final Logger log = LoggerFactory.getLogger(WorkspaceConnectionFacadeImpl.class);
@@ -106,6 +105,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     protected final UserService userService;
     protected final WorkflowService workflowService;
     protected final WorkflowTestConfigurationService workflowTestConfigurationService;
+    protected final List<WorkspaceConnectionContributor> workspaceConnectionContributors;
     protected final WorkspaceConnectionService workspaceConnectionService;
     protected final WorkspaceFacade workspaceFacade;
 
@@ -121,6 +121,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         ProjectWorkflowService projectWorkflowService, TagService tagService, UserService userService,
         WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
+        ObjectProvider<WorkspaceConnectionContributor> workspaceConnectionContributorProvider,
         WorkspaceConnectionService workspaceConnectionService, WorkspaceFacade workspaceFacade) {
 
         this.connectionFacade = connectionFacade;
@@ -137,6 +138,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         this.userService = userService;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
+        this.workspaceConnectionContributors = workspaceConnectionContributorProvider.orderedStream()
+            .toList();
         this.workspaceConnectionService = workspaceConnectionService;
         this.workspaceFacade = workspaceFacade;
     }
@@ -154,13 +157,15 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
-    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_CREATED, data = {
-        @AuditData(key = "workspaceId", value = "#workspaceId"),
-        @AuditData(key = "connectionId", value = "#result"),
-        @AuditData(key = "name", value = "#connectionDTO.name"),
-        @AuditData(key = "componentName", value = "#connectionDTO.componentName"),
-        @AuditData(key = "environmentId", value = "#connectionDTO.environmentId")
-    })
+    @Audited(
+        event = WorkspaceConnectionAuditEvents.CONNECTION_CREATED, mapper = WorkspaceConnectionAuditMapper.class,
+        data = {
+            @AuditData(key = "workspaceId", value = "#workspaceId"),
+            @AuditData(key = "connectionId", value = "#result"),
+            @AuditData(key = "name", value = "#connectionDTO.name"),
+            @AuditData(key = "componentName", value = "#connectionDTO.componentName"),
+            @AuditData(key = "environmentId", value = "#connectionDTO.environmentId")
+        })
     @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'CONNECTION_CREATE', #connectionDTO.environmentId)")
     public long create(long workspaceId, ConnectionDTO connectionDTO) {
         ResourceVisibility requestedVisibility = connectionDTO.visibility();
@@ -190,13 +195,19 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
-    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_DELETED, data = {
-        @AuditData(key = "connectionId", value = "#connectionId")
-    })
+    @Audited(
+        event = WorkspaceConnectionAuditEvents.CONNECTION_DELETED, mapper = WorkspaceConnectionAuditMapper.class,
+        data = {
+            @AuditData(key = "connectionId", value = "#connectionId")
+        })
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE') && " +
         "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
     public void delete(long connectionId) {
         requireAutomationConnectionUnlessConnectedUser(connectionId);
+
+        for (WorkspaceConnectionContributor workspaceConnectionContributor : workspaceConnectionContributors) {
+            workspaceConnectionContributor.beforeDelete(connectionId);
+        }
 
         workspaceConnectionService.deleteWorkspaceConnection(connectionId);
 
@@ -272,8 +283,11 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
                 ? connectionDTO : connectionDTO.withoutCredentials());
     }
 
-    protected List<Long> getSharedConnectionIds() {
-        return List.of();
+    private List<Long> getSharedConnectionIds() {
+        return workspaceConnectionContributors.stream()
+            .flatMap(workspaceConnectionContributor -> CollectionUtils.stream(
+                workspaceConnectionContributor.getSharedConnectionIds()))
+            .toList();
     }
 
     /**
@@ -321,9 +335,9 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
-    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'CONNECTION_VIEW', #environmentId)")
     @Transactional(readOnly = true)
-    public List<Tag> getConnectionTags(long workspaceId, Long environmentId) {
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
+    public List<Tag> getConnectionTags(long workspaceId) {
         List<Long> connectionIds = CollectionUtils.map(
             workspaceConnectionService.getWorkspaceConnections(workspaceId), WorkspaceConnection::getConnectionId);
 
@@ -336,7 +350,6 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         return tagService.getTags(
             connections.stream()
                 .filter(connection -> connection.getType() == PlatformType.AUTOMATION)
-                .filter(connection -> environmentId == null || connection.getEnvironmentId() == environmentId)
                 .flatMap(connection -> CollectionUtils.stream(connection.getTagIds()))
                 .distinct()
                 .toList());
@@ -469,15 +482,17 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
-    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_CREDENTIALS_UPDATED, data = {
-        @AuditData(key = "connectionId", value = "#connectionId")
-    })
+    @Audited(
+        event = WorkspaceConnectionAuditEvents.CONNECTION_CREDENTIALS_UPDATED,
+        mapper = WorkspaceConnectionAuditMapper.class, data = {
+            @AuditData(key = "connectionId", value = "#connectionId")
+        })
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') && " +
-        "isResourceOwner(#connectionId, 'Connection')")
+        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
     public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
         requireAutomationConnection(connectionId);
 
-        validateSecretOwner(connectionService.getConnection(connectionId));
+        validateCredentialReplacer(connectionService.getConnection(connectionId));
 
         connectionFacade.updateCredentials(connectionId, parameters, version);
     }
@@ -491,10 +506,11 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
             ConnectionSecrets.canCurrentUserAccessSecrets(connectionDTO.createdBy(), connectionDTO.visibility());
     }
 
-    private void validateSecretOwner(Connection connection) {
-        if (!ConnectionSecrets.canCurrentUserAccessSecrets(connection.getCreatedBy(), connection.getVisibility())) {
+    private void validateCredentialReplacer(Connection connection) {
+        if (!ConnectionSecrets.canCurrentUserReplaceSecrets(connection.getCreatedBy())) {
             throw new AccessDeniedException(
-                "Only the connection owner can replace the credentials of connection " + connection.getId());
+                "Only the connection owner or a tenant admin can replace the credentials of connection " +
+                    connection.getId());
         }
     }
 

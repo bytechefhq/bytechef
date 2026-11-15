@@ -8,6 +8,7 @@
 package com.bytechef.ee.automation.configuration.remote.client.facade;
 
 import com.bytechef.automation.configuration.dto.ConnectionWorkflowDTO;
+import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.ee.automation.configuration.facade.WorkspaceConnectionSharingFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.domain.ResourceVisibility;
@@ -23,7 +24,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnEEVersion
-public class RemoteWorkspaceConnectionFacadeClient implements WorkspaceConnectionSharingFacade {
+public class RemoteWorkspaceConnectionFacadeClient
+    implements WorkspaceConnectionFacade, WorkspaceConnectionSharingFacade {
 
     @Override
     public long create(long workspaceId, com.bytechef.platform.connection.dto.ConnectionDTO connectionDTO) {
@@ -61,7 +63,7 @@ public class RemoteWorkspaceConnectionFacadeClient implements WorkspaceConnectio
     }
 
     @Override
-    public List<Tag> getConnectionTags(long workspaceId, Long environmentId) {
+    public List<Tag> getConnectionTags(long workspaceId) {
         throw new UnsupportedOperationException();
     }
 

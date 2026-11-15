@@ -7,15 +7,8 @@
 
 package com.bytechef.ee.automation.configuration.facade;
 
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.WorkspaceConnection;
-import com.bytechef.automation.configuration.facade.WorkspaceFacade;
-import com.bytechef.automation.configuration.service.PermissionService;
-import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
-import com.bytechef.automation.configuration.service.ProjectService;
-import com.bytechef.automation.configuration.service.ProjectWorkflowService;
-import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.automation.configuration.audit.ConnectionAuditEvents;
@@ -25,30 +18,21 @@ import com.bytechef.ee.platform.resource.grant.service.ResourceGrantService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.Audited;
-import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
-import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.security.domain.ResourceVisibilityPolicyRegistry;
-import com.bytechef.platform.tag.service.TagService;
-import com.bytechef.platform.user.service.UserService;
-import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
-import java.util.Map;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * EE implementation of the workspace connection visibility and sharing operations. Extends the CE CRUD impl so the EE
- * bean satisfies both the CE base interface (REST/GraphQL CRUD consumers) and the EE sub-interface.
+ * EE implementation of the workspace connection visibility and sharing operations. The CRUD operations stay on the
+ * edition-neutral {@link com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade}; what EE adds to them
+ * is contributed through {@link WorkspaceConnectionGrantContributor}.
  *
  * <p>
  * Every sharing mutation here is owner-or-admin, and "admin" means a <em>workspace-wide</em> ADMIN role:
@@ -66,40 +50,28 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @ConditionalOnEEVersion
-@SuppressFBWarnings("NM")
-public class WorkspaceConnectionFacadeImpl
-    extends com.bytechef.automation.configuration.facade.WorkspaceConnectionFacadeImpl
-    implements WorkspaceConnectionSharingFacade {
+public class WorkspaceConnectionSharingFacadeImpl implements WorkspaceConnectionSharingFacade {
 
     private static final String CONNECTION = "Connection";
 
+    private final ConnectionService connectionService;
+    private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ResourceGrantService resourceGrantService;
     private final ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry;
+    private final WorkspaceConnectionService workspaceConnectionService;
     private final WorkspaceUserService workspaceUserService;
 
-    @SuppressFBWarnings({
-        "CT_CONSTRUCTOR_THROW", "EI", "EI2"
-    })
-    public WorkspaceConnectionFacadeImpl(
-        ConnectionFacade connectionFacade, ConnectionLifecycleFacade connectionLifecycleFacade,
-        ConnectionService connectionService, ObjectProvider<MeterRegistry> meterRegistryProvider,
-        PermissionService permissionService, ProjectDeploymentService projectDeploymentService,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
-        ProjectWorkflowService projectWorkflowService, ResourceGrantService resourceGrantService,
-        ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry,
-        ResourceVisibilityResolver resourceVisibilityResolver, TagService tagService, UserService userService,
-        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService,
-        WorkspaceConnectionService workspaceConnectionService, WorkspaceFacade workspaceFacade,
-        WorkspaceUserService workspaceUserService) {
+    @SuppressFBWarnings("EI")
+    public WorkspaceConnectionSharingFacadeImpl(
+        ConnectionService connectionService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        ResourceGrantService resourceGrantService, ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry,
+        WorkspaceConnectionService workspaceConnectionService, WorkspaceUserService workspaceUserService) {
 
-        super(
-            connectionFacade, connectionLifecycleFacade, connectionService, resourceVisibilityResolver,
-            meterRegistryProvider, permissionService, projectDeploymentService, projectDeploymentWorkflowService,
-            projectService, projectWorkflowService, tagService, userService, workflowService,
-            workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
-
+        this.connectionService = connectionService;
+        this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.resourceGrantService = resourceGrantService;
         this.resourceVisibilityPolicyRegistry = resourceVisibilityPolicyRegistry;
+        this.workspaceConnectionService = workspaceConnectionService;
         this.workspaceUserService = workspaceUserService;
     }
 
@@ -169,38 +141,6 @@ public class WorkspaceConnectionFacadeImpl
         validateConnectionBelongsToWorkspace(workspaceId, connectionId);
 
         return resourceGrantService.getGrantedUserIds(CONNECTION, connectionId);
-    }
-
-    @Override
-    @Audited(event = ConnectionAuditEvents.CONNECTION_CREATED, mapper = ConnectionAuditMapper.class)
-    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'CONNECTION_CREATE', #connectionDTO.environmentId)")
-    public long create(long workspaceId, ConnectionDTO connectionDTO) {
-        return super.create(workspaceId, connectionDTO);
-    }
-
-    @Override
-    @Audited(event = ConnectionAuditEvents.CONNECTION_DELETED, mapper = ConnectionAuditMapper.class)
-    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE') && " +
-        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
-    public void delete(long connectionId) {
-        resourceGrantService.deleteGrants(CONNECTION, connectionId);
-
-        super.delete(connectionId);
-    }
-
-    @Override
-    @Audited(event = ConnectionAuditEvents.CONNECTION_CREDENTIALS_UPDATED, mapper = ConnectionAuditMapper.class)
-    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') && " +
-        "isResourceOwner(#connectionId, 'Connection')")
-    public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
-        super.updateConnectionCredentials(connectionId, parameters, version);
-    }
-
-    @Override
-    protected List<Long> getSharedConnectionIds() {
-        return CollectionUtils.map(
-            connectionService.getConnectionsByVisibility(ResourceVisibility.ORGANIZATION, PlatformType.AUTOMATION),
-            Connection::getId);
     }
 
     private void validateConnectionBelongsToWorkspace(long workspaceId, long connectionId) {

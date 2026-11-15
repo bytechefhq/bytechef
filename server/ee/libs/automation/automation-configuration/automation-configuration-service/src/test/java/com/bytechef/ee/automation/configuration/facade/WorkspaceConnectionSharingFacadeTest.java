@@ -16,32 +16,18 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.WorkspaceConnection;
-import com.bytechef.automation.configuration.facade.WorkspaceFacade;
-import com.bytechef.automation.configuration.service.PermissionService;
-import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
-import com.bytechef.automation.configuration.service.ProjectService;
-import com.bytechef.automation.configuration.service.ProjectWorkflowService;
-import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.ee.automation.configuration.service.WorkspaceUserService;
 import com.bytechef.ee.platform.resource.grant.service.ResourceGrantService;
 import com.bytechef.exception.ConfigurationException;
-import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
-import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.security.domain.ResourceVisibilityPolicy;
 import com.bytechef.platform.security.domain.ResourceVisibilityPolicyRegistry;
-import com.bytechef.platform.tag.service.TagService;
-import com.bytechef.platform.user.service.UserService;
-import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
-import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -52,7 +38,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * Behavioural tests for connection visibility and sharing. The authorization gates themselves are enforced through the
@@ -65,14 +50,11 @@ import org.springframework.beans.factory.ObjectProvider;
  */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class WorkspaceConnectionFacadeTest {
+class WorkspaceConnectionSharingFacadeTest {
 
     private static final long CONNECTION_ID = 10L;
     private static final long GRANTEE_ID = 8L;
     private static final long WORKSPACE_ID = 1L;
-
-    @Mock
-    private ConnectionFacade connectionFacade;
 
     @Mock
     private ConnectionService connectionService;
@@ -89,15 +71,10 @@ class WorkspaceConnectionFacadeTest {
     @Mock
     private WorkspaceUserService workspaceUserService;
 
-    private WorkspaceConnectionFacadeImpl workspaceConnectionFacade;
+    private WorkspaceConnectionSharingFacadeImpl workspaceConnectionSharingFacade;
 
     @BeforeEach
-    @SuppressWarnings("unchecked")
     void setUp() {
-        ObjectProvider<MeterRegistry> meterRegistryProvider = mock(ObjectProvider.class);
-
-        when(meterRegistryProvider.getIfAvailable()).thenReturn(null);
-
         WorkspaceConnection workspaceConnection = mock(WorkspaceConnection.class);
 
         when(workspaceConnection.getConnectionId()).thenReturn(CONNECTION_ID);
@@ -106,30 +83,9 @@ class WorkspaceConnectionFacadeTest {
 
         when(workspaceUserService.isWorkspaceMember(GRANTEE_ID, WORKSPACE_ID)).thenReturn(true);
 
-        workspaceConnectionFacade = new WorkspaceConnectionFacadeImpl(
-            connectionFacade, mock(ConnectionLifecycleFacade.class), connectionService,
-            meterRegistryProvider, mock(PermissionService.class), mock(ProjectDeploymentService.class),
-            projectDeploymentWorkflowService, mock(ProjectService.class), mock(ProjectWorkflowService.class),
-            resourceGrantService,
-            connectionPolicyRegistry(), mock(ResourceVisibilityResolver.class), mock(TagService.class),
-            mock(UserService.class), mock(WorkflowService.class), mock(WorkflowTestConfigurationService.class),
-            workspaceConnectionService,
-            mock(WorkspaceFacade.class), workspaceUserService);
-    }
-
-    @Test
-    void testGetConnectionsListsOrganizationConnectionsInEveryWorkspace() {
-        Connection organizationConnection = new Connection();
-
-        organizationConnection.setId(20L);
-
-        when(connectionService.getConnectionsByVisibility(ResourceVisibility.ORGANIZATION, PlatformType.AUTOMATION))
-            .thenReturn(List.of(organizationConnection));
-
-        workspaceConnectionFacade.getConnections(WORKSPACE_ID, null, null, null, null);
-
-        verify(connectionFacade).getConnections(
-            null, null, List.of(CONNECTION_ID, 20L), null, null, PlatformType.AUTOMATION);
+        workspaceConnectionSharingFacade = new WorkspaceConnectionSharingFacadeImpl(
+            connectionService, projectDeploymentWorkflowService, resourceGrantService, connectionPolicyRegistry(),
+            workspaceConnectionService, workspaceUserService);
     }
 
     @Test
@@ -137,7 +93,7 @@ class WorkspaceConnectionFacadeTest {
         when(projectDeploymentWorkflowService.isConnectionUsed(CONNECTION_ID)).thenReturn(true);
 
         assertThatThrownBy(
-            () -> workspaceConnectionFacade.setConnectionVisibility(
+            () -> workspaceConnectionSharingFacade.setConnectionVisibility(
                 WORKSPACE_ID, CONNECTION_ID, ResourceVisibility.PRIVATE))
                     .isInstanceOf(ConfigurationException.class)
                     .hasMessageContaining("used by a deployment");
@@ -154,7 +110,8 @@ class WorkspaceConnectionFacadeTest {
 
         when(connectionService.fetchConnection(CONNECTION_ID)).thenReturn(Optional.of(connection));
 
-        workspaceConnectionFacade.setConnectionVisibility(WORKSPACE_ID, CONNECTION_ID, ResourceVisibility.PRIVATE);
+        workspaceConnectionSharingFacade.setConnectionVisibility(WORKSPACE_ID, CONNECTION_ID,
+            ResourceVisibility.PRIVATE);
 
         verify(resourceGrantService).deleteGrants("Connection", CONNECTION_ID);
         verify(connectionService).updateVisibility(CONNECTION_ID, ResourceVisibility.PRIVATE);
@@ -169,14 +126,16 @@ class WorkspaceConnectionFacadeTest {
 
         when(connectionService.fetchConnection(CONNECTION_ID)).thenReturn(Optional.of(connection));
 
-        workspaceConnectionFacade.setConnectionVisibility(WORKSPACE_ID, CONNECTION_ID, ResourceVisibility.PRIVATE);
+        workspaceConnectionSharingFacade.setConnectionVisibility(WORKSPACE_ID, CONNECTION_ID,
+            ResourceVisibility.PRIVATE);
 
         verify(resourceGrantService, never()).deleteGrants(anyString(), anyLong());
     }
 
     @Test
     void testWideningVisibilityDoesNotCheckDeploymentUsage() {
-        workspaceConnectionFacade.setConnectionVisibility(WORKSPACE_ID, CONNECTION_ID, ResourceVisibility.WORKSPACE);
+        workspaceConnectionSharingFacade.setConnectionVisibility(WORKSPACE_ID, CONNECTION_ID,
+            ResourceVisibility.WORKSPACE);
 
         // Widening can never strand a deployment, so the usage query — a real database round-trip — must not run.
         verify(projectDeploymentWorkflowService, never()).isConnectionUsed(anyLong());
@@ -186,7 +145,7 @@ class WorkspaceConnectionFacadeTest {
     @Test
     void testSetVisibilityBlockedWhenConnectionNotInWorkspace() {
         assertThatThrownBy(
-            () -> workspaceConnectionFacade.setConnectionVisibility(
+            () -> workspaceConnectionSharingFacade.setConnectionVisibility(
                 WORKSPACE_ID, 999L, ResourceVisibility.WORKSPACE))
                     .isInstanceOf(ConfigurationException.class)
                     .hasMessageContaining("does not belong to workspace");
@@ -195,7 +154,7 @@ class WorkspaceConnectionFacadeTest {
     @Test
     void testSetVisibilityRejectsOrganization() {
         assertThatThrownBy(
-            () -> workspaceConnectionFacade.setConnectionVisibility(
+            () -> workspaceConnectionSharingFacade.setConnectionVisibility(
                 WORKSPACE_ID, CONNECTION_ID, ResourceVisibility.ORGANIZATION))
                     .isInstanceOf(ConfigurationException.class)
                     .hasMessageContaining("organization connection facade");
@@ -206,7 +165,7 @@ class WorkspaceConnectionFacadeTest {
         when(workspaceUserService.isWorkspaceMember(99L, WORKSPACE_ID)).thenReturn(false);
 
         assertThatThrownBy(
-            () -> workspaceConnectionFacade.grantConnectionAccess(WORKSPACE_ID, CONNECTION_ID, 99L))
+            () -> workspaceConnectionSharingFacade.grantConnectionAccess(WORKSPACE_ID, CONNECTION_ID, 99L))
                 .isInstanceOf(ConfigurationException.class)
                 .satisfies(
                     exception -> assertThat(((ConfigurationException) exception).getErrorKey())
@@ -219,7 +178,7 @@ class WorkspaceConnectionFacadeTest {
 
     @Test
     void testGrantDelegatesToTheGrantService() {
-        workspaceConnectionFacade.grantConnectionAccess(WORKSPACE_ID, CONNECTION_ID, GRANTEE_ID);
+        workspaceConnectionSharingFacade.grantConnectionAccess(WORKSPACE_ID, CONNECTION_ID, GRANTEE_ID);
 
         verify(resourceGrantService).grant("Connection", CONNECTION_ID, GRANTEE_ID);
     }
@@ -229,25 +188,9 @@ class WorkspaceConnectionFacadeTest {
         when(workspaceUserService.isWorkspaceMember(GRANTEE_ID, WORKSPACE_ID)).thenReturn(false);
 
         // Someone removed from the workspace must still be revocable, otherwise their grant would be stranded.
-        workspaceConnectionFacade.revokeConnectionAccess(WORKSPACE_ID, CONNECTION_ID, GRANTEE_ID);
+        workspaceConnectionSharingFacade.revokeConnectionAccess(WORKSPACE_ID, CONNECTION_ID, GRANTEE_ID);
 
         verify(resourceGrantService).revoke("Connection", CONNECTION_ID, GRANTEE_ID);
-    }
-
-    @Test
-    void testDeletingAConnectionDeletesItsGrants() {
-        Connection connection = new Connection();
-
-        connection.setId(CONNECTION_ID);
-        connection.setType(PlatformType.AUTOMATION);
-
-        when(connectionService.getConnection(CONNECTION_ID)).thenReturn(connection);
-
-        workspaceConnectionFacade.delete(CONNECTION_ID);
-
-        // resource_id is polymorphic with no foreign key, so a grant left behind would attach to whatever later
-        // recycles this id.
-        verify(resourceGrantService).deleteGrants("Connection", CONNECTION_ID);
     }
 
     private static ResourceVisibilityPolicyRegistry connectionPolicyRegistry() {

@@ -19,6 +19,7 @@ import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacadeImpl;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -153,6 +154,7 @@ class WorkspaceConnectionAuditIntTest {
     void testUpdateConnectionCredentialsRecordsTheConnectionWithoutTheCredentials() {
         authenticate(AuthorityConstants.ADMIN);
 
+        when(permissionService.hasResourceScope(CONNECTION_ID, "Connection", "CONNECTION_EDIT")).thenReturn(true);
         when(permissionService.isTenantAdmin()).thenReturn(true);
 
         workspaceConnectionFacade.updateConnectionCredentials(CONNECTION_ID, Map.of("token", "secret-token"), 0);
@@ -212,8 +214,12 @@ class WorkspaceConnectionAuditIntTest {
             PermissionService permissionService,
             ObjectProvider<MethodSecurityExpressionContributor> methodSecurityExpressionContributorProvider) {
 
-            return new AutomationMethodSecurityExpressionHandler(
+            AutomationMethodSecurityExpressionHandler expressionHandler = new AutomationMethodSecurityExpressionHandler(
                 permissionService, methodSecurityExpressionContributorProvider);
+
+            expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
+
+            return expressionHandler;
         }
 
         @Bean
@@ -225,7 +231,7 @@ class WorkspaceConnectionAuditIntTest {
                 mock(ResourceVisibilityResolver.class), mock(ObjectProvider.class), mock(PermissionService.class),
                 mock(ProjectDeploymentService.class), projectDeploymentWorkflowService, mock(ProjectService.class),
                 mock(ProjectWorkflowService.class), mock(TagService.class), mock(UserService.class),
-                mock(WorkflowService.class), mock(WorkflowTestConfigurationService.class),
+                mock(WorkflowService.class), mock(WorkflowTestConfigurationService.class), mock(ObjectProvider.class),
                 mock(WorkspaceConnectionService.class), mock(WorkspaceFacade.class));
         }
     }
