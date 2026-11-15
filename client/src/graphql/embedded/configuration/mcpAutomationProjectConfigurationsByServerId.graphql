@@ -11,6 +11,7 @@ query mcpAutomationProjectConfigurationsByServerId($mcpServerId: ID!) {
         workflows {
             id
             workflowUuid
+            workflowId
             label
             parameters
             enabled
