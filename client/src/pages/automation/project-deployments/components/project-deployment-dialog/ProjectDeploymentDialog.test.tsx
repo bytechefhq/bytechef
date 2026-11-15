@@ -144,6 +144,48 @@ const renderNewDeploymentAndSave = async () => {
     return hoisted.createMutate.mock.calls[0][0] as ProjectDeployment;
 };
 
+const renderStoredDeploymentAndSave = async (changeProjectVersion: boolean) => {
+    render(
+        <MemoryRouter>
+            <TooltipProvider>
+                <ProjectDeploymentDialog
+                    changeProjectVersion={changeProjectVersion}
+                    projectDeployment={{
+                        id: 21,
+                        name: 'Gmail',
+                        projectDeploymentWorkflows: [
+                            {
+                                connections: [
+                                    {
+                                        connectionId: 7,
+                                        workflowConnectionKey: 'googleMail',
+                                        workflowNodeName: 'googleMail_1',
+                                    },
+                                ],
+                                enabled: true,
+                                workflowId: 'workflow-v0',
+                                workflowUuid: 'workflow-uuid',
+                            },
+                        ],
+                        projectId: 5,
+                        projectVersion: 1,
+                    }}
+                />
+            </TooltipProvider>
+        </MemoryRouter>
+    );
+
+    if (changeProjectVersion) {
+        await userEvent.click(await screen.findByRole('button', {name: 'Next'}));
+    }
+
+    await userEvent.click(await screen.findByRole('button', {name: 'Save'}));
+
+    await waitFor(() => expect(hoisted.updateMutate).toHaveBeenCalledTimes(1));
+
+    return hoisted.updateMutate.mock.calls[0][0] as ProjectDeployment;
+};
+
 beforeEach(() => {
     vi.clearAllMocks();
 
@@ -253,47 +295,43 @@ describe('ProjectDeploymentDialog', () => {
         ]);
     });
 
-    it('keeps a connection already stored on the deployment instead of the editor connection', async () => {
+    it('prefers the editor connection over the stored one when changing the project version', async () => {
         hoisted.connections = [{id: 7}, {id: 42}];
         hoisted.findTestConnectionId.mockReturnValue(42);
         hoisted.workflows = [gmailWorkflow];
 
-        render(
-            <MemoryRouter>
-                <TooltipProvider>
-                    <ProjectDeploymentDialog
-                        changeProjectVersion
-                        projectDeployment={{
-                            id: 21,
-                            name: 'Gmail',
-                            projectDeploymentWorkflows: [
-                                {
-                                    connections: [
-                                        {
-                                            connectionId: 7,
-                                            workflowConnectionKey: 'googleMail',
-                                            workflowNodeName: 'googleMail_1',
-                                        },
-                                    ],
-                                    enabled: true,
-                                    workflowId: 'workflow-v0',
-                                    workflowUuid: 'workflow-uuid',
-                                },
-                            ],
-                            projectId: 5,
-                            projectVersion: 1,
-                        }}
-                    />
-                </TooltipProvider>
-            </MemoryRouter>
-        );
+        const submittedDeployment = await renderStoredDeploymentAndSave(true);
 
-        await userEvent.click(await screen.findByRole('button', {name: 'Next'}));
-        await userEvent.click(await screen.findByRole('button', {name: 'Save'}));
+        expect(hoisted.findTestConnectionId).toHaveBeenCalledWith('workflow-uuid', 'googleMail_1', 'googleMail');
+        expect(submittedDeployment.projectDeploymentWorkflows).toEqual([
+            expect.objectContaining({
+                connections: [
+                    {connectionId: 42, workflowConnectionKey: 'googleMail', workflowNodeName: 'googleMail_1'},
+                ],
+            }),
+        ]);
+    });
 
-        await waitFor(() => expect(hoisted.updateMutate).toHaveBeenCalledTimes(1));
+    it('keeps the stored connection when the editor connection is not available in the deployment environment', async () => {
+        hoisted.connections = [{id: 7}];
+        hoisted.findTestConnectionId.mockReturnValue(42);
+        hoisted.workflows = [gmailWorkflow];
 
-        const submittedDeployment = hoisted.updateMutate.mock.calls[0][0] as ProjectDeployment;
+        const submittedDeployment = await renderStoredDeploymentAndSave(true);
+
+        expect(submittedDeployment.projectDeploymentWorkflows).toEqual([
+            expect.objectContaining({
+                connections: [{connectionId: 7, workflowConnectionKey: 'googleMail', workflowNodeName: 'googleMail_1'}],
+            }),
+        ]);
+    });
+
+    it('keeps the stored connection when editing a deployment without changing its version', async () => {
+        hoisted.connections = [{id: 7}, {id: 42}];
+        hoisted.findTestConnectionId.mockReturnValue(42);
+        hoisted.workflows = [gmailWorkflow];
+
+        const submittedDeployment = await renderStoredDeploymentAndSave(false);
 
         expect(hoisted.findTestConnectionId).not.toHaveBeenCalled();
         expect(submittedDeployment.projectDeploymentWorkflows).toEqual([

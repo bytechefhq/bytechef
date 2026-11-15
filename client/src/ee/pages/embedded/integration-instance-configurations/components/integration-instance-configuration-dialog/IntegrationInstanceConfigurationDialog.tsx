@@ -714,7 +714,10 @@ const IntegrationInstanceConfigurationDialog = ({
                 .filter((connection) => connection.componentName !== integration.componentName);
 
             componentConnections.forEach((componentConnection, connectionIndex) => {
-                if (integrationInstanceConfigurationWorkflow.connections?.[connectionIndex]?.connectionId != null) {
+                const storedConnectionId =
+                    integrationInstanceConfigurationWorkflow.connections?.[connectionIndex]?.connectionId;
+
+                if (storedConnectionId != null && !updateIntegrationVersion) {
                     return;
                 }
 
@@ -724,7 +727,7 @@ const IntegrationInstanceConfigurationDialog = ({
                     componentConnection.key
                 );
 
-                if (testConnectionId == null) {
+                if (testConnectionId == null || testConnectionId === storedConnectionId) {
                     return;
                 }
 
@@ -734,7 +737,7 @@ const IntegrationInstanceConfigurationDialog = ({
                 );
             });
         });
-    }, [getValues, integration, setValue, workflowTestConfigurationConnections, workflows]);
+    }, [getValues, integration, setValue, updateIntegrationVersion, workflowTestConfigurationConnections, workflows]);
 
     return (
         <Dialog

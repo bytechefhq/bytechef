@@ -912,8 +912,9 @@ describe('IntegrationInstanceConfigurationDialog', () => {
             workflowUuid: 'workflow-uuid',
         };
 
-        const renderUpgradeAndSave = async (
-            connections: {connectionId: number; workflowConnectionKey: string; workflowNodeName: string}[]
+        const renderAndSave = async (
+            connections: {connectionId: number; workflowConnectionKey: string; workflowNodeName: string}[],
+            updateIntegrationVersion = true
         ) => {
             const user = userEvent.setup();
 
@@ -934,11 +935,14 @@ describe('IntegrationInstanceConfigurationDialog', () => {
                         name: 'Existing',
                     }}
                     onClose={onClose}
-                    updateIntegrationVersion
+                    updateIntegrationVersion={updateIntegrationVersion}
                 />
             );
 
-            await user.click(screen.getByRole('button', {name: 'Next'}));
+            if (updateIntegrationVersion) {
+                await user.click(screen.getByRole('button', {name: 'Next'}));
+            }
+
             await user.click(await screen.findByRole('button', {name: 'Save'}));
 
             await waitFor(() => expect(hoisted.updateMutate).toHaveBeenCalledTimes(1));
@@ -949,7 +953,7 @@ describe('IntegrationInstanceConfigurationDialog', () => {
         it('should preselect the connection picked in the workflow editor Connection tab', async () => {
             hoisted.findTestConnectionId.mockReturnValue(42);
 
-            const submittedConfiguration = await renderUpgradeAndSave([]);
+            const submittedConfiguration = await renderAndSave([]);
 
             expect(hoisted.findTestConnectionId).toHaveBeenCalledWith('workflow-uuid', 'googleMail_1', 'googleMail');
             expect(hoisted.findTestConnectionId).not.toHaveBeenCalledWith(
@@ -965,12 +969,42 @@ describe('IntegrationInstanceConfigurationDialog', () => {
             ]);
         });
 
-        it('should keep a connection already stored on the configuration', async () => {
+        it('should prefer the editor connection over the stored one when upgrading the version', async () => {
             hoisted.findTestConnectionId.mockReturnValue(42);
 
-            const submittedConfiguration = await renderUpgradeAndSave([
+            const submittedConfiguration = await renderAndSave([
                 {connectionId: 7, workflowConnectionKey: 'googleMail', workflowNodeName: 'googleMail_1'},
             ]);
+
+            expect(hoisted.findTestConnectionId).toHaveBeenCalledWith('workflow-uuid', 'googleMail_1', 'googleMail');
+            expect(submittedConfiguration.integrationInstanceConfigurationWorkflows).toEqual([
+                expect.objectContaining({
+                    connections: [expect.objectContaining({connectionId: 42, workflowNodeName: 'googleMail_1'})],
+                }),
+            ]);
+        });
+
+        it('should keep the stored connection when the editor has no connection for it', async () => {
+            hoisted.findTestConnectionId.mockReturnValue(undefined);
+
+            const submittedConfiguration = await renderAndSave([
+                {connectionId: 7, workflowConnectionKey: 'googleMail', workflowNodeName: 'googleMail_1'},
+            ]);
+
+            expect(submittedConfiguration.integrationInstanceConfigurationWorkflows).toEqual([
+                expect.objectContaining({
+                    connections: [expect.objectContaining({connectionId: 7, workflowNodeName: 'googleMail_1'})],
+                }),
+            ]);
+        });
+
+        it('should keep the stored connection when editing a configuration without upgrading its version', async () => {
+            hoisted.findTestConnectionId.mockReturnValue(42);
+
+            const submittedConfiguration = await renderAndSave(
+                [{connectionId: 7, workflowConnectionKey: 'googleMail', workflowNodeName: 'googleMail_1'}],
+                false
+            );
 
             expect(hoisted.findTestConnectionId).not.toHaveBeenCalled();
             expect(submittedConfiguration.integrationInstanceConfigurationWorkflows).toEqual([
