@@ -7,6 +7,12 @@ query dataTables($environmentId: ID!, $workspaceId: ID!) {
             id
             name
             type
+            link {
+                targetDataTableId
+                targetDataTableName
+                onDelete
+                displayColumnName
+            }
         }
     }
 }

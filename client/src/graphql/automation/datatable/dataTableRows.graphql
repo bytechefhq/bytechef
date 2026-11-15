@@ -1,5 +1,5 @@
-query dataTableRows($environmentId: ID!, $tableId: ID!) {
-    dataTableRows(environmentId: $environmentId, tableId: $tableId) {
+query dataTableRows($environmentId: ID!, $tableId: ID!, $expand: [String!]) {
+    dataTableRows(environmentId: $environmentId, tableId: $tableId, expand: $expand) {
         id
         values
     }

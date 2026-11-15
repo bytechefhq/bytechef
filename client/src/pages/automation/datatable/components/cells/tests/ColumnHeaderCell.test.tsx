@@ -1,3 +1,4 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -39,6 +40,32 @@ describe('ColumnHeaderCell', () => {
             const columnNameSpan = screen.getByText('Test Column');
 
             expect(columnNameSpan).toHaveAttribute('title', 'Test Column');
+        });
+    });
+
+    describe('link columns', () => {
+        it('shows a link icon for link columns', async () => {
+            const user = userEvent.setup();
+
+            render(
+                <TooltipProvider>
+                    <ColumnHeaderCell {...defaultProps} linkTargetTableName="customers" />
+                </TooltipProvider>
+            );
+
+            const linkIcon = screen.getByRole('img', {name: 'Links to customers'});
+
+            expect(linkIcon).toBeInTheDocument();
+
+            await user.hover(linkIcon);
+
+            expect((await screen.findAllByText('customers')).length).toBeGreaterThan(0);
+        });
+
+        it('does not show a link icon for other columns', () => {
+            render(<ColumnHeaderCell {...defaultProps} />);
+
+            expect(screen.queryByRole('img')).not.toBeInTheDocument();
         });
     });
 

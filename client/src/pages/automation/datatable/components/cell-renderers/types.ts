@@ -9,3 +9,9 @@ export interface BooleanCellRendererProps {
     onToggle: (rowId: string, columnName: string, value: boolean) => void;
     setLocalRows: Dispatch<SetStateAction<GridRowType[]>>;
 }
+
+export interface LinkValueI {
+    externalId?: string | null;
+    id: string;
+    values?: Record<string, unknown> | null;
+}

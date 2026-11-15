@@ -1,4 +1,4 @@
-import {ColumnType} from '@/shared/middleware/graphql';
+import {ColumnType, LinkDeleteRule} from '@/shared/middleware/graphql';
 import {act, renderHook} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -7,6 +7,10 @@ const hoisted = vi.hoisted(() => {
         mockClearDialog: vi.fn(),
         mockMutate: vi.fn(),
         mockSetOpen: vi.fn(),
+        mockTables: [
+            {baseName: 'orders', columns: [], id: 'table-123'},
+            {baseName: 'customers', columns: [], id: '7'},
+        ],
         storeState: {
             open: false,
         },
@@ -49,6 +53,7 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
         useAddDataTableColumnMutation: () => ({
             mutate: hoisted.mockMutate,
         }),
+        useDataTablesQuery: () => ({data: {dataTables: hoisted.mockTables}}),
     };
 });
 
@@ -147,6 +152,38 @@ describe('useAddDataTableColumnDialog', () => {
                     tableId: 'table-123',
                 },
             });
+        });
+    });
+
+    describe('link columns', () => {
+        it('sends the link input with the column', () => {
+            const {result} = renderHook(() => useAddDataTableColumnDialog());
+
+            act(() => {
+                result.current.handleAdd('customer', ColumnType.Link, {
+                    displayColumnName: 'name',
+                    onDelete: LinkDeleteRule.Block,
+                    targetDataTableId: '7',
+                });
+            });
+
+            expect(hoisted.mockMutate).toHaveBeenCalledWith({
+                input: {
+                    column: {
+                        link: {displayColumnName: 'name', onDelete: 'BLOCK', targetDataTableId: '7'},
+                        name: 'customer',
+                        type: 'LINK',
+                    },
+                    environmentId: '2',
+                    tableId: 'table-123',
+                },
+            });
+        });
+
+        it('offers every table except the current one as a target', () => {
+            const {result} = renderHook(() => useAddDataTableColumnDialog());
+
+            expect(result.current.targetTables.map((table) => table.id)).toEqual(['7']);
         });
     });
 

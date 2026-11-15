@@ -1,0 +1,12 @@
+query dataTableLinkOptions($environmentId: ID!, $tableId: ID!, $columnName: String!, $search: String, $limit: Int) {
+    dataTableLinkOptions(
+        environmentId: $environmentId
+        tableId: $tableId
+        columnName: $columnName
+        search: $search
+        limit: $limit
+    ) {
+        id
+        label
+    }
+}

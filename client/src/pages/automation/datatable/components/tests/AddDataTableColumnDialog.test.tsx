@@ -8,6 +8,16 @@ const hoisted = vi.hoisted(() => {
         mockHandleAdd: vi.fn(),
         mockHandleOpenChange: vi.fn(),
         mockOpen: true,
+        mockTargetTables: [
+            {
+                baseName: 'customers',
+                columns: [
+                    {id: '1', name: 'name', type: 'STRING'},
+                    {id: '2', name: 'parent', type: 'LINK'},
+                ],
+                id: '7',
+            },
+        ],
     };
 });
 
@@ -16,11 +26,17 @@ vi.mock('../../hooks/useAddDataTableColumnDialog', () => ({
         handleAdd: hoisted.mockHandleAdd,
         handleOpenChange: hoisted.mockHandleOpenChange,
         open: hoisted.mockOpen,
+        targetTables: hoisted.mockTargetTables,
     }),
 }));
 
 beforeEach(() => {
     windowResizeObserver();
+
+    Element.prototype.hasPointerCapture = vi.fn().mockReturnValue(false);
+    Element.prototype.releasePointerCapture = vi.fn();
+    Element.prototype.setPointerCapture = vi.fn();
+
     hoisted.mockOpen = true;
 });
 
@@ -130,6 +146,87 @@ describe('AddDataTableColumnDialog', () => {
             await user.click(addButton);
 
             expect(hoisted.mockHandleAdd).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('link columns', () => {
+        const chooseOption = async (
+            user: ReturnType<typeof userEvent.setup>,
+            triggerName: string,
+            optionName: string
+        ) => {
+            await user.click(screen.getByRole('combobox', {name: triggerName}));
+            await user.click(await screen.findByRole('option', {name: optionName}));
+        };
+
+        it('shows target table, display column and delete rule when LINK is chosen', async () => {
+            const user = userEvent.setup();
+
+            render(<AddDataTableColumnDialog />);
+
+            expect(screen.queryByText('Target table')).not.toBeInTheDocument();
+
+            await user.click(screen.getByRole('combobox'));
+            await user.click(await screen.findByRole('option', {name: 'LINK'}));
+
+            expect(screen.getByRole('combobox', {name: 'Target table'})).toBeInTheDocument();
+            expect(screen.getByRole('combobox', {name: 'Display column'})).toBeInTheDocument();
+            expect(screen.getByRole('radio', {name: 'Prevent deleting linked rows'})).toBeChecked();
+            expect(screen.getByRole('radio', {name: 'Clear the link'})).not.toBeChecked();
+        });
+
+        it('sends the link input with BLOCK by default', async () => {
+            const user = userEvent.setup();
+
+            render(<AddDataTableColumnDialog />);
+
+            await user.type(screen.getByRole('textbox'), 'customer');
+
+            await chooseOption(user, 'Type', 'LINK');
+            await chooseOption(user, 'Target table', 'customers');
+            await chooseOption(user, 'Display column', 'name');
+
+            expect(screen.queryByRole('option', {name: 'parent'})).not.toBeInTheDocument();
+
+            await user.click(screen.getByRole('button', {name: 'Add'}));
+
+            expect(hoisted.mockHandleAdd).toHaveBeenCalledWith('customer', 'LINK', {
+                displayColumnName: 'name',
+                onDelete: 'BLOCK',
+                targetDataTableId: '7',
+            });
+        });
+
+        it('sends CLEAR when the clear rule is chosen', async () => {
+            const user = userEvent.setup();
+
+            render(<AddDataTableColumnDialog />);
+
+            await user.type(screen.getByRole('textbox'), 'customer');
+
+            await chooseOption(user, 'Type', 'LINK');
+            await chooseOption(user, 'Target table', 'customers');
+
+            await user.click(screen.getByRole('radio', {name: 'Clear the link'}));
+            await user.click(screen.getByRole('button', {name: 'Add'}));
+
+            expect(hoisted.mockHandleAdd).toHaveBeenCalledWith('customer', 'LINK', {
+                displayColumnName: undefined,
+                onDelete: 'CLEAR',
+                targetDataTableId: '7',
+            });
+        });
+
+        it('does not add a link column without a target table', async () => {
+            const user = userEvent.setup();
+
+            render(<AddDataTableColumnDialog />);
+
+            await user.type(screen.getByRole('textbox'), 'customer');
+
+            await chooseOption(user, 'Type', 'LINK');
+
+            expect(screen.getByRole('button', {name: 'Add'})).toBeDisabled();
         });
     });
 
