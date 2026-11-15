@@ -131,6 +131,8 @@ paths:
           description: "Deleted."
         "404":
           $ref: "#/components/responses/Error"
+        "409":
+          $ref: "#/components/responses/Error"
   /workspaces/{workspaceId}/data-tables/{name}/columns:
     post:
       description: "Add a column."
@@ -243,6 +245,17 @@ paths:
             type: "array"
             items:
               type: "string"
+        - name: "expand"
+          description: "Comma-separated link column names whose values are returned as the linked row object\
+            \ `{id, externalId, values}` instead of the linked row id. One level deep."
+          in: "query"
+          required: false
+          style: "form"
+          explode: false
+          schema:
+            type: "array"
+            items:
+              type: "string"
         - name: "pageNumber"
           description: "The zero-based page to return."
           in: "query"
@@ -333,6 +346,8 @@ paths:
           $ref: "#/components/responses/Error"
         "404":
           $ref: "#/components/responses/Error"
+        "409":
+          $ref: "#/components/responses/Error"
   /workspaces/{workspaceId}/data-tables/{name}/rows/{id}:
     get:
       summary: "Get a row"
@@ -344,6 +359,17 @@ paths:
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/RowId"
         - $ref: "#/components/parameters/XEnvironment"
+        - name: "expand"
+          description: "Comma-separated link column names whose values are returned as the linked row object\
+            \ `{id, externalId, values}` instead of the linked row id. One level deep."
+          in: "query"
+          required: false
+          style: "form"
+          explode: false
+          schema:
+            type: "array"
+            items:
+              type: "string"
       responses:
         "200":
           description: "The row."
@@ -351,6 +377,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DataTableRow"
+        "400":
+          $ref: "#/components/responses/Error"
         "404":
           $ref: "#/components/responses/Error"
     patch:
@@ -399,6 +427,8 @@ paths:
           description: "Deleted."
         "404":
           $ref: "#/components/responses/Error"
+        "409":
+          $ref: "#/components/responses/Error"
   /workspaces/{workspaceId}/data-tables/{name}/rows/by-external-id/{externalId}:
     get:
       summary: "Get a row by external id"
@@ -410,6 +440,17 @@ paths:
         - $ref: "#/components/parameters/TableName"
         - $ref: "#/components/parameters/ExternalId"
         - $ref: "#/components/parameters/XEnvironment"
+        - name: "expand"
+          description: "Comma-separated link column names whose values are returned as the linked row object\
+            \ `{id, externalId, values}` instead of the linked row id. One level deep."
+          in: "query"
+          required: false
+          style: "form"
+          explode: false
+          schema:
+            type: "array"
+            items:
+              type: "string"
       responses:
         "200":
           description: "The row."
@@ -417,6 +458,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DataTableRow"
+        "400":
+          $ref: "#/components/responses/Error"
         "404":
           $ref: "#/components/responses/Error"
     put:
@@ -471,6 +514,8 @@ paths:
           description: "Deleted."
         "404":
           $ref: "#/components/responses/Error"
+        "409":
+          $ref: "#/components/responses/Error"
   /workspaces/{workspaceId}/data-tables/{name}/rows/batch:
     post:
       description: "Insert or upsert up to 1000 rows in one transaction; one failure rolls back all of them.\
@@ -523,6 +568,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/ClearRowsResponse"
         "404":
+          $ref: "#/components/responses/Error"
+        "409":
           $ref: "#/components/responses/Error"
   /workspaces/{workspaceId}/data-tables/{name}/rows/import:
     post:
@@ -649,6 +696,7 @@ components:
         - "DATE"
         - "DATE_TIME"
         - "BOOLEAN"
+        - "LINK"
     CreateStrategy:
       description: "How a batch treats each row."
       type: "string"
@@ -673,10 +721,30 @@ components:
           description: "The stable machine-readable key. 100 DATA_TABLE_NOT_FOUND, 103 DATA_TABLE_NAME_INVALID,\
             \ 104 DATA_TABLE_ALREADY_EXISTS, 105 COLUMN_NOT_FOUND, 106 COLUMN_ALREADY_EXISTS, 107 COLUMN_NAME_INVALID,\
             \ 108 ROW_NOT_FOUND, 109 ROW_VALUE_INVALID, 110 ROW_EXTERNAL_ID_CONFLICT, 111 ROW_EXTERNAL_ID_REQUIRED,\
-            \ 112 FILTER_INVALID, 113 SORT_INVALID, 114 BATCH_TOO_LARGE, 115 CSV_INVALID, 116 STORAGE_LIMIT_EXCEEDED.\
-            \ Absent on schema-validation failures."
+            \ 112 FILTER_INVALID, 113 SORT_INVALID, 114 BATCH_TOO_LARGE, 115 CSV_INVALID, 116 STORAGE_LIMIT_EXCEEDED,\
+            \ 117 LINK_TARGET_INVALID, 118 LINK_DISPLAY_COLUMN_INVALID, 119 LINKED_ROW_NOT_FOUND (400), 120 ROW_STILL_LINKED\
+            \ (409). Absent on schema-validation failures."
           type: "integer"
         entityClass:
+          type: "string"
+    ColumnLink:
+      description: "A many-to-one link to the rows of another data table in the same workspace."
+      type: "object"
+      required:
+        - "targetDataTableId"
+      properties:
+        targetDataTableId:
+          type: "integer"
+          format: "int64"
+        onDelete:
+          description: "BLOCK refuses deleting a linked row; CLEAR empties the link."
+          type: "string"
+          default: "BLOCK"
+          enum:
+            - "BLOCK"
+            - "CLEAR"
+        displayColumnName:
+          description: "The target column shown for a linked row."
           type: "string"
     DataTableColumn:
       type: "object"
@@ -688,6 +756,8 @@ components:
           type: "string"
         type:
           $ref: "#/components/schemas/ColumnType"
+        link:
+          $ref: "#/components/schemas/ColumnLink"
     DataTable:
       type: "object"
       required:
@@ -761,6 +831,8 @@ components:
           pattern: "^[a-z_][a-z0-9_]*$"
         type:
           $ref: "#/components/schemas/ColumnType"
+        link:
+          $ref: "#/components/schemas/ColumnLink"
     RenameColumnRequest:
       type: "object"
       required:
@@ -780,7 +852,7 @@ components:
           type: "string"
         values:
           description: "Column name to value. STRING→string, NUMBER→number, INTEGER→integer, BOOLEAN→boolean,\
-            \ DATE→YYYY-MM-DD, DATE_TIME→ISO-8601 UTC."
+            \ DATE→YYYY-MM-DD, DATE_TIME→ISO-8601 UTC, LINK→the linked row id (or the linked row object when expanded)."
           type: "object"
           additionalProperties: true
     CreateRowRequest:
