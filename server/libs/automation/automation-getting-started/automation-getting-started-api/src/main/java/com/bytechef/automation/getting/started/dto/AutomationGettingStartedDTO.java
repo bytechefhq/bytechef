@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.dto;
+package com.bytechef.automation.getting.started.dto;
 
-import com.bytechef.atlas.execution.domain.Job;
-import java.time.Instant;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
-public record AutomationGettingStartedRunDTO(
-    long jobId, Job.Status status, Instant date, @Nullable String errorMessage, long projectDeploymentId,
-    @Nullable Boolean projectDeploymentEnabled) {
+public record AutomationGettingStartedDTO(
+    boolean completed, boolean deployed, @Nullable AutomationGettingStartedRunDTO firstRun, boolean httpClientAdded,
+    @Nullable AutomationGettingStartedRunDTO lastFailedRun, boolean live, boolean loggerAdded, boolean projectCreated,
+    boolean published, boolean workflowCreated) {
 }

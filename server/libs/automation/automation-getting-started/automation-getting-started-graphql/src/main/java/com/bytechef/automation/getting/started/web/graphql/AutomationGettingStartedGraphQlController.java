@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.web.graphql;
+package com.bytechef.automation.getting.started.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.automation.configuration.dto.AutomationGettingStartedDTO;
-import com.bytechef.automation.configuration.dto.AutomationGettingStartedRunDTO;
-import com.bytechef.automation.configuration.facade.AutomationGettingStartedFacade;
+import com.bytechef.automation.getting.started.dto.AutomationGettingStartedDTO;
+import com.bytechef.automation.getting.started.dto.AutomationGettingStartedRunDTO;
+import com.bytechef.automation.getting.started.facade.AutomationGettingStartedFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
@@ -50,13 +49,6 @@ public class AutomationGettingStartedGraphQlController {
     @QueryMapping
     public boolean automationGettingStartedCompleted(@Argument long workspaceId) {
         return automationGettingStartedFacade.isAutomationGettingStartedCompleted(workspaceId);
-    }
-
-    @MutationMapping
-    public boolean dismissAutomationGettingStarted(@Argument long workspaceId) {
-        automationGettingStartedFacade.dismissAutomationGettingStarted(workspaceId);
-
-        return true;
     }
 
     @SchemaMapping(typeName = "AutomationGettingStartedRun", field = "date")

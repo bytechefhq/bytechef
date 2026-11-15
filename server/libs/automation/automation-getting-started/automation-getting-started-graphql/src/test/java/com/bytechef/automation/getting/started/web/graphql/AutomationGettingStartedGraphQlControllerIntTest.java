@@ -14,31 +14,26 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.web.graphql;
+package com.bytechef.automation.getting.started.web.graphql;
 
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.automation.configuration.dto.AutomationGettingStartedDTO;
-import com.bytechef.automation.configuration.dto.AutomationGettingStartedRunDTO;
-import com.bytechef.automation.configuration.facade.AutomationGettingStartedFacade;
-import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlConfigurationSharedMocks;
-import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlTestConfiguration;
+import com.bytechef.automation.getting.started.dto.AutomationGettingStartedDTO;
+import com.bytechef.automation.getting.started.dto.AutomationGettingStartedRunDTO;
+import com.bytechef.automation.getting.started.facade.AutomationGettingStartedFacade;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
  */
-@ContextConfiguration(classes = {
-    AutomationConfigurationGraphQlTestConfiguration.class,
-    AutomationGettingStartedGraphQlController.class
-})
+@ContextConfiguration(classes = AutomationGettingStartedGraphQlController.class)
 @GraphQlTest(
     controllers = AutomationGettingStartedGraphQlController.class,
     properties = {
@@ -46,12 +41,11 @@ import org.springframework.test.context.ContextConfiguration;
         "spring.graphql.schema.inspection.enabled=false",
         "spring.graphql.schema.locations=classpath*:/graphql/"
     })
-@AutomationConfigurationGraphQlConfigurationSharedMocks
 class AutomationGettingStartedGraphQlControllerIntTest {
 
     private static final Instant RUN_DATE = Instant.parse("2026-11-11T10:15:30Z");
 
-    @Autowired
+    @MockitoBean
     private AutomationGettingStartedFacade automationGettingStartedFacade;
 
     @Autowired
@@ -188,21 +182,5 @@ class AutomationGettingStartedGraphQlControllerIntTest {
             .path("automationGettingStartedCompleted")
             .entity(Boolean.class)
             .isEqualTo(true);
-    }
-
-    @Test
-    void testDismissAutomationGettingStarted() {
-        graphQlTester
-            .document("""
-                mutation {
-                    dismissAutomationGettingStarted(workspaceId: 5)
-                }
-                """)
-            .execute()
-            .path("dismissAutomationGettingStarted")
-            .entity(Boolean.class)
-            .isEqualTo(true);
-
-        verify(automationGettingStartedFacade).dismissAutomationGettingStarted(5L);
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.facade;
+package com.bytechef.automation.getting.started.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
@@ -27,23 +27,19 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.dto.AutomationGettingStartedDTO;
-import com.bytechef.automation.configuration.dto.AutomationGettingStartedRunDTO;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.automation.getting.started.dto.AutomationGettingStartedDTO;
+import com.bytechef.automation.getting.started.dto.AutomationGettingStartedRunDTO;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.configuration.domain.Property;
-import com.bytechef.platform.configuration.domain.Property.Scope;
-import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -58,11 +54,9 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Ivica Cardic
  */
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class AutomationGettingStartedFacadeImpl implements AutomationGettingStartedFacade {
 
-    private static final String COMPLETION_TYPE = "completionType";
-    private static final String GETTING_STARTED = "gettingStarted";
     private static final String HTTP_CLIENT = "httpClient";
     private static final String HTTP_CLIENT_GET = "get";
     private static final String LOGGER = "logger";
@@ -73,7 +67,6 @@ public class AutomationGettingStartedFacadeImpl implements AutomationGettingStar
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
-    private final PropertyService propertyService;
     private final TaskExecutionService taskExecutionService;
     private final WorkflowService workflowService;
 
@@ -83,8 +76,8 @@ public class AutomationGettingStartedFacadeImpl implements AutomationGettingStar
         JobService jobService, PrincipalJobService principalJobService,
         ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
-        ProjectWorkflowService projectWorkflowService, PropertyService propertyService,
-        TaskExecutionService taskExecutionService, WorkflowService workflowService) {
+        ProjectWorkflowService projectWorkflowService, TaskExecutionService taskExecutionService,
+        WorkflowService workflowService) {
 
         this.jobService = jobService;
         this.principalJobService = principalJobService;
@@ -92,22 +85,13 @@ public class AutomationGettingStartedFacadeImpl implements AutomationGettingStar
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
-        this.propertyService = propertyService;
         this.taskExecutionService = taskExecutionService;
         this.workflowService = workflowService;
     }
 
     @Override
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'PROJECT_CREATE')")
-    public void dismissAutomationGettingStarted(long workspaceId) {
-        complete(CompletionType.DISMISSED);
-    }
-
-    @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'PROJECT_CREATE')")
     public AutomationGettingStartedDTO getAutomationGettingStarted(long workspaceId) {
-        boolean stored = isStored();
-
         List<ProjectDeployment> projectDeployments = getProjectDeployments();
 
         List<Long> projectDeploymentIds = getProjectDeploymentIds(projectDeployments);
@@ -117,8 +101,6 @@ public class AutomationGettingStartedFacadeImpl implements AutomationGettingStar
 
         if (firstRun == null) {
             lastFailedRun = fetchLatestRun(Job.Status.FAILED, projectDeploymentIds);
-        } else if (!stored) {
-            complete(CompletionType.COMPLETED);
         }
 
         List<Project> projects = projectService.getProjects(null, null, null, null, null, null);
@@ -142,7 +124,7 @@ public class AutomationGettingStartedFacadeImpl implements AutomationGettingStar
         lastFailedRun = hideRunDetailsOutsideWorkspace(lastFailedRun, workspaceProjectDeploymentIds);
 
         return new AutomationGettingStartedDTO(
-            stored || firstRun != null, !projectDeployments.isEmpty(), firstRun,
+            firstRun != null, !projectDeployments.isEmpty(), firstRun,
             hasTaskType(workflows, HTTP_CLIENT, HTTP_CLIENT_GET), lastFailedRun, isLive(projectDeployments),
             hasTaskType(workflows, LOGGER, null), !projects.isEmpty(), published, !projectWorkflows.isEmpty());
     }
@@ -150,34 +132,9 @@ public class AutomationGettingStartedFacadeImpl implements AutomationGettingStar
     @Override
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'PROJECT_CREATE')")
     public boolean isAutomationGettingStartedCompleted(long workspaceId) {
-        if (isStored()) {
-            return true;
-        }
-
         List<Long> projectDeploymentIds = getProjectDeploymentIds(getProjectDeployments());
 
-        AutomationGettingStartedRunDTO firstRun = fetchLatestRun(Job.Status.COMPLETED, projectDeploymentIds);
-
-        if (firstRun == null) {
-            return false;
-        }
-
-        complete(CompletionType.COMPLETED);
-
-        return true;
-    }
-
-    private void complete(CompletionType completionType) {
-        if (!isStored()) {
-            propertyService.save(
-                GETTING_STARTED, Map.of(COMPLETION_TYPE, completionType.name()), Scope.AUTOMATION, null);
-        }
-    }
-
-    private boolean isStored() {
-        List<Property> properties = propertyService.getProperties(List.of(GETTING_STARTED), Scope.AUTOMATION, null);
-
-        return !properties.isEmpty();
+        return fetchLatestRun(Job.Status.COMPLETED, projectDeploymentIds) != null;
     }
 
     private @Nullable AutomationGettingStartedRunDTO fetchLatestRun(
@@ -332,9 +289,5 @@ public class AutomationGettingStartedFacadeImpl implements AutomationGettingStar
         }
 
         return operationName == null || operationName.equals(typeParts[2]);
-    }
-
-    private enum CompletionType {
-        COMPLETED, DISMISSED
     }
 }

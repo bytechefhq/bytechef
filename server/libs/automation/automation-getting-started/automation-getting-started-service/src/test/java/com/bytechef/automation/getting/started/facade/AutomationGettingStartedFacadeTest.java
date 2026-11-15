@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.facade;
+package com.bytechef.automation.getting.started.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,23 +37,19 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.dto.AutomationGettingStartedDTO;
-import com.bytechef.automation.configuration.dto.AutomationGettingStartedRunDTO;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.automation.getting.started.dto.AutomationGettingStartedDTO;
+import com.bytechef.automation.getting.started.dto.AutomationGettingStartedRunDTO;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.configuration.domain.Property;
-import com.bytechef.platform.configuration.domain.Property.Scope;
-import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,7 +72,6 @@ class AutomationGettingStartedFacadeTest {
     private ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private ProjectService projectService;
     private ProjectWorkflowService projectWorkflowService;
-    private PropertyService propertyService;
     private TaskExecutionService taskExecutionService;
     private WorkflowService workflowService;
 
@@ -88,16 +83,12 @@ class AutomationGettingStartedFacadeTest {
         projectDeploymentWorkflowService = mock(ProjectDeploymentWorkflowService.class);
         projectService = mock(ProjectService.class);
         projectWorkflowService = mock(ProjectWorkflowService.class);
-        propertyService = mock(PropertyService.class);
         taskExecutionService = mock(TaskExecutionService.class);
         workflowService = mock(WorkflowService.class);
 
         automationGettingStartedFacade = new AutomationGettingStartedFacadeImpl(
             jobService, principalJobService, projectDeploymentService, projectDeploymentWorkflowService,
-            projectService, projectWorkflowService, propertyService, taskExecutionService, workflowService);
-
-        when(propertyService.getProperties(List.of("gettingStarted"), Scope.AUTOMATION, null))
-            .thenReturn(List.of());
+            projectService, projectWorkflowService, taskExecutionService, workflowService);
     }
 
     @Test
@@ -127,7 +118,6 @@ class AutomationGettingStartedFacadeTest {
             .projectDeploymentEnabled()).isTrue();
         assertThat(automationGettingStartedDTO.completed()).isTrue();
 
-        verify(propertyService).save("gettingStarted", Map.of("completionType", "COMPLETED"), Scope.AUTOMATION, null);
         verify(principalJobService).getJobIds(
             eq(Job.Status.COMPLETED), any(), any(), eq(List.of(10L, 20L)), eq(PlatformType.AUTOMATION), eq(List.of()),
             eq(true), eq(0));
@@ -186,8 +176,6 @@ class AutomationGettingStartedFacadeTest {
         assertThat(automationGettingStartedDTO.lastFailedRun()
             .errorMessage()).isEqualTo("boom");
         assertThat(automationGettingStartedDTO.completed()).isFalse();
-
-        verify(propertyService, never()).save(any(), any(), any(), any());
     }
 
     @Test
@@ -273,22 +261,10 @@ class AutomationGettingStartedFacadeTest {
         assertThat(automationGettingStartedDTO.deployed()).isFalse();
         assertThat(automationGettingStartedDTO.live()).isFalse();
         assertThat(automationGettingStartedFacade.isAutomationGettingStartedCompleted(WORKSPACE_ID)).isFalse();
-
-        verify(propertyService, never()).save(any(), any(), any(), any());
     }
 
     @Test
-    void testCompletedFlagUsesStoredRowWithoutQuerying() {
-        when(propertyService.getProperties(List.of("gettingStarted"), Scope.AUTOMATION, null))
-            .thenReturn(List.of(new Property()));
-
-        assertThat(automationGettingStartedFacade.isAutomationGettingStartedCompleted(WORKSPACE_ID)).isTrue();
-
-        verifyNoInteractions(projectDeploymentService);
-    }
-
-    @Test
-    void testCompletedFlagEvaluatesAndPersists() {
+    void testCompletedFlagEvaluatesLiveState() {
         ProjectDeployment projectDeployment = deployment(10L, true);
 
         when(projectDeploymentService.getProjectDeployments(false, Environment.DEVELOPMENT, null, null, null))
@@ -298,15 +274,6 @@ class AutomationGettingStartedFacadeTest {
         mockJobs(Job.Status.COMPLETED, 100L, 10L, null);
 
         assertThat(automationGettingStartedFacade.isAutomationGettingStartedCompleted(WORKSPACE_ID)).isTrue();
-
-        verify(propertyService).save("gettingStarted", Map.of("completionType", "COMPLETED"), Scope.AUTOMATION, null);
-    }
-
-    @Test
-    void testDismissStoresDismissed() {
-        automationGettingStartedFacade.dismissAutomationGettingStarted(WORKSPACE_ID);
-
-        verify(propertyService).save("gettingStarted", Map.of("completionType", "DISMISSED"), Scope.AUTOMATION, null);
     }
 
     @Test
@@ -524,22 +491,6 @@ class AutomationGettingStartedFacadeTest {
         mockJobs(Job.Status.COMPLETED, 100L, 10L, null);
 
         assertThat(automationGettingStartedFacade.isAutomationGettingStartedCompleted(OTHER_WORKSPACE_ID)).isTrue();
-
-        verify(propertyService).save("gettingStarted", Map.of("completionType", "COMPLETED"), Scope.AUTOMATION, null);
-    }
-
-    @Test
-    void testDismissInOneWorkspaceCompletesEveryWorkspace() {
-        automationGettingStartedFacade.dismissAutomationGettingStarted(WORKSPACE_ID);
-
-        verify(propertyService).save("gettingStarted", Map.of("completionType", "DISMISSED"), Scope.AUTOMATION, null);
-
-        when(propertyService.getProperties(List.of("gettingStarted"), Scope.AUTOMATION, null))
-            .thenReturn(List.of(new Property()));
-
-        assertThat(automationGettingStartedFacade.isAutomationGettingStartedCompleted(OTHER_WORKSPACE_ID)).isTrue();
-        assertThat(automationGettingStartedFacade.getAutomationGettingStarted(OTHER_WORKSPACE_ID)
-            .completed()).isTrue();
     }
 
     private static ProjectDeployment deployment(long id, boolean enabled) {

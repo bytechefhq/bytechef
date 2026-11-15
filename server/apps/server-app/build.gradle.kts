@@ -136,6 +136,8 @@ dependencies {
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-instance-impl"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-rest:automation-configuration-rest-impl"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
+    implementation(project(":server:libs:automation:automation-getting-started:automation-getting-started-graphql"))
+    implementation(project(":server:libs:automation:automation-getting-started:automation-getting-started-service"))
     implementation(project(":server:libs:automation:automation-connection:automation-connection-service"))
     implementation(project(":server:libs:automation:automation-data-table:automation-data-table-graphql"))
     implementation(project(":server:libs:automation:automation-data-table:automation-data-table-service"))

@@ -3,10 +3,6 @@ extend type Query {
     automationGettingStartedCompleted(workspaceId: ID!): Boolean!
 }
 
-extend type Mutation {
-    dismissAutomationGettingStarted(workspaceId: ID!): Boolean
-}
-
 type AutomationGettingStarted {
     completed: Boolean!
     deployed: Boolean!

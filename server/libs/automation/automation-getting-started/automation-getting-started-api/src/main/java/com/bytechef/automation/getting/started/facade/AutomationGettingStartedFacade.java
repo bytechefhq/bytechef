@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.facade;
+package com.bytechef.automation.getting.started.facade;
 
-import com.bytechef.automation.configuration.dto.AutomationGettingStartedDTO;
+import com.bytechef.automation.getting.started.dto.AutomationGettingStartedDTO;
 
 /**
  * @author Ivica Cardic
  */
 public interface AutomationGettingStartedFacade {
-
-    void dismissAutomationGettingStarted(long workspaceId);
 
     AutomationGettingStartedDTO getAutomationGettingStarted(long workspaceId);
 
