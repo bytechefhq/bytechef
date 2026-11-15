@@ -9,6 +9,7 @@ import {
     useAutomationProjectConfigurationsQuery,
     useAutomationProjectsQuery,
     useCreateMcpAutomationProjectConfigurationMutation,
+    useMcpAutomationProjectConfigurationToolWorkflowUuidsQuery,
     useUpdateMcpAutomationProjectConfigurationMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
@@ -62,6 +63,11 @@ const McpAutomationProjectConfigurationDialog = ({
         {enabled: !!projectId}
     );
 
+    const {data: toolWorkflowUuidsData} = useMcpAutomationProjectConfigurationToolWorkflowUuidsQuery(
+        {automationProjectConfigurationId: configurationId ?? '0'},
+        {enabled: !!configurationId}
+    );
+
     const projects = useMemo(
         () =>
             (projectsData?.automationProjects ?? []).filter(
@@ -80,13 +86,17 @@ const McpAutomationProjectConfigurationDialog = ({
 
     const selectedConfiguration = configurations.find((configuration) => configuration.id === configurationId);
 
-    const workflows = useMemo(
-        () =>
-            selectedConfiguration?.workflows.map(
-                (workflow) => ({id: workflow.workflowUuid, label: workflow.label}) as Workflow
-            ),
-        [selectedConfiguration]
-    );
+    const workflows = useMemo(() => {
+        if (!selectedConfiguration || !toolWorkflowUuidsData) {
+            return undefined;
+        }
+
+        const toolWorkflowUuids = new Set(toolWorkflowUuidsData.mcpAutomationProjectConfigurationToolWorkflowUuids);
+
+        return selectedConfiguration.workflows
+            .filter((workflow) => toolWorkflowUuids.has(workflow.workflowUuid))
+            .map((workflow) => ({id: workflow.workflowUuid, label: workflow.label}) as Workflow);
+    }, [selectedConfiguration, toolWorkflowUuidsData]);
 
     const enabledWorkflowUuids = useMemo(
         () =>
@@ -228,7 +238,7 @@ const McpAutomationProjectConfigurationDialog = ({
                 icon={<ServerIcon />}
                 isEditMode={isEditMode}
                 isSubmitPending={createMutation.isPending || updateMutation.isPending}
-                noEligibleWorkflowsMessage="This automation configuration has no workflows. Only workflows with a New Workflow Call trigger can be added to an MCP server."
+                noEligibleWorkflowsMessage="This automation configuration has no workflows that can become tools. Only workflows that are turned on and have a New Workflow Call trigger can be added to an MCP server."
                 onComplete={handleComplete}
                 selectedWorkflowIds={selectedWorkflowUuids}
                 title={isEditMode ? 'Edit Automation Workflows' : 'Add Automation Workflows'}

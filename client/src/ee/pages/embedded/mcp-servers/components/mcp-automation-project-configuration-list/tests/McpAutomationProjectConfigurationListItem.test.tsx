@@ -14,6 +14,7 @@ const item = {
     id: 'm1',
     mcpServerId: 's1',
     projectId: '10',
+    projectName: 'Onboarding',
     projectVersion: 2,
     workflows: [
         {available: true, enabled: true, id: 'w1', label: 'Workflow One', parameters: null, workflowUuid: 'uuid-1'},
@@ -25,6 +26,7 @@ describe('McpAutomationProjectConfigurationListItem', () => {
     it('listItemMarksUnavailableWorkflow', async () => {
         render(<McpAutomationProjectConfigurationListItem mcpAutomationProjectConfiguration={item} />);
 
+        expect(screen.getByText('Onboarding')).toBeInTheDocument();
         expect(screen.getByText('Production config')).toBeInTheDocument();
 
         await userEvent.click(screen.getByRole('button', {name: 'Expand automation'}));

@@ -37,8 +37,12 @@ const McpAutomationProjectConfigurationListItem = ({
 
                     <WorkflowIcon className="size-6 shrink-0 text-content-neutral-secondary" />
 
-                    <span className="min-w-0 flex-1 truncate text-sm font-medium">
-                        {mcpAutomationProjectConfiguration.automationProjectConfigurationName}
+                    <span className="min-w-0 flex-1 truncate text-sm">
+                        <span className="font-medium">{mcpAutomationProjectConfiguration.projectName}</span>
+
+                        <span className="ml-2 text-xs text-content-neutral-secondary">
+                            {mcpAutomationProjectConfiguration.automationProjectConfigurationName}
+                        </span>
                     </span>
 
                     <Badge

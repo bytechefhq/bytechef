@@ -3,7 +3,12 @@ import McpComponentDialog from '@/ee/pages/embedded/mcp-servers/components/mcp-c
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import McpServerCollapsibleItem from '@/shared/components/mcp-server/McpServerCollapsibleItem';
 import McpServerConfigurationCode from '@/shared/components/mcp-server/McpServerConfigurationCode';
-import {McpServer, Tag, useMcpIntegrationInstanceConfigurationsByServerIdQuery} from '@/shared/middleware/graphql';
+import {
+    McpServer,
+    Tag,
+    useMcpAutomationProjectConfigurationsByServerIdQuery,
+    useMcpIntegrationInstanceConfigurationsByServerIdQuery,
+} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 
 import {McpIntegrationInstanceConfigurationWorkflowItemType} from '../mcp-integration-instance-configuration-list/hooks/useMcpIntegrationInstanceConfigurationList';
@@ -21,6 +26,10 @@ const McpServerListItemWithWorkflows = ({mcpServer, tags}: {mcpServer: McpServer
         mcpServerId: mcpServer.id!,
     });
 
+    const {data: mcpAutomationProjectConfigurationsData} = useMcpAutomationProjectConfigurationsByServerIdQuery({
+        mcpServerId: mcpServer.id!,
+    });
+
     const mcpIntegrationInstanceConfigurations =
         mcpIntegrationInstanceConfigurationsData?.mcpIntegrationInstanceConfigurationsByServerId?.filter(
             (integration) => integration !== null
@@ -31,11 +40,19 @@ const McpServerListItemWithWorkflows = ({mcpServer, tags}: {mcpServer: McpServer
             .flatMap((integration) => integration?.mcpIntegrationInstanceConfigurationWorkflows || [])
             .filter((workflow): workflow is NonNullable<typeof workflow> => workflow !== null);
 
+    const mcpAutomationWorkflowCount = (
+        mcpAutomationProjectConfigurationsData?.mcpAutomationProjectConfigurationsByServerId ?? []
+    ).reduce(
+        (workflowCount, mcpAutomationProjectConfiguration) =>
+            workflowCount + mcpAutomationProjectConfiguration.workflows.length,
+        0
+    );
+
     return (
         <McpServerListItem
-            mcpIntegrationInstanceConfigurationWorkflows={mcpIntegrationInstanceConfigurationWorkflows}
             mcpServer={mcpServer}
             tags={tags}
+            workflowToolCount={mcpIntegrationInstanceConfigurationWorkflows.length + mcpAutomationWorkflowCount}
         />
     );
 };

@@ -9,6 +9,7 @@ import {McpAutomationProjectConfigurationItemType} from '../hooks/useMcpAutomati
 const hoisted = vi.hoisted(() => ({
     configurationsQuery: vi.fn(),
     createMutate: vi.fn(),
+    toolWorkflowUuidsQuery: vi.fn(),
     updateMutate: vi.fn(),
 }));
 
@@ -26,6 +27,7 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
             mutate: hoisted.createMutate,
             reset: vi.fn(),
         }),
+        useMcpAutomationProjectConfigurationToolWorkflowUuidsQuery: hoisted.toolWorkflowUuidsQuery,
         useUpdateMcpAutomationProjectConfigurationMutation: () => ({
             isPending: false,
             mutate: hoisted.updateMutate,
@@ -81,9 +83,13 @@ describe('McpAutomationProjectConfigurationDialog', () => {
     beforeEach(() => {
         hoisted.configurationsQuery.mockReset();
         hoisted.createMutate.mockReset();
+        hoisted.toolWorkflowUuidsQuery.mockReset();
         hoisted.updateMutate.mockReset();
         hoisted.configurationsQuery.mockReturnValue({
             data: {automationProjectConfigurations: configurations},
+        });
+        hoisted.toolWorkflowUuidsQuery.mockReturnValue({
+            data: {mcpAutomationProjectConfigurationToolWorkflowUuids: ['uuid-1', 'uuid-2']},
         });
 
         Element.prototype.scrollIntoView = vi.fn();
@@ -123,6 +129,27 @@ describe('McpAutomationProjectConfigurationDialog', () => {
         expect(await screen.findByText('Turned off in the configuration')).toBeInTheDocument();
         expect(screen.getByRole('switch', {name: 'Workflow Two'})).toBeDisabled();
         expect(screen.getByRole('switch', {name: 'Workflow One'})).toBeEnabled();
+    });
+
+    it('dialogListsOnlyWorkflowsWithWorkflowCallTrigger', async () => {
+        hoisted.toolWorkflowUuidsQuery.mockReturnValue({
+            data: {mcpAutomationProjectConfigurationToolWorkflowUuids: ['uuid-1']},
+        });
+
+        render(
+            <McpAutomationProjectConfigurationDialog
+                mcpAutomationProjectConfiguration={makeEditItem([])}
+                mcpServer={mcpServer}
+            />
+        );
+
+        expect(await screen.findByRole('switch', {name: 'Workflow One'})).toBeInTheDocument();
+        expect(screen.queryByRole('switch', {name: 'Workflow Two'})).not.toBeInTheDocument();
+
+        expect(hoisted.toolWorkflowUuidsQuery).toHaveBeenCalledWith(
+            {automationProjectConfigurationId: '100'},
+            expect.objectContaining({enabled: true})
+        );
     });
 
     it('dialogSubmitsSelectedWorkflowUuids', async () => {
