@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.configuration.dto;
+package com.bytechef.ee.embedded.getting.started.dto;
 
 import org.jspecify.annotations.Nullable;
 
@@ -18,7 +18,7 @@ public record EmbeddedGettingStartedDTO(
     boolean apiKeyCreated, boolean integrationCreated, boolean integrationHasWorkflows, boolean integrationPublished,
     boolean integrationConfigurationCreated, boolean integrationConfigurationEnabled, boolean testUserAdded,
     boolean testUserConnected, @Nullable String testUserExternalId, boolean firstCallMade,
-    @Nullable LastFailedCallDTO lastFailedCall, boolean completed, @Nullable String completionType,
+    @Nullable LastFailedCallDTO lastFailedCall, boolean completed,
     @Nullable Long integrationId, @Nullable Long integrationInstanceConfigurationId, @Nullable Long testUserId,
     @Nullable String componentName, @Nullable Integer componentVersion) {
 }
