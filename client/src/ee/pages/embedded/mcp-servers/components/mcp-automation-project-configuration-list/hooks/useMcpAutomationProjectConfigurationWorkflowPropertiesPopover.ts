@@ -43,7 +43,7 @@ const useMcpAutomationProjectConfigurationWorkflowPropertiesPopover = (
         [properties, workflow.parameters]
     );
 
-    const form = useForm({defaultValues});
+    const form = useForm<Record<string, unknown>>({defaultValues});
 
     const {control, formState, handleSubmit} = form;
 
