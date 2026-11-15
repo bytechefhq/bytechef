@@ -785,7 +785,7 @@ export type ColumnInput = {
 
 export type ColumnLinkInput = {
   displayColumnName?: InputMaybe<Scalars['String']['input']>;
-  onDelete: LinkDeleteRule;
+  onDelete?: InputMaybe<LinkDeleteRule>;
   targetDataTableId: Scalars['ID']['input'];
 };
 
