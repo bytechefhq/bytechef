@@ -21,9 +21,17 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
 import com.bytechef.automation.data.table.web.graphql.config.AutomationDataTableGraphQlTestConfiguration;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.domain.DataTableStorageUsage;
+import com.bytechef.platform.data.table.domain.LinkDeleteRule;
+import com.bytechef.platform.data.table.domain.LinkSpec;
+import java.time.Instant;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
@@ -51,8 +59,92 @@ class DataTableGraphQlControllerIntTest {
     @Autowired
     private GraphQlTester graphQlTester;
 
+    @Autowired
+    private EnvironmentService environmentService;
+
     @MockitoBean
     private WorkspaceDataTableFacade workspaceDataTableFacade;
+
+    @Test
+    void testAddDataTableColumnWithLink() {
+        when(environmentService.getEnvironment(1L)).thenReturn(Environment.DEVELOPMENT);
+
+        GraphQlTester.Response response = graphQlTester
+            .document("""
+                mutation {
+                    addDataTableColumn(input: {
+                        environmentId: 1, tableId: 5,
+                        column: {
+                            name: "customer", type: LINK,
+                            link: {targetDataTableId: 7, onDelete: CLEAR, displayColumnName: "name"}
+                        }
+                    })
+                }
+                """)
+            .execute();
+
+        response.path("addDataTableColumn")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(workspaceDataTableFacade).addColumn(
+            5L,
+            new ColumnSpec("customer", ColumnType.LINK, new LinkSpec(7L, LinkDeleteRule.CLEAR, "name")),
+            Environment.DEVELOPMENT.ordinal());
+    }
+
+    @Test
+    void testDataTablesExposeLinkColumns() {
+        when(environmentService.getEnvironment(1L)).thenReturn(Environment.DEVELOPMENT);
+        when(workspaceDataTableFacade.listTables(3L, Environment.DEVELOPMENT.ordinal()))
+            .thenReturn(List.of(
+                new DataTableInfo(
+                    7L, "customers", 3L, null, List.of(new ColumnSpec("name", ColumnType.STRING)), Instant.now()),
+                new DataTableInfo(
+                    5L, "orders", 3L, null,
+                    List.of(
+                        new ColumnSpec("title", ColumnType.STRING),
+                        new ColumnSpec("customer", ColumnType.LINK, new LinkSpec(7L, LinkDeleteRule.BLOCK, "name"))),
+                    Instant.now())));
+
+        GraphQlTester.Response response = graphQlTester
+            .document("""
+                query {
+                    dataTables(environmentId: 1, workspaceId: 3) {
+                        baseName
+                        columns {
+                            name
+                            type
+                            link {
+                                targetDataTableId
+                                targetDataTableName
+                                onDelete
+                                displayColumnName
+                            }
+                        }
+                    }
+                }
+                """)
+            .execute();
+
+        response.path("dataTables[1].columns[0].link")
+            .valueIsNull();
+        response.path("dataTables[1].columns[1].type")
+            .entity(String.class)
+            .isEqualTo("LINK");
+        response.path("dataTables[1].columns[1].link.targetDataTableId")
+            .entity(Long.class)
+            .isEqualTo(7L);
+        response.path("dataTables[1].columns[1].link.targetDataTableName")
+            .entity(String.class)
+            .isEqualTo("customers");
+        response.path("dataTables[1].columns[1].link.onDelete")
+            .entity(String.class)
+            .isEqualTo("BLOCK");
+        response.path("dataTables[1].columns[1].link.displayColumnName")
+            .entity(String.class)
+            .isEqualTo("name");
+    }
 
     @Test
     void testDataTableStorageUsage() {

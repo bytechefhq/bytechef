@@ -326,6 +326,9 @@ class DataTableRowServiceIntTest {
             findItemIds(List.of(filter("title", Operation.CONTAINS, "p")), null));
         assertEquals(List.of(), findItemIds(List.of(filter("title", Operation.CONTAINS, "P")), null));
         assertEquals(
+            List.of(itemIds.get(0), itemIds.get(1)),
+            findItemIds(List.of(filter("title", Operation.CONTAINS_IGNORE_CASE, "P")), null));
+        assertEquals(
             List.of(itemIds.get(2), itemIds.get(3), itemIds.get(4)),
             findItemIds(List.of(filter("title", Operation.NOT_CONTAINS, "p")), null));
         assertEquals(List.of(), findItemIds(List.of(filter("title", Operation.EQUALS, "banana")), null));
@@ -543,6 +546,9 @@ class DataTableRowServiceIntTest {
             "only supported on text columns",
             () -> findItemIds(List.of(filter("amount", Operation.CONTAINS, "1")), null));
         assertMessageContains(
+            "only supported on text columns",
+            () -> findItemIds(List.of(filter("amount", Operation.CONTAINS_IGNORE_CASE, "1")), null));
+        assertMessageContains(
             "requires a value", () -> findItemIds(List.of(filter("amount", Operation.EQUALS, null)), null));
         assertMessageContains(
             "requires exactly two values",
@@ -758,7 +764,7 @@ class DataTableRowServiceIntTest {
     void testFindRowsRejectsBlankValues() {
         for (Operation operation : List.of(
             Operation.EQUALS, Operation.EQUALS_IGNORE_CASE, Operation.NOT_EQUALS, Operation.CONTAINS,
-            Operation.NOT_CONTAINS, Operation.STARTS_WITH, Operation.ENDS_WITH)) {
+            Operation.CONTAINS_IGNORE_CASE, Operation.NOT_CONTAINS, Operation.STARTS_WITH, Operation.ENDS_WITH)) {
 
             assertMessageContains(
                 "requires a value", () -> findItemIds(List.of(filter("title", operation, "")), null));

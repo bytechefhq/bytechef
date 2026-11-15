@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.data.table.configuration.facade;
 
+import com.bytechef.automation.data.table.configuration.domain.DataTableLinkOption;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService.Webhook;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
@@ -61,6 +62,11 @@ public interface WorkspaceDataTableFacade {
     void renameTable(long dataTableId, String newName);
 
     List<DataTableRow> listRows(long dataTableId, int limit, int offset, long environmentId);
+
+    List<DataTableRow> listRows(long dataTableId, int limit, int offset, List<String> expand, long environmentId);
+
+    List<DataTableLinkOption> getLinkOptions(
+        long dataTableId, String columnName, @Nullable String search, int limit, long environmentId);
 
     DataTableRow insertRow(long dataTableId, Map<String, Object> values, long environmentId);
 

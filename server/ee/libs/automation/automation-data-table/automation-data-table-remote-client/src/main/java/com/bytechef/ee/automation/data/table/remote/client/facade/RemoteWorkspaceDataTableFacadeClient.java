@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.data.table.remote.client.facade;
 
+import com.bytechef.automation.data.table.configuration.domain.DataTableLinkOption;
 import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
@@ -81,6 +82,20 @@ public class RemoteWorkspaceDataTableFacadeClient implements WorkspaceDataTableF
 
     @Override
     public List<DataTableRow> listRows(long dataTableId, int limit, int offset, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<DataTableRow> listRows(
+        long dataTableId, int limit, int offset, List<String> expand, long environmentId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<DataTableLinkOption> getLinkOptions(
+        long dataTableId, String columnName, @Nullable String search, int limit, long environmentId) {
+
         throw new UnsupportedOperationException();
     }
 

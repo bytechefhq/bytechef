@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 import com.bytechef.automation.data.table.config.AutomationDataTableIntTestConfiguration;
+import com.bytechef.automation.data.table.configuration.domain.DataTableLinkOption;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
@@ -28,12 +29,16 @@ import com.bytechef.platform.data.table.configuration.exception.DataTableExcepti
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.LinkDeleteRule;
+import com.bytechef.platform.data.table.domain.LinkSpec;
 import com.bytechef.platform.data.table.exception.DataTableStorageLimitExceededException;
+import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import com.bytechef.platform.data.table.execution.service.DataTableStorageService;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
@@ -264,6 +269,95 @@ class WorkspaceDataTableFacadeIntTest {
             .containsExactly("events");
     }
 
+    @Test
+    void testLinkOptionsSearchDisplayColumnInIdOrder() {
+        long customersDataTableId = workspaceDataTableFacade.createTable(
+            "events", null, List.of(new ColumnSpec("name", ColumnType.STRING)), WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+        long ordersDataTableId = workspaceDataTableFacade.createTable(
+            "events_copy", null, List.of(new ColumnSpec("title", ColumnType.STRING)), WORKSPACE_ID,
+            DEV_ENVIRONMENT_ID);
+
+        workspaceDataTableFacade.addColumn(
+            ordersDataTableId,
+            new ColumnSpec("customer", ColumnType.LINK,
+                new LinkSpec(customersDataTableId, LinkDeleteRule.BLOCK, "name")),
+            DEV_ENVIRONMENT_ID);
+
+        DataTableRow banana = workspaceDataTableFacade.insertRow(
+            customersDataTableId, Map.of("name", "Banana"), DEV_ENVIRONMENT_ID);
+
+        workspaceDataTableFacade.insertRow(customersDataTableId, Map.of("name", "Cherry"), DEV_ENVIRONMENT_ID);
+
+        DataTableRow andrew = workspaceDataTableFacade.insertRow(
+            customersDataTableId, Map.of("name", "ANDREW"), DEV_ENVIRONMENT_ID);
+
+        assertThat(workspaceDataTableFacade.getLinkOptions(ordersDataTableId, "Customer", "an", 20, DEV_ENVIRONMENT_ID))
+            .containsExactly(
+                new DataTableLinkOption(banana.id(), "Banana"), new DataTableLinkOption(andrew.id(), "ANDREW"));
+        assertThat(workspaceDataTableFacade.getLinkOptions(ordersDataTableId, "customer", null, 2, DEV_ENVIRONMENT_ID))
+            .hasSize(2);
+        assertThat(workspaceDataTableFacade.getLinkOptions(ordersDataTableId, "customer", "", 0, DEV_ENVIRONMENT_ID))
+            .hasSize(3);
+    }
+
+    @Test
+    void testLinkOptionsWithoutDisplayColumnUseHashId() {
+        long customersDataTableId = workspaceDataTableFacade.createTable(
+            "events", null, List.of(new ColumnSpec("name", ColumnType.STRING)), WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+        long ordersDataTableId = workspaceDataTableFacade.createTable(
+            "events_copy", null, List.of(new ColumnSpec("title", ColumnType.STRING)), WORKSPACE_ID,
+            DEV_ENVIRONMENT_ID);
+
+        workspaceDataTableFacade.addColumn(
+            ordersDataTableId,
+            new ColumnSpec("customer", ColumnType.LINK, new LinkSpec(customersDataTableId, LinkDeleteRule.BLOCK, null)),
+            DEV_ENVIRONMENT_ID);
+
+        DataTableRow first = workspaceDataTableFacade.insertRow(
+            customersDataTableId, Map.of("name", "Ana"), DEV_ENVIRONMENT_ID);
+        DataTableRow second = workspaceDataTableFacade.insertRow(
+            customersDataTableId, Map.of("name", "Bob"), DEV_ENVIRONMENT_ID);
+
+        assertThat(
+            workspaceDataTableFacade.getLinkOptions(ordersDataTableId, "customer", "Ana", 20, DEV_ENVIRONMENT_ID))
+                .containsExactly(
+                    new DataTableLinkOption(first.id(), "#" + first.id()),
+                    new DataTableLinkOption(second.id(), "#" + second.id()));
+    }
+
+    @Test
+    void testLinkOptionsIgnoreSearchWhenDisplayColumnIsNotText() {
+        long customersDataTableId = workspaceDataTableFacade.createTable(
+            "events", null, List.of(new ColumnSpec("code", ColumnType.INTEGER)), WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+        long ordersDataTableId = workspaceDataTableFacade.createTable(
+            "events_copy", null, List.of(new ColumnSpec("title", ColumnType.STRING)), WORKSPACE_ID,
+            DEV_ENVIRONMENT_ID);
+
+        workspaceDataTableFacade.addColumn(
+            ordersDataTableId,
+            new ColumnSpec(
+                "customer", ColumnType.LINK, new LinkSpec(customersDataTableId, LinkDeleteRule.BLOCK, "code")),
+            DEV_ENVIRONMENT_ID);
+
+        DataTableRow first = workspaceDataTableFacade.insertRow(
+            customersDataTableId, Map.of("code", 10), DEV_ENVIRONMENT_ID);
+        DataTableRow second = workspaceDataTableFacade.insertRow(
+            customersDataTableId, Map.of("code", 20), DEV_ENVIRONMENT_ID);
+
+        assertThat(workspaceDataTableFacade.getLinkOptions(ordersDataTableId, "customer", "1", 20, DEV_ENVIRONMENT_ID))
+            .containsExactly(new DataTableLinkOption(first.id(), "10"), new DataTableLinkOption(second.id(), "20"));
+    }
+
+    @Test
+    void testLinkOptionsOfANonLinkColumnAreRejected() {
+        long dataTableId = workspaceDataTableFacade.createTable(
+            "events", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+
+        assertThatThrownBy(
+            () -> workspaceDataTableFacade.getLinkOptions(dataTableId, "title", null, 20, DEV_ENVIRONMENT_ID))
+                .isInstanceOf(DataTableException.class);
+    }
+
     private void limitStorageToLiveBytesPlus(long headroomBytes) {
         List<String> physicalTableNames = jdbcTemplate.queryForList(
             "SELECT tablename FROM pg_tables WHERE schemaname = current_schema() AND tablename LIKE 'dt\\_%' " +
@@ -297,6 +391,8 @@ class WorkspaceDataTableFacadeIntTest {
             .ifPresent(dataTables::add);
         dataTableService.fetchDataTable(null, "events_copy")
             .ifPresent(dataTables::add);
+
+        dataTables.sort(Comparator.comparing(DataTable::getId, Comparator.nullsFirst(Comparator.reverseOrder())));
 
         for (DataTable dataTable : dataTables) {
             dataTableService.dropTable(dataTable.getId(), DEV_ENVIRONMENT_ID);

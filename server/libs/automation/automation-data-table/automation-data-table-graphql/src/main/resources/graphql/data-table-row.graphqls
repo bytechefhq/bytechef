@@ -1,6 +1,7 @@
 extend type Query {
-    dataTableRows(environmentId: ID!, tableId: ID!): [DataTableRow!]!
-    dataTableRowsPage(environmentId: ID!, tableId: ID!, limit: Int, offset: Int): DataTableRowPage!
+    dataTableRows(environmentId: ID!, tableId: ID!, expand: [String!]): [DataTableRow!]!
+    dataTableRowsPage(environmentId: ID!, tableId: ID!, limit: Int, offset: Int, expand: [String!]): DataTableRowPage!
+    dataTableLinkOptions(environmentId: ID!, tableId: ID!, columnName: String!, search: String, limit: Int): [DataTableLinkOption!]!
     exportDataTableCsv(environmentId: ID!, tableId: ID!): String!
 }
 
@@ -14,6 +15,11 @@ extend type Mutation {
 type DataTableRow {
     id: ID!
     values: Map!
+}
+
+type DataTableLinkOption {
+    id: ID!
+    label: String!
 }
 
 type DataTableRowPage {
