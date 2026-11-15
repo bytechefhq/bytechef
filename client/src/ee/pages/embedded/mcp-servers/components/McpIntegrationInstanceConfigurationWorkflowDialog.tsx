@@ -248,7 +248,6 @@ const McpIntegrationInstanceConfigurationWorkflowDialog = ({
         </Form>
     );
 
-    // Pre-populate selected workflow IDs once eligible workflows load in edit mode
     useEffect(() => {
         if (isEditMode && initialSelectedWorkflowIds.length > 0 && selectedWorkflowIds.length === 0) {
             setValue('selectedWorkflowIds', initialSelectedWorkflowIds);

@@ -6,11 +6,6 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import McpIntegrationInstanceConfigurationWorkflowDialog from './McpIntegrationInstanceConfigurationWorkflowDialog';
 import {McpIntegrationInstanceConfigurationItemType} from './mcp-integration-instance-configuration-list/hooks/useMcpIntegrationInstanceConfigurationList';
 
-// ---------------------------------------------------------------------------
-// Hoisted mocks (must not reference outer-scope constants — vi.hoisted runs
-// before module initialisation)
-// ---------------------------------------------------------------------------
-
 const hoisted = vi.hoisted(() => ({
     createMutate: vi.fn(),
     eligibleResult: {data: undefined} as {data: unknown},
@@ -123,7 +118,6 @@ describe('McpIntegrationInstanceConfigurationWorkflowDialog', () => {
             />
         );
 
-        // Edit mode pre-populates the previously-selected workflow once eligible workflows load.
         await waitFor(() => expect(screen.getByRole('button', {name: 'Update'})).toBeEnabled());
 
         expect(screen.queryByText(/No tool-eligible workflows found/i)).not.toBeInTheDocument();
