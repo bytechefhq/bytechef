@@ -16,19 +16,25 @@
 
 package com.bytechef.platform.connection.security;
 
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Decides who may view or replace a connection's secret values: only the member who created the connection. Tenant
- * admins can still use, rename, tag and delete connections they did not create, but not read or replace their secrets.
+ * Decides who may view or replace a connection's secret values. Viewing is for the member who created the connection
+ * only; tenant admins can still use, rename, tag and delete connections they did not create, but not read their
+ * secrets. Replacing is for the creator or any tenant admin.
  *
  * @author Ivica Cardic
  */
 public final class ConnectionSecrets {
 
     private ConnectionSecrets() {
+    }
+
+    public static boolean canCurrentUserReplaceSecrets(@Nullable String createdBy) {
+        return isCurrentUserCreator(createdBy) || SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN);
     }
 
     public static boolean isCurrentUserCreator(@Nullable String createdBy) {

@@ -435,9 +435,10 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                 "Only the owning connected user can replace the credentials of connection " + connection.getId());
         }
 
-        if (!ConnectionSecrets.isCurrentUserCreator(connection.getCreatedBy())) {
+        if (!ConnectionSecrets.canCurrentUserReplaceSecrets(connection.getCreatedBy())) {
             throw new AccessDeniedException(
-                "Only the connection creator can replace the credentials of connection " + connection.getId());
+                "Only the connection creator or a tenant admin can replace the credentials of connection " +
+                    connection.getId());
         }
     }
 
