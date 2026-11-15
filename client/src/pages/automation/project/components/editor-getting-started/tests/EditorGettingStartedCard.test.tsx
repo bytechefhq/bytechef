@@ -1,4 +1,5 @@
 import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
+import {gettingStartedStore} from '@/shared/stores/useGettingStartedStore';
 import {act, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {MemoryRouter} from 'react-router-dom';
@@ -108,6 +109,8 @@ describe('EditorGettingStartedCard', () => {
         vi.clearAllMocks();
         localStorage.clear();
         useProjectDeploymentWorkflowSheetStore.setState({projectDeploymentWorkflowSheetOpen: false});
+
+        gettingStartedStore.setState({completions: {}});
         localStorage.setItem(
             'bytechef.automation-getting-started.guide-workflow',
             JSON.stringify({projectId: 5, projectWorkflowId: 7})
@@ -472,12 +475,13 @@ describe('EditorGettingStartedCard', () => {
         expect(mocks.invalidateQueries).toHaveBeenCalledWith({queryKey: ['automationGettingStarted']});
     });
 
-    it('invalidates the completed query once a first run appears', () => {
+    it('stores the completion once a first run appears', () => {
         mocks.deployments = [liveDeployment];
 
         const view = renderCard();
 
         expect(mocks.invalidateQueries).not.toHaveBeenCalled();
+        expect(gettingStartedStore.getState().completions.automation).toBeUndefined();
 
         mocks.status = {completed: false, firstRun: {projectDeploymentEnabled: true, projectDeploymentId: '9'}};
 
@@ -487,7 +491,7 @@ describe('EditorGettingStartedCard', () => {
             </MemoryRouter>
         );
 
-        expect(mocks.invalidateQueries).toHaveBeenCalledWith({queryKey: ['automationGettingStartedCompleted']});
+        expect(gettingStartedStore.getState().completions.automation).toBe('COMPLETED');
         expect(mocks.invalidateQueries).toHaveBeenCalledWith({queryKey: ['projectDeployments']});
         expect(mocks.invalidateQueries).toHaveBeenCalledWith({queryKey: ['automation_workflowExecutions']});
     });

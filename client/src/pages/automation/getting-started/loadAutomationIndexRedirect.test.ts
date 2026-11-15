@@ -4,6 +4,7 @@ import {WorkspaceKeys} from '@/shared/queries/automation/workspaces.queries';
 import {EditionType, applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
+import {gettingStartedStore} from '@/shared/stores/useGettingStartedStore';
 import {permissionStore} from '@/shared/stores/usePermissionStore';
 import {QueryClient} from '@tanstack/react-query';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -64,6 +65,7 @@ describe('loadAutomationIndexRedirect', () => {
         permissionStore.setState({workspaceScopeStates: {}});
         environmentStore.setState({currentEnvironmentId: ENVIRONMENT_ID});
         useWorkspaceStore.setState({currentWorkspaceId: WORKSPACE_ID});
+        gettingStartedStore.setState({completions: {}});
 
         applicationInfoStore.setState({application: {edition: EditionType.EE}});
     });
@@ -86,6 +88,25 @@ describe('loadAutomationIndexRedirect', () => {
                 queryKey: ['automationGettingStartedCompleted', {workspaceId: WORKSPACE_ID}],
             })
         );
+    });
+
+    it('lands on projects without asking the server when the browser stored a completion', async () => {
+        authenticationStore.setState({account: ADMIN_ACCOUNT, authenticated: true, sessionHasBeenFetched: true});
+        gettingStartedStore.setState({completions: {automation: 'DISMISSED'}});
+
+        const querySpy = mockQueries(queryClient);
+
+        await expect(loadAutomationIndexRedirect(queryClient)).resolves.toBe('projects');
+        expect(queryKeysOf(querySpy)).toEqual(['workspaces']);
+    });
+
+    it('stores the completion the server reports', async () => {
+        authenticationStore.setState({account: ADMIN_ACCOUNT, authenticated: true, sessionHasBeenFetched: true});
+
+        mockQueries(queryClient, {completed: true});
+
+        await expect(loadAutomationIndexRedirect(queryClient)).resolves.toBe('projects');
+        expect(gettingStartedStore.getState().completions.automation).toBe('COMPLETED');
     });
 
     it('lands on getting started for an editor whose scopes are fetched from an empty store', async () => {

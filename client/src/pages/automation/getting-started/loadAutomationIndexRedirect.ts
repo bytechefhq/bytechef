@@ -15,6 +15,7 @@ import {WorkspaceKeys} from '@/shared/queries/automation/workspaces.queries';
 import {EditionType, applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
+import {gettingStartedStore, isGettingStartedCompleted} from '@/shared/stores/useGettingStartedStore';
 import {permissionStore} from '@/shared/stores/usePermissionStore';
 import {QueryClient} from '@tanstack/react-query';
 
@@ -145,6 +146,10 @@ export default async function loadAutomationIndexRedirect(queryClient: QueryClie
         return resolveAutomationIndexRedirect({canEdit: false});
     }
 
+    if (isGettingStartedCompleted('automation')) {
+        return resolveAutomationIndexRedirect({canEdit, completed: true});
+    }
+
     try {
         const data = await queryClient.query({
             queryFn: fetcher<AutomationGettingStartedCompletedQuery, AutomationGettingStartedCompletedQueryVariables>(
@@ -153,6 +158,10 @@ export default async function loadAutomationIndexRedirect(queryClient: QueryClie
             ),
             queryKey: ['automationGettingStartedCompleted', {workspaceId: currentWorkspaceId}],
         });
+
+        if (data.automationGettingStartedCompleted) {
+            gettingStartedStore.getState().complete('automation', 'COMPLETED');
+        }
 
         return resolveAutomationIndexRedirect({canEdit, completed: data.automationGettingStartedCompleted});
     } catch {

@@ -20,6 +20,7 @@ import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects
 import {WorkflowExecutionKeys} from '@/shared/queries/automation/workflowExecutions.queries';
 import {useGetWorkflowNodeOutputQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {useGettingStartedStore} from '@/shared/stores/useGettingStartedStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
@@ -56,6 +57,7 @@ export default function useEditorGettingStarted({
     const completionInvalidatedRef = useRef(false);
     const progressSignatureRef = useRef<string | undefined>(undefined);
 
+    const completeGettingStarted = useGettingStartedStore((state) => state.complete);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const taskList = useWorkflowDataStore((state) => state.workflow.tasks);
@@ -162,11 +164,12 @@ export default function useEditorGettingStarted({
         if (queriesEnabled && incompleteAtLoad === true && firstRunExists && !completionInvalidatedRef.current) {
             completionInvalidatedRef.current = true;
 
-            void queryClient.invalidateQueries({queryKey: ['automationGettingStartedCompleted']});
+            completeGettingStarted('automation', 'COMPLETED');
+
             void queryClient.invalidateQueries({queryKey: ProjectDeploymentKeys.projectDeployments});
             void queryClient.invalidateQueries({queryKey: WorkflowExecutionKeys.workflowExecutions});
         }
-    }, [firstRunExists, incompleteAtLoad, queriesEnabled, queryClient]);
+    }, [completeGettingStarted, firstRunExists, incompleteAtLoad, queriesEnabled, queryClient]);
 
     useEffect(() => {
         setCollapsed(isEditorGuideCollapsed());

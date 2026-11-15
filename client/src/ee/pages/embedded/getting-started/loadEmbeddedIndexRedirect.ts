@@ -8,6 +8,7 @@ import {fetcher} from '@/shared/middleware/graphqlFetcher';
 import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
+import {gettingStartedStore, isGettingStartedCompleted} from '@/shared/stores/useGettingStartedStore';
 import {QueryClient} from '@tanstack/react-query';
 
 import resolveEmbeddedIndexRedirect, {EMBEDDED_DEFAULT_ROUTE_PATH} from './resolveEmbeddedIndexRedirect';
@@ -42,12 +43,20 @@ export default async function loadEmbeddedIndexRedirect(queryClient: QueryClient
         edition: application?.edition,
         environmentId: environmentStore.getState().currentEnvironmentId,
         fetchCompleted: async () => {
+            if (isGettingStartedCompleted('embedded')) {
+                return true;
+            }
+
             const data = await queryClient.query({
                 queryFn: fetcher<EmbeddedGettingStartedCompletedQuery, EmbeddedGettingStartedCompletedQueryVariables>(
                     EmbeddedGettingStartedCompletedDocument
                 ),
                 queryKey: ['embeddedGettingStartedCompleted'],
             });
+
+            if (data.embeddedGettingStartedCompleted) {
+                gettingStartedStore.getState().complete('embedded', 'COMPLETED');
+            }
 
             return data.embeddedGettingStartedCompleted;
         },
