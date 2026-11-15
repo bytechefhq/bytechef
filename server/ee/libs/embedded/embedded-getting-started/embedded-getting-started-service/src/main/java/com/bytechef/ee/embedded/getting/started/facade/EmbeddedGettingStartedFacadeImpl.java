@@ -75,13 +75,13 @@ public class EmbeddedGettingStartedFacadeImpl implements EmbeddedGettingStartedF
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('EMBEDDED_VIEW')")
     public EmbeddedGettingStartedDTO getEmbeddedGettingStarted() {
         return evaluate(Environment.DEVELOPMENT, getPublishedIntegrationIds());
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('EMBEDDED_VIEW')")
     public boolean isEmbeddedGettingStartedCompleted() {
         return isSetupComplete(Environment.DEVELOPMENT, getPublishedIntegrationIds());
     }

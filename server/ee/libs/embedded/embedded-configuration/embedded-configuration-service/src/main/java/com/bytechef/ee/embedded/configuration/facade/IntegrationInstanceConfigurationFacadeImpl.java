@@ -215,7 +215,10 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 key = "targetIntegrationInstanceConfigurationId", value = "#result?.targetConfigurationId"),
             @AuditData(key = "movedConnectedUserIds", value = "#result?.movedConnectedUserIds")
         })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#sourceId, 'IntegrationInstanceConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT') and (#targetId == null ? " +
+        "hasPermission(#sourceId, 'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_CREATE') : " +
+        "hasPermission(#targetId, 'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_EDIT'))")
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public ConfigurationMoveResultDTO changeConnectedUserVersion(
         long sourceId, long connectedUserId, int integrationVersion, @Nullable Long targetId) {
@@ -472,7 +475,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         @AuditData(key = "integrationVersion", value = "#integrationVersion"),
         @AuditData(key = "environment", value = "#environment")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScopeInEnvironment('INTEGRATION_INSTANCE_CONFIGURATION_CREATE', #environment) and " +
+        "hasEmbeddedScopeInEnvironment('INTEGRATION_INSTANCE_CONFIGURATION_EDIT', #environment)")
     public long enableIntegrationVersion(long integrationId, int integrationVersion, Environment environment) {
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
             integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(
@@ -869,7 +873,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_CONFIGURATION_CREDENTIALS_UPDATED, data = {
         @AuditData(key = "integrationInstanceConfigurationId", value = "#id")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public void updateIntegrationInstanceConfigurationCredentials(long id, Map<String, ?> parameters, int version) {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
             .getIntegrationInstanceConfiguration(id);

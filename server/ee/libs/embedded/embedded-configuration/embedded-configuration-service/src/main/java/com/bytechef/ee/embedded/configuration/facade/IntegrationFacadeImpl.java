@@ -48,6 +48,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -341,7 +342,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         @AuditData(key = "integrationId", value = "#id"),
         @AuditData(key = "integrationVersion", value = "#integrationVersion")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'Integration', 'WORKFLOW_EDIT')")
     public void restoreIntegrationVersion(long id, int integrationVersion) {
         Integration integration = integrationService.getIntegration(id);
 

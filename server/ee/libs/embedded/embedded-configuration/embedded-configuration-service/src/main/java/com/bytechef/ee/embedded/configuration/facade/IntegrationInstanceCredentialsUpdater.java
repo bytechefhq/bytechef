@@ -37,7 +37,7 @@ class IntegrationInstanceCredentialsUpdater {
         @AuditData(key = "connectionId", value = "#connectionId"),
         @AuditData(key = "connectedUserId", value = "#connectedUserId")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE')")
     void updateCredentials(
         long integrationInstanceId, long connectedUserId, long connectionId, Map<String, ?> parameters,
         int version) {
