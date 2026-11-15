@@ -279,6 +279,13 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
     }
 
     @Override
+    @Audited(
+        event = McpAutomationProjectConfigurationAuditEvents.MCP_AUTOMATION_PROJECT_CONFIGURATION_WORKFLOW_PARAMETERS_UPDATED,
+        data = {
+            @AuditData(key = "mcpAutomationProjectConfigurationWorkflowId", value = "#id"),
+            @AuditData(
+                key = "mcpAutomationProjectConfigurationId", value = "#result?.mcpAutomationProjectConfigurationId")
+        })
     @PreAuthorize("isTenantAdmin()")
     public McpAutomationProjectConfigurationWorkflow updateMcpAutomationProjectConfigurationWorkflowParameters(
         long id, Map<String, ?> parameters) {
