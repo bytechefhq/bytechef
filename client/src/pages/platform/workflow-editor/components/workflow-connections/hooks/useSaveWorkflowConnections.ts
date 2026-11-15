@@ -117,7 +117,7 @@ export default function useSaveWorkflowConnections({environmentId, workflowId}: 
 
             invalidateWorkflowValidation(queryClient);
 
-            queryClient.invalidateQueries({queryKey: ConnectionKeys.connections});
+            void queryClient.invalidateQueries({queryKey: ConnectionKeys.connections});
 
             await queryClient.invalidateQueries({
                 queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations,
