@@ -1603,6 +1603,13 @@ export type IntegrationWorkflowsByIntegrationIdQueryVariables = Exact<{
 
 export type IntegrationWorkflowsByIntegrationIdQuery = { integrationWorkflowsByIntegrationId: Array<{ id: string, label: string, description: string | null, integrationWorkflowId: string, workflowUuid: string | null, permissionExpression: string | null, workflowTaskComponentNames: Array<string>, workflowTriggerComponentNames: Array<string>, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any }> };
 
+export type McpAutomationProjectConfigurationToolWorkflowUuidsQueryVariables = Exact<{
+  automationProjectConfigurationId: string | number;
+}>;
+
+
+export type McpAutomationProjectConfigurationToolWorkflowUuidsQuery = { mcpAutomationProjectConfigurationToolWorkflowUuids: Array<string> };
+
 export type McpAutomationProjectConfigurationWorkflowPropertiesQueryVariables = Exact<{
   mcpAutomationProjectConfigurationWorkflowId: string | number;
 }>;
@@ -1628,7 +1635,7 @@ export type McpAutomationProjectConfigurationsByServerIdQueryVariables = Exact<{
 }>;
 
 
-export type McpAutomationProjectConfigurationsByServerIdQuery = { mcpAutomationProjectConfigurationsByServerId: Array<{ id: string, mcpServerId: string, automationProjectConfigurationId: string, automationProjectConfigurationName: string, automationProjectConfigurationEnabled: boolean, projectId: string, projectVersion: number, workflows: Array<{ id: string, workflowUuid: string, label: string | null, parameters: any, enabled: boolean, available: boolean }> }> };
+export type McpAutomationProjectConfigurationsByServerIdQuery = { mcpAutomationProjectConfigurationsByServerId: Array<{ id: string, mcpServerId: string, automationProjectConfigurationId: string, automationProjectConfigurationName: string, automationProjectConfigurationEnabled: boolean, projectId: string, projectName: string, projectVersion: number, workflows: Array<{ id: string, workflowUuid: string, label: string | null, parameters: any, enabled: boolean, available: boolean }> }> };
 
 export type McpComponentDefinitionsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -8410,6 +8417,30 @@ export const useIntegrationWorkflowsByIntegrationIdQuery = <
   }
     )};
 
+export const McpAutomationProjectConfigurationToolWorkflowUuidsDocument = new TypedDocumentString(`
+    query mcpAutomationProjectConfigurationToolWorkflowUuids($automationProjectConfigurationId: ID!) {
+  mcpAutomationProjectConfigurationToolWorkflowUuids(
+    automationProjectConfigurationId: $automationProjectConfigurationId
+  )
+}
+    `);
+
+export const useMcpAutomationProjectConfigurationToolWorkflowUuidsQuery = <
+      TData = McpAutomationProjectConfigurationToolWorkflowUuidsQuery,
+      TError = unknown
+    >(
+      variables: McpAutomationProjectConfigurationToolWorkflowUuidsQueryVariables,
+      options?: Omit<UseQueryOptions<McpAutomationProjectConfigurationToolWorkflowUuidsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpAutomationProjectConfigurationToolWorkflowUuidsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<McpAutomationProjectConfigurationToolWorkflowUuidsQuery, TError, TData>(
+      {
+    queryKey: ['mcpAutomationProjectConfigurationToolWorkflowUuids', variables],
+    queryFn: fetcher<McpAutomationProjectConfigurationToolWorkflowUuidsQuery, McpAutomationProjectConfigurationToolWorkflowUuidsQueryVariables>(McpAutomationProjectConfigurationToolWorkflowUuidsDocument, variables),
+    ...options
+  }
+    )};
+
 export const McpAutomationProjectConfigurationWorkflowPropertiesDocument = new TypedDocumentString(`
     query mcpAutomationProjectConfigurationWorkflowProperties($mcpAutomationProjectConfigurationWorkflowId: ID!) {
   mcpAutomationProjectConfigurationWorkflowProperties(
@@ -8491,6 +8522,7 @@ export const McpAutomationProjectConfigurationsByServerIdDocument = new TypedDoc
     automationProjectConfigurationName
     automationProjectConfigurationEnabled
     projectId
+    projectName
     projectVersion
     workflows {
       id
