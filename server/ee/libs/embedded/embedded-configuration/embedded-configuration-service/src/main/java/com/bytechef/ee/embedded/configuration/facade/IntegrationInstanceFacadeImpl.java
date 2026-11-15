@@ -24,6 +24,8 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionIntegrationInstanceWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionableIntegrationDTO;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -40,8 +42,10 @@ import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
@@ -50,6 +54,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -57,6 +62,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -69,6 +75,8 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade {
 
+    private final ConnectedUserConnectionFacade connectedUserConnectionFacade;
+    private final ObjectProvider<ConnectedUserIntegrationFacade> connectedUserIntegrationFacadeProvider;
     private final ObjectProvider<ConnectedUserIntegrationInstanceFacade> connectedUserIntegrationInstanceFacadeProvider;
     private final ConnectedUserService connectedUserService;
     private final Evaluator evaluator;
@@ -76,6 +84,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final IntegrationInstanceConnectionCleanup integrationInstanceConnectionCleanup;
+    private final IntegrationInstanceCredentialsUpdater integrationInstanceCredentialsUpdater;
     private final IntegrationInstanceDataStorageCleanup integrationInstanceDataStorageCleanup;
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
     private final IntegrationInstanceService integrationInstanceService;
@@ -89,12 +98,14 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
     @SuppressFBWarnings("EI")
     public IntegrationInstanceFacadeImpl(
-        ApplicationProperties applicationProperties,
+        ApplicationProperties applicationProperties, ConnectedUserConnectionFacade connectedUserConnectionFacade,
+        ObjectProvider<ConnectedUserIntegrationFacade> connectedUserIntegrationFacadeProvider,
         ObjectProvider<ConnectedUserIntegrationInstanceFacade> connectedUserIntegrationInstanceFacadeProvider,
         ConnectedUserService connectedUserService, Evaluator evaluator,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceConnectionCleanup integrationInstanceConnectionCleanup,
+        IntegrationInstanceCredentialsUpdater integrationInstanceCredentialsUpdater,
         IntegrationInstanceDataStorageCleanup integrationInstanceDataStorageCleanup,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
         IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
@@ -103,12 +114,15 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService) {
 
         this.componentConnectionFacade = componentConnectionFacade;
+        this.connectedUserConnectionFacade = connectedUserConnectionFacade;
+        this.connectedUserIntegrationFacadeProvider = connectedUserIntegrationFacadeProvider;
         this.connectedUserIntegrationInstanceFacadeProvider = connectedUserIntegrationInstanceFacadeProvider;
         this.connectedUserService = connectedUserService;
         this.evaluator = evaluator;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.integrationInstanceConnectionCleanup = integrationInstanceConnectionCleanup;
+        this.integrationInstanceCredentialsUpdater = integrationInstanceCredentialsUpdater;
         this.integrationInstanceDataStorageCleanup = integrationInstanceDataStorageCleanup;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.integrationInstanceService = integrationInstanceService;
@@ -269,6 +283,48 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
     @Override
     @PreAuthorize("isTenantAdmin()")
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public ConnectionDTO getIntegrationInstanceConnection(long integrationInstanceId) {
+        IntegrationInstance integrationInstance = requireProvisioned(integrationInstanceId);
+
+        long connectionId = integrationInstance.getConnectionId();
+
+        return connectedUserConnectionFacade
+            .getConnectedUserConnectionsForAdmin(
+                integrationInstance.getConnectedUserId(), null, List.of(connectionId))
+            .stream()
+            .findFirst()
+            .orElseThrow(() -> new NoSuchElementException(
+                "Integration instance id=%s not found".formatted(integrationInstanceId)));
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public List<ProvisionableIntegrationDTO> getProvisionableIntegrations(long connectedUserId) {
+        ConnectedUserIntegrationFacade connectedUserIntegrationFacade =
+            connectedUserIntegrationFacadeProvider.getObject();
+
+        return connectedUserIntegrationFacade.getProvisionableIntegrations(connectedUserId);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public long provisionIntegrationInstance(
+        long connectedUserId, long integrationInstanceConfigurationId, Map<String, Object> connectionParameters,
+        List<ProvisionIntegrationInstanceWorkflowDTO> workflows) {
+
+        ConnectedUserIntegrationFacade connectedUserIntegrationFacade =
+            connectedUserIntegrationFacadeProvider.getObject();
+
+        return connectedUserIntegrationFacade.provisionIntegrationInstance(
+            connectedUserId, integrationInstanceConfigurationId, connectionParameters, workflows,
+            SecurityUtils.getCurrentUserLogin());
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
     public void updateIntegrationInstanceConfigurationWorkflowTriggers(
         IntegrationInstanceConfigurationWorkflow previousIntegrationInstanceConfigurationWorkflow,
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
@@ -298,6 +354,19 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
             updatedIntegrationInstanceWorkflows.add(integrationInstanceWorkflow);
         }
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public void updateIntegrationInstanceCredentials(
+        long integrationInstanceId, Map<String, ?> parameters, int version) {
+
+        IntegrationInstance integrationInstance = requireProvisioned(integrationInstanceId);
+
+        integrationInstanceCredentialsUpdater.updateCredentials(
+            integrationInstanceId, integrationInstance.getConnectedUserId(), integrationInstance.getConnectionId(),
+            parameters, version);
     }
 
     @Override
@@ -336,6 +405,16 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         }
 
         integrationInstanceWorkflowService.update(integrationInstanceWorkflow);
+    }
+
+    private IntegrationInstance requireProvisioned(long integrationInstanceId) {
+        Optional<IntegrationInstance> integrationInstanceOptional = integrationInstanceService.fetchIntegrationInstance(
+            integrationInstanceId);
+
+        return integrationInstanceOptional
+            .filter(integrationInstance -> integrationInstance.getProvisionedBy() != null)
+            .orElseThrow(() -> new NoSuchElementException(
+                "Integration instance id=%s not found".formatted(integrationInstanceId)));
     }
 
     private void disableWorkflowTriggers(IntegrationInstanceWorkflow integrationInstanceWorkflow) {

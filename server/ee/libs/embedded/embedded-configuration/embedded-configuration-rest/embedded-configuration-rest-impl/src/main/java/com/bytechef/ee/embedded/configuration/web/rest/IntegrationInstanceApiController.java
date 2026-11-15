@@ -11,7 +11,6 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.ObfuscateUtils;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionIntegrationInstanceWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionableIntegrationDTO;
-import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceAdminFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectionModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel;
@@ -44,16 +43,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class IntegrationInstanceApiController implements IntegrationInstanceApi {
 
     private final ConversionService conversionService;
-    private final IntegrationInstanceAdminFacade integrationInstanceAdminFacade;
     private final IntegrationInstanceFacade integrationInstanceFacade;
 
     @SuppressFBWarnings("EI")
     public IntegrationInstanceApiController(
-        ConversionService conversionService, IntegrationInstanceAdminFacade integrationInstanceAdminFacade,
-        IntegrationInstanceFacade integrationInstanceFacade) {
+        ConversionService conversionService, IntegrationInstanceFacade integrationInstanceFacade) {
 
         this.conversionService = conversionService;
-        this.integrationInstanceAdminFacade = integrationInstanceAdminFacade;
         this.integrationInstanceFacade = integrationInstanceFacade;
     }
 
@@ -75,7 +71,7 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
 
     @Override
     public ResponseEntity<Void> enableIntegrationInstanceWorkflow(Long id, String workflowId, Boolean enable) {
-        integrationInstanceAdminFacade.enableIntegrationInstanceWorkflow(id, workflowId, enable);
+        integrationInstanceFacade.enableIntegrationInstanceWorkflow(id, workflowId, enable);
 
         return ResponseEntity.ok()
             .build();
@@ -92,7 +88,7 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
     public ResponseEntity<ConnectionModel> getIntegrationInstanceConnection(Long id) {
         ConnectionModel connectionModel = Validate.notNull(
             conversionService.convert(
-                integrationInstanceAdminFacade.getIntegrationInstanceConnection(Validate.notNull(id, "id")),
+                integrationInstanceFacade.getIntegrationInstanceConnection(Validate.notNull(id, "id")),
                 ConnectionModel.class),
             "connectionModel");
 
@@ -102,7 +98,7 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
     @Override
     public ResponseEntity<List<ProvisionableIntegrationModel>> getProvisionableIntegrations(Long connectedUserId) {
         return ResponseEntity.ok(
-            integrationInstanceAdminFacade.getProvisionableIntegrations(connectedUserId)
+            integrationInstanceFacade.getProvisionableIntegrations(connectedUserId)
                 .stream()
                 .map(this::toProvisionableIntegrationModel)
                 .toList());
@@ -129,7 +125,7 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
                 .toList();
 
         return ResponseEntity.ok(
-            integrationInstanceAdminFacade.provisionIntegrationInstance(
+            integrationInstanceFacade.provisionIntegrationInstance(
                 connectedUserId, provisionIntegrationInstanceRequestModel.getIntegrationInstanceConfigurationId(),
                 connectionParameters, workflows));
     }
@@ -138,7 +134,7 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
     public ResponseEntity<Void> updateIntegrationInstanceCredentials(
         Long id, UpdateConnectionCredentialsRequestModel updateConnectionCredentialsRequestModel) {
 
-        integrationInstanceAdminFacade.updateIntegrationInstanceCredentials(
+        integrationInstanceFacade.updateIntegrationInstanceCredentials(
             id, updateConnectionCredentialsRequestModel.getParameters(),
             Objects.requireNonNull(updateConnectionCredentialsRequestModel.getVersion()));
 

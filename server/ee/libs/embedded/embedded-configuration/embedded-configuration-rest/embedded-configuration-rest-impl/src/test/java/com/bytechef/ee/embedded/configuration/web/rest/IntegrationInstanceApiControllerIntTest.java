@@ -29,7 +29,6 @@ import com.bytechef.ee.embedded.configuration.dto.ProvisionableIntegrationDTO.Pr
 import com.bytechef.ee.embedded.configuration.facade.AppEventFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
-import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceAdminFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
@@ -114,9 +113,6 @@ class IntegrationInstanceApiControllerIntTest {
     private WorkflowService workflowService;
 
     @Autowired
-    private IntegrationInstanceAdminFacade integrationInstanceAdminFacade;
-
-    @Autowired
     private MockMvc mockMvc;
 
     private WebTestClient webTestClient;
@@ -132,7 +128,7 @@ class IntegrationInstanceApiControllerIntTest {
     void testGetIntegrationInstanceConnectionObfuscatesTheCredentials() {
         String rawToken = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGH";
 
-        when(integrationInstanceAdminFacade.getIntegrationInstanceConnection(7L))
+        when(integrationInstanceFacade.getIntegrationInstanceConnection(7L))
             .thenReturn(
                 ConnectionDTO.builder()
                     .authorizationParameters(Map.of("token", rawToken))
@@ -161,7 +157,7 @@ class IntegrationInstanceApiControllerIntTest {
 
     @Test
     void testGetIntegrationInstanceConnectionAnswersNotFoundForAnUnknownOrSelfActivatedInstance() {
-        when(integrationInstanceAdminFacade.getIntegrationInstanceConnection(8L))
+        when(integrationInstanceFacade.getIntegrationInstanceConnection(8L))
             .thenThrow(new NoSuchElementException("Integration instance id=8 not found"));
 
         this.webTestClient
@@ -186,13 +182,13 @@ class IntegrationInstanceApiControllerIntTest {
             .expectStatus()
             .isNoContent();
 
-        verify(integrationInstanceAdminFacade).updateIntegrationInstanceCredentials(7L, Map.of("token", "new"), 3);
+        verify(integrationInstanceFacade).updateIntegrationInstanceCredentials(7L, Map.of("token", "new"), 3);
     }
 
     @Test
     void testPutIntegrationInstanceCredentialsAnswersNotFoundForAnUnknownOrSelfActivatedInstance() {
         doThrow(new NoSuchElementException("Integration instance id=8 not found"))
-            .when(integrationInstanceAdminFacade)
+            .when(integrationInstanceFacade)
             .updateIntegrationInstanceCredentials(eq(8L), any(), anyInt());
 
         this.webTestClient
@@ -209,7 +205,7 @@ class IntegrationInstanceApiControllerIntTest {
 
     @Test
     void testProvisionIntegrationInstancePassesBodyToTheAdminFacade() {
-        when(integrationInstanceAdminFacade.provisionIntegrationInstance(eq(5L), eq(9L), eq(Map.of("token", "t")),
+        when(integrationInstanceFacade.provisionIntegrationInstance(eq(5L), eq(9L), eq(Map.of("token", "t")),
             any()))
                 .thenReturn(123L);
 
@@ -229,7 +225,7 @@ class IntegrationInstanceApiControllerIntTest {
 
         ArgumentCaptor<List<ProvisionIntegrationInstanceWorkflowDTO>> workflowsCaptor = ArgumentCaptor.captor();
 
-        verify(integrationInstanceAdminFacade)
+        verify(integrationInstanceFacade)
             .provisionIntegrationInstance(eq(5L), eq(9L), any(), workflowsCaptor.capture());
 
         assertThat(workflowsCaptor.getValue())
@@ -238,7 +234,7 @@ class IntegrationInstanceApiControllerIntTest {
 
     @Test
     void testProvisionIntegrationInstanceTreatsExplicitNullsAsEmpty() {
-        when(integrationInstanceAdminFacade.provisionIntegrationInstance(eq(5L), eq(9L), any(), any()))
+        when(integrationInstanceFacade.provisionIntegrationInstance(eq(5L), eq(9L), any(), any()))
             .thenReturn(124L);
 
         this.webTestClient
@@ -254,12 +250,12 @@ class IntegrationInstanceApiControllerIntTest {
             .expectBody(Long.class)
             .isEqualTo(124L);
 
-        verify(integrationInstanceAdminFacade).provisionIntegrationInstance(5L, 9L, Map.of(), List.of());
+        verify(integrationInstanceFacade).provisionIntegrationInstance(5L, 9L, Map.of(), List.of());
     }
 
     @Test
     void testGetProvisionableIntegrationsMapsSelfServeAndSharedParameterNames() {
-        when(integrationInstanceAdminFacade.getProvisionableIntegrations(5L))
+        when(integrationInstanceFacade.getProvisionableIntegrations(5L))
             .thenReturn(List.of(getProvisionableIntegration()));
 
         this.webTestClient

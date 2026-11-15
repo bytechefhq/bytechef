@@ -2424,7 +2424,7 @@ class ConnectedUserIntegrationFacadeIntTest {
         class ProvisioningMethodSecurity {
 
             @Autowired
-            private IntegrationInstanceAdminFacade integrationInstanceAdminFacade;
+            private IntegrationInstanceFacade integrationInstanceFacade;
 
             @Autowired
             private PermissionService permissionService;
@@ -2443,12 +2443,12 @@ class ConnectedUserIntegrationFacadeIntTest {
 
                 when(permissionService.isTenantAdmin()).thenReturn(true);
 
-                assertThat(integrationInstanceAdminFacade.getProvisionableIntegrations(connectedUserId))
+                assertThat(integrationInstanceFacade.getProvisionableIntegrations(connectedUserId))
                     .extracting(integration -> integration.integration()
                         .id())
                     .contains(provisioningIntegrationId);
 
-                long instanceId = integrationInstanceAdminFacade.provisionIntegrationInstance(
+                long instanceId = integrationInstanceFacade.provisionIntegrationInstance(
                     connectedUserId, version1ConfigurationId, Map.of("token", "t"),
                     List.of(new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidA, Map.of("channel", "#ops"))));
 
@@ -2473,10 +2473,10 @@ class ConnectedUserIntegrationFacadeIntTest {
                             Environment.PRODUCTION.ordinal(), connectedUserId,
                             new User(connectedUser.getExternalId(), "", List.of()), false));
 
-                assertThatThrownBy(() -> integrationInstanceAdminFacade.provisionIntegrationInstance(
+                assertThatThrownBy(() -> integrationInstanceFacade.provisionIntegrationInstance(
                     connectedUserId, version1ConfigurationId, Map.of(), List.of()))
                         .isInstanceOf(AccessDeniedException.class);
-                assertThatThrownBy(() -> integrationInstanceAdminFacade.getProvisionableIntegrations(connectedUserId))
+                assertThatThrownBy(() -> integrationInstanceFacade.getProvisionableIntegrations(connectedUserId))
                     .isInstanceOf(AccessDeniedException.class);
                 assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
                     connectedUserId, version1ConfigurationId, Map.of(), List.of(), "admin"))

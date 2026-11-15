@@ -10,14 +10,17 @@ package com.bytechef.ee.embedded.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -69,6 +72,7 @@ import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacad
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
@@ -93,10 +97,12 @@ import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefi
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,6 +121,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * @version ee
@@ -701,6 +708,180 @@ class IntegrationInstanceFacadeIntTest {
 
     private Optional<IntegrationInstanceWorkflow> fetchIntegrationInstanceWorkflow(long integrationInstanceId) {
         return integrationInstanceWorkflowService.fetchIntegrationInstanceWorkflow(integrationInstanceId, workflowId);
+    }
+
+    @Nested
+    class Provisioning {
+
+        private static final long PROVISIONED_CONNECTED_USER_ID = 5L;
+        private static final long PROVISIONED_CONNECTION_ID = 9L;
+        private static final long PROVISIONED_INTEGRATION_INSTANCE_ID = 9_000_001L;
+
+        @MockitoBean
+        private ConnectedUserConnectionFacade connectedUserConnectionFacade;
+
+        @MockitoBean
+        private ConnectedUserIntegrationFacade connectedUserIntegrationFacade;
+
+        @MockitoSpyBean
+        private IntegrationInstanceService integrationInstanceService;
+
+        @Test
+        void testProvisionIntegrationInstanceIsDeniedForConnectedUsersAndNonAdmins() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION, connectedUserA));
+
+            assertThatThrownBy(
+                () -> integrationInstanceFacade.provisionIntegrationInstance(1L, 2L, Map.of("key", "v"), List.of()))
+                    .isInstanceOf(AccessDeniedException.class);
+
+            authenticate(createNonAdminAuthentication());
+
+            assertThatThrownBy(
+                () -> integrationInstanceFacade.provisionIntegrationInstance(1L, 2L, Map.of("key", "v"), List.of()))
+                    .isInstanceOf(AccessDeniedException.class);
+
+            verifyNoInteractions(connectedUserIntegrationFacade);
+        }
+
+        @Test
+        void testProvisionIntegrationInstanceDelegatesForTenantAdmin() {
+            authenticate(createTenantAdminAuthentication());
+
+            integrationInstanceFacade.provisionIntegrationInstance(1L, 2L, Map.of("key", "v"), List.of());
+
+            verify(connectedUserIntegrationFacade).provisionIntegrationInstance(
+                1L, 2L, Map.of("key", "v"), List.of(), "admin@localhost.com");
+        }
+
+        @Test
+        void testGetProvisionableIntegrationsIsDeniedForConnectedUsersAndNonAdmins() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION, connectedUserA));
+
+            assertThatThrownBy(() -> integrationInstanceFacade.getProvisionableIntegrations(1L))
+                .isInstanceOf(AccessDeniedException.class);
+
+            authenticate(createNonAdminAuthentication());
+
+            assertThatThrownBy(() -> integrationInstanceFacade.getProvisionableIntegrations(1L))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verifyNoInteractions(connectedUserIntegrationFacade);
+        }
+
+        @Test
+        void testGetProvisionableIntegrationsDelegatesForTenantAdmin() {
+            authenticate(createTenantAdminAuthentication());
+
+            integrationInstanceFacade.getProvisionableIntegrations(1L);
+
+            verify(connectedUserIntegrationFacade).getProvisionableIntegrations(1L);
+        }
+
+        @Test
+        void testGetIntegrationInstanceConnectionReturnsProvisionedConnection() {
+            authenticate(createTenantAdminAuthentication());
+
+            givenProvisionedIntegrationInstance();
+
+            ConnectionDTO connectionDTO = ConnectionDTO.builder()
+                .id(PROVISIONED_CONNECTION_ID)
+                .build();
+
+            when(connectedUserConnectionFacade.getConnectedUserConnectionsForAdmin(
+                PROVISIONED_CONNECTED_USER_ID, null, List.of(PROVISIONED_CONNECTION_ID)))
+                    .thenReturn(List.of(connectionDTO));
+
+            assertThat(integrationInstanceFacade.getIntegrationInstanceConnection(PROVISIONED_INTEGRATION_INSTANCE_ID))
+                .isEqualTo(connectionDTO);
+        }
+
+        @Test
+        void testGetIntegrationInstanceConnectionThrowsForSelfActivatedInstance() {
+            authenticate(createTenantAdminAuthentication());
+
+            assertThatThrownBy(() -> integrationInstanceFacade.getIntegrationInstanceConnection(integrationInstanceAId))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("Integration instance id=%s not found".formatted(integrationInstanceAId));
+
+            verifyNoInteractions(connectedUserConnectionFacade);
+        }
+
+        @Test
+        void testGetIntegrationInstanceConnectionThrowsForUnknownInstance() {
+            authenticate(createTenantAdminAuthentication());
+
+            assertThatThrownBy(
+                () -> integrationInstanceFacade.getIntegrationInstanceConnection(PROVISIONED_INTEGRATION_INSTANCE_ID))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @Test
+        void testUpdateIntegrationInstanceCredentialsDelegatesForProvisionedInstance() {
+            authenticate(createTenantAdminAuthentication());
+
+            givenProvisionedIntegrationInstance();
+
+            integrationInstanceFacade.updateIntegrationInstanceCredentials(
+                PROVISIONED_INTEGRATION_INSTANCE_ID, Map.of("token", "new"), 4);
+
+            verify(connectedUserConnectionFacade).updateIntegrationInstanceConnectionCredentials(
+                PROVISIONED_CONNECTED_USER_ID, PROVISIONED_CONNECTION_ID, Map.of("token", "new"), 4);
+        }
+
+        @Test
+        void testUpdateIntegrationInstanceCredentialsThrowsForSelfActivatedInstance() {
+            authenticate(createTenantAdminAuthentication());
+
+            assertThatThrownBy(
+                () -> integrationInstanceFacade.updateIntegrationInstanceCredentials(
+                    integrationInstanceAId, Map.of("token", "new"), 4))
+                        .isInstanceOf(NoSuchElementException.class)
+                        .hasMessage("Integration instance id=%s not found".formatted(integrationInstanceAId));
+
+            verify(connectedUserConnectionFacade, never())
+                .updateIntegrationInstanceConnectionCredentials(anyLong(), anyLong(), any(), anyInt());
+        }
+
+        @Test
+        void testIntegrationInstanceCredentialsAreDeniedForConnectedUsersAndNonAdmins() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION, connectedUserA));
+
+            assertThatThrownBy(() -> integrationInstanceFacade.getIntegrationInstanceConnection(1L))
+                .isInstanceOf(AccessDeniedException.class);
+            assertThatThrownBy(
+                () -> integrationInstanceFacade.updateIntegrationInstanceCredentials(1L, Map.of("token", "new"), 0))
+                    .isInstanceOf(AccessDeniedException.class);
+
+            authenticate(createNonAdminAuthentication());
+
+            assertThatThrownBy(() -> integrationInstanceFacade.getIntegrationInstanceConnection(1L))
+                .isInstanceOf(AccessDeniedException.class);
+            assertThatThrownBy(
+                () -> integrationInstanceFacade.updateIntegrationInstanceCredentials(1L, Map.of("token", "new"), 0))
+                    .isInstanceOf(AccessDeniedException.class);
+
+            verifyNoInteractions(connectedUserConnectionFacade);
+        }
+
+        private Authentication createNonAdminAuthentication() {
+            when(permissionService.isTenantAdmin()).thenReturn(false);
+
+            return new UsernamePasswordAuthenticationToken(
+                "user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        }
+
+        private void givenProvisionedIntegrationInstance() {
+            IntegrationInstance integrationInstance = new IntegrationInstance();
+
+            integrationInstance.setConnectedUserId(PROVISIONED_CONNECTED_USER_ID);
+            integrationInstance.setConnectionId(PROVISIONED_CONNECTION_ID);
+            integrationInstance.setId(PROVISIONED_INTEGRATION_INSTANCE_ID);
+            integrationInstance.setProvisionedBy("admin");
+
+            doReturn(Optional.of(integrationInstance))
+                .when(integrationInstanceService)
+                .fetchIntegrationInstance(PROVISIONED_INTEGRATION_INSTANCE_ID);
+        }
     }
 
     @Configuration

@@ -9,6 +9,10 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionIntegrationInstanceWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionableIntegrationDTO;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,9 +35,19 @@ public interface IntegrationInstanceFacade {
 
     IntegrationInstanceDTO getIntegrationInstance(long id);
 
+    ConnectionDTO getIntegrationInstanceConnection(long integrationInstanceId);
+
+    List<ProvisionableIntegrationDTO> getProvisionableIntegrations(long connectedUserId);
+
+    long provisionIntegrationInstance(
+        long connectedUserId, long integrationInstanceConfigurationId, Map<String, Object> connectionParameters,
+        List<ProvisionIntegrationInstanceWorkflowDTO> workflows);
+
     void updateIntegrationInstanceConfigurationWorkflowTriggers(
         IntegrationInstanceConfigurationWorkflow previousIntegrationInstanceConfigurationWorkflow,
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow);
+
+    void updateIntegrationInstanceCredentials(long integrationInstanceId, Map<String, ?> parameters, int version);
 
     void updateIntegrationInstanceWorkflow(
         long integrationInstanceId, String workflowId, Map<String, Object> inputs);
