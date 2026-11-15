@@ -25,6 +25,8 @@ import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
+import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.domain.DataTableStorageUsage;
@@ -117,15 +119,19 @@ public class DataTableGraphQlController {
             .toList();
     }
 
-    private DataTableColumnLink toLink(@Nullable LinkSpec linkSpec, Map<Long, String> tableNames, long environmentId) {
+    private @Nullable DataTableColumnLink toLink(
+        @Nullable LinkSpec linkSpec, Map<Long, String> tableNames, long environmentId) {
+
         if (linkSpec == null) {
             return null;
         }
 
         String targetDataTableName = tableNames.computeIfAbsent(
-            linkSpec.targetDataTableId(),
-            targetDataTableId -> workspaceDataTableFacade.getTable(targetDataTableId, environmentId)
-                .name());
+            linkSpec.targetDataTableId(), targetDataTableId -> {
+                DataTableInfo targetDataTableInfo = workspaceDataTableFacade.getTable(targetDataTableId, environmentId);
+
+                return targetDataTableInfo.name();
+            });
 
         return new DataTableColumnLink(
             linkSpec.targetDataTableId(), targetDataTableName, linkSpec.onDelete(), linkSpec.displayColumnName());
@@ -207,16 +213,29 @@ public class DataTableGraphQlController {
 
     public record ColumnInput(String name, ColumnType type, @Nullable ColumnLinkInput link) {
         public ColumnSpec toSpec() {
+            if (type == ColumnType.LINK && link == null) {
+                throw new DataTableException(
+                    "A LINK column requires a link specification", DataTableErrorType.LINK_TARGET_INVALID);
+            }
+
+            if (type != ColumnType.LINK && link != null) {
+                throw new DataTableException(
+                    "Only a LINK column can have a link specification", DataTableErrorType.LINK_TARGET_INVALID);
+            }
+
             if (link == null) {
                 return new ColumnSpec(name, type);
             }
 
+            LinkDeleteRule linkDeleteRule = link.onDelete() == null ? LinkDeleteRule.BLOCK : link.onDelete();
+
             return new ColumnSpec(
-                name, type, new LinkSpec(link.targetDataTableId(), link.onDelete(), link.displayColumnName()));
+                name, type, new LinkSpec(link.targetDataTableId(), linkDeleteRule, link.displayColumnName()));
         }
     }
 
-    public record ColumnLinkInput(Long targetDataTableId, LinkDeleteRule onDelete, @Nullable String displayColumnName) {
+    public record ColumnLinkInput(
+        Long targetDataTableId, @Nullable LinkDeleteRule onDelete, @Nullable String displayColumnName) {
     }
 
     // GraphQL output records

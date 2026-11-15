@@ -16,6 +16,10 @@
 
 package com.bytechef.automation.data.table.web.graphql;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -91,6 +95,71 @@ class DataTableGraphQlControllerIntTest {
             5L,
             new ColumnSpec("customer", ColumnType.LINK, new LinkSpec(7L, LinkDeleteRule.CLEAR, "name")),
             Environment.DEVELOPMENT.ordinal());
+    }
+
+    @Test
+    void testAddDataTableColumnWithLinkDefaultsOnDeleteToBlock() {
+        when(environmentService.getEnvironment(1L)).thenReturn(Environment.DEVELOPMENT);
+
+        GraphQlTester.Response response = graphQlTester
+            .document("""
+                mutation {
+                    addDataTableColumn(input: {
+                        environmentId: 1, tableId: 5,
+                        column: {name: "customer", type: LINK, link: {targetDataTableId: 7}}
+                    })
+                }
+                """)
+            .execute();
+
+        response.path("addDataTableColumn")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(workspaceDataTableFacade).addColumn(
+            5L, new ColumnSpec("customer", ColumnType.LINK, new LinkSpec(7L, LinkDeleteRule.BLOCK, null)),
+            Environment.DEVELOPMENT.ordinal());
+    }
+
+    @Test
+    void testAddDataTableColumnOfLinkTypeWithoutLinkIsRejected() {
+        when(environmentService.getEnvironment(1L)).thenReturn(Environment.DEVELOPMENT);
+
+        GraphQlTester.Response response = graphQlTester
+            .document("""
+                mutation {
+                    addDataTableColumn(input: {
+                        environmentId: 1, tableId: 5, column: {name: "customer", type: LINK}
+                    })
+                }
+                """)
+            .execute();
+
+        response.errors()
+            .satisfy(errors -> assertThat(errors).hasSize(1));
+
+        verify(workspaceDataTableFacade, never()).addColumn(anyLong(), any(ColumnSpec.class), anyLong());
+    }
+
+    @Test
+    void testAddDataTableColumnWithLinkOnNonLinkTypeIsRejected() {
+        when(environmentService.getEnvironment(1L)).thenReturn(Environment.DEVELOPMENT);
+
+        GraphQlTester.Response response = graphQlTester
+            .document("""
+                mutation {
+                    addDataTableColumn(input: {
+                        environmentId: 1, tableId: 5,
+                        column: {name: "title", type: STRING, link: {targetDataTableId: 7, onDelete: BLOCK}}
+                    })
+                }
+                """)
+            .execute();
+
+        response.errors()
+            .satisfy(errors -> assertThat(errors).hasSize(1));
+
+        verify(workspaceDataTableFacade, never()).addColumn(anyLong(), any(ColumnSpec.class), anyLong());
     }
 
     @Test
