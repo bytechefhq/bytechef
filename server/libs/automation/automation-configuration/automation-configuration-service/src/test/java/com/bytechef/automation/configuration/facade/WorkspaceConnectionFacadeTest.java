@@ -602,12 +602,25 @@ class WorkspaceConnectionFacadeTest {
     }
 
     @Test
-    void testUpdateConnectionCredentialsRefusesATenantAdminOnAMembersConnection() {
+    void testUpdateConnectionCredentialsAllowsATenantAdminOnAMembersConnection() {
         Connection connection = activeConnection("someone@example.com", ResourceVisibility.WORKSPACE);
 
         when(connectionService.getConnection(5L)).thenReturn(connection);
 
         authenticate(CURRENT_USER, AuthorityConstants.ADMIN);
+
+        workspaceConnectionFacade.updateConnectionCredentials(5L, Map.of("apiKey", "new"), 3);
+
+        verify(connectionFacade).updateCredentials(5L, Map.of("apiKey", "new"), 3);
+    }
+
+    @Test
+    void testUpdateConnectionCredentialsRefusesAMemberOnAnotherMembersConnection() {
+        Connection connection = activeConnection("someone@example.com", ResourceVisibility.WORKSPACE);
+
+        when(connectionService.getConnection(5L)).thenReturn(connection);
+
+        authenticate(CURRENT_USER, "ROLE_USER");
 
         assertThatThrownBy(() -> workspaceConnectionFacade.updateConnectionCredentials(5L, Map.of("apiKey", "new"), 3))
             .isInstanceOf(AccessDeniedException.class);

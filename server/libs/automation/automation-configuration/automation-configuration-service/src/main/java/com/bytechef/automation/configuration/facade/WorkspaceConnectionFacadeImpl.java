@@ -335,11 +335,11 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         @AuditData(key = "connectionId", value = "#connectionId")
     })
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') && " +
-        "isResourceOwner(#connectionId, 'Connection')")
+        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
     public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
         requireAutomationConnection(connectionId);
 
-        validateSecretOwner(connectionService.getConnection(connectionId));
+        validateCredentialReplacer(connectionService.getConnection(connectionId));
 
         connectionFacade.updateCredentials(connectionId, parameters, version);
     }
@@ -353,10 +353,11 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
             ConnectionSecrets.canCurrentUserAccessSecrets(connectionDTO.createdBy(), connectionDTO.visibility());
     }
 
-    private void validateSecretOwner(Connection connection) {
-        if (!ConnectionSecrets.canCurrentUserAccessSecrets(connection.getCreatedBy(), connection.getVisibility())) {
+    private void validateCredentialReplacer(Connection connection) {
+        if (!ConnectionSecrets.canCurrentUserReplaceSecrets(connection.getCreatedBy())) {
             throw new AccessDeniedException(
-                "Only the connection owner can replace the credentials of connection " + connection.getId());
+                "Only the connection owner or a tenant admin can replace the credentials of connection " +
+                    connection.getId());
         }
     }
 

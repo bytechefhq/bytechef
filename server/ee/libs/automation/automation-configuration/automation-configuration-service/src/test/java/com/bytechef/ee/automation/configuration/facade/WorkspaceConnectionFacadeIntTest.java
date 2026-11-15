@@ -366,16 +366,14 @@ class WorkspaceConnectionFacadeIntTest {
     }
 
     @Test
-    void testUpdateConnectionCredentialsRefusesATenantAdminOnAMembersWorkspaceConnection() {
+    void testUpdateConnectionCredentialsAllowsATenantAdminOnAMembersWorkspaceConnection() {
         givenConnection(OWNER_LOGIN, ResourceVisibility.WORKSPACE);
 
         authenticate(TENANT_ADMIN_LOGIN, AuthorityConstants.ADMIN);
 
-        assertThatThrownBy(
-            () -> workspaceConnectionSharingFacade.updateConnectionCredentials(CONNECTION_ID, Map.of(), 0))
-                .isInstanceOf(AccessDeniedException.class);
+        workspaceConnectionSharingFacade.updateConnectionCredentials(CONNECTION_ID, Map.of("token", "new"), 0);
 
-        verify(connectionFacade, never()).updateCredentials(anyLong(), any(), anyInt());
+        verify(connectionFacade).updateCredentials(CONNECTION_ID, Map.of("token", "new"), 0);
     }
 
     @Test
