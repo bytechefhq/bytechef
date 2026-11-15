@@ -70,6 +70,57 @@ On the **Data Tables** list page, each table's menu has **Rename**, **Duplicate*
 
 ---
 
+## Link columns
+
+A **Link** column points each row at one row of another table, for example an *Orders* row that points at a *Customers* row. The target table must be in the same workspace and environment, and a table can't link to itself.
+
+When you add a Link column you choose:
+
+- **Target table** - the table whose rows can be linked.
+- **Display column** - the target column whose value is shown for each link in the grid.
+- **When a linked row is deleted** - what happens to links when the row they point at is deleted:
+  - **Prevent deleting linked rows** (the default) - the delete is refused and nothing is deleted. The error names the table, the column and the number of rows that still link to it.
+  - **Clear the link** - the delete goes ahead and the links become empty. The rows that lost a link are reported as updated, so **Record Updated** triggers run for them.
+
+A table can't be deleted while other tables link to it. Delete or change those link columns first.
+
+Renaming the target table or its display column doesn't break a link.
+
+### Writing a link
+
+When creating or updating a row from a workflow, the API or a CSV import, give the link as either:
+
+- the target row's `id` - a number or a numeric string, or
+- `{"externalId": "..."}` - the target row's external id.
+
+A target that doesn't exist fails with `LINKED_ROW_NOT_FOUND`. In a batch, one bad link means no row in the batch is written.
+
+### Filtering and sorting
+
+A Link column supports the **Equals**, **Not Equals**, **In**, **Empty** and **Not Empty** operations, compared by the target row's `id`. Sorting by a Link column sorts by that `id`.
+
+### Reading linked rows
+
+**Get Record** and **Find Records** return only the target's `id` for a link. Turn on **Expand** to get the linked row instead, one level deep:
+
+```json
+{
+  "customer": {
+    "id": 12,
+    "externalId": "cust-12",
+    "values": {"name": "Acme"}
+  }
+}
+```
+
+A row with no link returns `null`. The GraphQL row queries and the public REST row reads (get, list and get by external id) accept `expand` too.
+
+### CSV
+
+An export writes two columns for each Link column: `<column>` with the target `id`, and `<column>.externalId`. An import uses `<column>.externalId` when it is present, and an empty cell there means an empty link. A file with only the id column is still imported, with a warning, because row ids differ between environments; use external ids to move data between them.
+
+---
+
 ## Use a table in workflows
 
 Add the **Data Table** component to a workflow to read and write tables. Select the target **Table**; the action's inputs adapt to that table's columns.
@@ -178,7 +229,7 @@ Tables, columns and rows are also available over `/api/automation/v1` - see the
 [Data Tables API reference](/openapi/automation-data-tables-data-table) for tables and columns, and
 the [Data Table Rows reference](/openapi/automation-data-tables-data-table-row) for rows. Rows can be
 queried with `filter=column:OPERATOR:value`, written in batches, imported and exported as CSV, and
-upserted on a caller-supplied `externalId`.
+upserted on a caller-supplied `externalId`. Link columns are created with a `link` object holding `targetDataTableId`, `onDelete` (`BLOCK` by default, or `CLEAR`) and `displayColumnName`. The API answers 400 for `LINKED_ROW_NOT_FOUND`, `LINK_TARGET_INVALID` and `LINK_DISPLAY_COLUMN_INVALID`, and 409 for `ROW_STILL_LINKED`, both when deleting rows and when dropping a table that other tables link to.
 
 ---
 

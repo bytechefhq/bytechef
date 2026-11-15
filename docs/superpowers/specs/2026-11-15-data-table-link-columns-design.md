@@ -143,7 +143,7 @@ works on one environment, like every other column operation.
 | Operation | Behavior |
 |---|---|
 | Add link column | Validate the target (same workspace, exists in this environment, not the source itself in the first version) and the display column (a user column of the target in this environment). Insert the registry row, then add the column, foreign key and index. |
-| Rename link column | Rename the physical column and its foreign key, and update `column_name` in this environment's registry row. |
+| Rename link column | Rename the physical column (the foreign key is named after the registry row, `fk_dt_link_<registryRowId>`, so it keeps its name), and update `column_name` in this environment's registry row. |
 | Remove link column | Drop the foreign key, index and column, then delete this environment's registry row. |
 | Rename target table | Nothing to do: links use ids. |
 | Rename the target's display column | Update `display_column_name` in the registry rows of the same environment that use it. |
