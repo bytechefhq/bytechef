@@ -26,7 +26,7 @@ const AutomationGettingStartedDismissButton = () => {
             <AlertDialog
                 confirmButtonVariant="default"
                 confirmLabel="Dismiss Getting Started"
-                description="Getting Started leaves the sidebar and Automation opens on Projects. It leaves every workspace. Nothing you built is removed."
+                description="Getting Started leaves the sidebar and Automation opens on Projects. It stays hidden in this browser. Nothing you built is removed."
                 onCancel={() => setShowConfirmation(false)}
                 onConfirm={handleConfirm}
                 open={showConfirmation}
