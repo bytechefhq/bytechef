@@ -472,7 +472,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         return new ConnectedUserProjectWorkflowDTO(
             connectedUserProject.getConnectedUserId(), connectedUserProjectWorkflow,
             isProjectDeploymentWorkflowEnabled(projectWorkflow, environment),
-            getWorkflowLastExecutionDate(projectWorkflow.getWorkflowId()), projectWorkflow, workflowDTO,
+            getWorkflowLastExecutionDate(projectWorkflow), projectWorkflow, workflowDTO,
             toComponents(workflowDTO.getWorkflow()));
     }
 
@@ -723,7 +723,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                 ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflowDTO = new ConnectedUserProjectWorkflowDTO(
                     connectedUserProject.getConnectedUserId(), connectedUserProjectWorkflow,
                     isProjectDeploymentWorkflowEnabled(latestProjectWorkflow, environment),
-                    getWorkflowLastExecutionDate(latestProjectWorkflow.getWorkflowId()), latestProjectWorkflow,
+                    getWorkflowLastExecutionDate(latestProjectWorkflow), latestProjectWorkflow,
                     new WorkflowDTO(publishedWorkflow, List.of(), List.of()), toComponents(publishedWorkflow),
                     toInputs(workflow),
                     fetchInputValues(connectedUserProject.getProjectId(), latestProjectWorkflow, environment));
@@ -1012,8 +1012,14 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             null);
     }
 
-    private Instant getWorkflowLastExecutionDate(String workflowId) {
-        return OptionalUtils.mapOrElse(jobService.fetchLastWorkflowJob(workflowId), Job::getEndDate, null);
+    private Instant getWorkflowLastExecutionDate(ProjectWorkflow projectWorkflow) {
+        List<String> workflowIds = projectWorkflowService
+            .getProjectWorkflows(projectWorkflow.getProjectId(), projectWorkflow.getUuidAsString())
+            .stream()
+            .map(ProjectWorkflow::getWorkflowId)
+            .toList();
+
+        return OptionalUtils.mapOrElse(jobService.fetchLastWorkflowJob(workflowIds), Job::getEndDate, null);
     }
 
     private boolean isProjectDeploymentWorkflowEnabled(ProjectWorkflow projectWorkflow, Environment environment) {
