@@ -22,12 +22,11 @@ vi.mock('../hooks/useMcpIntegrationInstanceConfigurationListItemDropdownMenu', (
 
 const mcpIntegrationInstanceConfiguration = {id: '5'} as McpIntegrationInstanceConfigurationItemType;
 
-const renderMenu = (handlers: {onEditWorkflowsClick?: () => void; onUpdateIntegrationVersionClick?: () => void} = {}) =>
+const renderMenu = (handlers: {onEditWorkflowsClick?: () => void} = {}) =>
     render(
         <McpIntegrationInstanceConfigurationListItemDropdownMenu
             mcpIntegrationInstanceConfiguration={mcpIntegrationInstanceConfiguration}
             onEditWorkflowsClick={handlers.onEditWorkflowsClick ?? vi.fn()}
-            onUpdateIntegrationVersionClick={handlers.onUpdateIntegrationVersionClick ?? vi.fn()}
         />
     );
 
@@ -51,7 +50,7 @@ describe('McpIntegrationInstanceConfigurationListItemDropdownMenu', () => {
 
         expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
         expect(screen.getByRole('menuitem', {name: 'Edit Workflows'})).toHaveClass('text-content-neutral-primary');
-        expect(screen.getByRole('menuitem', {name: 'Change Integration Version'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Change Integration Version'})).not.toBeInTheDocument();
         expect(screen.getByRole('menuitem', {name: 'Delete'})).toHaveClass('text-content-destructive-primary');
     });
 
@@ -64,17 +63,6 @@ describe('McpIntegrationInstanceConfigurationListItemDropdownMenu', () => {
         await userEvent.click(screen.getByRole('menuitem', {name: 'Edit Workflows'}));
 
         expect(onEditWorkflowsClick).toHaveBeenCalledTimes(1);
-    });
-
-    it('calls onUpdateIntegrationVersionClick when Change Integration Version is clicked', async () => {
-        const onUpdateIntegrationVersionClick = vi.fn();
-
-        renderMenu({onUpdateIntegrationVersionClick});
-
-        await userEvent.click(screen.getByRole('button'));
-        await userEvent.click(screen.getByRole('menuitem', {name: 'Change Integration Version'}));
-
-        expect(onUpdateIntegrationVersionClick).toHaveBeenCalledTimes(1);
     });
 
     it('asks for delete confirmation when Delete is clicked', async () => {

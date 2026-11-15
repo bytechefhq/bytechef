@@ -1,59 +1,11 @@
-import {useGetIntegrationInstanceConfigurationQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
-import {useQueryClient} from '@tanstack/react-query';
-import {useMemo, useState} from 'react';
+import {useState} from 'react';
 
-import {McpIntegrationInstanceConfigurationItemType} from './useMcpIntegrationInstanceConfigurationList';
-
-const useMcpIntegrationInstanceConfigurationListItem = (
-    mcpIntegrationInstanceConfiguration: McpIntegrationInstanceConfigurationItemType
-) => {
+const useMcpIntegrationInstanceConfigurationListItem = () => {
     const [showEditWorkflowsDialog, setShowEditWorkflowsDialog] = useState(false);
-    const [showUpdateIntegrationVersionDialog, setShowUpdateIntegrationVersionDialog] = useState(false);
-
-    const {data: integrationInstanceConfiguration} = useGetIntegrationInstanceConfigurationQuery(
-        +mcpIntegrationInstanceConfiguration.integrationInstanceConfigurationId!
-    );
-
-    const queryClient = useQueryClient();
-
-    const mcpConfigurationWorkflowIds = useMemo(
-        () =>
-            new Set(
-                mcpIntegrationInstanceConfiguration.mcpIntegrationInstanceConfigurationWorkflows
-                    ?.filter((workflow) => workflow != null)
-                    .map((workflow) => String(workflow.integrationInstanceConfigurationWorkflowId)) || []
-            ),
-        [mcpIntegrationInstanceConfiguration.mcpIntegrationInstanceConfigurationWorkflows]
-    );
-
-    const mcpWorkflowUuids = useMemo(
-        () =>
-            integrationInstanceConfiguration?.integrationInstanceConfigurationWorkflows
-                ?.filter(
-                    (configurationWorkflow) =>
-                        configurationWorkflow.workflowUuid != null &&
-                        mcpConfigurationWorkflowIds.has(String(configurationWorkflow.id))
-                )
-                .map((configurationWorkflow) => configurationWorkflow.workflowUuid!) || [],
-        [mcpConfigurationWorkflowIds, integrationInstanceConfiguration?.integrationInstanceConfigurationWorkflows]
-    );
-
-    const handleOnIntegrationInstanceConfigurationDialogClose = () => {
-        void queryClient
-            .invalidateQueries({
-                queryKey: ['mcpIntegrationInstanceConfigurationsByServerId'],
-            })
-            .then(() => setShowUpdateIntegrationVersionDialog(false));
-    };
 
     return {
-        handleOnIntegrationInstanceConfigurationDialogClose,
-        integrationInstanceConfiguration,
-        mcpWorkflowUuids,
         setShowEditWorkflowsDialog,
-        setShowUpdateIntegrationVersionDialog,
         showEditWorkflowsDialog,
-        showUpdateIntegrationVersionDialog,
     };
 };
 
