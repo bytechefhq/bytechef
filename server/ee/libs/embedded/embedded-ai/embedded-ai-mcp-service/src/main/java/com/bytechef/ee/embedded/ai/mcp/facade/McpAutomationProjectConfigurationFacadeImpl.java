@@ -59,7 +59,7 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
     private final AutomationProjectConfigurationService automationProjectConfigurationService;
     private final McpAutomationProjectConfigurationService mcpAutomationProjectConfigurationService;
     private final McpAutomationProjectConfigurationWorkflowService mcpAutomationProjectConfigurationWorkflowService;
-    private final McpAutomationRows mcpAutomationRows;
+    private final McpAutomationRowFacade mcpAutomationRowFacade;
     private final McpServerService mcpServerService;
     private final ProjectWorkflowService projectWorkflowService;
     private final WorkflowService workflowService;
@@ -69,13 +69,13 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
         AutomationProjectConfigurationService automationProjectConfigurationService,
         McpAutomationProjectConfigurationService mcpAutomationProjectConfigurationService,
         McpAutomationProjectConfigurationWorkflowService mcpAutomationProjectConfigurationWorkflowService,
-        McpAutomationRows mcpAutomationRows, McpServerService mcpServerService,
+        McpAutomationRowFacade mcpAutomationRowFacade, McpServerService mcpServerService,
         ProjectWorkflowService projectWorkflowService, WorkflowService workflowService) {
 
         this.automationProjectConfigurationService = automationProjectConfigurationService;
         this.mcpAutomationProjectConfigurationService = mcpAutomationProjectConfigurationService;
         this.mcpAutomationProjectConfigurationWorkflowService = mcpAutomationProjectConfigurationWorkflowService;
-        this.mcpAutomationRows = mcpAutomationRows;
+        this.mcpAutomationRowFacade = mcpAutomationRowFacade;
         this.mcpServerService = mcpServerService;
         this.projectWorkflowService = projectWorkflowService;
         this.workflowService = workflowService;
@@ -123,7 +123,7 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
                 mcpAutomationProjectConfiguration.getId(), workflowUuid, parametersByWorkflowUuid.get(workflowUuid));
         }
 
-        mcpAutomationRows.addMissingRowsForLink(mcpAutomationProjectConfiguration.getId());
+        mcpAutomationRowFacade.addMissingRowsForLink(mcpAutomationProjectConfiguration.getId());
 
         return mcpAutomationProjectConfiguration;
     }
@@ -205,7 +205,7 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
             }
         }
 
-        mcpAutomationRows.addMissingRowsForLinkWorkflows(id, createdLinkWorkflowIds);
+        mcpAutomationRowFacade.addMissingRowsForLinkWorkflows(id, createdLinkWorkflowIds);
 
         return mcpAutomationProjectConfiguration;
     }

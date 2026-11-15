@@ -27,8 +27,8 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
-import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRows;
-import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRows;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRowFacade;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
@@ -125,7 +125,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
     JobFacade.class, JobService.class, McpComponentService.class, McpIntegrationComponentService.class,
     McpIntegrationInstanceConfigurationService.class,
     McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceToolService.class,
-    McpIntegrationInstanceWorkflowService.class, McpAutomationRows.class, McpIntegrationInstanceRows.class,
+    McpIntegrationInstanceWorkflowService.class, McpAutomationRowFacade.class, McpIntegrationInstanceRowFacade.class,
     McpServerService.class, McpToolService.class, OAuth2ParametersFacade.class, OAuth2Service.class,
     PrincipalJobFacade.class, PrincipalJobService.class,
     TaskDispatcherDefinitionService.class, TaskExecutionService.class,

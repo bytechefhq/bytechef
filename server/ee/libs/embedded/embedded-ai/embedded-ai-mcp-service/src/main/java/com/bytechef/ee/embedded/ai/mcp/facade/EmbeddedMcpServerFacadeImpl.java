@@ -55,7 +55,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
     private final IntegrationService integrationService;
     private final McpComponentService mcpComponentService;
     private final McpIntegrationComponentService mcpIntegrationComponentService;
-    private final McpIntegrationInstanceRows mcpIntegrationInstanceRows;
+    private final McpIntegrationInstanceRowFacade mcpIntegrationInstanceRowFacade;
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
     private final McpServerService mcpServerService;
     private final McpToolService mcpToolService;
@@ -67,7 +67,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationService integrationService, McpComponentService mcpComponentService,
         McpIntegrationComponentService mcpIntegrationComponentService,
-        McpIntegrationInstanceRows mcpIntegrationInstanceRows,
+        McpIntegrationInstanceRowFacade mcpIntegrationInstanceRowFacade,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
         McpToolService mcpToolService, TagService tagService) {
 
@@ -76,7 +76,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
         this.integrationService = integrationService;
         this.mcpComponentService = mcpComponentService;
         this.mcpIntegrationComponentService = mcpIntegrationComponentService;
-        this.mcpIntegrationInstanceRows = mcpIntegrationInstanceRows;
+        this.mcpIntegrationInstanceRowFacade = mcpIntegrationInstanceRowFacade;
         this.mcpIntegrationInstanceToolService = mcpIntegrationInstanceToolService;
         this.mcpServerService = mcpServerService;
         this.mcpToolService = mcpToolService;
@@ -95,7 +95,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
 
         mcpIntegrationComponentService.create(createdMcpComponent.getId(), integrationId);
 
-        mcpIntegrationInstanceRows.addMissingRowsForConnectedUsers(createdMcpComponent.getMcpServerId());
+        mcpIntegrationInstanceRowFacade.addMissingRowsForConnectedUsers(createdMcpComponent.getMcpServerId());
 
         return createdMcpComponent;
     }
@@ -244,7 +244,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
 
         McpComponent updatedMcpComponent = mcpComponentService.update(mcpComponent, requiredAuthorities, mcpTools);
 
-        mcpIntegrationInstanceRows.addMissingRowsForConnectedUsers(mcpComponent.getMcpServerId());
+        mcpIntegrationInstanceRowFacade.addMissingRowsForConnectedUsers(mcpComponent.getMcpServerId());
 
         return updatedMcpComponent;
     }
@@ -321,7 +321,7 @@ class EmbeddedMcpServerFacadeImpl implements EmbeddedMcpServerFacade {
         if (enabled) {
             McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpTool.getMcpComponentId());
 
-            mcpIntegrationInstanceRows.addMissingRowsForConnectedUsers(mcpComponent.getMcpServerId());
+            mcpIntegrationInstanceRowFacade.addMissingRowsForConnectedUsers(mcpComponent.getMcpServerId());
         }
 
         return mcpTool;

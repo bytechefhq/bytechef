@@ -46,9 +46,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Component
 @Transactional
 @ConditionalOnEEVersion
-public class McpAutomationRowsImpl implements McpAutomationRows {
+public class McpAutomationRowFacadeImpl implements McpAutomationRowFacade {
 
-    private static final Logger log = LoggerFactory.getLogger(McpAutomationRowsImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(McpAutomationRowFacadeImpl.class);
 
     private final ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService;
     private final ConnectedUserProjectService connectedUserProjectService;
@@ -60,7 +60,7 @@ public class McpAutomationRowsImpl implements McpAutomationRows {
     private final TransactionTemplate nestedTransactionTemplate;
 
     @SuppressFBWarnings("EI")
-    public McpAutomationRowsImpl(
+    public McpAutomationRowFacadeImpl(
         ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService,
         ConnectedUserProjectService connectedUserProjectService,
         ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService,

@@ -1263,12 +1263,12 @@ public class ConnectedUserMcpServerFacadeIntTest {
         IntegrationInstanceConfigurationWorkflowServiceImpl.class, IntegrationInstanceServiceImpl.class,
         IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class, McpComponentServiceImpl.class,
         McpIntegrationInstanceConfigurationServiceImpl.class,
-        McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpIntegrationInstanceRowsImpl.class,
+        McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpIntegrationInstanceRowFacadeImpl.class,
         McpServerMembership.class,
         McpServerServiceImpl.class, WorkflowServiceImpl.class, EmbeddedMcpAuditIntTestConfiguration.class,
         IntegrationWorkflowServiceImpl.class, AutomationProjectConfigurationServiceImpl.class,
         ConnectedUserProjectConfigurationServiceImpl.class, ConnectedUserProjectServiceImpl.class,
-        ConnectedUserProjectWorkflowServiceImpl.class, McpAutomationRowsImpl.class, ProjectServiceImpl.class,
+        ConnectedUserProjectWorkflowServiceImpl.class, McpAutomationRowFacadeImpl.class, ProjectServiceImpl.class,
         ProjectWorkflowServiceImpl.class
     })
     static class FacadeIntTestConfiguration {

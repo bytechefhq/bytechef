@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author Ivica Cardic
  */
-public interface McpAutomationRows {
+public interface McpAutomationRowFacade {
 
     void addMissingRowsForLink(long mcpAutomationProjectConfigurationId);
 

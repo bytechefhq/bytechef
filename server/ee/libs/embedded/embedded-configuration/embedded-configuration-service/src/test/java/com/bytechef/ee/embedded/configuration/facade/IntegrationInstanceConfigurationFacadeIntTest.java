@@ -31,7 +31,7 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
-import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRows;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
@@ -219,7 +219,7 @@ class IntegrationInstanceConfigurationFacadeIntTest {
     private McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
 
     @Autowired
-    private McpIntegrationInstanceRows mcpIntegrationInstanceRows;
+    private McpIntegrationInstanceRowFacade mcpIntegrationInstanceRowFacade;
 
     @Autowired
     private TriggerLifecycleFacade triggerLifecycleFacade;
@@ -821,13 +821,13 @@ class IntegrationInstanceConfigurationFacadeIntTest {
             cronFixture.integrationInstanceConfigurationId(), integrationInstanceConfigurationWorkflow.getWorkflowId(),
             false);
 
-        verify(mcpIntegrationInstanceRows, never()).addMissingRowsForIntegrationInstanceConfiguration(anyLong());
+        verify(mcpIntegrationInstanceRowFacade, never()).addMissingRowsForIntegrationInstanceConfiguration(anyLong());
 
         integrationInstanceConfigurationFacade.enableIntegrationInstanceConfigurationWorkflow(
             cronFixture.integrationInstanceConfigurationId(), integrationInstanceConfigurationWorkflow.getWorkflowId(),
             true);
 
-        verify(mcpIntegrationInstanceRows).addMissingRowsForIntegrationInstanceConfiguration(
+        verify(mcpIntegrationInstanceRowFacade).addMissingRowsForIntegrationInstanceConfiguration(
             cronFixture.integrationInstanceConfigurationId());
     }
 
@@ -841,7 +841,7 @@ class IntegrationInstanceConfigurationFacadeIntTest {
             integrationInstanceConfigurationFacade.getIntegrationInstanceConfiguration(
                 cronFixture.integrationInstanceConfigurationId()));
 
-        verify(mcpIntegrationInstanceRows).addMissingRowsForIntegrationInstanceConfiguration(
+        verify(mcpIntegrationInstanceRowFacade).addMissingRowsForIntegrationInstanceConfiguration(
             cronFixture.integrationInstanceConfigurationId());
     }
 
@@ -854,7 +854,7 @@ class IntegrationInstanceConfigurationFacadeIntTest {
         integrationInstanceConfigurationFacade.moveConnectedUsers(
             moveFixture.sourceConfigurationId(), moveFixture.targetConfigurationId(), List.of(CONNECTED_USER_ID));
 
-        verify(mcpIntegrationInstanceRows).remapIntegrationInstance(moveFixture.integrationInstanceId());
+        verify(mcpIntegrationInstanceRowFacade).remapIntegrationInstance(moveFixture.integrationInstanceId());
     }
 
     @Test
@@ -866,7 +866,7 @@ class IntegrationInstanceConfigurationFacadeIntTest {
         integrationInstanceConfigurationFacade.moveConnectedUsers(
             moveFixture.sourceConfigurationId(), moveFixture.targetConfigurationId(), List.of(CONNECTED_USER_ID));
 
-        verify(mcpIntegrationInstanceRows, never()).remapIntegrationInstance(anyLong());
+        verify(mcpIntegrationInstanceRowFacade, never()).remapIntegrationInstance(anyLong());
     }
 
     @Test

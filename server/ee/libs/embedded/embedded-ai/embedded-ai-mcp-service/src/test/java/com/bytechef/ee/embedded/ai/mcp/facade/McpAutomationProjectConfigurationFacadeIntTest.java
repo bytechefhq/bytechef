@@ -742,7 +742,7 @@ class McpAutomationProjectConfigurationFacadeIntTest {
             ConnectedUserProjectServiceImpl.class, ConnectedUserProjectWorkflowServiceImpl.class,
             EmbeddedMcpAuditIntTestConfiguration.class, EmbeddedMcpServerBeforeDeleteEventListener.class,
             IntegrationInstanceServiceImpl.class, McpAutomationProjectConfigurationFacadeImpl.class,
-            McpAutomationRowsImpl.class, McpComponentServiceImpl.class,
+            McpAutomationRowFacadeImpl.class, McpComponentServiceImpl.class,
             McpIntegrationInstanceConfigurationServiceImpl.class, McpServerMembership.class,
             McpServerServiceImpl.class, ProjectWorkflowServiceImpl.class
         })

@@ -52,7 +52,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Transactional
 @ConditionalOnEEVersion
-public class McpIntegrationInstanceRowsImpl implements McpIntegrationInstanceRows {
+public class McpIntegrationInstanceRowFacadeImpl implements McpIntegrationInstanceRowFacade {
 
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
@@ -69,7 +69,7 @@ public class McpIntegrationInstanceRowsImpl implements McpIntegrationInstanceRow
     private final McpToolService mcpToolService;
 
     @SuppressFBWarnings("EI")
-    public McpIntegrationInstanceRowsImpl(
+    public McpIntegrationInstanceRowFacadeImpl(
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService,
@@ -479,7 +479,7 @@ public class McpIntegrationInstanceRowsImpl implements McpIntegrationInstanceRow
         private List<Long> getOfferedMcpToolIds(IntegrationInstance integrationInstance) {
             String componentName = componentNameByIntegrationInstanceConfigurationId.computeIfAbsent(
                 integrationInstance.getIntegrationInstanceConfigurationId(),
-                McpIntegrationInstanceRowsImpl.this::getComponentName);
+                McpIntegrationInstanceRowFacadeImpl.this::getComponentName);
 
             return enabledMcpToolIdsByComponentName.getOrDefault(componentName, List.of());
         }

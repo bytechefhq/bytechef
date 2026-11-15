@@ -50,8 +50,8 @@ import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
-import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRows;
-import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRows;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRowFacade;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
@@ -174,7 +174,7 @@ import org.springframework.transaction.support.TransactionTemplate;
     JobFacade.class, JobService.class, McpComponentService.class, McpIntegrationComponentService.class,
     McpIntegrationInstanceConfigurationService.class,
     McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceToolService.class,
-    McpIntegrationInstanceWorkflowService.class, McpAutomationRows.class, McpIntegrationInstanceRows.class,
+    McpIntegrationInstanceWorkflowService.class, McpAutomationRowFacade.class, McpIntegrationInstanceRowFacade.class,
     McpServerService.class, McpToolService.class, OAuth2ParametersFacade.class, OAuth2Service.class,
     PrincipalJobFacade.class, PrincipalJobService.class, ProjectFacade.class,
     TaskDispatcherDefinitionService.class, TaskExecutionService.class,
@@ -293,7 +293,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     private JobFacade jobFacade;
 
     @Autowired
-    private McpAutomationRows mcpAutomationRows;
+    private McpAutomationRowFacade mcpAutomationRowFacade;
 
     @Autowired
     private PlatformTransactionManager platformTransactionManager;
@@ -2064,7 +2064,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         assertThat(moveResult.movedConnectedUserIds()).containsExactly(connectedUser.getId());
 
-        verify(mcpAutomationRows).remapConnectedUser(
+        verify(mcpAutomationRowFacade).remapConnectedUser(
             connectedUser.getId(), sourceConfiguration.getId(), targetConfiguration.getId());
     }
 

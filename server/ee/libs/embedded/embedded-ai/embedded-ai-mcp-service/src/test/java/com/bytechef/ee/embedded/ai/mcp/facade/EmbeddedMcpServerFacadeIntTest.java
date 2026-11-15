@@ -114,7 +114,7 @@ class EmbeddedMcpServerFacadeIntTest {
     private McpIntegrationComponentService mcpIntegrationComponentService;
 
     @MockitoBean
-    private McpIntegrationInstanceRows mcpIntegrationInstanceRows;
+    private McpIntegrationInstanceRowFacade mcpIntegrationInstanceRowFacade;
 
     @MockitoBean
     private McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
@@ -221,7 +221,7 @@ class EmbeddedMcpServerFacadeIntTest {
         private void verifyNoServiceInteractions() {
             verifyNoInteractions(
                 componentDefinitionService, integrationInstanceConfigurationService, integrationService,
-                mcpComponentService, mcpIntegrationComponentService, mcpIntegrationInstanceRows,
+                mcpComponentService, mcpIntegrationComponentService, mcpIntegrationInstanceRowFacade,
                 mcpIntegrationInstanceToolService, mcpServerService, mcpToolService, tagService);
         }
     }
@@ -274,7 +274,7 @@ class EmbeddedMcpServerFacadeIntTest {
 
             embeddedMcpServerFacade.createEmbeddedMcpComponent(mcpComponent, INTEGRATION_ID, mcpTools);
 
-            verify(mcpIntegrationInstanceRows).addMissingRowsForConnectedUsers(EMBEDDED_MCP_SERVER_ID);
+            verify(mcpIntegrationInstanceRowFacade).addMissingRowsForConnectedUsers(EMBEDDED_MCP_SERVER_ID);
 
             McpComponent updatedMcpComponent = createMcpComponent(EMBEDDED_MCP_COMPONENT_ID, EMBEDDED_MCP_SERVER_ID);
 
@@ -284,18 +284,18 @@ class EmbeddedMcpServerFacadeIntTest {
 
             embeddedMcpServerFacade.updateEmbeddedMcpComponent(updatedMcpComponent, null, null, mcpTools);
 
-            verify(mcpIntegrationInstanceRows, times(2)).addMissingRowsForConnectedUsers(EMBEDDED_MCP_SERVER_ID);
+            verify(mcpIntegrationInstanceRowFacade, times(2)).addMissingRowsForConnectedUsers(EMBEDDED_MCP_SERVER_ID);
         }
 
         @Test
         void testToolSwitchedBackOnReachesConnectedUsers() {
             embeddedMcpServerFacade.updateEmbeddedMcpToolEnabled(EMBEDDED_MCP_TOOL_ID, false);
 
-            verify(mcpIntegrationInstanceRows, never()).addMissingRowsForConnectedUsers(anyLong());
+            verify(mcpIntegrationInstanceRowFacade, never()).addMissingRowsForConnectedUsers(anyLong());
 
             embeddedMcpServerFacade.updateEmbeddedMcpToolEnabled(EMBEDDED_MCP_TOOL_ID, true);
 
-            verify(mcpIntegrationInstanceRows).addMissingRowsForConnectedUsers(EMBEDDED_MCP_SERVER_ID);
+            verify(mcpIntegrationInstanceRowFacade).addMissingRowsForConnectedUsers(EMBEDDED_MCP_SERVER_ID);
         }
 
         @Test

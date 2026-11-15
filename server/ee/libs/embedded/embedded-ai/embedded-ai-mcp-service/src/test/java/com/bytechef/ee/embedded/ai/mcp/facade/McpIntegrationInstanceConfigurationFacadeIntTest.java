@@ -117,7 +117,7 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
     private McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
 
     @Autowired
-    private McpIntegrationInstanceRows mcpIntegrationInstanceRows;
+    private McpIntegrationInstanceRowFacade mcpIntegrationInstanceRowFacade;
 
     @Autowired
     private McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService;
@@ -470,7 +470,7 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
         long otherIntegrationInstanceId = fixture.insertIntegrationInstance(
             integrationInstanceConfigurationId, fixture.insertConnectedUser("user-2"), connectionId);
 
-        mcpIntegrationInstanceRows.provisionMcpServer(
+        mcpIntegrationInstanceRowFacade.provisionMcpServer(
             getConnectedUserId(integrationInstanceId), mcpServerId);
 
         createConfigurationWorkflow(SECOND_WORKFLOW_ID, true);
@@ -553,7 +553,7 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
         IntegrationInstanceConfigurationWorkflowServiceImpl.class, IntegrationInstanceWorkflowServiceImpl.class,
         IntegrationInstanceServiceImpl.class, IntegrationServiceImpl.class, IntegrationWorkflowServiceImpl.class,
         McpComponentServiceImpl.class, McpIntegrationInstanceConfigurationFacadeImpl.class,
-        McpIntegrationInstanceConfigurationServiceImpl.class, McpIntegrationInstanceRowsImpl.class,
+        McpIntegrationInstanceConfigurationServiceImpl.class, McpIntegrationInstanceRowFacadeImpl.class,
         McpServerMembership.class,
         McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, EmbeddedMcpAuditIntTestConfiguration.class
     })
