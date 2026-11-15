@@ -692,7 +692,7 @@ class ConnectionFacadeIntTest {
     }
 
     @Test
-    void testAnAdminWhoDidNotCreateTheConnectionCannotReplaceItsCredentials() {
+    void testAnAdminWhoDidNotCreateTheConnectionCanReplaceItsCredentialsAndAMemberCannot() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
         securityContext.setAuthentication(
@@ -700,24 +700,22 @@ class ConnectionFacadeIntTest {
 
         long connectionId = connectionFacade.create(connectionDTO(), PlatformType.AUTOMATION);
 
-        ConnectionDTO createdConnectionDTO = connectionFacade.getConnection(connectionId);
+        securityContext.setAuthentication(
+            new TestingAuthenticationToken("member@localhost.com", null, AuthorityConstants.USER));
+
+        Assertions.assertThatThrownBy(
+            () -> connectionFacade.replaceAuthorizationParameters(connectionId, Map.of("key", "member")))
+            .isInstanceOf(AccessDeniedException.class);
 
         securityContext.setAuthentication(
             new TestingAuthenticationToken("admin@localhost.com", null, AuthorityConstants.ADMIN));
 
-        Assertions.assertThatThrownBy(
-            () -> connectionFacade.replaceAuthorizationParameters(connectionId, Map.of("key", "value")))
-            .isInstanceOf(AccessDeniedException.class);
-
-        connectionFacade.update(connectionId, "renamed", List.of(), createdConnectionDTO.version());
+        connectionFacade.replaceAuthorizationParameters(connectionId, Map.of("key", "value"));
 
         Assertions.assertThat(connectionRepository.findById(connectionId))
-            .hasValueSatisfying(connection -> {
-                Assertions.assertThat(connection.getName())
-                    .isEqualTo("renamed");
-                Assertions.assertThat(connection.getParameters())
-                    .doesNotContainKey("key");
-            });
+            .hasValueSatisfying(connection -> Assertions.assertThat(connection.getParameters()
+                .get("key"))
+                .isEqualTo("value"));
 
         connectionFacade.delete(connectionId);
 
