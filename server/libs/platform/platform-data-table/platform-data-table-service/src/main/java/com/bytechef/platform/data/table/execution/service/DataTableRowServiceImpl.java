@@ -1286,7 +1286,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         return switch (type) {
             case STRING -> "varchar";
             case NUMBER -> "numeric";
-            case INTEGER -> "bigint";
+            case INTEGER, LINK -> "bigint";
             case DATE -> "date";
             case DATE_TIME -> "timestamp";
             case BOOLEAN -> "boolean";
@@ -1297,7 +1297,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         return switch (type) {
             case STRING -> String.valueOf(value);
             case NUMBER -> toBigDecimal((Number) value);
-            case INTEGER -> ((Number) value).longValue();
+            case INTEGER, LINK -> ((Number) value).longValue();
             case DATE -> value instanceof java.sql.Date date ? date : new java.sql.Date(((Date) value).getTime());
             case DATE_TIME -> switch (value) {
                 case LocalDateTime localDateTime -> localDateTime.toString();
@@ -1695,7 +1695,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             return switch (type) {
                 case STRING -> trimmed;
                 case BOOLEAN -> BooleanUtils.parseBoolean(trimmed);
-                case INTEGER -> com.bytechef.commons.util.NumberUtils.parseLong(trimmed);
+                case INTEGER, LINK -> com.bytechef.commons.util.NumberUtils.parseLong(trimmed);
                 case NUMBER -> com.bytechef.commons.util.NumberUtils.parseBigDecimal(trimmed);
                 case DATE -> DateUtils.parseSqlDate(trimmed);
                 case DATE_TIME -> DateUtils.parseSqlTimestamp(trimmed);
@@ -1706,7 +1706,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             case STRING -> String.valueOf(rawValue);
             case BOOLEAN -> (rawValue instanceof Boolean) ? rawValue
                 : BooleanUtils.parseBoolean(String.valueOf(rawValue));
-            case INTEGER -> (rawValue instanceof Number n) ? Long.valueOf(n.longValue())
+            case INTEGER, LINK -> (rawValue instanceof Number n) ? Long.valueOf(n.longValue())
                 : com.bytechef.commons.util.NumberUtils.parseLong(String.valueOf(rawValue));
             case NUMBER -> (rawValue instanceof BigDecimal bd)
                 ? bd
@@ -1804,7 +1804,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             int sqlType = switch (type) {
                 case STRING -> Types.VARCHAR;
                 case NUMBER -> Types.DECIMAL;
-                case INTEGER -> Types.BIGINT;
+                case INTEGER, LINK -> Types.BIGINT;
                 case DATE -> Types.DATE;
                 case DATE_TIME -> Types.TIMESTAMP;
                 case BOOLEAN -> Types.BOOLEAN;

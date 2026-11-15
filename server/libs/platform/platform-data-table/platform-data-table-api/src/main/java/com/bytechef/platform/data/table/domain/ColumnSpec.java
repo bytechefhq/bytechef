@@ -17,16 +17,29 @@
 package com.bytechef.platform.data.table.domain;
 
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Column specification used for dynamic DDL operations.
  *
  * @author Ivica Cardic
  */
-public record ColumnSpec(String name, ColumnType type) {
+public record ColumnSpec(String name, ColumnType type, @Nullable LinkSpec link) {
 
     public ColumnSpec {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(type, "type");
+
+        if (type == ColumnType.LINK && link == null) {
+            throw new IllegalArgumentException("A LINK column requires a link specification");
+        }
+
+        if (type != ColumnType.LINK && link != null) {
+            throw new IllegalArgumentException("Only a LINK column can have a link specification");
+        }
+    }
+
+    public ColumnSpec(String name, ColumnType type) {
+        this(name, type, null);
     }
 }
