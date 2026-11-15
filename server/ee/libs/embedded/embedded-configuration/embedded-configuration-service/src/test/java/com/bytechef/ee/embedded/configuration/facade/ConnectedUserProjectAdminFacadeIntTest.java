@@ -462,12 +462,15 @@ class ConnectedUserProjectAdminFacadeIntTest {
             .getOrCreateReference(
                 anyString(), eq(failingWorkflowUuid), any(Environment.class), anyMap(), any());
 
+        long connectedUserId = connectedUser.getId();
+        long configurationId = getConfigurationId(projectId);
+        List<ProvisionConnectedUserProjectWorkflowDTO> workflows = List.of(
+            new ProvisionConnectedUserProjectWorkflowDTO(firstWorkflowUuid, null),
+            new ProvisionConnectedUserProjectWorkflowDTO(failingWorkflowUuid, null));
+
         assertThatThrownBy(() -> connectedUserProjectAdminFacade.provisionProjectWorkflows(
-            connectedUser.getId(), getConfigurationId(projectId),
-            List.of(
-                new ProvisionConnectedUserProjectWorkflowDTO(firstWorkflowUuid, null),
-                new ProvisionConnectedUserProjectWorkflowDTO(failingWorkflowUuid, null))))
-                    .isInstanceOf(IllegalStateException.class);
+            connectedUserId, configurationId, workflows))
+                .isInstanceOf(IllegalStateException.class);
 
         assertThat(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId()))
             .extracting(ConnectedUserProjectWorkflow::getAutomationUuid,
