@@ -602,7 +602,7 @@ public class ProjectDeploymentFacadeIntTest {
         projectDeploymentFacade.updateProjectDeploymentTags(
             otherProjectDeploymentDTO.id(), List.of(new Tag("deployment-tag-z")));
 
-        List<Tag> tags = projectDeploymentFacade.getProjectDeploymentTags(workspace.getId(), null);
+        List<Tag> tags = projectDeploymentFacade.getProjectDeploymentTags(workspace.getId());
 
         assertThat(tags)
             .extracting(Tag::getName)
@@ -623,10 +623,10 @@ public class ProjectDeploymentFacadeIntTest {
         projectDeploymentFacade.updateProjectDeploymentTags(
             otherProjectDeploymentDTO.id(), List.of(new Tag("other-workspace-deployment-tag")));
 
-        assertThat(projectDeploymentFacade.getProjectDeploymentTags(workspace.getId(), null))
+        assertThat(projectDeploymentFacade.getProjectDeploymentTags(workspace.getId()))
             .extracting(Tag::getName)
             .containsExactly("workspace-deployment-tag");
-        assertThat(projectDeploymentFacade.getProjectDeploymentTags(otherWorkspace.getId(), null))
+        assertThat(projectDeploymentFacade.getProjectDeploymentTags(otherWorkspace.getId()))
             .extracting(Tag::getName)
             .containsExactly("other-workspace-deployment-tag");
     }
@@ -2131,24 +2131,6 @@ public class ProjectDeploymentFacadeIntTest {
             grant("DEPLOYMENT_CREATE");
 
             assertThatThrownBy(() -> projectDeploymentFacade.updateProjectDeployment(projectDeploymentDTO()))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage(BODY_REACHED);
-        }
-
-        @Test
-        void testProjectDeploymentTagsRequireTheDeploymentViewScopeInTheRequestedEnvironment() {
-            long environmentId = Environment.PRODUCTION.ordinal();
-
-            when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "DEPLOYMENT_VIEW", Environment.DEVELOPMENT))
-                .thenReturn(true);
-
-            assertThatThrownBy(() -> projectDeploymentFacade.getProjectDeploymentTags(WORKSPACE_ID, environmentId))
-                .isInstanceOf(AccessDeniedException.class);
-
-            when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "DEPLOYMENT_VIEW", Environment.PRODUCTION))
-                .thenReturn(true);
-
-            assertThatThrownBy(() -> projectDeploymentFacade.getProjectDeploymentTags(WORKSPACE_ID, environmentId))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage(BODY_REACHED);
         }

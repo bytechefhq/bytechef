@@ -24,7 +24,6 @@ import com.bytechef.automation.configuration.facade.ProjectDeploymentFacadeImpl;
 import com.bytechef.automation.configuration.facade.ProjectTagFacadeImpl;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacadeImpl;
 import com.bytechef.automation.configuration.service.PermissionService;
-import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Method;
@@ -41,8 +40,7 @@ import org.springframework.security.util.SimpleMethodInvocation;
 
 /**
  * Evaluates the real {@code @PreAuthorize} expressions on the workspace tag listings through the real expression
- * handler, in both directions, and shows that a scope held in another environment does not reach a listing asked for
- * one environment.
+ * handler, in both directions.
  *
  * @author Ivica Cardic
  */
@@ -51,26 +49,21 @@ class WorkspaceTagListingAuthorizationTest {
     private static final long WORKSPACE_ID = 42L;
 
     @Test
-    void testConnectionTagsRequireTheConnectionViewScopeInTheRequestedEnvironment() throws Exception {
-        Method method = WorkspaceConnectionFacadeImpl.class.getMethod("getConnectionTags", long.class, Long.class);
-
-        assertThat(evaluateEnvironmentGuard(method, "CONNECTION_VIEW", Environment.PRODUCTION)).isTrue();
-        assertThat(evaluateEnvironmentGuard(method, "CONNECTION_VIEW", Environment.DEVELOPMENT)).isFalse();
+    void testConnectionTagsRequireTheWorkflowViewScopeInTheWorkspace() throws Exception {
+        assertWorkflowViewGuard(WorkspaceConnectionFacadeImpl.class.getMethod("getConnectionTags", long.class));
     }
 
     @Test
-    void testProjectDeploymentTagsRequireTheDeploymentViewScopeInTheRequestedEnvironment() throws Exception {
-        Method method = ProjectDeploymentFacadeImpl.class.getMethod(
-            "getProjectDeploymentTags", long.class, Long.class);
-
-        assertThat(evaluateEnvironmentGuard(method, "DEPLOYMENT_VIEW", Environment.PRODUCTION)).isTrue();
-        assertThat(evaluateEnvironmentGuard(method, "DEPLOYMENT_VIEW", Environment.DEVELOPMENT)).isFalse();
+    void testProjectDeploymentTagsRequireTheWorkflowViewScopeInTheWorkspace() throws Exception {
+        assertWorkflowViewGuard(ProjectDeploymentFacadeImpl.class.getMethod("getProjectDeploymentTags", long.class));
     }
 
     @Test
     void testProjectTagsRequireTheWorkflowViewScopeInTheWorkspace() throws Exception {
-        Method method = ProjectTagFacadeImpl.class.getMethod("getProjectTags", long.class);
+        assertWorkflowViewGuard(ProjectTagFacadeImpl.class.getMethod("getProjectTags", long.class));
+    }
 
+    private static void assertWorkflowViewGuard(Method method) {
         PermissionService grantingPermissionService = mock(PermissionService.class);
 
         when(grantingPermissionService.hasResourceScope(WORKSPACE_ID, "Workspace", "WORKFLOW_VIEW")).thenReturn(true);
@@ -87,16 +80,6 @@ class WorkspaceTagListingAuthorizationTest {
                     WORKSPACE_ID
                 }))
                     .isFalse();
-    }
-
-    private static boolean evaluateEnvironmentGuard(Method method, String scope, Environment grantedEnvironment) {
-        PermissionService permissionService = mock(PermissionService.class);
-
-        when(permissionService.hasWorkspaceScope(WORKSPACE_ID, scope, grantedEnvironment)).thenReturn(true);
-
-        return evaluateGuard(permissionService, method, new Object[] {
-            WORKSPACE_ID, (long) Environment.PRODUCTION.ordinal()
-        });
     }
 
     @SuppressFBWarnings(

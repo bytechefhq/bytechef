@@ -79,6 +79,8 @@ class AuditDataContractTest {
     private static final String RESULT_VARIABLE = "result";
     private static final List<String> READ_METHOD_PREFIXES = List.of(
         "count", "exists", "fetch", "find", "get", "has", "is", "list", "load", "read", "search");
+    private static final String APP_AUDIT_PUBLISHER = "recorded by AppAuditPublisher once the change is made";
+    private static final String CHUNK_DATA = "knowledge base chunks are document data and are not recorded";
     private static final String DEFINITION_EDIT = "workflow definition edit";
     private static final String DELEGATES = "delegates to an audited method";
     private static final String EDITOR_TEST = "editor-time test run";
@@ -88,11 +90,14 @@ class AuditDataContractTest {
     private static final String RUNTIME_APPROVAL = "approval task opened by a workflow run";
     private static final String TAGS = "tag assignment";
     private static final String JOB_STATUS = "job status change recorded by the job status listener";
+    private static final String PORTAL_BOOKKEEPING =
+        "per-user App Portal bookkeeping, not a change to a governed resource";
     private static final String PREVIEW = "returns a generated preview without saving it";
     private static final String RECORDED_BY_CALLER = "called only from audited methods";
     private static final String ROW_DATA = "data table rows are data and are not recorded";
     private static final String TOOL_SETTING = "parameter or skill edit of a tool of an audited MCP or A2A server";
     private static final String TRIGGER_INTERNAL = "trigger bookkeeping of an audited enable";
+    private static final String VERSION_LABEL = "version label; the deployment that names it is recorded";
     private static final String WEBHOOK_TRIGGER_TEST = "editor-time webhook trigger test";
     private static final String WORKFLOW_INPUTS = "workflow input or connection values";
     private static final Map<String, String> UNAUDITED_GUARDED_CLASSES = Map.of(
@@ -108,8 +113,44 @@ class AuditDataContractTest {
         Map.entry("A2aServerFacadeImpl.updateA2aServerTags", TAGS),
         Map.entry("AiAgentTestFacadeImpl.executeAiAgentAction", EDITOR_TEST),
         Map.entry("AiSkillFacadeImpl.updateAiSkillTags", TAGS),
+        Map.entry("ApiCollectionFacadeImpl.enableApiCollection", DELEGATES),
+        Map.entry("ApiCollectionFacadeImpl.enableApiCollectionEndpoint", DELEGATES),
+        Map.entry("ApiCollectionFacadeImpl.updateApiCollectionEndpointWorkflow", WORKFLOW_INPUTS),
         Map.entry("ApiCollectionFacadeImpl.updateApiCollectionTags", TAGS),
         Map.entry("ApiConnectorFacadeImpl.generateSpecification", PREVIEW),
+        Map.entry("AppApiCollectionFacadeImpl.bindApiCollection", APP_AUDIT_PUBLISHER),
+        Map.entry("AppApiCollectionFacadeImpl.unbindApiCollection", APP_AUDIT_PUBLISHER),
+        Map.entry("AppDeploymentFacadeImpl.cancel", APP_AUDIT_PUBLISHER),
+        Map.entry("AppDeploymentFacadeImpl.createVersion", VERSION_LABEL),
+        Map.entry("AppDeploymentFacadeImpl.deploy", APP_AUDIT_PUBLISHER),
+        Map.entry("AppDeploymentFacadeImpl.recordDeployment", APP_AUDIT_PUBLISHER),
+        Map.entry("AppDeploymentFacadeImpl.rollback", APP_AUDIT_PUBLISHER),
+        Map.entry("AppFacadeImpl.createApp", APP_AUDIT_PUBLISHER),
+        Map.entry("AppFacadeImpl.deleteApp", APP_AUDIT_PUBLISHER),
+        Map.entry("AppFacadeImpl.deleteAppIcon", APP_AUDIT_PUBLISHER),
+        Map.entry("AppFacadeImpl.updateApp", APP_AUDIT_PUBLISHER),
+        Map.entry("AppFacadeImpl.updateAppIcon", APP_AUDIT_PUBLISHER),
+        Map.entry("AppFacadeImpl.updateAppStatus", APP_AUDIT_PUBLISHER),
+        Map.entry("AppInstanceFacadeImpl.bindConnection", APP_AUDIT_PUBLISHER),
+        Map.entry("AppInstanceFacadeImpl.createAppInstance", APP_AUDIT_PUBLISHER),
+        Map.entry("AppInstanceFacadeImpl.deleteAppInstance", APP_AUDIT_PUBLISHER),
+        Map.entry("AppInstanceFacadeImpl.rotateSecretKey", APP_AUDIT_PUBLISHER),
+        Map.entry("AppInstanceFacadeImpl.unbindConnection", APP_AUDIT_PUBLISHER),
+        Map.entry("AppInstanceFacadeImpl.updateAppInstance", APP_AUDIT_PUBLISHER),
+        Map.entry("AppInstanceFacadeImpl.updateAppInstanceConfiguration", APP_AUDIT_PUBLISHER),
+        Map.entry("AppInstanceFacadeImpl.updateAppInstanceDeploymentSettings", APP_AUDIT_PUBLISHER),
+        Map.entry("AppInstanceFacadeImpl.updateAppInstanceStatus", APP_AUDIT_PUBLISHER),
+        Map.entry("AppInstanceFacadeImpl.updateAppInstanceUserAuth", APP_AUDIT_PUBLISHER),
+        Map.entry("AppPortalFacadeImpl.recordAppLaunch", PORTAL_BOOKKEEPING),
+        Map.entry("AppPortalFacadeImpl.setAppFavorite", PORTAL_BOOKKEEPING),
+        Map.entry("AppSharingFacadeImpl.grantAppAccess", APP_AUDIT_PUBLISHER),
+        Map.entry("AppSharingFacadeImpl.grantAppInstanceAccess", APP_AUDIT_PUBLISHER),
+        Map.entry("AppSharingFacadeImpl.revokeAppAccess", APP_AUDIT_PUBLISHER),
+        Map.entry("AppSharingFacadeImpl.revokeAppInstanceAccess", APP_AUDIT_PUBLISHER),
+        Map.entry("AppSharingFacadeImpl.setAppInstanceVisibility", APP_AUDIT_PUBLISHER),
+        Map.entry("AppSharingFacadeImpl.setAppVisibility", APP_AUDIT_PUBLISHER),
+        Map.entry("AppWorkflowFacadeImpl.bindWorkflow", APP_AUDIT_PUBLISHER),
+        Map.entry("AppWorkflowFacadeImpl.unbindWorkflow", APP_AUDIT_PUBLISHER),
         Map.entry("ApprovalTaskFacadeImpl.createApprovalTask", RUNTIME_APPROVAL),
         Map.entry("AutomationProjectFacadeImpl.updateProjectWorkflow", DEFINITION_EDIT),
         Map.entry("AutomationProjectCodeWorkflowFacadeImpl.createEmptyCodeWorkflow", DELEGATES),
@@ -211,7 +252,10 @@ class AuditDataContractTest {
         Map.entry("WorkspaceDataTableFacadeImpl.updateTags", TAGS),
         Map.entry("WorkspaceDataTableFacadeImpl.upsertRow", ROW_DATA),
         Map.entry("WorkspaceKnowledgeBaseDocumentFacadeImpl.deleteKnowledgeBaseDocument", DELEGATES),
+        Map.entry("WorkspaceKnowledgeBaseDocumentFacadeImpl.deleteKnowledgeBaseDocumentChunk", CHUNK_DATA),
+        Map.entry("WorkspaceKnowledgeBaseDocumentFacadeImpl.updateKnowledgeBaseDocumentChunk", CHUNK_DATA),
         Map.entry("WorkspaceKnowledgeBaseDocumentFacadeImpl.updateKnowledgeBaseDocumentTags", TAGS),
+        Map.entry("WorkspaceKnowledgeBaseFacadeImpl.updateKnowledgeBase", DELEGATES),
         Map.entry("WorkspaceKnowledgeBaseFacadeImpl.updateKnowledgeBaseTags", TAGS),
         Map.entry("WorkspaceMcpServerFacadeImpl.createWorkspaceMcpServer", DELEGATES),
         Map.entry("WorkspaceMcpServerFacadeImpl.deleteWorkspaceMcpServer", DELEGATES),

@@ -16,9 +16,6 @@
 
 package com.bytechef.automation.knowledgebase.facade;
 
-import com.bytechef.platform.audit.AuditData;
-import com.bytechef.platform.audit.Audited;
-import com.bytechef.platform.knowledgebase.audit.KnowledgeBaseAuditEvents;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import com.bytechef.platform.knowledgebase.dto.DocumentStatusUpdate;
@@ -67,9 +64,6 @@ public class WorkspaceKnowledgeBaseDocumentFacadeImpl implements WorkspaceKnowle
     }
 
     @Override
-    @Audited(event = KnowledgeBaseAuditEvents.KB_DOCUMENT_CHUNK_DELETED, data = {
-        @AuditData(key = "knowledgeBaseDocumentChunkId", value = "#knowledgeBaseDocumentChunkId")
-    })
     @PreAuthorize("hasPermission(#knowledgeBaseDocumentChunkId, 'KnowledgeBaseDocumentChunk', 'KNOWLEDGE_BASE_EDIT')")
     public void deleteKnowledgeBaseDocumentChunk(long knowledgeBaseDocumentChunkId) {
         knowledgeBaseDocumentChunkFacade.deleteKnowledgeBaseDocumentChunk(knowledgeBaseDocumentChunkId);
@@ -111,10 +105,6 @@ public class WorkspaceKnowledgeBaseDocumentFacadeImpl implements WorkspaceKnowle
     }
 
     @Override
-    @Audited(event = KnowledgeBaseAuditEvents.KB_DOCUMENT_CHUNK_UPDATED, data = {
-        @AuditData(key = "knowledgeBaseDocumentChunkId", value = "#knowledgeBaseDocumentChunkId"),
-        @AuditData(key = "knowledgeBaseDocumentId", value = "#result?.knowledgeBaseDocumentId")
-    })
     @PreAuthorize("hasPermission(#knowledgeBaseDocumentChunkId, 'KnowledgeBaseDocumentChunk', 'KNOWLEDGE_BASE_EDIT')")
     public KnowledgeBaseDocumentChunk updateKnowledgeBaseDocumentChunk(
         long knowledgeBaseDocumentChunkId, String content) {

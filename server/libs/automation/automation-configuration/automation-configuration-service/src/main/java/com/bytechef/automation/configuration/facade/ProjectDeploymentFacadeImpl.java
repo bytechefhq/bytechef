@@ -358,6 +358,11 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @Audited(event = ProjectDeploymentAuditEvents.PROJECT_DEPLOYED, data = {
+        @AuditData(key = "projectId", value = "#projectId"),
+        @AuditData(key = "projectDeploymentId", value = "#result?.projectDeploymentId"),
+        @AuditData(key = "projectVersion", value = "#result?.projectVersion")
+    })
     @PreAuthorize("hasResourceScopeInEnvironment(#projectId, 'Project', 'DEPLOYMENT_CREATE', " +
         "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT) and " +
         "(#projectDeploymentId == null or hasPermission(#projectDeploymentId, 'ProjectDeployment', " +
@@ -592,13 +597,11 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
-    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#id, 'DEPLOYMENT_VIEW', #environmentId)")
     @Transactional(readOnly = true)
-    public List<Tag> getProjectDeploymentTags(long id, Long environmentId) {
-        Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
-
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
+    public List<Tag> getProjectDeploymentTags(long workspaceId) {
         List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(
-            false, environment, null, null, id);
+            false, null, null, null, workspaceId);
 
         return tagService.getTags(
             projectDeployments.stream()

@@ -334,10 +334,10 @@ public class WorkspaceConnectionFacadeIntTest {
         when(connectionService.getConnections(List.of(10L))).thenReturn(List.of(connection));
         when(connectionService.getConnections(List.of(20L))).thenReturn(List.of(otherConnection));
 
-        assertThat(workspaceConnectionFacade.getConnectionTags(workspace.getId(), null))
+        assertThat(workspaceConnectionFacade.getConnectionTags(workspace.getId()))
             .extracting(Tag::getName)
             .containsExactly("workspace-connection-tag");
-        assertThat(workspaceConnectionFacade.getConnectionTags(otherWorkspace.getId(), null))
+        assertThat(workspaceConnectionFacade.getConnectionTags(otherWorkspace.getId()))
             .extracting(Tag::getName)
             .containsExactly("other-workspace-connection-tag");
     }
@@ -354,7 +354,7 @@ public class WorkspaceConnectionFacadeIntTest {
 
         when(connectionService.getConnections(List.of(30L))).thenReturn(List.of(embeddedConnection));
 
-        assertThat(workspaceConnectionFacade.getConnectionTags(workspace.getId(), null)).isEmpty();
+        assertThat(workspaceConnectionFacade.getConnectionTags(workspace.getId())).isEmpty();
     }
 
     @Test

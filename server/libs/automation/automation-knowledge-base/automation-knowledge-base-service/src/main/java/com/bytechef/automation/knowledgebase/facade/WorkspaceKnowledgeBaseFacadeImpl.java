@@ -193,7 +193,7 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     @Audited(event = KnowledgeBaseAuditEvents.KB_DELETED, data = {
         @AuditData(key = "knowledgeBaseId", value = "#knowledgeBaseId")
     })
-    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_EDIT')")
+    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_DELETE')")
     public void deleteWorkspaceKnowledgeBase(Long knowledgeBaseId) {
         knowledgeBaseService.getKnowledgeBase(knowledgeBaseId);
 
@@ -216,10 +216,6 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     }
 
     @Override
-    @Audited(event = KnowledgeBaseAuditEvents.KB_UPDATED, data = {
-        @AuditData(key = "knowledgeBaseId", value = "#knowledgeBaseId"),
-        @AuditData(key = "name", value = "#result?.name")
-    })
     @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_EDIT')")
     public KnowledgeBase updateKnowledgeBase(long knowledgeBaseId, KnowledgeBase knowledgeBase) {
         return knowledgeBaseService.updateKnowledgeBase(knowledgeBaseId, knowledgeBase);

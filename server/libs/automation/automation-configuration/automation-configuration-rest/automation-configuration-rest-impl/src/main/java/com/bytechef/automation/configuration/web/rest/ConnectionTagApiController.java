@@ -48,9 +48,9 @@ public class ConnectionTagApiController implements ConnectionTagApi {
     }
 
     @Override
-    public ResponseEntity<List<TagModel>> getConnectionTags(Long id, Long environmentId) {
+    public ResponseEntity<List<TagModel>> getConnectionTags(Long id) {
         return ResponseEntity.ok(
-            workspaceConnectionFacade.getConnectionTags(id, environmentId)
+            workspaceConnectionFacade.getConnectionTags(id)
                 .stream()
                 .map(tag -> conversionService.convert(tag, TagModel.class))
                 .toList());

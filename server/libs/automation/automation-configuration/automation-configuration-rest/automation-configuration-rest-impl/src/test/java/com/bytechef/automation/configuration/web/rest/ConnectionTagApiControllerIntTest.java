@@ -79,12 +79,12 @@ class ConnectionTagApiControllerIntTest {
 
     @Test
     void testGetConnectionTags() {
-        when(workspaceConnectionFacade.getConnectionTags(7L, null))
+        when(workspaceConnectionFacade.getConnectionTags(1L))
             .thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
 
         webTestClient
             .get()
-            .uri("/internal/workspaces/7/connection-tags")
+            .uri("/internal/workspaces/1/connection-tags")
             .exchange()
             .expectStatus()
             .isOk()
@@ -100,7 +100,7 @@ class ConnectionTagApiControllerIntTest {
             .jsonPath("$[1].name")
             .isEqualTo("tag2");
 
-        verify(workspaceConnectionFacade).getConnectionTags(7L, null);
+        verify(workspaceConnectionFacade).getConnectionTags(1L);
     }
 
     @Test
