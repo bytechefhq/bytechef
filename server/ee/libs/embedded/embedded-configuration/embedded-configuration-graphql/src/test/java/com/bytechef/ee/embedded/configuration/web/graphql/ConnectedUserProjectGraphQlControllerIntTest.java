@@ -121,7 +121,7 @@ class ConnectedUserProjectGraphQlControllerIntTest {
     @Test
     void testProjectWorkflowToolOnlyFlag() {
         when(environmentService.getEnvironment(0L)).thenReturn(Environment.DEVELOPMENT);
-        when(connectedUserProjectAdminFacade.getConnectedUserProjects(7L, Environment.DEVELOPMENT))
+        when(connectedUserProjectFacade.getConnectedUserProjects(7L, Environment.DEVELOPMENT))
             .thenReturn(
                 List.of(
                     new ConnectedUserProjectDTO(

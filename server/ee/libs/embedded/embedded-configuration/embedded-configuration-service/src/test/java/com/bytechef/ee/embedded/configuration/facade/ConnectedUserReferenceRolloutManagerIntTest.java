@@ -2059,7 +2059,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         connectedUserWorkflowReferenceFacade.getOrCreateReference(
             connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
 
-        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationAdminFacade.moveConnectedUsers(
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.moveConnectedUsers(
             sourceConfiguration.getId(), targetConfiguration.getId(), List.of(connectedUser.getId()));
 
         assertThat(moveResult.movedConnectedUserIds()).containsExactly(connectedUser.getId());
