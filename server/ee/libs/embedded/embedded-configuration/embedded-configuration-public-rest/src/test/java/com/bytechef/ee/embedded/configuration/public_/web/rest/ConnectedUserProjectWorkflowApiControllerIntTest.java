@@ -648,7 +648,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
 
         ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflowDTO = ConnectedUserProjectWorkflowDTO.ofReference(
             7L, reference, new WorkflowDTO(workflow, List.of(), List.of()), List.of(), List.of(), Map.of(),
-            "MISSING_CONNECTION:slack");
+            Map.of(), "MISSING_CONNECTION:slack");
 
         when(connectedUserProjectFacade.getConnectedUserProjectWorkflows(eq(EXTERNAL_USER_ID), any()))
             .thenReturn(List.of(connectedUserProjectWorkflowDTO));
@@ -884,7 +884,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
             7L, reference, new WorkflowDTO(workflow, List.of(), List.of()),
             List.of(new ConnectedUserWorkflowTemplateDTO.Component("openAi", "OpenAI", null, true, null, true)),
             List.of(new ConnectedUserWorkflowTemplateDTO.Input("model", "Model", "STRING", true, true)), Map.of(),
-            null);
+            Map.of(), null);
 
         when(connectedUserProjectFacade.getConnectedUserProjectWorkflows(eq(EXTERNAL_USER_ID), any()))
             .thenReturn(List.of(connectedUserProjectWorkflowDTO));
