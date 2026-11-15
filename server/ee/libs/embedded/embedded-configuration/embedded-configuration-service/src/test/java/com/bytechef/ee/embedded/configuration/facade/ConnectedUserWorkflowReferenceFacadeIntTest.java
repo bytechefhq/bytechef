@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -53,6 +55,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowSer
 import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.ee.embedded.configuration.exception.AutomationTemplateNotVisibleException;
 import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
@@ -65,6 +68,7 @@ import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluat
 import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -113,6 +117,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -210,6 +215,9 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Autowired
     private ConnectedUserConnectionService connectedUserConnectionService;
+
+    @MockitoSpyBean
+    private ConnectedUserProjectService connectedUserProjectService;
 
     @Autowired
     private ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;
@@ -1485,6 +1493,51 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
             .containsExactly(ownedConnectionId);
         assertThat(connectedUserConnectionFacade.getOwnedConnectionIds(connectedUser.getId()))
             .containsExactly(ownedConnectionId);
+    }
+
+    @Test
+    void testGetReferencesJoinsBackToTheOwningConnectedUserInBatch() {
+        long automationProjectId = createAutomationProject("References");
+
+        String firstWorkflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
+        String secondWorkflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationProjectId);
+
+        ConnectedUser firstConnectedUser = createConnectedUser(Environment.PRODUCTION);
+        ConnectedUser secondConnectedUser = createConnectedUser(Environment.PRODUCTION);
+
+        givenOwnedConnection(firstConnectedUser);
+        givenOwnedConnection(secondConnectedUser);
+
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            firstConnectedUser.getExternalId(), firstWorkflowUuid, Environment.PRODUCTION);
+        ConnectedUserProjectWorkflow secondReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            secondConnectedUser.getExternalId(), secondWorkflowUuid, Environment.PRODUCTION);
+
+        markDangling(secondReference);
+
+        clearInvocations(connectedUserProjectService, connectedUserService);
+
+        List<ConnectedUserWorkflowReferenceDTO> result = connectedUserWorkflowReferenceFacade.getReferences(
+            Set.of(firstWorkflowUuid, secondWorkflowUuid));
+
+        assertThat(result)
+            .extracting(
+                ConnectedUserWorkflowReferenceDTO::automationUuid,
+                ConnectedUserWorkflowReferenceDTO::externalUserId, ConnectedUserWorkflowReferenceDTO::environment,
+                ConnectedUserWorkflowReferenceDTO::enabled, ConnectedUserWorkflowReferenceDTO::dangling,
+                ConnectedUserWorkflowReferenceDTO::danglingReason)
+            .containsExactlyInAnyOrder(
+                tuple(
+                    firstWorkflowUuid, firstConnectedUser.getExternalId(), Environment.PRODUCTION.name(), true, false,
+                    null),
+                tuple(
+                    secondWorkflowUuid, secondConnectedUser.getExternalId(), Environment.PRODUCTION.name(), false,
+                    true, "Removed from the automation project on redeploy"));
+
+        verify(connectedUserProjectService, times(1)).getConnectedUserProjects(anyList());
+        verify(connectedUserService, times(1)).getConnectedUsers(anyList());
     }
 
     private long givenAdministratorConnection() {

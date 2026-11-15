@@ -11,6 +11,7 @@ import com.bytechef.atlas.configuration.exception.WorkflowErrorType;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
@@ -19,6 +20,7 @@ import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfigurat
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceValuesDTO;
 import com.bytechef.ee.embedded.configuration.exception.AutomationTemplateNotVisibleException;
 import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
@@ -42,8 +44,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -268,6 +274,48 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(readOnly = true)
+    public List<ConnectedUserWorkflowReferenceDTO> getReferences(Set<String> automationUuids) {
+        List<ConnectedUserProjectWorkflow> references =
+            connectedUserProjectWorkflowRepository.findAllByAutomationUuidIn(automationUuids);
+
+        List<Long> connectedUserProjectIds = references.stream()
+            .map(ConnectedUserProjectWorkflow::getConnectedUserProjectId)
+            .distinct()
+            .toList();
+
+        Map<Long, ConnectedUserProject> connectedUserProjectMap =
+            connectedUserProjectService.getConnectedUserProjects(connectedUserProjectIds)
+                .stream()
+                .collect(Collectors.toMap(ConnectedUserProject::getId, Function.identity()));
+
+        List<Long> connectedUserIds = connectedUserProjectMap.values()
+            .stream()
+            .map(ConnectedUserProject::getConnectedUserId)
+            .distinct()
+            .toList();
+
+        Map<Long, ConnectedUser> connectedUserMap = connectedUserService.getConnectedUsers(connectedUserIds)
+            .stream()
+            .collect(Collectors.toMap(ConnectedUser::getId, Function.identity()));
+
+        List<Long> projectIds = connectedUserProjectMap.values()
+            .stream()
+            .map(ConnectedUserProject::getProjectId)
+            .distinct()
+            .toList();
+
+        Map<Long, String> workflowIds = projectWorkflowService.getProjectWorkflows(projectIds)
+            .stream()
+            .collect(Collectors.toMap(ProjectWorkflow::getId, ProjectWorkflow::getWorkflowId));
+
+        return references.stream()
+            .map(reference -> toDTO(reference, connectedUserProjectMap, connectedUserMap, workflowIds))
+            .toList();
+    }
+
+    @Override
     public void updateReferenceInputs(
         String externalUserId, String automationUuid, Map<String, ?> inputs, Environment environment) {
         ConnectedUserProjectWorkflow reference = requireReference(externalUserId, automationUuid, environment);
@@ -282,6 +330,23 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
         if (reference.isEnabled() && !isRowEnabled(reference)) {
             applyWorkflow(reference, externalUserId, environment, true, ApplyMode.RESUME, Map.of(), null);
         }
+    }
+
+    private ConnectedUserWorkflowReferenceDTO toDTO(
+        ConnectedUserProjectWorkflow reference, Map<Long, ConnectedUserProject> connectedUserProjectMap,
+        Map<Long, ConnectedUser> connectedUserMap, Map<Long, String> workflowIds) {
+        ConnectedUserProject connectedUserProject = connectedUserProjectMap.get(
+            reference.getConnectedUserProjectId());
+
+        ConnectedUser connectedUser = connectedUserMap.get(connectedUserProject.getConnectedUserId());
+
+        Environment environment = connectedUser.getEnvironment();
+
+        return new ConnectedUserWorkflowReferenceDTO(
+            reference.getAutomationUuid(), connectedUser.getId(), connectedUser.getExternalId(),
+            environment.name(),
+            reference.isEnabled(), reference.isDangling(), reference.getDanglingReason(),
+            workflowIds.get(reference.getProjectWorkflowId()), reference.getProjectDeploymentId());
     }
 
     private ConnectedUserProjectWorkflow applyWorkflow(

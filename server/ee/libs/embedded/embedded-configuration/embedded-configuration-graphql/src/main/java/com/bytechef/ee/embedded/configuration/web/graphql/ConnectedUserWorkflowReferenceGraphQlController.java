@@ -9,7 +9,7 @@ package com.bytechef.ee.embedded.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
-import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceAdminFacade;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -27,17 +27,17 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 @ConditionalOnEEVersion
 public class ConnectedUserWorkflowReferenceGraphQlController {
-    private final ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade;
+    private final ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserWorkflowReferenceGraphQlController(
-        ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade) {
-        this.connectedUserWorkflowReferenceAdminFacade = connectedUserWorkflowReferenceAdminFacade;
+        ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade) {
+        this.connectedUserWorkflowReferenceFacade = connectedUserWorkflowReferenceFacade;
     }
 
     @QueryMapping
     public List<ConnectedUserWorkflowReferenceDTO> connectedUserCodeWorkflowReferences(
         @Argument List<String> automationUuids) {
-        return connectedUserWorkflowReferenceAdminFacade.getReferences(Set.copyOf(automationUuids));
+        return connectedUserWorkflowReferenceFacade.getReferences(Set.copyOf(automationUuids));
     }
 }

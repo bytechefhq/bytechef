@@ -8,12 +8,14 @@
 package com.bytechef.ee.embedded.configuration.remote.client.facade;
 
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceValuesDTO;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -68,6 +70,11 @@ public class RemoteConnectedUserWorkflowReferenceFacadeClient implements Connect
 
     @Override
     public ConnectedUserWorkflowReferenceValuesDTO getReferenceValues(long referenceId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ConnectedUserWorkflowReferenceDTO> getReferences(Set<String> automationUuids) {
         throw new UnsupportedOperationException();
     }
 

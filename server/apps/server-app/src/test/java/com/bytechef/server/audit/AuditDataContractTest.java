@@ -93,7 +93,7 @@ class AuditDataContractTest {
         Map.entry("A2aProjectWorkflowFacadeImpl.updateA2aProjectWorkflowSkill", TOOL_SETTING),
         Map.entry("A2aServerFacadeImpl.updateA2aServerTags", TAGS),
         Map.entry("AutomationProjectFacadeImpl.updateProjectWorkflow", DEFINITION_EDIT),
-        Map.entry("AutomationProjectConfigurationAdminFacadeImpl.updateConfigurationWorkflow", WORKFLOW_INPUTS),
+        Map.entry("AutomationProjectConfigurationFacadeImpl.updateConfigurationWorkflow", WORKFLOW_INPUTS),
         Map.entry("ConnectedUserConnectionFacadeImpl.updateConnectedUserConnectionTags", TAGS),
         Map.entry("ConnectedUserConnectionFacadeImpl.updateIntegrationInstanceConnectionCredentials",
             RECORDED_BY_CALLER),
