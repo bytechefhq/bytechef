@@ -464,7 +464,7 @@ Responses:
 | `204 No Content` | The integration was saved and published, and enabled when `enable=true`. |
 | `400 Bad Request` | The file is missing or fails to load, its language is unsupported or Java uploads are disabled, the component is ambiguous, or `enable=true` can't create or pick the instance configuration. The body names the reason. |
 | `401 Unauthorized` | The API key is unknown in that environment, is not an Embedded API key, or `X-ENVIRONMENT` is not a valid environment. |
-| `403 Forbidden` | The key's user is not an administrator. |
+| `403 Forbidden` | The key's user is not an administrator, or, with `enable=true`, lacks `INTEGRATION_INSTANCE_CONFIGURATION_CREATE` or `INTEGRATION_INSTANCE_CONFIGURATION_EDIT` in the environment. |
 
 Java uploads follow the
 [`BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED`](/platform/automation/build/workflows/code-workflows#restricting-java-code-workflows)
