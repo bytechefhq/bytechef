@@ -449,7 +449,7 @@ class ConnectedUserProjectGraphQlControllerIntTest {
     private static ConnectedUserProjectWorkflowDTO createReferenceWorkflowDTO(long id, @Nullable WorkflowDTO workflow) {
         return new ConnectedUserProjectWorkflowDTO(
             id, 7L, true, null, 0L, workflow, AUTOMATION_UUID, 1, ConnectedUserProjectWorkflowDTO.Kind.REFERENCE,
-            AUTOMATION_UUID, null, false, List.of(), List.of(), Map.of(), null, null);
+            AUTOMATION_UUID, null, false, List.of(), List.of(), Map.of(), Map.of(), null, null);
     }
 
     private static WorkflowTriggerDTO createTrigger(String type, boolean disabled) {
