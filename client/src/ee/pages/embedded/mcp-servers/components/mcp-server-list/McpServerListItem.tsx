@@ -10,16 +10,15 @@ import McpServerListItemDropdownMenu from '@/shared/components/mcp-server/McpSer
 import McpServerToolCounts from '@/shared/components/mcp-server/McpServerToolCounts';
 import {McpServer, Tag} from '@/shared/middleware/graphql';
 
-import {McpIntegrationInstanceConfigurationWorkflowItemType} from '../mcp-integration-instance-configuration-list/hooks/useMcpIntegrationInstanceConfigurationList';
 import useMcpServerListItem from './hooks/useMcpServerListItem';
 
 interface McpServerListItemProps {
     mcpServer: McpServer;
-    mcpIntegrationInstanceConfigurationWorkflows?: McpIntegrationInstanceConfigurationWorkflowItemType[];
     tags?: Tag[];
+    workflowToolCount: number;
 }
 
-const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpServer, tags}: McpServerListItemProps) => {
+const McpServerListItem = ({mcpServer, tags, workflowToolCount}: McpServerListItemProps) => {
     const {
         handleDeleteClick,
         handleMcpServerListItemClick,
@@ -60,10 +59,7 @@ const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpSer
                                     className="group mr-4 flex text-xs font-semibold text-muted-foreground"
                                     ref={toolsCollapsibleTriggerRef}
                                 >
-                                    <McpServerToolCounts
-                                        mcpServer={mcpServer}
-                                        workflowToolCount={mcpIntegrationInstanceConfigurationWorkflows?.length || 0}
-                                    />
+                                    <McpServerToolCounts mcpServer={mcpServer} workflowToolCount={workflowToolCount} />
                                 </CollapsibleTrigger>
 
                                 <div onClick={(event) => event.preventDefault()} role="presentation">
