@@ -56,7 +56,7 @@ This page lists only your own connections, including the ones you shared with co
 
 To replace the credentials of one of your connections, choose **Edit** and click **Update credentials** in the **Edit Connection** dialog. This is refused for a revoked connection and for one waiting to be reassigned to a new owner; the **Not Active** usage badge does not matter. If someone else changed the connection in the meantime, the save is refused and you reload before trying again. Each replacement is recorded as a `CONNECTION_CREDENTIALS_UPDATED` audit event that holds the connection id only, never the credential values.
 
-A connection's credentials are shown only to the member who created it, and only while that member can edit connections in its environment. An admin who did not create the connection sees its credential fields as **Hidden**. No ByteChef member sees the credentials of a connection created for a connected user; only that connected user can replace them, through the [frontend endpoints](#frontend-endpoints). See [Users and Roles](/platform/embedded/administration/users-and-roles#credentials) for the full table.
+A connection's credentials are shown only to the member who created it, and only while that member can edit connections in its environment. An admin who did not create the connection sees its credential fields as **Hidden**, but can still replace them with new values. No ByteChef member sees the credentials of a connection created for a connected user; only that connected user can replace them, through the [frontend endpoints](#frontend-endpoints). See [Users and Roles](/platform/embedded/administration/users-and-roles#credentials) for the full table.
 
 ### Shared connections
 
