@@ -284,7 +284,7 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         @AuditData(key = "mcpIntegrationInstanceWorkflowId", value = "#mcpIntegrationInstanceWorkflowId"),
         @AuditData(key = "enabled", value = "#enable")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpIntegrationInstanceWorkflowId, 'McpIntegrationInstanceWorkflow', 'MCP_EDIT')")
     public void enableMcpWorkflow(long mcpIntegrationInstanceWorkflowId, boolean enable) {
         mcpIntegrationInstanceWorkflowService.updateEnabled(mcpIntegrationInstanceWorkflowId, enable);
     }

@@ -287,7 +287,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_VIEW')")
     @Transactional(propagation = Propagation.SUPPORTS)
     public ConnectionDTO getIntegrationInstanceConnection(long integrationInstanceId) {
         IntegrationInstance integrationInstance = requireProvisioned(integrationInstanceId);
@@ -417,7 +417,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE')")
     @Transactional(propagation = Propagation.SUPPORTS)
     public void updateIntegrationInstanceCredentials(
         long integrationInstanceId, Map<String, ?> parameters, int version) {

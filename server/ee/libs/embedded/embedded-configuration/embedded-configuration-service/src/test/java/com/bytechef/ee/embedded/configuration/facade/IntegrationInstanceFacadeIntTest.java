@@ -807,6 +807,8 @@ class IntegrationInstanceFacadeIntTest {
     }
 
     private Authentication createTenantAdminAuthentication() {
+        when(permissionService.hasResourceScope(any(), eq("IntegrationInstance"), eq("CONNECTED_USER_VIEW")))
+            .thenReturn(true);
         when(permissionService.hasResourceScope(any(), eq("IntegrationInstance"), eq("CONNECTED_USER_MANAGE")))
             .thenReturn(true);
         when(permissionService.hasResourceScope(any(), eq("IntegrationInstance"), eq("CONNECTED_USER_DELETE")))

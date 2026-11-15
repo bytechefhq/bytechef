@@ -342,7 +342,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         @AuditData(key = "integrationId", value = "#id"),
         @AuditData(key = "integrationVersion", value = "#integrationVersion")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'Integration', 'WORKFLOW_EDIT')")
     public void restoreIntegrationVersion(long id, int integrationVersion) {
         Integration integration = integrationService.getIntegration(id);
 

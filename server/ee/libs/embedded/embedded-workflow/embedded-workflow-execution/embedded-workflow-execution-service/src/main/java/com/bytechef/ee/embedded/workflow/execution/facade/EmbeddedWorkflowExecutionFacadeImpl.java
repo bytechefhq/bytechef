@@ -62,7 +62,11 @@ public class EmbeddedWorkflowExecutionFacadeImpl implements EmbeddedWorkflowExec
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("#connectedUserId != null ? "
+        + "(hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) and "
+        + "hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')) : "
+        + "(hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) and "
+        + "hasEmbeddedScopeInEnvironmentId('CONNECTED_USER_VIEW', #environmentId))")
     @Transactional(readOnly = true)
     public Page<EmbeddedWorkflowExecutionDTO> getWorkflowExecutions(
         @Nullable Long environmentId, @Nullable Status jobStatus, @Nullable Instant jobStartDate,
