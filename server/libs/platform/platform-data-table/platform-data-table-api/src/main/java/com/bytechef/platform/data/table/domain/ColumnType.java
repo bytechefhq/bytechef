@@ -28,5 +28,6 @@ public enum ColumnType {
     INTEGER,
     DATE,
     DATE_TIME,
-    BOOLEAN
+    BOOLEAN,
+    LINK
 }

@@ -36,7 +36,7 @@ public final class ColumnValues {
                 case STRING -> true;
                 case BOOLEAN -> value instanceof Boolean || "true".equalsIgnoreCase(text) ||
                     "false".equalsIgnoreCase(text);
-                case INTEGER -> value instanceof Integer || value instanceof Long || parsesAsLong(text);
+                case INTEGER, LINK -> value instanceof Integer || value instanceof Long || parsesAsLong(text);
                 case NUMBER -> value instanceof Number || parsesAsDecimal(text);
                 case DATE -> DateUtils.parseSqlDate(text) != null;
                 case DATE_TIME -> DateUtils.parseSqlTimestamp(text) != null;

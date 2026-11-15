@@ -40,6 +40,10 @@ public class DataTableErrorType extends AbstractErrorType {
     public static final DataTableErrorType BATCH_TOO_LARGE = new DataTableErrorType(114);
     public static final DataTableErrorType CSV_INVALID = new DataTableErrorType(115);
     public static final DataTableErrorType STORAGE_LIMIT_EXCEEDED = new DataTableErrorType(116);
+    public static final DataTableErrorType LINK_TARGET_INVALID = new DataTableErrorType(117);
+    public static final DataTableErrorType LINK_DISPLAY_COLUMN_INVALID = new DataTableErrorType(118);
+    public static final DataTableErrorType LINKED_ROW_NOT_FOUND = new DataTableErrorType(119);
+    public static final DataTableErrorType ROW_STILL_LINKED = new DataTableErrorType(120);
 
     private DataTableErrorType(int errorKey) {
         super(DataTableErrorType.class, errorKey);

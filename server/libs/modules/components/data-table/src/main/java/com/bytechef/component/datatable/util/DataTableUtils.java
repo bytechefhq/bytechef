@@ -548,6 +548,7 @@ public final class DataTableUtils {
             case DATE -> LocalDate.now();
             case DATE_TIME -> LocalDateTime.now();
             case BOOLEAN -> false;
+            case LINK -> 1L;
         };
     }
 
@@ -577,6 +578,7 @@ public final class DataTableUtils {
             case DATE -> date(name);
             case DATE_TIME -> dateTime(name);
             case BOOLEAN -> bool(name);
+            case LINK -> integer(name);
         };
     }
 

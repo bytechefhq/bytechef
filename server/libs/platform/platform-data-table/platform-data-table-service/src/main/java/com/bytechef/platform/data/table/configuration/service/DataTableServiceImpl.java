@@ -509,6 +509,7 @@ public class DataTableServiceImpl implements DataTableService {
             case DATE -> "DATE";
             case DATE_TIME -> "TIMESTAMP";
             case BOOLEAN -> "BOOLEAN";
+            case LINK -> "BIGINT";
         };
     }
 
