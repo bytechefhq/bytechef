@@ -40,10 +40,6 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import tools.jackson.databind.ObjectMapper;
 
 /**
- * Boots the real {@link McpToolServiceImpl}, {@link McpIntegrationComponentServiceImpl},
- * {@link McpIntegrationInstanceToolServiceImpl} and {@link McpToolBeforeDeleteEventListener} on a PostgreSQL schema
- * built from every changelog on the test classpath.
- *
  * @version ee
  *
  * @author Ivica Cardic

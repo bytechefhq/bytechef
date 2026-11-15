@@ -40,10 +40,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Defines who is on an embedded MCP server across every kind of per-user row: a connected user is on a server when they
- * have at least one component tool, integration workflow or automation workflow row for it, and their state there is on
- * when any of those rows is enabled.
- *
  * @version ee
  *
  * @author Ivica Cardic

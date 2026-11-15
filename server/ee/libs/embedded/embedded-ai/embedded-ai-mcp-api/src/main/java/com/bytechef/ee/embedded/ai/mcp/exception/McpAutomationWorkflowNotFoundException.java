@@ -8,9 +8,6 @@
 package com.bytechef.ee.embedded.ai.mcp.exception;
 
 /**
- * Thrown when a connected user has no automation workflow reference for a workflow uuid, or the reference belongs to
- * another connected user. The public REST controllers map it to HTTP 404.
- *
  * @version ee
  *
  * @author Ivica Cardic

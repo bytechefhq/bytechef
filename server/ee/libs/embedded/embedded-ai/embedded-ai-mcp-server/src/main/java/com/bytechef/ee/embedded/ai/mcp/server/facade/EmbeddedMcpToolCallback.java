@@ -15,21 +15,12 @@ import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.tool.metadata.ToolMetadata;
 
 /**
- * A tool callback with the MCP {@code _meta} the embedded MCP server lists alongside the tool, so a client can tell
- * which integration a tool belongs to before calling it.
- *
- * @param delegate the tool callback that does the work
- * @param meta     the MCP {@code _meta} entries of the tool
- *
  * @version ee
  *
  * @author Ivica Cardic
  */
 public record EmbeddedMcpToolCallback(ToolCallback delegate, Map<String, Object> meta) implements ToolCallback {
 
-    /**
-     * The {@code _meta} key holding the id of the integration a tool belongs to.
-     */
     public static final String INTEGRATION_ID_META_KEY = "bytechef.io/integrationId";
 
     public EmbeddedMcpToolCallback {

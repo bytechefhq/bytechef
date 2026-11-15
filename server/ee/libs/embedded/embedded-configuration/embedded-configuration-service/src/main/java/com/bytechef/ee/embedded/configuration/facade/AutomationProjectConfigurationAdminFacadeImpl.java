@@ -1062,11 +1062,6 @@ public class AutomationProjectConfigurationAdminFacadeImpl
         return name.trim();
     }
 
-    /**
-     * Deletes the references, the reference deployment and the assignment of every connected user still assigned to the
-     * configuration. Takes the rollout lock first and then each user's connected user projects; no path takes the
-     * rollout lock while it holds a connected user project lock.
-     */
     private void deleteAssignedReferenceDeployments(AutomationProjectConfiguration configuration) {
         requiresNewTransactionTemplate.executeWithoutResult(status -> {
             automationProjectConfigurationService.lockRollout(

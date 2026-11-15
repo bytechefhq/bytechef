@@ -212,7 +212,6 @@ public class IntegrationFacadeIntTest {
 
         integration = integrationRepository.save(integration);
 
-        // TODO remove
         Mockito.when(workflowFacade.getWorkflow(Mockito.anyString()))
             .thenReturn(new com.bytechef.platform.configuration.dto.WorkflowDTO(
                 new Workflow(
@@ -441,7 +440,6 @@ public class IntegrationFacadeIntTest {
                 integration.getId(), Validate.notNull(integration.getLastIntegrationVersion(), "lastVersion"),
                 Validate.notNull(workflow.getId(), "id"), UUID.randomUUID()));
 
-        // TODO remove
         Mockito.when(workflowFacade.getWorkflow(Mockito.anyString()))
             .thenReturn(new com.bytechef.platform.configuration.dto.WorkflowDTO(workflow, List.of(), List.of()));
 

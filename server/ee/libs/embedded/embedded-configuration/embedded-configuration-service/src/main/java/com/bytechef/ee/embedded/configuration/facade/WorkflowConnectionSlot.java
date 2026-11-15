@@ -41,10 +41,6 @@ public class WorkflowConnectionSlot {
         this.workflowService = workflowService;
     }
 
-    /**
-     * Returns the component name of the first required connection slot of the workflow that none of the given
-     * deployment workflow connections fills, or null when every required slot is filled.
-     */
     @Nullable
     public String findMissingRequiredComponentName(
         String workflowId, List<ProjectDeploymentWorkflowConnection> connections) {

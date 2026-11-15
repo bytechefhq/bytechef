@@ -193,11 +193,6 @@ class ConnectedUserReferenceAttentionResolver {
             Objects.equals(connection.getWorkflowConnectionKey(), componentConnection.key());
     }
 
-    /**
-     * @param inputs          the reference's stored input values, keyed by input name
-     * @param connections     the id of the connection each component is wired to, keyed by component name
-     * @param attentionReason why the reference needs attention, {@code null} when it is healthy
-     */
     @SuppressFBWarnings("EI")
     public record ReferenceState(
         Map<String, ?> inputs, Map<String, Long> connections, @Nullable String attentionReason) {

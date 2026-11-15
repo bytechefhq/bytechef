@@ -24,13 +24,6 @@ public final class ToolOnlyWorkflowUtils {
     private ToolOnlyWorkflowUtils() {
     }
 
-    /**
-     * A workflow is tool-only when it has at least one enabled trigger and every enabled trigger is the workflow call
-     * trigger, so the only way to start it is as an MCP tool.
-     *
-     * @param workflow the workflow, may be {@code null}
-     * @return whether the workflow can only be started as an MCP tool
-     */
     public static boolean isToolOnly(@Nullable WorkflowDTO workflow) {
         if (workflow == null || workflow.getTriggers() == null) {
             return false;

@@ -356,9 +356,6 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
             List<ConnectedUserMcpServerAutomationDTO> automations = automationsByServerId.getOrDefault(
                 mcpServerId, List.of());
 
-            // "enabled for user" is computed per-user, not taken from the workspace-level flag: the
-            // server is considered active for this user when at least one of their tools, workflows or automations
-            // is enabled.
             boolean enabledForUser = tools.stream()
                 .anyMatch(ConnectedUserMcpServerToolDTO::enabled) ||
                 workflows.stream()
@@ -520,7 +517,6 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
             }
         }
 
-        // A component may be listed both as a tool component and through a workflow configuration; covered wins.
         missingComponentNames.removeAll(coveredComponentNames);
 
         return new McpServerCoverage(coveredComponentNames, missingComponentNames);
