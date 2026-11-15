@@ -18,6 +18,7 @@ package com.bytechef.platform.data.table.domain;
 
 import com.bytechef.commons.util.DateUtils;
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -36,7 +37,8 @@ public final class ColumnValues {
                 case STRING -> true;
                 case BOOLEAN -> value instanceof Boolean || "true".equalsIgnoreCase(text) ||
                     "false".equalsIgnoreCase(text);
-                case INTEGER, LINK -> value instanceof Integer || value instanceof Long || parsesAsLong(text);
+                case INTEGER -> value instanceof Integer || value instanceof Long || parsesAsLong(text);
+                case LINK -> isLinkValue(value, text);
                 case NUMBER -> value instanceof Number || parsesAsDecimal(text);
                 case DATE -> DateUtils.parseSqlDate(text) != null;
                 case DATE_TIME -> DateUtils.parseSqlTimestamp(text) != null;
@@ -44,6 +46,18 @@ public final class ColumnValues {
         } catch (RuntimeException runtimeException) {
             return false;
         }
+    }
+
+    private static boolean isLinkValue(Object value, String text) {
+        if (value instanceof Integer || value instanceof Long) {
+            return true;
+        }
+
+        if (value instanceof Map<?, ?> map) {
+            return map.size() == 1 && map.get("externalId") instanceof String externalId && !externalId.isBlank();
+        }
+
+        return parsesAsLong(text);
     }
 
     private static boolean parsesAsLong(String text) {
