@@ -34,6 +34,35 @@ describe('Thread', () => {
         expect(composer!.compareDocumentPosition(suggestion) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     });
 
+    it('centers the composer under the welcome message before the conversation starts', async () => {
+        const {container} = render(<TestRuntimeProvider messages={[]} />);
+
+        await screen.findByText('Test your agent');
+
+        const welcome = container.querySelector('.aui-thread-welcome-root');
+        const composerWrapper = container.querySelector('.aui-composer-wrapper');
+        const spacers = container.querySelectorAll('.aui-thread-empty-spacer');
+
+        expect(welcome!.compareDocumentPosition(composerWrapper!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+        expect(spacers).toHaveLength(2);
+        expect(spacers[0].compareDocumentPosition(welcome!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+        expect(composerWrapper!.compareDocumentPosition(spacers[1]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+
+    it('keeps the composer at the bottom once the conversation has started', async () => {
+        const {container} = render(
+            <TestRuntimeProvider
+                messages={[
+                    {content: 'Hello', role: 'user'},
+                    {content: 'Hi there', role: 'assistant'},
+                ]}
+            />
+        );
+
+        expect(await screen.findByText('Hi there')).toBeInTheDocument();
+        expect(container.querySelectorAll('.aui-thread-empty-spacer')).toHaveLength(0);
+    });
+
     it('drops the suggested prompts once the conversation has started', async () => {
         render(
             <TestRuntimeProvider
