@@ -624,7 +624,9 @@ const ProjectDeploymentDialog = ({
             }
 
             getWorkflowComponentConnections(workflow, workflows).forEach((componentConnection, connectionIndex) => {
-                if (projectDeploymentWorkflow.connections?.[connectionIndex]?.connectionId != null) {
+                const storedConnectionId = projectDeploymentWorkflow.connections?.[connectionIndex]?.connectionId;
+
+                if (storedConnectionId != null && !effectiveChangeProjectVersion) {
                     return;
                 }
 
@@ -634,7 +636,11 @@ const ProjectDeploymentDialog = ({
                     componentConnection.key
                 );
 
-                if (testConnectionId == null || !availableConnectionIds.has(testConnectionId)) {
+                if (
+                    testConnectionId == null ||
+                    testConnectionId === storedConnectionId ||
+                    !availableConnectionIds.has(testConnectionId)
+                ) {
                     return;
                 }
 
@@ -644,7 +650,14 @@ const ProjectDeploymentDialog = ({
                 );
             });
         });
-    }, [connections, getValues, setValue, workflowTestConfigurationConnections, workflows]);
+    }, [
+        connections,
+        effectiveChangeProjectVersion,
+        getValues,
+        setValue,
+        workflowTestConfigurationConnections,
+        workflows,
+    ]);
 
     useLayoutEffect(() => {
         if (!isOpen) {
