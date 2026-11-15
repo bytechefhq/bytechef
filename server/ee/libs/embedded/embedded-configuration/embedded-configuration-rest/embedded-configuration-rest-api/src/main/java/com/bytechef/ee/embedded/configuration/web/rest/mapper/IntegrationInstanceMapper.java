@@ -48,6 +48,7 @@ public class IntegrationInstanceMapper {
 
         @InheritInverseConfiguration
         @DelegatingConverter
+        @Mapping(target = "provisionedBy", ignore = true)
         IntegrationInstance invertConvert(IntegrationInstanceModel integrationInstanceModel);
     }
 
