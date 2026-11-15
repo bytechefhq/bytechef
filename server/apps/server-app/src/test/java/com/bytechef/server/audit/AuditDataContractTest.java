@@ -100,7 +100,6 @@ class AuditDataContractTest {
         Map.entry("ConnectedUserConnectionFacadeImpl.updateIntegrationInstanceConnectionCredentials",
             RECORDED_BY_CALLER),
         Map.entry("ConnectionAdminFacadeImpl.updateConnectionTags", TAGS),
-        Map.entry("EmbeddedGettingStartedFacadeImpl.dismissEmbeddedGettingStarted", GETTING_STARTED_DISMISSAL),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpComponent", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpServer", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.deleteEmbeddedMcpComponent", DELEGATES),

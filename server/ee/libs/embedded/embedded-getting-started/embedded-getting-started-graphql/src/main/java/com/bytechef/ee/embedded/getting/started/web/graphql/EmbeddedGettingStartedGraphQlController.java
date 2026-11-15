@@ -5,19 +5,18 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.configuration.web.graphql;
+package com.bytechef.ee.embedded.getting.started.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.embedded.configuration.dto.EmbeddedGettingStartedDTO;
-import com.bytechef.ee.embedded.configuration.dto.LastFailedCallDTO;
-import com.bytechef.ee.embedded.configuration.facade.EmbeddedGettingStartedFacade;
+import com.bytechef.ee.embedded.getting.started.dto.EmbeddedGettingStartedDTO;
+import com.bytechef.ee.embedded.getting.started.dto.LastFailedCallDTO;
+import com.bytechef.ee.embedded.getting.started.facade.EmbeddedGettingStartedFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
-import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
@@ -65,13 +64,6 @@ public class EmbeddedGettingStartedGraphQlController {
     @QueryMapping
     public boolean embeddedGettingStartedCompleted() {
         return embeddedGettingStartedFacade.isEmbeddedGettingStartedCompleted();
-    }
-
-    @MutationMapping
-    public boolean dismissEmbeddedGettingStarted() {
-        embeddedGettingStartedFacade.dismissEmbeddedGettingStarted();
-
-        return true;
     }
 
     @SchemaMapping(typeName = "EmbeddedGettingStartedFailedCall", field = "createdDate")

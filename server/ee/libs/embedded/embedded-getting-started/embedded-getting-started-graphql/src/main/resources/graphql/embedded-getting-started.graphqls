@@ -3,15 +3,10 @@ extend type Query {
     embeddedGettingStartedCompleted: Boolean!
 }
 
-extend type Mutation {
-    dismissEmbeddedGettingStarted: Boolean
-}
-
 type EmbeddedGettingStarted {
     apiBaseUrl: String
     apiKeyCreated: Boolean!
     completed: Boolean!
-    completionType: String
     componentName: String
     componentVersion: Int
     firstCallMade: Boolean!

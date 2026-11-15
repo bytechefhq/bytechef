@@ -95,6 +95,8 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-rest:embedded-configuration-rest-impl"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-service"))
+    implementation(project(":server:ee:libs:embedded:embedded-getting-started:embedded-getting-started-graphql"))
+    implementation(project(":server:ee:libs:embedded:embedded-getting-started:embedded-getting-started-service"))
     implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-remote-client"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-graphql"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-rest"))

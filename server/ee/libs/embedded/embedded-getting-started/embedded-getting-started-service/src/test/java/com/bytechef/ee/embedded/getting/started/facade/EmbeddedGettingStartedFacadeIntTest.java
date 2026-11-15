@@ -5,10 +5,9 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.configuration.facade;
+package com.bytechef.ee.embedded.getting.started.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -17,19 +16,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
-import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
-import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
-import com.bytechef.ee.embedded.configuration.dto.EmbeddedGettingStartedDTO;
-import com.bytechef.ee.embedded.configuration.dto.LastFailedCallDTO;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceConfigurationRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepository;
@@ -38,10 +32,13 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.ee.embedded.getting.started.config.EmbeddedGettingStartedIntTestConfiguration;
+import com.bytechef.ee.embedded.getting.started.config.EmbeddedGettingStartedIntTestConfigurationSharedMocks;
+import com.bytechef.ee.embedded.getting.started.dto.EmbeddedGettingStartedDTO;
+import com.bytechef.ee.embedded.getting.started.dto.LastFailedCallDTO;
 import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
 import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocationLogService;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.configuration.repository.PropertyRepository;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import com.bytechef.platform.security.constant.AuthorityConstants;
@@ -81,14 +78,15 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @SpringBootTest(
     classes = {
-        IntegrationIntTestConfiguration.class, EmbeddedGettingStartedFacadeIntTest.MethodSecurityConfiguration.class
+        EmbeddedGettingStartedIntTestConfiguration.class,
+        EmbeddedGettingStartedFacadeIntTest.MethodSecurityConfiguration.class
     },
     properties = {
         "bytechef.workflow.repository.jdbc.enabled=true",
         "bytechef.webhook-url=/webhooks/{id}"
     })
 @Import(PostgreSQLContainerConfiguration.class)
-@IntegrationIntTestConfigurationSharedMocks
+@EmbeddedGettingStartedIntTestConfigurationSharedMocks
 class EmbeddedGettingStartedFacadeIntTest {
 
     private static final long RUNNABLE_CONNECTED_USER_ID = 42L;
@@ -102,9 +100,6 @@ class EmbeddedGettingStartedFacadeIntTest {
 
     @Autowired
     private EmbeddedGettingStartedFacade embeddedGettingStartedFacade;
-
-    @Autowired
-    private PropertyRepository propertyRepository;
 
     @Autowired
     private ExternalInvocationLogService externalInvocationLogService;
@@ -130,15 +125,12 @@ class EmbeddedGettingStartedFacadeIntTest {
     @BeforeEach
     void beforeEach() {
         reset(externalInvocationLogService);
-
-        propertyRepository.deleteAll();
     }
 
     @AfterEach
     void afterEach() {
         SecurityContextHolder.clearContext();
 
-        propertyRepository.deleteAll();
         integrationInstanceConfigurationRepository.deleteAll();
         integrationWorkflowRepository.deleteAll();
         integrationRepository.deleteAll();
@@ -169,22 +161,6 @@ class EmbeddedGettingStartedFacadeIntTest {
     }
 
     @Test
-    void testDismissEmbeddedGettingStartedAllowedOnlyForAdmin() {
-        authenticate(nonAdmin());
-
-        assertThatThrownBy(() -> embeddedGettingStartedFacade.dismissEmbeddedGettingStarted())
-            .isInstanceOf(AccessDeniedException.class);
-
-        assertThat(propertyRepository.findAll()).isEmpty();
-
-        authenticate(admin());
-
-        assertThatCode(() -> embeddedGettingStartedFacade.dismissEmbeddedGettingStarted()).doesNotThrowAnyException();
-
-        assertThat(embeddedGettingStartedFacade.isEmbeddedGettingStartedCompleted()).isTrue();
-    }
-
-    @Test
     void testAllChecksFalseOnEmptyTenant() {
         authenticate(admin());
 
@@ -202,14 +178,11 @@ class EmbeddedGettingStartedFacadeIntTest {
         assertThat(embeddedGettingStartedDTO.firstCallMade()).isFalse();
         assertThat(embeddedGettingStartedDTO.lastFailedCall()).isNull();
         assertThat(embeddedGettingStartedDTO.completed()).isFalse();
-        assertThat(embeddedGettingStartedDTO.completionType()).isNull();
         assertThat(embeddedGettingStartedDTO.integrationId()).isNull();
         assertThat(embeddedGettingStartedDTO.integrationInstanceConfigurationId()).isNull();
         assertThat(embeddedGettingStartedDTO.testUserId()).isNull();
         assertThat(embeddedGettingStartedDTO.componentName()).isNull();
         assertThat(embeddedGettingStartedDTO.componentVersion()).isNull();
-
-        assertThat(propertyRepository.findAll()).isEmpty();
     }
 
     @Test
@@ -439,12 +412,6 @@ class EmbeddedGettingStartedFacadeIntTest {
         assertThat(embeddedGettingStartedDTO.testUserConnected()).isTrue();
         assertThat(embeddedGettingStartedDTO.testUserExternalId()).isEqualTo("external-user");
         assertThat(embeddedGettingStartedDTO.completed()).isTrue();
-        assertThat(embeddedGettingStartedDTO.completionType()).isEqualTo("COMPLETED");
-
-        assertThat(propertyRepository.findAll())
-            .singleElement()
-            .extracting(property -> property.get("completionType"))
-            .isEqualTo("COMPLETED");
     }
 
     @ParameterizedTest
@@ -458,31 +425,7 @@ class EmbeddedGettingStartedFacadeIntTest {
             embeddedGettingStartedFacade.getEmbeddedGettingStarted();
 
         assertThat(embeddedGettingStartedDTO.completed()).isFalse();
-        assertThat(embeddedGettingStartedDTO.completionType()).isNull();
-        assertThat(propertyRepository.findAll()).isEmpty();
-
         assertThat(embeddedGettingStartedFacade.isEmbeddedGettingStartedCompleted()).isFalse();
-        assertThat(propertyRepository.findAll()).isEmpty();
-    }
-
-    @Test
-    void testDoesNotCompleteAgainWhenRowExists() {
-        authenticate(admin());
-
-        stubAllFourStepsHold(Environment.DEVELOPMENT);
-
-        embeddedGettingStartedFacade.dismissEmbeddedGettingStarted();
-
-        EmbeddedGettingStartedDTO embeddedGettingStartedDTO =
-            embeddedGettingStartedFacade.getEmbeddedGettingStarted();
-
-        assertThat(embeddedGettingStartedDTO.completed()).isTrue();
-        assertThat(embeddedGettingStartedDTO.completionType()).isEqualTo("DISMISSED");
-
-        assertThat(propertyRepository.findAll())
-            .singleElement()
-            .extracting(property -> property.get("completionType"))
-            .isEqualTo("DISMISSED");
     }
 
     @Test
@@ -545,8 +488,6 @@ class EmbeddedGettingStartedFacadeIntTest {
 
         assertThat(embeddedGettingStartedFacade.isEmbeddedGettingStartedCompleted()).isFalse();
 
-        assertThat(propertyRepository.findAll()).isEmpty();
-
         verify(apiKeyService).getApiKeys(Environment.DEVELOPMENT.ordinal(), PlatformType.EMBEDDED);
         verify(apiKeyService, never()).getApiKeys(Environment.PRODUCTION.ordinal(), PlatformType.EMBEDDED);
     }
@@ -559,11 +500,6 @@ class EmbeddedGettingStartedFacadeIntTest {
 
         assertThat(embeddedGettingStartedFacade.isEmbeddedGettingStartedCompleted()).isTrue();
 
-        assertThat(propertyRepository.findAll())
-            .singleElement()
-            .extracting(property -> property.get("completionType"))
-            .isEqualTo("COMPLETED");
-
         verify(externalInvocationLogService, never()).fetchLastFailedExternalInvocationLog(any(), anyInt());
     }
 
@@ -572,31 +508,6 @@ class EmbeddedGettingStartedFacadeIntTest {
         authenticate(admin());
 
         assertThat(embeddedGettingStartedFacade.isEmbeddedGettingStartedCompleted()).isFalse();
-
-        assertThat(propertyRepository.findAll()).isEmpty();
-    }
-
-    @Test
-    void testIsCompletedDoesNotEvaluateWhenRowExists() {
-        authenticate(admin());
-
-        embeddedGettingStartedFacade.dismissEmbeddedGettingStarted();
-
-        assertThat(embeddedGettingStartedFacade.isEmbeddedGettingStartedCompleted()).isTrue();
-
-        verifyNoInteractions(apiKeyService, externalInvocationLogService, integrationInstanceService);
-    }
-
-    @Test
-    void testDismissStoresDismissed() {
-        authenticate(admin());
-
-        embeddedGettingStartedFacade.dismissEmbeddedGettingStarted();
-
-        assertThat(propertyRepository.findAll())
-            .singleElement()
-            .extracting(property -> property.get("completionType"))
-            .isEqualTo("DISMISSED");
     }
 
     private void stubAllFourStepsHold(Environment environment) {

@@ -5,9 +5,9 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.configuration.facade;
+package com.bytechef.ee.embedded.getting.started.facade;
 
-import com.bytechef.ee.embedded.configuration.dto.EmbeddedGettingStartedDTO;
+import com.bytechef.ee.embedded.getting.started.dto.EmbeddedGettingStartedDTO;
 
 /**
  * @version ee
@@ -15,8 +15,6 @@ import com.bytechef.ee.embedded.configuration.dto.EmbeddedGettingStartedDTO;
  * @author Ivica Cardic
  */
 public interface EmbeddedGettingStartedFacade {
-
-    void dismissEmbeddedGettingStarted();
 
     EmbeddedGettingStartedDTO getEmbeddedGettingStarted();
 

@@ -30,7 +30,6 @@ import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.connected.user.security.ConnectedUserSecurity;
-import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocationLogService;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.evaluator.Evaluator;
@@ -94,12 +93,6 @@ public class IntegrationIntTestConfiguration {
     @ConditionalOnMissingBean
     ApiKeyService apiKeyService() {
         return mock(ApiKeyService.class);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    ExternalInvocationLogService externalInvocationLogService() {
-        return mock(ExternalInvocationLogService.class);
     }
 
     @Bean

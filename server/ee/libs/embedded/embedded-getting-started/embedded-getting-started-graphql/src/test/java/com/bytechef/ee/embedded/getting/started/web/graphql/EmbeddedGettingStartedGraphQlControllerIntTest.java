@@ -5,17 +5,15 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.configuration.web.graphql;
+package com.bytechef.ee.embedded.getting.started.web.graphql;
 
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.embedded.configuration.dto.EmbeddedGettingStartedDTO;
-import com.bytechef.ee.embedded.configuration.dto.LastFailedCallDTO;
-import com.bytechef.ee.embedded.configuration.facade.EmbeddedGettingStartedFacade;
-import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlConfigurationSharedMocks;
-import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlTestConfiguration;
+import com.bytechef.ee.embedded.getting.started.dto.EmbeddedGettingStartedDTO;
+import com.bytechef.ee.embedded.getting.started.dto.LastFailedCallDTO;
+import com.bytechef.ee.embedded.getting.started.facade.EmbeddedGettingStartedFacade;
+import com.bytechef.ee.embedded.getting.started.web.graphql.config.EmbeddedGettingStartedGraphQlTestConfiguration;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
@@ -32,8 +30,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  * @author Ivica Cardic
  */
 @ContextConfiguration(classes = {
-    EmbeddedConfigurationGraphQlTestConfiguration.class,
-    EmbeddedGettingStartedGraphQlController.class
+    EmbeddedGettingStartedGraphQlController.class, EmbeddedGettingStartedGraphQlTestConfiguration.class
 })
 @GraphQlTest(
     controllers = EmbeddedGettingStartedGraphQlController.class,
@@ -42,7 +39,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
         "bytechef.edition=ee",
         "spring.graphql.schema.locations=classpath*:/graphql/"
     })
-@EmbeddedConfigurationGraphQlConfigurationSharedMocks
 @ExtendWith(ObjectMapperSetupExtension.class)
 class EmbeddedGettingStartedGraphQlControllerIntTest {
 
@@ -58,7 +54,7 @@ class EmbeddedGettingStartedGraphQlControllerIntTest {
     @MockitoBean
     private ApplicationProperties applicationProperties;
 
-    @Autowired
+    @MockitoBean
     private EmbeddedGettingStartedFacade embeddedGettingStartedFacade;
 
     @Autowired
@@ -69,7 +65,7 @@ class EmbeddedGettingStartedGraphQlControllerIntTest {
         when(embeddedGettingStartedFacade.getEmbeddedGettingStarted())
             .thenReturn(new EmbeddedGettingStartedDTO(
                 true, true, true, true, true, false, true, true, "user-1", true,
-                new LastFailedCallDTO("FAILED", "boom", CREATED_DATE), false, "AUTO", 7L, 8L, 9L,
+                new LastFailedCallDTO("FAILED", "boom", CREATED_DATE), false, 7L, 8L, 9L,
                 "httpClient", 1));
 
         this.graphQlTester
@@ -78,7 +74,6 @@ class EmbeddedGettingStartedGraphQlControllerIntTest {
                     embeddedGettingStarted {
                         apiKeyCreated
                         completed
-                        completionType
                         componentName
                         componentVersion
                         firstCallMade
@@ -108,9 +103,6 @@ class EmbeddedGettingStartedGraphQlControllerIntTest {
             .path("embeddedGettingStarted.completed")
             .entity(Boolean.class)
             .isEqualTo(false)
-            .path("embeddedGettingStarted.completionType")
-            .entity(String.class)
-            .isEqualTo("AUTO")
             .path("embeddedGettingStarted.componentName")
             .entity(String.class)
             .isEqualTo("httpClient")
@@ -170,9 +162,7 @@ class EmbeddedGettingStartedGraphQlControllerIntTest {
             .thenReturn(
                 new EmbeddedGettingStartedDTO(
                     false, false, false, false, false, false, false, false, null, false, null, false, null, null, null,
-                    null,
-                    null,
-                    null));
+                    null, null));
 
         this.graphQlTester
             .document("""
@@ -248,29 +238,11 @@ class EmbeddedGettingStartedGraphQlControllerIntTest {
             .isEqualTo(true);
     }
 
-    @Test
-    void testDismissEmbeddedGettingStartedCallsFacade() {
-        this.graphQlTester
-            .document("""
-                mutation {
-                    dismissEmbeddedGettingStarted
-                }
-                """)
-            .execute()
-            .path("dismissEmbeddedGettingStarted")
-            .entity(Boolean.class)
-            .isEqualTo(true);
-
-        verify(embeddedGettingStartedFacade).dismissEmbeddedGettingStarted();
-    }
-
     private void mockEmptyEmbeddedGettingStarted() {
         when(embeddedGettingStartedFacade.getEmbeddedGettingStarted())
             .thenReturn(
                 new EmbeddedGettingStartedDTO(
                     false, false, false, false, false, false, false, false, null, false, null, false, null, null, null,
-                    null,
-                    null,
-                    null));
+                    null, null));
     }
 }

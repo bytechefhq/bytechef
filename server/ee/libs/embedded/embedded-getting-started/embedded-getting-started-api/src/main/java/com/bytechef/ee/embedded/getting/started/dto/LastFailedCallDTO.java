@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.configuration.dto;
+package com.bytechef.ee.embedded.getting.started.dto;
 
 import java.time.Instant;
 import org.jspecify.annotations.Nullable;

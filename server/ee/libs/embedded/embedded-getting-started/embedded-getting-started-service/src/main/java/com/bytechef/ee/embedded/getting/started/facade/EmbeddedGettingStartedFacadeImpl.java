@@ -5,26 +5,23 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.configuration.facade;
+package com.bytechef.ee.embedded.getting.started.facade;
 
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
-import com.bytechef.ee.embedded.configuration.dto.EmbeddedGettingStartedDTO;
-import com.bytechef.ee.embedded.configuration.dto.LastFailedCallDTO;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.ee.embedded.getting.started.dto.EmbeddedGettingStartedDTO;
+import com.bytechef.ee.embedded.getting.started.dto.LastFailedCallDTO;
 import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
 import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocationLogService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.configuration.domain.Property;
-import com.bytechef.platform.configuration.domain.Property.Scope;
-import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import com.bytechef.platform.security.domain.ApiKey;
@@ -32,7 +29,6 @@ import com.bytechef.platform.security.service.ApiKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -48,12 +44,9 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Ivica Cardic
  */
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @ConditionalOnEEVersion
 public class EmbeddedGettingStartedFacadeImpl implements EmbeddedGettingStartedFacade {
-
-    private static final String COMPLETION_TYPE = "completionType";
-    private static final String GETTING_STARTED = "gettingStarted";
 
     private final ApiKeyService apiKeyService;
     private final ConnectedUserService connectedUserService;
@@ -62,7 +55,6 @@ public class EmbeddedGettingStartedFacadeImpl implements EmbeddedGettingStartedF
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationService integrationService;
     private final IntegrationWorkflowService integrationWorkflowService;
-    private final PropertyService propertyService;
 
     @SuppressFBWarnings("EI")
     @SuppressWarnings("PMD.ExcessiveParameterList")
@@ -71,7 +63,7 @@ public class EmbeddedGettingStartedFacadeImpl implements EmbeddedGettingStartedF
         ExternalInvocationLogService externalInvocationLogService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
-        IntegrationWorkflowService integrationWorkflowService, PropertyService propertyService) {
+        IntegrationWorkflowService integrationWorkflowService) {
 
         this.apiKeyService = apiKeyService;
         this.connectedUserService = connectedUserService;
@@ -80,77 +72,18 @@ public class EmbeddedGettingStartedFacadeImpl implements EmbeddedGettingStartedF
         this.integrationInstanceService = integrationInstanceService;
         this.integrationService = integrationService;
         this.integrationWorkflowService = integrationWorkflowService;
-        this.propertyService = propertyService;
-    }
-
-    @Override
-    @PreAuthorize("isTenantAdmin()")
-    public void dismissEmbeddedGettingStarted() {
-        complete(CompletionType.DISMISSED);
     }
 
     @Override
     @PreAuthorize("isTenantAdmin()")
     public EmbeddedGettingStartedDTO getEmbeddedGettingStarted() {
-        Set<Long> publishedIntegrationIds = getPublishedIntegrationIds();
-
-        Optional<String> completionTypeNameOptional = fetchCompletionTypeName();
-
-        EmbeddedGettingStartedDTO embeddedGettingStartedDTO =
-            evaluate(Environment.DEVELOPMENT, publishedIntegrationIds);
-
-        if (completionTypeNameOptional.isEmpty() && isSetupComplete(embeddedGettingStartedDTO)) {
-            complete(CompletionType.COMPLETED);
-
-            completionTypeNameOptional = fetchCompletionTypeName();
-        }
-
-        return new EmbeddedGettingStartedDTO(
-            embeddedGettingStartedDTO.apiKeyCreated(), embeddedGettingStartedDTO.integrationCreated(),
-            embeddedGettingStartedDTO.integrationHasWorkflows(), embeddedGettingStartedDTO.integrationPublished(),
-            embeddedGettingStartedDTO.integrationConfigurationCreated(),
-            embeddedGettingStartedDTO.integrationConfigurationEnabled(), embeddedGettingStartedDTO.testUserAdded(),
-            embeddedGettingStartedDTO.testUserConnected(), embeddedGettingStartedDTO.testUserExternalId(),
-            embeddedGettingStartedDTO.firstCallMade(),
-            embeddedGettingStartedDTO.lastFailedCall(), completionTypeNameOptional.isPresent(),
-            completionTypeNameOptional.orElse(null),
-            embeddedGettingStartedDTO.integrationId(), embeddedGettingStartedDTO.integrationInstanceConfigurationId(),
-            embeddedGettingStartedDTO.testUserId(), embeddedGettingStartedDTO.componentName(),
-            embeddedGettingStartedDTO.componentVersion());
+        return evaluate(Environment.DEVELOPMENT, getPublishedIntegrationIds());
     }
 
     @Override
     @PreAuthorize("isTenantAdmin()")
     public boolean isEmbeddedGettingStartedCompleted() {
-        Optional<String> completionTypeNameOptional = fetchCompletionTypeName();
-
-        if (completionTypeNameOptional.isPresent()) {
-            return true;
-        }
-
-        if (!isSetupComplete(Environment.DEVELOPMENT, getPublishedIntegrationIds())) {
-            return false;
-        }
-
-        complete(CompletionType.COMPLETED);
-
-        return true;
-    }
-
-    private void complete(CompletionType completionType) {
-        Optional<String> completionTypeNameOptional = fetchCompletionTypeName();
-
-        if (completionTypeNameOptional.isEmpty()) {
-            propertyService.save(GETTING_STARTED, Map.of(COMPLETION_TYPE, completionType.name()), Scope.EMBEDDED, null);
-        }
-    }
-
-    private Optional<String> fetchCompletionTypeName() {
-        List<Property> properties = propertyService.getProperties(List.of(GETTING_STARTED), Scope.EMBEDDED, null);
-
-        return properties.stream()
-            .findFirst()
-            .map(property -> (String) property.get(COMPLETION_TYPE));
+        return isSetupComplete(Environment.DEVELOPMENT, getPublishedIntegrationIds());
     }
 
     private Set<Long> getPublishedIntegrationIds() {
@@ -259,13 +192,18 @@ public class EmbeddedGettingStartedFacadeImpl implements EmbeddedGettingStartedF
             .map(IntegrationInstance::getConnectedUserId)
             .orElseGet(() -> getLastEnabledConnectedUserId(environment));
 
+        boolean apiKeyCreated = hasApiKey(environment);
+        boolean configurationEnabled = isConfigurationEnabled(environment, publishedIntegrationIds);
+        boolean testUserConnected = testUserExternalId != null;
+
         return new EmbeddedGettingStartedDTO(
-            hasApiKey(environment), !integrations.isEmpty(), hasIntegrationWorkflows(integrations, targetIntegrationId),
+            apiKeyCreated, !integrations.isEmpty(), hasIntegrationWorkflows(integrations, targetIntegrationId),
             !publishedIntegrationIds.isEmpty(),
             !publishedIntegrationInstanceConfigurations.isEmpty(),
-            isConfigurationEnabled(environment, publishedIntegrationIds), testUserId != null,
-            testUserExternalId != null, testUserExternalId, firstCallMade, lastFailedCall, false, null,
-            targetIntegrationId, integrationInstanceConfigurationId, testUserId,
+            configurationEnabled, testUserId != null,
+            testUserConnected, testUserExternalId, firstCallMade, lastFailedCall,
+            apiKeyCreated && configurationEnabled && testUserConnected && firstCallMade, targetIntegrationId,
+            integrationInstanceConfigurationId, testUserId,
             componentIntegrationOptional.map(Integration::getComponentName)
                 .orElse(null),
             componentIntegrationOptional.map(Integration::getComponentVersion)
@@ -319,19 +257,10 @@ public class EmbeddedGettingStartedFacadeImpl implements EmbeddedGettingStartedF
             .orElse(null);
     }
 
-    private static boolean isSetupComplete(EmbeddedGettingStartedDTO embeddedGettingStartedDTO) {
-        return embeddedGettingStartedDTO.apiKeyCreated() && embeddedGettingStartedDTO.integrationConfigurationEnabled()
-            && embeddedGettingStartedDTO.testUserConnected() && embeddedGettingStartedDTO.firstCallMade();
-    }
-
     private static LastFailedCallDTO toLastFailedCallDTO(ExternalInvocationLog externalInvocationLog) {
         ExternalInvocationStatus status = externalInvocationLog.getStatus();
 
         return new LastFailedCallDTO(
             status.name(), externalInvocationLog.getErrorMessage(), externalInvocationLog.getCreatedDate());
-    }
-
-    private enum CompletionType {
-        COMPLETED, DISMISSED
     }
 }

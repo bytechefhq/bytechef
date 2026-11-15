@@ -1,0 +1,149 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.ee.embedded.getting.started.config;
+
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import com.bytechef.automation.configuration.service.ProjectVersionWorkflowChangeService;
+import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
+import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserSecurity;
+import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocationLogService;
+import com.bytechef.encryption.Encryption;
+import com.bytechef.encryption.EncryptionKey;
+import com.bytechef.evaluator.Evaluator;
+import com.bytechef.evaluator.SpelEvaluator;
+import com.bytechef.jackson.config.JacksonConfiguration;
+import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.configuration.repository.PropertyRepository;
+import com.bytechef.platform.configuration.service.PropertyService;
+import com.bytechef.platform.configuration.service.PropertyServiceImpl;
+import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowValidationResult;
+import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Arrays;
+import java.util.List;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScan.Filter;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import tools.jackson.databind.ObjectMapper;
+
+/**
+ * @author Ivica Cardic
+ */
+@ComponentScan(
+    basePackages = {
+        "com.bytechef.encryption", "com.bytechef.platform.category",
+        "com.bytechef.ee.embedded.configuration", "com.bytechef.ee.embedded.getting.started",
+        "com.bytechef.platform.configuration.workflow.diff", "com.bytechef.platform.tag"
+    },
+    excludeFilters = @Filter(type = FilterType.REGEX, pattern = ".*IntTest\\$.*"))
+@EnableAutoConfiguration
+@EnableCaching
+@EnableConfigurationProperties(ApplicationProperties.class)
+@Import({
+    ConnectedUserSecurity.class, JacksonConfiguration.class, LiquibaseConfiguration.class
+})
+@Configuration
+public class EmbeddedGettingStartedIntTestConfiguration {
+
+    @Bean
+    Evaluator evaluator() {
+        return SpelEvaluator.create();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    ApiKeyService apiKeyService() {
+        return mock(ApiKeyService.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    ExternalInvocationLogService externalInvocationLogService() {
+        return mock(ExternalInvocationLogService.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    PropertyService propertyService(PropertyRepository propertyRepository) {
+        return new PropertyServiceImpl(propertyRepository);
+    }
+
+    @Bean
+    EncryptionKey encryptionKey() {
+        return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService() {
+        return mock(ProjectVersionWorkflowChangeService.class);
+    }
+
+    @Bean
+    WorkflowValidatorFacade workflowValidatorFacade() {
+        WorkflowValidatorFacade workflowValidatorFacade = mock(WorkflowValidatorFacade.class);
+
+        when(workflowValidatorFacade.validateWorkflow(anyString(), anyLong()))
+            .thenReturn(new WorkflowValidationResult(List.of(), List.of()));
+
+        return workflowValidatorFacade;
+    }
+
+    @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
+    public static class EmbeddedGettingStartedIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
+
+        private final Encryption encryption;
+        private final ObjectMapper objectMapper;
+
+        @SuppressFBWarnings("EI2")
+        public EmbeddedGettingStartedIntTestJdbcConfiguration(Encryption encryption, ObjectMapper objectMapper) {
+            this.encryption = encryption;
+            this.objectMapper = objectMapper;
+        }
+
+        @Override
+        protected List<?> userConverters() {
+            return Arrays.asList(
+                new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
+                new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
+                new FileEntryToStringConverter(objectMapper),
+                new MapWrapperToStringConverter(objectMapper),
+                new StringToFileEntryConverter(objectMapper),
+                new StringToMapWrapperConverter(objectMapper));
+        }
+    }
+}
