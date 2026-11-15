@@ -1,8 +1,10 @@
 import {SidebarInset, SidebarProvider} from '@/components/ui/sidebar';
 import {Toaster} from '@/components/ui/sonner';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
+import useEmbeddedGettingStartedCompleted from '@/ee/pages/embedded/getting-started/hooks/useEmbeddedGettingStartedCompleted';
 import shouldShowEmbeddedGettingStarted from '@/ee/pages/embedded/getting-started/shouldShowEmbeddedGettingStarted';
 import {useUserGuiding} from '@/hooks/useUserGuiding';
+import useAutomationGettingStartedCompleted from '@/pages/automation/getting-started/hooks/useAutomationGettingStartedCompleted';
 import shouldShowAutomationGettingStarted from '@/pages/automation/getting-started/shouldShowAutomationGettingStarted';
 import {useCloseProjectsLeftSidebarOnLeave} from '@/pages/automation/project/hooks/useCloseProjectsLeftSidebarOnLeave';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
@@ -18,16 +20,11 @@ import {useOnLogout} from '@/shared/hooks/useOnLogout';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
 import {TrialBanner} from '@/shared/layout/TrialBanner';
 import {AppSidebar} from '@/shared/layout/app-sidebar/AppSidebar';
-import {
-    useAutomationGettingStartedCompletedQuery,
-    useEmbeddedGettingStartedCompletedQuery,
-} from '@/shared/middleware/graphql';
 import {isStandaloneRoute} from '@/shared/navigation/standaloneRoutes';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {useGettingStartedStore} from '@/shared/stores/useGettingStartedStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     ActivityIcon,
@@ -209,11 +206,8 @@ function App() {
         }))
     );
     const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
-    const automationGettingStartedStored = useGettingStartedStore((state) => !!state.completions.automation);
-    const completeGettingStarted = useGettingStartedStore((state) => state.complete);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
-    const embeddedGettingStartedStored = useGettingStartedStore((state) => !!state.completions.embedded);
     const {currentType, setCurrentType} = usePlatformTypeStore(
         useShallow((state) => ({
             currentType: state.currentType,
@@ -239,38 +233,27 @@ function App() {
     const isAutomationPath = location.pathname.includes('/automation/');
     const isEmbeddedPath = location.pathname.startsWith('/embedded/');
 
-    const {data: embeddedGettingStartedCompletedData} = useEmbeddedGettingStartedCompletedQuery(undefined, {
-        enabled:
-            !embeddedGettingStartedStored &&
-            currentEnvironmentId === DEVELOPMENT_ENVIRONMENT &&
-            isEmbeddedPath &&
-            isAdmin &&
-            edition === EditionType.EE,
-    });
-
-    const {data: automationGettingStartedCompletedData} = useAutomationGettingStartedCompletedQuery(
-        {workspaceId: currentWorkspaceId},
-        {
-            enabled:
-                !automationGettingStartedStored &&
-                isAutomationPath &&
-                canEditWorkspace &&
-                currentEnvironmentId === DEVELOPMENT_ENVIRONMENT &&
-                currentWorkspaceId !== undefined,
-        }
+    const embeddedGettingStartedCompleted = useEmbeddedGettingStartedCompleted(
+        currentEnvironmentId === DEVELOPMENT_ENVIRONMENT && isEmbeddedPath && isAdmin && edition === EditionType.EE
     );
 
-    const automationGettingStartedCompleted = automationGettingStartedCompletedData?.automationGettingStartedCompleted;
-    const embeddedGettingStartedCompleted = embeddedGettingStartedCompletedData?.embeddedGettingStartedCompleted;
+    const automationGettingStartedCompleted = useAutomationGettingStartedCompleted({
+        enabled:
+            isAutomationPath &&
+            canEditWorkspace &&
+            currentEnvironmentId === DEVELOPMENT_ENVIRONMENT &&
+            currentWorkspaceId !== undefined,
+        workspaceId: currentWorkspaceId,
+    });
 
     const showAutomationGettingStarted = shouldShowAutomationGettingStarted({
         canEdit: canEditWorkspace,
-        completed: automationGettingStartedStored || automationGettingStartedCompleted,
+        completed: automationGettingStartedCompleted,
         development: currentEnvironmentId === DEVELOPMENT_ENVIRONMENT,
     });
 
     const showEmbeddedGettingStarted = shouldShowEmbeddedGettingStarted({
-        completed: embeddedGettingStartedStored || embeddedGettingStartedCompleted,
+        completed: embeddedGettingStartedCompleted,
         edition,
         environmentId: currentEnvironmentId,
         isAdmin,
@@ -356,18 +339,6 @@ function App() {
     }, [account, helpHub, userGuiding]);
 
     useOnLogout(() => analytics.reset());
-
-    useEffect(() => {
-        if (automationGettingStartedCompleted) {
-            completeGettingStarted('automation', 'COMPLETED');
-        }
-    }, [automationGettingStartedCompleted, completeGettingStarted]);
-
-    useEffect(() => {
-        if (embeddedGettingStartedCompleted) {
-            completeGettingStarted('embedded', 'COMPLETED');
-        }
-    }, [completeGettingStarted, embeddedGettingStartedCompleted]);
 
     useLayoutEffect(() => {
         document.title =
