@@ -94,6 +94,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import org.awaitility.core.ConditionFactory;
 import org.junit.jupiter.api.AfterEach;
@@ -666,47 +667,68 @@ class JobSyncExecutorIntTest {
 
     @Test
     void testTimedOutJobIsFailedEvenWhenTheFirstUpdateLosesToAConcurrentUpdate() {
+        Thread awaitingThread = Thread.currentThread();
+        AtomicBoolean concurrentUpdatePending = new AtomicBoolean();
+        AtomicInteger lostUpdates = new AtomicInteger();
+
+        doAnswer(invocation -> {
+            if (Thread.currentThread() == awaitingThread && concurrentUpdatePending.compareAndSet(true, false)) {
+                lostUpdates.incrementAndGet();
+
+                throw new OptimisticLockingFailureException("concurrent update");
+            }
+
+            return jobService.update(invocation.getArgument(0));
+        }).when(recordingJobService)
+            .update(any(Job.class));
+
         long jobId = jobSyncExecutor.startJob(new JobParametersDTO(GATE_WORKFLOW_ID, Map.of()));
 
         taskGates.awaitStarted(jobId);
 
-        doThrow(new OptimisticLockingFailureException("concurrent update"))
-            .doAnswer(invocation -> jobService.update(invocation.getArgument(0)))
-            .when(recordingJobService)
-            .update(any(Job.class));
+        concurrentUpdatePending.set(true);
 
         assertThatThrownBy(
             () -> jobSyncExecutor.awaitJob(jobId, true, taskExecutionCompleteEvent -> {}, Duration.ofMillis(100)))
                 .isInstanceOf(ExecutionException.class)
                 .hasMessage("Job " + jobId + " did not finish within 100 milliseconds");
 
+        assertThat(lostUpdates).hasValue(1);
         assertThat(getJobStatus(jobId)).isEqualTo(Job.Status.FAILED);
     }
 
     @Test
     void testJobThatFinishesAsTheWaitTimesOutIsNotFailed() {
+        Thread awaitingThread = Thread.currentThread();
+        AtomicLong finishingJobId = new AtomicLong();
+        AtomicInteger finishingJobReads = new AtomicInteger();
+
+        doAnswer(invocation -> {
+            long requestedJobId = invocation.getArgument(0);
+
+            Job job = jobService.getJob(requestedJobId);
+
+            if (requestedJobId == finishingJobId.get() && Thread.currentThread() == awaitingThread &&
+                finishingJobReads.getAndIncrement() > 0) {
+
+                job.setStatus(Job.Status.COMPLETED);
+            }
+
+            return job;
+        }).when(recordingJobService)
+            .getJob(anyLong());
+
         long jobId = jobSyncExecutor.startJob(new JobParametersDTO(GATE_WORKFLOW_ID, Map.of()));
 
         taskGates.awaitStarted(jobId);
 
-        Job startedJob = jobService.getJob(jobId);
-        Job completedJob = jobService.getJob(jobId);
-
-        completedJob.setStatus(Job.Status.COMPLETED);
-
-        doReturn(startedJob, completedJob).when(recordingJobService)
-            .getJob(jobId);
-
-        clearInvocations(recordingJobService);
+        finishingJobId.set(jobId);
 
         Job job = jobSyncExecutor.awaitJob(jobId, false, taskExecutionCompleteEvent -> {}, Duration.ofMillis(100));
 
-        doAnswer(invocation -> jobService.getJob(jobId)).when(recordingJobService)
-            .getJob(jobId);
-
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
-
-        verify(recordingJobService, never()).update(any(Job.class));
+        assertThat(finishingJobReads).hasValueGreaterThan(1);
+        assertThat(getJobStatus(jobId)).isNotEqualTo(Job.Status.FAILED);
     }
 
     @Test
