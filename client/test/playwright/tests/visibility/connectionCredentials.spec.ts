@@ -104,16 +104,12 @@ test.describe('Connection credential replacement', () => {
         });
     }
 
-    test("a tenant admin cannot replace the credentials of a colleague's connection", async ({
-        adminApi,
-        rbacWorkspace,
-    }) => {
+    test("a tenant admin replaces the credentials of a colleague's connection", async ({adminApi, rbacWorkspace}) => {
         const connectionId = await createConnection(apis.EDITOR!, rbacWorkspace.id);
 
         const version = await connectionVersion(adminApi, connectionId);
 
-        expectAccessDenied(await updateConnectionCredentials(adminApi, connectionId, {}, version));
-        expect(await connectionVersion(adminApi, connectionId)).toBe(version);
+        expectNoGraphQlErrors(await updateConnectionCredentials(adminApi, connectionId, {}, version));
     });
 
     test("a second tenant admin replaces the credentials of another admin's organization connection", async ({
@@ -211,7 +207,7 @@ test.describe('Connection credential replacement', () => {
         }).toPass({timeout: 60000});
     });
 
-    test('an EDITOR owner is offered Update credentials; a tenant admin sees them hidden; a VIEWER owner and non-owners get no Edit', async ({
+    test('an EDITOR owner is offered Update credentials; a tenant admin sees them hidden but is offered Update credentials; a VIEWER owner and non-owners get no Edit', async ({
         adminApi,
         browser,
         rbacWorkspace,
@@ -255,7 +251,7 @@ test.describe('Connection credential replacement', () => {
                 const dialog = await openEditDialog(tenantAdmin.page, name);
 
                 await expect(dialog.getByText('Hidden').first()).toBeVisible();
-                await expect(dialog.getByRole('button', {name: 'Update credentials'})).toHaveCount(0);
+                await expect(dialog.getByRole('button', {name: 'Update credentials'})).toBeVisible();
             } finally {
                 await tenantAdmin.context.close();
             }
