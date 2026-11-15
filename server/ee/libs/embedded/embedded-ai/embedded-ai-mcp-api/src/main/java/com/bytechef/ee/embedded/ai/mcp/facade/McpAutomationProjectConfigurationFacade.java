@@ -44,6 +44,13 @@ public interface McpAutomationProjectConfigurationFacade {
     void deleteMcpAutomationProjectConfiguration(long id);
 
     /**
+     * Removes one workflow tool from an MCP automation project configuration.
+     *
+     * @param id the link workflow ID
+     */
+    void deleteMcpAutomationProjectConfigurationWorkflow(long id);
+
+    /**
      * Replaces the selected workflows of a link by computing a diff against its current workflows. Newly selected
      * workflows are validated like on creation; unchanged ones are preserved.
      *
@@ -64,6 +71,17 @@ public interface McpAutomationProjectConfigurationFacade {
      */
     Optional<Workflow> fetchMcpAutomationProjectConfigurationWorkflowPinnedWorkflow(
         long mcpAutomationProjectConfigurationWorkflowId);
+
+    /**
+     * Returns the workflow of an automation project configuration at the configuration's project version when it has
+     * the workflow call trigger, so its tool properties can be configured before it is added to an MCP server.
+     *
+     * @param automationProjectConfigurationId the automation project configuration ID
+     * @param workflowUuid                     the workflow UUID
+     * @return the tool workflow, or empty when the workflow does not exist at that version or cannot be a tool
+     */
+    Optional<Workflow> fetchAutomationProjectConfigurationToolWorkflow(
+        long automationProjectConfigurationId, String workflowUuid);
 
     McpAutomationProjectConfigurationDTO getMcpAutomationProjectConfiguration(long id);
 

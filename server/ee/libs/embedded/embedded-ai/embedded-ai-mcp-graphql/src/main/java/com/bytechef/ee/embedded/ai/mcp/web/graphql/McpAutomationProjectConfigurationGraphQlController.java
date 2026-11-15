@@ -66,6 +66,13 @@ class McpAutomationProjectConfigurationGraphQlController {
     }
 
     @MutationMapping
+    boolean deleteMcpAutomationProjectConfigurationWorkflow(@Argument long id) {
+        mcpAutomationProjectConfigurationFacade.deleteMcpAutomationProjectConfigurationWorkflow(id);
+
+        return true;
+    }
+
+    @MutationMapping
     McpAutomationProjectConfigurationDTO updateMcpAutomationProjectConfiguration(
         @Argument long id, @Argument UpdateMcpAutomationProjectConfigurationInput input) {
 
@@ -118,6 +125,21 @@ class McpAutomationProjectConfigurationGraphQlController {
         Optional<Workflow> workflowOptional =
             mcpAutomationProjectConfigurationFacade.fetchMcpAutomationProjectConfigurationWorkflowPinnedWorkflow(
                 mcpAutomationProjectConfigurationWorkflowId);
+
+        if (workflowOptional.isEmpty()) {
+            return List.of();
+        }
+
+        return McpToolWorkflowProperties.getToolProperties(workflowOptional.get());
+    }
+
+    @QueryMapping
+    List<Property> toolEligibleAutomationProjectConfigurationWorkflowProperties(
+        @Argument long automationProjectConfigurationId, @Argument String workflowUuid) {
+
+        Optional<Workflow> workflowOptional =
+            mcpAutomationProjectConfigurationFacade.fetchAutomationProjectConfigurationToolWorkflow(
+                automationProjectConfigurationId, workflowUuid);
 
         if (workflowOptional.isEmpty()) {
             return List.of();

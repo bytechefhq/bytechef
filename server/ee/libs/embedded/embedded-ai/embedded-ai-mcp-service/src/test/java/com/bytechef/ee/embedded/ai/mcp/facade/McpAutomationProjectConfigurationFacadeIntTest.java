@@ -620,6 +620,73 @@ class McpAutomationProjectConfigurationFacadeIntTest {
         }
 
         @Test
+        void testDeleteWorkflowRemovesOnlyThatWorkflow() {
+            McpAutomationProjectConfiguration mcpAutomationProjectConfiguration =
+                mcpAutomationProjectConfigurationFacade.createMcpAutomationProjectConfiguration(
+                    mcpServerId, automationProjectConfigurationId, List.of(FIRST_WORKFLOW_UUID, SECOND_WORKFLOW_UUID),
+                    List.of());
+
+            McpAutomationProjectConfigurationWorkflow firstWorkflow = getLinkWorkflow(
+                mcpAutomationProjectConfiguration.getId(), FIRST_WORKFLOW_UUID);
+
+            mcpAutomationProjectConfigurationFacade.deleteMcpAutomationProjectConfigurationWorkflow(
+                firstWorkflow.getId());
+
+            assertThat(
+                mcpAutomationProjectConfigurationWorkflowService.getMcpAutomationProjectConfigurationWorkflows(
+                    mcpAutomationProjectConfiguration.getId()))
+                        .extracting(McpAutomationProjectConfigurationWorkflow::getWorkflowUuid)
+                        .containsExactly(SECOND_WORKFLOW_UUID);
+            assertThat(
+                findSingleEventData(
+                    McpAutomationProjectConfigurationAuditEvents.MCP_AUTOMATION_PROJECT_CONFIGURATION_WORKFLOW_DELETED))
+                        .containsEntry("result", "SUCCESS")
+                        .containsEntry(
+                            "mcpAutomationProjectConfigurationWorkflowId", String.valueOf(firstWorkflow.getId()));
+        }
+
+        @Test
+        void testDeleteOfAnUnknownWorkflowRecordsAFailure() {
+            long unknownWorkflowId = Long.MAX_VALUE;
+
+            assertThatThrownBy(
+                () -> mcpAutomationProjectConfigurationFacade.deleteMcpAutomationProjectConfigurationWorkflow(
+                    unknownWorkflowId))
+                        .isInstanceOf(IllegalArgumentException.class);
+
+            assertThat(
+                findSingleEventData(
+                    McpAutomationProjectConfigurationAuditEvents.MCP_AUTOMATION_PROJECT_CONFIGURATION_WORKFLOW_DELETED))
+                        .containsEntry("result", "ERROR")
+                        .containsEntry("errorClass", IllegalArgumentException.class.getName())
+                        .containsEntry("mcpAutomationProjectConfigurationWorkflowId",
+                            String.valueOf(unknownWorkflowId));
+        }
+
+        @Test
+        void testFetchToolWorkflowReturnsOnlyWorkflowsWithWorkflowCallTrigger() {
+            assertThat(
+                mcpAutomationProjectConfigurationFacade.fetchAutomationProjectConfigurationToolWorkflow(
+                    automationProjectConfigurationId, FIRST_WORKFLOW_UUID))
+                        .isPresent();
+            assertThat(
+                mcpAutomationProjectConfigurationFacade.fetchAutomationProjectConfigurationToolWorkflow(
+                    automationProjectConfigurationId, NO_TRIGGER_WORKFLOW_UUID))
+                        .isEmpty();
+        }
+
+        private McpAutomationProjectConfigurationWorkflow getLinkWorkflow(
+            long mcpAutomationProjectConfigurationId, String workflowUuid) {
+
+            return mcpAutomationProjectConfigurationWorkflowService
+                .getMcpAutomationProjectConfigurationWorkflows(mcpAutomationProjectConfigurationId)
+                .stream()
+                .filter(linkWorkflow -> workflowUuid.equals(linkWorkflow.getWorkflowUuid()))
+                .findFirst()
+                .orElseThrow();
+        }
+
+        @Test
         void testCreateRecordsTheMcpAutomationProjectConfiguration() {
             McpAutomationProjectConfiguration mcpAutomationProjectConfiguration =
                 mcpAutomationProjectConfigurationFacade.createMcpAutomationProjectConfiguration(
