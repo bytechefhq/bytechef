@@ -102,16 +102,17 @@ matches, nothing changes and the step reports a count of 0. Each condition picks
 |---|---|
 | **Equals** / **Not Equals** | is, or is not, the value. **Not Equals** also matches cells with no value |
 | **Equals Ignore Case** | equals the text, ignoring upper and lower case |
+| **Contains Ignore Case** | contains the text, ignoring upper and lower case |
 | **Contains** / **Not Contains** / **Starts With** / **Ends With** | contains, does not contain, starts with or ends with the text. These comparisons are case-sensitive. **Not Contains** also matches cells with no value |
 | **Greater** / **Greater or Equals** / **Less** / **Less or Equals** | compares as a number, date, boolean or text. Text is ordered by the database's collation, so letter case and accents may not order the way you expect |
 | **In** | is one of the listed **Values** |
 | **Between** | lies between **Value** and **To Value**, both included. On number, date, date-time and boolean columns a **Value** after **To Value** is rejected; on text columns it matches no row |
 | **Empty** / **Not Empty** | does not have, or has, a value. For text columns an empty string counts as empty |
 
-The text operations - **Equals Ignore Case**, **Contains**, **Not Contains**, **Starts With** and
-**Ends With** - work only on text columns. Values are converted to the column's type, so `10` in the
+The text operations - **Equals Ignore Case**, **Contains**, **Contains Ignore Case**, **Not Contains**,
+**Starts With** and **Ends With** - work only on text columns. Values are converted to the column's type, so `10` in the
 **Value** field compares as a number against an integer column, and text values are trimmed - except for **Contains**,
-**Not Contains**, **Starts With** and **Ends With**, which use the text exactly as given, spaces included (a value of only spaces counts as blank). A value
+**Contains Ignore Case**, **Not Contains**, **Starts With** and **Ends With**, which use the text exactly as given, spaces included (a value of only spaces counts as blank). A value
 that does not fit the column type stops the step with an error instead of matching other rows: for
 example `abc` or `10.5` for an integer column, `2025` for a date column, or `2026-02-30`, a date that does not
 exist. Date columns take a date such as `2026-01-31`; a date and time is accepted too and only its date is used, after
