@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.facade;
+package com.bytechef.automation.getting.started.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -22,11 +22,9 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
-import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.service.PermissionService;
-import com.bytechef.platform.configuration.domain.Property.Scope;
-import com.bytechef.platform.configuration.service.PropertyService;
+import com.bytechef.automation.getting.started.config.AutomationGettingStartedIntTestConfiguration;
+import com.bytechef.automation.getting.started.config.AutomationGettingStartedIntTestConfigurationSharedMocks;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.io.Serializable;
@@ -50,17 +48,15 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  * @author Ivica Cardic
  */
 @SpringBootTest(
-    classes = ProjectIntTestConfiguration.class,
+    classes = AutomationGettingStartedIntTestConfiguration.class,
     properties = {
         "bytechef.workflow.repository.jdbc.enabled=true"
     })
 @Import(PostgreSQLContainerConfiguration.class)
-@ProjectIntTestConfigurationSharedMocks
+@AutomationGettingStartedIntTestConfigurationSharedMocks
 @ContextConfiguration(classes = AutomationGettingStartedFacadeIntTest.MethodSecurityConfiguration.class)
 class AutomationGettingStartedFacadeIntTest {
 
-    private static final String GETTING_STARTED = "gettingStarted";
-    private static final long OTHER_WORKSPACE_ID = 12L;
     private static final long WORKSPACE_ID = 11L;
 
     @Autowired
@@ -68,9 +64,6 @@ class AutomationGettingStartedFacadeIntTest {
 
     @MockitoBean
     private PermissionService permissionService;
-
-    @Autowired
-    private PropertyService propertyService;
 
     @BeforeEach
     void beforeEach() {
@@ -84,30 +77,16 @@ class AutomationGettingStartedFacadeIntTest {
 
     @AfterEach
     void afterEach() {
-        propertyService.delete(GETTING_STARTED, Scope.AUTOMATION, null);
-
         SecurityContextHolder.clearContext();
     }
 
     @Test
-    void testDismissInOneWorkspaceCompletesAnotherWorkspace() {
-        propertyService.delete(GETTING_STARTED, Scope.AUTOMATION, null);
-
+    void testIsAutomationGettingStartedCompletedWithoutRunIsFalse() {
         Serializable workspaceId = WORKSPACE_ID;
-        Serializable otherWorkspaceId = OTHER_WORKSPACE_ID;
 
         when(permissionService.hasResourceScope(workspaceId, "Workspace", "PROJECT_CREATE")).thenReturn(true);
-        when(permissionService.hasResourceScope(otherWorkspaceId, "Workspace", "PROJECT_CREATE")).thenReturn(true);
 
-        automationGettingStartedFacade.dismissAutomationGettingStarted(WORKSPACE_ID);
-
-        assertThat(automationGettingStartedFacade.isAutomationGettingStartedCompleted(OTHER_WORKSPACE_ID)).isTrue();
-        assertThat(propertyService.getProperties(List.of(GETTING_STARTED), Scope.AUTOMATION, null)).hasSize(1);
-    }
-
-    @Test
-    void testDismissAutomationGettingStartedRequiresProjectCreate() {
-        assertRequiresProjectCreate(() -> automationGettingStartedFacade.dismissAutomationGettingStarted(WORKSPACE_ID));
+        assertThat(automationGettingStartedFacade.isAutomationGettingStartedCompleted(WORKSPACE_ID)).isFalse();
     }
 
     @Test

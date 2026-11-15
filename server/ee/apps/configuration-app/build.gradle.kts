@@ -31,6 +31,8 @@ dependencies {
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-graphql"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-rest:automation-configuration-rest-impl"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
+    implementation(project(":server:libs:automation:automation-getting-started:automation-getting-started-graphql"))
+    implementation(project(":server:libs:automation:automation-getting-started:automation-getting-started-service"))
     implementation(project(":server:libs:automation:automation-task:automation-task-graphql"))
     implementation(project(":server:libs:automation:automation-task:automation-task-service"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-graphql"))
