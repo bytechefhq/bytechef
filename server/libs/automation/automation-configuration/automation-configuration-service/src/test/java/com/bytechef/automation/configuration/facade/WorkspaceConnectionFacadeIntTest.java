@@ -151,6 +151,8 @@ public class WorkspaceConnectionFacadeIntTest {
 
         categoryRepository.deleteAll();
         tagRepository.deleteAll();
+
+        SecurityContextHolder.clearContext();
     }
 
     @BeforeEach
@@ -358,8 +360,16 @@ public class WorkspaceConnectionFacadeIntTest {
     @Test
     public void testUpdateConnectionCredentialsDelegatesForAutomationConnection() {
         Map<String, String> parameters = Map.of("token", "new-token");
+        Connection connection = createConnection(ConnectionStatus.ACTIVE, 3);
 
-        when(connectionService.getConnection(1L)).thenReturn(createConnection(ConnectionStatus.ACTIVE, 3));
+        connection.setCreatedBy("user");
+
+        when(connectionService.getConnection(1L)).thenReturn(connection);
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                    "user", "n/a", List.of(new SimpleGrantedAuthority(AuthorityConstants.USER))));
 
         workspaceConnectionFacade.updateConnectionCredentials(1L, parameters, 3);
 
@@ -535,7 +545,15 @@ public class WorkspaceConnectionFacadeIntTest {
         }
 
         @Test
+        void testUpdateConnectionCredentialsDeniesTheOwnerWithoutTheEditScope() {
+            when(permissionService.isResourceOwner("Connection", 1L)).thenReturn(true);
+
+            assertDenied(() -> workspaceConnectionFacade.updateConnectionCredentials(1L, Map.of(), 0));
+        }
+
+        @Test
         void testUpdateConnectionCredentialsAdmitsTheConnectionOwner() {
+            when(permissionService.hasResourceScope(1L, "Connection", "CONNECTION_EDIT")).thenReturn(true);
             when(permissionService.isResourceOwner("Connection", 1L)).thenReturn(true);
 
             assertNotDenied(() -> workspaceConnectionFacade.updateConnectionCredentials(1L, Map.of(), 0));
@@ -543,6 +561,7 @@ public class WorkspaceConnectionFacadeIntTest {
 
         @Test
         void testUpdateConnectionCredentialsAdmitsATenantAdmin() {
+            when(permissionService.hasResourceScope(1L, "Connection", "CONNECTION_EDIT")).thenReturn(true);
             when(permissionService.isTenantAdmin()).thenReturn(true);
 
             assertNotDenied(() -> workspaceConnectionFacade.updateConnectionCredentials(1L, Map.of(), 0));

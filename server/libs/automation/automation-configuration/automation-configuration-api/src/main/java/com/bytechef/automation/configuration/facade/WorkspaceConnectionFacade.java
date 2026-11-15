@@ -42,7 +42,7 @@ public interface WorkspaceConnectionFacade {
     List<ConnectionDTO> getConnections(
         long workspaceId, String componentName, Integer connectionVersion, Long environmentId, Long tagId);
 
-    List<Tag> getConnectionTags(long workspaceId, Long environmentId);
+    List<Tag> getConnectionTags(long workspaceId);
 
     void update(long connectionId, String name, List<Tag> tags, int version);
 

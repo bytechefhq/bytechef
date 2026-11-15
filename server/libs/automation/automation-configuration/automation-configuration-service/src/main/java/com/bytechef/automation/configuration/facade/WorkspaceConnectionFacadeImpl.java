@@ -279,9 +279,9 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
-    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'CONNECTION_VIEW', #environmentId)")
     @Transactional(readOnly = true)
-    public List<Tag> getConnectionTags(long workspaceId, Long environmentId) {
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
+    public List<Tag> getConnectionTags(long workspaceId) {
         List<Long> connectionIds = CollectionUtils.map(
             workspaceConnectionService.getWorkspaceConnections(workspaceId), WorkspaceConnection::getConnectionId);
 
@@ -294,7 +294,6 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         return tagService.getTags(
             connections.stream()
                 .filter(connection -> connection.getType() == PlatformType.AUTOMATION)
-                .filter(connection -> environmentId == null || connection.getEnvironmentId() == environmentId)
                 .flatMap(connection -> CollectionUtils.stream(connection.getTagIds()))
                 .distinct()
                 .toList());
@@ -342,11 +341,11 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         @AuditData(key = "connectionId", value = "#connectionId")
     })
     @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') && " +
-        "isResourceOwner(#connectionId, 'Connection')")
+        "(isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())")
     public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
         requireAutomationConnection(connectionId);
 
-        validateSecretOwner(connectionService.getConnection(connectionId));
+        validateCredentialReplacer(connectionService.getConnection(connectionId));
 
         connectionFacade.updateCredentials(connectionId, parameters, version);
     }
@@ -360,10 +359,11 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
             ConnectionSecrets.canCurrentUserAccessSecrets(connectionDTO.createdBy(), connectionDTO.visibility());
     }
 
-    private void validateSecretOwner(Connection connection) {
-        if (!ConnectionSecrets.canCurrentUserAccessSecrets(connection.getCreatedBy(), connection.getVisibility())) {
+    private void validateCredentialReplacer(Connection connection) {
+        if (!ConnectionSecrets.canCurrentUserReplaceSecrets(connection.getCreatedBy())) {
             throw new AccessDeniedException(
-                "Only the connection owner can replace the credentials of connection " + connection.getId());
+                "Only the connection owner or a tenant admin can replace the credentials of connection " +
+                    connection.getId());
         }
     }
 
