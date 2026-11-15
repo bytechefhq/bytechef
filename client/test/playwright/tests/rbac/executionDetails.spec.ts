@@ -66,7 +66,7 @@ async function createCompletedRun(adminApi: APIRequestContext, workspace: RbacWo
 }
 
 async function openRunTaskOutput(page: Page, projectName: string): Promise<void> {
-    await page.goto('/automation/executions');
+    await page.goto('/automation/workflow-executions');
 
     const executionsTable = page.getByTestId('workflow-executions-table');
 

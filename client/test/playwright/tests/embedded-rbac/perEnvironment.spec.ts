@@ -144,7 +144,7 @@ test.describe('Embedded per-environment roles', () => {
             });
 
             await test.step('Production configurations can be created', async () => {
-                await expect(page.getByRole('button', {name: 'New Instance Configuration'})).toBeVisible();
+                await expect(page.getByRole('button', {exact: true, name: 'New Configuration'})).toBeVisible();
             });
 
             await test.step('Production connections can be created', async () => {
@@ -246,11 +246,11 @@ test.describe('Embedded per-environment roles', () => {
 
                     await openListPage(
                         page,
-                        '/embedded/configurations',
+                        `/embedded/integrations?integrationId=${embeddedData.integrationId}&tab=configurations`,
                         environmentNames.DEVELOPMENT.configurationName
                     );
 
-                    await expect(page.getByRole('button', {name: 'New Instance Configuration'})).toHaveCount(0);
+                    await expect(page.getByRole('button', {exact: true, name: 'Create Configuration'})).toHaveCount(0);
                 });
 
                 await test.step('Production offers the create controls', async () => {
@@ -258,11 +258,11 @@ test.describe('Embedded per-environment roles', () => {
 
                     await page.getByRole('menuitemradio').filter({hasText: 'PRODUCTION'}).click();
 
-                    await expect(page.getByText(environmentNames.PRODUCTION.configurationName).first()).toBeVisible({
-                        timeout: 30_000,
-                    });
+                    await expectSelectedEnvironmentId(page, ENVIRONMENT_IDS.PRODUCTION);
 
-                    await expect(page.getByRole('button', {name: 'New Instance Configuration'})).toBeVisible();
+                    await openListPage(page, '/embedded/configurations', environmentNames.PRODUCTION.configurationName);
+
+                    await expect(page.getByRole('button', {exact: true, name: 'New Configuration'})).toBeVisible();
 
                     await navigateInApp(page, '/embedded/connections', environmentNames.PRODUCTION.connectionName);
 

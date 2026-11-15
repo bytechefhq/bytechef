@@ -50,19 +50,21 @@ test.describe('Denied requests in the client', () => {
         const refusedRequests: string[] = [];
 
         page.on('response', (response) => {
-            if (response.status() === 403 && response.url().includes('/api/automation/internal/project-deployments')) {
+            if (response.status() === 403 && response.url().includes('/project-deployments')) {
                 refusedRequests.push(response.url());
             }
         });
 
-        await page.goto('/automation/deployments');
+        await page.goto(`/automation/projects?projectId=${rbacWorkspace.projectId}&tab=deployments`);
 
         const toast = page.locator('[data-sonner-toast]').filter({hasText: 'Access denied'});
 
         await expect(toast).toBeVisible({timeout: 30000});
-        await expect(toast).toContainText('You do not have permission to perform this action.');
+        await expect(toast).toContainText('Forbidden');
 
         await page.waitForTimeout(3000);
+
+        expect(refusedRequests.length).toBeGreaterThan(0);
 
         const refusedUrls = new Set(refusedRequests);
 

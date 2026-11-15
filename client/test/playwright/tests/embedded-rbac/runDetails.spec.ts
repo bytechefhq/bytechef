@@ -190,7 +190,7 @@ async function deleteEmbeddedRun(adminApi: APIRequestContext, embeddedRun: Embed
 }
 
 async function openRunTaskOutput(page: Page, configurationName: string): Promise<void> {
-    await page.goto('/embedded/executions');
+    await page.goto('/embedded/workflow-executions');
 
     await page.getByRole('cell', {exact: true, name: configurationName}).first().click({timeout: 30_000});
 

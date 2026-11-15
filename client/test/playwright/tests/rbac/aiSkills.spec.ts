@@ -6,7 +6,10 @@ import {RBAC_BASE_URL, createRoleUserApiContext, graphql, postGraphQl} from '../
 const AI_SKILLS = 'query AiSkills { aiSkills { id name } }';
 
 test.describe('AI skills', () => {
-    test('only the owner and a tenant admin can see or change a skill', async ({adminApi, roleUsers}) => {
+    test('every member can see a skill, and only the owner and a tenant admin can change it', async ({
+        adminApi,
+        roleUsers,
+    }) => {
         const ownerApi = await createRoleUserApiContext(RBAC_BASE_URL, roleUsers.EDITOR);
         const otherApi = await createRoleUserApiContext(RBAC_BASE_URL, roleUsers.ADMIN);
 
@@ -27,13 +30,20 @@ test.describe('AI skills', () => {
                 {name}
             );
 
-            await test.step('another member does not see it and is refused on it', async () => {
+            await test.step('another member sees it and is refused when changing it', async () => {
                 const {aiSkills} = await graphql<{aiSkills: {id: string}[]}>(otherApi, AI_SKILLS, {});
 
-                expect(aiSkills.map((curAiSkill) => curAiSkill.id)).not.toContain(aiSkill.id);
+                expect(aiSkills.map((curAiSkill) => curAiSkill.id)).toContain(aiSkill.id);
+
+                const {aiSkill: readAiSkill} = await graphql<{aiSkill: {id: string}}>(
+                    otherApi,
+                    'query AiSkill($id: ID!) { aiSkill(id: $id) { id } }',
+                    {id: aiSkill.id}
+                );
+
+                expect(readAiSkill.id).toBe(aiSkill.id);
 
                 for (const query of [
-                    'query AiSkill($id: ID!) { aiSkill(id: $id) { id } }',
                     'mutation UpdateAiSkill($id: ID!) { updateAiSkill(id: $id, name: "hijacked") { id } }',
                     'mutation DeleteAiSkill($id: ID!) { deleteAiSkill(id: $id) }',
                 ]) {

@@ -5,8 +5,10 @@ import {
     type BuiltInRoleType,
     PAGE_BODY_TEXT,
     RBAC_BASE_URL,
+    expandProjectItem,
     expectPresence,
     openAsRoleUser,
+    openDevelopmentProjectDeployments,
     openPage,
     publishRbacWorkspaceProject,
 } from '../../utils/rbacUtils';
@@ -100,10 +102,10 @@ for (const role of ['VIEWER', 'EDITOR', 'ADMIN'] as BuiltInRoleType[]) {
                 );
             });
 
-            const projectItem = page.getByLabel(String(rbacWorkspace.projectId), {exact: true});
-
             await test.step('create workflow', async () => {
-                await expect(projectItem.getByRole('button', {name: 'Create Workflow'})).toHaveCount(
+                const projectContainer = await expandProjectItem(page, rbacWorkspace.projectId);
+
+                await expect(projectContainer.getByRole('button', {exact: true, name: 'Create Workflow'})).toHaveCount(
                     expectations.createWorkflow ? 1 : 0
                 );
             });
@@ -131,12 +133,15 @@ for (const role of ['VIEWER', 'EDITOR', 'ADMIN'] as BuiltInRoleType[]) {
             });
         });
 
-        test('deployments page offers create only to roles that may deploy', async ({adminApi, rbacWorkspace}) => {
+        test('project deployments tab offers deploy only to roles that may deploy', async ({
+            adminApi,
+            rbacWorkspace,
+        }) => {
             await publishRbacWorkspaceProject(adminApi, rbacWorkspace);
 
-            await openPage(page, '/automation/deployments', PAGE_BODY_TEXT.deployments);
+            await openDevelopmentProjectDeployments(page, rbacWorkspace.projectId);
 
-            await expectPresence(page, /^(New|Create) Deployment$/, expectations.createDeployment, 'button');
+            await expectPresence(page, 'Deploy', expectations.createDeployment, 'button');
         });
 
         test('project header offers deploy only to roles that may deploy', async ({adminApi, rbacWorkspace}) => {

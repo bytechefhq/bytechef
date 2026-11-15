@@ -10,9 +10,11 @@ import {
     createCustomRoleUser,
     deleteCustomRole,
     deleteRoleUser,
+    expandProjectItem,
     expectPresence,
     openAsRoleUser,
     openAsTenantAdmin,
+    openDevelopmentProjectDeployments,
     openPage,
     publishRbacWorkspaceProject,
     updateCustomRoleScopes,
@@ -50,9 +52,9 @@ test.describe('Custom role member', () => {
 
         await expect(page.locator('button[aria-label="Create Project"]')).toHaveCount(1);
 
-        const projectItem = page.getByLabel(String(rbacWorkspace.projectId), {exact: true});
+        const projectContainer = await expandProjectItem(page, rbacWorkspace.projectId);
 
-        await expect(projectItem.getByRole('button', {name: 'Create Workflow'})).toHaveCount(0);
+        await expect(projectContainer.getByRole('button', {exact: true, name: 'Create Workflow'})).toHaveCount(0);
 
         await page.getByTestId(`${rbacWorkspace.projectId}-moreProjectActionsButton`).click();
 
@@ -77,9 +79,9 @@ test.describe('Custom role member', () => {
 
         ({context, page} = await openAsRoleUser(browser, RBAC_BASE_URL, roleUser, rbacWorkspace));
 
-        await openPage(page, '/automation/deployments', PAGE_BODY_TEXT.deployments);
+        await openDevelopmentProjectDeployments(page, rbacWorkspace.projectId);
 
-        await expectPresence(page, /^(New|Create) Deployment$/, true, 'button');
+        await expectPresence(page, 'Deploy', true, 'button');
 
         await openPage(page, '/automation/projects', new RegExp(rbacWorkspace.projectName));
 

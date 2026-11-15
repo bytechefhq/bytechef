@@ -90,15 +90,15 @@ const ROLE_EXPECTATIONS: Record<EmbeddedCallerType, RoleExpectationsI> = {
     },
 };
 
-const EMBEDDED_PAGE_HREFS = [
+const EMBEDDED_NAVIGATION_HREFS = [
     '/embedded/integrations',
-    '/embedded/configurations',
     '/embedded/connected-users',
     '/embedded/app-events',
-    '/embedded/executions',
     '/embedded/connections',
     '/embedded/mcp-servers',
 ];
+
+const EMBEDDED_PAGE_PATHS = [...EMBEDDED_NAVIGATION_HREFS, '/embedded/workflow-executions'];
 
 async function openEmbeddedPage(page: Page, path: string, readyText: RegExp | string): Promise<void> {
     await page.goto(path);
@@ -136,7 +136,7 @@ for (const caller of ['VIEWER', 'EDITOR', 'ADMIN', 'TENANT_ADMIN'] as EmbeddedCa
         test('integrations page offers only the integration actions the role holds', async ({embeddedData}) => {
             await openEmbeddedPage(page, '/embedded/integrations', embeddedData.integrationName);
 
-            for (const href of EMBEDDED_PAGE_HREFS) {
+            for (const href of EMBEDDED_NAVIGATION_HREFS) {
                 await expect(page.locator(`a[href="${href}"]`).first(), href).toBeVisible();
             }
 
@@ -169,14 +169,13 @@ for (const caller of ['VIEWER', 'EDITOR', 'ADMIN', 'TENANT_ADMIN'] as EmbeddedCa
                 `/integration-instance-configurations/${embeddedData.byEnvironment.DEVELOPMENT.instanceConfigurationId}`
             );
 
-            await openEmbeddedPage(page, '/embedded/configurations', configuration.name);
-
-            await expectPresence(
+            await openEmbeddedPage(
                 page,
-                /^(New|Create) Instance Configuration$/,
-                expectations.createConfiguration,
-                'button'
+                `/embedded/integrations?integrationId=${embeddedData.integrationId}&tab=configurations`,
+                configuration.name
             );
+
+            await expectPresence(page, 'Create Configuration', expectations.createConfiguration, 'button');
 
             await openEmbeddedPage(page, '/embedded/connections', /^Connections$/);
 
@@ -184,7 +183,7 @@ for (const caller of ['VIEWER', 'EDITOR', 'ADMIN', 'TENANT_ADMIN'] as EmbeddedCa
 
             await openEmbeddedPage(page, '/embedded/app-events', /^App Events$/);
 
-            await expectPresence(page, 'New App Event', expectations.createAppEvent, 'button');
+            await expectPresence(page, /^(New|Create) App Event$/, expectations.createAppEvent, 'button');
         });
 
         test('MCP servers offer create and the server URL only to roles that may edit them', async ({
@@ -281,7 +280,7 @@ test.describe('tenant user who is not an embedded member', () => {
         });
 
         try {
-            for (const path of [...EMBEDDED_PAGE_HREFS, '/embedded/settings/members']) {
+            for (const path of [...EMBEDDED_PAGE_PATHS, '/embedded/settings/members']) {
                 await test.step(path, async () => {
                     await page.goto(path);
 
@@ -292,7 +291,7 @@ test.describe('tenant user who is not an embedded member', () => {
                         )
                     ).toBeVisible();
 
-                    for (const href of EMBEDDED_PAGE_HREFS) {
+                    for (const href of EMBEDDED_NAVIGATION_HREFS) {
                         await expect(page.locator(`a[href="${href}"]`), href).toHaveCount(0);
                     }
                 });
