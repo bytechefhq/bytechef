@@ -474,7 +474,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         @AuditData(key = "integrationVersion", value = "#integrationVersion"),
         @AuditData(key = "environment", value = "#environment")
     })
-    @PreAuthorize("hasEmbeddedScopeInEnvironment('INTEGRATION_INSTANCE_CONFIGURATION_EDIT', #environment)")
+    @PreAuthorize("hasEmbeddedScopeInEnvironment('INTEGRATION_INSTANCE_CONFIGURATION_CREATE', #environment) and "
+        + "hasEmbeddedScopeInEnvironment('INTEGRATION_INSTANCE_CONFIGURATION_EDIT', #environment)")
     public long enableIntegrationVersion(long integrationId, int integrationVersion, Environment environment) {
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
             integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(
