@@ -583,13 +583,6 @@ export type DisconnectConnectionMutationVariables = Exact<{
 
 export type DisconnectConnectionMutation = { disconnectConnection: boolean };
 
-export type DismissAutomationGettingStartedMutationVariables = Exact<{
-  workspaceId: string | number;
-}>;
-
-
-export type DismissAutomationGettingStartedMutation = { dismissAutomationGettingStarted: boolean | null };
-
 export type ExportSharedProjectMutationVariables = Exact<{
   id: string | number;
   description?: string | null | undefined;
@@ -1460,11 +1453,6 @@ export type DeleteMcpIntegrationInstanceConfigurationWorkflowMutationVariables =
 
 export type DeleteMcpIntegrationInstanceConfigurationWorkflowMutation = { deleteMcpIntegrationInstanceConfigurationWorkflow: boolean | null };
 
-export type DismissEmbeddedGettingStartedMutationVariables = Exact<{ [key: string]: never; }>;
-
-
-export type DismissEmbeddedGettingStartedMutation = { dismissEmbeddedGettingStarted: boolean | null };
-
 export type DuplicateAutomationProjectMutationVariables = Exact<{
   id: string | number;
 }>;
@@ -1482,7 +1470,7 @@ export type DuplicateAutomationProjectWorkflowMutation = { duplicateAutomationPr
 export type EmbeddedGettingStartedQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type EmbeddedGettingStartedQuery = { embeddedGettingStarted: { apiBaseUrl: string | null, apiKeyCreated: boolean, completed: boolean, completionType: string | null, componentName: string | null, componentVersion: number | null, firstCallMade: boolean, integrationConfigurationCreated: boolean, integrationConfigurationEnabled: boolean, integrationCreated: boolean, integrationHasWorkflows: boolean, integrationId: any, integrationInstanceConfigurationId: any, integrationPublished: boolean, testUserAdded: boolean, testUserConnected: boolean, testUserExternalId: string | null, testUserId: any, lastFailedCall: { createdDate: any, errorMessage: string | null, status: string } | null } };
+export type EmbeddedGettingStartedQuery = { embeddedGettingStarted: { apiBaseUrl: string | null, apiKeyCreated: boolean, completed: boolean, componentName: string | null, componentVersion: number | null, firstCallMade: boolean, integrationConfigurationCreated: boolean, integrationConfigurationEnabled: boolean, integrationCreated: boolean, integrationHasWorkflows: boolean, integrationId: any, integrationInstanceConfigurationId: any, integrationPublished: boolean, testUserAdded: boolean, testUserConnected: boolean, testUserExternalId: string | null, testUserId: any, lastFailedCall: { createdDate: any, errorMessage: string | null, status: string } | null } };
 
 export type EmbeddedGettingStartedCompletedQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4619,25 +4607,6 @@ export const useDisconnectConnectionMutation = <
   }
     )};
 
-export const DismissAutomationGettingStartedDocument = new TypedDocumentString(`
-    mutation dismissAutomationGettingStarted($workspaceId: ID!) {
-  dismissAutomationGettingStarted(workspaceId: $workspaceId)
-}
-    `);
-
-export const useDismissAutomationGettingStartedMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<DismissAutomationGettingStartedMutation, TError, DismissAutomationGettingStartedMutationVariables, TContext>) => {
-    
-    return useMutation<DismissAutomationGettingStartedMutation, TError, DismissAutomationGettingStartedMutationVariables, TContext>(
-      {
-    mutationKey: ['dismissAutomationGettingStarted'],
-    mutationFn: (variables?: DismissAutomationGettingStartedMutationVariables) => fetcher<DismissAutomationGettingStartedMutation, DismissAutomationGettingStartedMutationVariables>(DismissAutomationGettingStartedDocument, variables)(),
-    ...options
-  }
-    )};
-
 export const ExportSharedProjectDocument = new TypedDocumentString(`
     mutation exportSharedProject($id: ID!, $description: String) {
   exportSharedProject(id: $id, description: $description)
@@ -7751,25 +7720,6 @@ export const useDeleteMcpIntegrationInstanceConfigurationWorkflowMutation = <
   }
     )};
 
-export const DismissEmbeddedGettingStartedDocument = new TypedDocumentString(`
-    mutation dismissEmbeddedGettingStarted {
-  dismissEmbeddedGettingStarted
-}
-    `);
-
-export const useDismissEmbeddedGettingStartedMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<DismissEmbeddedGettingStartedMutation, TError, DismissEmbeddedGettingStartedMutationVariables, TContext>) => {
-    
-    return useMutation<DismissEmbeddedGettingStartedMutation, TError, DismissEmbeddedGettingStartedMutationVariables, TContext>(
-      {
-    mutationKey: ['dismissEmbeddedGettingStarted'],
-    mutationFn: (variables?: DismissEmbeddedGettingStartedMutationVariables) => fetcher<DismissEmbeddedGettingStartedMutation, DismissEmbeddedGettingStartedMutationVariables>(DismissEmbeddedGettingStartedDocument, variables)(),
-    ...options
-  }
-    )};
-
 export const DuplicateAutomationProjectDocument = new TypedDocumentString(`
     mutation duplicateAutomationProject($id: ID!) {
   duplicateAutomationProject(id: $id)
@@ -7814,7 +7764,6 @@ export const EmbeddedGettingStartedDocument = new TypedDocumentString(`
     apiBaseUrl
     apiKeyCreated
     completed
-    completionType
     componentName
     componentVersion
     firstCallMade

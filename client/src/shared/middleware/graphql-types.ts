@@ -1276,7 +1276,6 @@ export type EmbeddedGettingStarted = {
   apiBaseUrl?: Maybe<Scalars['String']['output']>;
   apiKeyCreated: Scalars['Boolean']['output'];
   completed: Scalars['Boolean']['output'];
-  completionType?: Maybe<Scalars['String']['output']>;
   componentName?: Maybe<Scalars['String']['output']>;
   componentVersion?: Maybe<Scalars['Int']['output']>;
   firstCallMade: Scalars['Boolean']['output'];
@@ -2008,8 +2007,6 @@ export type Mutation = {
   deleteWorkspaceApiKey: Scalars['Boolean']['output'];
   deleteWorkspaceMcpServer?: Maybe<Scalars['Boolean']['output']>;
   disconnectConnection: Scalars['Boolean']['output'];
-  dismissAutomationGettingStarted?: Maybe<Scalars['Boolean']['output']>;
-  dismissEmbeddedGettingStarted?: Maybe<Scalars['Boolean']['output']>;
   dropDataTable: Scalars['Boolean']['output'];
   duplicateAutomationProject: Scalars['ID']['output'];
   duplicateAutomationProjectWorkflow: Scalars['ID']['output'];
@@ -2534,11 +2531,6 @@ export type MutationDeleteWorkspaceMcpServerArgs = {
 
 export type MutationDisconnectConnectionArgs = {
   connectionId: Scalars['ID']['input'];
-};
-
-
-export type MutationDismissAutomationGettingStartedArgs = {
-  workspaceId: Scalars['ID']['input'];
 };
 
 
