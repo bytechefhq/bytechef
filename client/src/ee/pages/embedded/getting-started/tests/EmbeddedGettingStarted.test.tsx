@@ -2,6 +2,7 @@ import {TooltipProvider} from '@/components/ui/tooltip';
 import {useConnectedUserSheetStore} from '@/ee/pages/embedded/connected-users/stores/useConnectedUserSheetStore';
 import {EmbeddedGettingStartedQuery} from '@/shared/middleware/graphql';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
+import {gettingStartedStore} from '@/shared/stores/useGettingStartedStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {act, cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -14,8 +15,6 @@ import EmbeddedGettingStarted from '../EmbeddedGettingStarted';
 type StatusType = EmbeddedGettingStartedQuery['embeddedGettingStarted'];
 
 const hoisted = vi.hoisted(() => ({
-    dismissMutateMock: vi.fn(),
-    useDismissEmbeddedGettingStartedMutationMock: vi.fn(),
     useEmbeddedGettingStartedQueryMock: vi.fn(),
 }));
 
@@ -24,7 +23,6 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useApiKeysQuery: vi.fn(),
     useCreateApiKeyMutation: vi.fn(),
     useDeleteApiKeyMutation: vi.fn(),
-    useDismissEmbeddedGettingStartedMutation: hoisted.useDismissEmbeddedGettingStartedMutationMock,
     useEmbeddedGettingStartedQuery: hoisted.useEmbeddedGettingStartedQueryMock,
     useEnvironmentsQuery: () => ({data: undefined}),
     useUpdateApiKeyMutation: vi.fn(),
@@ -53,7 +51,6 @@ const baseStatus: StatusType = {
     apiBaseUrl: null,
     apiKeyCreated: false,
     completed: false,
-    completionType: null,
     componentName: null,
     componentVersion: null,
     firstCallMade: false,
@@ -123,19 +120,13 @@ describe('EmbeddedGettingStarted', () => {
     beforeEach(() => {
         queryClient = new QueryClient();
 
-        vi.spyOn(queryClient, 'invalidateQueries');
-
-        hoisted.dismissMutateMock.mockReset();
-        hoisted.useDismissEmbeddedGettingStartedMutationMock.mockReset();
-        hoisted.useDismissEmbeddedGettingStartedMutationMock.mockReturnValue({
-            isPending: false,
-            mutate: hoisted.dismissMutateMock,
-        });
         hoisted.useEmbeddedGettingStartedQueryMock.mockReset();
 
         mockStatus(baseStatus);
 
         environmentStore.setState({currentEnvironmentId: 0});
+
+        gettingStartedStore.setState({completions: {}});
 
         useConnectedUserSheetStore.setState({connectedUserId: 0, connectedUserSheetOpen: false});
     });
@@ -325,7 +316,7 @@ describe('EmbeddedGettingStarted', () => {
     });
 
     it('shows the set-up title once the first call is made', async () => {
-        mockStatus({...readyStatus, completed: true, completionType: 'COMPLETED', firstCallMade: true});
+        mockStatus({...readyStatus, completed: true, firstCallMade: true});
 
         renderPage();
 
@@ -344,8 +335,8 @@ describe('EmbeddedGettingStarted', () => {
         expect(screen.queryByRole('button', {name: 'Dismiss'})).not.toBeInTheDocument();
     });
 
-    it('keeps the getting started title for a dismissed tenant without a first call', () => {
-        mockStatus({...baseStatus, completed: true, completionType: 'DISMISSED'});
+    it('keeps the getting started title for a dismissed browser without a first call', () => {
+        gettingStartedStore.setState({completions: {embedded: 'DISMISSED'}});
 
         renderPage();
 
@@ -355,8 +346,10 @@ describe('EmbeddedGettingStarted', () => {
         expect(screen.queryByRole('button', {name: 'Dismiss'})).not.toBeInTheDocument();
     });
 
-    it('keeps the getting started title while listening in a completed tenant', () => {
-        mockStatus({...readyStatus, completed: true, completionType: 'COMPLETED'});
+    it('keeps the getting started title while listening after an earlier completion', () => {
+        gettingStartedStore.setState({completions: {embedded: 'COMPLETED'}});
+
+        mockStatus(readyStatus);
 
         renderPage();
 
@@ -365,50 +358,40 @@ describe('EmbeddedGettingStarted', () => {
         expect(screen.getByText('Listening for the call')).toBeInTheDocument();
     });
 
-    it('invalidates the completed query on unmount after completion, not before', () => {
+    it('stores the completion on unmount after completion, not before', () => {
         mockStatus({...readyStatus, completed: true, firstCallMade: true});
 
         const {unmount} = renderPage();
 
-        expect(queryClient.invalidateQueries).not.toHaveBeenCalledWith({queryKey: ['embeddedGettingStartedCompleted']});
+        expect(gettingStartedStore.getState().completions.embedded).toBeUndefined();
 
         unmount();
 
-        expect(queryClient.invalidateQueries).toHaveBeenCalledWith({queryKey: ['embeddedGettingStartedCompleted']});
+        expect(gettingStartedStore.getState().completions.embedded).toBe('COMPLETED');
     });
 
-    it('does not invalidate the completed query on unmount when not completed', () => {
+    it('does not store a completion on unmount when not completed', () => {
         const {unmount} = renderPage();
 
         unmount();
 
-        expect(queryClient.invalidateQueries).not.toHaveBeenCalledWith({queryKey: ['embeddedGettingStartedCompleted']});
+        expect(gettingStartedStore.getState().completions.embedded).toBeUndefined();
     });
 
-    it('dismiss asks for confirmation then calls the mutation and invalidates the completed query', async () => {
+    it('dismiss asks for confirmation then stores the dismissal in the browser', async () => {
         renderPage();
 
         await userEvent.click(screen.getByRole('button', {name: 'Dismiss'}));
 
-        expect(hoisted.dismissMutateMock).not.toHaveBeenCalled();
+        expect(gettingStartedStore.getState().completions.embedded).toBeUndefined();
 
         await userEvent.click(await screen.findByRole('button', {name: 'Dismiss Getting Started'}));
 
-        expect(hoisted.dismissMutateMock).toHaveBeenCalled();
-
-        const [mutationOptions] = hoisted.useDismissEmbeddedGettingStartedMutationMock.mock.lastCall ?? [];
-
-        act(() => {
-            mutationOptions.onSuccess();
-        });
+        expect(gettingStartedStore.getState().completions.embedded).toBe('DISMISSED');
 
         await waitFor(() => {
-            expect(queryClient.invalidateQueries).toHaveBeenCalledWith({
-                queryKey: ['embeddedGettingStartedCompleted'],
-            });
+            expect(screen.queryByRole('button', {name: 'Dismiss'})).not.toBeInTheDocument();
         });
-
-        expect(queryClient.invalidateQueries).toHaveBeenCalledWith({queryKey: ['embeddedGettingStarted']});
     });
 
     it('keeps the connected user panel open when the test user step collapses after connecting', () => {

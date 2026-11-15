@@ -1,22 +1,18 @@
 import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
-import {useDismissEmbeddedGettingStartedMutation} from '@/shared/middleware/graphql';
-import {useQueryClient} from '@tanstack/react-query';
+import {useGettingStartedStore} from '@/shared/stores/useGettingStartedStore';
 import {useState} from 'react';
 
 const EmbeddedGettingStartedDismissButton = () => {
     const [showConfirmation, setShowConfirmation] = useState(false);
 
-    const queryClient = useQueryClient();
+    const complete = useGettingStartedStore((state) => state.complete);
 
-    const dismissMutation = useDismissEmbeddedGettingStartedMutation({
-        onSuccess: () => {
-            setShowConfirmation(false);
+    const handleConfirm = () => {
+        complete('embedded', 'DISMISSED');
 
-            void queryClient.invalidateQueries({queryKey: ['embeddedGettingStartedCompleted']});
-            void queryClient.invalidateQueries({queryKey: ['embeddedGettingStarted']});
-        },
-    });
+        setShowConfirmation(false);
+    };
 
     return (
         <>
@@ -26,9 +22,8 @@ const EmbeddedGettingStartedDismissButton = () => {
                 confirmButtonVariant="default"
                 confirmLabel="Dismiss Getting Started"
                 description="Getting Started leaves the sidebar and Embedded opens where it usually does. You can still open this page later from Help & Feedback in the sidebar."
-                isPending={dismissMutation.isPending}
                 onCancel={() => setShowConfirmation(false)}
-                onConfirm={() => dismissMutation.mutate({})}
+                onConfirm={handleConfirm}
                 open={showConfirmation}
                 title="Dismiss Getting Started?"
             />

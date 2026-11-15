@@ -5,9 +5,10 @@ import {AutomationGettingStartedQuery} from '@/shared/middleware/graphql';
 import {EditionType, applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
+import {gettingStartedStore} from '@/shared/stores/useGettingStartedStore';
 import {permissionStore} from '@/shared/stores/usePermissionStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {act, cleanup, render, screen, waitFor, within} from '@testing-library/react';
+import {act, cleanup, render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -17,11 +18,9 @@ import AutomationGettingStarted from '../AutomationGettingStarted';
 type StatusType = AutomationGettingStartedQuery['automationGettingStarted'];
 
 const hoisted = vi.hoisted(() => ({
-    dismissMutateMock: vi.fn(),
     useAutomationGettingStartedQueryMock: vi.fn(),
     useCreateProjectMutationMock: vi.fn(),
     useCreateProjectWorkflowMutationMock: vi.fn(),
-    useDismissAutomationGettingStartedMutationMock: vi.fn(),
     useEnableProjectDeploymentMutationMock: vi.fn(),
     useGetProjectCategoriesQueryMock: vi.fn(),
     useGetProjectTagsQueryMock: vi.fn(),
@@ -31,7 +30,6 @@ const hoisted = vi.hoisted(() => ({
 
 vi.mock('@/shared/middleware/graphql', () => ({
     useAutomationGettingStartedQuery: hoisted.useAutomationGettingStartedQueryMock,
-    useDismissAutomationGettingStartedMutation: hoisted.useDismissAutomationGettingStartedMutationMock,
     useEnvironmentsQuery: () => ({data: undefined}),
 }));
 
@@ -156,15 +154,11 @@ describe('AutomationGettingStarted', () => {
     beforeEach(() => {
         queryClient = new QueryClient();
 
+        gettingStartedStore.setState({completions: {}});
+
         vi.spyOn(queryClient, 'invalidateQueries');
 
-        hoisted.dismissMutateMock.mockReset();
         hoisted.useAutomationGettingStartedQueryMock.mockReset();
-        hoisted.useDismissAutomationGettingStartedMutationMock.mockReset();
-        hoisted.useDismissAutomationGettingStartedMutationMock.mockReturnValue({
-            isPending: false,
-            mutate: hoisted.dismissMutateMock,
-        });
         hoisted.useEnableProjectDeploymentMutationMock.mockReset();
         hoisted.useEnableProjectDeploymentMutationMock.mockReturnValue({
             isPending: false,
@@ -488,48 +482,32 @@ describe('AutomationGettingStarted', () => {
         expect(screen.getByText('Need help automating with ByteChef?')).toBeInTheDocument();
     });
 
-    it('dismiss marks setup done and leaves the page', async () => {
+    it('dismiss stores the dismissal in the browser and leaves the page', async () => {
         renderPage();
 
         await userEvent.click(screen.getByRole('button', {name: 'Dismiss'}));
 
-        expect(hoisted.dismissMutateMock).not.toHaveBeenCalled();
+        expect(gettingStartedStore.getState().completions.automation).toBeUndefined();
 
         await userEvent.click(await screen.findByRole('button', {name: 'Dismiss Getting Started'}));
 
-        expect(hoisted.dismissMutateMock).toHaveBeenCalledWith({workspaceId: '3'});
-
-        const [mutationOptions] = hoisted.useDismissAutomationGettingStartedMutationMock.mock.lastCall ?? [];
-
-        act(() => {
-            mutationOptions.onSuccess();
-        });
-
-        await waitFor(() => {
-            expect(queryClient.invalidateQueries).toHaveBeenCalledWith({
-                queryKey: ['automationGettingStartedCompleted'],
-            });
-        });
+        expect(gettingStartedStore.getState().completions.automation).toBe('DISMISSED');
 
         expect(await screen.findByText('Projects page')).toBeInTheDocument();
     });
 
-    it('invalidates the completed query on unmount after completion only', () => {
+    it('stores the completion on unmount after completion only', () => {
         const {unmount} = renderPage();
 
         unmount();
 
-        expect(queryClient.invalidateQueries).not.toHaveBeenCalledWith({
-            queryKey: ['automationGettingStartedCompleted'],
-        });
+        expect(gettingStartedStore.getState().completions.automation).toBeUndefined();
 
         mockPage({...baseStatus, completed: true, firstRun}, 'live');
 
         renderPage().unmount();
 
-        expect(queryClient.invalidateQueries).toHaveBeenCalledWith({
-            queryKey: ['automationGettingStartedCompleted'],
-        });
+        expect(gettingStartedStore.getState().completions.automation).toBe('COMPLETED');
     });
 
     it('opens the create project dialog with the default name', async () => {

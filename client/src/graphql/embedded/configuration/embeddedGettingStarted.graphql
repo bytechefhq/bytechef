@@ -3,7 +3,6 @@ query embeddedGettingStarted {
         apiBaseUrl
         apiKeyCreated
         completed
-        completionType
         componentName
         componentVersion
         firstCallMade

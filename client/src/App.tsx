@@ -27,6 +27,7 @@ import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicati
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
+import {useGettingStartedStore} from '@/shared/stores/useGettingStartedStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     ActivityIcon,
@@ -208,8 +209,11 @@ function App() {
         }))
     );
     const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
+    const automationGettingStartedStored = useGettingStartedStore((state) => !!state.completions.automation);
+    const completeGettingStarted = useGettingStartedStore((state) => state.complete);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+    const embeddedGettingStartedStored = useGettingStartedStore((state) => !!state.completions.embedded);
     const {currentType, setCurrentType} = usePlatformTypeStore(
         useShallow((state) => ({
             currentType: state.currentType,
@@ -237,13 +241,18 @@ function App() {
 
     const {data: embeddedGettingStartedCompletedData} = useEmbeddedGettingStartedCompletedQuery(undefined, {
         enabled:
-            currentEnvironmentId === DEVELOPMENT_ENVIRONMENT && isEmbeddedPath && isAdmin && edition === EditionType.EE,
+            !embeddedGettingStartedStored &&
+            currentEnvironmentId === DEVELOPMENT_ENVIRONMENT &&
+            isEmbeddedPath &&
+            isAdmin &&
+            edition === EditionType.EE,
     });
 
     const {data: automationGettingStartedCompletedData} = useAutomationGettingStartedCompletedQuery(
         {workspaceId: currentWorkspaceId},
         {
             enabled:
+                !automationGettingStartedStored &&
                 isAutomationPath &&
                 canEditWorkspace &&
                 currentEnvironmentId === DEVELOPMENT_ENVIRONMENT &&
@@ -251,14 +260,17 @@ function App() {
         }
     );
 
+    const automationGettingStartedCompleted = automationGettingStartedCompletedData?.automationGettingStartedCompleted;
+    const embeddedGettingStartedCompleted = embeddedGettingStartedCompletedData?.embeddedGettingStartedCompleted;
+
     const showAutomationGettingStarted = shouldShowAutomationGettingStarted({
         canEdit: canEditWorkspace,
-        completed: automationGettingStartedCompletedData?.automationGettingStartedCompleted,
+        completed: automationGettingStartedStored || automationGettingStartedCompleted,
         development: currentEnvironmentId === DEVELOPMENT_ENVIRONMENT,
     });
 
     const showEmbeddedGettingStarted = shouldShowEmbeddedGettingStarted({
-        completed: embeddedGettingStartedCompletedData?.embeddedGettingStartedCompleted,
+        completed: embeddedGettingStartedStored || embeddedGettingStartedCompleted,
         edition,
         environmentId: currentEnvironmentId,
         isAdmin,
@@ -344,6 +356,18 @@ function App() {
     }, [account, helpHub, userGuiding]);
 
     useOnLogout(() => analytics.reset());
+
+    useEffect(() => {
+        if (automationGettingStartedCompleted) {
+            completeGettingStarted('automation', 'COMPLETED');
+        }
+    }, [automationGettingStartedCompleted, completeGettingStarted]);
+
+    useEffect(() => {
+        if (embeddedGettingStartedCompleted) {
+            completeGettingStarted('embedded', 'COMPLETED');
+        }
+    }, [completeGettingStarted, embeddedGettingStartedCompleted]);
 
     useLayoutEffect(() => {
         document.title =

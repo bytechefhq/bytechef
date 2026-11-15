@@ -11,7 +11,6 @@ const baseStatus: StatusType = {
     apiBaseUrl: null,
     apiKeyCreated: false,
     completed: false,
-    completionType: null,
     componentName: null,
     componentVersion: null,
     firstCallMade: false,

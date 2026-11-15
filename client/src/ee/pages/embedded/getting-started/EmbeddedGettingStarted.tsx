@@ -24,6 +24,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useEmbeddedGettingStartedQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {useGettingStartedStore} from '@/shared/stores/useGettingStartedStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Navigate} from 'react-router-dom';
@@ -42,6 +43,8 @@ const EmbeddedGettingStarted = () => {
     const connectedUserSheetOpen = useConnectedUserSheetStore((state) => state.connectedUserSheetOpen);
     const setConnectedUserSheetOpen = useConnectedUserSheetStore((state) => state.setConnectedUserSheetOpen);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const completeGettingStarted = useGettingStartedStore((state) => state.complete);
+    const dismissed = useGettingStartedStore((state) => state.completions.embedded === 'DISMISSED');
 
     const queryClient = useQueryClient();
 
@@ -154,11 +157,12 @@ const EmbeddedGettingStarted = () => {
         ];
     }, [status, stepExpandedOverrides, toggleStep]);
 
-    const completed = !!status?.completed;
+    const setupCompleted = !!status?.completed;
+    const completed = setupCompleted || dismissed;
 
     useEffect(() => {
-        completedRef.current = completed;
-    }, [completed]);
+        completedRef.current = setupCompleted;
+    }, [setupCompleted]);
 
     useEffect(() => {
         if (!connectedUserSheetOpen) {
@@ -171,10 +175,10 @@ const EmbeddedGettingStarted = () => {
     useEffect(
         () => () => {
             if (completedRef.current) {
-                void queryClient.invalidateQueries({queryKey: ['embeddedGettingStartedCompleted']});
+                completeGettingStarted('embedded', 'COMPLETED');
             }
         },
-        [queryClient]
+        [completeGettingStarted]
     );
 
     if (!isDevelopment) {

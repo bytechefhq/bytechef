@@ -2,6 +2,7 @@ import {AUTHORITIES} from '@/shared/constants';
 import {EditionType, applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
+import {gettingStartedStore} from '@/shared/stores/useGettingStartedStore';
 import {QueryClient} from '@tanstack/react-query';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -35,6 +36,7 @@ describe('loadEmbeddedIndexRedirect', () => {
         applicationInfoStore.setState(applicationInfoStore.getInitialState(), true);
         authenticationStore.setState(authenticationStore.getInitialState(), true);
         environmentStore.setState({currentEnvironmentId: 0});
+        gettingStartedStore.setState({completions: {}});
     });
 
     afterEach(() => {
@@ -75,6 +77,27 @@ describe('loadEmbeddedIndexRedirect', () => {
 
         await expect(redirectPathPromise).resolves.toBe('getting-started');
         expect(querySpy).toHaveBeenCalledWith(expect.objectContaining({queryKey: ['embeddedGettingStartedCompleted']}));
+    });
+
+    it('redirects to integrations without asking the server when the browser stored a completion', async () => {
+        applicationInfoStore.setState({application: {edition: EditionType.EE}});
+        authenticationStore.setState({account: ADMIN_ACCOUNT, authenticated: true, sessionHasBeenFetched: true});
+        gettingStartedStore.setState({completions: {embedded: 'DISMISSED'}});
+
+        const querySpy = vi.spyOn(queryClient, 'query');
+
+        await expect(loadEmbeddedIndexRedirect(queryClient)).resolves.toBe('integrations');
+        expect(querySpy).not.toHaveBeenCalled();
+    });
+
+    it('stores the completion the server reports', async () => {
+        applicationInfoStore.setState({application: {edition: EditionType.EE}});
+        authenticationStore.setState({account: ADMIN_ACCOUNT, authenticated: true, sessionHasBeenFetched: true});
+
+        vi.spyOn(queryClient, 'query').mockResolvedValue({embeddedGettingStartedCompleted: true});
+
+        await expect(loadEmbeddedIndexRedirect(queryClient)).resolves.toBe('integrations');
+        expect(gettingStartedStore.getState().completions.embedded).toBe('COMPLETED');
     });
 
     it('does not refetch information that is already loaded', async () => {

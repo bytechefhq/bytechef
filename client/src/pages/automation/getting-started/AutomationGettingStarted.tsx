@@ -14,6 +14,7 @@ import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useAutomationGettingStartedQuery} from '@/shared/middleware/graphql';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {useGettingStartedStore} from '@/shared/stores/useGettingStartedStore';
 import {usePermissionStore} from '@/shared/stores/usePermissionStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
@@ -60,6 +61,7 @@ const AutomationGettingStarted = () => {
 
     const completedRef = useRef(false);
 
+    const completeGettingStarted = useGettingStartedStore((state) => state.complete);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const workspaceScopeStatus = usePermissionStore(
@@ -246,10 +248,10 @@ const AutomationGettingStarted = () => {
     useEffect(
         () => () => {
             if (completedRef.current) {
-                void queryClient.invalidateQueries({queryKey: ['automationGettingStartedCompleted']});
+                completeGettingStarted('automation', 'COMPLETED');
             }
         },
-        [queryClient]
+        [completeGettingStarted]
     );
 
     if (currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT) {
