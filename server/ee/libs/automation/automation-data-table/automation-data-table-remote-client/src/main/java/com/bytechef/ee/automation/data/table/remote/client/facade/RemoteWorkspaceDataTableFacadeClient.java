@@ -163,7 +163,20 @@ public class RemoteWorkspaceDataTableFacadeClient implements WorkspaceDataTableF
     }
 
     @Override
+    public Page<DataTableRow> listRows(
+        long dataTableId, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int pageNumber,
+        int pageSize, List<String> expand, long environmentId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public DataTableRow getRow(long dataTableId, long rowId, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public DataTableRow getRow(long dataTableId, long rowId, List<String> expand, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
