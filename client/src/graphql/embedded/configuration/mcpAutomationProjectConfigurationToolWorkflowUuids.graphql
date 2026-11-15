@@ -1,0 +1,5 @@
+query mcpAutomationProjectConfigurationToolWorkflowUuids($automationProjectConfigurationId: ID!) {
+    mcpAutomationProjectConfigurationToolWorkflowUuids(
+        automationProjectConfigurationId: $automationProjectConfigurationId
+    )
+}
