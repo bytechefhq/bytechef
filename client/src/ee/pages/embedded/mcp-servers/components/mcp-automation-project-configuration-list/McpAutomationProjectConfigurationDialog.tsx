@@ -3,6 +3,9 @@ import {Input} from '@/components/Input/Input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Label} from '@/components/ui/label';
 import {Workflow} from '@/ee/shared/middleware/embedded/configuration';
+import useMcpWorkflowToolForms, {
+    SavedToolParametersByWorkflowIdType,
+} from '@/pages/platform/mcp-servers/hooks/useMcpWorkflowToolForms';
 import ServerWorkflowsDialogContent from '@/shared/components/server-workflows-dialog/ServerWorkflowsDialogContent';
 import {
     McpServer,
@@ -14,11 +17,12 @@ import {
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {ServerIcon} from 'lucide-react';
-import {ReactNode, useMemo, useState} from 'react';
+import {ReactNode, useCallback, useMemo, useState} from 'react';
 
 import McpIntegrationWorkflowsList from '../McpIntegrationWorkflowsList';
+import McpAutomationWorkflowToolFields from './McpAutomationWorkflowToolFields';
 import {McpAutomationProjectConfigurationItemType} from './hooks/useMcpAutomationProjectConfigurationList';
-import {buildMcpAutomationToolParameters, getMcpAutomationToolText} from './mcpAutomationToolParameters';
+import {fetchToolEligibleAutomationWorkflowProperties} from './mcpAutomationWorkflowToolProperties';
 
 interface McpAutomationProjectConfigurationDialogProps {
     mcpAutomationProjectConfiguration?: McpAutomationProjectConfigurationItemType;
@@ -42,16 +46,6 @@ const McpAutomationProjectConfigurationDialog = ({
     );
     const [selectedWorkflowUuids, setSelectedWorkflowUuids] = useState<string[]>(
         () => mcpAutomationProjectConfiguration?.workflows.map((workflow) => workflow.workflowUuid) ?? []
-    );
-
-    const [parametersByWorkflowUuid, setParametersByWorkflowUuid] = useState<Record<string, Record<string, unknown>>>(
-        () =>
-            Object.fromEntries(
-                (mcpAutomationProjectConfiguration?.workflows ?? []).map((workflow) => [
-                    workflow.workflowUuid,
-                    (workflow.parameters as Record<string, unknown> | null) ?? {},
-                ])
-            )
     );
 
     const queryClient = useQueryClient();
@@ -106,6 +100,37 @@ const McpAutomationProjectConfigurationDialog = ({
         [selectedConfiguration]
     );
 
+    const savedToolParametersByWorkflowUuid: SavedToolParametersByWorkflowIdType = useMemo(
+        () =>
+            new Map(
+                (mcpAutomationProjectConfiguration?.workflows ?? []).map((workflow) => [
+                    workflow.workflowUuid,
+                    workflow.parameters &&
+                    typeof workflow.parameters === 'object' &&
+                    !Array.isArray(workflow.parameters)
+                        ? (workflow.parameters as Record<string, unknown>)
+                        : undefined,
+                ])
+            ),
+        [mcpAutomationProjectConfiguration?.workflows]
+    );
+
+    const loadWorkflowProperties = useCallback(
+        (workflowUuid: string) =>
+            fetchToolEligibleAutomationWorkflowProperties(queryClient, {
+                automationProjectConfigurationId: configurationId!,
+                workflowUuid,
+            }),
+        [configurationId, queryClient]
+    );
+
+    const toolForms = useMcpWorkflowToolForms({
+        loadWorkflowProperties,
+        savedParametersByWorkflowId: savedToolParametersByWorkflowUuid,
+        seedKey: configurationId ?? '',
+        selectedWorkflowIds: selectedWorkflowUuids,
+    });
+
     const closeDialog = () => {
         setIsOpen(false);
 
@@ -124,19 +149,14 @@ const McpAutomationProjectConfigurationDialog = ({
     const createMutation = useCreateMcpAutomationProjectConfigurationMutation({onSuccess: invalidateAndClose});
     const updateMutation = useUpdateMcpAutomationProjectConfigurationMutation({onSuccess: invalidateAndClose});
 
-    const handleToolTextChange = (workflowUuid: string, key: 'toolDescription' | 'toolName', value: string) =>
-        setParametersByWorkflowUuid((current) => ({
-            ...current,
-            [workflowUuid]: buildMcpAutomationToolParameters(current[workflowUuid], key, value),
+    const handleComplete = async () => {
+        const toolParameters = await toolForms.buildToolParameters(selectedWorkflowUuids);
+
+        const workflowConfigurations = toolParameters.map((toolParameter) => ({
+            parameters: toolParameter.parameters,
+            workflowUuid: toolParameter.workflowId,
         }));
 
-    const workflowConfigurations = selectedWorkflowUuids.map((workflowUuid) => {
-        const parameters = parametersByWorkflowUuid[workflowUuid];
-
-        return parameters && Object.keys(parameters).length > 0 ? {parameters, workflowUuid} : {workflowUuid};
-    });
-
-    const handleComplete = () => {
         if (isEditMode) {
             updateMutation.mutate({
                 id: mcpAutomationProjectConfiguration.id,
@@ -237,7 +257,7 @@ const McpAutomationProjectConfigurationDialog = ({
                 description="Expose workflows (those with a New Workflow Call trigger) of an automation configuration as tools of this MCP server."
                 icon={<ServerIcon />}
                 isEditMode={isEditMode}
-                isSubmitPending={createMutation.isPending || updateMutation.isPending}
+                isSubmitPending={createMutation.isPending || updateMutation.isPending || toolForms.isAwaitingSeeding}
                 noEligibleWorkflowsMessage="This automation configuration has no workflows that can become tools. Only workflows that are turned on and have a New Workflow Call trigger can be added to an MCP server."
                 onComplete={handleComplete}
                 selectedWorkflowIds={selectedWorkflowUuids}
@@ -249,33 +269,17 @@ const McpAutomationProjectConfigurationDialog = ({
                         <McpIntegrationWorkflowsList
                             enabledWorkflowIds={enabledWorkflowUuids}
                             onSelectedWorkflowIdsChange={setSelectedWorkflowUuids}
-                            renderSelectedWorkflowExtra={(workflow) => (
-                                <fieldset className="mt-2 space-y-2 border-0 p-0">
-                                    <Input
-                                        aria-label={`${workflow.label || workflow.id} tool name`}
-                                        onChange={(event) =>
-                                            handleToolTextChange(workflow.id!, 'toolName', event.target.value)
-                                        }
-                                        placeholder="Tool name (defaults to the workflow name)"
-                                        value={getMcpAutomationToolText(
-                                            parametersByWorkflowUuid[workflow.id!],
-                                            'toolName'
-                                        )}
-                                    />
-
-                                    <Input
-                                        aria-label={`${workflow.label || workflow.id} tool description`}
-                                        onChange={(event) =>
-                                            handleToolTextChange(workflow.id!, 'toolDescription', event.target.value)
-                                        }
-                                        placeholder="Tool description (defaults to the workflow description)"
-                                        value={getMcpAutomationToolText(
-                                            parametersByWorkflowUuid[workflow.id!],
-                                            'toolDescription'
-                                        )}
-                                    />
-                                </fieldset>
-                            )}
+                            renderSelectedWorkflowExtra={(workflow) =>
+                                configurationId && workflow.id ? (
+                                    <div className="mt-2">
+                                        <McpAutomationWorkflowToolFields
+                                            automationProjectConfigurationId={configurationId}
+                                            toolForms={toolForms}
+                                            workflowUuid={workflow.id}
+                                        />
+                                    </div>
+                                ) : null
+                            }
                             selectedWorkflowIds={selectedWorkflowUuids}
                             workflows={workflows}
                         />
