@@ -12,6 +12,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.embedded.ai.mcp.server.facade.EmbeddedMcpToolCallback;
 import com.bytechef.ee.embedded.ai.mcp.server.facade.EmbeddedMcpToolFacade;
 import com.bytechef.ee.embedded.ai.mcp.server.security.web.configurer.EmbeddedMcpServerSecurityConfigurer;
 import com.bytechef.ee.embedded.ai.mcp.service.McpAutomationProjectConfigurationService;
@@ -62,6 +63,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.mcp.server.webmvc.transport.WebMvcStreamableServerTransportProvider;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
@@ -179,7 +181,7 @@ public class EmbeddedMcpServerConfiguration {
                             mcpTool, externalUserId, environment, tenantId);
 
                         if (callback != null) {
-                            toolSpecifications.add(McpToolUtils.toAsyncToolSpecification(callback));
+                            toolSpecifications.add(toAsyncToolSpecification(callback));
                         }
                     });
 
@@ -189,7 +191,7 @@ public class EmbeddedMcpServerConfiguration {
                     .flatMap(mcpIntegrationInstanceConfiguration -> CollectionUtils.stream(
                         embeddedMcpToolFacade.getFunctionToolCallbacks(
                             mcpIntegrationInstanceConfiguration, externalUserId, environment, tenantId)))
-                    .map(McpToolUtils::toAsyncToolSpecification)
+                    .map(EmbeddedMcpServerConfiguration::toAsyncToolSpecification)
                     .forEach(toolSpecifications::add);
 
                 mcpAutomationProjectConfigurationService
@@ -198,7 +200,7 @@ public class EmbeddedMcpServerConfiguration {
                     .flatMap(mcpAutomationProjectConfiguration -> CollectionUtils.stream(
                         embeddedMcpToolFacade.getAutomationToolCallbacks(
                             mcpAutomationProjectConfiguration, externalUserId, environment, tenantId)))
-                    .map(McpToolUtils::toAsyncToolSpecification)
+                    .map(EmbeddedMcpServerConfiguration::toAsyncToolSpecification)
                     .forEach(toolSpecifications::add);
 
                 return toolSpecifications;
@@ -241,6 +243,30 @@ public class EmbeddedMcpServerConfiguration {
         }
 
         return McpTransportContext.create(context);
+    }
+
+    static McpServerFeatures.AsyncToolSpecification toAsyncToolSpecification(ToolCallback toolCallback) {
+        McpServerFeatures.AsyncToolSpecification toolSpecification = McpToolUtils.toAsyncToolSpecification(
+            toolCallback);
+
+        if (!(toolCallback instanceof EmbeddedMcpToolCallback embeddedMcpToolCallback)) {
+            return toolSpecification;
+        }
+
+        McpSchema.Tool tool = toolSpecification.tool();
+
+        McpSchema.Tool toolWithMeta = McpSchema.Tool.builder()
+            .name(tool.name())
+            .title(tool.title())
+            .description(tool.description())
+            .inputSchema(tool.inputSchema())
+            .outputSchema(tool.outputSchema())
+            .annotations(tool.annotations())
+            .icons(tool.icons())
+            .meta(embeddedMcpToolCallback.meta())
+            .build();
+
+        return new McpServerFeatures.AsyncToolSpecification(toolWithMeta, toolSpecification.callHandler());
     }
 
     private com.bytechef.platform.configuration.domain.Environment getEnvironment(String environment) {
