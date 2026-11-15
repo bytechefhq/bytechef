@@ -75,7 +75,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = AdminWorkspaceFacadeIntTest.Config.class, properties = "bytechef.edition=ee")
+@SpringBootTest(classes = WorkspaceFacadeIntTest.Config.class, properties = "bytechef.edition=ee")
 @MockitoBean(types = {
     ApplicationProperties.class, CacheManager.class, CategoryService.class, CodeWorkflowContainerFacade.class,
     ComponentConnectionFacade.class, ComponentDefinitionHelper.class, ConnectionFacade.class,
@@ -88,12 +88,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     WorkflowNodeTestOutputService.class, WorkflowService.class, WorkflowTestConfigurationService.class,
     WorkflowValidatorFacade.class, WorkspaceConnectionService.class, WorkspaceService.class
 })
-class AdminWorkspaceFacadeIntTest {
+class WorkspaceFacadeIntTest {
 
     private static final long WORKSPACE_ID = 21L;
 
     @Autowired
-    private AdminWorkspaceFacadeImpl adminWorkspaceFacade;
+    private WorkspaceFacadeImpl workspaceFacade;
 
     @Autowired
     private PermissionService permissionService;
@@ -114,11 +114,11 @@ class AdminWorkspaceFacadeIntTest {
     void testIsProtected() {
         Workspace workspace = new Workspace(WORKSPACE_ID, "workspace");
 
-        assertRequiresAdminAuthority(() -> adminWorkspaceFacade.createWorkspace(workspace));
-        assertRequiresAdminAuthority(() -> adminWorkspaceFacade.deleteWorkspace(WORKSPACE_ID));
-        assertRequiresAdminAuthority(() -> adminWorkspaceFacade.getWorkspace(WORKSPACE_ID));
-        assertRequiresAdminAuthority(() -> adminWorkspaceFacade.getWorkspaces());
-        assertRequiresAdminAuthority(() -> adminWorkspaceFacade.updateWorkspace(workspace));
+        assertRequiresAdminAuthority(() -> workspaceFacade.createWorkspace(workspace));
+        assertRequiresAdminAuthority(() -> workspaceFacade.deleteWorkspace(WORKSPACE_ID));
+        assertRequiresAdminAuthority(() -> workspaceFacade.getWorkspace(WORKSPACE_ID));
+        assertRequiresAdminAuthority(() -> workspaceFacade.getWorkspaces());
+        assertRequiresAdminAuthority(() -> workspaceFacade.updateWorkspace(workspace));
     }
 
     private void assertRequiresAdminAuthority(ThrowingCallable call) {
@@ -158,7 +158,7 @@ class AdminWorkspaceFacadeIntTest {
     @EnableMethodSecurity(proxyTargetClass = true)
     @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
     @Import({
-        AdminWorkspaceFacadeImpl.class
+        WorkspaceFacadeImpl.class
     })
     static class Config {
 

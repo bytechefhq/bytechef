@@ -10,7 +10,7 @@ package com.bytechef.ee.automation.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.web.rest.model.WorkspaceModel;
-import com.bytechef.ee.automation.configuration.facade.AdminWorkspaceFacade;
+import com.bytechef.ee.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Authorization (ROLE_ADMIN) is enforced on {@link AdminWorkspaceFacade}, not here.
+ * Authorization (ROLE_ADMIN) is enforced on {@link WorkspaceFacade}, not here.
  *
  * @version ee
  *
@@ -32,12 +32,12 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class WorkspaceApiController implements WorkspaceApi {
 
-    private final AdminWorkspaceFacade adminWorkspaceFacade;
+    private final WorkspaceFacade workspaceFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public WorkspaceApiController(AdminWorkspaceFacade adminWorkspaceFacade, ConversionService conversionService) {
-        this.adminWorkspaceFacade = adminWorkspaceFacade;
+    public WorkspaceApiController(WorkspaceFacade workspaceFacade, ConversionService conversionService) {
+        this.workspaceFacade = workspaceFacade;
         this.conversionService = conversionService;
     }
 
@@ -45,13 +45,13 @@ public class WorkspaceApiController implements WorkspaceApi {
     public ResponseEntity<WorkspaceModel> createWorkspace(WorkspaceModel workspaceModel) {
         return ResponseEntity.ok(
             conversionService.convert(
-                adminWorkspaceFacade.createWorkspace(conversionService.convert(workspaceModel, Workspace.class)),
+                workspaceFacade.createWorkspace(conversionService.convert(workspaceModel, Workspace.class)),
                 WorkspaceModel.class));
     }
 
     @Override
     public ResponseEntity<Void> deleteWorkspace(Long id) {
-        adminWorkspaceFacade.deleteWorkspace(id);
+        workspaceFacade.deleteWorkspace(id);
 
         return ResponseEntity.noContent()
             .build();
@@ -60,13 +60,13 @@ public class WorkspaceApiController implements WorkspaceApi {
     @Override
     public ResponseEntity<WorkspaceModel> getWorkspace(Long id) {
         return ResponseEntity.ok(
-            conversionService.convert(adminWorkspaceFacade.getWorkspace(id), WorkspaceModel.class));
+            conversionService.convert(workspaceFacade.getWorkspace(id), WorkspaceModel.class));
     }
 
     @Override
     public ResponseEntity<List<WorkspaceModel>> getWorkspaces() {
         return ResponseEntity.ok(
-            adminWorkspaceFacade.getWorkspaces()
+            workspaceFacade.getWorkspaces()
                 .stream()
                 .map(workspace -> conversionService.convert(workspace, WorkspaceModel.class))
                 .toList());
@@ -76,7 +76,7 @@ public class WorkspaceApiController implements WorkspaceApi {
     public ResponseEntity<WorkspaceModel> updateWorkspace(Long id, WorkspaceModel workspaceModel) {
         return ResponseEntity.ok(
             conversionService.convert(
-                adminWorkspaceFacade.updateWorkspace(conversionService.convert(workspaceModel.id(id), Workspace.class)),
+                workspaceFacade.updateWorkspace(conversionService.convert(workspaceModel.id(id), Workspace.class)),
                 WorkspaceModel.class));
     }
 }

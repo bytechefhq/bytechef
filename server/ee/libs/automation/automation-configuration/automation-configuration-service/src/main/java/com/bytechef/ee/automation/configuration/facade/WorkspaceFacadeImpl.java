@@ -24,14 +24,14 @@ import org.springframework.stereotype.Service;
  *
  * @author Ivica Cardic
  */
-@Service
+@Service("com.bytechef.ee.automation.configuration.facade.WorkspaceFacade")
 @ConditionalOnEEVersion
-public class AdminWorkspaceFacadeImpl implements AdminWorkspaceFacade {
+public class WorkspaceFacadeImpl implements WorkspaceFacade {
 
     private final WorkspaceService workspaceService;
 
     @SuppressFBWarnings("EI")
-    public AdminWorkspaceFacadeImpl(WorkspaceService workspaceService) {
+    public WorkspaceFacadeImpl(WorkspaceService workspaceService) {
         this.workspaceService = workspaceService;
     }
 
