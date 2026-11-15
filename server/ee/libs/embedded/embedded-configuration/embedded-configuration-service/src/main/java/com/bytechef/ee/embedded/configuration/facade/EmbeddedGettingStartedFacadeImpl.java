@@ -84,13 +84,13 @@ public class EmbeddedGettingStartedFacadeImpl implements EmbeddedGettingStartedF
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('EMBEDDED_SETTINGS_MANAGE')")
     public void dismissEmbeddedGettingStarted() {
         complete(CompletionType.DISMISSED);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('EMBEDDED_VIEW')")
     public EmbeddedGettingStartedDTO getEmbeddedGettingStarted() {
         Set<Long> publishedIntegrationIds = getPublishedIntegrationIds();
 
@@ -120,7 +120,7 @@ public class EmbeddedGettingStartedFacadeImpl implements EmbeddedGettingStartedF
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('EMBEDDED_VIEW')")
     public boolean isEmbeddedGettingStartedCompleted() {
         Optional<String> completionTypeNameOptional = fetchCompletionTypeName();
 
