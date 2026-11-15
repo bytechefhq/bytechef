@@ -445,9 +445,11 @@ class ConnectionFacadeIntTest {
         void testUpdateConnectionCredentialsThrowsForConnectedUserConnection() {
             stubEmbedded(CONNECTED_USER_CONNECTION_ID);
 
+            Map<String, String> parameters = Map.of("token", "secret");
+
             assertThatThrownBy(
                 () -> connectionFacade.updateConnectionCredentials(
-                    CONNECTED_USER_CONNECTION_ID, Map.of("token", "secret"), 0))
+                    CONNECTED_USER_CONNECTION_ID, parameters, 0))
                         .isInstanceOf(NoSuchElementException.class);
 
             verify(platformConnectionFacade, never()).updateCredentials(anyLong(), any(), anyInt());
