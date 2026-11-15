@@ -58,6 +58,7 @@ const ProjectDeploymentsPanel = ({
         refetch: refetchProjectDeployments,
     } = useGetWorkspaceProjectDeploymentsQuery(
         {
+            environmentId: currentEnvironmentId,
             id: currentWorkspaceId ?? 0,
             projectId: project.id ?? 0,
         },

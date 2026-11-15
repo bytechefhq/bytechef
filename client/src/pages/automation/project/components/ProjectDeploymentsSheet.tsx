@@ -38,6 +38,7 @@ const ProjectDeploymentsSheet = ({
     const {isFetching: projectDeploymentsIsFetching, refetch: refetchProjectDeployments} =
         useGetWorkspaceProjectDeploymentsQuery(
             {
+                environmentId: currentEnvironmentId,
                 id: currentWorkspaceId ?? 0,
                 projectId: project.id ?? 0,
             },
