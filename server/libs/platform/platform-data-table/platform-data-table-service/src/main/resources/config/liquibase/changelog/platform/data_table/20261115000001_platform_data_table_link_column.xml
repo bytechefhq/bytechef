@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd"
+                   logicalFilePath="config/liquibase/changelog/platform/data_table/20261115000001_platform_data_table_link_column.xml">
+
+    <changeSet id="20261115000001-1" author="Ivica Cardic">
+        <createTable tableName="data_table_link_column">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="data_table_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="environment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="column_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_data_table_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="on_delete" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="display_column_name" type="VARCHAR(255)"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="data_table_link_column"
+            baseColumnNames="data_table_id"
+            constraintName="fk_data_table_link_column_data_table"
+            referencedTableName="data_table"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+            baseTableName="data_table_link_column"
+            baseColumnNames="target_data_table_id"
+            constraintName="fk_data_table_link_column_target_data_table"
+            referencedTableName="data_table"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <addUniqueConstraint
+            tableName="data_table_link_column"
+            columnNames="data_table_id,environment_id,column_name"
+            constraintName="uk_data_table_link_column"/>
+    </changeSet>
+
+    <changeSet id="20261115000001-2" author="Ivica Cardic">
+        <createIndex tableName="data_table_link_column" indexName="idx_data_table_link_column_target">
+            <column name="target_data_table_id"/>
+            <column name="environment_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
