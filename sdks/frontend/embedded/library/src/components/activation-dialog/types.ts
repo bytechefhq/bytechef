@@ -1,7 +1,6 @@
 export interface TemplateComponentType {
     connectionRequired?: boolean;
     icon?: string;
-    /** Absent when the component needs a connection but no integration is set up for it. */
     integrationId?: number | null;
     name: string;
     provided?: boolean;
@@ -34,16 +33,13 @@ export interface ConnectionType {
 
 export interface ConnectedUserWorkflowType {
     automationUuid?: string;
-    /** For a REFERENCE, the id of the connection each component uses, keyed by component name. */
     connections?: Record<string, number>;
-    /** The values the user already supplied, keyed by input name. */
     inputValues?: Record<string, unknown>;
     kind?: 'COPY' | 'REFERENCE';
     mcpEnabled?: boolean | null;
     toolOnly?: boolean | null;
 }
 
-/** What the user already chose for an automation they activated before, prefilled when the dialog edits it. */
 export interface ExistingReferenceType {
     connections: Record<string, number>;
     inputValues: Record<string, unknown>;
