@@ -35,7 +35,7 @@ public abstract class AbstractDataTableApiController {
     private static final Set<Integer> CONFLICT_KEYS = Set.of(
         DataTableErrorType.DATA_TABLE_ALREADY_EXISTS.getErrorKey(),
         DataTableErrorType.COLUMN_ALREADY_EXISTS.getErrorKey(),
-        DataTableErrorType.ROW_EXTERNAL_ID_CONFLICT.getErrorKey());
+        DataTableErrorType.ROW_EXTERNAL_ID_CONFLICT.getErrorKey(), DataTableErrorType.ROW_STILL_LINKED.getErrorKey());
 
     @ExceptionHandler({
         DataTableException.class, ExecutionException.class

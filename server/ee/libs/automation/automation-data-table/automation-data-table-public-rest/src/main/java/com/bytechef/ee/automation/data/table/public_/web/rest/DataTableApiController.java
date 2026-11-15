@@ -18,7 +18,6 @@ import com.bytechef.ee.automation.data.table.public_.web.rest.model.UpdateDataTa
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
-import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -148,9 +147,7 @@ public class DataTableApiController extends AbstractDataTableApiController imple
         long environmentId = support.environmentId(xEnvironment);
 
         workspaceDataTableFacade.addColumn(
-            dataTableId, new ColumnSpec(
-                request.getName(), ColumnType.valueOf(request.getType()
-                    .name())),
+            dataTableId, DataTableModelMapper.toColumnSpec(request.getName(), request.getType(), request.getLink()),
             environmentId);
 
         return ResponseEntity.status(HttpStatus.CREATED)

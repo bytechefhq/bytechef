@@ -39,6 +39,8 @@ import com.bytechef.platform.data.table.configuration.exception.DataTableExcepti
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.LinkDeleteRule;
+import com.bytechef.platform.data.table.domain.LinkSpec;
 import com.bytechef.platform.tag.domain.Tag;
 import jakarta.servlet.ServletException;
 import java.time.Instant;
@@ -505,6 +507,149 @@ class DataTableApiControllerIntTest {
                             """))
             .andExpect(status().isConflict())
             .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.COLUMN_ALREADY_EXISTS.getErrorKey()));
+    }
+
+    @Test
+    void testCreateLinkColumn() throws Exception {
+        stubOrdersTable();
+
+        ColumnSpec linkColumnSpec = new ColumnSpec(
+            "customer", ColumnType.LINK, new LinkSpec(4L, LinkDeleteRule.CLEAR, "name"));
+
+        when(workspaceDataTableFacade.getTable(7L, PRODUCTION_ENVIRONMENT_ID))
+            .thenReturn(new DataTableInfo(7L, "orders", WORKSPACE_ID, null, List.of(linkColumnSpec), Instant.EPOCH));
+        when(workspaceDataTableFacade.getTagsByTableId(1L)).thenReturn(Map.of());
+
+        mockMvc
+            .perform(
+                post(COLUMNS_PATH, WORKSPACE_ID, "orders")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "name": "customer",
+                                "type": "LINK",
+                                "link": {"targetDataTableId": 4, "onDelete": "CLEAR", "displayColumnName": "name"}
+                            }
+                            """))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.columns[0].type").value("LINK"))
+            .andExpect(jsonPath("$.columns[0].link.targetDataTableId").value(4));
+
+        verify(workspaceDataTableFacade).addColumn(7L, linkColumnSpec, PRODUCTION_ENVIRONMENT_ID);
+    }
+
+    @Test
+    void testCreateLinkColumnWithInvalidTargetReturns400() throws Exception {
+        stubOrdersTable();
+
+        doThrow(new DataTableException("Invalid target", DataTableErrorType.LINK_TARGET_INVALID))
+            .when(workspaceDataTableFacade)
+            .addColumn(
+                7L, new ColumnSpec("customer", ColumnType.LINK, new LinkSpec(4L, LinkDeleteRule.BLOCK, null)),
+                PRODUCTION_ENVIRONMENT_ID);
+
+        mockMvc
+            .perform(
+                post(COLUMNS_PATH, WORKSPACE_ID, "orders")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {"name": "customer", "type": "LINK", "link": {"targetDataTableId": 4, "onDelete": "BLOCK"}}
+                            """))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.LINK_TARGET_INVALID.getErrorKey()));
+    }
+
+    @Test
+    void testCreateLinkColumnWithoutOnDeleteDefaultsToBlock() throws Exception {
+        stubOrdersTable();
+
+        when(workspaceDataTableFacade.getTagsByTableId(1L)).thenReturn(Map.of());
+
+        mockMvc
+            .perform(
+                post(COLUMNS_PATH, WORKSPACE_ID, "orders")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {"name": "customer", "type": "LINK", "link": {"targetDataTableId": 4}}
+                            """))
+            .andExpect(status().isCreated());
+
+        verify(workspaceDataTableFacade).addColumn(
+            7L, new ColumnSpec("customer", ColumnType.LINK, new LinkSpec(4L, LinkDeleteRule.BLOCK, null)),
+            PRODUCTION_ENVIRONMENT_ID);
+    }
+
+    @Test
+    void testCreateLinkColumnWithoutLinkReturns400() throws Exception {
+        stubOrdersTable();
+
+        mockMvc
+            .perform(
+                post(COLUMNS_PATH, WORKSPACE_ID, "orders")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {"name": "customer", "type": "LINK"}
+                            """))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.LINK_TARGET_INVALID.getErrorKey()));
+
+        verify(workspaceDataTableFacade, never()).addColumn(anyLong(), any(), anyLong());
+    }
+
+    @Test
+    void testCreateNonLinkColumnWithLinkReturns400() throws Exception {
+        stubOrdersTable();
+
+        mockMvc
+            .perform(
+                post(COLUMNS_PATH, WORKSPACE_ID, "orders")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {"name": "qty", "type": "INTEGER", "link": {"targetDataTableId": 4}}
+                            """))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.LINK_TARGET_INVALID.getErrorKey()));
+
+        verify(workspaceDataTableFacade, never()).addColumn(anyLong(), any(), anyLong());
+    }
+
+    @Test
+    void testDeleteTableReferencedByLinkReturns409() throws Exception {
+        stubDataTable("orders", 7L);
+
+        doThrow(new DataTableException("Table is still linked", DataTableErrorType.ROW_STILL_LINKED))
+            .when(workspaceDataTableFacade)
+            .dropTable(7L, PRODUCTION_ENVIRONMENT_ID);
+
+        mockMvc
+            .perform(delete(DATA_TABLE_PATH, WORKSPACE_ID, "orders"))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.ROW_STILL_LINKED.getErrorKey()));
+    }
+
+    @Test
+    void testGetTableReportsLink() throws Exception {
+        stubOrdersTable();
+
+        ColumnSpec linkColumnSpec = new ColumnSpec(
+            "customer", ColumnType.LINK, new LinkSpec(4L, LinkDeleteRule.BLOCK, "name"));
+
+        when(workspaceDataTableFacade.getTable(7L, PRODUCTION_ENVIRONMENT_ID))
+            .thenReturn(new DataTableInfo(7L, "orders", WORKSPACE_ID, null, List.of(linkColumnSpec), Instant.EPOCH));
+        when(workspaceDataTableFacade.getTagsByTableId(1L)).thenReturn(Map.of());
+
+        mockMvc
+            .perform(get(DATA_TABLE_PATH, WORKSPACE_ID, "orders").accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.columns[0].type").value("LINK"))
+            .andExpect(jsonPath("$.columns[0].link.targetDataTableId").value(4))
+            .andExpect(jsonPath("$.columns[0].link.onDelete").value("BLOCK"))
+            .andExpect(jsonPath("$.columns[0].link.displayColumnName").value("name"));
     }
 
     @Test

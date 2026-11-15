@@ -42,6 +42,8 @@ import com.bytechef.platform.data.table.configuration.exception.DataTableExcepti
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.LinkDeleteRule;
+import com.bytechef.platform.data.table.domain.LinkSpec;
 import com.bytechef.platform.data.table.exception.DataTableStorageLimitExceededException;
 import com.bytechef.platform.data.table.execution.domain.CreateStrategy;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
@@ -126,7 +128,8 @@ class DataTableRowApiControllerIntTest {
 
         when(
             workspaceDataTableFacade.listRows(
-                eq(7L), any(DataTableRowConditions.class), anyList(), eq(0), eq(500), eq(PRODUCTION_ENVIRONMENT_ID)))
+                eq(7L), any(DataTableRowConditions.class), anyList(), eq(0), eq(500), anyList(),
+                eq(PRODUCTION_ENVIRONMENT_ID)))
                     .thenReturn(
                         new PageImpl<>(List.of(new DataTableRow(1L, "k", Map.of("total", new BigDecimal("9.5"))))));
 
@@ -145,7 +148,8 @@ class DataTableRowApiControllerIntTest {
             ArgumentCaptor.forClass(DataTableRowConditions.class);
 
         verify(workspaceDataTableFacade).listRows(
-            eq(7L), conditionsArgumentCaptor.capture(), anyList(), eq(0), eq(500), eq(PRODUCTION_ENVIRONMENT_ID));
+            eq(7L), conditionsArgumentCaptor.capture(), anyList(), eq(0), eq(500), anyList(),
+            eq(PRODUCTION_ENVIRONMENT_ID));
 
         DataTableRowConditions dataTableRowConditions = conditionsArgumentCaptor.getValue();
 
@@ -164,7 +168,8 @@ class DataTableRowApiControllerIntTest {
 
         when(
             workspaceDataTableFacade.listRows(
-                eq(7L), any(DataTableRowConditions.class), anyList(), eq(0), eq(50), eq(PRODUCTION_ENVIRONMENT_ID)))
+                eq(7L), any(DataTableRowConditions.class), anyList(), eq(0), eq(50), anyList(),
+                eq(PRODUCTION_ENVIRONMENT_ID)))
                     .thenReturn(new PageImpl<>(List.of()));
 
         mockMvc
@@ -175,7 +180,8 @@ class DataTableRowApiControllerIntTest {
             ArgumentCaptor.forClass(DataTableRowConditions.class);
 
         verify(workspaceDataTableFacade).listRows(
-            eq(7L), conditionsArgumentCaptor.capture(), anyList(), eq(0), eq(50), eq(PRODUCTION_ENVIRONMENT_ID));
+            eq(7L), conditionsArgumentCaptor.capture(), anyList(), eq(0), eq(50), anyList(),
+            eq(PRODUCTION_ENVIRONMENT_ID));
 
         DataTableRowConditions dataTableRowConditions = conditionsArgumentCaptor.getValue();
 
@@ -194,7 +200,8 @@ class DataTableRowApiControllerIntTest {
 
         when(
             workspaceDataTableFacade.listRows(
-                eq(7L), any(DataTableRowConditions.class), anyList(), eq(0), eq(50), eq(PRODUCTION_ENVIRONMENT_ID)))
+                eq(7L), any(DataTableRowConditions.class), anyList(), eq(0), eq(50), anyList(),
+                eq(PRODUCTION_ENVIRONMENT_ID)))
                     .thenReturn(new PageImpl<>(List.of()));
 
         mockMvc
@@ -205,7 +212,8 @@ class DataTableRowApiControllerIntTest {
             ArgumentCaptor.forClass(DataTableRowConditions.class);
 
         verify(workspaceDataTableFacade).listRows(
-            eq(7L), conditionsArgumentCaptor.capture(), anyList(), eq(0), eq(50), eq(PRODUCTION_ENVIRONMENT_ID));
+            eq(7L), conditionsArgumentCaptor.capture(), anyList(), eq(0), eq(50), anyList(),
+            eq(PRODUCTION_ENVIRONMENT_ID));
 
         DataTableRowConditions dataTableRowConditions = conditionsArgumentCaptor.getValue();
 
@@ -229,7 +237,7 @@ class DataTableRowApiControllerIntTest {
 
         verify(workspaceDataTableFacade, never()).listRows(
             anyLong(), any(DataTableRowConditions.class), anyList(), anyInt(), anyInt(),
-            anyLong());
+            anyList(), anyLong());
     }
 
     @Test
@@ -238,7 +246,8 @@ class DataTableRowApiControllerIntTest {
 
         when(
             workspaceDataTableFacade.listRows(
-                eq(7L), any(DataTableRowConditions.class), anyList(), eq(0), eq(1), eq(PRODUCTION_ENVIRONMENT_ID)))
+                eq(7L), any(DataTableRowConditions.class), anyList(), eq(0), eq(1), anyList(),
+                eq(PRODUCTION_ENVIRONMENT_ID)))
                     .thenReturn(
                         new PageImpl<>(List.of(new DataTableRow(1L, null, Map.of())), PageRequest.of(0, 1), 5));
 
@@ -356,13 +365,190 @@ class DataTableRowApiControllerIntTest {
     @Test
     void testGetRowReturnsOk() throws Exception {
         stubDataTable("orders", 7L);
-        when(workspaceDataTableFacade.getRow(7L, 3L, PRODUCTION_ENVIRONMENT_ID))
+        when(workspaceDataTableFacade.getRow(7L, 3L, List.of(), PRODUCTION_ENVIRONMENT_ID))
             .thenReturn(new DataTableRow(3L, null, Map.of("total", BigDecimal.ONE)));
 
         mockMvc
             .perform(get(ROW_PATH, WORKSPACE_ID, "orders", 3L).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(3));
+    }
+
+    @Test
+    void testListRowsExpand() throws Exception {
+        stubOrdersTable();
+
+        DataTableRow customerRow = new DataTableRow(5L, "c-1", Map.of("name", "Ada"));
+
+        when(
+            workspaceDataTableFacade.listRows(
+                eq(7L), any(DataTableRowConditions.class), anyList(), eq(0), eq(50), eq(List.of("customer", "owner")),
+                eq(PRODUCTION_ENVIRONMENT_ID)))
+                    .thenReturn(new PageImpl<>(List.of(new DataTableRow(1L, null, Map.of("customer", customerRow)))));
+
+        mockMvc
+            .perform(get(ROWS_PATH, WORKSPACE_ID, "orders").param("expand", "customer,owner"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content[0].values.customer.id").value(5))
+            .andExpect(jsonPath("$.content[0].values.customer.externalId").value("c-1"))
+            .andExpect(jsonPath("$.content[0].values.customer.values.name").value("Ada"));
+    }
+
+    @Test
+    void testListRowsExpandOfAnUnknownColumnIsNotFound() throws Exception {
+        stubOrdersTable();
+
+        when(
+            workspaceDataTableFacade.listRows(
+                eq(7L), any(DataTableRowConditions.class), anyList(), eq(0), eq(50), eq(List.of("missing")),
+                eq(PRODUCTION_ENVIRONMENT_ID)))
+                    .thenThrow(new DataTableException("Column not found", DataTableErrorType.COLUMN_NOT_FOUND));
+
+        mockMvc
+            .perform(get(ROWS_PATH, WORKSPACE_ID, "orders").param("expand", "missing"))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.COLUMN_NOT_FOUND.getErrorKey()));
+    }
+
+    @Test
+    void testGetRowExpand() throws Exception {
+        stubDataTable("orders", 7L);
+        when(workspaceDataTableFacade.getRow(7L, 3L, List.of("customer"), PRODUCTION_ENVIRONMENT_ID))
+            .thenReturn(
+                new DataTableRow(3L, null, Map.of("customer", new DataTableRow(5L, "c-1", Map.of("name", "Ada")))));
+
+        mockMvc
+            .perform(get(ROW_PATH, WORKSPACE_ID, "orders", 3L).param("expand", "customer"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.values.customer.externalId").value("c-1"));
+    }
+
+    @Test
+    void testGetRowByExternalIdExpand() throws Exception {
+        stubDataTable("orders", 7L);
+        when(workspaceDataTableFacade.fetchRowByExternalId(7L, "o-1", PRODUCTION_ENVIRONMENT_ID))
+            .thenReturn(Optional.of(new DataTableRow(3L, "o-1", Map.of("customer", 5L))));
+        when(workspaceDataTableFacade.getRow(7L, 3L, List.of("customer"), PRODUCTION_ENVIRONMENT_ID))
+            .thenReturn(
+                new DataTableRow(
+                    3L, "o-1", Map.of("customer", new DataTableRow(5L, "c-1", Map.of("name", "Ada")))));
+
+        mockMvc
+            .perform(get(ROW_BY_EXTERNAL_ID_PATH, WORKSPACE_ID, "orders", "o-1").param("expand", "customer"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.values.customer.id").value(5))
+            .andExpect(jsonPath("$.values.customer.externalId").value("c-1"));
+    }
+
+    @Test
+    void testInsertRowLinksByExternalId() throws Exception {
+        stubDataTable("orders", 7L);
+        when(workspaceDataTableFacade.getTable(7L, PRODUCTION_ENVIRONMENT_ID))
+            .thenReturn(
+                new DataTableInfo(
+                    7L, "orders", WORKSPACE_ID, null, List.of(linkColumn()), Instant.EPOCH));
+        when(
+            workspaceDataTableFacade.insertRow(
+                7L, Map.of("customer", Map.of("externalId", "c-1")), null, PRODUCTION_ENVIRONMENT_ID))
+                    .thenReturn(new DataTableRow(1L, null, Map.of("customer", 5L)));
+
+        mockMvc
+            .perform(
+                post(ROWS_PATH, WORKSPACE_ID, "orders")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {"values": {"customer": {"externalId": "c-1"}}}
+                            """))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.values.customer").value(5));
+
+        verify(workspaceDataTableFacade).insertRow(
+            7L, Map.of("customer", Map.of("externalId", "c-1")), null, PRODUCTION_ENVIRONMENT_ID);
+    }
+
+    @Test
+    void testInsertRowWithUnknownLinkReturns400() throws Exception {
+        stubDataTable("orders", 7L);
+        when(workspaceDataTableFacade.getTable(7L, PRODUCTION_ENVIRONMENT_ID))
+            .thenReturn(
+                new DataTableInfo(
+                    7L, "orders", WORKSPACE_ID, null, List.of(linkColumn()), Instant.EPOCH));
+        when(workspaceDataTableFacade.insertRow(eq(7L), anyMap(), isNull(), eq(PRODUCTION_ENVIRONMENT_ID)))
+            .thenThrow(new DataTableException("No linked row", DataTableErrorType.LINKED_ROW_NOT_FOUND));
+
+        mockMvc
+            .perform(
+                post(ROWS_PATH, WORKSPACE_ID, "orders")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {"values": {"customer": 99}}
+                            """))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.LINKED_ROW_NOT_FOUND.getErrorKey()))
+            .andExpect(jsonPath("$.entityClass").value("DataTableErrorType"));
+    }
+
+    @Test
+    void testInsertRowWithInvalidLinkTargetReturns400() throws Exception {
+        stubDataTable("orders", 7L);
+        when(workspaceDataTableFacade.getTable(7L, PRODUCTION_ENVIRONMENT_ID))
+            .thenReturn(
+                new DataTableInfo(
+                    7L, "orders", WORKSPACE_ID, null, List.of(linkColumn()), Instant.EPOCH));
+
+        mockMvc
+            .perform(
+                post(ROWS_PATH, WORKSPACE_ID, "orders")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {"values": {"customer": {"externalId": "c-1", "other": "x"}}}
+                            """))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.ROW_VALUE_INVALID.getErrorKey()));
+
+        verify(workspaceDataTableFacade, never()).insertRow(anyLong(), anyMap(), any(), anyLong());
+    }
+
+    @Test
+    void testLinkErrorsMapToTheirStatuses() throws Exception {
+        stubDataTable("orders", 7L);
+        when(workspaceDataTableFacade.updateRow(eq(7L), eq(3L), anyMap(), any(), eq(PRODUCTION_ENVIRONMENT_ID)))
+            .thenThrow(new DataTableException("Bad target", DataTableErrorType.LINK_TARGET_INVALID))
+            .thenThrow(new DataTableException("Bad display", DataTableErrorType.LINK_DISPLAY_COLUMN_INVALID));
+        when(workspaceDataTableFacade.getTable(7L, PRODUCTION_ENVIRONMENT_ID))
+            .thenReturn(new DataTableInfo(7L, "orders", WORKSPACE_ID, null, List.of(), Instant.EPOCH));
+
+        mockMvc
+            .perform(
+                patch(ROW_PATH, WORKSPACE_ID, "orders", 3L)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{}"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.LINK_TARGET_INVALID.getErrorKey()));
+
+        mockMvc
+            .perform(
+                patch(ROW_PATH, WORKSPACE_ID, "orders", 3L)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{}"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.LINK_DISPLAY_COLUMN_INVALID.getErrorKey()));
+    }
+
+    @Test
+    void testDeleteLinkedRowReturns409() throws Exception {
+        stubDataTable("orders", 7L);
+        when(workspaceDataTableFacade.deleteRow(7L, 3L, PRODUCTION_ENVIRONMENT_ID))
+            .thenThrow(new DataTableException("Row is still linked", DataTableErrorType.ROW_STILL_LINKED));
+
+        mockMvc
+            .perform(delete(ROW_PATH, WORKSPACE_ID, "orders", 3L))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.ROW_STILL_LINKED.getErrorKey()))
+            .andExpect(jsonPath("$.entityClass").value("DataTableErrorType"));
     }
 
     @Test
@@ -729,6 +915,10 @@ class DataTableRowApiControllerIntTest {
             .andExpect(header().string(HttpHeaders.CONTENT_TYPE, "text/csv;charset=UTF-8"))
             .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"orders.csv\""))
             .andExpect(content().string("external_id,total\n,1\n"));
+    }
+
+    private static ColumnSpec linkColumn() {
+        return new ColumnSpec("customer", ColumnType.LINK, new LinkSpec(4L, LinkDeleteRule.BLOCK, null));
     }
 
     private void stubOrdersTable() {
