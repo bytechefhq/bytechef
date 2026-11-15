@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-14T20:58:12.896819+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-15T03:07:08.789973+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 @Validated
 @Tag(name = "data-table", description = "Data table and column definitions.")
 public interface DataTableApi {
@@ -102,7 +102,7 @@ public interface DataTableApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"id\" : 0, \"workspaceId\" : 6, \"name\" : \"name\", \"description\" : \"description\", \"columns\" : [ { \"name\" : \"name\", \"type\" : \"STRING\" }, { \"name\" : \"name\", \"type\" : \"STRING\" } ], \"tags\" : [ \"tags\", \"tags\" ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
+                    String exampleString = "{ \"id\" : 0, \"workspaceId\" : 6, \"name\" : \"name\", \"description\" : \"description\", \"columns\" : [ { \"name\" : \"name\", \"type\" : \"STRING\", \"link\" : { \"targetDataTableId\" : 1, \"onDelete\" : \"BLOCK\", \"displayColumnName\" : \"displayColumnName\" } }, { \"name\" : \"name\", \"type\" : \"STRING\", \"link\" : { \"targetDataTableId\" : 1, \"onDelete\" : \"BLOCK\", \"displayColumnName\" : \"displayColumnName\" } } ], \"tags\" : [ \"tags\", \"tags\" ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -179,7 +179,7 @@ public interface DataTableApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"id\" : 0, \"workspaceId\" : 6, \"name\" : \"name\", \"description\" : \"description\", \"columns\" : [ { \"name\" : \"name\", \"type\" : \"STRING\" }, { \"name\" : \"name\", \"type\" : \"STRING\" } ], \"tags\" : [ \"tags\", \"tags\" ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
+                    String exampleString = "{ \"id\" : 0, \"workspaceId\" : 6, \"name\" : \"name\", \"description\" : \"description\", \"columns\" : [ { \"name\" : \"name\", \"type\" : \"STRING\", \"link\" : { \"targetDataTableId\" : 1, \"onDelete\" : \"BLOCK\", \"displayColumnName\" : \"displayColumnName\" } }, { \"name\" : \"name\", \"type\" : \"STRING\", \"link\" : { \"targetDataTableId\" : 1, \"onDelete\" : \"BLOCK\", \"displayColumnName\" : \"displayColumnName\" } } ], \"tags\" : [ \"tags\", \"tags\" ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -264,6 +264,7 @@ public interface DataTableApi {
      * @param xEnvironment The environment whose physical table is addressed. PRODUCTION when omitted. (optional)
      * @return Deleted. (status code 204)
      *         or The problem. (status code 404)
+     *         or The problem. (status code 409)
      */
     @Operation(
         operationId = "deleteDataTable",
@@ -273,6 +274,9 @@ public interface DataTableApi {
         responses = {
             @ApiResponse(responseCode = "204", description = "Deleted."),
             @ApiResponse(responseCode = "404", description = "The problem.", content = {
+                @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
+            }),
+            @ApiResponse(responseCode = "409", description = "The problem.", content = {
                 @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
             })
         }
@@ -289,6 +293,11 @@ public interface DataTableApi {
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
+                    String exampleString = "Custom MIME type example not yet supported: application/problem+json";
+                    ApiUtil.setExampleResponse(request, "application/problem+json", exampleString);
+                    break;
+                }
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
                     String exampleString = "Custom MIME type example not yet supported: application/problem+json";
                     ApiUtil.setExampleResponse(request, "application/problem+json", exampleString);
@@ -341,7 +350,7 @@ public interface DataTableApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"id\" : 0, \"workspaceId\" : 6, \"name\" : \"name\", \"description\" : \"description\", \"columns\" : [ { \"name\" : \"name\", \"type\" : \"STRING\" }, { \"name\" : \"name\", \"type\" : \"STRING\" } ], \"tags\" : [ \"tags\", \"tags\" ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
+                    String exampleString = "{ \"id\" : 0, \"workspaceId\" : 6, \"name\" : \"name\", \"description\" : \"description\", \"columns\" : [ { \"name\" : \"name\", \"type\" : \"STRING\", \"link\" : { \"targetDataTableId\" : 1, \"onDelete\" : \"BLOCK\", \"displayColumnName\" : \"displayColumnName\" } }, { \"name\" : \"name\", \"type\" : \"STRING\", \"link\" : { \"targetDataTableId\" : 1, \"onDelete\" : \"BLOCK\", \"displayColumnName\" : \"displayColumnName\" } } ], \"tags\" : [ \"tags\", \"tags\" ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -397,7 +406,7 @@ public interface DataTableApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"id\" : 0, \"workspaceId\" : 6, \"name\" : \"name\", \"description\" : \"description\", \"columns\" : [ { \"name\" : \"name\", \"type\" : \"STRING\" }, { \"name\" : \"name\", \"type\" : \"STRING\" } ], \"tags\" : [ \"tags\", \"tags\" ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\" }, { \"id\" : 0, \"workspaceId\" : 6, \"name\" : \"name\", \"description\" : \"description\", \"columns\" : [ { \"name\" : \"name\", \"type\" : \"STRING\" }, { \"name\" : \"name\", \"type\" : \"STRING\" } ], \"tags\" : [ \"tags\", \"tags\" ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\" } ]";
+                    String exampleString = "[ { \"id\" : 0, \"workspaceId\" : 6, \"name\" : \"name\", \"description\" : \"description\", \"columns\" : [ { \"name\" : \"name\", \"type\" : \"STRING\", \"link\" : { \"targetDataTableId\" : 1, \"onDelete\" : \"BLOCK\", \"displayColumnName\" : \"displayColumnName\" } }, { \"name\" : \"name\", \"type\" : \"STRING\", \"link\" : { \"targetDataTableId\" : 1, \"onDelete\" : \"BLOCK\", \"displayColumnName\" : \"displayColumnName\" } } ], \"tags\" : [ \"tags\", \"tags\" ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\" }, { \"id\" : 0, \"workspaceId\" : 6, \"name\" : \"name\", \"description\" : \"description\", \"columns\" : [ { \"name\" : \"name\", \"type\" : \"STRING\", \"link\" : { \"targetDataTableId\" : 1, \"onDelete\" : \"BLOCK\", \"displayColumnName\" : \"displayColumnName\" } }, { \"name\" : \"name\", \"type\" : \"STRING\", \"link\" : { \"targetDataTableId\" : 1, \"onDelete\" : \"BLOCK\", \"displayColumnName\" : \"displayColumnName\" } } ], \"tags\" : [ \"tags\", \"tags\" ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\" } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -468,7 +477,7 @@ public interface DataTableApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"id\" : 0, \"workspaceId\" : 6, \"name\" : \"name\", \"description\" : \"description\", \"columns\" : [ { \"name\" : \"name\", \"type\" : \"STRING\" }, { \"name\" : \"name\", \"type\" : \"STRING\" } ], \"tags\" : [ \"tags\", \"tags\" ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
+                    String exampleString = "{ \"id\" : 0, \"workspaceId\" : 6, \"name\" : \"name\", \"description\" : \"description\", \"columns\" : [ { \"name\" : \"name\", \"type\" : \"STRING\", \"link\" : { \"targetDataTableId\" : 1, \"onDelete\" : \"BLOCK\", \"displayColumnName\" : \"displayColumnName\" } }, { \"name\" : \"name\", \"type\" : \"STRING\", \"link\" : { \"targetDataTableId\" : 1, \"onDelete\" : \"BLOCK\", \"displayColumnName\" : \"displayColumnName\" } } ], \"tags\" : [ \"tags\", \"tags\" ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -542,7 +551,7 @@ public interface DataTableApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"id\" : 0, \"workspaceId\" : 6, \"name\" : \"name\", \"description\" : \"description\", \"columns\" : [ { \"name\" : \"name\", \"type\" : \"STRING\" }, { \"name\" : \"name\", \"type\" : \"STRING\" } ], \"tags\" : [ \"tags\", \"tags\" ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
+                    String exampleString = "{ \"id\" : 0, \"workspaceId\" : 6, \"name\" : \"name\", \"description\" : \"description\", \"columns\" : [ { \"name\" : \"name\", \"type\" : \"STRING\", \"link\" : { \"targetDataTableId\" : 1, \"onDelete\" : \"BLOCK\", \"displayColumnName\" : \"displayColumnName\" } }, { \"name\" : \"name\", \"type\" : \"STRING\", \"link\" : { \"targetDataTableId\" : 1, \"onDelete\" : \"BLOCK\", \"displayColumnName\" : \"displayColumnName\" } } ], \"tags\" : [ \"tags\", \"tags\" ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
