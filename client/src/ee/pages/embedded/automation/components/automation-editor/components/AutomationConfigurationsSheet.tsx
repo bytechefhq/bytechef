@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import AutomationExecutionsSheet from '@/ee/pages/embedded/automations/components/automation-executions-sheet/AutomationExecutionsSheet';
 import AutomationProjectConfigurationDialog from '@/ee/pages/embedded/automations/components/automation-project-configuration-dialog/AutomationProjectConfigurationDialog';
 import AutomationProjectConfigurationList from '@/ee/pages/embedded/automations/components/automation-project-configuration-list/AutomationProjectConfigurationList';
 import AutomationProjectPublishDialog from '@/ee/pages/embedded/automations/components/automation-project-publish-dialog/AutomationProjectPublishDialog';
@@ -100,6 +101,8 @@ const AutomationConfigurationsSheet = ({onSheetOpenChange, project, sheetOpen}: 
                 <footer className="flex shrink-0 justify-end gap-x-2 rounded-b-md border-t border-t-border/50 bg-surface-neutral-primary p-3">
                     <Button label="Close" onClick={() => onSheetOpenChange(false)} variant="outline" />
                 </footer>
+
+                <AutomationExecutionsSheet />
 
                 {configurationDialog && (
                     <AutomationProjectConfigurationDialog

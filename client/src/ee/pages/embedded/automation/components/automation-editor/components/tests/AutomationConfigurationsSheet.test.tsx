@@ -63,6 +63,10 @@ vi.mock(
     })
 );
 
+vi.mock('@/ee/pages/embedded/automations/components/automation-executions-sheet/AutomationExecutionsSheet', () => ({
+    default: () => null,
+}));
+
 vi.mock(
     '@/ee/pages/embedded/automations/components/automation-project-configuration-dialog/AutomationProjectConfigurationDialog',
     () => ({

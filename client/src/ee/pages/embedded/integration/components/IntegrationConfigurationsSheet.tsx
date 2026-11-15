@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationsPanel from '@/ee/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationsPanel';
+import IntegrationInstanceConfigurationWorkflowExecutionsSheet from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-executions-sheet/IntegrationInstanceConfigurationWorkflowExecutionsSheet';
 import {Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {useGetIntegrationInstanceConfigurationsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
@@ -80,6 +81,8 @@ const IntegrationConfigurationsSheet = ({
                 <footer className="flex shrink-0 justify-end gap-x-2 rounded-b-md border-t border-t-border/50 bg-surface-neutral-primary p-3">
                     <Button label="Close" onClick={() => onSheetOpenChange(false)} variant="outline" />
                 </footer>
+
+                <IntegrationInstanceConfigurationWorkflowExecutionsSheet />
             </SheetContent>
         </Sheet>
     );
