@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.ai.copilot.service.CopilotWorkflowGenerator;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -107,6 +108,7 @@ import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefi
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowValidationResult;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -253,6 +255,9 @@ class ConnectedUserProjectFacadeIntTest {
 
     @Autowired
     private IntegrationService integrationService;
+
+    @Autowired
+    private JobService jobService;
 
     @Autowired
     private PrincipalJobService principalJobService;
@@ -402,6 +407,30 @@ class ConnectedUserProjectFacadeIntTest {
             .singleElement()
             .satisfies(connectedUserProjectWorkflowDTO -> assertThat(connectedUserProjectWorkflowDTO.attentionReason())
                 .isNull());
+    }
+
+    @Test
+    void testGetConnectedUserProjectWorkflowsReportsTheLastExecutionOfThePublishedVersionBehindADraft() {
+        String workflowUuid = createPublishedCopy(externalUserId, COPY_WORKFLOW_WITH_SHEET_INPUT_DEFINITION);
+
+        connectedUserProjectFacade.updateProjectWorkflow(
+            externalUserId, workflowUuid, COPY_WORKFLOW_WITH_SHEET_INPUT_DEFINITION, Environment.PRODUCTION);
+
+        String publishedWorkflowId = getPublishedCopyWorkflowId(externalUserId, workflowUuid);
+
+        Instant endDate = Instant.parse("2026-11-15T00:28:50Z");
+
+        Job job = new Job(1L);
+
+        job.setEndDate(endDate);
+
+        when(jobService.fetchLastWorkflowJob(argThat((List<String> workflowIds) -> workflowIds.contains(
+            publishedWorkflowId)))).thenReturn(Optional.of(job));
+
+        assertThat(connectedUserProjectFacade.getConnectedUserProjectWorkflows(externalUserId, Environment.PRODUCTION))
+            .singleElement()
+            .extracting(ConnectedUserProjectWorkflowDTO::lastExecutionDate)
+            .isEqualTo(endDate);
     }
 
     @Test
