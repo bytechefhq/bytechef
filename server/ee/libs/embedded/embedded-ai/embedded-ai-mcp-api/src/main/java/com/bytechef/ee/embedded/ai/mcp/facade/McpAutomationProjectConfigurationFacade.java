@@ -69,6 +69,15 @@ public interface McpAutomationProjectConfigurationFacade {
 
     List<McpAutomationProjectConfigurationDTO> getMcpServerMcpAutomationProjectConfigurations(long mcpServerId);
 
+    /**
+     * Returns the UUIDs of the workflows of an automation project configuration that have the workflow call trigger at
+     * the configuration's project version, so they can become MCP tools once turned on in the configuration.
+     *
+     * @param automationProjectConfigurationId the automation project configuration ID
+     * @return the workflow UUIDs
+     */
+    List<String> getToolWorkflowUuids(long automationProjectConfigurationId);
+
     McpAutomationProjectConfigurationWorkflow updateMcpAutomationProjectConfigurationWorkflowEnabled(
         long id, boolean enabled);
 

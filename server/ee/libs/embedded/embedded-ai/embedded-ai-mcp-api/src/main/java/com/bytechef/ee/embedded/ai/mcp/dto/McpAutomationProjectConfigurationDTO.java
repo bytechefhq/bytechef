@@ -18,6 +18,6 @@ import java.util.List;
 @SuppressFBWarnings("EI")
 public record McpAutomationProjectConfigurationDTO(
     long id, long mcpServerId, long automationProjectConfigurationId, String automationProjectConfigurationName,
-    long projectId, int projectVersion, boolean automationProjectConfigurationEnabled,
+    long projectId, String projectName, int projectVersion, boolean automationProjectConfigurationEnabled,
     List<McpAutomationProjectConfigurationWorkflowDTO> workflows) {
 }

@@ -82,6 +82,7 @@ class McpAutomationProjectConfigurationGraphQlControllerIntTest {
                     automationProjectConfigurationName
                     automationProjectConfigurationEnabled
                     projectId
+                    projectName
                     projectVersion
                     workflows {
                         id
@@ -107,6 +108,40 @@ class McpAutomationProjectConfigurationGraphQlControllerIntTest {
             .path("mcpAutomationProjectConfigurationsByServerId[0].workflows[0].parameters.name")
             .entity(String.class)
             .isEqualTo("tool");
+    }
+
+    @Test
+    void testMcpAutomationProjectConfigurationsByServerIdReturnsProjectName() {
+        when(mcpAutomationProjectConfigurationFacade.getMcpServerMcpAutomationProjectConfigurations(3L))
+            .thenReturn(List.of(createDTO(true)));
+
+        graphQlTester.document("""
+            query {
+                mcpAutomationProjectConfigurationsByServerId(mcpServerId: "3") {
+                    projectName
+                }
+            }
+            """)
+            .execute()
+            .path("mcpAutomationProjectConfigurationsByServerId[0].projectName")
+            .entity(String.class)
+            .isEqualTo("Project");
+    }
+
+    @Test
+    void testMcpAutomationProjectConfigurationToolWorkflowUuids() {
+        when(mcpAutomationProjectConfigurationFacade.getToolWorkflowUuids(5L))
+            .thenReturn(List.of(WORKFLOW_UUID));
+
+        graphQlTester.document("""
+            query {
+                mcpAutomationProjectConfigurationToolWorkflowUuids(automationProjectConfigurationId: "5")
+            }
+            """)
+            .execute()
+            .path("mcpAutomationProjectConfigurationToolWorkflowUuids")
+            .entityList(String.class)
+            .containsExactly(WORKFLOW_UUID);
     }
 
     @Test
@@ -363,7 +398,7 @@ class McpAutomationProjectConfigurationGraphQlControllerIntTest {
 
     private static McpAutomationProjectConfigurationDTO createDTO(boolean available) {
         return new McpAutomationProjectConfigurationDTO(
-            11L, 3L, 5L, "Configuration", 7L, 1, true,
+            11L, 3L, 5L, "Configuration", 7L, "Project", 1, true,
             List.of(
                 new McpAutomationProjectConfigurationWorkflowDTO(
                     21L, WORKFLOW_UUID, "Workflow", Map.of("name", "tool"), true, available)));

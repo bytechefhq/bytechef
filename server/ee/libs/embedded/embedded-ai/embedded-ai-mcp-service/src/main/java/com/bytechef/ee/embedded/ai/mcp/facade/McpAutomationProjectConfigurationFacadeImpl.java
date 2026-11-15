@@ -9,8 +9,10 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.audit.McpAutomationProjectConfigurationAuditEvents;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpAutomationProjectConfiguration;
@@ -61,6 +63,7 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
     private final McpAutomationProjectConfigurationWorkflowService mcpAutomationProjectConfigurationWorkflowService;
     private final McpAutomationRowFacade mcpAutomationRowFacade;
     private final McpServerService mcpServerService;
+    private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final WorkflowService workflowService;
 
@@ -69,7 +72,7 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
         AutomationProjectConfigurationService automationProjectConfigurationService,
         McpAutomationProjectConfigurationService mcpAutomationProjectConfigurationService,
         McpAutomationProjectConfigurationWorkflowService mcpAutomationProjectConfigurationWorkflowService,
-        McpAutomationRowFacade mcpAutomationRowFacade, McpServerService mcpServerService,
+        McpAutomationRowFacade mcpAutomationRowFacade, McpServerService mcpServerService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, WorkflowService workflowService) {
 
         this.automationProjectConfigurationService = automationProjectConfigurationService;
@@ -77,6 +80,7 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
         this.mcpAutomationProjectConfigurationWorkflowService = mcpAutomationProjectConfigurationWorkflowService;
         this.mcpAutomationRowFacade = mcpAutomationRowFacade;
         this.mcpServerService = mcpServerService;
+        this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
         this.workflowService = workflowService;
     }
@@ -263,6 +267,28 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(readOnly = true)
+    public List<String> getToolWorkflowUuids(long automationProjectConfigurationId) {
+        AutomationProjectConfiguration automationProjectConfiguration =
+            automationProjectConfigurationService.getConfiguration(automationProjectConfigurationId);
+
+        List<ProjectWorkflow> projectWorkflows = callSkippingAutomationChecks(
+            () -> projectWorkflowService.getProjectWorkflows(
+                automationProjectConfiguration.getProjectId(), automationProjectConfiguration.getProjectVersion()));
+
+        List<String> toolWorkflowUuids = new ArrayList<>();
+
+        for (ProjectWorkflow projectWorkflow : projectWorkflows) {
+            if (hasWorkflowCallTrigger(workflowService.getWorkflow(projectWorkflow.getWorkflowId()))) {
+                toolWorkflowUuids.add(projectWorkflow.getUuidAsString());
+            }
+        }
+
+        return toolWorkflowUuids;
+    }
+
+    @Override
     @Audited(
         event = McpAutomationProjectConfigurationAuditEvents.MCP_AUTOMATION_PROJECT_CONFIGURATION_WORKFLOW_ENABLED_UPDATED,
         data = {
@@ -376,10 +402,14 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
                     mcpAutomationProjectConfigurationWorkflow.isEnabled(), available));
         }
 
+        Project project = callSkippingAutomationChecks(
+            () -> projectService.getProject(automationProjectConfiguration.getProjectId()));
+
         return new McpAutomationProjectConfigurationDTO(
             mcpAutomationProjectConfiguration.getId(), mcpAutomationProjectConfiguration.getMcpServerId(),
             automationProjectConfiguration.getId(), automationProjectConfiguration.getName(),
-            automationProjectConfiguration.getProjectId(), automationProjectConfiguration.getProjectVersion(),
+            automationProjectConfiguration.getProjectId(), project.getName(),
+            automationProjectConfiguration.getProjectVersion(),
             automationProjectConfiguration.isEnabled(), workflowDTOs);
     }
 
