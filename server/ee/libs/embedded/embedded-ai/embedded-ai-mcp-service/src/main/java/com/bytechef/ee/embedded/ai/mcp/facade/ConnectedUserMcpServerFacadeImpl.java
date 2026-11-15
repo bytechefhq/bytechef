@@ -258,7 +258,7 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         @AuditData(key = "mcpConnectedUserProjectWorkflowId", value = "#mcpConnectedUserProjectWorkflowId"),
         @AuditData(key = "enabled", value = "#enable")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'MCP_EDIT')")
     public ConnectedUserMcpServerAutomationDTO enableMcpAutomation(
         long connectedUserId, long mcpConnectedUserProjectWorkflowId, boolean enable) {
 
@@ -284,7 +284,7 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         @AuditData(key = "mcpIntegrationInstanceWorkflowId", value = "#mcpIntegrationInstanceWorkflowId"),
         @AuditData(key = "enabled", value = "#enable")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpIntegrationInstanceWorkflowId, 'McpIntegrationInstanceWorkflow', 'MCP_EDIT')")
     public void enableMcpWorkflow(long mcpIntegrationInstanceWorkflowId, boolean enable) {
         mcpIntegrationInstanceWorkflowService.updateEnabled(mcpIntegrationInstanceWorkflowId, enable);
     }

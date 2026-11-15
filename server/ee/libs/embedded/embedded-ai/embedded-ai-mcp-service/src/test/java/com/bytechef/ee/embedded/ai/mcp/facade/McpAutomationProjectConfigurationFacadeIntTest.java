@@ -11,9 +11,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
 
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
@@ -21,6 +20,8 @@ import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
+import com.bytechef.automation.configuration.security.ProjectVisibilityPolicy;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectWorkflowServiceImpl;
@@ -50,6 +51,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.config.ResourceVisibilityConfiguration;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
@@ -132,7 +134,9 @@ class McpAutomationProjectConfigurationFacadeIntTest {
                 .isInstanceOf(AccessDeniedException.class);
         }
 
-        verify(permissionService, times(methods.size())).isTenantAdmin();
+        assertThat(mockingDetails(permissionService).getInvocations())
+            .as("every denied call consulted the permission service")
+            .hasSizeGreaterThanOrEqualTo(methods.size());
     }
 
     private void invoke(Method method) throws Throwable {
@@ -832,7 +836,8 @@ class McpAutomationProjectConfigurationFacadeIntTest {
             IntegrationInstanceServiceImpl.class, McpAutomationProjectConfigurationFacadeImpl.class,
             McpAutomationRowFacadeImpl.class, McpComponentServiceImpl.class,
             McpIntegrationInstanceConfigurationServiceImpl.class, McpServerMembership.class,
-            McpServerServiceImpl.class, ProjectServiceImpl.class, ProjectWorkflowServiceImpl.class
+            McpServerServiceImpl.class, ProjectServiceImpl.class, ProjectVisibilityPolicy.class,
+            ProjectWorkflowServiceImpl.class, ResourceVisibilityConfiguration.class
         })
         static class LinkConfiguration {
 
@@ -858,8 +863,15 @@ class McpAutomationProjectConfigurationFacadeIntTest {
         static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
             PermissionService permissionService,
             ObjectProvider<MethodSecurityExpressionContributor> methodSecurityExpressionContributorProvider) {
-            return new AutomationMethodSecurityExpressionHandler(
-                permissionService, methodSecurityExpressionContributorProvider);
+
+            AutomationMethodSecurityExpressionHandler automationMethodSecurityExpressionHandler =
+                new AutomationMethodSecurityExpressionHandler(
+                    permissionService, methodSecurityExpressionContributorProvider);
+
+            automationMethodSecurityExpressionHandler.setPermissionEvaluator(
+                new AutomationPermissionEvaluator(permissionService));
+
+            return automationMethodSecurityExpressionHandler;
         }
 
         @Bean

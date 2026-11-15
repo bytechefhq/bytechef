@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.automation.configuration.security.ProjectVisibilityPolicy;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectWorkflowServiceImpl;
@@ -63,6 +64,7 @@ import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository
 import com.bytechef.encryption.Encryption;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.config.ResourceVisibilityConfiguration;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -1274,7 +1276,7 @@ public class ConnectedUserMcpServerFacadeIntTest {
         IntegrationWorkflowServiceImpl.class, AutomationProjectConfigurationServiceImpl.class,
         ConnectedUserProjectConfigurationServiceImpl.class, ConnectedUserProjectServiceImpl.class,
         ConnectedUserProjectWorkflowServiceImpl.class, McpAutomationRowFacadeImpl.class, ProjectServiceImpl.class,
-        ProjectWorkflowServiceImpl.class
+        ProjectVisibilityPolicy.class, ProjectWorkflowServiceImpl.class, ResourceVisibilityConfiguration.class
     })
     static class FacadeIntTestConfiguration {
 
