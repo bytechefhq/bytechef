@@ -33,6 +33,8 @@ import com.bytechef.platform.data.table.config.DataTableIntTestUtils;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
 import com.bytechef.platform.data.table.configuration.exception.DataTableException;
+import com.bytechef.platform.data.table.configuration.repository.DataTableLinkColumnRepository;
+import com.bytechef.platform.data.table.configuration.repository.DataTableRepository;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
@@ -98,6 +100,12 @@ class DataTableRowServiceIntTest {
 
     @Autowired
     private ApplicationEvents applicationEvents;
+
+    @Autowired
+    private DataTableLinkColumnRepository dataTableLinkColumnRepository;
+
+    @Autowired
+    private DataTableRepository dataTableRepository;
 
     @Autowired
     private DataSource dataSource;
@@ -1752,7 +1760,9 @@ class DataTableRowServiceIntTest {
             }
         };
 
-        return new DataTableRowServiceImpl(applicationEventPublisher, new JdbcTemplate(h2ReportingDataSource));
+        return new DataTableRowServiceImpl(
+            applicationEventPublisher, dataTableLinkColumnRepository, dataTableRepository,
+            new JdbcTemplate(h2ReportingDataSource));
     }
 
     private DataTableRow deletedRow() {

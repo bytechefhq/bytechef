@@ -18,11 +18,17 @@ package com.bytechef.platform.data.table.execution.service;
 
 import com.bytechef.commons.util.BooleanUtils;
 import com.bytechef.commons.util.DateUtils;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
+import com.bytechef.platform.data.table.configuration.domain.DataTableLinkColumn;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
 import com.bytechef.platform.data.table.configuration.exception.DataTableException;
+import com.bytechef.platform.data.table.configuration.repository.DataTableLinkColumnRepository;
+import com.bytechef.platform.data.table.configuration.repository.DataTableRepository;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.LinkDeleteRule;
+import com.bytechef.platform.data.table.domain.LinkSpec;
 import com.bytechef.platform.data.table.domain.ReservedColumns;
 import com.bytechef.platform.data.table.execution.domain.CreateStrategy;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
@@ -67,8 +73,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -77,6 +85,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.function.BiFunction;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -115,6 +125,15 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     private static final Pattern EPOCH_PATTERN = Pattern.compile("-?\\d+");
 
+    private static final Pattern LINK_CONSTRAINT_PATTERN =
+        Pattern.compile("fk_dt_link_(\\d+)", Pattern.CASE_INSENSITIVE);
+
+    private static final Set<String> FOREIGN_KEY_VIOLATION_SQL_STATES = Set.of("23503", "23506");
+
+    private static final Set<DataTableRowFilter.Operation> LINK_FILTER_OPERATIONS = EnumSet.of(
+        DataTableRowFilter.Operation.EQUALS, DataTableRowFilter.Operation.NOT_EQUALS,
+        DataTableRowFilter.Operation.IN, DataTableRowFilter.Operation.EMPTY, DataTableRowFilter.Operation.NOT_EMPTY);
+
     private static final DateTimeFormatter[] STRICT_DATE_FORMATTERS = {
         DateTimeFormatter.ISO_LOCAL_DATE,
         DateTimeFormatter.ofPattern("uuuu-M-d")
@@ -130,13 +149,21 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     };
 
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final DataTableLinkColumnRepository dataTableLinkColumnRepository;
+    private final DataTableRepository dataTableRepository;
     private final JdbcTemplate jdbcTemplate;
 
     private Boolean returningSupported;
 
     @SuppressFBWarnings("EI")
-    public DataTableRowServiceImpl(ApplicationEventPublisher applicationEventPublisher, JdbcTemplate jdbcTemplate) {
+    public DataTableRowServiceImpl(
+        ApplicationEventPublisher applicationEventPublisher,
+        DataTableLinkColumnRepository dataTableLinkColumnRepository, DataTableRepository dataTableRepository,
+        JdbcTemplate jdbcTemplate) {
+
         this.applicationEventPublisher = applicationEventPublisher;
+        this.dataTableLinkColumnRepository = dataTableLinkColumnRepository;
+        this.dataTableRepository = dataTableRepository;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -147,12 +174,18 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         checkHasId(dataTableId, physicalName);
 
+        List<BlockingLink> blockingLinks = loadBlockingLinks(dataTableId, physicalName, environmentId, id, null);
+
         DataTableRow deletedDataTableRow;
 
-        if (isReturningSupported()) {
-            deletedDataTableRow = deleteRowReturningValues(physicalName, id);
-        } else {
-            deletedDataTableRow = deleteRowAfterReadingValues(dataTableId, physicalName, id, environmentId);
+        try {
+            if (isReturningSupported()) {
+                deletedDataTableRow = deleteRowReturningValues(physicalName, id);
+            } else {
+                deletedDataTableRow = deleteRowAfterReadingValues(dataTableId, physicalName, id, environmentId);
+            }
+        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+            throw toRowStillLinked(dataTableId, id, blockingLinks, dataIntegrityViolationException);
         }
 
         if (deletedDataTableRow == null) {
@@ -189,7 +222,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         checkHasId(dataTableId, physicalName);
 
-        List<ColumnSpec> columnSpecs = listColumns(physicalName);
+        List<ColumnSpec> columnSpecs = listColumns(dataTableId, physicalName, environmentId);
 
         List<String> columnNames = getNonIdColumnNames(columnSpecs);
 
@@ -197,27 +230,35 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         String tableName = escapeIdentifier(physicalName);
 
+        List<BlockingLink> blockingLinks = loadBlockingLinks(
+            dataTableId, physicalName, environmentId, null, whereClause);
+
         List<DataTableRow> deletedDataTableRows;
 
-        if (isReturningSupported()) {
-            String sql = "DELETE FROM " + tableName + whereClause.sql() + " RETURNING " +
-                buildSelectColumns(columnNames);
+        try {
+            if (isReturningSupported()) {
+                String sql = "DELETE FROM " + tableName + whereClause.sql() + " RETURNING " +
+                    buildSelectColumns(columnNames);
 
-            deletedDataTableRows = jdbcTemplate.query(
-                sql, preparedStatement -> setFilterParameters(preparedStatement, 1, whereClause.filterParameters()),
-                (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
-        } else {
-            deletedDataTableRows = selectRowsForUpdate(tableName, columnNames, whereClause);
+                deletedDataTableRows = jdbcTemplate.query(
+                    sql,
+                    preparedStatement -> setFilterParameters(preparedStatement, 1, whereClause.filterParameters()),
+                    (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
+            } else {
+                deletedDataTableRows = selectRowsForUpdate(tableName, columnNames, whereClause);
 
-            List<Long> ids = deletedDataTableRows.stream()
-                .map(DataTableRow::id)
-                .toList();
+                List<Long> ids = deletedDataTableRows.stream()
+                    .map(DataTableRow::id)
+                    .toList();
 
-            if (!ids.isEmpty()) {
-                jdbcTemplate.update(
-                    "DELETE FROM " + tableName + " WHERE " + buildAnyCondition("\"id\"", ids.size()),
-                    (PreparedStatementSetter) preparedStatement -> setIds(preparedStatement, 1, ids));
+                if (!ids.isEmpty()) {
+                    jdbcTemplate.update(
+                        "DELETE FROM " + tableName + " WHERE " + buildAnyCondition("\"id\"", ids.size()),
+                        (PreparedStatementSetter) preparedStatement -> setIds(preparedStatement, 1, ids));
+                }
             }
+        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+            throw toRowStillLinked(dataTableId, null, blockingLinks, dataIntegrityViolationException);
         }
 
         List<DataTableRow> sortedDataTableRows = sortById(deletedDataTableRows);
@@ -234,7 +275,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         checkHasId(dataTableId, physicalName);
 
-        List<String> columnNames = listColumns(physicalName).stream()
+        List<String> columnNames = listPhysicalColumns(physicalName).stream()
             .map(ColumnSpec::name)
             .filter(name -> !"id".equalsIgnoreCase(name))
             .toList();
@@ -258,7 +299,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         checkHasId(dataTableId, physicalName);
 
-        List<ColumnSpec> columnSpecs = listColumns(physicalName);
+        List<ColumnSpec> columnSpecs = listColumns(dataTableId, physicalName, environmentId);
         List<String> columnNames = columnSpecs.stream()
             .map(ColumnSpec::name)
             .filter(n -> !"id".equalsIgnoreCase(n))
@@ -311,7 +352,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             return 0;
         }
 
-        List<ColumnSpec> columnSpecs = listColumns(physicalName);
+        List<ColumnSpec> columnSpecs = listColumns(dataTableId, physicalName, environmentId);
 
         List<String> columnNames = columnSpecs.stream()
             .map(ColumnSpec::name)
@@ -433,9 +474,11 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         Set<String> ignoredColumnNames = new LinkedHashSet<>();
 
+        List<ColumnSpec> columnSpecs = listColumns(dataTableId, physicalName, environmentId);
+
         DataTableRow dataTableRow = insertRowWithoutEvent(
-            dataTableId, physicalName, listColumns(physicalName), values, externalId, environmentId,
-            ignoredColumnNames);
+            dataTableId, physicalName, columnSpecs, resolveLinkValues(columnSpecs, values, environmentId),
+            externalId, environmentId, ignoredColumnNames);
 
         logIgnoredColumnNames(dataTableId, environmentId, ignoredColumnNames);
 
@@ -451,16 +494,24 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         checkHasId(dataTableId, physicalName);
 
-        List<ColumnSpec> columnSpecs = listColumns(physicalName);
+        List<ColumnSpec> columnSpecs = listColumns(dataTableId, physicalName, environmentId);
         List<DataTableRow> insertedDataTableRows = new ArrayList<>();
         Set<String> ignoredColumnNames = new LinkedHashSet<>();
 
-        for (int index = 0; index < rowValues.size(); index++) {
+        List<Map<String, Object>> resolvedRowValues = resolveLinkValues(
+            columnSpecs, rowValues, environmentId,
+            (index, message) -> "Record %d: %s; no record was inserted".formatted(index + 1, message));
+
+        for (int index = 0; index < resolvedRowValues.size(); index++) {
             try {
                 insertedDataTableRows.add(
                     insertRowWithoutEvent(
-                        dataTableId, physicalName, columnSpecs, rowValues.get(index), null, environmentId,
+                        dataTableId, physicalName, columnSpecs, resolvedRowValues.get(index), null, environmentId,
                         ignoredColumnNames));
+            } catch (DataTableException dataTableException) {
+                throw new DataTableException(
+                    "Record %d: %s; no record was inserted".formatted(index + 1, dataTableException.getMessage()),
+                    dataTableException, dataTableException.getErrorType());
             } catch (IllegalArgumentException exception) {
                 IllegalArgumentException illegalArgumentException = new IllegalArgumentException(
                     "Record %d: %s; no record was inserted".formatted(index + 1, exception.getMessage()));
@@ -500,19 +551,26 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         checkHasId(dataTableId, physicalName);
 
-        List<ColumnSpec> columnSpecs = listColumns(physicalName);
+        List<ColumnSpec> columnSpecs = listColumns(dataTableId, physicalName, environmentId);
         List<DataTableRow> dataTableRows = new ArrayList<>();
         List<DataTableRow> createdDataTableRows = new ArrayList<>();
         List<DataTableRow> updatedDataTableRows = new ArrayList<>();
         Set<String> ignoredColumnNames = new LinkedHashSet<>();
 
+        List<Map<String, Object>> resolvedRowValues = resolveLinkValues(
+            columnSpecs, newRows.stream()
+                .map(NewRow::values)
+                .toList(),
+            environmentId, (index, message) -> "Record %d: %s; no record was inserted".formatted(index + 1, message));
+
         for (int index = 0; index < newRows.size(); index++) {
             NewRow newRow = newRows.get(index);
+            Map<String, Object> resolvedValues = resolvedRowValues.get(index);
 
             try {
                 if (createStrategy == CreateStrategy.UPSERT) {
                     UpsertResult upsertResult = upsertRowWithoutEvent(
-                        dataTableId, physicalName, columnSpecs, newRow.externalId(), newRow.values(), environmentId,
+                        dataTableId, physicalName, columnSpecs, newRow.externalId(), resolvedValues, environmentId,
                         ignoredColumnNames);
 
                     dataTableRows.add(upsertResult.row());
@@ -524,7 +582,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                     }
                 } else {
                     DataTableRow dataTableRow = insertRowWithoutEvent(
-                        dataTableId, physicalName, columnSpecs, newRow.values(), newRow.externalId(), environmentId,
+                        dataTableId, physicalName, columnSpecs, resolvedValues, newRow.externalId(), environmentId,
                         ignoredColumnNames);
 
                     dataTableRows.add(dataTableRow);
@@ -622,6 +680,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             }
         } catch (DuplicateKeyException duplicateKeyException) {
             throw toExternalIdConflict(externalId, duplicateKeyException);
+        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+            throw toLinkedRowNotFound(dataTableId, columnSpecs, values, dataIntegrityViolationException);
         }
 
         if (result == null) {
@@ -654,7 +714,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         checkHasId(dataTableId, physicalName);
 
-        List<ColumnSpec> columnSpecs = listColumns(physicalName);
+        List<ColumnSpec> columnSpecs = listColumns(dataTableId, physicalName, environmentId);
 
         List<String> columnNames = getNonIdColumnNames(columnSpecs);
 
@@ -694,7 +754,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         checkHasId(dataTableId, physicalName);
 
-        WhereClause whereClause = buildWhereClause(listColumns(physicalName), conditions);
+        WhereClause whereClause = buildWhereClause(listColumns(dataTableId, physicalName, environmentId), conditions);
 
         Long count = jdbcTemplate.query(
             "SELECT COUNT(*) FROM " + escapeIdentifier(physicalName) + whereClause.sql(),
@@ -736,14 +796,16 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         checkHasId(dataTableId, physicalName);
 
-        List<ColumnSpec> columnSpecs = listColumns(physicalName);
+        List<ColumnSpec> columnSpecs = listColumns(dataTableId, physicalName, environmentId);
 
         List<String> allColumnNames = getColumnNames(columnSpecs);
 
         Set<String> ignoredColumnNames = new LinkedHashSet<>();
 
+        Map<String, Object> resolvedValues = resolveLinkValues(columnSpecs, values, environmentId);
+
         List<ColumnValue> columnValues = new ArrayList<>(
-            getColumnValues(columnSpecs, values, ValuePolicy.SINGLE_ROW, ignoredColumnNames));
+            getColumnValues(columnSpecs, resolvedValues, ValuePolicy.SINGLE_ROW, ignoredColumnNames));
 
         if (externalIdPatch != null) {
             columnValues.add(toExternalIdColumnValue(dataTableId, columnSpecs, externalIdPatch.externalId()));
@@ -782,6 +844,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         } catch (DuplicateKeyException duplicateKeyException) {
             throw toExternalIdConflict(
                 externalIdPatch == null ? null : externalIdPatch.externalId(), duplicateKeyException);
+        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+            throw toLinkedRowNotFound(dataTableId, columnSpecs, resolvedValues, dataIntegrityViolationException);
         }
 
         if (updatedDataTableRow == null) {
@@ -805,9 +869,11 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         Set<String> ignoredColumnNames = new LinkedHashSet<>();
 
+        List<ColumnSpec> columnSpecs = listColumns(dataTableId, physicalName, environmentId);
+
         UpsertResult upsertResult = upsertRowWithoutEvent(
-            dataTableId, physicalName, listColumns(physicalName), externalId, values, environmentId,
-            ignoredColumnNames);
+            dataTableId, physicalName, columnSpecs, externalId, resolveLinkValues(columnSpecs, values, environmentId),
+            environmentId, ignoredColumnNames);
 
         logIgnoredColumnNames(dataTableId, environmentId, ignoredColumnNames);
 
@@ -819,8 +885,20 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         return upsertResult;
     }
 
-    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     private UpsertResult upsertRowWithoutEvent(
+        long dataTableId, String physicalName, List<ColumnSpec> columnSpecs, @Nullable String externalId,
+        Map<String, Object> values, long environmentId, Set<String> ignoredColumnNames) {
+
+        try {
+            return upsertRowStatement(
+                dataTableId, physicalName, columnSpecs, externalId, values, environmentId, ignoredColumnNames);
+        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+            throw toLinkedRowNotFound(dataTableId, columnSpecs, values, dataIntegrityViolationException);
+        }
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private UpsertResult upsertRowStatement(
         long dataTableId, String physicalName, List<ColumnSpec> columnSpecs, @Nullable String externalId,
         Map<String, Object> values, long environmentId, Set<String> ignoredColumnNames) {
 
@@ -922,13 +1000,16 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         checkHasId(dataTableId, physicalName);
 
-        List<ColumnSpec> columnSpecs = listColumns(physicalName);
+        List<ColumnSpec> columnSpecs = listColumns(dataTableId, physicalName, environmentId);
 
         List<String> columnNames = getNonIdColumnNames(columnSpecs);
 
         WhereClause whereClause = buildWhereClause(columnSpecs, conditions);
 
-        List<ColumnValue> columnValues = getColumnValues(columnSpecs, values, ValuePolicy.BULK_UPDATE, Set.of());
+        Map<String, Object> resolvedValues = resolveLinkValues(columnSpecs, values, environmentId);
+
+        List<ColumnValue> columnValues = getColumnValues(
+            columnSpecs, resolvedValues, ValuePolicy.BULK_UPDATE, Set.of());
 
         if (columnValues.isEmpty()) {
             throw new IllegalArgumentException("Updating rows requires a value for at least one column");
@@ -936,6 +1017,19 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         String tableName = escapeIdentifier(physicalName);
         String setClause = buildSetClause(columnValues);
+
+        try {
+            return updateMatchingRows(
+                dataTableId, tableName, setClause, columnNames, whereClause, columnValues, environmentId);
+        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+            throw toLinkedRowNotFound(dataTableId, columnSpecs, resolvedValues, dataIntegrityViolationException);
+        }
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private List<DataTableRow> updateMatchingRows(
+        long dataTableId, String tableName, String setClause, List<String> columnNames, WhereClause whereClause,
+        List<ColumnValue> columnValues, long environmentId) {
 
         List<DataTableRow> updatedDataTableRows;
 
@@ -1321,6 +1415,13 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         ColumnType columnType = columnSpec.type();
         DataTableRowFilter.Operation operation = filter.operation();
 
+        if (columnType == ColumnType.LINK && !LINK_FILTER_OPERATIONS.contains(operation)) {
+            throw new DataTableException(
+                "Filter operation %s is not supported on link column '%s'; use EQUALS, NOT_EQUALS, IN, EMPTY or NOT_EMPTY"
+                    .formatted(operation, columnSpec.name()),
+                DataTableErrorType.FILTER_INVALID);
+        }
+
         if (operation.textOnly() && columnType != ColumnType.STRING) {
             throw new IllegalArgumentException(
                 "Filter operation %s is only supported on text columns, but column '%s' is %s".formatted(
@@ -1434,6 +1535,10 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         if (rawValue instanceof String string && string.isBlank()) {
             return columnType == ColumnType.STRING ? "" : null;
+        }
+
+        if (columnType == ColumnType.LINK) {
+            return toLinkId(columnSpec, rawValue);
         }
 
         if (rawValue instanceof Collection<?> || rawValue instanceof Map<?, ?> || isArray(rawValue)) {
@@ -1671,7 +1776,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             return;
         }
 
-        List<ColumnSpec> columnSpecs = listColumns(physicalName);
+        List<ColumnSpec> columnSpecs = listPhysicalColumns(physicalName);
 
         if (columnSpecs.isEmpty()) {
             throw new IllegalArgumentException("Data table %d not found in this environment".formatted(dataTableId));
@@ -1756,7 +1861,347 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         return new DataTableRow(resultSet.getLong("id"), externalId, values);
     }
 
-    private List<ColumnSpec> listColumns(String physicalName) {
+    private List<ColumnSpec> listColumns(long dataTableId, String physicalName, long environmentId) {
+        List<ColumnSpec> physicalColumnSpecs = listPhysicalColumns(physicalName);
+
+        List<DataTableLinkColumn> dataTableLinkColumns =
+            dataTableLinkColumnRepository.findAllByDataTableIdAndEnvironmentId(dataTableId, environmentId);
+
+        if (dataTableLinkColumns.isEmpty()) {
+            return physicalColumnSpecs;
+        }
+
+        Map<String, LinkSpec> linkSpecs = new HashMap<>();
+
+        for (DataTableLinkColumn dataTableLinkColumn : dataTableLinkColumns) {
+            linkSpecs.put(dataTableLinkColumn.getColumnName(), dataTableLinkColumn.toLinkSpec());
+        }
+
+        List<ColumnSpec> columnSpecs = new ArrayList<>(physicalColumnSpecs.size());
+
+        for (ColumnSpec columnSpec : physicalColumnSpecs) {
+            LinkSpec linkSpec = linkSpecs.get(columnSpec.name());
+
+            columnSpecs.add(
+                linkSpec == null ? columnSpec : new ColumnSpec(columnSpec.name(), ColumnType.LINK, linkSpec));
+        }
+
+        return columnSpecs;
+    }
+
+    private Map<String, Object> resolveLinkValues(
+        List<ColumnSpec> columnSpecs, Map<String, Object> values, long environmentId) {
+
+        List<Map<String, Object>> resolvedRowValues = resolveLinkValues(
+            columnSpecs, List.of(values), environmentId, (index, message) -> message);
+
+        return resolvedRowValues.getFirst();
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private List<Map<String, Object>> resolveLinkValues(
+        List<ColumnSpec> columnSpecs, List<Map<String, Object>> rowValues, long environmentId,
+        BiFunction<Integer, String, String> messageDecorator) {
+
+        Map<String, ColumnSpec> linkColumnSpecs = new HashMap<>();
+
+        for (ColumnSpec columnSpec : columnSpecs) {
+            if (columnSpec.type() == ColumnType.LINK) {
+                linkColumnSpecs.put(columnSpec.name(), columnSpec);
+            }
+        }
+
+        if (linkColumnSpecs.isEmpty()) {
+            return rowValues;
+        }
+
+        Map<String, Set<String>> externalIdsByColumnName = new HashMap<>();
+
+        for (int index = 0; index < rowValues.size(); index++) {
+            for (Map.Entry<String, Object> entry : rowValues.get(index)
+                .entrySet()) {
+
+                ColumnSpec linkColumnSpec = linkColumnSpecs.get(entry.getKey()
+                    .toLowerCase(Locale.ROOT));
+
+                if (linkColumnSpec != null && entry.getValue() instanceof Map<?, ?> linkValue) {
+                    Set<String> externalIds = externalIdsByColumnName.computeIfAbsent(
+                        linkColumnSpec.name(), columnName -> new LinkedHashSet<>());
+
+                    externalIds.add(toLinkExternalId(linkColumnSpec, linkValue, index, messageDecorator));
+                }
+            }
+        }
+
+        if (externalIdsByColumnName.isEmpty()) {
+            return rowValues;
+        }
+
+        Map<String, Map<String, Long>> idsByColumnName = new HashMap<>();
+
+        for (Map.Entry<String, Set<String>> entry : externalIdsByColumnName.entrySet()) {
+            LinkSpec linkSpec = Objects.requireNonNull(linkColumnSpecs.get(entry.getKey())
+                .link());
+
+            idsByColumnName.put(
+                entry.getKey(),
+                selectIdsByExternalId(
+                    DataTablePhysicalNameUtils.getPhysicalName(environmentId, linkSpec.targetDataTableId()),
+                    new ArrayList<>(entry.getValue())));
+        }
+
+        List<Map<String, Object>> resolvedRowValues = new ArrayList<>(rowValues.size());
+
+        for (int index = 0; index < rowValues.size(); index++) {
+            Map<String, Object> resolvedValues = new LinkedHashMap<>(rowValues.get(index));
+
+            for (Map.Entry<String, Object> entry : resolvedValues.entrySet()) {
+                ColumnSpec linkColumnSpec = linkColumnSpecs.get(entry.getKey()
+                    .toLowerCase(Locale.ROOT));
+
+                if (linkColumnSpec == null || !(entry.getValue() instanceof Map<?, ?> linkValue)) {
+                    continue;
+                }
+
+                String externalId = toLinkExternalId(linkColumnSpec, linkValue, index, messageDecorator);
+
+                Map<String, Long> idsByExternalId = idsByColumnName.get(linkColumnSpec.name());
+
+                Long id = idsByExternalId.get(externalId);
+
+                if (id == null) {
+                    LinkSpec linkSpec = Objects.requireNonNull(linkColumnSpec.link());
+
+                    throw new DataTableException(
+                        messageDecorator.apply(
+                            index,
+                            "Column '%s' links to external id '%s' which matches no row of data table %d".formatted(
+                                linkColumnSpec.name(), externalId, linkSpec.targetDataTableId())),
+                        DataTableErrorType.LINKED_ROW_NOT_FOUND);
+                }
+
+                entry.setValue(id);
+            }
+
+            resolvedRowValues.add(resolvedValues);
+        }
+
+        return resolvedRowValues;
+    }
+
+    private static String toLinkExternalId(
+        ColumnSpec linkColumnSpec, Map<?, ?> linkValue, int index,
+        BiFunction<Integer, String, String> messageDecorator) {
+
+        Object externalId = linkValue.get("externalId");
+
+        if (linkValue.size() != 1 || externalId == null || String.valueOf(externalId)
+            .isBlank()) {
+
+            throw new DataTableException(
+                messageDecorator.apply(
+                    index,
+                    "Value for link column '%s' must be a row id or {\"externalId\": \"...\"}".formatted(
+                        linkColumnSpec.name())),
+                DataTableErrorType.ROW_VALUE_INVALID);
+        }
+
+        return String.valueOf(externalId)
+            .trim();
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private Map<String, Long> selectIdsByExternalId(String targetPhysicalName, List<String> externalIds) {
+        String sql = "SELECT \"id\", " + escapeIdentifier(ReservedColumns.EXTERNAL_ID) + " FROM " +
+            escapeIdentifier(targetPhysicalName) + " WHERE " +
+            buildAnyCondition(escapeIdentifier(ReservedColumns.EXTERNAL_ID), externalIds.size());
+
+        Map<String, Long> idsByExternalId = jdbcTemplate.query(sql, preparedStatement -> {
+            int index = 1;
+
+            for (List<String> chunk : partition(externalIds)) {
+                setArrayParam(preparedStatement, index++, ColumnType.STRING, chunk.toArray());
+            }
+        }, resultSet -> {
+            Map<String, Long> result = new HashMap<>();
+
+            while (resultSet.next()) {
+                result.put(resultSet.getString(ReservedColumns.EXTERNAL_ID), resultSet.getLong("id"));
+            }
+
+            return result;
+        });
+
+        return Objects.requireNonNull(idsByExternalId, "idsByExternalId");
+    }
+
+    private static Long toLinkId(ColumnSpec columnSpec, Object rawValue) {
+        Long id = null;
+
+        if (!(rawValue instanceof Collection<?>) && !(rawValue instanceof Map<?, ?>) && !isArray(rawValue)
+            && !(rawValue instanceof Boolean)) {
+
+            id = toLong(rawValue);
+        }
+
+        if (id == null) {
+            throw new DataTableException(
+                "Value '%s' is not a valid link for column '%s'; use a row id or {\"externalId\": \"...\"}".formatted(
+                    rawValue, columnSpec.name()),
+                DataTableErrorType.ROW_VALUE_INVALID);
+        }
+
+        return id;
+    }
+
+    private static boolean isForeignKeyViolation(DataIntegrityViolationException dataIntegrityViolationException) {
+        Throwable mostSpecificCause = dataIntegrityViolationException.getMostSpecificCause();
+
+        return mostSpecificCause instanceof SQLException sqlException
+            && FOREIGN_KEY_VIOLATION_SQL_STATES.contains(sqlException.getSQLState());
+    }
+
+    private static @Nullable Long parseLinkColumnId(DataIntegrityViolationException dataIntegrityViolationException) {
+        Throwable mostSpecificCause = dataIntegrityViolationException.getMostSpecificCause();
+
+        Matcher matcher = LINK_CONSTRAINT_PATTERN.matcher(String.valueOf(mostSpecificCause.getMessage()));
+
+        return matcher.find() ? Long.valueOf(matcher.group(1)) : null;
+    }
+
+    private static RuntimeException toLinkedRowNotFound(
+        long dataTableId, List<ColumnSpec> columnSpecs, Map<String, Object> values,
+        DataIntegrityViolationException dataIntegrityViolationException) {
+
+        if (!isForeignKeyViolation(dataIntegrityViolationException)) {
+            return dataIntegrityViolationException;
+        }
+
+        Throwable mostSpecificCause = dataIntegrityViolationException.getMostSpecificCause();
+
+        String causeMessage = String.valueOf(mostSpecificCause.getMessage())
+            .toLowerCase(Locale.ROOT);
+
+        List<String> writtenLinkColumnNames = columnSpecs.stream()
+            .filter(columnSpec -> columnSpec.type() == ColumnType.LINK)
+            .map(ColumnSpec::name)
+            .filter(columnName -> values.entrySet()
+                .stream()
+                .anyMatch(entry -> columnName.equalsIgnoreCase(entry.getKey()) && entry.getValue() != null))
+            .toList();
+
+        List<String> mentionedLinkColumnNames = writtenLinkColumnNames.stream()
+            .filter(columnName -> causeMessage.contains(columnName))
+            .toList();
+
+        List<String> linkColumnNames = mentionedLinkColumnNames.isEmpty()
+            ? writtenLinkColumnNames : mentionedLinkColumnNames;
+
+        return new DataTableException(
+            "Link column(s) %s of data table %d point to a row that does not exist".formatted(
+                linkColumnNames, dataTableId),
+            dataIntegrityViolationException, DataTableErrorType.LINKED_ROW_NOT_FOUND);
+    }
+
+    private List<BlockingLink> loadBlockingLinks(
+        long dataTableId, String physicalName, long environmentId, @Nullable Long rowId,
+        @Nullable WhereClause whereClause) {
+
+        List<BlockingLink> blockingLinks = new ArrayList<>();
+
+        for (DataTableLinkColumn dataTableLinkColumn : dataTableLinkColumnRepository
+            .findAllByTargetDataTableIdAndEnvironmentId(dataTableId, environmentId)) {
+
+            if (dataTableLinkColumn.getOnDelete() != LinkDeleteRule.BLOCK) {
+                continue;
+            }
+
+            String tableName = dataTableRepository.findById(dataTableLinkColumn.getDataTableId())
+                .map(DataTable::getName)
+                .orElse(String.valueOf(dataTableLinkColumn.getDataTableId()));
+
+            long linkingRowCount = countLinkingRows(
+                DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableLinkColumn.getDataTableId()),
+                dataTableLinkColumn.getColumnName(), physicalName, rowId, whereClause);
+
+            blockingLinks.add(
+                new BlockingLink(
+                    dataTableLinkColumn.getId(), tableName, dataTableLinkColumn.getColumnName(), linkingRowCount));
+        }
+
+        return blockingLinks;
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private long countLinkingRows(
+        String sourcePhysicalName, String columnName, String targetPhysicalName, @Nullable Long rowId,
+        @Nullable WhereClause whereClause) {
+
+        String column = escapeIdentifier(columnName);
+        String sourceTableName = escapeIdentifier(sourcePhysicalName);
+
+        Long count;
+
+        if (rowId != null) {
+            count = jdbcTemplate.query(
+                "SELECT COUNT(*) FROM " + sourceTableName + " WHERE " + column + " = ?",
+                preparedStatement -> preparedStatement.setLong(1, rowId), resultSet -> {
+                    resultSet.next();
+
+                    return resultSet.getLong(1);
+                });
+        } else {
+            WhereClause targetWhereClause = Objects.requireNonNull(whereClause, "whereClause");
+
+            count = jdbcTemplate.query(
+                "SELECT COUNT(*) FROM " + sourceTableName + " WHERE " + column + " IN (SELECT \"id\" FROM " +
+                    escapeIdentifier(targetPhysicalName) + targetWhereClause.sql() + ")",
+                preparedStatement -> setFilterParameters(preparedStatement, 1, targetWhereClause.filterParameters()),
+                resultSet -> {
+                    resultSet.next();
+
+                    return resultSet.getLong(1);
+                });
+        }
+
+        return count == null ? 0L : count;
+    }
+
+    private static RuntimeException toRowStillLinked(
+        long dataTableId, @Nullable Long rowId, List<BlockingLink> blockingLinks,
+        DataIntegrityViolationException dataIntegrityViolationException) {
+
+        if (!isForeignKeyViolation(dataIntegrityViolationException)) {
+            return dataIntegrityViolationException;
+        }
+
+        Long linkColumnId = parseLinkColumnId(dataIntegrityViolationException);
+
+        List<BlockingLink> firedBlockingLinks = blockingLinks.stream()
+            .filter(blockingLink -> linkColumnId != null && linkColumnId.equals(blockingLink.linkColumnId()))
+            .toList();
+
+        if (firedBlockingLinks.isEmpty()) {
+            firedBlockingLinks = blockingLinks.stream()
+                .filter(blockingLink -> blockingLink.linkingRowCount() > 0)
+                .toList();
+        }
+
+        String linkedFrom = firedBlockingLinks.stream()
+            .map(blockingLink -> "%d %s in %s.%s".formatted(
+                blockingLink.linkingRowCount(), blockingLink.linkingRowCount() == 1 ? "row" : "rows",
+                blockingLink.tableName(), blockingLink.columnName()))
+            .collect(Collectors.joining(", "));
+
+        String subject = rowId == null
+            ? "Rows to delete from data table %d are".formatted(dataTableId) : "Row %d is".formatted(rowId);
+
+        return new DataTableException(
+            "%s linked from %s; no row was deleted".formatted(subject, linkedFrom), dataIntegrityViolationException,
+            DataTableErrorType.ROW_STILL_LINKED);
+    }
+
+    private List<ColumnSpec> listPhysicalColumns(String physicalName) {
         String sql = "SELECT column_name, data_type FROM information_schema.columns " +
             "WHERE table_schema = current_schema() AND table_name = ? ORDER BY ordinal_position";
 
@@ -1820,7 +2265,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             case NUMBER ->
                 preparedStatement.setBigDecimal(index,
                     (value instanceof BigDecimal bigDecimal) ? bigDecimal : toBigDecimal((Number) value));
-            case INTEGER -> {
+            case INTEGER, LINK -> {
                 switch (value) {
                     case Integer integer -> preparedStatement.setInt(index, integer);
                     case Long longValue -> preparedStatement.setLong(index, longValue);
@@ -1894,7 +2339,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     private DataTableRow deleteRowReturningValues(String physicalName, long id) {
-        List<String> columnNames = listColumns(physicalName).stream()
+        List<String> columnNames = listPhysicalColumns(physicalName).stream()
             .map(ColumnSpec::name)
             .filter(name -> !"id".equalsIgnoreCase(name))
             .toList();
@@ -2043,6 +2488,10 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             sql, preparedStatementSetter, (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
 
         return updatedDataTableRows.isEmpty() ? null : updatedDataTableRows.getFirst();
+    }
+
+    private record BlockingLink(
+        @Nullable Long linkColumnId, String tableName, String columnName, long linkingRowCount) {
     }
 
     private record ColumnValue(ColumnSpec columnSpec, @Nullable Object value) {
