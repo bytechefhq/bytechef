@@ -52,7 +52,7 @@ class DataTableFindRecordsActionTest extends AbstractDataTableActionTest {
 
     @Test
     void testPerformEmitsFlatRows() throws Exception {
-        when(dataTableRowService.findRows(anyLong(), any(), any(), anyInt(), anyInt(), anyLong()))
+        when(dataTableRowService.findRows(anyLong(), any(), any(), anyInt(), anyInt(), any(), anyLong()))
             .thenReturn(
                 List.of(
                     new DataTableRow(1, Map.of("status", "BOT")), new DataTableRow(2, Map.of("status", "CLOSED"))));
@@ -66,10 +66,33 @@ class DataTableFindRecordsActionTest extends AbstractDataTableActionTest {
 
         verify(dataTableRowService).findRows(
             eq(DATA_TABLE_ID), conditionsArgumentCaptor.capture(), sortArgumentCaptor.capture(), eq(100), eq(0),
+            eq(List.of()),
             eq(1L));
 
         assertEquals(DataTableRowConditions.matchAll(), conditionsArgumentCaptor.getValue());
         assertEquals(List.of(), sortArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testFindRecordsPassesExpand() throws Exception {
+        when(dataTableRowService.findRows(anyLong(), any(), any(), anyInt(), anyInt(), any(), anyLong()))
+            .thenReturn(
+                List.of(
+                    new DataTableRow(
+                        1, Map.of("customer", new DataTableRow(5, "ext-5", Map.of("name", "Ada"))))));
+
+        ModifiableActionDefinition actionDefinition = DataTableFindRecordsAction.of(
+            dataTableService, dataTableRowService, dataTableWorkspaceResolver);
+
+        Object result = perform(actionDefinition, Map.of("table", "conversations", "expand", List.of("customer")));
+
+        verify(dataTableRowService).findRows(
+            eq(DATA_TABLE_ID), any(), any(), eq(100), eq(0), eq(List.of("customer")), eq(1L));
+
+        assertEquals(
+            List.of(
+                Map.of("id", 1L, "customer", Map.of("id", 5L, "externalId", "ext-5", "values", Map.of("name", "Ada")))),
+            result);
     }
 
     @Test
@@ -96,6 +119,7 @@ class DataTableFindRecordsActionTest extends AbstractDataTableActionTest {
 
         verify(dataTableRowService).findRows(
             eq(DATA_TABLE_ID), conditionsArgumentCaptor.capture(), sortArgumentCaptor.capture(), eq(10), eq(20),
+            eq(List.of()),
             eq(1L));
 
         assertEquals(
@@ -122,6 +146,7 @@ class DataTableFindRecordsActionTest extends AbstractDataTableActionTest {
 
         verify(dataTableRowService).findRows(
             eq(DATA_TABLE_ID), conditionsArgumentCaptor.capture(), sortArgumentCaptor.capture(), eq(100), eq(0),
+            eq(List.of()),
             eq(1L));
 
         assertEquals(List.of(new DataTableRowSort("score", Direction.DESC)), sortArgumentCaptor.getValue());
@@ -136,6 +161,7 @@ class DataTableFindRecordsActionTest extends AbstractDataTableActionTest {
 
         verify(dataTableRowService).findRows(
             eq(DATA_TABLE_ID), conditionsArgumentCaptor.capture(), sortArgumentCaptor.capture(), eq(100), eq(0),
+            eq(List.of()),
             eq(1L));
 
         assertEquals(List.of(), sortArgumentCaptor.getValue());

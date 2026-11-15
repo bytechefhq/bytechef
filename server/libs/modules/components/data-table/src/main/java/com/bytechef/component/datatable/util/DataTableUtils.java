@@ -18,6 +18,8 @@ package com.bytechef.component.datatable.util;
 
 import static com.bytechef.component.datatable.constant.DataTableConstants.COLUMN;
 import static com.bytechef.component.datatable.constant.DataTableConstants.CONDITIONS;
+import static com.bytechef.component.datatable.constant.DataTableConstants.EXPAND;
+import static com.bytechef.component.datatable.constant.DataTableConstants.EXTERNAL_ID;
 import static com.bytechef.component.datatable.constant.DataTableConstants.ID;
 import static com.bytechef.component.datatable.constant.DataTableConstants.OPERATION;
 import static com.bytechef.component.datatable.constant.DataTableConstants.TABLE;
@@ -137,6 +139,57 @@ public final class DataTableUtils {
 
             return columnNames;
         };
+    }
+
+    public static ActionDefinition.OptionsFunction<String> getActionLinkColumnOptions(
+        DataTableService dataTableService, DataTableWorkspaceResolver dataTableWorkspaceResolver) {
+
+        return (inputParameters, connectionParameters, dependencyPaths, searchText, context) -> {
+            String name = inputParameters.getString(TABLE);
+
+            if (name == null || name.isBlank()) {
+                return List.of();
+            }
+
+            DataTableInfo dataTableInfo = getDataTableInfo(
+                dataTableService, resolveWorkspaceId(dataTableWorkspaceResolver, context), name,
+                DEVELOPMENT.ordinal());
+
+            List<Option<String>> columnNames = new ArrayList<>();
+
+            if (dataTableInfo != null && dataTableInfo.columns() != null) {
+                for (ColumnSpec columnSpec : dataTableInfo.columns()) {
+                    if (columnSpec.type() != ColumnType.LINK) {
+                        continue;
+                    }
+
+                    if (Objects.nonNull(searchText) && !Strings.CI.contains(columnSpec.name(), searchText)) {
+                        continue;
+                    }
+
+                    columnNames.add(option(columnSpec.name(), columnSpec.name()));
+                }
+            }
+
+            return columnNames;
+        };
+    }
+
+    public static ModifiableArrayProperty expandProperty(
+        DataTableService dataTableService, DataTableWorkspaceResolver dataTableWorkspaceResolver) {
+
+        return array(EXPAND)
+            .label("Expand")
+            .description(
+                "Link columns to replace with the linked record. An expanded link holds the id, externalId and " +
+                    "values of the record it points to, or null when empty.")
+            .items(string())
+            .options(getActionLinkColumnOptions(dataTableService, dataTableWorkspaceResolver))
+            .optionsLookupDependsOn(TABLE);
+    }
+
+    public static List<String> getExpand(Parameters inputParameters) {
+        return inputParameters.getList(EXPAND, String.class, List.of());
     }
 
     public static ModifiableArrayProperty conditionsProperty(
@@ -426,13 +479,25 @@ public final class DataTableUtils {
     }
 
     public static BaseValueProperty<?> rowObjectSchema(@Nullable DataTableInfo dataTableInfo) {
+        return rowObjectSchema(dataTableInfo, List.of());
+    }
+
+    public static BaseValueProperty<?> rowObjectSchema(
+        @Nullable DataTableInfo dataTableInfo, List<String> expandedColumnNames) {
+
         List<Property.ValueProperty<?>> properties = new ArrayList<>();
 
         properties.add(integer("id").label("ID"));
 
         if (dataTableInfo != null && dataTableInfo.columns() != null) {
             for (ColumnSpec columnSpec : dataTableInfo.columns()) {
-                properties.add(mapColumn(columnSpec));
+                if (columnSpec.type() == ColumnType.LINK && expandedColumnNames.contains(columnSpec.name())) {
+                    properties.add(
+                        object(columnSpec.name())
+                            .properties(integer(ID), string(EXTERNAL_ID), object(VALUES)));
+                } else {
+                    properties.add(mapColumn(columnSpec));
+                }
             }
         }
 
@@ -442,6 +507,13 @@ public final class DataTableUtils {
     public static Map<String, Object> createSampleOutput(
         @Nullable DataTableInfo dataTableInfo, long rowId, Map<String, Object> rowValues) {
 
+        return createSampleOutput(dataTableInfo, rowId, rowValues, List.of());
+    }
+
+    public static Map<String, Object> createSampleOutput(
+        @Nullable DataTableInfo dataTableInfo, long rowId, Map<String, Object> rowValues,
+        List<String> expandedColumnNames) {
+
         Map<String, Object> sampleOutput = new HashMap<>();
 
         sampleOutput.put("id", rowId);
@@ -450,6 +522,18 @@ public final class DataTableUtils {
             for (ColumnSpec columnSpec : dataTableInfo.columns()) {
                 String columnName = columnSpec.name();
                 Object value = rowValues.get(columnName);
+
+                if (columnSpec.type() == ColumnType.LINK && expandedColumnNames.contains(columnName)) {
+                    Map<String, Object> expandedSample = new HashMap<>();
+
+                    expandedSample.put(ID, 1L);
+                    expandedSample.put(EXTERNAL_ID, "sample value");
+                    expandedSample.put(VALUES, Map.of());
+
+                    sampleOutput.put(columnName, expandedSample);
+
+                    continue;
+                }
 
                 sampleOutput.put(
                     columnName, Objects.requireNonNullElseGet(value, () -> getSampleValue(columnSpec.type())));
@@ -468,7 +552,12 @@ public final class DataTableUtils {
         Map<String, Object> flattenedRow = new HashMap<>();
 
         flattenedRow.put("id", dataTableRow.id());
-        flattenedRow.putAll(dataTableRow.values());
+
+        for (Map.Entry<String, Object> entry : dataTableRow.values()
+            .entrySet()) {
+
+            flattenedRow.put(entry.getKey(), toOutputValue(entry.getValue()));
+        }
 
         return flattenedRow;
     }
@@ -541,6 +630,28 @@ public final class DataTableUtils {
         };
     }
 
+    private static Object toOutputValue(@Nullable Object value) {
+        if (!(value instanceof DataTableRow expandedRow)) {
+            return value;
+        }
+
+        Map<String, Object> expandedValues = new HashMap<>();
+
+        for (Map.Entry<String, Object> entry : expandedRow.values()
+            .entrySet()) {
+
+            expandedValues.put(entry.getKey(), toOutputValue(entry.getValue()));
+        }
+
+        Map<String, Object> expandedOutput = new HashMap<>();
+
+        expandedOutput.put(ID, expandedRow.id());
+        expandedOutput.put(EXTERNAL_ID, expandedRow.externalId());
+        expandedOutput.put(VALUES, expandedValues);
+
+        return expandedOutput;
+    }
+
     private static Object getSampleValue(ColumnType columnType) {
         return switch (columnType) {
             case STRING -> "sample value";
@@ -579,7 +690,7 @@ public final class DataTableUtils {
             case DATE -> date(name);
             case DATE_TIME -> dateTime(name);
             case BOOLEAN -> bool(name);
-            case LINK -> integer(name);
+            case LINK -> integer(name).description("Target row id, or {\"externalId\": \"...\"}");
         };
     }
 

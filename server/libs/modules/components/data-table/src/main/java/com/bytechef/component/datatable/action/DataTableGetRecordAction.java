@@ -78,7 +78,8 @@ public class DataTableGetRecordAction {
                     .options(DataTableUtils.getActionTableOptions(dataTableService, dataTableWorkspaceResolver)),
                 integer(ID)
                     .label("Record ID")
-                    .required(true))
+                    .required(true),
+                DataTableUtils.expandProperty(dataTableService, dataTableWorkspaceResolver))
             .output(this::output)
             .help("", "https://docs.bytechef.io/reference/components/data-table_v1#get-record")
             .perform(this::perform);
@@ -95,7 +96,9 @@ public class DataTableGetRecordAction {
         DataTableInfo dataTableInfo = DataTableUtils.resolveDataTable(
             dataTableService, workspaceId, name, DEVELOPMENT.ordinal());
 
-        var rowSchema = DataTableUtils.rowObjectSchema(dataTableInfo);
+        List<String> expand = DataTableUtils.getExpand(inputParameters);
+
+        var rowSchema = DataTableUtils.rowObjectSchema(dataTableInfo, expand);
 
         List<DataTableRow> rows = dataTableRowService.listRows(dataTableInfo.id(), 1, 0, DEVELOPMENT.ordinal());
 
@@ -106,7 +109,7 @@ public class DataTableGetRecordAction {
         DataTableRow firstRow = rows.getFirst();
 
         Map<String, Object> sampleOutput = DataTableUtils.createSampleOutput(
-            dataTableInfo, firstRow.id(), firstRow.values());
+            dataTableInfo, firstRow.id(), firstRow.values(), expand);
 
         return OutputResponse.of(rowSchema, sampleOutput);
     }
@@ -123,7 +126,10 @@ public class DataTableGetRecordAction {
             dataTableService, dataTableWorkspaceResolver, actionContext, name);
         long id = inputParameters.getRequiredLong(ID);
 
+        List<String> expand = DataTableUtils.getExpand(inputParameters);
+
         return DataTableUtils.flattenRow(
-            dataTableRowService.getRow(dataTableId, id, Objects.requireNonNull(actionContextAware.getEnvironmentId())));
+            dataTableRowService.getRow(
+                dataTableId, id, expand, Objects.requireNonNull(actionContextAware.getEnvironmentId())));
     }
 }

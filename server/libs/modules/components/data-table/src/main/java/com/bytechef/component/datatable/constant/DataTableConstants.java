@@ -35,6 +35,8 @@ public class DataTableConstants {
     public static final String OPERATION = "operation";
     public static final String VALUE = "value";
     public static final String VALUE_TO = "valueTo";
+    public static final String EXPAND = "expand";
+    public static final String EXTERNAL_ID = "externalId";
     public static final String SORT_COLUMN = "sortColumn";
     public static final String SORT_DIRECTION = "sortDirection";
 

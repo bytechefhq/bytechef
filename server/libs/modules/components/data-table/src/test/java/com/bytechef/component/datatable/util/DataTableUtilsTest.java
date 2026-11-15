@@ -32,7 +32,9 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ArrayProperty;
+import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -46,6 +48,8 @@ import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
+import com.bytechef.platform.data.table.domain.LinkDeleteRule;
+import com.bytechef.platform.data.table.domain.LinkSpec;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
@@ -109,6 +113,61 @@ class DataTableUtilsTest {
         assertEquals(
             List.of("name"),
             getOptionValues(optionsFunction.apply(inputParameters, null, null, "nam", actionContext)));
+    }
+
+    @Test
+    void testLinkColumnOptionsListOnlyLinkColumns() throws Exception {
+        ActionContextAware actionContext = mock(ActionContextAware.class);
+
+        when(actionContext.getWorkflowId()).thenReturn("workflow-1");
+        when(dataTableWorkspaceResolver.resolveByWorkflowId("workflow-1")).thenReturn(OptionalLong.of(7L));
+        when(dataTableService.fetchDataTable(7L, "orders")).thenReturn(Optional.of(new DataTable(1L, "orders")));
+        when(dataTableService.fetchDataTableInfo(1L, 0L)).thenReturn(
+            Optional.of(
+                new DataTableInfo(
+                    1L, "orders", 7L, null,
+                    List.of(
+                        new ColumnSpec("name", ColumnType.STRING),
+                        new ColumnSpec("customer", ColumnType.LINK, new LinkSpec(2L, LinkDeleteRule.BLOCK, "name")),
+                        new ColumnSpec("supplier", ColumnType.LINK, new LinkSpec(3L, LinkDeleteRule.BLOCK, "name"))),
+                    Instant.EPOCH)));
+
+        ActionDefinition.OptionsFunction<String> optionsFunction = DataTableUtils.getActionLinkColumnOptions(
+            dataTableService, dataTableWorkspaceResolver);
+
+        Parameters inputParameters = MockParametersFactory.create(Map.of("table", "orders"));
+
+        assertEquals(
+            List.of("customer", "supplier"),
+            getOptionValues(optionsFunction.apply(inputParameters, null, null, null, actionContext)));
+        assertEquals(
+            List.of("supplier"),
+            getOptionValues(optionsFunction.apply(inputParameters, null, null, "supp", actionContext)));
+    }
+
+    @Test
+    void testRowObjectSchemaDescribesExpandedLink() {
+        DataTableInfo dataTableInfo = new DataTableInfo(
+            1L, "orders", 7L, null,
+            List.of(
+                new ColumnSpec("customer", ColumnType.LINK, new LinkSpec(2L, LinkDeleteRule.BLOCK, "name")),
+                new ColumnSpec("supplier", ColumnType.LINK, new LinkSpec(3L, LinkDeleteRule.BLOCK, "name"))),
+            Instant.EPOCH);
+
+        ObjectProperty rowSchema = (ObjectProperty) DataTableUtils.rowObjectSchema(dataTableInfo, List.of("customer"));
+
+        List<? extends ValueProperty<?>> properties = rowSchema.getProperties();
+
+        ObjectProperty customerProperty = (ObjectProperty) properties.get(1);
+
+        assertEquals(
+            List.of("id", "externalId", "values"),
+            customerProperty.getProperties()
+                .stream()
+                .map(Property::getName)
+                .toList());
+        assertEquals(Property.Type.INTEGER, properties.get(2)
+            .getType());
     }
 
     @Test
