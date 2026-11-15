@@ -102,7 +102,7 @@ public class EmbeddedAiAutoMemoryFacadeImpl implements EmbeddedAiAutoMemoryFacad
         @AuditData(key = "principalType", value = "#principalType"),
         @AuditData(key = "principalId", value = "#principalId")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScopeInEnvironment('CONNECTED_USER_MANAGE', #environment)")
     public void deleteEmbeddedAiAutoMemory(
         Environment environment, AiAutoMemoryPrincipalType principalType, long principalId, long id) {
 
@@ -110,7 +110,7 @@ public class EmbeddedAiAutoMemoryFacadeImpl implements EmbeddedAiAutoMemoryFacad
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScopeInEnvironment('CONNECTED_USER_VIEW', #environment)")
     public List<EmbeddedAiAutoMemory> getEmbeddedAiAutoMemories(
         Environment environment, @Nullable Long connectedUserId, @Nullable AiAutoMemoryType memoryType) {
 
@@ -124,7 +124,7 @@ public class EmbeddedAiAutoMemoryFacadeImpl implements EmbeddedAiAutoMemoryFacad
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScopeInEnvironment('CONNECTED_USER_VIEW', #environment)")
     public List<EmbeddedAiAutoMemoryConnectedUser> getEmbeddedAiAutoMemoryConnectedUsers(Environment environment) {
         List<EmbeddedAiAutoMemory> embeddedAiAutoMemories = toEmbeddedAiAutoMemories(
             listEmbeddedMemories(environment, null));
@@ -160,7 +160,7 @@ public class EmbeddedAiAutoMemoryFacadeImpl implements EmbeddedAiAutoMemoryFacad
         @AuditData(key = "principalType", value = "#principalType"),
         @AuditData(key = "principalId", value = "#principalId")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScopeInEnvironment('CONNECTED_USER_MANAGE', #environment)")
     public EmbeddedAiAutoMemory updateEmbeddedAiAutoMemory(
         Environment environment, AiAutoMemoryPrincipalType principalType, long principalId, long id,
         long expectedVersion, AiAutoMemoryPatch patch) {

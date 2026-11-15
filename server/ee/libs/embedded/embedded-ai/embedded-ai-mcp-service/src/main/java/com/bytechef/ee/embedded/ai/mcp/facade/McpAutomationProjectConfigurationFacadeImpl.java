@@ -93,7 +93,7 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
             @AuditData(key = "automationProjectConfigurationId", value = "#automationProjectConfigurationId"),
             @AuditData(key = "workflowUuids", value = "#workflowUuids")
         })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpAutomationProjectConfiguration createMcpAutomationProjectConfiguration(
         long mcpServerId, long automationProjectConfigurationId, List<String> workflowUuids,
         List<McpAutomationWorkflowConfigurationDTO> workflowConfigurations) {
@@ -137,7 +137,7 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
         event = McpAutomationProjectConfigurationAuditEvents.MCP_AUTOMATION_PROJECT_CONFIGURATION_DELETED, data = {
             @AuditData(key = "mcpAutomationProjectConfigurationId", value = "#id")
         })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('MCP_EDIT')")
     public void deleteMcpAutomationProjectConfiguration(long id) {
         getMcpAutomationProjectConfigurationOrThrow(id);
 
@@ -150,7 +150,7 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
         data = {
             @AuditData(key = "mcpAutomationProjectConfigurationWorkflowId", value = "#id")
         })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('MCP_EDIT')")
     public void deleteMcpAutomationProjectConfigurationWorkflow(long id) {
         mcpAutomationProjectConfigurationWorkflowService.fetch(id)
             .orElseThrow(
@@ -166,7 +166,7 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
             @AuditData(key = "mcpServerId", value = "#result?.mcpServerId"),
             @AuditData(key = "workflowUuids", value = "#workflowUuids")
         })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('MCP_EDIT')")
     public McpAutomationProjectConfiguration updateMcpAutomationProjectConfiguration(
         long id, List<String> workflowUuids, List<McpAutomationWorkflowConfigurationDTO> workflowConfigurations) {
 
@@ -230,7 +230,7 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('MCP_VIEW')")
     @Transactional(readOnly = true)
     public Optional<Workflow> fetchMcpAutomationProjectConfigurationWorkflowPinnedWorkflow(
         long mcpAutomationProjectConfigurationWorkflowId) {
@@ -258,7 +258,7 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('MCP_VIEW')")
     @Transactional(readOnly = true)
     public Optional<Workflow> fetchAutomationProjectConfigurationToolWorkflow(
         long automationProjectConfigurationId, String workflowUuid) {
@@ -271,14 +271,14 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('MCP_VIEW')")
     @Transactional(readOnly = true)
     public McpAutomationProjectConfigurationDTO getMcpAutomationProjectConfiguration(long id) {
         return toDTO(getMcpAutomationProjectConfigurationOrThrow(id));
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_VIEW')")
     @Transactional(readOnly = true)
     public List<McpAutomationProjectConfigurationDTO> getMcpServerMcpAutomationProjectConfigurations(
         long mcpServerId) {
@@ -295,7 +295,7 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('MCP_VIEW')")
     @Transactional(readOnly = true)
     public List<String> getToolWorkflowUuids(long automationProjectConfigurationId) {
         AutomationProjectConfiguration automationProjectConfiguration =
@@ -325,7 +325,7 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
                 key = "mcpAutomationProjectConfigurationId", value = "#result?.mcpAutomationProjectConfigurationId"),
             @AuditData(key = "enabled", value = "#enabled")
         })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('MCP_EDIT')")
     public McpAutomationProjectConfigurationWorkflow updateMcpAutomationProjectConfigurationWorkflowEnabled(
         long id, boolean enabled) {
 
@@ -340,7 +340,7 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
             @AuditData(
                 key = "mcpAutomationProjectConfigurationId", value = "#result?.mcpAutomationProjectConfigurationId")
         })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('MCP_EDIT')")
     public McpAutomationProjectConfigurationWorkflow updateMcpAutomationProjectConfigurationWorkflowParameters(
         long id, Map<String, ?> parameters) {
 

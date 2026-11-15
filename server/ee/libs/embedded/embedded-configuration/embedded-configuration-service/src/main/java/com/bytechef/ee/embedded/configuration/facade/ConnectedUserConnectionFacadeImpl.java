@@ -133,7 +133,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         @AuditData(key = "name", value = "#connectionDTO.name"),
         @AuditData(key = "componentName", value = "#connectionDTO.componentName")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_MANAGE')")
     public long createConnectedUserConnectionAsAdmin(long connectedUserId, ConnectionDTO connectionDTO) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
 
@@ -194,7 +194,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')")
     public List<ConnectionDTO> getConnectedUserConnectionsForAdmin(
         long connectedUserId, @Nullable String componentName, List<Long> connectionIds) {
 
@@ -269,7 +269,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         @AuditData(key = "connectionId", value = "#connectionId"),
         @AuditData(key = "connectedUserId", value = "#connectedUserId")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_MANAGE')")
     public void updateConnectedUserConnectionCredentials(
         long connectedUserId, long connectionId, Map<String, ?> parameters, int version) {
 
@@ -295,7 +295,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_MANAGE')")
     public void updateIntegrationInstanceConnectionCredentials(
         long connectedUserId, long connectionId, Map<String, ?> parameters, int version) {
 

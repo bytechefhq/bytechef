@@ -338,7 +338,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('EXECUTION_VIEW')")
     @Transactional(readOnly = true)
     public List<WorkflowExecutionDTO> getWorkflowExecutions(List<Long> jobIds) {
         if (jobIds.isEmpty()) {
@@ -349,7 +349,11 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("#connectedUserId != null ? "
+        + "(hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) and "
+        + "hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')) : "
+        + "(hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) and "
+        + "hasEmbeddedScopeInEnvironmentId('CONNECTED_USER_VIEW', #environmentId))")
     @Transactional(readOnly = true)
     public @Nullable WorkflowExecutionScopeDTO getWorkflowExecutionScope(
         @Nullable Long environmentId, @Nullable Long connectedUserId) {
