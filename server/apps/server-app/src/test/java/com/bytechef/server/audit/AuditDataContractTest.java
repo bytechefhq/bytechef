@@ -182,6 +182,7 @@ class AuditDataContractTest {
         Map.entry("ProjectWorkflowFacadeImpl.updateWorkflow", DEFINITION_EDIT),
         Map.entry("TriggerLogFileStorageImpl.deleteLogEntries", EXECUTION_LOGS),
         Map.entry("TriggerLogFileStorageImpl.logsExist", EXISTENCE_CHECK),
+        Map.entry("WorkflowNodeOutputFacadeImpl.checkWorkflowCache", EDITOR_TEST_DATA),
         Map.entry("WorkspaceApiKeyFacadeImpl.create", DELEGATES),
         Map.entry("WorkspaceApiKeyFacadeImpl.delete", DELEGATES),
         Map.entry("WorkspaceConnectionFacadeImpl.updateConnectionTags", TAGS),
