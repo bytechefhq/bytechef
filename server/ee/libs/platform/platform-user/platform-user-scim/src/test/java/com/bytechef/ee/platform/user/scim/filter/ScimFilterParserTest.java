@@ -58,6 +58,13 @@ class ScimFilterParserTest {
     }
 
     @Test
+    void testParseAcceptsADottedAttributePath() {
+        ScimFilter scimFilter = ScimFilterParser.parse("emails.value eq \"john@example.com\"");
+
+        assertThat(scimFilter).isEqualTo(new ScimFilter("emails.value", "john@example.com"));
+    }
+
+    @Test
     void testParseAcceptsEmptyQuotedValue() {
         ScimFilter scimFilter = ScimFilterParser.parse("userName eq \"\"");
 
@@ -71,7 +78,6 @@ class ScimFilterParserTest {
         "userName pr",
         "userName eq john",
         "userName eq \"john\" and active eq \"true\"",
-        "emails.value eq \"john@example.com\"",
         "emails[type eq \"work\"].value eq \"john@example.com\"",
         "eq \"john\"",
         "userName eq \"jo\"hn\""

@@ -7,20 +7,20 @@
 
 package com.bytechef.ee.security.sso.oauth2;
 
+import com.bytechef.security.web.oauth2.OAuth2AuthenticationFailureHandler;
 import com.bytechef.tenant.constant.TenantConstants;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
-public class SsoOAuth2AuthenticationFailureHandler implements AuthenticationFailureHandler {
+public class SsoOAuth2AuthenticationFailureHandler extends OAuth2AuthenticationFailureHandler {
 
     @Override
     public void onAuthenticationFailure(
@@ -31,6 +31,6 @@ public class SsoOAuth2AuthenticationFailureHandler implements AuthenticationFail
 
         session.removeAttribute(TenantConstants.CURRENT_TENANT_ID);
 
-        response.sendRedirect("/login?error=oauth2");
+        super.onAuthenticationFailure(request, response, exception);
     }
 }

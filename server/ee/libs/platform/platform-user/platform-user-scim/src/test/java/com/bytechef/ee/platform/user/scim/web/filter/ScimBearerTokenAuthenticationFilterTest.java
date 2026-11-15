@@ -12,12 +12,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.platform.user.domain.IdentityProvider;
+import com.bytechef.ee.platform.user.domain.ScimApiKey;
 import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
@@ -25,8 +25,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import org.json.JSONArray;
@@ -38,16 +36,19 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 
 /**
  * @version ee
+ *
+ * @author Ivica Cardic
  */
 class ScimBearerTokenAuthenticationFilterTest {
 
-    private static final String API_KEY = "scim-api-key";
+    private static final String API_KEY = "bcscim_000007_scim-api-key";
     private static final String SCIM_USERS_URI = "/api/scim/v2/Users";
 
     private final IdentityProviderService identityProviderService = mock(IdentityProviderService.class);
@@ -61,6 +62,18 @@ class ScimBearerTokenAuthenticationFilterTest {
     void afterEach() {
         SecurityContextHolder.clearContext();
         TenantContext.resetCurrentTenantId();
+    }
+
+    @Test
+    void testTokenFormat() {
+        String scimApiKey = ScimApiKey.generate("000004");
+
+        assertThat(scimApiKey).startsWith("bcscim_000004_");
+        assertThat(ScimApiKey.tenantIdOf(scimApiKey)).contains("000004");
+        assertThat(ScimApiKey.hash(scimApiKey)).hasSize(64)
+            .isNotEqualTo(scimApiKey);
+        assertThat(ScimApiKey.tenantIdOf("not-a-scim-token")).isEmpty();
+        assertThat(ScimApiKey.tenantIdOf("bcscim__secret")).isEmpty();
     }
 
     @Test
@@ -117,16 +130,28 @@ class ScimBearerTokenAuthenticationFilterTest {
 
         scimBearerTokenAuthenticationFilter.doFilter(request, response, filterChain);
 
-        assertUnauthorized("Empty Bearer token");
+        assertUnauthorized("Invalid SCIM API key");
         assertThat(filterChain.getRequest()).isNull();
 
-        verifyNoInteractions(identityProviderService, tenantService);
+        verifyNoInteractions(identityProviderService);
     }
 
     @Test
-    void testUnknownApiKeyIsRejectedAfterCheckingEveryTenant() throws Exception {
-        when(tenantService.getTenantIds()).thenReturn(List.of("000001", "000002"));
-        when(identityProviderService.fetchByScimApiKey(API_KEY)).thenReturn(Optional.empty());
+    void testTokenWithoutTenantIsRejectedWithoutLookup() throws Exception {
+        MockFilterChain filterChain = new MockFilterChain();
+
+        scimBearerTokenAuthenticationFilter.doFilter(
+            createScimRequest("Bearer scim-api-key"), response, filterChain);
+
+        assertUnauthorized("Invalid SCIM API key");
+        assertThat(filterChain.getRequest()).isNull();
+
+        verifyNoInteractions(identityProviderService);
+    }
+
+    @Test
+    void testTokenOfAnotherTenantModeIsRejectedWithoutLookup() throws Exception {
+        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
 
         MockFilterChain filterChain = new MockFilterChain();
 
@@ -135,36 +160,33 @@ class ScimBearerTokenAuthenticationFilterTest {
         assertUnauthorized("Invalid SCIM API key");
         assertThat(filterChain.getRequest()).isNull();
 
-        verify(identityProviderService, times(2)).fetchByScimApiKey(API_KEY);
+        verify(identityProviderService, never()).fetchByScimApiKey(anyString());
     }
 
     @Test
-    void testApiKeyIsLookedUpWithinEachTenantContext() throws Exception {
-        List<String> lookupTenantIds = new ArrayList<>();
+    void testUnknownApiKeyIsRejectedAfterOneLookupInItsTenant() throws Exception {
+        AtomicReference<String> lookupTenantId = new AtomicReference<>();
 
-        when(tenantService.getTenantIds()).thenReturn(List.of("000001", "000002", "000003"));
+        when(tenantService.isMultiTenantEnabled()).thenReturn(true);
         when(identityProviderService.fetchByScimApiKey(API_KEY)).thenAnswer(invocation -> {
-            String currentTenantId = TenantContext.getCurrentTenantId();
-
-            lookupTenantIds.add(currentTenantId);
-
-            if (currentTenantId.equals("000002")) {
-                return Optional.of(createIdentityProvider(5L, "Okta"));
-            }
+            lookupTenantId.set(TenantContext.getCurrentTenantId());
 
             return Optional.empty();
         });
 
-        scimBearerTokenAuthenticationFilter.doFilter(
-            createScimRequest("Bearer " + API_KEY), response, new MockFilterChain());
+        MockFilterChain filterChain = new MockFilterChain();
 
-        assertThat(lookupTenantIds).containsExactly("000001", "000002");
-        assertThat(response.getStatus()).isEqualTo(200);
+        scimBearerTokenAuthenticationFilter.doFilter(createScimRequest("Bearer " + API_KEY), response, filterChain);
+
+        assertUnauthorized("Invalid SCIM API key");
+        assertThat(filterChain.getRequest()).isNull();
+        assertThat(lookupTenantId.get()).isEqualTo("000007");
+        assertThat(TenantContext.getCurrentTenantId()).isEqualTo(TenantContext.DEFAULT_TENANT_ID);
     }
 
     @Test
     void testValidApiKeyRunsChainInTenantAndScimSecurityContext() throws Exception {
-        when(tenantService.getTenantIds()).thenReturn(List.of("000007"));
+        when(tenantService.isMultiTenantEnabled()).thenReturn(true);
         when(identityProviderService.fetchByScimApiKey(API_KEY))
             .thenReturn(Optional.of(createIdentityProvider(5L, "Okta")));
 
@@ -188,7 +210,26 @@ class ScimBearerTokenAuthenticationFilterTest {
         assertThat(authentication.isAuthenticated()).isTrue();
         assertThat(authentication.getPrincipal()).isEqualTo("scim:Okta (5)");
         assertThat(authentication.getCredentials()).isNull();
-        assertThat(authentication.getAuthorities()).isEmpty();
+        assertThat(authentication.getAuthorities()).extracting(GrantedAuthority::getAuthority)
+            .containsExactly("ROLE_SCIM");
+        assertThat(response.getStatus()).isEqualTo(200);
+    }
+
+    @Test
+    void testSingleTenantApiKeyRunsChainInTheDefaultTenant() throws Exception {
+        String apiKey = "bcscim_" + TenantContext.DEFAULT_TENANT_ID + "_scim-api-key";
+
+        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
+        when(identityProviderService.fetchByScimApiKey(apiKey))
+            .thenReturn(Optional.of(createIdentityProvider(5L, "Okta")));
+
+        AtomicReference<String> chainTenantId = new AtomicReference<>();
+
+        scimBearerTokenAuthenticationFilter.doFilter(
+            createScimRequest("Bearer " + apiKey), response,
+            (servletRequest, servletResponse) -> chainTenantId.set(TenantContext.getCurrentTenantId()));
+
+        assertThat(chainTenantId.get()).isEqualTo(TenantContext.DEFAULT_TENANT_ID);
         assertThat(response.getStatus()).isEqualTo(200);
     }
 
@@ -199,7 +240,7 @@ class ScimBearerTokenAuthenticationFilterTest {
 
         SecurityContextHolder.setContext(previousSecurityContext);
 
-        when(tenantService.getTenantIds()).thenReturn(List.of("000007"));
+        when(tenantService.isMultiTenantEnabled()).thenReturn(true);
         when(identityProviderService.fetchByScimApiKey(API_KEY))
             .thenReturn(Optional.of(createIdentityProvider(5L, "Okta")));
 
@@ -217,7 +258,7 @@ class ScimBearerTokenAuthenticationFilterTest {
 
         SecurityContextHolder.setContext(previousSecurityContext);
 
-        when(tenantService.getTenantIds()).thenReturn(List.of("000007"));
+        when(tenantService.isMultiTenantEnabled()).thenReturn(true);
         when(identityProviderService.fetchByScimApiKey(API_KEY))
             .thenReturn(Optional.of(createIdentityProvider(5L, "Okta")));
 
@@ -247,7 +288,7 @@ class ScimBearerTokenAuthenticationFilterTest {
     void testLongIdentityProviderNameIsTruncatedInPrincipal() throws Exception {
         String longName = "A".repeat(80);
 
-        when(tenantService.getTenantIds()).thenReturn(List.of("000007"));
+        when(tenantService.isMultiTenantEnabled()).thenReturn(true);
         when(identityProviderService.fetchByScimApiKey(API_KEY))
             .thenReturn(Optional.of(createIdentityProvider(123L, longName)));
 
@@ -260,25 +301,13 @@ class ScimBearerTokenAuthenticationFilterTest {
 
     @Test
     void testMissingIdentityProviderNameProducesPrincipalWithIdOnly() throws Exception {
-        when(tenantService.getTenantIds()).thenReturn(List.of("000007"));
+        when(tenantService.isMultiTenantEnabled()).thenReturn(true);
         when(identityProviderService.fetchByScimApiKey(API_KEY))
             .thenReturn(Optional.of(createIdentityProvider(9L, null)));
 
         String principal = filterAndCapturePrincipal();
 
         assertThat(principal).isEqualTo("scim: (9)");
-    }
-
-    @Test
-    void testNoTenantsMeansApiKeyIsRejected() throws Exception {
-        when(tenantService.getTenantIds()).thenReturn(List.of());
-
-        scimBearerTokenAuthenticationFilter.doFilter(
-            createScimRequest("Bearer " + API_KEY), response, new MockFilterChain());
-
-        assertUnauthorized("Invalid SCIM API key");
-
-        verify(identityProviderService, never()).fetchByScimApiKey(anyString());
     }
 
     private void assertUnauthorized(String expectedDetail) throws Exception {
@@ -325,7 +354,7 @@ class ScimBearerTokenAuthenticationFilterTest {
 
         identityProvider.setId(id);
         identityProvider.setName(name);
-        identityProvider.setScimApiKey(API_KEY);
+        identityProvider.setScimApiKey(ScimApiKey.hash(API_KEY));
 
         return identityProvider;
     }

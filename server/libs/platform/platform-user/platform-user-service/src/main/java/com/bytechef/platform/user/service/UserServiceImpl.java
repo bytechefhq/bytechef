@@ -617,6 +617,8 @@ public class UserServiceImpl implements UserService {
 
                 this.clearUserCaches(user);
 
+                revokePersistentTokensIfDeactivated(user);
+
                 log.debug("Changed Information for User: {}", user);
 
                 return user;
@@ -696,6 +698,8 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
 
         clearUserCaches(savedUser);
+
+        revokePersistentTokensIfDeactivated(savedUser);
     }
 
     @Override
@@ -768,6 +772,12 @@ public class UserServiceImpl implements UserService {
         }
 
         workspaceMembershipAssigner.removeMemberships(userId);
+    }
+
+    private void revokePersistentTokensIfDeactivated(User user) {
+        if (!user.isActivated() && user.getId() != null) {
+            persistentTokenRepository.deleteAll(persistentTokenRepository.findAllByUserId(user.getId()));
+        }
     }
 
     private void clearUserCaches(User user) {

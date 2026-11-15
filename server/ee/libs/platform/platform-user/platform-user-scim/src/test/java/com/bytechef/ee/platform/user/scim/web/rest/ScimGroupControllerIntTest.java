@@ -45,7 +45,9 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
  */
 @AutoConfigureMockMvc(addFilters = false)
 @ContextConfiguration(classes = ScimRestTestConfiguration.class)
-@WebMvcTest(controllers = ScimGroupController.class, properties = "bytechef.edition=ee")
+@WebMvcTest(controllers = ScimGroupController.class, properties = {
+    "bytechef.edition=ee", "bytechef.security.sso.enabled=true"
+})
 class ScimGroupControllerIntTest {
 
     private static final String ERROR_SCHEMA = "urn:ietf:params:scim:api:messages:2.0:Error";

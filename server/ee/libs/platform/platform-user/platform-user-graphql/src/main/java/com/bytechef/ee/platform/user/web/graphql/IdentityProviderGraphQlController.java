@@ -10,8 +10,10 @@ package com.bytechef.ee.platform.user.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.platform.user.domain.IdentityProvider;
 import com.bytechef.ee.platform.user.domain.IdentityProviderDomain;
+import com.bytechef.ee.platform.user.domain.IdentityProviderRegistrationId;
 import com.bytechef.ee.platform.user.facade.IdentityProviderFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.user.constant.UserConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Set;
@@ -42,10 +44,7 @@ public class IdentityProviderGraphQlController {
 
     @MutationMapping(name = "createIdentityProvider")
     public IdentityProviderDTO createIdentityProvider(@Argument IdentityProviderInput input) {
-        if (input.clientSecret() == null || input.clientSecret()
-            .isEmpty()) {
-            throw new IllegalArgumentException("clientSecret is required when creating an identity provider");
-        }
+        validateRequiredFields(input);
 
         IdentityProvider identityProvider = toIdentityProvider(input);
 
@@ -57,6 +56,11 @@ public class IdentityProviderGraphQlController {
         identityProviderFacade.delete(id);
 
         return true;
+    }
+
+    @MutationMapping(name = "generateIdentityProviderScimApiKey")
+    public String generateIdentityProviderScimApiKey(@Argument Long id) {
+        return identityProviderFacade.generateScimApiKey(id);
     }
 
     @QueryMapping(name = "identityProvider")
@@ -79,6 +83,25 @@ public class IdentityProviderGraphQlController {
         identityProvider.setId(id);
 
         return toDTO(identityProviderFacade.update(identityProvider));
+    }
+
+    private static void validateRequiredFields(IdentityProviderInput input) {
+        if (UserConstants.AUTH_PROVIDER_SAML.equals(input.type())) {
+            if (isBlank(input.metadataUri())) {
+                throw new IllegalArgumentException("metadataUri is required for a SAML identity provider");
+            }
+
+            return;
+        }
+
+        if (isBlank(input.issuerUri()) || isBlank(input.clientId()) || isBlank(input.clientSecret())) {
+            throw new IllegalArgumentException(
+                "issuerUri, clientId and clientSecret are required for an OIDC identity provider");
+        }
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 
     private IdentityProviderDTO toDTO(IdentityProvider identityProvider) {
@@ -113,6 +136,9 @@ public class IdentityProviderGraphQlController {
             identityProvider.isMfaRequired(),
             identityProvider.getName(),
             identityProvider.getNameIdFormat(),
+            IdentityProviderRegistrationId.of(identityProvider)
+                .value(),
+            identityProvider.getScimApiKey() != null,
             identityProvider.getScopes(),
             identityProvider.getSigningCertificate(),
             identityProvider.getType());
@@ -191,7 +217,8 @@ public class IdentityProviderGraphQlController {
         boolean autoProvision, String clientId, String createdBy, Long createdDate, String defaultAuthority,
         List<String> domains, boolean enabled, boolean enforced, Long id, String issuerUri, String lastModifiedBy,
         Long lastModifiedDate, String metadataUri, String mfaMethod, boolean mfaRequired, String name,
-        String nameIdFormat, String scopes, String signingCertificate, String type) {
+        String nameIdFormat, String registrationId, boolean scimEnabled, String scopes, String signingCertificate,
+        String type) {
     }
 
     record IdentityProviderInput(

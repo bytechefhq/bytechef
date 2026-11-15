@@ -17,17 +17,14 @@
 package com.bytechef.tenant.single.security.web.authentication;
 
 import com.bytechef.platform.security.web.config.TwoFactorAuthenticationCustomizer;
-import com.bytechef.security.web.authentication.TwoFactorAuthentication;
+import com.bytechef.security.web.authentication.TwoFactorAuthenticationSupport;
 import com.bytechef.tenant.annotation.ConditionalOnSingleTenant;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Component;
 
 /**
@@ -55,11 +52,7 @@ public class SingleTenantAuthenticationSuccessHandler implements AuthenticationS
         if (twoFactorAuthenticationCustomizer != null &&
             twoFactorAuthenticationCustomizer.isTotpEnabled(authentication)) {
 
-            SecurityContext securityContext = SecurityContextHolder.getContext();
-
-            securityContext.setAuthentication(new TwoFactorAuthentication(authentication));
-
-            new HttpSessionSecurityContextRepository().saveContext(securityContext, request, response);
+            TwoFactorAuthenticationSupport.beginSecondFactor(request, response, authentication);
 
             response.setStatus(HttpStatus.ACCEPTED.value());
         } else {

@@ -16,6 +16,7 @@ public final class IdentityProviderAuditEvents {
 
     public static final String IDENTITY_PROVIDER_CREATED = "IDENTITY_PROVIDER_CREATED";
     public static final String IDENTITY_PROVIDER_DELETED = "IDENTITY_PROVIDER_DELETED";
+    public static final String IDENTITY_PROVIDER_SCIM_API_KEY_GENERATED = "IDENTITY_PROVIDER_SCIM_API_KEY_GENERATED";
     public static final String IDENTITY_PROVIDER_UPDATED = "IDENTITY_PROVIDER_UPDATED";
 
     private IdentityProviderAuditEvents() {

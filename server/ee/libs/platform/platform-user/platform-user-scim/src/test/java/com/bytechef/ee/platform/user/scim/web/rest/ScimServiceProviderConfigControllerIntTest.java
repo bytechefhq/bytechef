@@ -28,7 +28,9 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
  */
 @AutoConfigureMockMvc(addFilters = false)
 @ContextConfiguration(classes = ScimRestTestConfiguration.class)
-@WebMvcTest(controllers = ScimServiceProviderConfigController.class, properties = "bytechef.edition=ee")
+@WebMvcTest(controllers = ScimServiceProviderConfigController.class, properties = {
+    "bytechef.edition=ee", "bytechef.security.sso.enabled=true"
+})
 class ScimServiceProviderConfigControllerIntTest {
 
     private static final String GROUP_SCHEMA = "urn:ietf:params:scim:schemas:core:2.0:Group";
@@ -110,7 +112,7 @@ class ScimServiceProviderConfigControllerIntTest {
     }
 
     @Test
-    void testGetSchemasListsTheUserAndGroupSchemasAsJson() {
+    void testGetSchemasListsTheUserAndGroupSchemasAsScimJson() {
         webTestClient
             .get()
             .uri("/api/scim/v2/Schemas")
@@ -118,7 +120,7 @@ class ScimServiceProviderConfigControllerIntTest {
             .expectStatus()
             .isOk()
             .expectHeader()
-            .contentTypeCompatibleWith(MediaType.APPLICATION_JSON)
+            .contentTypeCompatibleWith(SCIM_JSON)
             .expectBody()
             .jsonPath("$.totalResults")
             .isEqualTo(2)

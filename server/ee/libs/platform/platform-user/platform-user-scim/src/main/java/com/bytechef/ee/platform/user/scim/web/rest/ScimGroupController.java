@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.platform.user.scim.web.rest;
 
-import com.bytechef.ee.platform.user.scim.exception.ScimBadRequestException;
+import com.bytechef.ee.platform.user.scim.ScimConstants;
 import com.bytechef.ee.platform.user.scim.facade.ScimGroupFacade;
 import com.bytechef.ee.platform.user.scim.filter.ScimFilterParser;
 import com.bytechef.ee.platform.user.scim.filter.ScimFilterParser.ScimFilter;
@@ -24,10 +24,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,7 +49,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(path = "/api/scim/v2/Groups", produces = "application/scim+json")
 @ConditionalOnEEVersion
-class ScimGroupController {
+@ConditionalOnProperty(prefix = "bytechef.security.sso", name = "enabled", havingValue = "true")
+@PreAuthorize("hasAuthority(\"" + ScimConstants.SCIM_AUTHORITY + "\")")
+class ScimGroupController extends AbstractScimController {
 
     private final AuthorityService authorityService;
     private final ScimGroupFacade scimGroupFacade;
@@ -149,11 +152,6 @@ class ScimGroupController {
 
         return ResponseEntity.noContent()
             .build();
-    }
-
-    @ExceptionHandler(ScimBadRequestException.class)
-    ResponseEntity<Object> handleScimBadRequestException(ScimBadRequestException scimBadRequestException) {
-        return ScimErrors.badRequest(scimBadRequestException);
     }
 
     private Map<String, Object> notFoundError(String resourceType, String id) {

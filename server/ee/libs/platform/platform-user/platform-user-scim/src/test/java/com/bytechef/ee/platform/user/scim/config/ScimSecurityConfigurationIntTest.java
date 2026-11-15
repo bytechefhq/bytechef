@@ -90,10 +90,10 @@ import org.springframework.web.cors.CorsConfigurationSource;
 class ScimSecurityConfigurationIntTest {
 
     private static final String[] ENABLING_PROPERTIES = {
-        "bytechef.edition=ee", "bytechef.security.sso.enabled=true", "bytechef.tenant.mode=multi"
+        "bytechef.edition=ee", "bytechef.security.sso.enabled=true"
     };
     private static final MediaType SCIM_JSON = MediaType.parseMediaType("application/scim+json");
-    private static final String SCIM_API_KEY = "scim-api-key-value";
+    private static final String SCIM_API_KEY = "bcscim_000001_scim-api-key-value";
     private static final String SCIM_USERS_PATH = "/api/scim/v2/Users";
     private static final String TENANT_ID = "000001";
 
@@ -131,14 +131,14 @@ class ScimSecurityConfigurationIntTest {
         identityProvider.setId(5L);
         identityProvider.setName("Okta");
 
-        when(tenantService.getTenantIds()).thenReturn(List.of(TenantContext.DEFAULT_TENANT_ID, TENANT_ID));
+        when(tenantService.isMultiTenantEnabled()).thenReturn(true);
         when(identityProviderService.fetchByScimApiKey(SCIM_API_KEY))
             .thenAnswer(invocation -> TENANT_ID.equals(TenantContext.getCurrentTenantId())
                 ? Optional.of(identityProvider) : Optional.empty());
     }
 
     @Test
-    void testConfigurationIsActiveOnlyForEnterpriseMultiTenantSso() {
+    void testConfigurationIsActiveOnlyForEnterpriseSso() {
         ApplicationContextRunner applicationContextRunner = new ApplicationContextRunner()
             .withUserConfiguration(ScimSecurityConfiguration.class)
             .withBean(IdentityProviderService.class, () -> mock(IdentityProviderService.class))

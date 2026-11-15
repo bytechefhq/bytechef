@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.platform.user.scim.web.rest;
 
-import com.bytechef.ee.platform.user.scim.exception.ScimBadRequestException;
+import com.bytechef.ee.platform.user.scim.ScimConstants;
 import com.bytechef.ee.platform.user.scim.facade.ScimUserFacade;
 import com.bytechef.ee.platform.user.scim.filter.ScimFilterParser;
 import com.bytechef.ee.platform.user.scim.filter.ScimFilterParser.ScimFilter;
@@ -25,10 +25,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,9 +53,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(path = "/api/scim/v2/Users", produces = "application/scim+json")
 @ConditionalOnEEVersion
-class ScimUserController {
+@ConditionalOnProperty(prefix = "bytechef.security.sso", name = "enabled", havingValue = "true")
+@PreAuthorize("hasAuthority(\"" + ScimConstants.SCIM_AUTHORITY + "\")")
+class ScimUserController extends AbstractScimController {
 
+    private static final String EMAILS = "emails";
+    private static final String EMAILS_VALUE = "emails.value";
     private static final String EXTERNAL_ID = "externalId";
+    private static final String ID = "id";
     private static final String USER_NAME = "userName";
 
     private final ScimUserFacade scimUserFacade;
@@ -92,6 +99,17 @@ class ScimUserController {
                     .toList();
             } else if (EXTERNAL_ID.equalsIgnoreCase(scimFilter.attributeName())) {
                 users = userService.getUsersByExternalId(scimFilter.value());
+            } else if (EMAILS.equalsIgnoreCase(scimFilter.attributeName()) ||
+                EMAILS_VALUE.equalsIgnoreCase(scimFilter.attributeName())) {
+
+                Optional<User> user = userService.fetchUserByEmail(scimFilter.value());
+
+                users = user.stream()
+                    .toList();
+            } else if (ID.equalsIgnoreCase(scimFilter.attributeName())) {
+                users = parseId(scimFilter.value()).flatMap(userService::fetchUser)
+                    .stream()
+                    .toList();
             } else {
                 return ScimErrors.invalidFilter(filter);
             }
@@ -196,11 +214,6 @@ class ScimUserController {
             .build();
     }
 
-    @ExceptionHandler(ScimBadRequestException.class)
-    ResponseEntity<Object> handleScimBadRequestException(ScimBadRequestException scimBadRequestException) {
-        return ScimErrors.badRequest(scimBadRequestException);
-    }
-
     @ExceptionHandler(DuplicateKeyException.class)
     ResponseEntity<Object> handleDuplicateKeyException() {
         return ScimErrors.uniqueness("A user with the same userName or email already exists");
@@ -211,6 +224,14 @@ class ScimUserController {
             "schemas", List.of("urn:ietf:params:scim:api:messages:2.0:Error"),
             "detail", resourceType + " " + id + " not found",
             "status", "404");
+    }
+
+    private static Optional<Long> parseId(String value) {
+        try {
+            return Optional.of(Long.parseLong(value));
+        } catch (NumberFormatException numberFormatException) {
+            return Optional.empty();
+        }
     }
 
     private ScimUser toScimUser(User user) {

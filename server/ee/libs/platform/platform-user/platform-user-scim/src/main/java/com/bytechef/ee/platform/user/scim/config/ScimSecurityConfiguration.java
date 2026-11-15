@@ -7,12 +7,12 @@
 
 package com.bytechef.ee.platform.user.scim.config;
 
+import com.bytechef.ee.platform.user.scim.ScimConstants;
 import com.bytechef.ee.platform.user.scim.web.filter.ScimBearerTokenAuthenticationFilter;
 import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
-import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import com.bytechef.tenant.service.TenantService;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -22,8 +22,9 @@ import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
 /**
- * Security configuration for the SCIM 2.0 module. Registers the Bearer token authentication filter and contributes SCIM
- * paths to the permit-all list.
+ * Secures the SCIM API with the identity provider's bearer token, in both tenant modes, and lets SCIM requests past the
+ * URL rules so the controllers' {@code ROLE_SCIM} check decides. SCIM tokens belong to identity provider records, so
+ * the API is available exactly when SSO is.
  *
  * @version ee
  *
@@ -31,7 +32,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
  */
 @Configuration
 @ConditionalOnEEVersion
-@ConditionalOnMultiTenant
 @ConditionalOnProperty(prefix = "bytechef.security.sso", name = "enabled", havingValue = "true")
 class ScimSecurityConfiguration {
 
@@ -41,7 +41,7 @@ class ScimSecurityConfiguration {
 
             @Override
             public List<String> getApiPermitAllRequestMatcherPaths() {
-                return List.of(ScimHttpConfigurer.SCIM_PATH_PATTERN);
+                return List.of(ScimConstants.PATH_PATTERN);
             }
         };
     }

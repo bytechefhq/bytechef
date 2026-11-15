@@ -7,9 +7,12 @@
 
 package com.bytechef.ee.platform.user.scim.web.rest;
 
+import com.bytechef.ee.platform.user.scim.ScimConstants;
 import com.bytechef.ee.platform.user.scim.exception.ScimBadRequestException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +24,6 @@ import org.springframework.http.ResponseEntity;
  */
 final class ScimErrors {
 
-    static final String ERROR_SCHEMA = "urn:ietf:params:scim:api:messages:2.0:Error";
     static final MediaType SCIM_JSON = MediaType.parseMediaType("application/scim+json");
     static final String INVALID_FILTER = "invalidFilter";
     static final String UNIQUENESS = "uniqueness";
@@ -42,14 +44,20 @@ final class ScimErrors {
         return error(HttpStatus.CONFLICT, UNIQUENESS, detail);
     }
 
-    private static ResponseEntity<Object> error(HttpStatus httpStatus, String scimType, String detail) {
+    static ResponseEntity<Object> error(HttpStatus httpStatus, @Nullable String scimType, String detail) {
+        Map<String, Object> body = new LinkedHashMap<>();
+
+        body.put("schemas", List.of(ScimConstants.ERROR_SCHEMA));
+
+        if (scimType != null) {
+            body.put("scimType", scimType);
+        }
+
+        body.put("detail", detail);
+        body.put("status", String.valueOf(httpStatus.value()));
+
         return ResponseEntity.status(httpStatus)
             .contentType(SCIM_JSON)
-            .body(
-                Map.of(
-                    "schemas", List.of(ERROR_SCHEMA),
-                    "scimType", scimType,
-                    "detail", detail,
-                    "status", String.valueOf(httpStatus.value())));
+            .body(body);
     }
 }

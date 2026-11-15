@@ -24,6 +24,8 @@ public interface IdentityProviderFacade {
 
     void delete(Long id);
 
+    String generateScimApiKey(Long id);
+
     IdentityProvider getIdentityProvider(Long id);
 
     List<IdentityProvider> getIdentityProviders();

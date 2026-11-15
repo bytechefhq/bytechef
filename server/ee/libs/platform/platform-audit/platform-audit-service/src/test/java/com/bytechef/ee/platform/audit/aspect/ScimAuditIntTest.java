@@ -12,6 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
+import com.bytechef.ee.platform.user.domain.ScimApiKey;
 import com.bytechef.ee.platform.user.scim.audit.ScimGroupAuditEvents;
 import com.bytechef.ee.platform.user.scim.audit.ScimGroupAuditMapper;
 import com.bytechef.ee.platform.user.scim.audit.ScimUserAuditEvents;
@@ -71,9 +72,10 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = {
-    AuditIntTestConfiguration.class, ScimAuditIntTest.Config.class
-})
+@SpringBootTest(
+    classes = {
+        AuditIntTestConfiguration.class, ScimAuditIntTest.Config.class
+    }, properties = "bytechef.security.sso.enabled=true")
 @ActiveProfiles("testint")
 @Import(PostgreSQLContainerConfiguration.class)
 public class ScimAuditIntTest {
@@ -82,7 +84,7 @@ public class ScimAuditIntTest {
     private static final String EXTERNAL_ID = "00u-external";
     private static final long IDENTITY_PROVIDER_ID = 5L;
     private static final MediaType SCIM_JSON = MediaType.parseMediaType("application/scim+json");
-    private static final String SCIM_API_KEY = "scim-api-key-value";
+    private static final String SCIM_API_KEY = "bcscim_000001_scim-api-key-value";
     private static final String SCIM_PRINCIPAL = "scim:Okta (5)";
     private static final String TENANT_ID = "000001";
     private static final String TENANT_SCHEMA = "bytechef_" + TENANT_ID;
@@ -125,9 +127,9 @@ public class ScimAuditIntTest {
         jdbcTemplate.update(
             "INSERT INTO " + TENANT_SCHEMA + ".identity_provider (id, name, issuer_uri, client_id, client_secret, " +
                 "scim_api_key) VALUES (?, 'Okta', 'https://okta.example.com', 'client', 'secret', ?)",
-            IDENTITY_PROVIDER_ID, SCIM_API_KEY);
+            IDENTITY_PROVIDER_ID, ScimApiKey.hash(SCIM_API_KEY));
 
-        when(tenantService.getTenantIds()).thenReturn(List.of(TenantContext.DEFAULT_TENANT_ID, TENANT_ID));
+        when(tenantService.isMultiTenantEnabled()).thenReturn(true);
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
             .addFilters(new ScimBearerTokenAuthenticationFilter(identityProviderService, tenantService))

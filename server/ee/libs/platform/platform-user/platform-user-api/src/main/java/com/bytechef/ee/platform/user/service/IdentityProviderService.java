@@ -32,6 +32,8 @@ public interface IdentityProviderService {
 
     List<IdentityProvider> getIdentityProviders();
 
+    String generateScimApiKey(long id);
+
     String getDecryptedClientSecret(IdentityProvider identityProvider);
 
     IdentityProvider update(IdentityProvider identityProvider);

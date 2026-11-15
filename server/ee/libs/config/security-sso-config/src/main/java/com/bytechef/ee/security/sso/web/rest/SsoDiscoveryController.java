@@ -8,12 +8,13 @@
 package com.bytechef.ee.security.sso.web.rest;
 
 import com.bytechef.ee.platform.user.domain.IdentityProvider;
-import com.bytechef.ee.platform.user.service.IdentityProviderService;
+import com.bytechef.ee.platform.user.domain.IdentityProviderRegistrationId;
+import com.bytechef.ee.security.sso.IdentityProviderLocator;
+import com.bytechef.ee.security.sso.IdentityProviderLocator.LocatedIdentityProvider;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.user.constant.UserConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
-import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,82 +34,63 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 @ConditionalOnEEVersion
+@ConditionalOnProperty(prefix = "bytechef.security.sso", name = "enabled", havingValue = "true")
 final class SsoDiscoveryController {
 
-    private final IdentityProviderService identityProviderService;
+    private final IdentityProviderLocator identityProviderLocator;
 
     @SuppressFBWarnings("EI")
-    SsoDiscoveryController(ObjectProvider<IdentityProviderService> identityProviderServiceProvider) {
-        this.identityProviderService = identityProviderServiceProvider.getIfAvailable();
+    SsoDiscoveryController(IdentityProviderLocator identityProviderLocator) {
+        this.identityProviderLocator = identityProviderLocator;
     }
 
     @PostMapping("/sso/discover")
     ResponseEntity<SsoDiscoveryResponse> discover(@RequestBody SsoDiscoveryRequest request) {
-        if (identityProviderService == null) {
-            return ResponseEntity.ok(new SsoDiscoveryResponse(null, null));
-        }
-
         String email = request.email();
 
         if (email == null || !email.contains("@")) {
-            return ResponseEntity.ok(new SsoDiscoveryResponse(null, null));
+            return ResponseEntity.ok(SsoDiscoveryResponse.NONE);
         }
 
         String domain = email.substring(email.lastIndexOf('@') + 1);
 
-        Optional<IdentityProvider> identityProvider = identityProviderService.fetchByDomain(domain);
-
-        if (identityProvider.isPresent() && identityProvider.get()
-            .isEnabled()) {
-            IdentityProvider idp = identityProvider.get();
-
-            String redirectUrl;
-
-            if (UserConstants.AUTH_PROVIDER_SAML.equals(idp.getType())) {
-                redirectUrl = "/saml2/authenticate/saml-" + idp.getId();
-            } else {
-                redirectUrl = "/oauth2/authorization/sso-" + idp.getId();
-            }
-
-            return ResponseEntity.ok(new SsoDiscoveryResponse(redirectUrl, idp.getName()));
-        }
-
-        return ResponseEntity.ok(new SsoDiscoveryResponse(null, null));
+        return ResponseEntity.ok(toResponse(identityProviderLocator.findByDomain(domain)));
     }
 
     @GetMapping("/sso/discover-by-name")
     ResponseEntity<SsoDiscoveryResponse> discoverByName(@RequestParam String company) {
-        if (identityProviderService == null) {
-            return ResponseEntity.ok(new SsoDiscoveryResponse(null, null));
-        }
-
         if (company == null || company.isBlank()) {
-            return ResponseEntity.ok(new SsoDiscoveryResponse(null, null));
+            return ResponseEntity.ok(SsoDiscoveryResponse.NONE);
         }
 
-        Optional<IdentityProvider> identityProviderOptional = identityProviderService.fetchByName(company.trim());
+        return ResponseEntity.ok(toResponse(identityProviderLocator.findByName(company.trim())));
+    }
 
-        if (identityProviderOptional.isPresent()) {
-            IdentityProvider identityProvider = identityProviderOptional.get();
-            if (identityProvider.isEnabled()) {
-                String redirectUrl;
+    private static SsoDiscoveryResponse toResponse(Optional<LocatedIdentityProvider> locatedIdentityProvider) {
+        if (locatedIdentityProvider.isEmpty() || !locatedIdentityProvider.get()
+            .identityProvider()
+            .isEnabled()) {
 
-                if (UserConstants.AUTH_PROVIDER_SAML.equals(identityProvider.getType())) {
-                    redirectUrl = "/saml2/authenticate/saml-" + identityProvider.getId();
-                } else {
-                    redirectUrl = "/oauth2/authorization/sso-" + identityProvider.getId();
-                }
-
-                return ResponseEntity.ok(new SsoDiscoveryResponse(redirectUrl, identityProvider.getName()));
-            }
+            return SsoDiscoveryResponse.NONE;
         }
 
-        return ResponseEntity.ok(new SsoDiscoveryResponse(null, null));
+        IdentityProvider identityProvider = locatedIdentityProvider.get()
+            .identityProvider();
+        IdentityProviderRegistrationId registrationId = locatedIdentityProvider.get()
+            .registrationId();
+
+        String redirectUrl = registrationId.isSaml()
+            ? "/saml2/authenticate/" + registrationId.value()
+            : "/oauth2/authorization/" + registrationId.value();
+
+        return new SsoDiscoveryResponse(redirectUrl, identityProvider.getName());
     }
 
     record SsoDiscoveryRequest(String email) {
     }
 
     record SsoDiscoveryResponse(String redirectUrl, String providerName) {
+
+        static final SsoDiscoveryResponse NONE = new SsoDiscoveryResponse(null, null);
     }
 }

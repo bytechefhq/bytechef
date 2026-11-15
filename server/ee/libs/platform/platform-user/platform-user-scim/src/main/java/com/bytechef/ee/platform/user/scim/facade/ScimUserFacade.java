@@ -17,6 +17,7 @@ import com.bytechef.ee.platform.user.scim.model.ScimPatchRequest;
 import com.bytechef.ee.platform.user.scim.model.ScimUser;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.Audited;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
@@ -25,6 +26,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,7 +54,7 @@ public class ScimUserFacade {
     }
 
     public static boolean isDeactivation(User user, ScimUser scimUser) {
-        return user.isActivated() && !scimUser.active();
+        return user.isActivated() && Boolean.FALSE.equals(scimUser.active());
     }
 
     public static boolean isDeactivation(User user, ScimPatchRequest scimPatchRequest) {
@@ -102,9 +104,11 @@ public class ScimUserFacade {
 
         applyScimUser(adminUserDTO, scimUser);
 
+        adminUserDTO.setAuthorities(Set.of(AuthorityConstants.USER));
+
         User user = userService.create(adminUserDTO);
 
-        if (!scimUser.active()) {
+        if (Boolean.FALSE.equals(scimUser.active())) {
             user.setActivated(false);
 
             userService.save(user);
@@ -184,6 +188,10 @@ public class ScimUserFacade {
 
         applyScimUser(adminUserDTO, scimUser);
 
+        Boolean active = scimUser.active();
+
+        adminUserDTO.setActivated(active == null ? user.isActivated() : active);
+
         String langKey = user.getLangKey();
 
         adminUserDTO.setImageUrl(user.getImageUrl());
@@ -209,7 +217,6 @@ public class ScimUserFacade {
         adminUserDTO.setLogin(scimUser.userName());
         adminUserDTO.setEmail(extractPrimaryEmail(scimUser));
         adminUserDTO.setExternalId(scimUser.externalId());
-        adminUserDTO.setActivated(scimUser.active());
 
         ScimName scimName = scimUser.name();
 

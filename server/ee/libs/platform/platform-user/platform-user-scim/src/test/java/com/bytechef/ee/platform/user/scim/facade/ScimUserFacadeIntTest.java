@@ -17,9 +17,12 @@ import com.bytechef.ee.platform.user.scim.model.ScimName;
 import com.bytechef.ee.platform.user.scim.model.ScimPatchOperation;
 import com.bytechef.ee.platform.user.scim.model.ScimPatchRequest;
 import com.bytechef.ee.platform.user.scim.model.ScimUser;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.constant.UserConstants;
+import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
+import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -52,6 +55,9 @@ import org.springframework.transaction.annotation.Transactional;
 class ScimUserFacadeIntTest {
 
     private static final long MISSING_USER_ID = Long.MAX_VALUE;
+
+    @Autowired
+    private AuthorityService authorityService;
 
     @Autowired
     private CacheManager cacheManager;
@@ -181,6 +187,20 @@ class ScimUserFacadeIntTest {
     }
 
     @Test
+    void testCreateUserAssignsTheUserRole() {
+        User createdUser = scimUserFacade.createUser(createScimUser("john.doe", true));
+
+        assertThat(fetchStoredUser(createdUser.getId()).getAuthorityIds()).containsExactly(getUserRoleId());
+    }
+
+    @Test
+    void testCreateUserWithoutActiveStoresAnActivatedUser() {
+        User createdUser = scimUserFacade.createUser(createScimUser("john.doe", null));
+
+        assertThat(fetchStoredUser(createdUser.getId()).isActivated()).isTrue();
+    }
+
+    @Test
     void testCreateUserWithActiveTrueStoresAnActivatedUser() {
         User createdUser = scimUserFacade.createUser(createScimUser("john.doe", true));
 
@@ -262,6 +282,18 @@ class ScimUserFacadeIntTest {
         assertThat(storedUser.getLastName()).isEqualTo("Smith");
         assertThat(storedUser.getExternalId()).isEqualTo("ext-2");
         assertThat(storedUser.isActivated()).isTrue();
+    }
+
+    @Test
+    void testReplaceUserWithoutActiveKeepsTheActivationAndTheRoles() {
+        User createdUser = scimUserFacade.createUser(createScimUser("john.doe", false));
+
+        scimUserFacade.replaceUser(createdUser.getId(), createScimUser("john.doe", null));
+
+        User storedUser = fetchStoredUser(createdUser.getId());
+
+        assertThat(storedUser.isActivated()).isFalse();
+        assertThat(storedUser.getAuthorityIds()).containsExactly(getUserRoleId());
     }
 
     @Test
@@ -774,6 +806,16 @@ class ScimUserFacadeIntTest {
         return userService.create(adminUserDTO);
     }
 
+    private long getUserRoleId() {
+        List<Authority> authorities = authorityService.getAuthorities();
+
+        return authorities.stream()
+            .filter(authority -> AuthorityConstants.USER.equals(authority.getName()))
+            .map(Authority::getId)
+            .findFirst()
+            .orElseThrow();
+    }
+
     private User fetchStoredUser(long id) {
         return userService.fetchUser(id)
             .orElseThrow();
@@ -802,11 +844,11 @@ class ScimUserFacadeIntTest {
             List.of("urn:ietf:params:scim:api:messages:2.0:PatchOp"), Arrays.asList(scimPatchOperations));
     }
 
-    private static ScimUser createScimUser(String userName, boolean active) {
+    private static ScimUser createScimUser(String userName, Boolean active) {
         return createScimUser(userName, null, active);
     }
 
-    private static ScimUser createScimUser(String userName, String externalId, boolean active) {
+    private static ScimUser createScimUser(String userName, String externalId, Boolean active) {
         return new ScimUser(
             List.of(ScimUser.SCHEMA), null, externalId, userName, null, null,
             List.of(new ScimEmail(userName.toLowerCase(Locale.ROOT) + "@example.com", "work", true)), active, null,

@@ -14,28 +14,24 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.service.UserService;
-import com.bytechef.security.web.authentication.TenantUser;
-import com.bytechef.security.web.oauth2.CustomOAuth2User;
+import com.bytechef.ee.platform.user.domain.IdentityProvider;
+import com.bytechef.ee.security.sso.IdentityProviderLocator;
+import com.bytechef.ee.security.sso.IdentityProviderLocator.LocatedIdentityProvider;
 import com.bytechef.security.web.oauth2.CustomOidcUser;
-import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.mock.web.MockHttpSession;
-import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.authentication.RememberMeServices;
 
@@ -46,22 +42,22 @@ import org.springframework.security.web.authentication.RememberMeServices;
  */
 class SsoOAuth2AuthenticationSuccessHandlerTest {
 
-    private static final String EMAIL = "someone@example.com";
+    private static final String LOGIN = "someone";
+    private static final String REGISTRATION_ID = "sso-000003-7";
     private static final String TENANT_ID = "000003";
-    private static final String TENANT_LOGIN = "someone";
 
+    private final IdentityProviderLocator identityProviderLocator = mock(IdentityProviderLocator.class);
     private final RememberMeServices rememberMeServices = mock(RememberMeServices.class);
     private final TenantService tenantService = mock(TenantService.class);
-    private final UserService userService = mock(UserService.class);
 
     private final MockHttpServletRequest request = new MockHttpServletRequest();
     private final MockHttpServletResponse response = new MockHttpServletResponse();
 
     @Test
-    void testOidcSignInUsesTheSingleTenantMatchingTheEmail() throws IOException {
+    void testOidcSignInBindsTheSessionToTheIdentityProvidersTenant() throws IOException {
         when(tenantService.isMultiTenantEnabled()).thenReturn(true);
-        when(tenantService.getTenantIdsByUserEmail(EMAIL)).thenReturn(List.of(TENANT_ID));
-        when(userService.fetchUserByEmail(EMAIL)).thenAnswer(invocation -> fetchTenantUser());
+        when(identityProviderLocator.findByRegistrationId(REGISTRATION_ID))
+            .thenReturn(Optional.of(new LocatedIdentityProvider(TENANT_ID, new IdentityProvider())));
 
         handler().onAuthenticationSuccess(request, response, oidcAuthentication());
 
@@ -69,87 +65,49 @@ class SsoOAuth2AuthenticationSuccessHandlerTest {
             .getAttribute(TenantConstants.CURRENT_TENANT_ID)).isEqualTo(TENANT_ID);
         assertThat(response.getRedirectedUrl()).isEqualTo("/oauth2/redirect");
 
-        TenantUser tenantUser = captureRememberMePrincipal();
+        ArgumentCaptor<Authentication> authenticationArgumentCaptor = ArgumentCaptor.forClass(Authentication.class);
 
-        assertThat(tenantUser.getUsername()).isEqualTo(TENANT_LOGIN);
-        assertThat(tenantUser.getTenantId()).isEqualTo(TENANT_ID);
+        verify(rememberMeServices).loginSuccess(eq(request), eq(response), authenticationArgumentCaptor.capture());
+        verify(tenantService, never()).getTenantIdsByUserLogin(anyString());
+
+        Authentication authentication = authenticationArgumentCaptor.getValue();
+
+        assertThat(authentication.getName()).isEqualTo(LOGIN);
     }
 
     @Test
-    void testEmailMatchingSeveralTenantsIsRejected() throws IOException {
-        MockHttpSession session = new MockHttpSession();
-
-        request.setSession(session);
-
+    void testUnknownIdentityProviderIsRejected() throws IOException {
         when(tenantService.isMultiTenantEnabled()).thenReturn(true);
-        when(tenantService.getTenantIdsByUserEmail(EMAIL)).thenReturn(List.of(TENANT_ID, "000004"));
+        when(identityProviderLocator.findByRegistrationId(REGISTRATION_ID)).thenReturn(Optional.empty());
 
         handler().onAuthenticationSuccess(request, response, oidcAuthentication());
 
-        assertThat(session.isInvalid()).isTrue();
+        assertThat(request.getSession(false)).isNull();
         assertThat(response.getRedirectedUrl()).isEqualTo("/login?error=oauth2");
 
-        verify(rememberMeServices).loginFail(request, response);
         verify(rememberMeServices, never()).loginSuccess(any(), any(), any());
     }
 
     @Test
-    void testSingleTenantSignInDoesNotLookUpTenants() throws IOException {
+    void testSingleTenantSignInDoesNotLookUpTheTenant() throws IOException {
         when(tenantService.isMultiTenantEnabled()).thenReturn(false);
-        when(tenantService.getTenantIdsByUserEmail(anyString())).thenThrow(new UnsupportedOperationException());
-        when(tenantService.getTenantIdsByUserLogin(anyString())).thenThrow(new UnsupportedOperationException());
-        when(userService.fetchUserByEmail(EMAIL)).thenReturn(Optional.of(createUser()));
 
-        CustomOAuth2User customOAuth2User = new CustomOAuth2User(EMAIL, List.of(), Map.of("email", EMAIL));
-
-        handler().onAuthenticationSuccess(
-            request, response, new TestingAuthenticationToken(customOAuth2User, null, List.of()));
+        handler().onAuthenticationSuccess(request, response, oidcAuthentication());
 
         assertThat(response.getRedirectedUrl()).isEqualTo("/oauth2/redirect");
-        assertThat(captureRememberMePrincipal().getUsername()).isEqualTo(TENANT_LOGIN);
-    }
 
-    private TenantUser captureRememberMePrincipal() {
-        ArgumentCaptor<Authentication> authenticationArgumentCaptor = ArgumentCaptor.forClass(Authentication.class);
-
-        verify(rememberMeServices).loginSuccess(eq(request), eq(response), authenticationArgumentCaptor.capture());
-
-        Authentication authentication = authenticationArgumentCaptor.getValue();
-
-        assertThat(authentication.getPrincipal()).isInstanceOf(TenantUser.class);
-
-        return (TenantUser) authentication.getPrincipal();
-    }
-
-    private static User createUser() {
-        User user = new User();
-
-        user.setActivated(true);
-        user.setEmail(EMAIL);
-        user.setLogin(TENANT_LOGIN);
-
-        return user;
-    }
-
-    private static Optional<User> fetchTenantUser() {
-        if (!TENANT_ID.equals(TenantContext.getCurrentTenantId())) {
-            return Optional.empty();
-        }
-
-        return Optional.of(createUser());
+        verify(rememberMeServices).loginSuccess(eq(request), eq(response), any());
+        verifyNoInteractions(identityProviderLocator);
     }
 
     private SsoOAuth2AuthenticationSuccessHandler handler() {
-        return new SsoOAuth2AuthenticationSuccessHandler(rememberMeServices, tenantService, userService);
+        return new SsoOAuth2AuthenticationSuccessHandler(identityProviderLocator, rememberMeServices, tenantService,
+            null);
     }
 
     private static Authentication oidcAuthentication() {
-        OidcUser oidcUser = mock(OidcUser.class);
+        CustomOidcUser customOidcUser = new CustomOidcUser(LOGIN, List.of(), mock(OidcUser.class));
 
-        when(oidcUser.getClaims()).thenReturn(Map.of(StandardClaimNames.EMAIL, EMAIL));
-
-        CustomOidcUser customOidcUser = new CustomOidcUser("public-login", List.of(), oidcUser);
-
-        return new TestingAuthenticationToken(customOidcUser, null, List.of());
+        return new OAuth2AuthenticationToken(customOidcUser, List.of(), REGISTRATION_ID);
     }
 }

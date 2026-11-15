@@ -59,7 +59,9 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
  */
 @AutoConfigureMockMvc(addFilters = false)
 @ContextConfiguration(classes = ScimRestTestConfiguration.class)
-@WebMvcTest(controllers = ScimUserController.class, properties = "bytechef.edition=ee")
+@WebMvcTest(controllers = ScimUserController.class, properties = {
+    "bytechef.edition=ee", "bytechef.security.sso.enabled=true"
+})
 class ScimUserControllerIntTest {
 
     private static final String ERROR_SCHEMA = "urn:ietf:params:scim:api:messages:2.0:Error";
@@ -366,7 +368,7 @@ class ScimUserControllerIntTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-        "emails.value eq \"a@b.com\"",
+        "title eq \"CEO\"",
         "userName eq \"x\" and active eq true",
         "userName co \"x\"",
         "active eq true",
@@ -475,6 +477,64 @@ class ScimUserControllerIntTest {
             .isEqualTo(0);
 
         verify(userService).getUsersByExternalId("john@example.com");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "emails eq \"john@example.com\"", "emails.value eq \"john@example.com\""
+    })
+    void testListUsersFilterByEmailReturnsTheMatchingUser(String filter) {
+        when(userService.fetchUserByEmail("john@example.com"))
+            .thenReturn(Optional.of(createUser(USER_ID, "john.doe", "john@example.com", true)));
+
+        webTestClient
+            .get()
+            .uri(USERS_PATH + "?filter={filter}", filter)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.totalResults")
+            .isEqualTo(1)
+            .jsonPath("$.Resources[0].id")
+            .isEqualTo("42")
+            .jsonPath("$.Resources[0].userName")
+            .isEqualTo("john.doe");
+
+        verify(userService, never()).getAllManagedUsers(any(Pageable.class));
+    }
+
+    @Test
+    void testListUsersFilterByIdReturnsTheMatchingUser() {
+        when(userService.fetchUser(USER_ID))
+            .thenReturn(Optional.of(createUser(USER_ID, "john.doe", "john@example.com", true)));
+
+        webTestClient
+            .get()
+            .uri(USERS_PATH + "?filter={filter}", "id eq \"42\"")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.totalResults")
+            .isEqualTo(1)
+            .jsonPath("$.Resources[0].id")
+            .isEqualTo("42");
+    }
+
+    @Test
+    void testListUsersFilterByANonNumericIdReturnsAnEmptyList() {
+        webTestClient
+            .get()
+            .uri(USERS_PATH + "?filter={filter}", "id eq \"abc\"")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.totalResults")
+            .isEqualTo(0);
+
+        verifyNoInteractions(userService);
     }
 
     @Test

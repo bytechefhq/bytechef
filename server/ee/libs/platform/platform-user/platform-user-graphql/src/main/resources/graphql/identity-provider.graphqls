@@ -6,6 +6,7 @@ extend type Query {
 extend type Mutation {
     createIdentityProvider(input: IdentityProviderInput!): IdentityProviderType!
     deleteIdentityProvider(id: ID!): Boolean!
+    generateIdentityProviderScimApiKey(id: ID!): String!
     updateIdentityProvider(id: ID!, input: IdentityProviderInput!): IdentityProviderType!
 }
 
@@ -27,6 +28,8 @@ type IdentityProviderType {
     mfaRequired: Boolean!
     name: String!
     nameIdFormat: String
+    registrationId: String!
+    scimEnabled: Boolean!
     scopes: String
     signingCertificate: String
     type: String!
