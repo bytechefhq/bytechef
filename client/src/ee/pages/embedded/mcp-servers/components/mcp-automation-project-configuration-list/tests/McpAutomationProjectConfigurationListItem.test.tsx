@@ -1,3 +1,4 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {render, screen} from '@/shared/util/test-utils';
 import userEvent from '@testing-library/user-event';
 import {describe, expect, it, vi} from 'vitest';
@@ -24,7 +25,11 @@ const item = {
 
 describe('McpAutomationProjectConfigurationListItem', () => {
     it('listItemMarksUnavailableWorkflow', async () => {
-        render(<McpAutomationProjectConfigurationListItem mcpAutomationProjectConfiguration={item} />);
+        render(
+            <TooltipProvider>
+                <McpAutomationProjectConfigurationListItem mcpAutomationProjectConfiguration={item} />
+            </TooltipProvider>
+        );
 
         expect(screen.getByText('Onboarding')).toBeInTheDocument();
         expect(screen.getByText('Production config')).toBeInTheDocument();
