@@ -124,6 +124,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone(ZoneOffset.UTC);
 
+    private static final String LINK_EXTERNAL_ID_SUFFIX = ".externalId";
+
     private static final Pattern EPOCH_PATTERN = Pattern.compile("-?\\d+");
 
     private static final Pattern LINK_CONSTRAINT_PATTERN =
@@ -334,15 +336,28 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             .filter(n -> !"id".equalsIgnoreCase(n))
             .toList();
 
+        List<String> headerNames = new ArrayList<>();
+
+        for (String columnName : columnNames) {
+            headerNames.add(columnName);
+
+            if (isLinkColumn(columnSpecs, columnName)) {
+                headerNames.add(columnName + LINK_EXTERNAL_ID_SUFFIX);
+            }
+        }
+
         StringWriter stringWriter = new StringWriter();
 
         CsvWriter csvWriter = CsvWriter.builder()
             .build(stringWriter);
 
         // Header
-        csvWriter.writeRow(columnNames);
+        csvWriter.writeRow(headerNames);
 
         List<DataTableRow> dataTableRows = listRows(dataTableId, Integer.MAX_VALUE, 0, environmentId);
+
+        Map<String, Map<Long, String>> targetExternalIds = selectLinkTargetExternalIds(
+            columnSpecs, dataTableRows, environmentId);
 
         for (DataTableRow dataTableRow : dataTableRows) {
             List<String> curValues = new ArrayList<>();
@@ -354,6 +369,13 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                     ? dataTableRow.externalId() : values.get(columnName);
 
                 curValues.add(toCsvValue(value));
+
+                if (isLinkColumn(columnSpecs, columnName)) {
+                    Map<Long, String> externalIdsByRowId = targetExternalIds.get(columnName);
+
+                    curValues.add(
+                        value instanceof Number number ? toCsvValue(externalIdsByRowId.get(number.longValue())) : "");
+                }
             }
 
             csvWriter.writeRow(curValues);
@@ -394,6 +416,10 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         try (CsvReader csvReader = csvReaderBuilder.build(new StringReader(csv))) {
             List<String> headers = null;
             List<String> mappedColumnNames = null;
+            List<Boolean> externalIdHeaderFlags = null;
+            List<Map<String, Object>> parsedValues = new ArrayList<>();
+            List<@Nullable String> parsedExternalIds = new ArrayList<>();
+            List<Long> parsedLineNumbers = new ArrayList<>();
 
             for (CsvRow csvRow : csvReader) {
                 List<String> fields = csvRow.getFields();
@@ -406,10 +432,12 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
                     // Build mapping from file index -> actual column name (skip unknown and id)
                     mappedColumnNames = new ArrayList<>(headers.size());
+                    externalIdHeaderFlags = new ArrayList<>(headers.size());
 
                     for (String header : headers) {
                         if (header.equalsIgnoreCase("id")) {
                             mappedColumnNames.add(null);
+                            externalIdHeaderFlags.add(false);
 
                             continue;
                         }
@@ -419,7 +447,27 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                             .findFirst()
                             .orElse(null);
 
+                        boolean externalIdHeader = false;
+
+                        if (columnName == null && header.toLowerCase(Locale.ROOT)
+                            .endsWith(LINK_EXTERNAL_ID_SUFFIX.toLowerCase(Locale.ROOT))) {
+
+                            String linkColumnName =
+                                header.substring(0, header.length() - LINK_EXTERNAL_ID_SUFFIX.length());
+
+                            Optional<ColumnSpec> linkColumnSpecOptional = findColumnSpec(columnSpecs, linkColumnName);
+
+                            if (linkColumnSpecOptional.isPresent() && linkColumnSpecOptional.get()
+                                .type() == ColumnType.LINK) {
+
+                                columnName = linkColumnSpecOptional.get()
+                                    .name();
+                                externalIdHeader = true;
+                            }
+                        }
+
                         mappedColumnNames.add(columnName);
+                        externalIdHeaderFlags.add(externalIdHeader);
                     }
 
                     if (mappedColumnNames.stream()
@@ -440,6 +488,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                 }
 
                 Map<String, Object> values = new HashMap<>();
+                Map<String, Object> externalIdLinkValues = new HashMap<>();
 
                 int limit = Math.min(mappedColumnNames.size(), fields.size());
 
@@ -452,32 +501,31 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
                     String field = fields.get(col);
 
-                    values.put(curColumnName, (field == null || field.isEmpty()) ? null : field);
+                    if (externalIdHeaderFlags.get(col)) {
+                        externalIdLinkValues.put(
+                            curColumnName,
+                            (field == null || field.isBlank()) ? null : Map.of("externalId", field.trim()));
+                    } else {
+                        values.put(curColumnName, (field == null || field.isEmpty()) ? null : field);
+                    }
                 }
 
-                String externalId = toExternalId(values.remove(ReservedColumns.EXTERNAL_ID));
+                values.putAll(externalIdLinkValues);
 
-                try {
-                    insertedDataTableRows.add(
-                        insertRowWithoutEvent(
-                            dataTableId, physicalName, columnSpecs, values, externalId, environmentId,
-                            new HashSet<>()));
-                } catch (DataTableException dataTableException) {
-                    throw new DataTableException(
-                        "CSV line %d: %s; no row was imported".formatted(
-                            csvRow.getOriginalLineNumber(), dataTableException.getMessage()),
-                        dataTableException, dataTableException.getErrorType());
-                } catch (IllegalArgumentException exception) {
-                    throw new IllegalArgumentException(
-                        "CSV line %d: %s; no row was imported".formatted(
-                            csvRow.getOriginalLineNumber(), exception.getMessage()),
-                        exception);
-                } catch (DataIntegrityViolationException dataIntegrityViolationException) {
-                    throw withRowPosition(
-                        "CSV line " + csvRow.getOriginalLineNumber(), "no row was imported",
-                        dataIntegrityViolationException);
-                }
+                parsedValues.add(values);
+                parsedExternalIds.add(toExternalId(values.remove(ReservedColumns.EXTERNAL_ID)));
+                parsedLineNumbers.add(csvRow.getOriginalLineNumber());
             }
+
+            List<Map<String, Object>> resolvedValues = resolveLinkValues(
+                columnSpecs, parsedValues, environmentId,
+                (index, message) -> "CSV line %d: %s; no row was imported".formatted(
+                    parsedLineNumbers.get(index), message));
+
+            insertedDataTableRows.addAll(
+                insertCsvRows(
+                    dataTableId, physicalName, columnSpecs, resolvedValues, parsedExternalIds, parsedLineNumbers,
+                    environmentId));
         } catch (IOException exception) {
             throw new RuntimeException("Failed to import CSV", exception);
         }
@@ -1114,6 +1162,82 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         publishWebhookEvent(dataTableId, DataTableWebhookType.RECORD_UPDATED, sortedDataTableRows, environmentId);
 
         return sortedDataTableRows;
+    }
+
+    private List<DataTableRow> insertCsvRows(
+        long dataTableId, String physicalName, List<ColumnSpec> columnSpecs, List<Map<String, Object>> rowValues,
+        List<@Nullable String> externalIds, List<Long> lineNumbers, long environmentId) {
+
+        List<DataTableRow> insertedDataTableRows = new ArrayList<>();
+
+        for (int index = 0; index < rowValues.size(); index++) {
+            long lineNumber = lineNumbers.get(index);
+
+            try {
+                insertedDataTableRows.add(
+                    insertRowWithoutEvent(
+                        dataTableId, physicalName, columnSpecs, rowValues.get(index), externalIds.get(index),
+                        environmentId, new HashSet<>()));
+            } catch (DataTableException dataTableException) {
+                throw new DataTableException(
+                    "CSV line %d: %s; no row was imported".formatted(lineNumber, dataTableException.getMessage()),
+                    dataTableException, dataTableException.getErrorType());
+            } catch (IllegalArgumentException exception) {
+                throw new IllegalArgumentException(
+                    "CSV line %d: %s; no row was imported".formatted(lineNumber, exception.getMessage()), exception);
+            } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+                throw withRowPosition(
+                    "CSV line " + lineNumber, "no row was imported", dataIntegrityViolationException);
+            }
+        }
+
+        return insertedDataTableRows;
+    }
+
+    private static boolean isLinkColumn(List<ColumnSpec> columnSpecs, String columnName) {
+        return findColumnSpec(columnSpecs, columnName).filter(columnSpec -> columnSpec.type() == ColumnType.LINK)
+            .isPresent();
+    }
+
+    private Map<String, Map<Long, String>> selectLinkTargetExternalIds(
+        List<ColumnSpec> columnSpecs, List<DataTableRow> dataTableRows, long environmentId) {
+
+        Map<String, Map<Long, String>> targetExternalIds = new HashMap<>();
+
+        for (ColumnSpec columnSpec : columnSpecs) {
+            if (columnSpec.type() != ColumnType.LINK) {
+                continue;
+            }
+
+            Set<Long> targetRowIds = new LinkedHashSet<>();
+
+            for (DataTableRow dataTableRow : dataTableRows) {
+                if (dataTableRow.values()
+                    .get(columnSpec.name()) instanceof Number number) {
+
+                    targetRowIds.add(number.longValue());
+                }
+            }
+
+            Map<Long, String> externalIdsByRowId = new HashMap<>();
+
+            if (!targetRowIds.isEmpty()) {
+                LinkSpec linkSpec = Objects.requireNonNull(columnSpec.link());
+
+                String targetPhysicalName = DataTablePhysicalNameUtils.getPhysicalName(
+                    environmentId, linkSpec.targetDataTableId());
+
+                for (DataTableRow targetDataTableRow : selectRowsByIds(
+                    targetPhysicalName, List.of(ReservedColumns.EXTERNAL_ID), new ArrayList<>(targetRowIds))) {
+
+                    externalIdsByRowId.put(targetDataTableRow.id(), targetDataTableRow.externalId());
+                }
+            }
+
+            targetExternalIds.put(columnSpec.name(), externalIdsByRowId);
+        }
+
+        return targetExternalIds;
     }
 
     private static String toCsvValue(@Nullable Object value) {
