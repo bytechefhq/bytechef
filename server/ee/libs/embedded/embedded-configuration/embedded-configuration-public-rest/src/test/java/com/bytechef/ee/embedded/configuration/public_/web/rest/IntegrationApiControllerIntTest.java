@@ -144,7 +144,7 @@ class IntegrationApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testGetIntegrationReturnsInternalOnlyOnMcpWorkflowInputs() {
         IntegrationDTO integrationDTO = new IntegrationDTO(
             null, false, null, "slack", 1, null, null, "Slack integration", null, "slack-icon", INTEGRATION_ID,
