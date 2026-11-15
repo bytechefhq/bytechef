@@ -896,8 +896,6 @@ const ActivationDialog = ({
     useEffect(() => {
         let cancelled = false;
 
-        // Activating re-checks the list before it provisions, so a failed check here only means the dialog
-        // opens to activate rather than to edit.
         const workflowsPromise = fetch<ConnectedUserWorkflowType[]>('/api/embedded/v1/automation/workflows').catch(
             (error: unknown) => {
                 console.error('Failed to check whether the automation is already active:', error);
