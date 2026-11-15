@@ -109,7 +109,8 @@ created, because two nullable `workspace_id` values cannot be compared by a cons
 In the environment's physical source table:
 
 - The link column is `BIGINT`, nullable.
-- It has a foreign key `fk_<sourcePhysicalName>_<columnName>` to `dt_<env>_<targetId>("id")`, with
+- It has a foreign key `fk_dt_link_<registryRowId>` to `dt_<env>_<targetId>("id")` (named by the registry row
+  id because PostgreSQL identifiers are capped at 63 characters), with
   `ON DELETE RESTRICT` for `BLOCK` and `ON DELETE SET NULL` for `CLEAR`.
 - It has an index on the link column. PostgreSQL does not index foreign key columns on its own, and a delete on the
   target table would otherwise scan the source table.
@@ -212,7 +213,7 @@ the registry.
 ### APIs
 
 **Platform service** (`DataTableService`): `addColumn(dataTableId, ColumnSpec, environmentId)` accepts the `LINK`
-spec; `fetchDataTableInfo` reports `LinkSpec`s. New method `List<LinkColumn> getLinksTo(long targetDataTableId)` for
+spec; `fetchDataTableInfo` reports `LinkSpec`s. New method `List<DataTableLinkColumn> getLinksTo(long targetDataTableId, long environmentId)` for
 the blocking checks and display-column updates. `DataTableRowService.getRow/findRows` gain an `expand` parameter
 (an overload, so existing callers are unchanged).
 
