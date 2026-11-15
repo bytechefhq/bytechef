@@ -7,9 +7,13 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserAutomationProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceValuesDTO;
 import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionConnectedUserProjectWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationProjectDTO;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +47,8 @@ public interface ConnectedUserProjectFacade {
 
     void enableProjectWorkflow(long connectedUserProjectWorkflowId, boolean enable);
 
+    List<ConnectedUserAutomationProjectConfigurationDTO> getConnectedUserProjectConfigurations(long connectedUserId);
+
     ConnectedUserProjectWorkflowDTO getConnectedUserProjectWorkflow(
         String externalUserId, String workflowUuid, Long environmentId);
 
@@ -53,7 +59,14 @@ public interface ConnectedUserProjectFacade {
 
     List<ConnectedUserProjectDTO> getConnectedUserProjects(String externalUserId, Environment environment);
 
+    ConnectedUserWorkflowReferenceValuesDTO getProjectWorkflowReferenceValues(long connectedUserProjectWorkflowId);
+
+    List<ProvisionableAutomationProjectDTO> getProvisionableProjects(long connectedUserId);
+
     CopilotChatContextDTO prepareCopilotChat(String externalUserId, String workflowUuid, Environment environment);
+
+    void provisionProjectWorkflows(
+        long connectedUserId, long configurationId, List<ProvisionConnectedUserProjectWorkflowDTO> workflows);
 
     void publishProjectWorkflow(
         String externalUserId, String workflowUuid, String description, Long environmentId);
