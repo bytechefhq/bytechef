@@ -206,7 +206,7 @@ class ConnectedUserProjectAdminFacadeIntTest {
     private ConnectedUserProjectAdminFacade connectedUserProjectAdminFacade;
 
     @Autowired
-    private AutomationProjectConfigurationAdminFacade automationProjectConfigurationAdminFacade;
+    private AutomationProjectConfigurationFacade automationProjectConfigurationFacade;
 
     @MockitoSpyBean
     private ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
@@ -307,7 +307,7 @@ class ConnectedUserProjectAdminFacadeIntTest {
             .findFirst()
             .orElseThrow();
 
-        automationProjectConfigurationAdminFacade.enableConfigurationWorkflow(
+        automationProjectConfigurationFacade.enableConfigurationWorkflow(
             configuration.getId(), turnedOffWorkflowUuid, false);
 
         ProvisionableAutomationProjectDTO provisionableProject = findProvisionableProject(
@@ -422,7 +422,7 @@ class ConnectedUserProjectAdminFacadeIntTest {
             .findFirst()
             .orElseThrow();
 
-        automationProjectConfigurationAdminFacade.enableConfigurationWorkflow(
+        automationProjectConfigurationFacade.enableConfigurationWorkflow(
             configuration.getId(), turnedOffWorkflowUuid, false);
 
         assertThatThrownBy(() -> connectedUserProjectAdminFacade.provisionProjectWorkflows(
@@ -583,7 +583,7 @@ class ConnectedUserProjectAdminFacadeIntTest {
             .getFirst()
             .workflowUuid();
 
-        automationProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+        automationProjectConfigurationFacade.updateConfigurationWorkflow(
             getConfigurationId(projectId), workflowUuid, Map.of("slack", administratorConnectionId),
             Map.of("channel", "#provided"));
 
@@ -728,7 +728,7 @@ class ConnectedUserProjectAdminFacadeIntTest {
             .getFirst()
             .workflowUuid();
 
-        automationProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+        automationProjectConfigurationFacade.updateConfigurationWorkflow(
             getConfigurationId(projectId), workflowUuid, Map.of("slack", administratorConnectionId),
             Map.of("channel", "#provided"));
 
@@ -861,7 +861,7 @@ class ConnectedUserProjectAdminFacadeIntTest {
         String betaTurnedOffWorkflowUuid = workflowUuids.getFirst();
         String betaReleasedWorkflowUuid = workflowUuids.getLast();
 
-        automationProjectConfigurationAdminFacade.enableConfigurationWorkflow(
+        automationProjectConfigurationFacade.enableConfigurationWorkflow(
             betaConfiguration.getId(), betaTurnedOffWorkflowUuid, false);
 
         ProvisionableAutomationProjectDTO provisionableProject = findProvisionableProject(

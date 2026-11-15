@@ -227,7 +227,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         """;
 
     @Autowired
-    private AutomationProjectConfigurationAdminFacade automationProjectConfigurationAdminFacade;
+    private AutomationProjectConfigurationFacade automationProjectConfigurationFacade;
 
     @Autowired
     private AutomationProjectConfigurationResolver automationProjectConfigurationResolver;
@@ -1107,7 +1107,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
             Thread saveThread = new Thread(() -> {
                 try {
-                    automationProjectConfigurationAdminFacade.updateConfiguration(
+                    automationProjectConfigurationFacade.updateConfiguration(
                         configuration.getId(), configuration.getName(), configuration.getPermissionExpression(), 3,
                         true, true);
                 } catch (RuntimeException | AssertionError throwable) {
@@ -1755,7 +1755,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     void testDeleteConfigurationDeletesAssignedUsersReferencesAndKeepsCopies() {
         DeleteFixture fixture = createDeleteFixture("Destructive Delete");
 
-        automationProjectConfigurationAdminFacade.deleteConfiguration(fixture.configurationA()
+        automationProjectConfigurationFacade.deleteConfiguration(fixture.configurationA()
             .getId());
 
         long projectId = fixture.automationProjectId();
@@ -1811,7 +1811,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         assertThat(staleConnectedUserIds).contains(fixture.firstConnectedUserId());
 
-        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationAdminFacade.moveConnectedUsers(
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.moveConnectedUsers(
             configurationAId, fixture.configurationB()
                 .getId(),
             List.of(fixture.firstConnectedUserId()));
@@ -1875,7 +1875,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
                 .extracting(AutomationProjectConfiguration::getId)
                 .isEqualTo(remainingConfiguration.getId());
 
-        automationProjectConfigurationAdminFacade.deleteConfiguration(deletedConfiguration.getId());
+        automationProjectConfigurationFacade.deleteConfiguration(deletedConfiguration.getId());
 
         assertThat(getAssignedConfigurationId(connectedUser.getId(), automationProjectId))
             .isEqualTo(remainingConfiguration.getId());
@@ -1889,9 +1889,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     void testGetDeleteImpact() {
         DeleteFixture fixture = createDeleteFixture("Delete Impact");
 
-        assertThat(automationProjectConfigurationAdminFacade.getDeleteImpact(fixture.configurationA()
+        assertThat(automationProjectConfigurationFacade.getDeleteImpact(fixture.configurationA()
             .getId())).isEqualTo(new AutomationProjectConfigurationDeleteImpactDTO(2, 1));
-        assertThat(automationProjectConfigurationAdminFacade.getDeleteImpact(fixture.configurationB()
+        assertThat(automationProjectConfigurationFacade.getDeleteImpact(fixture.configurationB()
             .getId())).isEqualTo(new AutomationProjectConfigurationDeleteImpactDTO(1, 1));
     }
 
@@ -1921,7 +1921,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         automationProjectFacade.publishProject(automationProjectId);
 
-        assertThat(automationProjectConfigurationAdminFacade.getVersionImpact(configurationA.getId(), 2)
+        assertThat(automationProjectConfigurationFacade.getVersionImpact(configurationA.getId(), 2)
             .workflows())
                 .singleElement()
                 .satisfies(workflow -> {
@@ -1945,7 +1945,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        automationProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+        automationProjectConfigurationFacade.updateConfigurationWorkflow(
             configurationA.getId(), workflowUuid, Map.of(), Map.of("channel", "#administrator"));
 
         String providedExternalUserId = createConnectedUser();
@@ -1966,7 +1966,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         assertThat(fetchDeploymentRow(providedReference).getInputs()).isEqualTo(Map.of("channel", "#administrator"));
         assertThat(fetchDeploymentRow(ownValueReference).getInputs()).isEqualTo(Map.of("channel", "#mine"));
 
-        automationProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+        automationProjectConfigurationFacade.updateConfigurationWorkflow(
             configurationA.getId(), workflowUuid, Map.of(), Map.of());
 
         rollOutTheLastUpdatedEvent();
@@ -2011,7 +2011,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         ConnectedUser targetConnectedUser = assignNewConnectedUser(automationProjectId, targetConfiguration);
 
-        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationAdminFacade.moveConnectedUsers(
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.moveConnectedUsers(
             sourceConfiguration.getId(), targetConfiguration.getId(),
             List.of(firstConnectedUser.getId(), secondConnectedUser.getId(), targetConnectedUser.getId()));
 
@@ -2099,7 +2099,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         AutomationProjectConfiguration targetConfiguration = automationProjectConfigurationService
             .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
 
-        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationAdminFacade.moveConnectedUsers(
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.moveConnectedUsers(
             sourceConfiguration.getId(), targetConfiguration.getId(),
             List.of(firstConnectedUser.getId(), secondConnectedUser.getId()));
 
@@ -2144,7 +2144,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         assertThat(fetchDeploymentRow(reference).isEnabled()).isTrue();
 
-        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationAdminFacade.moveConnectedUsers(
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.moveConnectedUsers(
             sourceConfiguration.getId(), targetConfiguration.getId(), List.of(connectedUser.getId()));
 
         assertThat(moveResult.movedConnectedUserIds()).containsExactly(connectedUser.getId());
@@ -2172,9 +2172,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        automationProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+        automationProjectConfigurationFacade.updateConfigurationWorkflow(
             sourceConfiguration.getId(), workflowUuid, Map.of(), Map.of("channel", "#source"));
-        automationProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+        automationProjectConfigurationFacade.updateConfigurationWorkflow(
             targetConfiguration.getId(), workflowUuid, Map.of(), Map.of("channel", "#target"));
 
         ConnectedUser connectedUser = assignNewConnectedUser(automationProjectId, sourceConfiguration);
@@ -2184,7 +2184,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         assertThat(fetchDeploymentRow(reference).getInputs()).isEqualTo(Map.of("channel", "#source"));
 
-        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationAdminFacade.moveConnectedUsers(
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.moveConnectedUsers(
             sourceConfiguration.getId(), targetConfiguration.getId(), List.of(connectedUser.getId()));
 
         assertThat(moveResult.movedConnectedUserIds()).containsExactly(connectedUser.getId());
@@ -2211,7 +2211,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        automationProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+        automationProjectConfigurationFacade.updateConfigurationWorkflow(
             sourceConfiguration.getId(), workflowUuid, Map.of(), Map.of("channel", "#source"));
 
         ConnectedUser firstConnectedUser = assignNewConnectedUser(automationProjectId, sourceConfiguration);
@@ -2220,7 +2220,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         connectedUserWorkflowReferenceFacade.getOrCreateReference(
             firstConnectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
 
-        ConfigurationMoveImpactDTO moveImpact = automationProjectConfigurationAdminFacade.getMoveImpact(
+        ConfigurationMoveImpactDTO moveImpact = automationProjectConfigurationFacade.getMoveImpact(
             sourceConfiguration.getId(), targetConfiguration.getId(),
             List.of(firstConnectedUser.getId(), secondConnectedUser.getId()));
 
@@ -2251,7 +2251,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        automationProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+        automationProjectConfigurationFacade.updateConfigurationWorkflow(
             sourceConfiguration.getId(), workflowUuid, Map.of(), Map.of("channel", "#source"));
 
         ConnectedUser connectedUser = assignNewConnectedUser(automationProjectId, sourceConfiguration);
@@ -2259,7 +2259,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
 
-        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationAdminFacade.moveConnectedUsers(
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.moveConnectedUsers(
             sourceConfiguration.getId(), targetConfiguration.getId(), List.of(connectedUser.getId()));
 
         assertThat(moveResult.movedConnectedUserIds()).containsExactly(connectedUser.getId());
@@ -2296,7 +2296,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             .findAllByCopiedFromWorkflowUuid(workflowUuid)
             .getFirst();
 
-        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationAdminFacade.moveConnectedUsers(
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.moveConnectedUsers(
             sourceConfiguration.getId(), targetConfiguration.getId(), List.of(connectedUser.getId()));
 
         assertThat(moveResult.movedConnectedUserIds()).containsExactly(connectedUser.getId());
@@ -2336,7 +2336,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         List<Long> connectedUserIds = List.of(connectedUser.getId());
 
         assertThatThrownBy(
-            () -> automationProjectConfigurationAdminFacade.moveConnectedUsers(
+            () -> automationProjectConfigurationFacade.moveConnectedUsers(
                 sourceConfiguration.getId(), otherProjectConfiguration.getId(), connectedUserIds))
                     .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
                         configurationException.getErrorKey())
@@ -2344,7 +2344,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
                                 AutomationProjectConfigurationErrorType.CONFIGURATION_PROJECT_MISMATCH
                                     .getErrorKey()));
         assertThatThrownBy(
-            () -> automationProjectConfigurationAdminFacade.getMoveImpact(
+            () -> automationProjectConfigurationFacade.getMoveImpact(
                 sourceConfiguration.getId(), otherProjectConfiguration.getId(), connectedUserIds))
                     .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
                         configurationException.getErrorKey())
@@ -2384,7 +2384,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         when(connectedUserConnectionFacade.getConnections(failingConnectedUser.getId(), "slack", List.of()))
             .thenThrow(new IllegalStateException("Connection lookup failed"));
 
-        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationAdminFacade.moveConnectedUsers(
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.moveConnectedUsers(
             sourceConfiguration.getId(), targetConfiguration.getId(),
             List.of(failingConnectedUser.getId(), otherConnectedUser.getId()));
 
@@ -2436,7 +2436,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         AutomationProjectConfiguration targetConfiguration = automationProjectConfigurationService
             .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
 
-        assertThat(automationProjectConfigurationAdminFacade.getMoveImpact(
+        assertThat(automationProjectConfigurationFacade.getMoveImpact(
             sourceConfiguration.getId(), targetConfiguration.getId(), List.of(movedConnectedUser.getId()))
             .workflows())
                 .singleElement()
@@ -2480,7 +2480,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         AutomationProjectConfiguration targetConfiguration = automationProjectConfigurationService
             .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
 
-        ConfigurationMoveImpactDTO moveImpact = automationProjectConfigurationAdminFacade.getMoveImpact(
+        ConfigurationMoveImpactDTO moveImpact = automationProjectConfigurationFacade.getMoveImpact(
             sourceConfiguration.getId(), targetConfiguration.getId(),
             List.of(firstConnectedUser.getId(), secondConnectedUser.getId(), thirdConnectedUser.getId()));
 
@@ -2529,7 +2529,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
 
         ConfigurationMoveResultDTO upgradeResult =
-            automationProjectConfigurationAdminFacade.upgradeConnectedUsers(
+            automationProjectConfigurationFacade.upgradeConnectedUsers(
                 targetConfiguration.getId(), List.of(secondConnectedUser.getId(), firstConnectedUser.getId()));
 
         assertThat(upgradeResult.movedConnectedUserIds()).containsExactly(
@@ -2569,7 +2569,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             createConnectedUser(), Environment.PRODUCTION);
 
         ConfigurationMoveResultDTO upgradeResult =
-            automationProjectConfigurationAdminFacade.upgradeConnectedUsers(
+            automationProjectConfigurationFacade.upgradeConnectedUsers(
                 targetConfiguration.getId(),
                 List.of(
                     sourceConnectedUser.getId(), targetConnectedUser.getId(), unassignedConnectedUser.getId(),
@@ -2624,7 +2624,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             otherAutomationProjectId, otherProjectConfiguration);
 
         ConfigurationMoveResultDTO upgradeResult =
-            automationProjectConfigurationAdminFacade.upgradeConnectedUsers(
+            automationProjectConfigurationFacade.upgradeConnectedUsers(
                 targetConfiguration.getId(),
                 List.of(stagingConnectedUser.getId(), otherProjectConnectedUser.getId()));
 
@@ -2686,12 +2686,12 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             firstConnectedUser.getId(), ConfigurationMoveResultDTO.Skipped.TARGET_LACKS_REFERENCED_WORKFLOWS,
             List.of("Fetch Recent Emails"));
 
-        assertThat(automationProjectConfigurationAdminFacade.getUpgradeImpact(
+        assertThat(automationProjectConfigurationFacade.getUpgradeImpact(
             targetConfiguration.getId(), connectedUserIds)
             .skipped()).containsExactly(expectedSkipped);
 
         ConfigurationMoveResultDTO upgradeResult =
-            automationProjectConfigurationAdminFacade.upgradeConnectedUsers(
+            automationProjectConfigurationFacade.upgradeConnectedUsers(
                 targetConfiguration.getId(), connectedUserIds);
 
         assertThat(upgradeResult.movedConnectedUserIds()).containsExactly(secondConnectedUser.getId());
@@ -2727,7 +2727,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        automationProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+        automationProjectConfigurationFacade.updateConfigurationWorkflow(
             firstSourceConfiguration.getId(), workflowUuid, Map.of(), Map.of("channel", "#source"));
 
         ConnectedUser firstConnectedUser = assignNewConnectedUser(
@@ -2739,7 +2739,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             firstConnectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
 
         ConfigurationMoveResultDTO upgradeResult =
-            automationProjectConfigurationAdminFacade.upgradeConnectedUsers(
+            automationProjectConfigurationFacade.upgradeConnectedUsers(
                 targetConfiguration.getId(), List.of(firstConnectedUser.getId(), secondConnectedUser.getId()));
 
         assertThat(upgradeResult.movedConnectedUserIds()).containsExactly(
@@ -2792,7 +2792,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         ConnectedUser targetConnectedUser = assignNewConnectedUser(automationProjectId, targetConfiguration);
 
-        ConfigurationMoveImpactDTO upgradeImpact = automationProjectConfigurationAdminFacade.getUpgradeImpact(
+        ConfigurationMoveImpactDTO upgradeImpact = automationProjectConfigurationFacade.getUpgradeImpact(
             targetConfiguration.getId(),
             List.of(
                 secondConnectedUser.getId(), firstConnectedUser.getId(), firstConnectedUser.getId(),
@@ -2833,7 +2833,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         assignNewConnectedUser(automationProjectId, configurationB);
 
-        assertThat(automationProjectConfigurationAdminFacade.getConfigurationConnectedUsers(
+        assertThat(automationProjectConfigurationFacade.getConfigurationConnectedUsers(
             configurationA.getId()))
                 .containsExactly(
                     new AutomationProjectConfigurationConnectedUserDTO(
@@ -3562,7 +3562,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             .findFirst()
             .orElseThrow();
 
-        automationProjectConfigurationAdminFacade.updateConfiguration(
+        automationProjectConfigurationFacade.updateConfiguration(
             configuration.getId(), configuration.getName(), configuration.getPermissionExpression(),
             configuration.getProjectVersion(), configuration.isEnabled(), configuration.isAutomationHubVisible());
 
@@ -3841,7 +3841,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             .findFirst()
             .orElseThrow();
 
-        automationProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+        automationProjectConfigurationFacade.updateConfigurationWorkflow(
             configuration.getId(), workflowUuid, providedConnections, providedInputs);
     }
 

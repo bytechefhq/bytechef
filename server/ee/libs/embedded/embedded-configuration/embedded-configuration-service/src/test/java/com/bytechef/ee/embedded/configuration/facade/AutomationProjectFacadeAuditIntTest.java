@@ -160,7 +160,7 @@ class AutomationProjectFacadeAuditIntTest {
     private static final String PERMISSION_EXPRESSION = "metadata['tier'] == 'pro'";
 
     @Autowired
-    private AutomationProjectConfigurationAdminFacade automationProjectConfigurationAdminFacade;
+    private AutomationProjectConfigurationFacade automationProjectConfigurationFacade;
 
     @Autowired
     private AutomationProjectFacade automationProjectFacade;
@@ -326,7 +326,7 @@ class AutomationProjectFacadeAuditIntTest {
 
         automationProjectFacade.publishProject(projectId);
 
-        long configurationId = automationProjectConfigurationAdminFacade.createConfiguration(
+        long configurationId = automationProjectConfigurationFacade.createConfiguration(
             projectId, 0L, CONFIGURATION_NAME, null, 1, true, false);
 
         assertThat(
@@ -340,7 +340,7 @@ class AutomationProjectFacadeAuditIntTest {
                     .containsEntry("projectVersion", "1")
                     .containsEntry("automationHubVisible", "false");
 
-        automationProjectConfigurationAdminFacade.updateConfiguration(
+        automationProjectConfigurationFacade.updateConfiguration(
             configurationId, CONFIGURATION_NAME, null, 1, true, true);
 
         assertThat(
@@ -350,7 +350,7 @@ class AutomationProjectFacadeAuditIntTest {
                     .containsEntry("configurationId", String.valueOf(configurationId))
                     .containsEntry("automationHubVisible", "true");
 
-        automationProjectConfigurationAdminFacade.enableConfigurationWorkflow(
+        automationProjectConfigurationFacade.enableConfigurationWorkflow(
             configurationId, workflowUuid, false);
 
         assertThat(
@@ -362,7 +362,7 @@ class AutomationProjectFacadeAuditIntTest {
                         .containsEntry("workflowUuid", workflowUuid)
                         .containsEntry("enabled", "false");
 
-        automationProjectConfigurationAdminFacade.enableConfiguration(configurationId, false);
+        automationProjectConfigurationFacade.enableConfiguration(configurationId, false);
 
         assertThat(
             findSingleEvent(
@@ -372,7 +372,7 @@ class AutomationProjectFacadeAuditIntTest {
                         .containsEntry("configurationId", String.valueOf(configurationId))
                         .containsEntry("enabled", "false");
 
-        automationProjectConfigurationAdminFacade.deleteConfiguration(configurationId);
+        automationProjectConfigurationFacade.deleteConfiguration(configurationId);
 
         assertThat(
             findSingleEvent(AutomationProjectAuditEvents.AUTOMATION_PROJECT_CONFIGURATION_DELETED)

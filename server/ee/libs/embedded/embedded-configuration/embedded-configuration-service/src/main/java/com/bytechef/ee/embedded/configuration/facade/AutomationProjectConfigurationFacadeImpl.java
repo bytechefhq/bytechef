@@ -96,11 +96,11 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Transactional
 @ConditionalOnEEVersion
 @PreAuthorize("isTenantAdmin()")
-public class AutomationProjectConfigurationAdminFacadeImpl
-    implements AutomationProjectConfigurationAdminFacade {
+public class AutomationProjectConfigurationFacadeImpl
+    implements AutomationProjectConfigurationFacade {
 
     private static final Logger log = LoggerFactory.getLogger(
-        AutomationProjectConfigurationAdminFacadeImpl.class);
+        AutomationProjectConfigurationFacadeImpl.class);
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final AutomationProjectConfigurationResolver automationProjectConfigurationResolver;
@@ -115,7 +115,7 @@ public class AutomationProjectConfigurationAdminFacadeImpl
     private final ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
     private final ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager;
     private final ConnectedUserService connectedUserService;
-    private final ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade;
+    private final ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
     private final ConnectionService connectionService;
     private final JobService jobService;
     private final McpAutomationRowFacade mcpAutomationRowFacade;
@@ -126,7 +126,7 @@ public class AutomationProjectConfigurationAdminFacadeImpl
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public AutomationProjectConfigurationAdminFacadeImpl(
+    public AutomationProjectConfigurationFacadeImpl(
         ApplicationEventPublisher applicationEventPublisher,
         AutomationProjectConfigurationResolver automationProjectConfigurationResolver,
         AutomationProjectConfigurationService automationProjectConfigurationService,
@@ -139,7 +139,7 @@ public class AutomationProjectConfigurationAdminFacadeImpl
         ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService,
         ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager,
         ConnectedUserService connectedUserService,
-        ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade,
+        ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade,
         ConnectionService connectionService, JobService jobService, McpAutomationRowFacade mcpAutomationRowFacade,
         PlatformTransactionManager platformTransactionManager, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService,
@@ -158,7 +158,7 @@ public class AutomationProjectConfigurationAdminFacadeImpl
         this.connectedUserReferenceDeploymentService = connectedUserReferenceDeploymentService;
         this.connectedUserReferenceRolloutManager = connectedUserReferenceRolloutManager;
         this.connectedUserService = connectedUserService;
-        this.connectedUserWorkflowReferenceAdminFacade = connectedUserWorkflowReferenceAdminFacade;
+        this.connectedUserWorkflowReferenceFacade = connectedUserWorkflowReferenceFacade;
         this.connectionService = connectionService;
         this.jobService = jobService;
         this.mcpAutomationRowFacade = mcpAutomationRowFacade;
@@ -382,7 +382,7 @@ public class AutomationProjectConfigurationAdminFacadeImpl
             .stream()
             .filter(workflowInput -> Objects.equals(workflowInput.getName(), inputName))
             .findFirst()
-            .map(AutomationProjectConfigurationAdminFacadeImpl::getComponentInputReference)
+            .map(AutomationProjectConfigurationFacadeImpl::getComponentInputReference)
             .orElseThrow(() -> newInvalidProvidedValueException(
                 "Input %s of workflow uuid=%s does not reference a component input".formatted(
                     inputName, workflowUuid)));
@@ -579,7 +579,7 @@ public class AutomationProjectConfigurationAdminFacadeImpl
             for (AutomationProjectConfigurationVersionImpactDTO.Workflow workflow : moveImpact.workflows()) {
                 workflowsByUuid.merge(
                     workflow.workflowUuid(), workflow,
-                    AutomationProjectConfigurationAdminFacadeImpl::mergeImpactWorkflows);
+                    AutomationProjectConfigurationFacadeImpl::mergeImpactWorkflows);
             }
 
             skipped.addAll(moveImpact.skipped());
@@ -1198,7 +1198,7 @@ public class AutomationProjectConfigurationAdminFacadeImpl
 
         Environment environment = Environment.values()[(int) configuration.getEnvironmentId()];
 
-        return connectedUserWorkflowReferenceAdminFacade.getReferences(workflowUuids)
+        return connectedUserWorkflowReferenceFacade.getReferences(workflowUuids)
             .stream()
             .filter(reference -> connectedUserIds.contains(reference.connectedUserId()) &&
                 Objects.equals(reference.environment(), environment.name()))
