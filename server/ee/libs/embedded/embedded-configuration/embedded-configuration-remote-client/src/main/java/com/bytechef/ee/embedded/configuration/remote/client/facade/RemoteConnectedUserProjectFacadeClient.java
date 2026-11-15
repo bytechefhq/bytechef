@@ -7,9 +7,13 @@
 
 package com.bytechef.ee.embedded.configuration.remote.client.facade;
 
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserAutomationProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceValuesDTO;
 import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionConnectedUserProjectWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -156,6 +160,32 @@ public class RemoteConnectedUserProjectFacadeClient implements ConnectedUserProj
     public void updateWorkflowConfigurationConnection(
         String externalUserId, String workflowUuid, String workflowNodeName, String workflowConnectionKey,
         long connectionId, Environment environment) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ConnectedUserAutomationProjectConfigurationDTO> getConnectedUserProjectConfigurations(
+        long connectedUserId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ConnectedUserWorkflowReferenceValuesDTO getProjectWorkflowReferenceValues(
+        long connectedUserProjectWorkflowId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ProvisionableAutomationProjectDTO> getProvisionableProjects(long connectedUserId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void provisionProjectWorkflows(
+        long connectedUserId, long configurationId, List<ProvisionConnectedUserProjectWorkflowDTO> workflows) {
 
         throw new UnsupportedOperationException();
     }

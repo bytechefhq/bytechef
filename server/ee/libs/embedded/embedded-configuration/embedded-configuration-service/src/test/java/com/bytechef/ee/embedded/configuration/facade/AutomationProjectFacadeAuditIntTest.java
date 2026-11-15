@@ -169,7 +169,7 @@ class AutomationProjectFacadeAuditIntTest {
     private AutomationProjectService automationProjectService;
 
     @Autowired
-    private ConnectedUserProjectAdminFacade connectedUserProjectAdminFacade;
+    private ConnectedUserProjectFacade connectedUserProjectFacade;
 
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
@@ -386,7 +386,7 @@ class AutomationProjectFacadeAuditIntTest {
         String workflowUuid = String.valueOf(UUID.randomUUID());
 
         assertThatThrownBy(
-            () -> connectedUserProjectAdminFacade.provisionProjectWorkflows(
+            () -> connectedUserProjectFacade.provisionProjectWorkflows(
                 Long.MAX_VALUE, Long.MAX_VALUE,
                 List.of(new ProvisionConnectedUserProjectWorkflowDTO(workflowUuid, null))))
                     .isInstanceOf(RuntimeException.class);
@@ -399,7 +399,7 @@ class AutomationProjectFacadeAuditIntTest {
                     .containsEntry("configurationId", String.valueOf(Long.MAX_VALUE))
                     .containsEntry("workflowUuids", "[" + workflowUuid + "]");
 
-        assertThatThrownBy(() -> connectedUserProjectAdminFacade.enableProjectWorkflow(Long.MAX_VALUE, true))
+        assertThatThrownBy(() -> connectedUserProjectFacade.enableProjectWorkflow(Long.MAX_VALUE, true))
             .isInstanceOf(RuntimeException.class);
 
         assertThat(
@@ -409,7 +409,7 @@ class AutomationProjectFacadeAuditIntTest {
                     .containsEntry("connectedUserProjectWorkflowId", String.valueOf(Long.MAX_VALUE))
                     .containsEntry("enabled", "true");
 
-        assertThatThrownBy(() -> connectedUserProjectAdminFacade.deleteProjectWorkflow(Long.MAX_VALUE))
+        assertThatThrownBy(() -> connectedUserProjectFacade.deleteProjectWorkflow(Long.MAX_VALUE))
             .isInstanceOf(RuntimeException.class);
 
         assertThat(

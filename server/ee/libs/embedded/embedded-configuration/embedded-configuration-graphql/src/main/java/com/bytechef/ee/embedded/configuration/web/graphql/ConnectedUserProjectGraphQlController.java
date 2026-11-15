@@ -14,7 +14,7 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDT
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceValuesDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationProjectDTO;
-import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectAdminFacade;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.util.ToolOnlyWorkflowUtils;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -41,12 +41,12 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnEEVersion
 public class ConnectedUserProjectGraphQlController {
 
-    private final ConnectedUserProjectAdminFacade connectedUserProjectFacade;
+    private final ConnectedUserProjectFacade connectedUserProjectFacade;
     private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserProjectGraphQlController(
-        ConnectedUserProjectAdminFacade connectedUserProjectFacade, EnvironmentService environmentService) {
+        ConnectedUserProjectFacade connectedUserProjectFacade, EnvironmentService environmentService) {
 
         this.connectedUserProjectFacade = connectedUserProjectFacade;
         this.environmentService = environmentService;
