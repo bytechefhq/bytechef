@@ -350,7 +350,7 @@ describe('ConnectionDialog withheld credentials', () => {
         expect(screen.queryByRole('button', {name: 'Update credentials'})).not.toBeInTheDocument();
     });
 
-    it('testATenantAdminSeesHiddenCredentialsOfAMembersWorkspaceConnection', () => {
+    it('testATenantAdminReplacesTheHiddenCredentialsOfAMembersWorkspaceConnection', async () => {
         act(() => {
             authenticateAs('admin@localhost.com', ['ROLE_ADMIN']);
             usePlatformTypeStore.setState({currentType: PlatformType.AUTOMATION});
@@ -359,10 +359,22 @@ describe('ConnectionDialog withheld credentials', () => {
 
         hoisted.workspaceGrants = {[PRODUCTION]: ['CONNECTION_EDIT', 'CONNECTION_VIEW']};
 
-        renderEditDialog(PlatformType.AUTOMATION, {visibility: 'WORKSPACE'});
+        const {credentialsMutateAsync} = renderEditDialog(PlatformType.AUTOMATION, {visibility: 'WORKSPACE'});
 
         expect(screen.getAllByText('Hidden')).toHaveLength(3);
-        expect(screen.queryByRole('button', {name: 'Update credentials'})).not.toBeInTheDocument();
+        expect(screen.queryByText('secret-api-key-value')).not.toBeInTheDocument();
+
+        const user = userEvent.setup({pointerEventsCheck: 0});
+
+        await user.click(screen.getByRole('button', {name: 'Update credentials'}));
+
+        expect(await screen.findAllByTestId('connection-properties')).not.toHaveLength(0);
+
+        await user.click(screen.getByRole('button', {name: 'Update credentials'}));
+
+        await waitFor(() => expect(credentialsMutateAsync).toHaveBeenCalledTimes(1));
+        expect(credentialsMutateAsync.mock.calls[0][0]).toMatchObject({id: 5, version: 3});
+        expect(JSON.stringify(credentialsMutateAsync.mock.calls[0][0])).not.toContain('secret-api-key-value');
     });
 
     it('testTheMemberAConnectionWasReassignedToSeesItsCredentials', () => {
