@@ -2,11 +2,13 @@ extend type Query {
     mcpAutomationProjectConfigurationToolWorkflowUuids(automationProjectConfigurationId: ID!): [String!]!
     mcpAutomationProjectConfigurationsByServerId(mcpServerId: ID!): [McpAutomationProjectConfiguration!]!
     mcpAutomationProjectConfigurationWorkflowProperties(mcpAutomationProjectConfigurationWorkflowId: ID!): [Property]
+    toolEligibleAutomationProjectConfigurationWorkflowProperties(automationProjectConfigurationId: ID!, workflowUuid: String!): [Property]
 }
 
 extend type Mutation {
     createMcpAutomationProjectConfiguration(input: CreateMcpAutomationProjectConfigurationInput!): McpAutomationProjectConfiguration!
     deleteMcpAutomationProjectConfiguration(id: ID!): Boolean
+    deleteMcpAutomationProjectConfigurationWorkflow(id: ID!): Boolean
     updateMcpAutomationProjectConfiguration(id: ID!, input: UpdateMcpAutomationProjectConfigurationInput!): McpAutomationProjectConfiguration!
     updateMcpAutomationProjectConfigurationWorkflowEnabled(id: ID!, enabled: Boolean!): McpAutomationProjectConfigurationWorkflow!
     updateMcpAutomationProjectConfigurationWorkflowParameters(id: ID!, parameters: Map!): McpAutomationProjectConfigurationWorkflow!
@@ -27,6 +29,7 @@ type McpAutomationProjectConfiguration {
 type McpAutomationProjectConfigurationWorkflow {
     id: ID!
     workflowUuid: String!
+    workflowId: String
     label: String
     parameters: Map
     enabled: Boolean!

@@ -146,6 +146,21 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
 
     @Override
     @Audited(
+        event = McpAutomationProjectConfigurationAuditEvents.MCP_AUTOMATION_PROJECT_CONFIGURATION_WORKFLOW_DELETED,
+        data = {
+            @AuditData(key = "mcpAutomationProjectConfigurationWorkflowId", value = "#id")
+        })
+    @PreAuthorize("isTenantAdmin()")
+    public void deleteMcpAutomationProjectConfigurationWorkflow(long id) {
+        mcpAutomationProjectConfigurationWorkflowService.fetch(id)
+            .orElseThrow(
+                () -> new IllegalArgumentException("McpAutomationProjectConfigurationWorkflow not found: " + id));
+
+        mcpAutomationProjectConfigurationWorkflowService.delete(id);
+    }
+
+    @Override
+    @Audited(
         event = McpAutomationProjectConfigurationAuditEvents.MCP_AUTOMATION_PROJECT_CONFIGURATION_UPDATED, data = {
             @AuditData(key = "mcpAutomationProjectConfigurationId", value = "#id"),
             @AuditData(key = "mcpServerId", value = "#result?.mcpServerId"),
@@ -240,6 +255,19 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
 
         return fetchPinnedWorkflow(automationProjectConfiguration,
             mcpAutomationProjectConfigurationWorkflow.getWorkflowUuid());
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(readOnly = true)
+    public Optional<Workflow> fetchAutomationProjectConfigurationToolWorkflow(
+        long automationProjectConfigurationId, String workflowUuid) {
+
+        AutomationProjectConfiguration automationProjectConfiguration =
+            automationProjectConfigurationService.getConfiguration(automationProjectConfigurationId);
+
+        return fetchPinnedWorkflow(automationProjectConfiguration, workflowUuid)
+            .filter(McpAutomationProjectConfigurationFacadeImpl::hasWorkflowCallTrigger);
     }
 
     @Override
@@ -394,10 +422,12 @@ public class McpAutomationProjectConfigurationFacadeImpl implements McpAutomatio
 
             String label = workflowOptional.map(Workflow::getLabel)
                 .orElse(null);
+            String workflowId = workflowOptional.map(Workflow::getId)
+                .orElse(null);
 
             workflowDTOs.add(
                 new McpAutomationProjectConfigurationWorkflowDTO(
-                    mcpAutomationProjectConfigurationWorkflow.getId(), workflowUuid, label,
+                    mcpAutomationProjectConfigurationWorkflow.getId(), workflowUuid, workflowId, label,
                     mcpAutomationProjectConfigurationWorkflow.getParameters(),
                     mcpAutomationProjectConfigurationWorkflow.isEnabled(), available));
         }

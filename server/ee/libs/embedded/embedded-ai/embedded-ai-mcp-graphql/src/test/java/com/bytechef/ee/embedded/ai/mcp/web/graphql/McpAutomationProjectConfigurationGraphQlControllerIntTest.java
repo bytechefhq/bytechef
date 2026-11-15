@@ -212,6 +212,55 @@ class McpAutomationProjectConfigurationGraphQlControllerIntTest {
     }
 
     @Test
+    void testToolEligibleAutomationProjectConfigurationWorkflowProperties() {
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflow.getExtensions("triggers", WorkflowTrigger.class, List.of()))
+            .thenReturn(
+                List.of(
+                    new WorkflowTrigger(
+                        Map.of(
+                            "name", "trigger_1", "type", "workflow/v1/newWorkflowCall", "parameters",
+                            Map.of(
+                                "inputSchema",
+                                "{\"type\":\"object\",\"properties\":{\"greeting\":{\"type\":\"string\"}}}")))));
+        when(mcpAutomationProjectConfigurationFacade.fetchAutomationProjectConfigurationToolWorkflow(5L, WORKFLOW_UUID))
+            .thenReturn(Optional.of(workflow));
+
+        graphQlTester.document("""
+            query {
+                toolEligibleAutomationProjectConfigurationWorkflowProperties(
+                    automationProjectConfigurationId: "5", workflowUuid: "%s") {
+                    name
+                }
+            }
+            """.replace("%s", WORKFLOW_UUID))
+            .execute()
+            .path("toolEligibleAutomationProjectConfigurationWorkflowProperties[*].name")
+            .entityList(String.class)
+            .containsExactly("toolName", "toolDescription", "greeting");
+    }
+
+    @Test
+    void testToolEligibleAutomationProjectConfigurationWorkflowPropertiesWithoutToolWorkflow() {
+        when(mcpAutomationProjectConfigurationFacade.fetchAutomationProjectConfigurationToolWorkflow(5L, WORKFLOW_UUID))
+            .thenReturn(Optional.empty());
+
+        graphQlTester.document("""
+            query {
+                toolEligibleAutomationProjectConfigurationWorkflowProperties(
+                    automationProjectConfigurationId: "5", workflowUuid: "%s") {
+                    name
+                }
+            }
+            """.replace("%s", WORKFLOW_UUID))
+            .execute()
+            .path("toolEligibleAutomationProjectConfigurationWorkflowProperties")
+            .entityList(Object.class)
+            .hasSize(0);
+    }
+
+    @Test
     void testCreateMcpAutomationProjectConfiguration() {
         when(
             mcpAutomationProjectConfigurationFacade.createMcpAutomationProjectConfiguration(
@@ -344,6 +393,21 @@ class McpAutomationProjectConfigurationGraphQlControllerIntTest {
     }
 
     @Test
+    void testDeleteMcpAutomationProjectConfigurationWorkflow() {
+        graphQlTester.document("""
+            mutation {
+                deleteMcpAutomationProjectConfigurationWorkflow(id: "21")
+            }
+            """)
+            .execute()
+            .path("deleteMcpAutomationProjectConfigurationWorkflow")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(mcpAutomationProjectConfigurationFacade).deleteMcpAutomationProjectConfigurationWorkflow(21L);
+    }
+
+    @Test
     void testUpdateMcpAutomationProjectConfigurationWorkflowParameters() {
         when(
             mcpAutomationProjectConfigurationFacade.updateMcpAutomationProjectConfigurationWorkflowParameters(
@@ -401,7 +465,7 @@ class McpAutomationProjectConfigurationGraphQlControllerIntTest {
             11L, 3L, 5L, "Configuration", 7L, "Project", 1, true,
             List.of(
                 new McpAutomationProjectConfigurationWorkflowDTO(
-                    21L, WORKFLOW_UUID, "Workflow", Map.of("name", "tool"), true, available)));
+                    21L, WORKFLOW_UUID, "workflow-id", "Workflow", Map.of("name", "tool"), true, available)));
     }
 
     private static McpAutomationProjectConfiguration createLink() {

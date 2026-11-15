@@ -18,6 +18,6 @@ import org.jspecify.annotations.Nullable;
  */
 @SuppressFBWarnings("EI")
 public record McpAutomationProjectConfigurationWorkflowDTO(
-    long id, String workflowUuid, @Nullable String label, Map<String, ?> parameters, boolean enabled,
-    boolean available) {
+    long id, String workflowUuid, @Nullable String workflowId, @Nullable String label, Map<String, ?> parameters,
+    boolean enabled, boolean available) {
 }
