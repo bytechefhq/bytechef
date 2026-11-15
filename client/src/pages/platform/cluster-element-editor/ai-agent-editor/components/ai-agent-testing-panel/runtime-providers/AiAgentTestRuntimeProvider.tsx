@@ -1,5 +1,6 @@
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import {humanizeAgentErrorMessage} from '@/shared/components/ai-chat/messages/humanizeAgentErrorMessage';
 import {SSERequestType, useSSE} from '@/shared/hooks/useSSE';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {
@@ -90,7 +91,8 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
                 setLastAssistantMessageContent(`${formatAskUserQuestionMessage(questionEvent)}\n\n`);
             },
             error: (data) => {
-                const errorMessage = typeof data === 'string' ? data : 'An unexpected error occurred';
+                const errorMessage =
+                    typeof data === 'string' ? humanizeAgentErrorMessage(data) : 'An unexpected error occurred';
 
                 awaitingStreamEventRef.current = false;
 

@@ -226,6 +226,28 @@ describe('AiAgentTestRuntimeProvider', () => {
         expect(getRuntimeOptions().isRunning).toBe(false);
     });
 
+    it('shows the provider message instead of its raw JSON error body', async () => {
+        render(<AiAgentTestRuntimeProvider>child</AiAgentTestRuntimeProvider>);
+
+        await act(async () => {
+            await getRuntimeOptions().onNew(createTextMessage('hi'));
+        });
+
+        act(() => {
+            getSSEOptions().eventHandlers!.error(
+                '400: {"type":"error","error":{"type":"invalid_request_error","message":"`temperature` is deprecated for this model."},"request_id":"req_1"}'
+            );
+        });
+
+        const {messages} = useAiAgentTestingChatStore.getState();
+
+        expect(messages[messages.length - 1]).toMatchObject({
+            role: 'assistant',
+            status: {error: '`temperature` is deprecated for this model.'},
+        });
+        expect(getRuntimeOptions().isRunning).toBe(false);
+    });
+
     it('shows the connection failure and stops running when the stream fails', async () => {
         const {rerender} = render(<AiAgentTestRuntimeProvider>child</AiAgentTestRuntimeProvider>);
 
