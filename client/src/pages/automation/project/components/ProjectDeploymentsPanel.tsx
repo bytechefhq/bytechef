@@ -58,6 +58,7 @@ const ProjectDeploymentsPanel = ({
         refetch: refetchProjectDeployments,
     } = useGetWorkspaceProjectDeploymentsQuery(
         {
+            environmentId: currentEnvironmentId,
             id: currentWorkspaceId ?? 0,
             projectId: project.id ?? 0,
         },
@@ -72,7 +73,7 @@ const ProjectDeploymentsPanel = ({
         enabled
     );
 
-    const {data: tags} = useGetProjectDeploymentTagsQuery(currentEnvironmentId);
+    const {data: tags} = useGetProjectDeploymentTagsQuery();
 
     const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
 

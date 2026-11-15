@@ -5,18 +5,16 @@ import {useQuery} from '@tanstack/react-query';
 
 export const ProjectDeploymentTagKeys = {
     projectDeploymentTags: ['projectDeploymentTags'] as const,
-    workspaceProjectDeploymentTags: (workspaceId: number, environmentId?: number) =>
-        environmentId === undefined
-            ? ([...ProjectDeploymentTagKeys.projectDeploymentTags, workspaceId] as const)
-            : ([...ProjectDeploymentTagKeys.projectDeploymentTags, workspaceId, environmentId] as const),
+    workspaceProjectDeploymentTags: (workspaceId: number) =>
+        [...ProjectDeploymentTagKeys.projectDeploymentTags, workspaceId] as const,
 };
 
-export const useGetProjectDeploymentTagsQuery = (environmentId?: number) => {
+export const useGetProjectDeploymentTagsQuery = () => {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     return useQuery<Tag[], Error>({
-        queryKey: ProjectDeploymentTagKeys.workspaceProjectDeploymentTags(currentWorkspaceId!, environmentId),
-        queryFn: () => new ProjectDeploymentTagApi().getProjectDeploymentTags({environmentId, id: currentWorkspaceId!}),
+        queryKey: ProjectDeploymentTagKeys.workspaceProjectDeploymentTags(currentWorkspaceId!),
+        queryFn: () => new ProjectDeploymentTagApi().getProjectDeploymentTags({id: currentWorkspaceId!}),
         enabled: currentWorkspaceId !== undefined,
     });
 };
