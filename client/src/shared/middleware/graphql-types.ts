@@ -1777,6 +1777,7 @@ export type McpAutomationProjectConfiguration = {
   id: Scalars['ID']['output'];
   mcpServerId: Scalars['ID']['output'];
   projectId: Scalars['ID']['output'];
+  projectName: Scalars['String']['output'];
   projectVersion: Scalars['Int']['output'];
   workflows: Array<McpAutomationProjectConfigurationWorkflow>;
 };
@@ -3679,6 +3680,7 @@ export type Query = {
   knowledgeBases?: Maybe<Array<Maybe<KnowledgeBase>>>;
   managementMcpServerCanonicalUrl: Scalars['String']['output'];
   managementMcpServerUrl?: Maybe<Scalars['String']['output']>;
+  mcpAutomationProjectConfigurationToolWorkflowUuids: Array<Scalars['String']['output']>;
   mcpAutomationProjectConfigurationWorkflowProperties?: Maybe<Array<Maybe<Property>>>;
   mcpAutomationProjectConfigurationsByServerId: Array<McpAutomationProjectConfiguration>;
   mcpComponent?: Maybe<McpComponent>;
@@ -4360,6 +4362,11 @@ export type QueryKnowledgeBaseEmbeddingActiveArgs = {
 export type QueryKnowledgeBasesArgs = {
   environmentId: Scalars['ID']['input'];
   workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryMcpAutomationProjectConfigurationToolWorkflowUuidsArgs = {
+  automationProjectConfigurationId: Scalars['ID']['input'];
 };
 
 
