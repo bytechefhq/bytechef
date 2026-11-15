@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("DataTableRow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-14T18:03:12.597132+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-15T02:59:05.917592+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class DataTableRowModel {
 
   private @Nullable Long id;
@@ -88,11 +88,11 @@ public class DataTableRowModel {
   }
 
   /**
-   * Column name to value. STRING→string, NUMBER→number, INTEGER→integer, BOOLEAN→boolean, DATE→YYYY-MM-DD, DATE_TIME→ISO-8601 UTC.
+   * Column name to value. STRING→string, NUMBER→number, INTEGER→integer, BOOLEAN→boolean, DATE→YYYY-MM-DD, DATE_TIME→ISO-8601 UTC, LINK→the linked row id (or the linked row object when expanded).
    * @return values
    */
   
-  @Schema(name = "values", description = "Column name to value. STRING→string, NUMBER→number, INTEGER→integer, BOOLEAN→boolean, DATE→YYYY-MM-DD, DATE_TIME→ISO-8601 UTC.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "values", description = "Column name to value. STRING→string, NUMBER→number, INTEGER→integer, BOOLEAN→boolean, DATE→YYYY-MM-DD, DATE_TIME→ISO-8601 UTC, LINK→the linked row id (or the linked row object when expanded).", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("values")
   public Map<String, Object> getValues() {
     return values;

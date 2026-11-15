@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The type of a column.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-14T18:03:12.597132+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-15T02:59:05.917592+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public enum ColumnTypeModel {
   
   STRING("STRING"),
@@ -33,7 +33,9 @@ public enum ColumnTypeModel {
   
   DATE_TIME("DATE_TIME"),
   
-  BOOLEAN("BOOLEAN");
+  BOOLEAN("BOOLEAN"),
+  
+  LINK("LINK");
 
   private final String value;
 

@@ -44,7 +44,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-14T20:58:12.896819+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-15T03:07:08.789973+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 @Validated
 @Tag(name = "data-table-row", description = "Data table rows.")
 public interface DataTableRowApi {
@@ -152,6 +152,7 @@ public interface DataTableRowApi {
      * @param xEnvironment The environment whose physical table is addressed. PRODUCTION when omitted. (optional)
      * @return How many rows were deleted. (status code 200)
      *         or The problem. (status code 404)
+     *         or The problem. (status code 409)
      */
     @Operation(
         operationId = "clearRows",
@@ -164,6 +165,10 @@ public interface DataTableRowApi {
                 @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ClearRowsResponseModel.class))
             }),
             @ApiResponse(responseCode = "404", description = "The problem.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorModel.class)),
+                @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
+            }),
+            @ApiResponse(responseCode = "409", description = "The problem.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorModel.class)),
                 @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
             })
@@ -184,6 +189,11 @@ public interface DataTableRowApi {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"deletedCount\" : 0 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
+                    String exampleString = "Custom MIME type example not yet supported: application/problem+json";
+                    ApiUtil.setExampleResponse(request, "application/problem+json", exampleString);
                     break;
                 }
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
@@ -297,6 +307,7 @@ public interface DataTableRowApi {
      * @param xEnvironment The environment whose physical table is addressed. PRODUCTION when omitted. (optional)
      * @return Deleted. (status code 204)
      *         or The problem. (status code 404)
+     *         or The problem. (status code 409)
      */
     @Operation(
         operationId = "deleteRow",
@@ -305,6 +316,9 @@ public interface DataTableRowApi {
         responses = {
             @ApiResponse(responseCode = "204", description = "Deleted."),
             @ApiResponse(responseCode = "404", description = "The problem.", content = {
+                @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
+            }),
+            @ApiResponse(responseCode = "409", description = "The problem.", content = {
                 @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
             })
         }
@@ -327,6 +341,11 @@ public interface DataTableRowApi {
                     ApiUtil.setExampleResponse(request, "application/problem+json", exampleString);
                     break;
                 }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
+                    String exampleString = "Custom MIME type example not yet supported: application/problem+json";
+                    ApiUtil.setExampleResponse(request, "application/problem+json", exampleString);
+                    break;
+                }
             }
         });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -344,6 +363,7 @@ public interface DataTableRowApi {
      * @param xEnvironment The environment whose physical table is addressed. PRODUCTION when omitted. (optional)
      * @return Deleted. (status code 204)
      *         or The problem. (status code 404)
+     *         or The problem. (status code 409)
      */
     @Operation(
         operationId = "deleteRowByExternalId",
@@ -352,6 +372,9 @@ public interface DataTableRowApi {
         responses = {
             @ApiResponse(responseCode = "204", description = "Deleted."),
             @ApiResponse(responseCode = "404", description = "The problem.", content = {
+                @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
+            }),
+            @ApiResponse(responseCode = "409", description = "The problem.", content = {
                 @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
             })
         }
@@ -369,6 +392,11 @@ public interface DataTableRowApi {
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
+                    String exampleString = "Custom MIME type example not yet supported: application/problem+json";
+                    ApiUtil.setExampleResponse(request, "application/problem+json", exampleString);
+                    break;
+                }
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
                     String exampleString = "Custom MIME type example not yet supported: application/problem+json";
                     ApiUtil.setExampleResponse(request, "application/problem+json", exampleString);
@@ -393,6 +421,7 @@ public interface DataTableRowApi {
      * @return What was deleted. (status code 200)
      *         or The problem. (status code 400)
      *         or The problem. (status code 404)
+     *         or The problem. (status code 409)
      */
     @Operation(
         operationId = "deleteRows",
@@ -409,6 +438,10 @@ public interface DataTableRowApi {
                 @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
             }),
             @ApiResponse(responseCode = "404", description = "The problem.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorModel.class)),
+                @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
+            }),
+            @ApiResponse(responseCode = "409", description = "The problem.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorModel.class)),
                 @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
             })
@@ -430,6 +463,11 @@ public interface DataTableRowApi {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"deletedCount\" : 0, \"deletedIds\" : [ 6, 6 ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
+                    String exampleString = "Custom MIME type example not yet supported: application/problem+json";
+                    ApiUtil.setExampleResponse(request, "application/problem+json", exampleString);
                     break;
                 }
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
@@ -508,7 +546,9 @@ public interface DataTableRowApi {
      * @param name The table name. (required)
      * @param id The row id. (required)
      * @param xEnvironment The environment whose physical table is addressed. PRODUCTION when omitted. (optional)
+     * @param expand Comma-separated link column names whose values are returned as the linked row object &#x60;{id, externalId, values}&#x60; instead of the linked row id. One level deep. (optional)
      * @return The row. (status code 200)
+     *         or The problem. (status code 400)
      *         or The problem. (status code 404)
      */
     @Operation(
@@ -519,6 +559,10 @@ public interface DataTableRowApi {
             @ApiResponse(responseCode = "200", description = "The row.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = DataTableRowModel.class)),
                 @Content(mediaType = "application/problem+json", schema = @Schema(implementation = DataTableRowModel.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "The problem.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorModel.class)),
+                @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
             }),
             @ApiResponse(responseCode = "404", description = "The problem.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorModel.class)),
@@ -535,13 +579,19 @@ public interface DataTableRowApi {
         @Parameter(name = "workspaceId", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("workspaceId") Long workspaceId,
         @Parameter(name = "name", description = "The table name.", required = true, in = ParameterIn.PATH) @PathVariable("name") String name,
         @Parameter(name = "id", description = "The row id.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "X-Environment", description = "The environment whose physical table is addressed. PRODUCTION when omitted.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
+        @Parameter(name = "X-Environment", description = "The environment whose physical table is addressed. PRODUCTION when omitted.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment,
+        @Parameter(name = "expand", description = "Comma-separated link column names whose values are returned as the linked row object `{id, externalId, values}` instead of the linked row id. One level deep.", in = ParameterIn.QUERY) @RequestParam(value = "expand", required = false) @Nullable List<String> expand
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"id\" : 2, \"externalId\" : \"externalId\", \"values\" : { \"key\" : \"\" } }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
+                    String exampleString = "Custom MIME type example not yet supported: application/problem+json";
+                    ApiUtil.setExampleResponse(request, "application/problem+json", exampleString);
                     break;
                 }
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
@@ -564,7 +614,9 @@ public interface DataTableRowApi {
      * @param name The table name. (required)
      * @param externalId The caller-supplied row key. (required)
      * @param xEnvironment The environment whose physical table is addressed. PRODUCTION when omitted. (optional)
+     * @param expand Comma-separated link column names whose values are returned as the linked row object &#x60;{id, externalId, values}&#x60; instead of the linked row id. One level deep. (optional)
      * @return The row. (status code 200)
+     *         or The problem. (status code 400)
      *         or The problem. (status code 404)
      */
     @Operation(
@@ -575,6 +627,10 @@ public interface DataTableRowApi {
             @ApiResponse(responseCode = "200", description = "The row.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = DataTableRowModel.class)),
                 @Content(mediaType = "application/problem+json", schema = @Schema(implementation = DataTableRowModel.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "The problem.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorModel.class)),
+                @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
             }),
             @ApiResponse(responseCode = "404", description = "The problem.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorModel.class)),
@@ -591,13 +647,19 @@ public interface DataTableRowApi {
         @Parameter(name = "workspaceId", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("workspaceId") Long workspaceId,
         @Parameter(name = "name", description = "The table name.", required = true, in = ParameterIn.PATH) @PathVariable("name") String name,
         @Size(max = 255) @Parameter(name = "externalId", description = "The caller-supplied row key.", required = true, in = ParameterIn.PATH) @PathVariable("externalId") String externalId,
-        @Parameter(name = "X-Environment", description = "The environment whose physical table is addressed. PRODUCTION when omitted.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
+        @Parameter(name = "X-Environment", description = "The environment whose physical table is addressed. PRODUCTION when omitted.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment,
+        @Parameter(name = "expand", description = "Comma-separated link column names whose values are returned as the linked row object `{id, externalId, values}` instead of the linked row id. One level deep.", in = ParameterIn.QUERY) @RequestParam(value = "expand", required = false) @Nullable List<String> expand
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"id\" : 2, \"externalId\" : \"externalId\", \"values\" : { \"key\" : \"\" } }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
+                    String exampleString = "Custom MIME type example not yet supported: application/problem+json";
+                    ApiUtil.setExampleResponse(request, "application/problem+json", exampleString);
                     break;
                 }
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
@@ -711,6 +773,7 @@ public interface DataTableRowApi {
      * @param xEnvironment The environment whose physical table is addressed. PRODUCTION when omitted. (optional)
      * @param filter A &#x60;column:OPERATOR:value&#x60; condition. Repeat the parameter to add conditions. (optional)
      * @param sort A &#x60;column:ASC&#x60; or &#x60;column:DESC&#x60; ordering. Repeat to add tie-breakers; &#x60;id:ASC&#x60; is always last. (optional)
+     * @param expand Comma-separated link column names whose values are returned as the linked row object &#x60;{id, externalId, values}&#x60; instead of the linked row id. One level deep. (optional)
      * @param pageNumber The zero-based page to return. (optional, default to 0)
      * @param pageSize Rows per page; at most 500. (optional, default to 50)
      * @return The page of rows. (status code 200)
@@ -748,6 +811,7 @@ public interface DataTableRowApi {
         @Parameter(name = "X-Environment", description = "The environment whose physical table is addressed. PRODUCTION when omitted.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment,
         @Parameter(name = "filter", description = "A `column:OPERATOR:value` condition. Repeat the parameter to add conditions.", in = ParameterIn.QUERY) @RequestParam(value = "filter", required = false) @Nullable List<String> filter,
         @Parameter(name = "sort", description = "A `column:ASC` or `column:DESC` ordering. Repeat to add tie-breakers; `id:ASC` is always last.", in = ParameterIn.QUERY) @RequestParam(value = "sort", required = false) @Nullable List<String> sort,
+        @Parameter(name = "expand", description = "Comma-separated link column names whose values are returned as the linked row object `{id, externalId, values}` instead of the linked row id. One level deep.", in = ParameterIn.QUERY) @RequestParam(value = "expand", required = false) @Nullable List<String> expand,
         @Parameter(name = "pageNumber", description = "The zero-based page to return.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "pageNumber", required = false, defaultValue = "0") Integer pageNumber,
         @Parameter(name = "pageSize", description = "Rows per page; at most 500.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "pageSize", required = false, defaultValue = "50") Integer pageSize
     ) {

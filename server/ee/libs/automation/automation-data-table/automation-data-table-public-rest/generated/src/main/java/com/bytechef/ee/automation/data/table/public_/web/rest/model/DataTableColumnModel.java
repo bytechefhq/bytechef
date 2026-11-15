@@ -2,6 +2,7 @@ package com.bytechef.ee.automation.data.table.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.ee.automation.data.table.public_.web.rest.model.ColumnLinkModel;
 import com.bytechef.ee.automation.data.table.public_.web.rest.model.ColumnTypeModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -23,12 +24,14 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("DataTableColumn")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-14T18:03:12.597132+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-15T02:59:05.917592+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class DataTableColumnModel {
 
   private String name;
 
   private ColumnTypeModel type;
+
+  private @Nullable ColumnLinkModel link;
 
   public DataTableColumnModel() {
     super();
@@ -84,6 +87,27 @@ public class DataTableColumnModel {
     this.type = type;
   }
 
+  public DataTableColumnModel link(@Nullable ColumnLinkModel link) {
+    this.link = link;
+    return this;
+  }
+
+  /**
+   * Get link
+   * @return link
+   */
+  @Valid 
+  @Schema(name = "link", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("link")
+  public @Nullable ColumnLinkModel getLink() {
+    return link;
+  }
+
+  @JsonProperty("link")
+  public void setLink(@Nullable ColumnLinkModel link) {
+    this.link = link;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -94,12 +118,13 @@ public class DataTableColumnModel {
     }
     DataTableColumnModel dataTableColumn = (DataTableColumnModel) o;
     return Objects.equals(this.name, dataTableColumn.name) &&
-        Objects.equals(this.type, dataTableColumn.type);
+        Objects.equals(this.type, dataTableColumn.type) &&
+        Objects.equals(this.link, dataTableColumn.link);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, type);
+    return Objects.hash(name, type, link);
   }
 
   @Override
@@ -108,6 +133,7 @@ public class DataTableColumnModel {
     sb.append("class DataTableColumnModel {\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
+    sb.append("    link: ").append(toIndentedString(link)).append("\n");
     sb.append("}");
     return sb.toString();
   }
