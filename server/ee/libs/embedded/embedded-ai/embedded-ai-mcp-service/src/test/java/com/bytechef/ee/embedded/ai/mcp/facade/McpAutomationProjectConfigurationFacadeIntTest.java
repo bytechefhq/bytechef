@@ -680,6 +680,31 @@ class McpAutomationProjectConfigurationFacadeIntTest {
                         .containsEntry("enabled", "false");
         }
 
+        @Test
+        void testParametersUpdateRecordsTheWorkflowWithoutTheParameters() {
+            McpAutomationProjectConfiguration mcpAutomationProjectConfiguration =
+                mcpAutomationProjectConfigurationFacade.createMcpAutomationProjectConfiguration(
+                    mcpServerId, automationProjectConfigurationId, List.of(FIRST_WORKFLOW_UUID), List.of());
+
+            long linkWorkflowId = mcpAutomationProjectConfigurationWorkflowService
+                .getMcpAutomationProjectConfigurationWorkflows(mcpAutomationProjectConfiguration.getId())
+                .getFirst()
+                .getId();
+
+            mcpAutomationProjectConfigurationFacade.updateMcpAutomationProjectConfigurationWorkflowParameters(
+                linkWorkflowId, Map.of("toolName", "secret_tool_name"));
+
+            Map<String, String> eventData = findSingleEventData(
+                McpAutomationProjectConfigurationAuditEvents.MCP_AUTOMATION_PROJECT_CONFIGURATION_WORKFLOW_PARAMETERS_UPDATED);
+
+            assertThat(eventData)
+                .containsEntry("result", "SUCCESS")
+                .containsEntry("mcpAutomationProjectConfigurationWorkflowId", String.valueOf(linkWorkflowId))
+                .containsEntry(
+                    "mcpAutomationProjectConfigurationId", String.valueOf(mcpAutomationProjectConfiguration.getId()));
+            assertThat(eventData.values()).noneMatch(value -> value.contains("secret_tool_name"));
+        }
+
         private Map<String, String> findSingleEventData(String eventType) {
             return EmbeddedMcpAuditIntTestConfiguration.findSingleEventData(
                 persistenceAuditEventRepository, eventType);
