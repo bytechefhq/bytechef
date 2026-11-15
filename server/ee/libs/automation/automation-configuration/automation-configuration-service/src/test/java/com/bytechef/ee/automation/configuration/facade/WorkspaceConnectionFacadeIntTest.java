@@ -28,6 +28,7 @@ import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider
 import com.bytechef.automation.configuration.security.ConnectionOwnershipResolver;
 import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
@@ -38,7 +39,6 @@ import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepositor
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.ee.automation.configuration.security.scope.ConnectionPermissionScopeProvider;
-import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.EmbeddedScopeCacheService;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
@@ -149,7 +149,7 @@ class WorkspaceConnectionFacadeIntTest {
     private WorkspaceConnectionSharingFacade workspaceConnectionSharingFacade;
 
     @Autowired
-    private WorkspaceScopeCacheService workspaceScopeCacheService;
+    private WorkspaceScopeCache workspaceScopeCache;
 
     @Autowired
     private WorkspaceUserRepository workspaceUserRepository;
@@ -262,7 +262,7 @@ class WorkspaceConnectionFacadeIntTest {
 
     @Test
     void testDeleteAllowsAnEditorOwner() {
-        when(workspaceScopeCacheService.getWorkspaceScopes(OWNER_USER_ID, WORKSPACE_ID))
+        when(workspaceScopeCache.getWorkspaceScopes(OWNER_USER_ID, WORKSPACE_ID))
             .thenReturn(builtInRoleScopes(WorkspaceRole.EDITOR));
 
         authenticate(OWNER_LOGIN, AuthorityConstants.USER);
@@ -272,7 +272,7 @@ class WorkspaceConnectionFacadeIntTest {
 
     @Test
     void testDeleteDeniesAViewerOwner() {
-        when(workspaceScopeCacheService.getWorkspaceScopes(OWNER_USER_ID, WORKSPACE_ID))
+        when(workspaceScopeCache.getWorkspaceScopes(OWNER_USER_ID, WORKSPACE_ID))
             .thenReturn(builtInRoleScopes(WorkspaceRole.VIEWER));
 
         authenticate(OWNER_LOGIN, AuthorityConstants.USER);
@@ -283,7 +283,7 @@ class WorkspaceConnectionFacadeIntTest {
 
     @Test
     void testDeleteDeniesAnAdminWhoIsNotTheOwner() {
-        when(workspaceScopeCacheService.getWorkspaceScopes(ADMIN_USER_ID, WORKSPACE_ID))
+        when(workspaceScopeCache.getWorkspaceScopes(ADMIN_USER_ID, WORKSPACE_ID))
             .thenReturn(builtInRoleScopes(WorkspaceRole.ADMIN));
 
         authenticate(ADMIN_LOGIN, AuthorityConstants.USER);
@@ -294,7 +294,7 @@ class WorkspaceConnectionFacadeIntTest {
 
     @Test
     void testDeleteDeniesAnEditorWhoIsNotTheOwner() {
-        when(workspaceScopeCacheService.getWorkspaceScopes(MEMBER_USER_ID, WORKSPACE_ID))
+        when(workspaceScopeCache.getWorkspaceScopes(MEMBER_USER_ID, WORKSPACE_ID))
             .thenReturn(builtInRoleScopes(WorkspaceRole.EDITOR));
 
         authenticate(MEMBER_LOGIN, AuthorityConstants.USER);
@@ -312,7 +312,7 @@ class WorkspaceConnectionFacadeIntTest {
 
     @Test
     void testUpdateConnectionCredentialsAllowsAnEditorOwner() {
-        when(workspaceScopeCacheService.getWorkspaceScopes(OWNER_USER_ID, WORKSPACE_ID))
+        when(workspaceScopeCache.getWorkspaceScopes(OWNER_USER_ID, WORKSPACE_ID))
             .thenReturn(builtInRoleScopes(WorkspaceRole.EDITOR));
 
         authenticate(OWNER_LOGIN, AuthorityConstants.USER);
@@ -323,7 +323,7 @@ class WorkspaceConnectionFacadeIntTest {
 
     @Test
     void testUpdateConnectionCredentialsDeniesAViewerOwner() {
-        when(workspaceScopeCacheService.getWorkspaceScopes(OWNER_USER_ID, WORKSPACE_ID))
+        when(workspaceScopeCache.getWorkspaceScopes(OWNER_USER_ID, WORKSPACE_ID))
             .thenReturn(builtInRoleScopes(WorkspaceRole.VIEWER));
 
         authenticate(OWNER_LOGIN, AuthorityConstants.USER);
@@ -335,7 +335,7 @@ class WorkspaceConnectionFacadeIntTest {
 
     @Test
     void testUpdateConnectionCredentialsDeniesAnAdminWhoIsNotTheOwner() {
-        when(workspaceScopeCacheService.getWorkspaceScopes(ADMIN_USER_ID, WORKSPACE_ID))
+        when(workspaceScopeCache.getWorkspaceScopes(ADMIN_USER_ID, WORKSPACE_ID))
             .thenReturn(builtInRoleScopes(WorkspaceRole.ADMIN));
 
         authenticate(ADMIN_LOGIN, AuthorityConstants.USER);
@@ -347,7 +347,7 @@ class WorkspaceConnectionFacadeIntTest {
 
     @Test
     void testUpdateConnectionCredentialsDeniesAnEditorWhoIsNotTheOwner() {
-        when(workspaceScopeCacheService.getWorkspaceScopes(MEMBER_USER_ID, WORKSPACE_ID))
+        when(workspaceScopeCache.getWorkspaceScopes(MEMBER_USER_ID, WORKSPACE_ID))
             .thenReturn(builtInRoleScopes(WorkspaceRole.EDITOR));
 
         authenticate(MEMBER_LOGIN, AuthorityConstants.USER);
@@ -366,16 +366,14 @@ class WorkspaceConnectionFacadeIntTest {
     }
 
     @Test
-    void testUpdateConnectionCredentialsRefusesATenantAdminOnAMembersWorkspaceConnection() {
+    void testUpdateConnectionCredentialsAllowsATenantAdminOnAMembersWorkspaceConnection() {
         givenConnection(OWNER_LOGIN, ResourceVisibility.WORKSPACE);
 
         authenticate(TENANT_ADMIN_LOGIN, AuthorityConstants.ADMIN);
 
-        assertThatThrownBy(
-            () -> workspaceConnectionSharingFacade.updateConnectionCredentials(CONNECTION_ID, Map.of(), 0))
-                .isInstanceOf(AccessDeniedException.class);
+        workspaceConnectionSharingFacade.updateConnectionCredentials(CONNECTION_ID, Map.of("token", "new"), 0);
 
-        verify(connectionFacade, never()).updateCredentials(anyLong(), any(), anyInt());
+        verify(connectionFacade).updateCredentials(CONNECTION_ID, Map.of("token", "new"), 0);
     }
 
     @Test
@@ -396,7 +394,7 @@ class WorkspaceConnectionFacadeIntTest {
         connection.reassignOwner(MEMBER_LOGIN);
 
         when(workspaceUserRepository.existsByUserIdAndWorkspaceId(MEMBER_USER_ID, WORKSPACE_ID)).thenReturn(true);
-        when(workspaceScopeCacheService.getWorkspaceScopes(MEMBER_USER_ID, WORKSPACE_ID))
+        when(workspaceScopeCache.getWorkspaceScopes(MEMBER_USER_ID, WORKSPACE_ID))
             .thenReturn(builtInRoleScopes(WorkspaceRole.EDITOR));
 
         authenticate(MEMBER_LOGIN, AuthorityConstants.USER);
@@ -412,7 +410,7 @@ class WorkspaceConnectionFacadeIntTest {
 
         connection.reassignOwner(MEMBER_LOGIN);
 
-        when(workspaceScopeCacheService.getWorkspaceScopes(OWNER_USER_ID, WORKSPACE_ID))
+        when(workspaceScopeCache.getWorkspaceScopes(OWNER_USER_ID, WORKSPACE_ID))
             .thenReturn(builtInRoleScopes(WorkspaceRole.EDITOR));
 
         authenticate(OWNER_LOGIN, AuthorityConstants.USER);
