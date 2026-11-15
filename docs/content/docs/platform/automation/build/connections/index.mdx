@@ -50,16 +50,16 @@ Each connection has an ellipsis (three-dots) menu with the following actions:
 
 ## Who can see and replace credentials
 
-A connection's secret values, such as API keys, tokens and passwords, are shown and can be replaced only by the member who created the connection. Using a connection in a workflow never requires seeing them.
+A connection's secret values, such as API keys, tokens and passwords, are shown only to the member who created the connection. The creator and organization admins can replace them; an organization admin who did not create the connection replaces its credentials without seeing the current values. Using a connection in a workflow never requires seeing them.
 
-| Connection | View and replace its secrets | Use it in workflows | Rename, tag and delete it |
-|---|---|---|---|
-| A connection you created | You, with `CONNECTION_EDIT` | Yes | You, with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
-| A connection another member owns | Nobody but its owner, not even an organization admin | Yes, where you can reach it | Organization admins |
-| An organization connection | Every organization admin | Every member | Organization admins |
-| An embedded connection created for a connected user | No ByteChef user | Only that connected user's integrations | Members with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
+| Connection | View its secrets | Replace its secrets | Use it in workflows | Rename, tag and delete it |
+|---|---|---|---|---|
+| A connection you created | You, with `CONNECTION_EDIT` | You, with `CONNECTION_EDIT` | Yes | You, with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
+| A connection another member owns | Nobody but its owner, not even an organization admin | Its owner and organization admins | Yes, where you can reach it | Organization admins |
+| An organization connection | Every organization admin | Every organization admin | Every member | Organization admins |
+| An embedded connection created for a connected user | No ByteChef user | No ByteChef user | Only that connected user's integrations | Members with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
 
-Anyone else who opens the connection sees each credential field as **Hidden**, and the server leaves the secret values out of every connection it returns to them. A request to replace the credentials of a connection you did not create is refused with HTTP **403**.
+Anyone else who opens the connection sees each credential field as **Hidden**, and the server leaves the secret values out of every connection it returns to them. A request from a member to replace the credentials of a connection they did not create is refused with HTTP **403**.
 
 ## Popular Integrations
 
