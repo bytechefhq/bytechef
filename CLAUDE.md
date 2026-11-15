@@ -395,6 +395,13 @@ platform-coordinator sweep, acting only on approval suspends. There are no appro
 
 Never add notification logic under `server/libs/atlas/`. See `.agents/hitl-approvals.md`.
 
+### Project versioning and audit dates
+
+A project's dates behave like a directory's: its `lastModifiedDate` follows changes to its list of workflows (add,
+delete, rename), not edits inside a workflow. Create, update, duplicate, delete, publish and restore follow numbered
+rules (PV-1...). Before changing any of these paths, read `.agents/project-versioning.md`: it lists each rule, the
+decisions behind it and the test that enforces it.
+
 ### Resource Visibility & Sharing
 
 Connections carry a `visibility` column typed `ResourceVisibility` (`PRIVATE < WORKSPACE <
@@ -424,8 +431,8 @@ controllers obfuscate `authorizationParameters` and null `parameters`. A member 
 a colleague's account; they cannot extract or repoint the credential. Renaming a connection needs `CONNECTION_EDIT`,
 deleting needs `CONNECTION_DELETE`, and both also need ownership: `hasPermission(#connectionId, 'Connection', <scope>)
 && (isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())`. Replacing the credentials
-(`updateConnectionCredentials`) needs `CONNECTION_EDIT` and the owner, in CE and EE alike; a tenant admin is not
-enough. Attaching a connection to a project
+(`updateConnectionCredentials`) needs `CONNECTION_EDIT` and the owner or a tenant admin, in CE and EE alike; viewing
+them stays owner-only (`ConnectionSecrets`), so a tenant admin replaces values it never sees. Attaching a connection to a project
 workflow's test configuration or to a deployment requires `CONNECTION_VIEW` on it, so a PRIVATE
 connection cannot be bound by id.
 
