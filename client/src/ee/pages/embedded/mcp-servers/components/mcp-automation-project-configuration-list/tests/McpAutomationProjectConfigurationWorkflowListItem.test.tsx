@@ -1,3 +1,5 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
+import useAutomationExecutionsSheetStore from '@/ee/pages/embedded/automations/stores/useAutomationExecutionsSheetStore';
 import {render, screen} from '@/shared/util/test-utils';
 import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -31,16 +33,35 @@ const workflow = {
     id: 'w1',
     label: 'Workflow One',
     parameters: {customerId: 'fromAi(customerId)', toolName: 'old_name'},
+    workflowId: 'workflow-id-1',
     workflowUuid: 'uuid-1',
 } as McpAutomationProjectConfigurationWorkflowItemType;
+
+const renderListItem = (listItemWorkflow = workflow, environmentId: string | undefined = '0') =>
+    render(
+        <TooltipProvider>
+            <McpAutomationProjectConfigurationWorkflowListItem
+                environmentId={environmentId}
+                projectName="Project One"
+                workflow={listItemWorkflow}
+            />
+        </TooltipProvider>
+    );
 
 describe('McpAutomationProjectConfigurationWorkflowListItem', () => {
     beforeEach(() => {
         hoisted.enabledMutate.mockReset();
+
+        useAutomationExecutionsSheetStore.setState({
+            automationExecutionsSheetOpen: false,
+            environmentId: undefined,
+            projectName: undefined,
+            workflow: undefined,
+        });
     });
 
     it('switchCallsEnabledMutation', async () => {
-        render(<McpAutomationProjectConfigurationWorkflowListItem workflow={workflow} />);
+        renderListItem();
 
         await userEvent.click(screen.getByRole('switch', {name: 'Enable Workflow One'}));
 
@@ -48,10 +69,29 @@ describe('McpAutomationProjectConfigurationWorkflowListItem', () => {
     });
 
     it('configureOpensThePropertiesPopover', async () => {
-        render(<McpAutomationProjectConfigurationWorkflowListItem workflow={workflow} />);
+        renderListItem();
 
         await userEvent.click(screen.getByRole('button', {name: 'Configure Workflow One'}));
 
         expect(await screen.findByTestId('properties-popover')).toBeInTheDocument();
+    });
+
+    it('workflowNameOpensTheExecutionsSheet', async () => {
+        renderListItem();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Workflow One'}));
+
+        const state = useAutomationExecutionsSheetStore.getState();
+
+        expect(state.automationExecutionsSheetOpen).toBe(true);
+        expect(state.environmentId).toBe(0);
+        expect(state.projectName).toBe('Project One');
+        expect(state.workflow).toEqual({label: 'Workflow One', workflowId: 'workflow-id-1', workflowUuid: 'uuid-1'});
+    });
+
+    it('workflowNameIsDisabledWithoutTheWorkflowId', () => {
+        renderListItem({...workflow, workflowId: null});
+
+        expect(screen.getByRole('button', {name: 'Workflow One'})).toBeDisabled();
     });
 });

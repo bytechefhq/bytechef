@@ -65,7 +65,12 @@ const McpAutomationProjectConfigurationListItem = ({
                 <CollapsibleContent>
                     <div className="flex flex-col gap-1 border-t border-border/50 px-3 py-2 pl-10">
                         {mcpAutomationProjectConfiguration.workflows.map((workflow) => (
-                            <McpAutomationProjectConfigurationWorkflowListItem key={workflow.id} workflow={workflow} />
+                            <McpAutomationProjectConfigurationWorkflowListItem
+                                environmentId={mcpServer?.environmentId}
+                                key={workflow.id}
+                                projectName={mcpAutomationProjectConfiguration.projectName}
+                                workflow={workflow}
+                            />
                         ))}
                     </div>
                 </CollapsibleContent>
