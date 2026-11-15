@@ -85,6 +85,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.TreeSet;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -174,7 +175,13 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         checkHasId(dataTableId, physicalName);
 
-        List<BlockingLink> blockingLinks = loadBlockingLinks(dataTableId, physicalName, environmentId, id, null);
+        List<DataTableLinkColumn> targetingLinkColumns =
+            dataTableLinkColumnRepository.findAllByTargetDataTableIdAndEnvironmentId(dataTableId, environmentId);
+
+        List<BlockingLink> blockingLinks = loadBlockingLinks(
+            targetingLinkColumns, physicalName, environmentId, id, null);
+        List<ClearedLinks> clearedLinks =
+            selectClearedLinks(targetingLinkColumns, physicalName, environmentId, id, null);
 
         DataTableRow deletedDataTableRow;
 
@@ -194,6 +201,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         publishWebhookEvent(dataTableId, DataTableWebhookType.RECORD_DELETED, List.of(deletedDataTableRow),
             environmentId);
+        publishClearedLinkEvents(clearedLinks, environmentId);
 
         return true;
     }
@@ -230,8 +238,13 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         String tableName = escapeIdentifier(physicalName);
 
+        List<DataTableLinkColumn> targetingLinkColumns =
+            dataTableLinkColumnRepository.findAllByTargetDataTableIdAndEnvironmentId(dataTableId, environmentId);
+
         List<BlockingLink> blockingLinks = loadBlockingLinks(
-            dataTableId, physicalName, environmentId, null, whereClause);
+            targetingLinkColumns, physicalName, environmentId, null, whereClause);
+        List<ClearedLinks> clearedLinks = selectClearedLinks(
+            targetingLinkColumns, physicalName, environmentId, null, whereClause);
 
         List<DataTableRow> deletedDataTableRows;
 
@@ -264,6 +277,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         List<DataTableRow> sortedDataTableRows = sortById(deletedDataTableRows);
 
         publishWebhookEvent(dataTableId, DataTableWebhookType.RECORD_DELETED, sortedDataTableRows, environmentId);
+        publishClearedLinkEvents(clearedLinks, environmentId);
 
         return sortedDataTableRows;
     }
@@ -2104,14 +2118,12 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     }
 
     private List<BlockingLink> loadBlockingLinks(
-        long dataTableId, String physicalName, long environmentId, @Nullable Long rowId,
+        List<DataTableLinkColumn> targetingLinkColumns, String physicalName, long environmentId, @Nullable Long rowId,
         @Nullable WhereClause whereClause) {
 
         List<BlockingLink> blockingLinks = new ArrayList<>();
 
-        for (DataTableLinkColumn dataTableLinkColumn : dataTableLinkColumnRepository
-            .findAllByTargetDataTableIdAndEnvironmentId(dataTableId, environmentId)) {
-
+        for (DataTableLinkColumn dataTableLinkColumn : targetingLinkColumns) {
             if (dataTableLinkColumn.getOnDelete() != LinkDeleteRule.BLOCK) {
                 continue;
             }
@@ -2165,6 +2177,85 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         }
 
         return count == null ? 0L : count;
+    }
+
+    private List<ClearedLinks> selectClearedLinks(
+        List<DataTableLinkColumn> targetingLinkColumns, String targetPhysicalName, long environmentId,
+        @Nullable Long rowId, @Nullable WhereClause whereClause) {
+
+        Map<Long, Set<Long>> sourceRowIdsByDataTableId = new LinkedHashMap<>();
+
+        for (DataTableLinkColumn dataTableLinkColumn : targetingLinkColumns) {
+            if (dataTableLinkColumn.getOnDelete() != LinkDeleteRule.CLEAR) {
+                continue;
+            }
+
+            List<Long> sourceRowIds = selectLinkingRowIds(
+                DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableLinkColumn.getDataTableId()),
+                dataTableLinkColumn.getColumnName(), targetPhysicalName, rowId, whereClause);
+
+            if (!sourceRowIds.isEmpty()) {
+                Set<Long> mergedSourceRowIds = sourceRowIdsByDataTableId.computeIfAbsent(
+                    dataTableLinkColumn.getDataTableId(), key -> new TreeSet<>());
+
+                mergedSourceRowIds.addAll(sourceRowIds);
+            }
+        }
+
+        List<ClearedLinks> clearedLinks = new ArrayList<>();
+
+        for (Map.Entry<Long, Set<Long>> entry : sourceRowIdsByDataTableId.entrySet()) {
+            clearedLinks.add(new ClearedLinks(entry.getKey(), new ArrayList<>(entry.getValue())));
+        }
+
+        return clearedLinks;
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private List<Long> selectLinkingRowIds(
+        String sourcePhysicalName, String columnName, String targetPhysicalName, @Nullable Long rowId,
+        @Nullable WhereClause whereClause) {
+
+        String column = escapeIdentifier(columnName);
+        String sourceTableName = escapeIdentifier(sourcePhysicalName);
+
+        if (rowId != null) {
+            return jdbcTemplate.query(
+                "SELECT \"id\" FROM " + sourceTableName + " WHERE " + column + " = ?",
+                preparedStatement -> preparedStatement.setLong(1, rowId),
+                (resultSet, rowNum) -> resultSet.getLong(1));
+        }
+
+        WhereClause targetWhereClause = Objects.requireNonNull(whereClause, "whereClause");
+
+        return jdbcTemplate.query(
+            "SELECT \"id\" FROM " + sourceTableName + " WHERE " + column + " IN (SELECT \"id\" FROM " +
+                escapeIdentifier(targetPhysicalName) + targetWhereClause.sql() + ")",
+            preparedStatement -> setFilterParameters(preparedStatement, 1, targetWhereClause.filterParameters()),
+            (resultSet, rowNum) -> resultSet.getLong(1));
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private void publishClearedLinkEvents(List<ClearedLinks> clearedLinks, long environmentId) {
+        for (ClearedLinks clearedLink : clearedLinks) {
+            long sourceDataTableId = clearedLink.dataTableId();
+
+            String sourcePhysicalName = DataTablePhysicalNameUtils.getPhysicalName(environmentId, sourceDataTableId);
+
+            List<String> columnNames =
+                getNonIdColumnNames(listColumns(sourceDataTableId, sourcePhysicalName, environmentId));
+
+            List<Long> sourceRowIds = clearedLink.rowIds();
+
+            List<DataTableRow> sourceDataTableRows = jdbcTemplate.query(
+                "SELECT " + buildSelectColumns(columnNames) + " FROM " + escapeIdentifier(sourcePhysicalName) +
+                    " WHERE " + buildAnyCondition("\"id\"", sourceRowIds.size()) + " ORDER BY \"id\"",
+                (PreparedStatementSetter) preparedStatement -> setIds(preparedStatement, 1, sourceRowIds),
+                (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
+
+            publishWebhookEvent(
+                sourceDataTableId, DataTableWebhookType.RECORD_UPDATED, sourceDataTableRows, environmentId);
+        }
     }
 
     private static RuntimeException toRowStillLinked(
@@ -2492,6 +2583,9 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     private record BlockingLink(
         @Nullable Long linkColumnId, String tableName, String columnName, long linkingRowCount) {
+    }
+
+    private record ClearedLinks(long dataTableId, List<Long> rowIds) {
     }
 
     private record ColumnValue(ColumnSpec columnSpec, @Nullable Object value) {
