@@ -129,6 +129,23 @@ class DataTableLinkColumnIntTest {
     }
 
     @Test
+    void testAddLinkColumnRejectsLinkColumnAsDisplayColumn() {
+        dataTableService.addColumn(
+            customersId,
+            new ColumnSpec("referrer", ColumnType.LINK, new LinkSpec(ordersId, LinkDeleteRule.BLOCK, null)),
+            DEV_ENVIRONMENT_ID);
+
+        assertErrorType(
+            DataTableErrorType.LINK_DISPLAY_COLUMN_INVALID,
+            () -> dataTableService.addColumn(
+                ordersId, customerLink(LinkDeleteRule.BLOCK, "referrer"), DEV_ENVIRONMENT_ID));
+
+        assertThat(getColumnSpecs(ordersId, DEV_ENVIRONMENT_ID))
+            .extracting(ColumnSpec::name)
+            .doesNotContain("customer");
+    }
+
+    @Test
     void testLinksInBothDirectionsAreAllowed() {
         dataTableService.addColumn(ordersId, customerLink(LinkDeleteRule.BLOCK, "name"), DEV_ENVIRONMENT_ID);
         dataTableService.addColumn(

@@ -181,6 +181,19 @@ class DataTableLinkCsvIntTest {
     }
 
     @Test
+    void testImportShortRowWithExternalIdHeaderIgnoresIdColumn() {
+        String csv = "title,customer,customer.externalId\no1," + firstCustomerId + "\n";
+
+        assertEquals(1, dataTableRowService.importCsv(ordersId, csv, ENVIRONMENT_ID));
+
+        List<DataTableRow> dataTableRows = dataTableRowService.listRows(ordersId, 10, 0, ENVIRONMENT_ID);
+
+        assertEquals(null, dataTableRows.getFirst()
+            .values()
+            .get("customer"));
+    }
+
+    @Test
     void testImportIgnoresExternalIdHeaderOfNonLinkColumn() {
         String csv = "title,title.externalId\no1,ignored\n";
 

@@ -48,16 +48,19 @@ public final class ColumnValues {
         }
     }
 
-    private static boolean isLinkValue(Object value, String text) {
+    private static boolean isLinkValue(Object value, String linkText) {
         if (value instanceof Integer || value instanceof Long) {
             return true;
         }
 
         if (value instanceof Map<?, ?> map) {
-            return map.size() == 1 && map.get("externalId") instanceof String externalId && !externalId.isBlank();
+            Object externalId = map.get("externalId");
+
+            return map.size() == 1 &&
+                (externalId instanceof Number || (externalId instanceof String text && !text.isBlank()));
         }
 
-        return parsesAsLong(text);
+        return parsesAsLong(linkText);
     }
 
     private static boolean parsesAsLong(String text) {
