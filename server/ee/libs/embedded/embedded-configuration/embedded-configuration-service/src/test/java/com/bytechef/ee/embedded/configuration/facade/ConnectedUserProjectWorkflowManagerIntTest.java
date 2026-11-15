@@ -291,11 +291,6 @@ class ConnectedUserProjectWorkflowManagerIntTest {
         return connection.getId();
     }
 
-    /**
-     * Holds each caller at project creation until the other arrives, so both pass the existence check before either
-     * creates. When the second caller never arrives because it is blocked on a lock the first holds, the wait times out
-     * and the first proceeds alone.
-     */
     private static void awaitOtherCaller(CyclicBarrier barrier) throws InterruptedException {
         try {
             barrier.await(2, TimeUnit.SECONDS);

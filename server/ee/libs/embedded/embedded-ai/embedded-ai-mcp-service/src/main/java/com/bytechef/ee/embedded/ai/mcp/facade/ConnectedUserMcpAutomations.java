@@ -56,9 +56,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * Reads the automation workflows a connected user has on embedded MCP servers: the per-user rows with their tool name,
- * availability and last execution, and which of a server's automation workflows the user has activated.
- *
  * @version ee
  *
  * @author Ivica Cardic

@@ -102,9 +102,6 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 
 /**
- * Tool facade for the embedded MCP server. Handles component-level tools (direct action execution), integration
- * workflow tools ({@link IntegrationInstanceService}) and the activated automation workflow tools of connected users.
- *
  * @version ee
  *
  * @author Ivica Cardic

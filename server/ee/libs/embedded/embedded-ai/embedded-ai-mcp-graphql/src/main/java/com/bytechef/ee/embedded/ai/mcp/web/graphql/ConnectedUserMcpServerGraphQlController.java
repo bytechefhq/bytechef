@@ -21,8 +21,6 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 /**
- * GraphQL controller exposing MCP servers a connected user is reachable through.
- *
  * @author Ivica Cardic
  * @version ee
  */

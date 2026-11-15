@@ -11,9 +11,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
 /**
- * The tool settings an MCP server link keeps for one automation workflow: tool name, description and the `fromAi`
- * parameter mapping.
- *
  * @version ee
  *
  * @author Ivica Cardic

@@ -22,9 +22,6 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Derives the properties of a workflow that is exposed as an MCP tool: the tool name and description plus the input
- * properties declared by the workflow call trigger.
- *
  * @version ee
  *
  * @author Ivica Cardic
