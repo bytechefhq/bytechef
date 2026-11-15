@@ -7,13 +7,18 @@
 
 package com.bytechef.ee.automation.data.table.public_.web.rest;
 
+import com.bytechef.ee.automation.data.table.public_.web.rest.model.ColumnLinkModel;
 import com.bytechef.ee.automation.data.table.public_.web.rest.model.ColumnTypeModel;
 import com.bytechef.ee.automation.data.table.public_.web.rest.model.DataTableColumnModel;
 import com.bytechef.ee.automation.data.table.public_.web.rest.model.DataTableModel;
 import com.bytechef.ee.automation.data.table.public_.web.rest.model.DataTableRowModel;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
+import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.LinkDeleteRule;
+import com.bytechef.platform.data.table.domain.LinkSpec;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.tag.domain.Tag;
 import java.time.ZoneOffset;
@@ -40,10 +45,7 @@ final class DataTableModelMapper {
             .description(dataTableInfo.description())
             .columns(dataTableInfo.columns()
                 .stream()
-                .map(columnSpec -> new DataTableColumnModel()
-                    .name(columnSpec.name())
-                    .type(ColumnTypeModel.valueOf(columnSpec.type()
-                        .name())))
+                .map(DataTableModelMapper::toColumnModel)
                 .toList())
             .tags(tags.stream()
                 .map(Tag::getName)
@@ -73,12 +75,64 @@ final class DataTableModelMapper {
     static ColumnSpec toColumnSpec(DataTableColumnModel dataTableColumnModel) {
         DataTableApiSupport.validateColumnName(dataTableColumnModel.getName());
 
-        return new ColumnSpec(
-            dataTableColumnModel.getName(), ColumnType.valueOf(dataTableColumnModel.getType()
+        return toColumnSpec(
+            dataTableColumnModel.getName(), dataTableColumnModel.getType(), dataTableColumnModel.getLink());
+    }
+
+    static ColumnSpec toColumnSpec(
+        String name, ColumnTypeModel columnTypeModel, @Nullable ColumnLinkModel columnLinkModel) {
+
+        ColumnType columnType = ColumnType.valueOf(columnTypeModel.name());
+
+        if (columnType == ColumnType.LINK && columnLinkModel == null) {
+            throw new DataTableException(
+                "A LINK column requires a link specification", DataTableErrorType.LINK_TARGET_INVALID);
+        }
+
+        if (columnType != ColumnType.LINK && columnLinkModel != null) {
+            throw new DataTableException(
+                "Only a LINK column can have a link specification", DataTableErrorType.LINK_TARGET_INVALID);
+        }
+
+        if (columnLinkModel == null) {
+            return new ColumnSpec(name, columnType, null);
+        }
+
+        ColumnLinkModel.OnDeleteEnum onDeleteEnum = columnLinkModel.getOnDelete() == null
+            ? ColumnLinkModel.OnDeleteEnum.BLOCK : columnLinkModel.getOnDelete();
+
+        LinkSpec linkSpec = new LinkSpec(
+            columnLinkModel.getTargetDataTableId(), LinkDeleteRule.valueOf(onDeleteEnum.name()),
+            columnLinkModel.getDisplayColumnName());
+
+        return new ColumnSpec(name, columnType, linkSpec);
+    }
+
+    private static DataTableColumnModel toColumnModel(ColumnSpec columnSpec) {
+        DataTableColumnModel dataTableColumnModel = new DataTableColumnModel()
+            .name(columnSpec.name())
+            .type(ColumnTypeModel.valueOf(columnSpec.type()
                 .name()));
+
+        LinkSpec linkSpec = columnSpec.link();
+
+        if (linkSpec != null) {
+            dataTableColumnModel.link(
+                new ColumnLinkModel()
+                    .targetDataTableId(linkSpec.targetDataTableId())
+                    .onDelete(ColumnLinkModel.OnDeleteEnum.valueOf(linkSpec.onDelete()
+                        .name()))
+                    .displayColumnName(linkSpec.displayColumnName()));
+        }
+
+        return dataTableColumnModel;
     }
 
     private static @Nullable Object toJsonValue(@Nullable Object value) {
+        if (value instanceof DataTableRow linkedRow) {
+            return toModel(linkedRow);
+        }
+
         if (value instanceof java.sql.Timestamp timestamp) {
             return timestamp.toInstant()
                 .toString();

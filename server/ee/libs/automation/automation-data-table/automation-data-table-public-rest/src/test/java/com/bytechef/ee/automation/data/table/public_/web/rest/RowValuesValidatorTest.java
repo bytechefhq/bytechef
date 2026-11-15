@@ -16,6 +16,8 @@ import com.bytechef.platform.data.table.configuration.exception.DataTableErrorTy
 import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.LinkDeleteRule;
+import com.bytechef.platform.data.table.domain.LinkSpec;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +52,30 @@ class RowValuesValidatorTest {
         values.remove("nullable");
 
         assertDoesNotThrow(() -> RowValuesValidator.validate(values, COLUMNS));
+    }
+
+    @Test
+    void testLinkValuesAcceptIdsAndExternalIdMapsOnly() {
+        List<ColumnSpec> columns = List.of(
+            new ColumnSpec("customer", ColumnType.LINK, new LinkSpec(4L, LinkDeleteRule.BLOCK, null)));
+
+        assertDoesNotThrow(() -> RowValuesValidator.validate(Map.of("customer", 5), columns));
+        assertDoesNotThrow(() -> RowValuesValidator.validate(Map.of("customer", 5L), columns));
+        assertDoesNotThrow(() -> RowValuesValidator.validate(Map.of("customer", "5"), columns));
+        assertDoesNotThrow(
+            () -> RowValuesValidator.validate(Map.of("customer", Map.of("externalId", "c-1")), columns));
+
+        assertThrows(
+            DataTableException.class, () -> RowValuesValidator.validate(Map.of("customer", "abc"), columns));
+        assertThrows(
+            DataTableException.class,
+            () -> RowValuesValidator.validate(Map.of("customer", Map.of("externalId", " ")), columns));
+        assertThrows(
+            DataTableException.class,
+            () -> RowValuesValidator.validate(Map.of("customer", Map.of("externalId", 1)), columns));
+        assertThrows(
+            DataTableException.class,
+            () -> RowValuesValidator.validate(Map.of("customer", Map.of("externalId", "c-1", "x", "y")), columns));
     }
 
     @Test

@@ -83,7 +83,8 @@ public class DataTableRowApiController extends AbstractDataTableApiController im
     })
     public ResponseEntity<Page> listRows(
         Long workspaceId, String name, @Nullable EnvironmentModel xEnvironment, @Nullable List<String> filter,
-        @Nullable List<String> sort, @Nullable Integer pageNumber, @Nullable Integer pageSize) {
+        @Nullable List<String> sort, @Nullable List<String> expand, @Nullable Integer pageNumber,
+        @Nullable Integer pageSize) {
 
         Resolved resolved = resolve(workspaceId, name, xEnvironment);
         Set<String> queryableColumns = queryableColumns(resolved.dataTableInfo());
@@ -95,7 +96,7 @@ public class DataTableRowApiController extends AbstractDataTableApiController im
         int resolvedPageSize = pageSize == null ? DEFAULT_PAGE_SIZE : Math.min(Math.max(1, pageSize), MAX_PAGE_SIZE);
 
         Page<DataTableRow> page = workspaceDataTableFacade.listRows(
-            resolved.dataTableId(), conditions, sorts, resolvedPageNumber, resolvedPageSize,
+            resolved.dataTableId(), conditions, sorts, resolvedPageNumber, resolvedPageSize, expandNames(expand),
             resolved.environmentId());
 
         return ResponseEntity.ok(page.map(DataTableModelMapper::toModel));
@@ -126,12 +127,13 @@ public class DataTableRowApiController extends AbstractDataTableApiController im
 
     @Override
     public ResponseEntity<DataTableRowModel> getRow(
-        Long workspaceId, String name, Long id, @Nullable EnvironmentModel xEnvironment) {
+        Long workspaceId, String name, Long id, @Nullable EnvironmentModel xEnvironment,
+        @Nullable List<String> expand) {
 
         long dataTableId = support.resolveTableId(workspaceId, name);
 
-        DataTableRow dataTableRow =
-            workspaceDataTableFacade.getRow(dataTableId, id, support.environmentId(xEnvironment));
+        DataTableRow dataTableRow = workspaceDataTableFacade.getRow(
+            dataTableId, id, expandNames(expand), support.environmentId(xEnvironment));
 
         return ResponseEntity.ok(DataTableModelMapper.toModel(dataTableRow));
     }
@@ -185,13 +187,22 @@ public class DataTableRowApiController extends AbstractDataTableApiController im
 
     @Override
     public ResponseEntity<DataTableRowModel> getRowByExternalId(
-        Long workspaceId, String name, String externalId, @Nullable EnvironmentModel xEnvironment) {
+        Long workspaceId, String name, String externalId, @Nullable EnvironmentModel xEnvironment,
+        @Nullable List<String> expand) {
+
+        long dataTableId = support.resolveTableId(workspaceId, name);
+        long environmentId = support.environmentId(xEnvironment);
 
         DataTableRow dataTableRow = workspaceDataTableFacade
-            .fetchRowByExternalId(support.resolveTableId(workspaceId, name), externalId,
-                support.environmentId(xEnvironment))
+            .fetchRowByExternalId(dataTableId, externalId, environmentId)
             .orElseThrow(() -> new DataTableException(
                 "Row not found: externalId=" + externalId, DataTableErrorType.ROW_NOT_FOUND));
+
+        List<String> expandNames = expandNames(expand);
+
+        if (!expandNames.isEmpty()) {
+            dataTableRow = workspaceDataTableFacade.getRow(dataTableId, dataTableRow.id(), expandNames, environmentId);
+        }
 
         return ResponseEntity.ok(DataTableModelMapper.toModel(dataTableRow));
     }
@@ -330,6 +341,17 @@ public class DataTableRowApiController extends AbstractDataTableApiController im
 
         return new Resolved(
             dataTableId, environmentId, workspaceDataTableFacade.getTable(dataTableId, environmentId));
+    }
+
+    private static List<String> expandNames(@Nullable List<String> expand) {
+        if (expand == null) {
+            return List.of();
+        }
+
+        return expand.stream()
+            .map(String::trim)
+            .filter(expandName -> !expandName.isEmpty())
+            .toList();
     }
 
     private static @Nullable List<String> rawFilters(@Nullable List<String> filter) {
