@@ -344,8 +344,79 @@ class WorkspaceDataTableFacadeIntTest {
         DataTableRow second = workspaceDataTableFacade.insertRow(
             customersDataTableId, Map.of("code", 20), DEV_ENVIRONMENT_ID);
 
-        assertThat(workspaceDataTableFacade.getLinkOptions(ordersDataTableId, "customer", "1", 20, DEV_ENVIRONMENT_ID))
-            .containsExactly(new DataTableLinkOption(first.id(), "10"), new DataTableLinkOption(second.id(), "20"));
+        assertThat(
+            workspaceDataTableFacade.getLinkOptions(ordersDataTableId, "customer", "abc", 20, DEV_ENVIRONMENT_ID))
+                .containsExactly(new DataTableLinkOption(first.id(), "10"), new DataTableLinkOption(second.id(), "20"));
+    }
+
+    @Test
+    void testLinkOptionsWithoutDisplayColumnFindRowPastLimitById() {
+        long customersDataTableId = workspaceDataTableFacade.createTable(
+            "events", null, List.of(new ColumnSpec("name", ColumnType.STRING)), WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+        long ordersDataTableId = workspaceDataTableFacade.createTable(
+            "events_copy", null, List.of(new ColumnSpec("title", ColumnType.STRING)), WORKSPACE_ID,
+            DEV_ENVIRONMENT_ID);
+
+        workspaceDataTableFacade.addColumn(
+            ordersDataTableId,
+            new ColumnSpec("customer", ColumnType.LINK, new LinkSpec(customersDataTableId, LinkDeleteRule.BLOCK, null)),
+            DEV_ENVIRONMENT_ID);
+
+        List<Long> customerIds = new ArrayList<>();
+
+        for (int index = 1; index <= 150; index++) {
+            DataTableRow customer = workspaceDataTableFacade.insertRow(
+                customersDataTableId, Map.of("name", "Customer " + index), DEV_ENVIRONMENT_ID);
+
+            customerIds.add(customer.id());
+        }
+
+        long targetId = customerIds.get(119);
+
+        assertThat(
+            workspaceDataTableFacade.getLinkOptions(
+                ordersDataTableId, "customer", String.valueOf(targetId), 20, DEV_ENVIRONMENT_ID))
+                    .containsExactly(new DataTableLinkOption(targetId, "#" + targetId));
+        assertThat(
+            workspaceDataTableFacade.getLinkOptions(
+                ordersDataTableId, "customer", "#" + targetId, 20, DEV_ENVIRONMENT_ID))
+                    .containsExactly(new DataTableLinkOption(targetId, "#" + targetId));
+    }
+
+    @Test
+    void testLinkOptionsWithTextDisplayColumnMatchRowIdAndDisplay() {
+        long customersDataTableId = workspaceDataTableFacade.createTable(
+            "events", null, List.of(new ColumnSpec("name", ColumnType.STRING)), WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+        long ordersDataTableId = workspaceDataTableFacade.createTable(
+            "events_copy", null, List.of(new ColumnSpec("title", ColumnType.STRING)), WORKSPACE_ID,
+            DEV_ENVIRONMENT_ID);
+
+        workspaceDataTableFacade.addColumn(
+            ordersDataTableId,
+            new ColumnSpec("customer", ColumnType.LINK,
+                new LinkSpec(customersDataTableId, LinkDeleteRule.BLOCK, "name")),
+            DEV_ENVIRONMENT_ID);
+
+        DataTableRow first = workspaceDataTableFacade.insertRow(
+            customersDataTableId, Map.of("name", "Alpha"), DEV_ENVIRONMENT_ID);
+        DataTableRow second = workspaceDataTableFacade.insertRow(
+            customersDataTableId, Map.of("name", "Beta"), DEV_ENVIRONMENT_ID);
+
+        workspaceDataTableFacade.insertRow(customersDataTableId, Map.of("name", "Gamma"), DEV_ENVIRONMENT_ID);
+
+        DataTableRow fourth = workspaceDataTableFacade.insertRow(
+            customersDataTableId, Map.of("name", "Room #" + second.id()), DEV_ENVIRONMENT_ID);
+
+        assertThat(
+            workspaceDataTableFacade.getLinkOptions(
+                ordersDataTableId, "customer", "#" + second.id(), 20, DEV_ENVIRONMENT_ID))
+                    .containsExactly(
+                        new DataTableLinkOption(second.id(), "Beta"),
+                        new DataTableLinkOption(fourth.id(), "Room #" + second.id()));
+        assertThat(
+            workspaceDataTableFacade.getLinkOptions(
+                ordersDataTableId, "customer", String.valueOf(first.id()), 20, DEV_ENVIRONMENT_ID))
+                    .containsExactly(new DataTableLinkOption(first.id(), "Alpha"));
     }
 
     @Test

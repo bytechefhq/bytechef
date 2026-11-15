@@ -82,7 +82,7 @@ input ColumnInput {
 
 input ColumnLinkInput {
     targetDataTableId: ID!
-    onDelete: LinkDeleteRule!
+    onDelete: LinkDeleteRule = BLOCK
     displayColumnName: String
 }
 

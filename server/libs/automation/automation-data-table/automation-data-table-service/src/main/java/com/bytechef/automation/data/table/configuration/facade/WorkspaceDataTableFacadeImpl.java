@@ -50,6 +50,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
@@ -68,6 +70,7 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
 
     private static final int DEFAULT_LINK_OPTIONS_LIMIT = 20;
     private static final int MAX_LINK_OPTIONS_LIMIT = 100;
+    private static final Pattern ROW_ID_SEARCH_PATTERN = Pattern.compile("#?(\\d{1,18})");
 
     private final DataTableRowFacade dataTableRowFacade;
     private final DataTableRowService dataTableRowService;
@@ -227,14 +230,25 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
         }
 
         String displayColumnName = linkSpec.displayColumnName();
-        DataTableRowConditions conditions = DataTableRowConditions.matchAll();
+        List<List<DataTableRowFilter>> conditionGroups = new ArrayList<>();
 
-        if (search != null && !search.isBlank() && displayColumnName != null
-            && isTextColumn(linkSpec.targetDataTableId(), displayColumnName, environmentId)) {
+        if (search != null && !search.isBlank()) {
+            if (displayColumnName != null
+                && isTextColumn(linkSpec.targetDataTableId(), displayColumnName, environmentId)) {
+                conditionGroups.add(
+                    List.of(new DataTableRowFilter(displayColumnName, Operation.CONTAINS_IGNORE_CASE, search.trim())));
+            }
 
-            conditions = DataTableRowConditions.of(
-                List.of(new DataTableRowFilter(displayColumnName, Operation.CONTAINS_IGNORE_CASE, search.trim())));
+            Matcher rowIdMatcher = ROW_ID_SEARCH_PATTERN.matcher(search.trim());
+
+            if (rowIdMatcher.matches()) {
+                conditionGroups.add(
+                    List.of(new DataTableRowFilter("id", Operation.EQUALS, Long.valueOf(rowIdMatcher.group(1)))));
+            }
         }
+
+        DataTableRowConditions conditions = conditionGroups.isEmpty()
+            ? DataTableRowConditions.matchAll() : DataTableRowConditions.anyOf(conditionGroups);
 
         int pageSize = limit <= 0 ? DEFAULT_LINK_OPTIONS_LIMIT : Math.min(limit, MAX_LINK_OPTIONS_LIMIT);
 
@@ -360,14 +374,7 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     @Transactional(readOnly = true)
     @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')")
     public DataTableRow getRow(long dataTableId, long rowId, long environmentId) {
-        DataTableRow dataTableRow = dataTableRowService.getRow(
-            dataTableId, rowId, environmentId);
-
-        if (dataTableRow == null) {
-            throw new DataTableException("Row not found: id=" + rowId, DataTableErrorType.ROW_NOT_FOUND);
-        }
-
-        return dataTableRow;
+        return getRow(dataTableId, rowId, List.of(), environmentId);
     }
 
     @Override
