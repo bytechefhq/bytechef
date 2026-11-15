@@ -203,6 +203,7 @@ Name: getRecord
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | table | Table | STRING |  | true |
 | id | Record ID | INTEGER |  | true |
+| expand | Expand | ARRAY <details> <summary> Items </summary> [STRING] </details> | Link columns to replace with the linked record. An expanded link holds the id, externalId and values of the record it points to, or null when empty. | false |
 
 #### Example JSON Structure
 ```json
@@ -211,7 +212,8 @@ Name: getRecord
   "name" : "getRecord",
   "parameters" : {
     "table" : "",
-    "id" : 1
+    "id" : 1,
+    "expand" : [ "" ]
   },
   "type" : "dataTable/v1/getRecord"
 }
@@ -239,6 +241,7 @@ Name: findRecords
 | conditions | OR Conditions | ARRAY <details> <summary> Items </summary> [[&#123;STRING\(column), STRING\(operation), STRING\(value), STRING\(valueTo), [STRING]\(values)&#125;]] </details> | OR Condition array that contains AND Condition arrays. A record is returned when it meets every condition of at least one AND Condition. Leave empty to return every record, up to Limit. | false |
 | sortColumn | Sort Column | STRING <details> <summary> Depends On </summary> table </details> | Column to sort the records by. Records are sorted by id when not set. | false |
 | sortDirection | Sort Direction | STRING <details> <summary> Options </summary> <span>ASC</span>, <span>DESC</span> </details> | Order of the Sort Column: Ascending or Descending. Has no effect when Sort Column is not set. | false |
+| expand | Expand | ARRAY <details> <summary> Items </summary> [STRING] </details> | Link columns to replace with the linked record. An expanded link holds the id, externalId and values of the record it points to, or null when empty. | false |
 | limit | Limit | INTEGER | Maximum number of records to return | false |
 | offset | Offset | INTEGER | Number of records to skip | false |
 
@@ -258,6 +261,7 @@ Name: findRecords
     } ] ],
     "sortColumn" : "",
     "sortDirection" : "",
+    "expand" : [ "" ],
     "limit" : 1,
     "offset" : 1
   },
