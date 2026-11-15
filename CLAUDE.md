@@ -430,8 +430,8 @@ controllers obfuscate `authorizationParameters` and null `parameters`. A member 
 a colleague's account; they cannot extract or repoint the credential. Renaming a connection needs `CONNECTION_EDIT`,
 deleting needs `CONNECTION_DELETE`, and both also need ownership: `hasPermission(#connectionId, 'Connection', <scope>)
 && (isResourceOwner(#connectionId, 'Connection') || isTenantAdmin())`. Replacing the credentials
-(`updateConnectionCredentials`) needs `CONNECTION_EDIT` and the owner, in CE and EE alike; a tenant admin is not
-enough. Attaching a connection to a project
+(`updateConnectionCredentials`) needs `CONNECTION_EDIT` and the owner or a tenant admin, in CE and EE alike; viewing
+them stays owner-only (`ConnectionSecrets`), so a tenant admin replaces values it never sees. Attaching a connection to a project
 workflow's test configuration or to a deployment requires `CONNECTION_VIEW` on it, so a PRIVATE
 connection cannot be bound by id.
 
