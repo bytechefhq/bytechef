@@ -357,6 +357,11 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @Audited(event = ProjectDeploymentAuditEvents.PROJECT_DEPLOYED, data = {
+        @AuditData(key = "projectId", value = "#projectId"),
+        @AuditData(key = "projectDeploymentId", value = "#result?.projectDeploymentId"),
+        @AuditData(key = "projectVersion", value = "#result?.projectVersion")
+    })
     @PreAuthorize("hasResourceScopeInEnvironment(#projectId, 'Project', 'DEPLOYMENT_CREATE', " +
         "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT) and " +
         "(#projectDeploymentId == null or hasPermission(#projectDeploymentId, 'ProjectDeployment', " +

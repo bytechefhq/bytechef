@@ -79,6 +79,7 @@ class AuditDataContractTest {
     private static final String RESULT_VARIABLE = "result";
     private static final List<String> READ_METHOD_PREFIXES = List.of(
         "count", "exists", "fetch", "find", "get", "has", "is", "list", "load", "read", "search");
+    private static final String APP_AUDIT_PUBLISHER = "recorded by AppAuditPublisher once the change is made";
     private static final String DEFINITION_EDIT = "workflow definition edit";
     private static final String DELEGATES = "delegates to an audited method";
     private static final String EDITOR_TEST = "editor-time test run";
@@ -110,8 +111,21 @@ class AuditDataContractTest {
         Map.entry("A2aServerFacadeImpl.updateA2aServerTags", TAGS),
         Map.entry("AiAgentTestFacadeImpl.executeAiAgentAction", EDITOR_TEST),
         Map.entry("AiSkillFacadeImpl.updateAiSkillTags", TAGS),
+        Map.entry("ApiCollectionFacadeImpl.enableApiCollectionEndpoint", DELEGATES),
+        Map.entry("ApiCollectionFacadeImpl.updateApiCollectionEndpointWorkflow", WORKFLOW_INPUTS),
         Map.entry("ApiCollectionFacadeImpl.updateApiCollectionTags", TAGS),
         Map.entry("ApiConnectorFacadeImpl.generateSpecification", PREVIEW),
+        Map.entry("AppApiCollectionFacadeImpl.bindApiCollection", APP_AUDIT_PUBLISHER),
+        Map.entry("AppApiCollectionFacadeImpl.unbindApiCollection", APP_AUDIT_PUBLISHER),
+        Map.entry("AppFacadeImpl.bindConnection", APP_AUDIT_PUBLISHER),
+        Map.entry("AppFacadeImpl.createApp", APP_AUDIT_PUBLISHER),
+        Map.entry("AppFacadeImpl.deleteApp", APP_AUDIT_PUBLISHER),
+        Map.entry("AppFacadeImpl.rotateSecretKey", APP_AUDIT_PUBLISHER),
+        Map.entry("AppFacadeImpl.unbindConnection", APP_AUDIT_PUBLISHER),
+        Map.entry("AppFacadeImpl.updateApp", APP_AUDIT_PUBLISHER),
+        Map.entry("AppFacadeImpl.updateAppStatus", APP_AUDIT_PUBLISHER),
+        Map.entry("AppWorkflowFacadeImpl.bindWorkflow", APP_AUDIT_PUBLISHER),
+        Map.entry("AppWorkflowFacadeImpl.unbindWorkflow", APP_AUDIT_PUBLISHER),
         Map.entry("ApprovalTaskFacadeImpl.createApprovalTask", RUNTIME_APPROVAL),
         Map.entry("AutomationGettingStartedFacadeImpl.dismissAutomationGettingStarted", GETTING_STARTED_DISMISSAL),
         Map.entry("AutomationProjectConfigurationAdminFacadeImpl.updateConfigurationWorkflow", WORKFLOW_INPUTS),
