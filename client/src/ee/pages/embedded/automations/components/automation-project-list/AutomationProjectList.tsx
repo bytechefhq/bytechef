@@ -79,6 +79,10 @@ const AutomationProjectList = ({
         return new Set(projectId ? [projectId] : []);
     });
 
+    const canCreateConfiguration = useHasEmbeddedScope(
+        'INTEGRATION_INSTANCE_CONFIGURATION_CREATE',
+        DEVELOPMENT_ENVIRONMENT
+    );
     const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
 
     const handleConfigurationSaved = (projectId: string) => {
@@ -137,7 +141,8 @@ const AutomationProjectList = ({
                         <AutomationProjectListItemTabs
                             actions={
                                 (activeTabs[project.id] || 'workflows') === 'workflows'
-                                    ? project.workflowTemplates.length > 0 &&
+                                    ? !project.codeWorkflowProject &&
+                                      project.workflowTemplates.length > 0 &&
                                       canCreateWorkflow && (
                                           <ButtonGroup aria-label="Workflow Creation Actions">
                                               <Button
@@ -173,7 +178,8 @@ const AutomationProjectList = ({
                                               </DropdownMenu>
                                           </ButtonGroup>
                                       )
-                                    : project.published &&
+                                    : canCreateConfiguration &&
+                                      project.published &&
                                       project.configurationCount > 0 && (
                                           <Button
                                               aria-label="Create Configuration"
