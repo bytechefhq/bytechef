@@ -171,6 +171,8 @@ class ConnectedUserReferenceAttentionResolverTest {
                 new ComponentConnection("slack", 1, "slack_1", "slack", true),
                 new ComponentConnection("slack", 1, "slack_2", "slack", true),
                 new ComponentConnection("hubspot", 1, "hubspot_1", "hubspot", true)));
+        when(workflowConnectionSlot.findMissingRequiredComponentName("automation-1", row.getConnections()))
+            .thenCallRealMethod();
 
         ReferenceState referenceState = resolver.resolve(newReference());
 
