@@ -2,8 +2,11 @@ import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useWorkflowExecutionDetailQueries} from '@/shared/components/workflow-executions/providers/workflowExecutionDetailQueriesProvider';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {PanelRightIcon} from 'lucide-react';
 import {useState} from 'react';
 
@@ -24,7 +27,14 @@ const WorkflowExecutionDetail = ({
 }: WorkflowExecutionDetailProps) => {
     const [workflowPanelVisible, setWorkflowPanelVisible] = useState(false);
 
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
     const {useGetComponentDefinitionsQuery} = useWorkflowExecutionDetailQueries();
+
+    const hasWorkspaceExecutionDetailsScope = useHasWorkspaceScope(currentWorkspaceId, 'EXECUTION_DETAILS_VIEW');
+    const hasEmbeddedExecutionDetailsScope = useHasEmbeddedScope('EXECUTION_DETAILS_VIEW');
+
+    const canViewExecutionDetails = embedded ? hasEmbeddedExecutionDetailsScope : hasWorkspaceExecutionDetailsScope;
 
     const {
         activeTab,
@@ -51,7 +61,7 @@ const WorkflowExecutionDetail = ({
         workflowExecutionError,
         workflowExecutionLoading,
         workflowExecutionRefetchError,
-    } = useWorkflowExecutionDetail(workflowExecutionId, enabled);
+    } = useWorkflowExecutionDetail(workflowExecutionId, enabled, canViewExecutionDetails);
 
     if (workflowExecutionLoading) {
         return (
