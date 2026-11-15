@@ -26,6 +26,7 @@ vi.mock('@/components/ui/collapsible', () => ({
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
+    useMcpAutomationProjectConfigurationsByServerIdQuery: () => ({data: undefined}),
     useMcpIntegrationInstanceConfigurationsByServerIdQuery: () => ({data: undefined}),
     useMcpProjectsByServerIdQuery: () => ({data: undefined}),
 }));
