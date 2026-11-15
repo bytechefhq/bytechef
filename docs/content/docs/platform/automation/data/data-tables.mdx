@@ -77,12 +77,12 @@ A **Link** column points each row at one row of another table, for example an *O
 When you add a Link column you choose:
 
 - **Target table** - the table whose rows can be linked.
-- **Display column** - the target column whose value is shown for each link in the grid.
+- **Display column** (optional) - the target column whose value is shown for each link in the grid. It must be a column of the target table and can't be another Link column. Without one, the grid shows `#<id>` for each link.
 - **When a linked row is deleted** - what happens to links when the row they point at is deleted:
   - **Prevent deleting linked rows** (the default) - the delete is refused and nothing is deleted. The error names the table, the column and the number of rows that still link to it.
   - **Clear the link** - the delete goes ahead and the links become empty. The rows that lost a link are reported as updated, so **Record Updated** triggers run for them.
 
-A table can't be deleted while other tables link to it. Delete or change those link columns first.
+A table can't be deleted while other tables link to it. Remove those link columns first.
 
 Renaming the target table or its display column doesn't break a link.
 
@@ -113,7 +113,7 @@ A Link column supports the **Equals**, **Not Equals**, **In**, **Empty** and **N
 }
 ```
 
-A row with no link returns `null`. The GraphQL row queries and the public REST row reads (get, list and get by external id) accept `expand` too.
+A row with no link returns `null`. The GraphQL row queries and the public REST row reads (get, list and get by external id) accept `expand` too. Expanding a column that exists but isn't a Link column fails with `COLUMN_NOT_FOUND` (404 in the REST API), like expanding a column that doesn't exist.
 
 ### CSV
 
