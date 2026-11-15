@@ -2,10 +2,19 @@ import {TooltipProvider} from '@/components/ui/tooltip';
 import {act, fireEvent, render, screen} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {executionQueryMock, sheetContentPropsMock, taskExecutionQueryMock} = vi.hoisted(() => ({
+const {executionDetailsScope, executionQueryMock, sheetContentPropsMock, taskExecutionQueryMock} = vi.hoisted(() => ({
+    executionDetailsScope: {granted: true},
     executionQueryMock: vi.fn(),
     sheetContentPropsMock: vi.fn(),
     taskExecutionQueryMock: vi.fn(),
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => executionDetailsScope.granted,
+}));
+
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    useHasEmbeddedScope: () => executionDetailsScope.granted,
 }));
 
 vi.mock('@/shared/queries/automation/workflowExecutions.queries', async (importOriginal) => ({
@@ -46,6 +55,7 @@ describe('WorkflowExecutionDetail', () => {
         sheetContentPropsMock.mockReset();
         taskExecutionQueryMock.mockReset();
         taskExecutionQueryMock.mockReturnValue({data: undefined, isError: false});
+        executionDetailsScope.granted = true;
     });
 
     it('shows a loading state while the execution is loading', () => {
@@ -204,6 +214,34 @@ describe('WorkflowExecutionDetail', () => {
                 selectedItem: focusedTaskExecution,
                 taskExecutionCount: 112464,
             })
+        );
+    });
+
+    it('does not fetch the focused task for a member without the execution details scope', () => {
+        const topLevelTaskExecution = {childCount: 1, id: '1', jobId: '5', status: 'FAILED'};
+
+        executionDetailsScope.granted = false;
+
+        executionQueryMock.mockReturnValue({
+            data: {
+                focusPath: [{taskExecutionId: '1'}, {taskExecutionId: '9'}],
+                id: 5,
+                job: {id: '5', status: 'FAILED', taskExecutions: [topLevelTaskExecution]},
+                workflow: {label: 'Order intake'},
+            },
+            isLoading: false,
+        });
+
+        render(<WorkflowExecutionDetail workflowExecutionId={5} />, {wrapper: TooltipProvider});
+
+        expect(taskExecutionQueryMock).toHaveBeenCalled();
+
+        for (const [, enabled] of taskExecutionQueryMock.mock.calls) {
+            expect(enabled).toBe(false);
+        }
+
+        expect(sheetContentPropsMock).toHaveBeenLastCalledWith(
+            expect.objectContaining({selectedItem: topLevelTaskExecution})
         );
     });
 
