@@ -12,6 +12,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -314,6 +316,8 @@ class IntegrationInstanceAdminFacadeIntTest {
                 "admin", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
 
         when(permissionService.isTenantAdmin()).thenReturn(true);
+        when(permissionService.hasResourceScope(eq(INTEGRATION_INSTANCE_ID), eq("IntegrationInstance"), anyString()))
+            .thenReturn(true);
     }
 
     private static IntegrationInstance createIntegrationInstance(String provisionedBy) {

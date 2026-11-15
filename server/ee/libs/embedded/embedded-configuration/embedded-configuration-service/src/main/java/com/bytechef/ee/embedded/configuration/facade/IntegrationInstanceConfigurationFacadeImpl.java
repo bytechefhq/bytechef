@@ -761,7 +761,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_CONFIGURATION_CREDENTIALS_UPDATED, data = {
         @AuditData(key = "integrationInstanceConfigurationId", value = "#id")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'IntegrationInstanceConfiguration', 'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public void updateIntegrationInstanceConfigurationCredentials(long id, Map<String, ?> parameters, int version) {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
             .getIntegrationInstanceConfiguration(id);

@@ -58,7 +58,7 @@ public class IntegrationInstanceAdminFacadeImpl implements IntegrationInstanceAd
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_VIEW')")
     public ConnectionDTO getIntegrationInstanceConnection(long integrationInstanceId) {
         IntegrationInstance integrationInstance = requireProvisioned(integrationInstanceId);
 
@@ -91,7 +91,7 @@ public class IntegrationInstanceAdminFacadeImpl implements IntegrationInstanceAd
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#integrationInstanceId, 'IntegrationInstance', 'CONNECTED_USER_MANAGE')")
     public void updateIntegrationInstanceCredentials(
         long integrationInstanceId, Map<String, ?> parameters, int version) {
 

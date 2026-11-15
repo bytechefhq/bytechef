@@ -13,6 +13,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -93,6 +94,7 @@ class EmbeddedGettingStartedFacadeIntTest {
 
     private static final long RUNNABLE_CONNECTED_USER_ID = 42L;
     private static final long LAST_ENABLED_CONNECTED_USER_ID = 4242L;
+    private static final String EMBEDDED_SCOPE_PREFIX = "EMBEDDED_SCOPE_";
 
     @Autowired
     private ApiKeyService apiKeyService;
@@ -145,7 +147,7 @@ class EmbeddedGettingStartedFacadeIntTest {
     }
 
     @Test
-    void testGetEmbeddedGettingStartedAllowedOnlyForAdmin() {
+    void testGetEmbeddedGettingStartedRequiresTheEmbeddedViewScope() {
         authenticate(nonAdmin());
 
         assertThatThrownBy(() -> embeddedGettingStartedFacade.getEmbeddedGettingStarted())
@@ -157,7 +159,7 @@ class EmbeddedGettingStartedFacadeIntTest {
     }
 
     @Test
-    void testIsEmbeddedGettingStartedCompletedAllowedOnlyForAdmin() {
+    void testIsEmbeddedGettingStartedCompletedRequiresTheEmbeddedViewScope() {
         authenticate(nonAdmin());
 
         assertThatThrownBy(() -> embeddedGettingStartedFacade.isEmbeddedGettingStartedCompleted())
@@ -169,7 +171,20 @@ class EmbeddedGettingStartedFacadeIntTest {
     }
 
     @Test
-    void testDismissEmbeddedGettingStartedAllowedOnlyForAdmin() {
+    void testAnEmbeddedViewerCanReadButNotDismissEmbeddedGettingStarted() {
+        authenticate(embeddedViewer());
+
+        assertThat(embeddedGettingStartedFacade.getEmbeddedGettingStarted()).isNotNull();
+        assertThat(embeddedGettingStartedFacade.isEmbeddedGettingStartedCompleted()).isFalse();
+
+        assertThatThrownBy(() -> embeddedGettingStartedFacade.dismissEmbeddedGettingStarted())
+            .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(propertyRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    void testDismissEmbeddedGettingStartedRequiresTheEmbeddedSettingsManageScope() {
         authenticate(nonAdmin());
 
         assertThatThrownBy(() -> embeddedGettingStartedFacade.dismissEmbeddedGettingStarted())
@@ -709,6 +724,14 @@ class EmbeddedGettingStartedFacadeIntTest {
         SecurityContextHolder.setContext(new SecurityContextImpl(authentication));
     }
 
+    private static Authentication embeddedViewer() {
+        return new UsernamePasswordAuthenticationToken(
+            "viewer", "n/a",
+            List.of(
+                new SimpleGrantedAuthority(AuthorityConstants.USER),
+                new SimpleGrantedAuthority(EMBEDDED_SCOPE_PREFIX + "EMBEDDED_VIEW")));
+    }
+
     private static Authentication nonAdmin() {
         return new UsernamePasswordAuthenticationToken(
             "user", "n/a", List.of(new SimpleGrantedAuthority(AuthorityConstants.USER)));
@@ -729,6 +752,9 @@ class EmbeddedGettingStartedFacadeIntTest {
 
             when(permissionService.isTenantAdmin())
                 .thenAnswer(invocation -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN));
+            when(permissionService.hasEmbeddedScope(anyString()))
+                .thenAnswer(invocation -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN) ||
+                    SecurityUtils.hasCurrentUserThisAuthority(EMBEDDED_SCOPE_PREFIX + invocation.getArgument(0)));
 
             return permissionService;
         }
