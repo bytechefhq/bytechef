@@ -62,7 +62,7 @@ Only workflows with a **New Workflow Call** trigger are eligible. A configuratio
 
 Each switched-on workflow shows its tool settings under its row: **Tool Name**, **Tool Description** and the fields of its **New Workflow Call** trigger, the same mapping that **Configure** opens later. Tool settings are stored per workflow.
 
-The **Workflow Tools** tab groups workflows by instance configuration. Each configuration row has a ⋮ menu with **Edit Workflows**, **Change Integration Version** and **Delete**. Each workflow has a **Configure** button (the tool's property values), a switch, and a ⋮ menu with **Edit** (its connections and inputs in the instance configuration) and **Delete**.
+The **Workflow Tools** tab groups workflows by instance configuration. Each configuration row has a ⋮ menu with **Edit Workflows** and **Delete**. To move a configuration to another integration version, change it under **Configurations**. Click a workflow's name to see its executions. Each workflow has a **Configure** button (the tool's property values), a switch, and a ⋮ menu with **Edit** (its connections and inputs in the instance configuration) and **Delete**.
 
 **Delete** removes a workflow from this server only. It stays in the instance configuration, with its other triggers. Deleting the whole server works the same way: the instance configurations it used, and their workflows, are kept.
 
@@ -73,13 +73,14 @@ A server can also expose workflows of an [automation project](/platform/embedded
 1. Click **Add Automations**.
 2. In the **Basic** step, pick the **Automation** and its **Automation Configuration**. Only configurations of the server's environment are listed.
 3. In the **Workflows** step, switch on the workflows to expose. Only workflows with a **New Workflow Call** trigger are listed. A workflow that is off in the configuration is listed as **Turned off in the configuration** and cannot be added. Adding a workflow never turns anything on and never changes the configuration.
-4. Optionally set each tool's **name** and **description**. They default to the workflow's label and description, and you can change them later in the tool's popover.
+4. Each switched-on workflow shows its tool settings under its row: **Tool Name**, **Tool Description** and the fields of its **New Workflow Call** trigger, the same mapping that **Configure** opens later. The name and description default to the workflow's label and description.
 5. Save the dialog.
 
-Each automation is listed with its project name, its configuration and the version it releases. Its ⋮ menu has **Edit Workflows** and **Delete**. Expand it to see its workflow tools. Each tool row has:
+Each automation is listed with its project name, its configuration and the version it releases. Its ⋮ menu has **Edit Workflows** and **Delete**. Expand it to see its workflow tools. Click a tool's name to see its executions. Each tool row has:
 
 - a **Configure** button, which opens the tool's properties popover. Set the **input mapping** there: fix a value, or let the agent fill it at call time with `fromAi(...)`. See [Supplying tool parameters with fromAi](/platform/automation/build/workflows/ai/agent#supplying-tool-parameters-with-fromai).
 - a switch that turns the tool on or off for the whole server.
+- a ⋮ menu with **Delete**, which removes the tool from this server only.
 
 A tool is marked **Not available** while its configuration or workflow is off, or when the workflow has lost its **New Workflow Call** trigger.
 
