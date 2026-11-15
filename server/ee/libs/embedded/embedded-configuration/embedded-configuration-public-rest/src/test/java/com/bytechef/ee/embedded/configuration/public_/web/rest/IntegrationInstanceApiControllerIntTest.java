@@ -17,6 +17,7 @@ import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestSharedMocks;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestTestConfiguration;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.config.WithMockConnectedUser;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import java.util.Map;
@@ -72,7 +73,7 @@ class IntegrationInstanceApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testCreateFrontendIntegrationInstanceReturnsNotFoundWhenIntegrationNotVisible() {
         when(connectedUserIntegrationFacade.createIntegrationInstance(
             EXTERNAL_USER_ID, INTEGRATION_ID, Map.of(), Environment.PRODUCTION))
@@ -91,7 +92,7 @@ class IntegrationInstanceApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testCreateFrontendIntegrationInstanceReturnsTheInstanceIdWhenIntegrationVisible() {
         IntegrationInstance integrationInstance = mock(IntegrationInstance.class);
 
@@ -116,7 +117,7 @@ class IntegrationInstanceApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
+    @WithMockConnectedUser(externalUserId = EXTERNAL_USER_ID)
     void testCreateIntegrationInstanceReturnsNotFoundWhenIntegrationNotVisible() {
         when(connectedUserIntegrationFacade.createIntegrationInstance(
             EXTERNAL_USER_ID, INTEGRATION_ID, Map.of(), Environment.PRODUCTION))
