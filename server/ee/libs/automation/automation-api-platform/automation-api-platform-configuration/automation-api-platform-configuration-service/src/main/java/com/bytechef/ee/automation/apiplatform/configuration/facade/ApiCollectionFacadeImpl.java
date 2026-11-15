@@ -192,6 +192,13 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
      * evaluated for the whole operation.
      */
     @Override
+    @Audited(event = ApiCollectionAuditEvents.API_COLLECTION_ENDPOINT_CREATED, data = {
+        @AuditData(key = "apiCollectionEndpointId", value = "#result?.id"),
+        @AuditData(key = "apiCollectionId", value = "#apiCollectionEndpointDTO.apiCollectionId"),
+        @AuditData(key = "name", value = "#apiCollectionEndpointDTO.name"),
+        @AuditData(key = "httpMethod", value = "#apiCollectionEndpointDTO.httpMethod"),
+        @AuditData(key = "path", value = "#apiCollectionEndpointDTO.path")
+    })
     @PreAuthorize("hasPermission(#apiCollectionEndpointDTO.apiCollectionId, 'ApiCollection', 'API_PLATFORM_EDIT')")
     public ApiCollectionEndpointDTO createApiCollectionEndpoint(
         ApiCollectionEndpointDTO apiCollectionEndpointDTO, List<ProjectDeploymentWorkflowConnection> connections,
@@ -469,6 +476,12 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
      * evaluated, both changes share one transaction, and the collection check of the former runs before the latter.
      */
     @Override
+    @Audited(event = ApiCollectionAuditEvents.API_COLLECTION_ENDPOINT_UPDATED, data = {
+        @AuditData(key = "apiCollectionEndpointId", value = "#apiCollectionEndpointDTO.id"),
+        @AuditData(key = "name", value = "#result?.name"),
+        @AuditData(key = "httpMethod", value = "#result?.httpMethod"),
+        @AuditData(key = "path", value = "#result?.path")
+    })
     @PreAuthorize("hasPermission(#apiCollectionEndpointDTO.id, 'ApiCollectionEndpoint', 'API_PLATFORM_EDIT')")
     public ApiCollectionEndpointDTO updateApiCollectionEndpoint(
         ApiCollectionEndpointDTO apiCollectionEndpointDTO, List<ProjectDeploymentWorkflowConnection> connections,
@@ -508,6 +521,11 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     @Override
+    @Audited(event = ApiCollectionAuditEvents.API_COLLECTION_PROJECT_VERSION_UPDATED, data = {
+        @AuditData(key = "apiCollectionId", value = "#id"),
+        @AuditData(key = "projectVersion", value = "#projectVersion"),
+        @AuditData(key = "removeMissingEndpoints", value = "#removeMissingEndpoints")
+    })
     @PreAuthorize("hasPermission(#id, 'ApiCollection', 'API_PLATFORM_EDIT')")
     public ApiCollectionVersionUpdateDTO updateApiCollectionProjectVersion(
         long id, int projectVersion, boolean removeMissingEndpoints) {

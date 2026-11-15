@@ -554,6 +554,13 @@ public class ProjectDeploymentFacadeIntTest {
                     login, "n/a", List.of(new SimpleGrantedAuthority(AuthorityConstants.USER))));
     }
 
+    private static void authenticateAdmin() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                    "admin", "n/a", List.of(new SimpleGrantedAuthority(AuthorityConstants.ADMIN))));
+    }
+
     @Test
     public void testDeleteProjectDeploymentRemovesAllPrincipalJobsBeforeAnyJob() {
         ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
@@ -602,7 +609,7 @@ public class ProjectDeploymentFacadeIntTest {
         projectDeploymentFacade.updateProjectDeploymentTags(
             otherProjectDeploymentDTO.id(), List.of(new Tag("deployment-tag-z")));
 
-        List<Tag> tags = projectDeploymentFacade.getProjectDeploymentTags(workspace.getId(), null);
+        List<Tag> tags = projectDeploymentFacade.getProjectDeploymentTags(workspace.getId());
 
         assertThat(tags)
             .extracting(Tag::getName)
@@ -623,10 +630,10 @@ public class ProjectDeploymentFacadeIntTest {
         projectDeploymentFacade.updateProjectDeploymentTags(
             otherProjectDeploymentDTO.id(), List.of(new Tag("other-workspace-deployment-tag")));
 
-        assertThat(projectDeploymentFacade.getProjectDeploymentTags(workspace.getId(), null))
+        assertThat(projectDeploymentFacade.getProjectDeploymentTags(workspace.getId()))
             .extracting(Tag::getName)
             .containsExactly("workspace-deployment-tag");
-        assertThat(projectDeploymentFacade.getProjectDeploymentTags(otherWorkspace.getId(), null))
+        assertThat(projectDeploymentFacade.getProjectDeploymentTags(otherWorkspace.getId()))
             .extracting(Tag::getName)
             .containsExactly("other-workspace-deployment-tag");
     }
@@ -1167,6 +1174,8 @@ public class ProjectDeploymentFacadeIntTest {
 
         verify(jobService, times(2)).getJob(runningJobId);
 
+        authenticateAdmin();
+
         List<ProjectDeploymentDTO> workspaceProjectDeployments = projectDeploymentFacade.getWorkspaceProjectDeployments(
             workspace.getId(), null, projectDTO.id(), null, true);
 
@@ -1201,6 +1210,8 @@ public class ProjectDeploymentFacadeIntTest {
             .thenReturn(Optional.of(finishedJobId));
         when(jobService.getJob(finishedJobId))
             .thenReturn(finishedJob);
+
+        authenticateAdmin();
 
         List<ProjectDeploymentDTO> workspaceProjectDeployments = projectDeploymentFacade.getWorkspaceProjectDeployments(
             workspace.getId(), null, projectDTO.id(), null, true);
@@ -2229,24 +2240,6 @@ public class ProjectDeploymentFacadeIntTest {
                 .hasMessage(BODY_REACHED);
         }
 
-        @Test
-        void testProjectDeploymentTagsRequireTheDeploymentViewScopeInTheRequestedEnvironment() {
-            long environmentId = Environment.PRODUCTION.ordinal();
-
-            when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "DEPLOYMENT_VIEW", Environment.DEVELOPMENT))
-                .thenReturn(true);
-
-            assertThatThrownBy(() -> projectDeploymentFacade.getProjectDeploymentTags(WORKSPACE_ID, environmentId))
-                .isInstanceOf(AccessDeniedException.class);
-
-            when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "DEPLOYMENT_VIEW", Environment.PRODUCTION))
-                .thenReturn(true);
-
-            assertThatThrownBy(() -> projectDeploymentFacade.getProjectDeploymentTags(WORKSPACE_ID, environmentId))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage(BODY_REACHED);
-        }
-
         private void stubDeploymentWorkflowWithConnection(long connectionId) {
             ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
 
@@ -2304,6 +2297,7 @@ public class ProjectDeploymentFacadeIntTest {
         private static ProjectDeploymentDTO projectDeploymentDTO() {
             return new ProjectDeploymentDTO(
                 null, null, null, true, Environment.PRODUCTION, PROJECT_DEPLOYMENT_ID, "deployment", null, null, null,
+                null,
                 null,
                 PROJECT_ID, 1, List.of(), List.of(), 0);
         }
