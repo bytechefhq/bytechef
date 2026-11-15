@@ -104,6 +104,7 @@ public class DataTableFindRecordsAction {
                         option("Ascending", Direction.ASC.name()),
                         option("Descending", Direction.DESC.name()))
                     .defaultValue(Direction.ASC.name()),
+                DataTableUtils.expandProperty(dataTableService, dataTableWorkspaceResolver),
                 integer(LIMIT)
                     .label("Limit")
                     .description("Maximum number of records to return")
@@ -128,7 +129,9 @@ public class DataTableFindRecordsAction {
         DataTableInfo dataTableInfo = DataTableUtils.resolveDataTable(
             dataTableService, workspaceId, name, DEVELOPMENT.ordinal());
 
-        var rowSchema = DataTableUtils.rowObjectSchema(dataTableInfo);
+        List<String> expand = DataTableUtils.getExpand(inputParameters);
+
+        var rowSchema = DataTableUtils.rowObjectSchema(dataTableInfo, expand);
 
         List<DataTableRow> rows = dataTableRowService.listRows(dataTableInfo.id(), 1, 0, DEVELOPMENT.ordinal());
 
@@ -139,7 +142,7 @@ public class DataTableFindRecordsAction {
         DataTableRow firstRow = rows.getFirst();
 
         Map<String, Object> sampleOutput = DataTableUtils.createSampleOutput(
-            dataTableInfo, firstRow.id(), firstRow.values());
+            dataTableInfo, firstRow.id(), firstRow.values(), expand);
 
         return OutputResponse.of(array().items((Property.ValueProperty<?>) rowSchema), List.of(sampleOutput));
     }
@@ -174,9 +177,11 @@ public class DataTableFindRecordsAction {
             sorts = List.of(new DataTableRowSort(sortColumn, direction));
         }
 
+        List<String> expand = DataTableUtils.getExpand(inputParameters);
+
         return DataTableUtils.flattenRows(
             dataTableRowService.findRows(
-                dataTableId, conditions, sorts, limit, offset,
+                dataTableId, conditions, sorts, limit, offset, expand,
                 Objects.requireNonNull(actionContextAware.getEnvironmentId())));
     }
 }

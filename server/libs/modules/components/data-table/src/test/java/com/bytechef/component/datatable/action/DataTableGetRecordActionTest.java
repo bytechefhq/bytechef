@@ -18,11 +18,15 @@ package com.bytechef.component.datatable.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +37,7 @@ class DataTableGetRecordActionTest extends AbstractDataTableActionTest {
 
     @Test
     void testPerformEmitsFlatRow() throws Exception {
-        when(dataTableRowService.getRow(anyLong(), anyLong(), anyLong()))
+        when(dataTableRowService.getRow(anyLong(), anyLong(), any(), anyLong()))
             .thenReturn(new DataTableRow(7, Map.of("staff_reply", "on my way")));
 
         ModifiableActionDefinition actionDefinition = DataTableGetRecordAction.of(
@@ -45,8 +49,26 @@ class DataTableGetRecordActionTest extends AbstractDataTableActionTest {
     }
 
     @Test
+    void testGetRecordPassesExpand() throws Exception {
+        when(dataTableRowService.getRow(anyLong(), anyLong(), any(), anyLong()))
+            .thenReturn(new DataTableRow(7, Map.of("customer", new DataTableRow(5, "ext-5", Map.of("name", "Ada")))));
+
+        ModifiableActionDefinition actionDefinition = DataTableGetRecordAction.of(
+            dataTableService, dataTableRowService, dataTableWorkspaceResolver);
+
+        Object result = perform(
+            actionDefinition, Map.of("table", "conversations", "id", 7, "expand", List.of("customer")));
+
+        verify(dataTableRowService).getRow(eq(DATA_TABLE_ID), eq(7L), eq(List.of("customer")), eq(ENVIRONMENT_ID));
+
+        assertEquals(
+            Map.of("id", 7L, "customer", Map.of("id", 5L, "externalId", "ext-5", "values", Map.of("name", "Ada"))),
+            result);
+    }
+
+    @Test
     void testPerformOfMissingRecordStaysNull() throws Exception {
-        when(dataTableRowService.getRow(anyLong(), anyLong(), anyLong())).thenReturn(null);
+        when(dataTableRowService.getRow(anyLong(), anyLong(), any(), anyLong())).thenReturn(null);
 
         ModifiableActionDefinition actionDefinition = DataTableGetRecordAction.of(
             dataTableService, dataTableRowService, dataTableWorkspaceResolver);
