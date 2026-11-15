@@ -27,6 +27,7 @@ import ConnectionParameters from '@/shared/components/connection/ConnectionParam
 import {CodePayloadI, TokenPayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
 import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
+import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {
     Authorization,
     AuthorizationType,
@@ -143,6 +144,7 @@ const ConnectionDialog = ({
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const canEditEmbeddedConnection = useHasEmbeddedScope('CONNECTION_EDIT', connection?.environmentId);
+    const isTenantAdmin = useIsTenantAdmin();
     const canEditWorkspaceConnection = useHasWorkspaceScope(
         currentWorkspaceId,
         'CONNECTION_EDIT',
@@ -218,8 +220,10 @@ const ConnectionDialog = ({
 
     const credentialsHidden = isEdit && (!canEditConnection || !isConnectionCreator);
 
+    const canReplaceCredentials = canEditConnection && (isConnectionCreator || isTenantAdmin);
+
     const canUpdateCredentials =
-        isEdit && !!useUpdateConnectionCredentialsMutation && !connection?.managed && !credentialsHidden;
+        isEdit && !!useUpdateConnectionCredentialsMutation && !connection?.managed && canReplaceCredentials;
 
     const canEditConnectionProperties = isEdit && !!connectionPropertiesEditable;
 
@@ -464,7 +468,7 @@ const ConnectionDialog = ({
     }
 
     function saveConnection(additionalParameters?: object) {
-        if (isUpdatingCredentials && credentialsMutation && !credentialsHidden) {
+        if (isUpdatingCredentials && credentialsMutation && canUpdateCredentials) {
             const {parameters} = getValues();
 
             const connectionPropertyNames = (connectionDefinition?.properties || []).map((property) => property.name);
