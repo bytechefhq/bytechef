@@ -439,6 +439,10 @@
               "value": "CONTAINS"
             }, {
               "description": null,
+              "label": "Contains Ignore Case",
+              "value": "CONTAINS_IGNORE_CASE"
+            }, {
+              "description": null,
               "label": "Not Contains",
               "value": "NOT_CONTAINS"
             }, {
@@ -833,6 +837,10 @@
               "value": "CONTAINS"
             }, {
               "description": null,
+              "label": "Contains Ignore Case",
+              "value": "CONTAINS_IGNORE_CASE"
+            }, {
+              "description": null,
               "label": "Not Contains",
               "value": "NOT_CONTAINS"
             }, {
@@ -1225,6 +1233,10 @@
               "description": null,
               "label": "Contains",
               "value": "CONTAINS"
+            }, {
+              "description": null,
+              "label": "Contains Ignore Case",
+              "value": "CONTAINS_IGNORE_CASE"
             }, {
               "description": null,
               "label": "Not Contains",
@@ -2050,6 +2062,10 @@
               "value": "CONTAINS"
             }, {
               "description": null,
+              "label": "Contains Ignore Case",
+              "value": "CONTAINS_IGNORE_CASE"
+            }, {
+              "description": null,
               "label": "Not Contains",
               "value": "NOT_CONTAINS"
             }, {
@@ -2438,6 +2454,10 @@
               "value": "CONTAINS"
             }, {
               "description": null,
+              "label": "Contains Ignore Case",
+              "value": "CONTAINS_IGNORE_CASE"
+            }, {
+              "description": null,
               "label": "Not Contains",
               "value": "NOT_CONTAINS"
             }, {
@@ -2824,6 +2844,10 @@
               "description": null,
               "label": "Contains",
               "value": "CONTAINS"
+            }, {
+              "description": null,
+              "label": "Contains Ignore Case",
+              "value": "CONTAINS_IGNORE_CASE"
             }, {
               "description": null,
               "label": "Not Contains",
