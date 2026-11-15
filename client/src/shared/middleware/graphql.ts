@@ -883,9 +883,21 @@ export type CreateDataTableMutationVariables = Exact<{
 
 export type CreateDataTableMutation = { createDataTable: boolean };
 
+export type DataTableLinkOptionsQueryVariables = Exact<{
+  environmentId: string | number;
+  tableId: string | number;
+  columnName: string;
+  search?: string | null | undefined;
+  limit?: number | null | undefined;
+}>;
+
+
+export type DataTableLinkOptionsQuery = { dataTableLinkOptions: Array<{ id: string, label: string }> };
+
 export type DataTableRowsQueryVariables = Exact<{
   environmentId: string | number;
   tableId: string | number;
+  expand?: Array<string> | string | null | undefined;
 }>;
 
 
@@ -896,6 +908,7 @@ export type DataTableRowsPageQueryVariables = Exact<{
   tableId: string | number;
   limit?: number | null | undefined;
   offset?: number | null | undefined;
+  expand?: Array<string> | string | null | undefined;
 }>;
 
 
@@ -924,7 +937,7 @@ export type DataTablesQueryVariables = Exact<{
 }>;
 
 
-export type DataTablesQuery = { dataTables: Array<{ id: string, baseName: string, lastModifiedDate: any, columns: Array<{ id: string, name: string, type: Types.ColumnType }> }> };
+export type DataTablesQuery = { dataTables: Array<{ id: string, baseName: string, lastModifiedDate: any, columns: Array<{ id: string, name: string, type: Types.ColumnType, link: { targetDataTableId: string, targetDataTableName: string, onDelete: Types.LinkDeleteRule, displayColumnName: string | null } | null }> }> };
 
 export type DeleteDataTableRowMutationVariables = Exact<{
   input: Types.DeleteRowInput;
@@ -5815,9 +5828,40 @@ export const useCreateDataTableMutation = <
   }
     )};
 
+export const DataTableLinkOptionsDocument = new TypedDocumentString(`
+    query dataTableLinkOptions($environmentId: ID!, $tableId: ID!, $columnName: String!, $search: String, $limit: Int) {
+  dataTableLinkOptions(
+    environmentId: $environmentId
+    tableId: $tableId
+    columnName: $columnName
+    search: $search
+    limit: $limit
+  ) {
+    id
+    label
+  }
+}
+    `);
+
+export const useDataTableLinkOptionsQuery = <
+      TData = DataTableLinkOptionsQuery,
+      TError = unknown
+    >(
+      variables: DataTableLinkOptionsQueryVariables,
+      options?: Omit<UseQueryOptions<DataTableLinkOptionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableLinkOptionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<DataTableLinkOptionsQuery, TError, TData>(
+      {
+    queryKey: ['dataTableLinkOptions', variables],
+    queryFn: fetcher<DataTableLinkOptionsQuery, DataTableLinkOptionsQueryVariables>(DataTableLinkOptionsDocument, variables),
+    ...options
+  }
+    )};
+
 export const DataTableRowsDocument = new TypedDocumentString(`
-    query dataTableRows($environmentId: ID!, $tableId: ID!) {
-  dataTableRows(environmentId: $environmentId, tableId: $tableId) {
+    query dataTableRows($environmentId: ID!, $tableId: ID!, $expand: [String!]) {
+  dataTableRows(environmentId: $environmentId, tableId: $tableId, expand: $expand) {
     id
     values
   }
@@ -5841,12 +5885,13 @@ export const useDataTableRowsQuery = <
     )};
 
 export const DataTableRowsPageDocument = new TypedDocumentString(`
-    query dataTableRowsPage($environmentId: ID!, $tableId: ID!, $limit: Int, $offset: Int) {
+    query dataTableRowsPage($environmentId: ID!, $tableId: ID!, $limit: Int, $offset: Int, $expand: [String!]) {
   dataTableRowsPage(
     environmentId: $environmentId
     tableId: $tableId
     limit: $limit
     offset: $offset
+    expand: $expand
   ) {
     items {
       id
@@ -5964,6 +6009,12 @@ export const DataTablesDocument = new TypedDocumentString(`
       id
       name
       type
+      link {
+        targetDataTableId
+        targetDataTableName
+        onDelete
+        displayColumnName
+      }
     }
   }
 }

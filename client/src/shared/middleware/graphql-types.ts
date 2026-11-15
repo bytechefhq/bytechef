@@ -778,8 +778,15 @@ export type ClusterElementType = {
 };
 
 export type ColumnInput = {
+  link?: InputMaybe<ColumnLinkInput>;
   name: Scalars['String']['input'];
   type: ColumnType;
+};
+
+export type ColumnLinkInput = {
+  displayColumnName?: InputMaybe<Scalars['String']['input']>;
+  onDelete: LinkDeleteRule;
+  targetDataTableId: Scalars['ID']['input'];
 };
 
 export enum ColumnType {
@@ -787,6 +794,7 @@ export enum ColumnType {
   Date = 'DATE',
   DateTime = 'DATE_TIME',
   Integer = 'INTEGER',
+  Link = 'LINK',
   Number = 'NUMBER',
   String = 'STRING'
 }
@@ -1164,8 +1172,23 @@ export type DataTable = {
 export type DataTableColumn = {
   __typename?: 'DataTableColumn';
   id: Scalars['ID']['output'];
+  link?: Maybe<DataTableColumnLink>;
   name: Scalars['String']['output'];
   type: ColumnType;
+};
+
+export type DataTableColumnLink = {
+  __typename?: 'DataTableColumnLink';
+  displayColumnName?: Maybe<Scalars['String']['output']>;
+  onDelete: LinkDeleteRule;
+  targetDataTableId: Scalars['ID']['output'];
+  targetDataTableName: Scalars['String']['output'];
+};
+
+export type DataTableLinkOption = {
+  __typename?: 'DataTableLinkOption';
+  id: Scalars['ID']['output'];
+  label: Scalars['String']['output'];
 };
 
 export type DataTableRow = {
@@ -1731,6 +1754,11 @@ export type KnowledgeBaseTagsEntry = {
   knowledgeBaseId: Scalars['ID']['output'];
   tags: Array<Tag>;
 };
+
+export enum LinkDeleteRule {
+  Block = 'BLOCK',
+  Clear = 'CLEAR'
+}
 
 export type LogEntry = {
   __typename?: 'LogEntry';
@@ -3645,6 +3673,7 @@ export type Query = {
   customComponent?: Maybe<CustomComponent>;
   customComponentDefinition?: Maybe<CustomComponentDefinition>;
   customComponents: Array<CustomComponent>;
+  dataTableLinkOptions: Array<DataTableLinkOption>;
   dataTableRows: Array<DataTableRow>;
   dataTableRowsPage: DataTableRowPage;
   dataTableStorageUsage: DataTableStorageUsage;
@@ -4201,17 +4230,33 @@ export type QueryCustomComponentDefinitionArgs = {
 };
 
 
+export type QueryDataTableLinkOptionsArgs = {
+  columnName: Scalars['String']['input'];
+  environmentId: Scalars['ID']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  tableId: Scalars['ID']['input'];
+};
+
+
 export type QueryDataTableRowsArgs = {
   environmentId: Scalars['ID']['input'];
+  expand?: InputMaybe<Array<Scalars['String']['input']>>;
   tableId: Scalars['ID']['input'];
 };
 
 
 export type QueryDataTableRowsPageArgs = {
   environmentId: Scalars['ID']['input'];
+  expand?: InputMaybe<Array<Scalars['String']['input']>>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   tableId: Scalars['ID']['input'];
+};
+
+
+export type QueryDataTableTagsArgs = {
+  workspaceId: Scalars['ID']['input'];
 };
 
 
