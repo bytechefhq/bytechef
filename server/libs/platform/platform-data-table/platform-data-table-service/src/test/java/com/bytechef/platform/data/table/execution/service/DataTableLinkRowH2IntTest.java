@@ -141,6 +141,17 @@ class DataTableLinkRowH2IntTest {
     }
 
     @Test
+    void testInsertRowMissingTargetMessageNamesColumnAndValue() {
+        DataTableException dataTableException = assertThrows(
+            DataTableException.class,
+            () -> dataTableRowService.insertRow(
+                ordersId, Map.of("title", "o1", "customer", MISSING_ID), ENVIRONMENT_ID));
+
+        assertEquals(DataTableErrorType.LINKED_ROW_NOT_FOUND, dataTableException.getErrorType());
+        assertThat(dataTableException.getMessage()).contains("customer=" + MISSING_ID);
+    }
+
+    @Test
     void testInsertRowRejectsUnknownExternalId() {
         assertErrorType(
             DataTableErrorType.LINKED_ROW_NOT_FOUND,

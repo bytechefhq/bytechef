@@ -417,6 +417,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             List<String> headers = null;
             List<String> mappedColumnNames = null;
             List<Boolean> externalIdHeaderFlags = null;
+            Set<String> externalIdLinkColumnNames = new HashSet<>();
             List<Map<String, Object>> parsedValues = new ArrayList<>();
             List<@Nullable String> parsedExternalIds = new ArrayList<>();
             List<Long> parsedLineNumbers = new ArrayList<>();
@@ -466,6 +467,10 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                             }
                         }
 
+                        if (externalIdHeader) {
+                            externalIdLinkColumnNames.add(columnName);
+                        }
+
                         mappedColumnNames.add(columnName);
                         externalIdHeaderFlags.add(externalIdHeader);
                     }
@@ -510,7 +515,9 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                     }
                 }
 
-                values.putAll(externalIdLinkValues);
+                for (String externalIdLinkColumnName : externalIdLinkColumnNames) {
+                    values.put(externalIdLinkColumnName, externalIdLinkValues.get(externalIdLinkColumnName));
+                }
 
                 parsedValues.add(values);
                 parsedExternalIds.add(toExternalId(values.remove(ReservedColumns.EXTERNAL_ID)));
@@ -2254,24 +2261,41 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         String causeMessage = String.valueOf(mostSpecificCause.getMessage())
             .toLowerCase(Locale.ROOT);
 
-        List<String> writtenLinkColumnNames = columnSpecs.stream()
-            .filter(columnSpec -> columnSpec.type() == ColumnType.LINK)
-            .map(ColumnSpec::name)
-            .filter(columnName -> values.entrySet()
-                .stream()
-                .anyMatch(entry -> columnName.equalsIgnoreCase(entry.getKey()) && entry.getValue() != null))
-            .toList();
+        Map<String, Object> writtenLinkValues = new LinkedHashMap<>();
 
-        List<String> mentionedLinkColumnNames = writtenLinkColumnNames.stream()
-            .filter(columnName -> causeMessage.contains(columnName))
-            .toList();
+        for (ColumnSpec columnSpec : columnSpecs) {
+            if (columnSpec.type() != ColumnType.LINK) {
+                continue;
+            }
 
-        List<String> linkColumnNames = mentionedLinkColumnNames.isEmpty()
-            ? writtenLinkColumnNames : mentionedLinkColumnNames;
+            for (Map.Entry<String, Object> entry : values.entrySet()) {
+                if (columnSpec.name()
+                    .equalsIgnoreCase(entry.getKey()) && entry.getValue() != null) {
+
+                    writtenLinkValues.put(columnSpec.name(), entry.getValue());
+                }
+            }
+        }
+
+        Map<String, Object> mentionedLinkValues = new LinkedHashMap<>();
+
+        for (Map.Entry<String, Object> entry : writtenLinkValues.entrySet()) {
+            if (causeMessage.contains(entry.getKey()
+                .toLowerCase(Locale.ROOT))) {
+                mentionedLinkValues.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        Map<String, Object> reportedLinkValues = mentionedLinkValues.isEmpty()
+            ? writtenLinkValues : mentionedLinkValues;
+
+        String linkedValues = reportedLinkValues.entrySet()
+            .stream()
+            .map(entry -> "%s=%s".formatted(entry.getKey(), entry.getValue()))
+            .collect(Collectors.joining(", "));
 
         return new DataTableException(
-            "Link column(s) %s of data table %d point to a row that does not exist".formatted(
-                linkColumnNames, dataTableId),
+            "Data table %d links to a row that does not exist: %s".formatted(dataTableId, linkedValues),
             dataIntegrityViolationException, DataTableErrorType.LINKED_ROW_NOT_FOUND);
     }
 
@@ -2286,9 +2310,17 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                 continue;
             }
 
-            String tableName = dataTableRepository.findById(dataTableLinkColumn.getDataTableId())
-                .map(DataTable::getName)
-                .orElse(String.valueOf(dataTableLinkColumn.getDataTableId()));
+            Optional<DataTable> sourceDataTableOptional = dataTableRepository.findById(
+                dataTableLinkColumn.getDataTableId());
+            String tableName;
+
+            if (sourceDataTableOptional.isPresent()) {
+                DataTable sourceDataTable = sourceDataTableOptional.get();
+
+                tableName = sourceDataTable.getName();
+            } else {
+                tableName = String.valueOf(dataTableLinkColumn.getDataTableId());
+            }
 
             long linkingRowCount = countLinkingRows(
                 DataTablePhysicalNameUtils.getPhysicalName(environmentId, dataTableLinkColumn.getDataTableId()),

@@ -64,6 +64,10 @@ class RowValuesValidatorTest {
         assertDoesNotThrow(() -> RowValuesValidator.validate(Map.of("customer", "5"), columns));
         assertDoesNotThrow(
             () -> RowValuesValidator.validate(Map.of("customer", Map.of("externalId", "c-1")), columns));
+        assertDoesNotThrow(
+            () -> RowValuesValidator.validate(Map.of("customer", Map.of("externalId", 1)), columns));
+        assertDoesNotThrow(
+            () -> RowValuesValidator.validate(Map.of("customer", Map.of("externalId", 1.5)), columns));
 
         assertThrows(
             DataTableException.class, () -> RowValuesValidator.validate(Map.of("customer", "abc"), columns));
@@ -72,7 +76,7 @@ class RowValuesValidatorTest {
             () -> RowValuesValidator.validate(Map.of("customer", Map.of("externalId", " ")), columns));
         assertThrows(
             DataTableException.class,
-            () -> RowValuesValidator.validate(Map.of("customer", Map.of("externalId", 1)), columns));
+            () -> RowValuesValidator.validate(Map.of("customer", Map.of("externalId", true)), columns));
         assertThrows(
             DataTableException.class,
             () -> RowValuesValidator.validate(Map.of("customer", Map.of("externalId", "c-1", "x", "y")), columns));
