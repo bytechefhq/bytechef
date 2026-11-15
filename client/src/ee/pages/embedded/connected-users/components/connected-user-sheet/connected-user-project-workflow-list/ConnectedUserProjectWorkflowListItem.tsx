@@ -118,7 +118,6 @@ const ConnectedUserProjectWorkflowListItem = ({
 
     const isDraft = !provisioned && connectedUserProjectWorkflow.workflowVersion == null;
 
-    // An unpublished copy has no deployment to switch on; the server rejects enabling it until it is published
     const enableDisabled = isDraft && !connectedUserProjectWorkflow.enabled;
 
     const turnedOffByAdministrator =
