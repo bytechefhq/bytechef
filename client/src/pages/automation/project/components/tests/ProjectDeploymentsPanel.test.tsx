@@ -12,6 +12,7 @@ const hoisted = vi.hoisted(() => ({
     isLoading: false,
     navigate: vi.fn(),
     projectDeployments: [] as ProjectDeployment[] | undefined,
+    queryRequests: [] as unknown[],
     refetch: vi.fn(),
     savedEnvironmentId: 0,
 }));
@@ -26,13 +27,17 @@ vi.mock('react-router-dom', async (importOriginal) => ({
 }));
 
 vi.mock('@/shared/queries/automation/projectDeployments.queries', () => ({
-    useGetWorkspaceProjectDeploymentsQuery: () => ({
-        data: hoisted.projectDeployments,
-        error: hoisted.error,
-        isFetching: false,
-        isLoading: hoisted.isLoading,
-        refetch: hoisted.refetch,
-    }),
+    useGetWorkspaceProjectDeploymentsQuery: (request: unknown) => {
+        hoisted.queryRequests.push(request);
+
+        return {
+            data: hoisted.projectDeployments,
+            error: hoisted.error,
+            isFetching: false,
+            isLoading: hoisted.isLoading,
+            refetch: hoisted.refetch,
+        };
+    },
 }));
 
 vi.mock('@/shared/queries/automation/componentDefinitions.queries', () => ({
@@ -147,6 +152,7 @@ const renderProjectDeploymentsPanel = (
 describe('ProjectDeploymentsPanel', () => {
     beforeEach(() => {
         hoisted.canCreateDeployment = true;
+        hoisted.queryRequests = [];
         hoisted.error = null;
         hoisted.isLoading = false;
         hoisted.navigate.mockReset();
@@ -218,6 +224,14 @@ describe('ProjectDeploymentsPanel', () => {
         renderProjectDeploymentsPanel(undefined, {...project, developmentDeploymentCount: 0} as Project);
 
         expect(screen.queryByRole('status', {name: 'Loading deployments'})).not.toBeInTheDocument();
+    });
+
+    it('asks only for the deployments of the current environment', () => {
+        environmentStore.setState({currentEnvironmentId: 2});
+
+        renderProjectDeploymentsPanel();
+
+        expect(hoisted.queryRequests.at(-1)).toMatchObject({environmentId: 2});
     });
 
     it('shows only the deployments of the current environment', () => {
