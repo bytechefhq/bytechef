@@ -32,7 +32,7 @@ When there are more users than fit on one page, pagination controls appear in th
 
 1. Click **Invite User**. The dialog explains: "The invitee receives an email with a link on which they set their own password. The link expires after 3 days. Optionally add them to workspaces now; you can also do that later from each workspace."
 2. Enter the **Email** address.
-3. Choose a **Role**. The options come from the organization's configured authorities; the first one is preselected. This step is Enterprise Edition only - Community Edition shows no **Role** field and invites every account as an administrator.
+3. Choose a **Role** (**Admin** or **User**). The options come from the organization's configured authorities, and the first one is preselected. This step is Enterprise Edition only: Community Edition shows no **Role** field and invites every account as an administrator.
 4. Optionally tick **Workspaces** to add the invitee to, and pick their role in each.
 5. Click **Invite**.
 
@@ -42,7 +42,7 @@ The **Invite** button stays disabled until an email address is set. In Enterpris
 
 The administrator does not set a password for the invitee, and no password is sent by email. The invitation email contains a link to `/accept-invitation?key=…`, where the invitee sets their own password. Setting the password activates the account. Until then the account shows **Pending** in the table and cannot sign in.
 
-The link is valid for 3 days and works once. After that it no longer works: delete the pending user and invite them again to send a new one. A nightly cleanup at 01:00 also removes accounts whose invitation expired, together with their workspace memberships, in every tenant. Inviting an email address that already has an account is rejected.
+The link is valid for 3 days and works once. To send a new link, delete the pending user and invite them again. A cleanup job runs every day at 01:00 and deletes accounts that were not activated within 3 days, together with their workspace memberships, in every tenant. Inviting an email address that already has an account is rejected.
 
 An invited account occupies a seat against the deployment's member quota from the moment the invitation is sent, not from the moment it is claimed.
 
@@ -235,7 +235,8 @@ Most actions need the scope their name suggests. These are the ones that are eas
 | Delete a data table | `DATA_TABLE_DELETE` | Admin |
 | Delete a knowledge base | `KNOWLEDGE_BASE_DELETE` | Admin |
 | Edit (rename, retag) or delete a connection | `CONNECTION_EDIT` / `CONNECTION_DELETE` | Editor |
-| View or replace a connection's credentials | Being the connection's creator, plus `CONNECTION_EDIT` | Editor |
+| View a connection's credentials | Being the connection's creator, plus `CONNECTION_EDIT` | Editor |
+| Replace a connection's credentials | Being the connection's creator or an organization admin, plus `CONNECTION_EDIT` | Editor |
 | Enable, disable or update a deployment; stop or restart a job | `DEPLOYMENT_EDIT` | Editor |
 | Create or import a workflow | `WORKFLOW_CREATE` in Development | Editor |
 | Duplicate a workflow | `WORKFLOW_CREATE` and `WORKFLOW_VIEW` in Development | Editor |
@@ -254,14 +255,14 @@ See [Git Configuration](/platform/automation/settings/git-configuration#required
 
 <EEBadge />
 
-A connection's secret values are shown and can be replaced only by the member who created it. Organization admins can use, rename, tag and delete connections they do not own, but cannot see or replace their secrets.
+A connection's secret values are shown only to the member who created it. Organization admins can use, rename, tag and delete connections they do not own, and can replace their secrets without ever seeing them.
 
-| Connection | View and replace its secrets | Use it in workflows | Rename, tag and delete it |
-|---|---|---|---|
-| A connection you created | You, with `CONNECTION_EDIT` | Yes | You, with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
-| A connection another member owns | Nobody but its owner, not even an organization admin | Yes, where you can reach it | Organization admins |
-| An organization connection | Every organization admin | Every member | Organization admins |
-| An embedded connection created for a connected user | No ByteChef user | Only that connected user's integrations | Members with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
+| Connection | View its secrets | Replace its secrets | Use it in workflows | Rename, tag and delete it |
+|---|---|---|---|---|
+| A connection you created | You, with `CONNECTION_EDIT` | You, with `CONNECTION_EDIT` | Yes | You, with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
+| A connection another member owns | Nobody but its owner, not even an organization admin | Its owner and organization admins | Yes, where you can reach it | Organization admins |
+| An organization connection | Every organization admin | Every organization admin | Every member | Organization admins |
+| An embedded connection created for a connected user | No ByteChef user | No ByteChef user | Only that connected user's integrations | Members with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
 
 ### Denied actions
 
@@ -287,7 +288,7 @@ Users who sign in through an external identity provider are matched to accounts 
 
 <EEBadge />
 
-Membership and role changes are recorded in the [audit log](/platform/settings/audit-events) as `WORKSPACE_USER_ADDED`, `WORKSPACE_USER_REMOVED`, `WORKSPACE_USER_ROLE_UPDATED`, `WORKSPACE_USER_ENVIRONMENT_ROLE_UPDATED`, and `WORKSPACE_USER_ENVIRONMENT_ROLE_REMOVED`; custom roles as `CUSTOM_ROLE_CREATED`, `CUSTOM_ROLE_UPDATED`, and `CUSTOM_ROLE_DELETED`; account lifecycle as `USER_CREATED`, `USER_ACTIVATED`, `USER_PASSWORD_CHANGED`, and `USER_DELETED`.
+Membership and role changes are recorded in the [audit log](/platform/settings/audit-events) as `WORKSPACE_USER_ADDED`, `WORKSPACE_USER_REMOVED`, `WORKSPACE_USER_ROLE_UPDATED`, `WORKSPACE_MEMBERSHIPS_REMOVED`, `WORKSPACE_USER_ENVIRONMENT_ROLE_UPDATED`, and `WORKSPACE_USER_ENVIRONMENT_ROLE_REMOVED`; custom roles as `CUSTOM_ROLE_CREATED`, `CUSTOM_ROLE_UPDATED`, and `CUSTOM_ROLE_DELETED`. Changes made on this page are recorded as `USER_INVITED`, `USER_ROLE_UPDATED`, and `USER_DELETED`.
 
 ## See also
 
