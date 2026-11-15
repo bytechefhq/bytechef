@@ -242,7 +242,7 @@ describe('ConnectionDialog withheld credentials', () => {
         expect(credentialsMutateAsync.mock.calls[0][0]).toMatchObject({id: 5, version: 3});
     });
 
-    it('testAnAdminWhoDidNotCreateTheConnectionSeesHiddenCredentialsInBothPlatforms', async () => {
+    it('testAnAdminWhoDidNotCreateTheConnectionSeesHiddenCredentialsButMayReplaceThemInBothPlatforms', async () => {
         act(() => {
             authenticateAs('admin@localhost.com', ['ROLE_ADMIN']);
             useWorkspaceStore.setState({currentWorkspaceId: WORKSPACE_ID});
@@ -257,7 +257,7 @@ describe('ConnectionDialog withheld credentials', () => {
             expect(screen.getAllByText('Hidden')).toHaveLength(3);
             expect(screen.getByText(HIDDEN_HINT)).toBeInTheDocument();
             expect(screen.queryByText('secret-api-key-value')).not.toBeInTheDocument();
-            expect(screen.queryByRole('button', {name: 'Update credentials'})).not.toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Update credentials'})).toBeInTheDocument();
 
             const payload = await saveAndGetPayload(updateConnectionMutate);
 
