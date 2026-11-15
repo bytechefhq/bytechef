@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -3761,22 +3762,10 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     private void awaitAWaitingAdvisoryLock() {
-        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(ROLLOUT_COMPLETION_TIMEOUT_SECONDS);
-
-        while (countWaitingAdvisoryLocks() == 0) {
-            if (System.nanoTime() > deadline) {
-                throw new IllegalStateException("No rollout started waiting for the rollout lock");
-            }
-
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException interruptedException) {
-                Thread.currentThread()
-                    .interrupt();
-
-                throw new IllegalStateException(interruptedException);
-            }
-        }
+        await("a rollout waiting for the rollout lock")
+            .atMost(ROLLOUT_COMPLETION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .pollInterval(10, TimeUnit.MILLISECONDS)
+            .until(() -> countWaitingAdvisoryLocks() > 0);
     }
 
     private int countWaitingAdvisoryLocks() {

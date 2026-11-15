@@ -385,11 +385,12 @@ class AutomationProjectFacadeAuditIntTest {
     void testConnectedUserProjectChangesOfUnknownTargetsRecordFailures() {
         String workflowUuid = String.valueOf(UUID.randomUUID());
 
+        List<ProvisionConnectedUserProjectWorkflowDTO> workflows = List.of(
+            new ProvisionConnectedUserProjectWorkflowDTO(workflowUuid, null));
+
         assertThatThrownBy(
-            () -> connectedUserProjectFacade.provisionProjectWorkflows(
-                Long.MAX_VALUE, Long.MAX_VALUE,
-                List.of(new ProvisionConnectedUserProjectWorkflowDTO(workflowUuid, null))))
-                    .isInstanceOf(RuntimeException.class);
+            () -> connectedUserProjectFacade.provisionProjectWorkflows(Long.MAX_VALUE, Long.MAX_VALUE, workflows))
+                .isInstanceOf(RuntimeException.class);
 
         assertThat(
             findSingleEvent(AutomationProjectAuditEvents.CONNECTED_USER_PROJECT_WORKFLOWS_PROVISIONED)

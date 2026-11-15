@@ -1723,15 +1723,13 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
     }
 
     @Nested
+    @MockitoBean(types = ConnectedUserConnectionFacade.class)
     class ProvisionInputs {
 
         private static final String SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION = """
             {"label":"Post","inputs":[{"name":"channel","label":"Channel","type":"string","required":true}],
              "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
             """;
-
-        @MockitoBean
-        private ConnectedUserConnectionFacade connectedUserConnectionFacade;
 
         private String externalUserId;
 
