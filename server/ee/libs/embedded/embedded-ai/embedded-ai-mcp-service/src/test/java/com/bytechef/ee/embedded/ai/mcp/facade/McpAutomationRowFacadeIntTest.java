@@ -51,12 +51,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
  */
 @SpringBootTest(
     classes = {
-        EmbeddedMcpIntTestConfiguration.class, McpAutomationRowsIntTest.AutomationRowsIntTestConfiguration.class
+        EmbeddedMcpIntTestConfiguration.class, McpAutomationRowFacadeIntTest.AutomationRowsIntTestConfiguration.class
     },
     properties = {
         "bytechef.edition=ee", "bytechef.workflow.repository.jdbc.enabled=true"
     })
-public class McpAutomationRowsIntTest {
+public class McpAutomationRowFacadeIntTest {
 
     private static final String ARCHIVE_WORKFLOW_UUID = "6eed0000-0000-0000-0000-00000000bbbb";
     private static final String OTHER_WORKFLOW_UUID = "6eed0000-0000-0000-0000-00000000dddd";
@@ -75,7 +75,7 @@ public class McpAutomationRowsIntTest {
     private McpAutomationProjectConfigurationWorkflowService mcpAutomationProjectConfigurationWorkflowService;
 
     @Autowired
-    private McpAutomationRows mcpAutomationRows;
+    private McpAutomationRowFacade mcpAutomationRowFacade;
 
     @MockitoSpyBean
     private McpConnectedUserProjectWorkflowService mcpConnectedUserProjectWorkflowService;
@@ -129,8 +129,8 @@ public class McpAutomationRowsIntTest {
         fixture.insertReference(danglingConnectedUserId, projectId, SEND_WORKFLOW_UUID, true);
         fixture.insertReference(notAssignedConnectedUserId, projectId, SEND_WORKFLOW_UUID, false);
 
-        mcpAutomationRows.addMissingRowsForLink(linkId);
-        mcpAutomationRows.addMissingRowsForLink(linkId);
+        mcpAutomationRowFacade.addMissingRowsForLink(linkId);
+        mcpAutomationRowFacade.addMissingRowsForLink(linkId);
 
         assertThat(mcpConnectedUserProjectWorkflowService.getMcpServerMcpConnectedUserProjectWorkflows(
             mcpServer.getId()))
@@ -155,7 +155,7 @@ public class McpAutomationRowsIntTest {
 
         long referenceId = fixture.insertReference(connectedUserId, projectId, SEND_WORKFLOW_UUID, false);
 
-        mcpAutomationRows.addMissingRowsForReference(referenceId);
+        mcpAutomationRowFacade.addMissingRowsForReference(referenceId);
 
         assertThat(mcpConnectedUserProjectWorkflowService.getConnectedUserMcpConnectedUserProjectWorkflows(
             connectedUserId))
@@ -184,7 +184,7 @@ public class McpAutomationRowsIntTest {
         doReturn(Optional.empty()).when(mcpConnectedUserProjectWorkflowService)
             .fetch(referenceId, sendLinkWorkflowId);
 
-        mcpAutomationRows.addMissingRowsForReference(referenceId);
+        mcpAutomationRowFacade.addMissingRowsForReference(referenceId);
 
         assertThat(mcpConnectedUserProjectWorkflowService.getConnectedUserMcpConnectedUserProjectWorkflows(
             connectedUserId))
@@ -205,7 +205,7 @@ public class McpAutomationRowsIntTest {
 
         long referenceId = fixture.insertReference(connectedUserId, projectId, SEND_WORKFLOW_UUID, false);
 
-        mcpAutomationRows.addMissingRowsForReference(referenceId);
+        mcpAutomationRowFacade.addMissingRowsForReference(referenceId);
 
         assertThat(getRows(sendLinkWorkflowId))
             .extracting(McpConnectedUserProjectWorkflow::isEnabled)
@@ -216,7 +216,7 @@ public class McpAutomationRowsIntTest {
     public void testReferenceCreatedWithoutAssignmentAddsNoRow() {
         long referenceId = fixture.insertReference(connectedUserId, projectId, SEND_WORKFLOW_UUID, false);
 
-        mcpAutomationRows.addMissingRowsForReference(referenceId);
+        mcpAutomationRowFacade.addMissingRowsForReference(referenceId);
 
         assertThat(mcpConnectedUserProjectWorkflowService.getConnectedUserMcpConnectedUserProjectWorkflows(
             connectedUserId)).isEmpty();
@@ -233,7 +233,7 @@ public class McpAutomationRowsIntTest {
 
         mcpConnectedUserProjectWorkflowService.create(sendReferenceId, sendLinkWorkflowId, false);
 
-        mcpAutomationRows.provisionMcpServer(connectedUserId, mcpServer.getId());
+        mcpAutomationRowFacade.provisionMcpServer(connectedUserId, mcpServer.getId());
 
         assertThat(mcpConnectedUserProjectWorkflowService.getConnectedUserMcpConnectedUserProjectWorkflows(
             connectedUserId))
@@ -261,7 +261,7 @@ public class McpAutomationRowsIntTest {
 
         moveAssignment(targetAutomationProjectConfigurationId);
 
-        mcpAutomationRows.remapConnectedUser(
+        mcpAutomationRowFacade.remapConnectedUser(
             connectedUserId, automationProjectConfigurationId, targetAutomationProjectConfigurationId);
 
         assertThat(mcpConnectedUserProjectWorkflowService.getConnectedUserMcpConnectedUserProjectWorkflows(
@@ -289,7 +289,7 @@ public class McpAutomationRowsIntTest {
 
         moveAssignment(targetAutomationProjectConfigurationId);
 
-        mcpAutomationRows.remapConnectedUser(
+        mcpAutomationRowFacade.remapConnectedUser(
             connectedUserId, automationProjectConfigurationId, targetAutomationProjectConfigurationId);
 
         assertThat(mcpConnectedUserProjectWorkflowService.getConnectedUserMcpConnectedUserProjectWorkflows(
@@ -322,7 +322,7 @@ public class McpAutomationRowsIntTest {
 
         moveAssignment(targetAutomationProjectConfigurationId);
 
-        mcpAutomationRows.remapConnectedUser(
+        mcpAutomationRowFacade.remapConnectedUser(
             connectedUserId, automationProjectConfigurationId, targetAutomationProjectConfigurationId);
 
         assertThat(getRows(sendLinkWorkflowId)).isEmpty();
@@ -389,7 +389,7 @@ public class McpAutomationRowsIntTest {
     @Import({
         ConnectedUserProjectConfigurationServiceImpl.class, ConnectedUserProjectServiceImpl.class,
         ConnectedUserProjectWorkflowServiceImpl.class, EmbeddedMcpServerBeforeDeleteEventListener.class,
-        IntegrationInstanceServiceImpl.class, McpAutomationRowsImpl.class, McpComponentServiceImpl.class,
+        IntegrationInstanceServiceImpl.class, McpAutomationRowFacadeImpl.class, McpComponentServiceImpl.class,
         McpIntegrationInstanceConfigurationServiceImpl.class, McpServerMembership.class
     })
     static class AutomationRowsIntTestConfiguration {

@@ -56,7 +56,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     })
 @MockitoBean(types = {
     ComponentDefinitionService.class, IntegrationInstanceConfigurationService.class, IntegrationService.class,
-    McpComponentService.class, McpIntegrationComponentService.class, McpIntegrationInstanceRows.class,
+    McpComponentService.class, McpIntegrationComponentService.class, McpIntegrationInstanceRowFacade.class,
     McpIntegrationInstanceToolService.class, McpServerService.class, McpToolService.class, PermissionService.class,
     TagService.class
 })

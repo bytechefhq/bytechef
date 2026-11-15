@@ -52,12 +52,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 @SpringBootTest(
     classes = {
-        EmbeddedMcpIntTestConfiguration.class, McpIntegrationInstanceRowsIntTest.RowsIntTestConfiguration.class
+        EmbeddedMcpIntTestConfiguration.class, McpIntegrationInstanceRowFacadeIntTest.RowsIntTestConfiguration.class
     },
     properties = {
         "bytechef.edition=ee", "bytechef.workflow.repository.jdbc.enabled=true"
     })
-public class McpIntegrationInstanceRowsIntTest {
+public class McpIntegrationInstanceRowFacadeIntTest {
 
     private static final String ARCHIVE_EMAIL_WORKFLOW_ID = "6eed0000-0000-0000-0000-0000000000b1";
     private static final String AUTOMATION_WORKFLOW_UUID = "6eed0000-0000-0000-0000-00000000cccc";
@@ -75,7 +75,7 @@ public class McpIntegrationInstanceRowsIntTest {
     private McpComponentRepository mcpComponentRepository;
 
     @Autowired
-    private McpIntegrationInstanceRows mcpIntegrationInstanceRows;
+    private McpIntegrationInstanceRowFacade mcpIntegrationInstanceRowFacade;
 
     @Autowired
     private McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
@@ -157,7 +157,7 @@ public class McpIntegrationInstanceRowsIntTest {
         mcpIntegrationInstanceToolService.createMcpIntegrationInstanceTool(
             integrationInstanceId, searchEmailToolId, true);
 
-        mcpIntegrationInstanceRows.addMissingRows(connectedUserId, mcpServer.getId());
+        mcpIntegrationInstanceRowFacade.addMissingRows(connectedUserId, mcpServer.getId());
 
         assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
             .extracting(McpIntegrationInstanceTool::getMcpToolId, McpIntegrationInstanceTool::isEnabled)
@@ -178,7 +178,7 @@ public class McpIntegrationInstanceRowsIntTest {
         mcpIntegrationInstanceWorkflowService.createMcpIntegrationInstanceWorkflow(
             integrationInstanceId, sendEmailLinkId, false);
 
-        mcpIntegrationInstanceRows.addMissingRows(connectedUserId, mcpServer.getId());
+        mcpIntegrationInstanceRowFacade.addMissingRows(connectedUserId, mcpServer.getId());
 
         assertThat(mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflows(integrationInstanceId))
             .extracting(McpIntegrationInstanceWorkflow::isEnabled)
@@ -193,7 +193,7 @@ public class McpIntegrationInstanceRowsIntTest {
         mcpIntegrationInstanceToolService.createMcpIntegrationInstanceTool(
             integrationInstanceId, searchEmailToolId, false);
 
-        mcpIntegrationInstanceRows.addMissingRows(connectedUserId, mcpServer.getId());
+        mcpIntegrationInstanceRowFacade.addMissingRows(connectedUserId, mcpServer.getId());
 
         assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
             .extracting(McpIntegrationInstanceTool::getMcpToolId, McpIntegrationInstanceTool::isEnabled)
@@ -213,7 +213,7 @@ public class McpIntegrationInstanceRowsIntTest {
         mcpIntegrationInstanceToolService.createMcpIntegrationInstanceTool(
             integrationInstanceId, searchEmailToolId, true);
 
-        mcpIntegrationInstanceRows.addMissingRows(connectedUserId, mcpServer.getId());
+        mcpIntegrationInstanceRowFacade.addMissingRows(connectedUserId, mcpServer.getId());
 
         assertThat(mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflows(integrationInstanceId))
             .extracting(McpIntegrationInstanceWorkflow::getMcpIntegrationInstanceConfigurationWorkflowId)
@@ -231,13 +231,13 @@ public class McpIntegrationInstanceRowsIntTest {
         mcpIntegrationInstanceToolService.createMcpIntegrationInstanceTool(
             integrationInstanceId, searchEmailToolId, true);
 
-        mcpIntegrationInstanceRows.addMissingRows(connectedUserId, mcpServer.getId());
+        mcpIntegrationInstanceRowFacade.addMissingRows(connectedUserId, mcpServer.getId());
 
         jdbcTemplate.update(
             "UPDATE integration_instance_configuration_workflow SET enabled = true WHERE id = ?",
             archiveEmailConfigurationWorkflowId);
 
-        mcpIntegrationInstanceRows.addMissingRowsForIntegrationInstanceConfiguration(
+        mcpIntegrationInstanceRowFacade.addMissingRowsForIntegrationInstanceConfiguration(
             integrationInstanceConfigurationId);
 
         assertThat(mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflows(integrationInstanceId))
@@ -255,7 +255,7 @@ public class McpIntegrationInstanceRowsIntTest {
         mcpIntegrationInstanceToolService.createMcpIntegrationInstanceTool(
             integrationInstanceId, searchEmailToolId, true);
 
-        mcpIntegrationInstanceRows.addMissingRowsForConnectedUsers(mcpServer.getId());
+        mcpIntegrationInstanceRowFacade.addMissingRowsForConnectedUsers(mcpServer.getId());
 
         assertThat(mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflows(integrationInstanceId))
             .extracting(McpIntegrationInstanceWorkflow::getMcpIntegrationInstanceConfigurationWorkflowId)
@@ -265,9 +265,9 @@ public class McpIntegrationInstanceRowsIntTest {
         assertThat(
             mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflows(otherIntegrationInstanceId))
                 .isEmpty();
-        assertThat(mcpIntegrationInstanceRows.getConnectedUserIds(mcpServer.getId()))
+        assertThat(mcpIntegrationInstanceRowFacade.getConnectedUserIds(mcpServer.getId()))
             .containsExactly(connectedUserId);
-        assertThat(mcpIntegrationInstanceRows.getMcpServerIds(otherConnectedUserId)).isEmpty();
+        assertThat(mcpIntegrationInstanceRowFacade.getMcpServerIds(otherConnectedUserId)).isEmpty();
     }
 
     @Test
@@ -288,7 +288,7 @@ public class McpIntegrationInstanceRowsIntTest {
         long slackIntegrationInstanceId = fixture.insertIntegrationInstance(
             slackIntegrationInstanceConfigurationId, connectedUserId, connectionId);
 
-        mcpIntegrationInstanceRows.addMissingRowsForIntegrationInstance(slackIntegrationInstanceId);
+        mcpIntegrationInstanceRowFacade.addMissingRowsForIntegrationInstance(slackIntegrationInstanceId);
 
         assertThat(
             mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflows(slackIntegrationInstanceId))
@@ -323,7 +323,7 @@ public class McpIntegrationInstanceRowsIntTest {
             "UPDATE integration_instance SET integration_instance_configuration_id = ? WHERE id = ?",
             targetIntegrationInstanceConfigurationId, integrationInstanceId);
 
-        mcpIntegrationInstanceRows.remapIntegrationInstance(integrationInstanceId);
+        mcpIntegrationInstanceRowFacade.remapIntegrationInstance(integrationInstanceId);
 
         assertThat(mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflows(integrationInstanceId))
             .extracting(
@@ -342,7 +342,7 @@ public class McpIntegrationInstanceRowsIntTest {
         fixture.insertInstanceWorkflow(integrationInstanceId, integrationInstanceConfigurationId,
             SEND_EMAIL_WORKFLOW_ID, false);
 
-        mcpIntegrationInstanceRows.provisionMcpServer(connectedUserId, mcpServer.getId());
+        mcpIntegrationInstanceRowFacade.provisionMcpServer(connectedUserId, mcpServer.getId());
 
         assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
             .extracting(McpIntegrationInstanceTool::getMcpToolId, McpIntegrationInstanceTool::isEnabled)
@@ -360,7 +360,7 @@ public class McpIntegrationInstanceRowsIntTest {
 
         fixture.insertAutomationRow(connectedUserId, linkWorkflowId, AUTOMATION_WORKFLOW_UUID, true);
 
-        mcpIntegrationInstanceRows.addMissingRows(connectedUserId, mcpServer.getId());
+        mcpIntegrationInstanceRowFacade.addMissingRows(connectedUserId, mcpServer.getId());
 
         assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
             .extracting(McpIntegrationInstanceTool::getMcpToolId, McpIntegrationInstanceTool::isEnabled)
@@ -376,7 +376,7 @@ public class McpIntegrationInstanceRowsIntTest {
 
         fixture.insertAutomationRow(connectedUserId, linkWorkflowId, AUTOMATION_WORKFLOW_UUID, false);
 
-        mcpIntegrationInstanceRows.addMissingRows(connectedUserId, mcpServer.getId());
+        mcpIntegrationInstanceRowFacade.addMissingRows(connectedUserId, mcpServer.getId());
 
         assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
             .extracting(McpIntegrationInstanceTool::getMcpToolId, McpIntegrationInstanceTool::isEnabled)
@@ -405,7 +405,7 @@ public class McpIntegrationInstanceRowsIntTest {
 
         fixture.insertAutomationRow(connectedUserId, otherLinkWorkflowId, AUTOMATION_WORKFLOW_UUID, true);
 
-        mcpIntegrationInstanceRows.addMissingRows(connectedUserId, mcpServer.getId());
+        mcpIntegrationInstanceRowFacade.addMissingRows(connectedUserId, mcpServer.getId());
 
         assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
             .extracting(McpIntegrationInstanceTool::getMcpToolId, McpIntegrationInstanceTool::isEnabled)
@@ -422,9 +422,9 @@ public class McpIntegrationInstanceRowsIntTest {
 
         fixture.insertAutomationRow(otherConnectedUserId, linkWorkflowId, AUTOMATION_WORKFLOW_UUID, false);
 
-        assertThat(mcpIntegrationInstanceRows.getConnectedUserIds(mcpServer.getId()))
+        assertThat(mcpIntegrationInstanceRowFacade.getConnectedUserIds(mcpServer.getId()))
             .containsExactly(otherConnectedUserId);
-        assertThat(mcpIntegrationInstanceRows.getMcpServerIds(otherConnectedUserId))
+        assertThat(mcpIntegrationInstanceRowFacade.getMcpServerIds(otherConnectedUserId))
             .containsExactly(mcpServer.getId());
     }
 
@@ -434,7 +434,7 @@ public class McpIntegrationInstanceRowsIntTest {
         IntegrationInstanceConfigurationServiceImpl.class, IntegrationInstanceConfigurationWorkflowServiceImpl.class,
         IntegrationInstanceServiceImpl.class, IntegrationInstanceWorkflowServiceImpl.class,
         IntegrationServiceImpl.class, IntegrationWorkflowServiceImpl.class, McpComponentServiceImpl.class,
-        McpIntegrationInstanceConfigurationServiceImpl.class, McpIntegrationInstanceRowsImpl.class,
+        McpIntegrationInstanceConfigurationServiceImpl.class, McpIntegrationInstanceRowFacadeImpl.class,
         McpServerMembership.class
     })
     static class RowsIntTestConfiguration {

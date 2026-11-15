@@ -88,12 +88,12 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationService integrationService;
     private final JobService jobService;
-    private final McpAutomationRows mcpAutomationRows;
+    private final McpAutomationRowFacade mcpAutomationRowFacade;
     private final McpComponentService mcpComponentService;
     private final McpConnectedUserProjectWorkflowService mcpConnectedUserProjectWorkflowService;
     private final McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
     private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
-    private final McpIntegrationInstanceRows mcpIntegrationInstanceRows;
+    private final McpIntegrationInstanceRowFacade mcpIntegrationInstanceRowFacade;
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
     private final McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService;
     private final McpServerService mcpServerService;
@@ -108,11 +108,11 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
-        JobService jobService, McpAutomationRows mcpAutomationRows, McpComponentService mcpComponentService,
+        JobService jobService, McpAutomationRowFacade mcpAutomationRowFacade, McpComponentService mcpComponentService,
         McpConnectedUserProjectWorkflowService mcpConnectedUserProjectWorkflowService,
         McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
-        McpIntegrationInstanceRows mcpIntegrationInstanceRows,
+        McpIntegrationInstanceRowFacade mcpIntegrationInstanceRowFacade,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
         McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService, McpServerService mcpServerService,
         McpToolService mcpToolService, PrincipalJobService principalJobService, WorkflowService workflowService) {
@@ -124,12 +124,12 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         this.integrationInstanceService = integrationInstanceService;
         this.integrationService = integrationService;
         this.jobService = jobService;
-        this.mcpAutomationRows = mcpAutomationRows;
+        this.mcpAutomationRowFacade = mcpAutomationRowFacade;
         this.mcpComponentService = mcpComponentService;
         this.mcpConnectedUserProjectWorkflowService = mcpConnectedUserProjectWorkflowService;
         this.mcpIntegrationInstanceConfigurationService = mcpIntegrationInstanceConfigurationService;
         this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
-        this.mcpIntegrationInstanceRows = mcpIntegrationInstanceRows;
+        this.mcpIntegrationInstanceRowFacade = mcpIntegrationInstanceRowFacade;
         this.mcpIntegrationInstanceToolService = mcpIntegrationInstanceToolService;
         this.mcpIntegrationInstanceWorkflowService = mcpIntegrationInstanceWorkflowService;
         this.mcpServerService = mcpServerService;
@@ -443,8 +443,8 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
                 ConnectedUserMcpServerErrorType.NO_COVERED_INTEGRATION);
         }
 
-        mcpIntegrationInstanceRows.provisionMcpServer(connectedUserId, mcpServerId);
-        mcpAutomationRows.provisionMcpServer(connectedUserId, mcpServerId);
+        mcpIntegrationInstanceRowFacade.provisionMcpServer(connectedUserId, mcpServerId);
+        mcpAutomationRowFacade.provisionMcpServer(connectedUserId, mcpServerId);
     }
 
     private Optional<McpIntegrationInstanceConfiguration> fetchMcpIntegrationInstanceConfiguration(

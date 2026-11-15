@@ -173,7 +173,7 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
             "bytechef.edition=ee", "bytechef.workflow.repository.jdbc.enabled=true"
         })
     @MockitoBean(types = {
-        McpIntegrationInstanceConfigurationService.class, McpIntegrationInstanceRows.class, PermissionService.class
+        McpIntegrationInstanceConfigurationService.class, McpIntegrationInstanceRowFacade.class, PermissionService.class
     })
     class ToolEligibleWorkflowsIntTest {
 
@@ -330,7 +330,8 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
     @MockitoBean(types = {
         IntegrationInstanceConfigurationService.class, IntegrationInstanceConfigurationWorkflowService.class,
         IntegrationInstanceWorkflowService.class, IntegrationWorkflowService.class,
-        McpIntegrationInstanceConfigurationService.class, McpIntegrationInstanceRows.class, PermissionService.class,
+        McpIntegrationInstanceConfigurationService.class, McpIntegrationInstanceRowFacade.class,
+        PermissionService.class,
         WorkflowService.class
     })
     class AuditIntTest {
@@ -633,7 +634,7 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
             IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class,
             IntegrationWorkflowServiceImpl.class, McpComponentServiceImpl.class,
             McpIntegrationInstanceConfigurationServiceImpl.class,
-            McpIntegrationInstanceConfigurationWorkflowFacadeImpl.class, McpIntegrationInstanceRowsImpl.class,
+            McpIntegrationInstanceConfigurationWorkflowFacadeImpl.class, McpIntegrationInstanceRowFacadeImpl.class,
             McpServerMembership.class
         })
         static class LinkConfiguration {

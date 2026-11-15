@@ -43,7 +43,7 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
     private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
-    private final McpIntegrationInstanceRows mcpIntegrationInstanceRows;
+    private final McpIntegrationInstanceRowFacade mcpIntegrationInstanceRowFacade;
 
     @SuppressFBWarnings("EI")
     public McpIntegrationInstanceConfigurationFacadeImpl(
@@ -51,13 +51,13 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
-        McpIntegrationInstanceRows mcpIntegrationInstanceRows) {
+        McpIntegrationInstanceRowFacade mcpIntegrationInstanceRowFacade) {
 
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.mcpIntegrationInstanceConfigurationService = mcpIntegrationInstanceConfigurationService;
         this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
-        this.mcpIntegrationInstanceRows = mcpIntegrationInstanceRows;
+        this.mcpIntegrationInstanceRowFacade = mcpIntegrationInstanceRowFacade;
     }
 
     @Override
@@ -104,7 +104,7 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
                 mcpIntegrationInstanceConfiguration.getId(), integrationInstanceConfigurationWorkflow.getId());
         }
 
-        mcpIntegrationInstanceRows.addMissingRowsForConnectedUsers(mcpServerId);
+        mcpIntegrationInstanceRowFacade.addMissingRowsForConnectedUsers(mcpServerId);
 
         return mcpIntegrationInstanceConfiguration;
     }
@@ -217,7 +217,7 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
             }
         }
 
-        mcpIntegrationInstanceRows
+        mcpIntegrationInstanceRowFacade
             .addMissingRowsForConnectedUsers(mcpIntegrationInstanceConfiguration.getMcpServerId());
 
         return mcpIntegrationInstanceConfiguration;

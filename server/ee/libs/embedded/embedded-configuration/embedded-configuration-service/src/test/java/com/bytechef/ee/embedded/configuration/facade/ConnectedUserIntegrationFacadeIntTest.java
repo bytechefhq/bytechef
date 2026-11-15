@@ -52,8 +52,8 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceWorkflow;
-import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRows;
-import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRows;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRowFacade;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
@@ -189,7 +189,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     JobFacade.class, JobService.class, McpComponentService.class, McpIntegrationComponentService.class,
     McpIntegrationInstanceConfigurationService.class,
     McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceToolService.class,
-    McpIntegrationInstanceWorkflowService.class, McpAutomationRows.class, McpIntegrationInstanceRows.class,
+    McpIntegrationInstanceWorkflowService.class, McpAutomationRowFacade.class, McpIntegrationInstanceRowFacade.class,
     McpServerService.class, McpToolService.class, OAuth2ParametersFacade.class, OAuth2Service.class,
     PrincipalJobFacade.class, PrincipalJobService.class, ProjectFacade.class,
     TaskDispatcherDefinitionService.class, TaskExecutionService.class,
@@ -257,7 +257,7 @@ class ConnectedUserIntegrationFacadeIntTest {
     private McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
 
     @Autowired
-    private McpIntegrationInstanceRows mcpIntegrationInstanceRows;
+    private McpIntegrationInstanceRowFacade mcpIntegrationInstanceRowFacade;
 
     @Autowired
     private McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService;
@@ -770,7 +770,7 @@ class ConnectedUserIntegrationFacadeIntTest {
             IntegrationInstance integrationInstance = connectedUserIntegrationFacade.createIntegrationInstance(
                 externalUserId, integrationId, Map.of(), Environment.PRODUCTION);
 
-            verify(mcpIntegrationInstanceRows).addMissingRowsForIntegrationInstance(integrationInstance.getId());
+            verify(mcpIntegrationInstanceRowFacade).addMissingRowsForIntegrationInstance(integrationInstance.getId());
         }
 
         @Test
@@ -1958,7 +1958,7 @@ class ConnectedUserIntegrationFacadeIntTest {
                     new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidB, Map.of())),
                 "admin");
 
-            verify(mcpIntegrationInstanceRows, times(1)).addMissingRowsForIntegrationInstance(instanceId);
+            verify(mcpIntegrationInstanceRowFacade, times(1)).addMissingRowsForIntegrationInstance(instanceId);
         }
 
         @Test

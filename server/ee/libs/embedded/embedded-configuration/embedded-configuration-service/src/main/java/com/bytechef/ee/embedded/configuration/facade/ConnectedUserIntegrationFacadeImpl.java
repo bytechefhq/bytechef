@@ -15,7 +15,7 @@ import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationComponent;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceWorkflow;
-import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRows;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
@@ -131,7 +131,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
     private final McpIntegrationComponentService mcpIntegrationComponentService;
     private final McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
     private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
-    private final McpIntegrationInstanceRows mcpIntegrationInstanceRows;
+    private final McpIntegrationInstanceRowFacade mcpIntegrationInstanceRowFacade;
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
     private final McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService;
     private final McpServerService mcpServerService;
@@ -159,7 +159,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         McpIntegrationComponentService mcpIntegrationComponentService,
         McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
-        McpIntegrationInstanceRows mcpIntegrationInstanceRows,
+        McpIntegrationInstanceRowFacade mcpIntegrationInstanceRowFacade,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
         McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService, McpServerService mcpServerService,
         McpToolService mcpToolService, OAuth2ParametersFacade oAuth2ParametersFacade, OAuth2Service oAuth2Service,
@@ -185,7 +185,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         this.mcpIntegrationComponentService = mcpIntegrationComponentService;
         this.mcpIntegrationInstanceConfigurationService = mcpIntegrationInstanceConfigurationService;
         this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
-        this.mcpIntegrationInstanceRows = mcpIntegrationInstanceRows;
+        this.mcpIntegrationInstanceRowFacade = mcpIntegrationInstanceRowFacade;
         this.mcpIntegrationInstanceToolService = mcpIntegrationInstanceToolService;
         this.mcpIntegrationInstanceWorkflowService = mcpIntegrationInstanceWorkflowService;
         this.mcpServerService = mcpServerService;
@@ -240,7 +240,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         IntegrationInstance integrationInstance = integrationInstanceService.create(
             connectedUser.getId(), connectionId, integrationInstanceConfiguration.getId());
 
-        mcpIntegrationInstanceRows.addMissingRowsForIntegrationInstance(integrationInstance.getId());
+        mcpIntegrationInstanceRowFacade.addMissingRowsForIntegrationInstance(integrationInstance.getId());
 
         return integrationInstance;
     }
@@ -480,7 +480,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
                     true);
             }
 
-            mcpIntegrationInstanceRows.addMissingRowsForIntegrationInstance(integrationInstanceId);
+            mcpIntegrationInstanceRowFacade.addMissingRowsForIntegrationInstance(integrationInstanceId);
 
             return integrationInstanceId;
         } catch (RuntimeException exception) {

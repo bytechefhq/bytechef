@@ -48,7 +48,7 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
     private final IntegrationWorkflowService integrationWorkflowService;
     private final McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
     private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
-    private final McpIntegrationInstanceRows mcpIntegrationInstanceRows;
+    private final McpIntegrationInstanceRowFacade mcpIntegrationInstanceRowFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
@@ -57,13 +57,13 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
         IntegrationWorkflowService integrationWorkflowService,
         McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
-        McpIntegrationInstanceRows mcpIntegrationInstanceRows, WorkflowService workflowService) {
+        McpIntegrationInstanceRowFacade mcpIntegrationInstanceRowFacade, WorkflowService workflowService) {
 
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationWorkflowService = integrationWorkflowService;
         this.mcpIntegrationInstanceConfigurationService = mcpIntegrationInstanceConfigurationService;
         this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
-        this.mcpIntegrationInstanceRows = mcpIntegrationInstanceRows;
+        this.mcpIntegrationInstanceRowFacade = mcpIntegrationInstanceRowFacade;
         this.workflowService = workflowService;
     }
 
@@ -232,7 +232,7 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
                 .orElseThrow(() -> new IllegalArgumentException(
                     "McpIntegrationInstanceConfiguration not found: " + mcpIntegrationInstanceConfigurationId));
 
-        mcpIntegrationInstanceRows.addMissingRowsForConnectedUsers(
+        mcpIntegrationInstanceRowFacade.addMissingRowsForConnectedUsers(
             mcpIntegrationInstanceConfiguration.getMcpServerId());
     }
 

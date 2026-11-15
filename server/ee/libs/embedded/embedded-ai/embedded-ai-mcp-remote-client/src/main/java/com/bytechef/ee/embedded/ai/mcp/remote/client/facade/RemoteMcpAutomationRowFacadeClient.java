@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.embedded.ai.mcp.remote.client.facade;
 
-import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRows;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRowFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnEEVersion
-public class RemoteMcpAutomationRowsClient implements McpAutomationRows {
+public class RemoteMcpAutomationRowFacadeClient implements McpAutomationRowFacade {
 
     @Override
     public void addMissingRowsForLink(long mcpAutomationProjectConfigurationId) {

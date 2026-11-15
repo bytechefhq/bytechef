@@ -14,7 +14,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowCon
 import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRows;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRowFacade;
 import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
@@ -66,7 +66,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
     private final ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager;
     private final ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager;
     private final ConnectedUserService connectedUserService;
-    private final McpAutomationRows mcpAutomationRows;
+    private final McpAutomationRowFacade mcpAutomationRowFacade;
     private final ProjectWorkflowService projectWorkflowService;
 
     @SuppressFBWarnings("EI")
@@ -79,7 +79,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
         ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository,
         ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager,
         ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager,
-        ConnectedUserService connectedUserService, McpAutomationRows mcpAutomationRows,
+        ConnectedUserService connectedUserService, McpAutomationRowFacade mcpAutomationRowFacade,
         ProjectWorkflowService projectWorkflowService) {
 
         this.automationProjectConfigurationResolver = automationProjectConfigurationResolver;
@@ -91,7 +91,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
         this.connectedUserReferenceDeploymentManager = connectedUserReferenceDeploymentManager;
         this.connectedUserReferenceRolloutManager = connectedUserReferenceRolloutManager;
         this.connectedUserService = connectedUserService;
-        this.mcpAutomationRows = mcpAutomationRows;
+        this.mcpAutomationRowFacade = mcpAutomationRowFacade;
         this.projectWorkflowService = projectWorkflowService;
     }
 
@@ -214,7 +214,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
 
         ConnectedUserProjectWorkflow savedReference = connectedUserProjectWorkflowRepository.save(reference);
 
-        mcpAutomationRows.addMissingRowsForReference(savedReference.getId());
+        mcpAutomationRowFacade.addMissingRowsForReference(savedReference.getId());
 
         return applyWorkflow(
             savedReference, externalUserId, environment, true, ApplyMode.PROVISION, requestedConnectionIds, inputs);

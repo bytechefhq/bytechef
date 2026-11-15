@@ -14,7 +14,7 @@ import java.util.Set;
  *
  * @author Ivica Cardic
  */
-public interface McpIntegrationInstanceRows {
+public interface McpIntegrationInstanceRowFacade {
 
     void addMissingRows(long connectedUserId, long mcpServerId);
 
