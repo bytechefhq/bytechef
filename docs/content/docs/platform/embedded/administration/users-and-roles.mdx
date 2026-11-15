@@ -122,13 +122,13 @@ Runs of connected users' automation workflows also need `CONNECTED_USER_VIEW` in
 
 ## Credentials
 
-A connection's secret values are shown and can be replaced only by the member who created it, and only while that member holds the edit scope. Tenant admins can use, rename, tag and delete connections they do not own, but cannot see or replace their secrets. Everyone else sees the resource with its secrets left out.
+A connection's secret values are shown only to the member who created it, and only while that member holds the edit scope. Tenant admins can use, rename, tag and delete connections they do not own, and can replace their secrets without ever seeing them. Everyone else sees the resource with its secrets left out.
 
-| Connection | View and replace its secrets | Use it | Rename, tag and delete it |
-|---|---|---|---|
-| A connection you created | You, with `CONNECTION_EDIT` | Yes | You, with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
-| A connection another member owns | Nobody but its owner, not even a tenant admin | Yes | Tenant admins |
-| An embedded connection created for a connected user | No ByteChef user; only the connected user, through the [frontend endpoints](/platform/embedded/build/connections#frontend-endpoints) | That connected user's integrations | Members with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
+| Connection | View its secrets | Replace its secrets | Use it | Rename, tag and delete it |
+|---|---|---|---|---|
+| A connection you created | You, with `CONNECTION_EDIT` | You, with `CONNECTION_EDIT` | Yes | You, with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
+| A connection another member owns | Nobody but its owner, not even a tenant admin | Its owner and tenant admins | Yes | Tenant admins |
+| An embedded connection created for a connected user | No ByteChef user | No ByteChef user; only the connected user, through the [frontend endpoints](/platform/embedded/build/connections#frontend-endpoints) | That connected user's integrations | Members with `CONNECTION_EDIT` / `CONNECTION_DELETE` |
 
 Other resources that carry secrets:
 
