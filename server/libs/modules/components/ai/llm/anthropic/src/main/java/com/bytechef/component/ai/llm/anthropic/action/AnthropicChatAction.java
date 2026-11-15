@@ -67,6 +67,11 @@ public class AnthropicChatAction {
         "claude-2", "claude-3", "claude-instant", "claude-opus-4-0", "claude-opus-4-2025", "claude-sonnet-4-0",
         "claude-sonnet-4-2025");
 
+    private static final List<String> SAMPLING_PARAMETERS_MODEL_PREFIXES = List.of(
+        "claude-2", "claude-3", "claude-instant", "claude-haiku-4-5", "claude-opus-4-0", "claude-opus-4-1",
+        "claude-opus-4-2025", "claude-opus-4-5", "claude-opus-4-6", "claude-sonnet-4-0", "claude-sonnet-4-2025",
+        "claude-sonnet-4-5", "claude-sonnet-4-6");
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask")
         .description("Ask anything you want.")
@@ -99,19 +104,8 @@ public class AnthropicChatAction {
                 optionsBuilder.thinkingDisabled();
             }
 
-            optionsBuilder.topK(inputParameters.getInteger(TOP_K));
-
-            // Anthropic rejects requests that include both `temperature` and `top_p`; pick one.
-            Double temperature = inputParameters.getDouble(TEMPERATURE);
-
-            if (temperature != null) {
-                optionsBuilder.temperature(temperature);
-            } else {
-                Double topP = inputParameters.getDouble(TOP_P);
-
-                if (topP != null) {
-                    optionsBuilder.topP(topP);
-                }
+            if (supportsSamplingParameters(model)) {
+                setSamplingParameters(optionsBuilder, inputParameters);
             }
         }
 
@@ -165,9 +159,33 @@ public class AnthropicChatAction {
             .anyMatch(model::startsWith);
     }
 
+    private static void setSamplingParameters(
+        AnthropicChatOptions.Builder optionsBuilder, Parameters inputParameters) {
+
+        optionsBuilder.topK(inputParameters.getInteger(TOP_K));
+
+        // Anthropic rejects requests that include both `temperature` and `top_p`; pick one.
+        Double temperature = inputParameters.getDouble(TEMPERATURE);
+
+        if (temperature != null) {
+            optionsBuilder.temperature(temperature);
+        } else {
+            Double topP = inputParameters.getDouble(TOP_P);
+
+            if (topP != null) {
+                optionsBuilder.topP(topP);
+            }
+        }
+    }
+
     private static boolean supportsNativeStructuredOutput(String model) {
         return PROMPT_ONLY_STRUCTURED_OUTPUT_MODEL_PREFIXES.stream()
             .noneMatch(model::startsWith);
+    }
+
+    private static boolean supportsSamplingParameters(String model) {
+        return SAMPLING_PARAMETERS_MODEL_PREFIXES.stream()
+            .anyMatch(model::startsWith);
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
