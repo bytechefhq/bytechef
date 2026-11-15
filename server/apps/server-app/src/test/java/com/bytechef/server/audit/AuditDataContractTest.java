@@ -79,18 +79,16 @@ class AuditDataContractTest {
     private static final String RESULT_VARIABLE = "result";
     private static final List<String> READ_METHOD_PREFIXES = List.of(
         "count", "exists", "fetch", "find", "get", "has", "is", "list", "load", "read", "search");
-    private static final String CHUNK_DATA = "knowledge base chunks are document data and are not recorded";
     private static final String DEFINITION_EDIT = "workflow definition edit";
     private static final String DELEGATES = "delegates to an audited method";
     private static final String EDITOR_TEST = "editor-time test run";
     private static final String EDITOR_TEST_DATA = "editor-time test output or configuration";
     private static final String EXECUTION_LOGS = "execution log data";
     private static final String EXISTENCE_CHECK = "read-only existence check";
-    private static final String GETTING_STARTED_DISMISSAL = "onboarding page dismissal";
     private static final String JOB_STATUS = "job status change recorded by the job status listener";
     private static final String PREVIEW = "returns a generated preview without saving it";
     private static final String RECORDED_BY_CALLER = "called only from audited methods";
-    private static final String ROW_DATA = "data table rows";
+    private static final String ROW_DATA = "data table rows are data and are not recorded";
     private static final String RUNTIME_APPROVAL = "approval task opened by a workflow run";
     private static final String TAGS = "tag assignment";
     private static final String TOOL_SETTING = "parameter or skill edit of a tool of an audited MCP or A2A server";
@@ -98,14 +96,13 @@ class AuditDataContractTest {
     private static final String WEBHOOK_TRIGGER_TEST = "editor-time webhook trigger test";
     private static final String WORKFLOW_INPUTS = "workflow input or connection values";
     private static final Map<String, String> UNAUDITED_GUARDED_CLASSES = Map.of(
-        "IntegrationInstanceAdminFacadeImpl", DELEGATES,
         "ProjectWebhookTriggerTestFacadeImpl", WEBHOOK_TRIGGER_TEST,
         "TestWorkflowExecutorImpl", EDITOR_TEST,
-        "WebhookTriggerTestAdminFacadeImpl", WEBHOOK_TRIGGER_TEST,
         "WorkflowNodeParameterFacadeImpl", DEFINITION_EDIT,
         "WorkflowNodeScriptFacadeImpl", EDITOR_TEST,
         "WorkflowNodeTestOutputFacadeImpl", EDITOR_TEST_DATA,
-        "WorkflowTestConfigurationFacadeImpl", EDITOR_TEST_DATA);
+        "WorkflowTestConfigurationFacadeImpl", EDITOR_TEST_DATA,
+        "com.bytechef.ee.embedded.configuration.facade.WebhookTriggerTestFacadeImpl", WEBHOOK_TRIGGER_TEST);
     private static final Map<String, String> UNAUDITED_GUARDED_METHODS = Map.ofEntries(
         Map.entry("A2aProjectWorkflowFacadeImpl.updateA2aProjectWorkflowSkill", TOOL_SETTING),
         Map.entry("A2aServerFacadeImpl.updateA2aServerTags", TAGS),
@@ -114,13 +111,18 @@ class AuditDataContractTest {
         Map.entry("ApiCollectionFacadeImpl.updateApiCollectionTags", TAGS),
         Map.entry("ApiConnectorFacadeImpl.generateSpecification", PREVIEW),
         Map.entry("ApprovalTaskFacadeImpl.createApprovalTask", RUNTIME_APPROVAL),
-        Map.entry("AutomationGettingStartedFacadeImpl.dismissAutomationGettingStarted", GETTING_STARTED_DISMISSAL),
-        Map.entry("AutomationProjectConfigurationAdminFacadeImpl.updateConfigurationWorkflow", WORKFLOW_INPUTS),
+        Map.entry("AutomationProjectCodeWorkflowFacadeImpl.createEmptyCodeWorkflow", DELEGATES),
+        Map.entry("AutomationProjectCodeWorkflowFacadeImpl.save", DEFINITION_EDIT),
+        Map.entry("AutomationProjectCodeWorkflowFacadeImpl.updateCodeWorkflowSource", DEFINITION_EDIT),
+        Map.entry("AutomationProjectConfigurationFacadeImpl.updateConfigurationWorkflow", WORKFLOW_INPUTS),
         Map.entry("AutomationProjectFacadeImpl.updateProjectWorkflow", DEFINITION_EDIT),
         Map.entry("ConnectedUserConnectionFacadeImpl.updateConnectedUserConnectionTags", TAGS),
         Map.entry("ConnectedUserConnectionFacadeImpl.updateIntegrationInstanceConnectionCredentials",
             RECORDED_BY_CALLER),
-        Map.entry("ConnectionAdminFacadeImpl.updateConnectionTags", TAGS),
+        Map.entry("com.bytechef.ee.embedded.configuration.facade.ConnectionFacadeImpl.updateConnectionTags", TAGS),
+        Map.entry("CustomComponentFacadeImpl.updateCustomComponentSource", DEFINITION_EDIT),
+        Map.entry("CustomComponentServiceImpl.enableCustomComponent", RECORDED_BY_CALLER),
+        Map.entry("CustomComponentServiceImpl.publishCustomComponent", RECORDED_BY_CALLER),
         Map.entry("CustomRoleFacadeImpl.createCustomRole", DELEGATES),
         Map.entry("CustomRoleFacadeImpl.deleteCustomRole", DELEGATES),
         Map.entry("CustomRoleFacadeImpl.updateCustomRole", DELEGATES),
@@ -129,7 +131,6 @@ class AuditDataContractTest {
         Map.entry("EmbeddedApiKeyFacadeImpl.createApiKey", DELEGATES),
         Map.entry("EmbeddedApiKeyFacadeImpl.deleteApiKey", DELEGATES),
         Map.entry("EmbeddedApiKeyFacadeImpl.updateApiKey", DELEGATES),
-        Map.entry("EmbeddedGettingStartedFacadeImpl.dismissEmbeddedGettingStarted", GETTING_STARTED_DISMISSAL),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpComponent", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpServer", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.deleteEmbeddedMcpComponent", DELEGATES),
@@ -187,22 +188,30 @@ class AuditDataContractTest {
         Map.entry("ProjectCodeWorkflowFacadeImpl.renameCodeWorkflowSource", RECORDED_BY_CALLER),
         Map.entry("ProjectCodeWorkflowFacadeImpl.restoreCodeWorkflowSource", RECORDED_BY_CALLER),
         Map.entry("ProjectCodeWorkflowFacadeImpl.save", DEFINITION_EDIT),
+        Map.entry("ProjectCodeWorkflowFacadeImpl.updateCodeWorkflowSource", DEFINITION_EDIT),
         Map.entry("ProjectDeploymentFacadeImpl.updateProjectDeploymentTags", TAGS),
         Map.entry("ProjectDeploymentFacadeImpl.updateProjectDeploymentWorkflow", WORKFLOW_INPUTS),
         Map.entry("ProjectTagFacadeImpl.updateProjectTags", TAGS),
         Map.entry("ProjectWorkflowFacadeImpl.updateWorkflow", DEFINITION_EDIT),
         Map.entry("TriggerLogFileStorageImpl.deleteLogEntries", EXECUTION_LOGS),
         Map.entry("TriggerLogFileStorageImpl.logsExist", EXISTENCE_CHECK),
+        Map.entry("WorkflowNodeOutputFacadeImpl.checkWorkflowCache", EDITOR_TEST_DATA),
         Map.entry("WorkspaceApiKeyFacadeImpl.create", DELEGATES),
         Map.entry("WorkspaceApiKeyFacadeImpl.delete", DELEGATES),
         Map.entry("WorkspaceConnectionFacadeImpl.updateConnectionTags", TAGS),
+        Map.entry("WorkspaceDataTableFacadeImpl.clearRows", ROW_DATA),
         Map.entry("WorkspaceDataTableFacadeImpl.deleteRow", ROW_DATA),
+        Map.entry("WorkspaceDataTableFacadeImpl.deleteRowByExternalId", ROW_DATA),
+        Map.entry("WorkspaceDataTableFacadeImpl.deleteRows", ROW_DATA),
         Map.entry("WorkspaceDataTableFacadeImpl.importCsv", ROW_DATA),
         Map.entry("WorkspaceDataTableFacadeImpl.insertRow", ROW_DATA),
+        Map.entry("WorkspaceDataTableFacadeImpl.insertRows", ROW_DATA),
+        Map.entry("WorkspaceDataTableFacadeImpl.updateDescription", "table description edit"),
         Map.entry("WorkspaceDataTableFacadeImpl.updateRow", ROW_DATA),
         Map.entry("WorkspaceDataTableFacadeImpl.updateTags", TAGS),
-        Map.entry("WorkspaceKnowledgeBaseFacadeImpl.deleteKnowledgeBaseDocument", DELEGATES),
-        Map.entry("WorkspaceKnowledgeBaseFacadeImpl.updateKnowledgeBaseDocumentTags", TAGS),
+        Map.entry("WorkspaceDataTableFacadeImpl.upsertRow", ROW_DATA),
+        Map.entry("WorkspaceKnowledgeBaseDocumentFacadeImpl.deleteKnowledgeBaseDocument", DELEGATES),
+        Map.entry("WorkspaceKnowledgeBaseDocumentFacadeImpl.updateKnowledgeBaseDocumentTags", TAGS),
         Map.entry("WorkspaceKnowledgeBaseFacadeImpl.updateKnowledgeBaseTags", TAGS),
         Map.entry("WorkspaceMcpServerFacadeImpl.createWorkspaceMcpServer", DELEGATES),
         Map.entry("WorkspaceMcpServerFacadeImpl.deleteWorkspaceMcpServer", DELEGATES),
