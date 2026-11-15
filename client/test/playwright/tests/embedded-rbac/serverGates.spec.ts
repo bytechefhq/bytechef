@@ -279,27 +279,6 @@ const GATE_CASES: GateCaseI[] = [
         },
     },
     {
-        allowed: ['EDITOR'],
-        denied: ['VIEWER'],
-        module: 'Connection',
-        name: 'change the tags of a connection a connected user created (CONNECTION_EDIT)',
-        rest: {
-            body: () => ({tags: []}),
-            method: 'PUT',
-            path: (resources) => `${EMBEDDED_INTERNAL}/connections/${resources.connectedUserConnectionId}/tags`,
-        },
-    },
-    {
-        allowed: ['EDITOR'],
-        denied: ['VIEWER'],
-        module: 'Connection',
-        name: 'delete a connection a connected user created (CONNECTION_DELETE)',
-        rest: {
-            method: 'DELETE',
-            path: (resources) => `${EMBEDDED_INTERNAL}/connections/${resources.connectedUserScratchConnectionId}`,
-        },
-    },
-    {
         allowed: ['VIEWER'],
         denied: ['OUTSIDER'],
         graphQl: {query: 'query EmbeddedMcpServers { embeddedMcpServers { id } }', variables: () => ({})},
@@ -796,22 +775,48 @@ test.describe('Embedded server-side permission gates', () => {
         });
     });
 
-    test('Connection: an EDITOR edits a connection a connected user created but not one another member created', async ({
+    test('Connection: the admin endpoints hide a connection a connected user created from every caller', async ({
+        adminApi,
+    }) => {
+        const connectedUserConnectionProbes: RestProbeI[] = [
+            {
+                body: () => ({tags: []}),
+                method: 'PUT',
+                path: () => `${EMBEDDED_INTERNAL}/connections/${resources.connectedUserConnectionId}/tags`,
+            },
+            {
+                method: 'DELETE',
+                path: () => `${EMBEDDED_INTERNAL}/connections/${resources.connectedUserScratchConnectionId}`,
+            },
+        ];
+
+        for (const [callerName, apiContext] of [
+            ['EDITOR', callers.EDITOR!],
+            ['ADMIN', callers.ADMIN!],
+            ['tenant admin', adminApi],
+        ] as const) {
+            await test.step(`${callerName} is told the connection does not exist`, async () => {
+                for (const probe of connectedUserConnectionProbes) {
+                    const response = await sendInternalApi(
+                        apiContext,
+                        probe.method,
+                        probe.path(resources),
+                        probe.body?.(resources)
+                    );
+
+                    expect(response.status(), await response.text()).toBe(404);
+                }
+            });
+        }
+    });
+
+    test('Connection: an EDITOR and an ADMIN are refused on a connection another member created', async ({
         adminApi,
     }) => {
         const connectionTagsProbe = (connectionId: number): RestProbeI => ({
             body: () => ({tags: []}),
             method: 'PUT',
             path: () => `${EMBEDDED_INTERNAL}/connections/${connectionId}/tags`,
-        });
-
-        await test.step('a connection a connected user created is allowed', async () => {
-            await expectRestStatus(
-                callers.EDITOR!,
-                connectionTagsProbe(resources.connectedUserConnectionId),
-                resources,
-                false
-            );
         });
 
         await test.step('a connection another member created is refused for EDITOR and ADMIN', async () => {
