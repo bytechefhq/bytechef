@@ -278,10 +278,10 @@ describe('ConnectionDialog', () => {
             version: 1,
         };
 
-        const authenticateAs = (login: string) =>
+        const authenticateAs = (login: string, authorities: string[] = ['ROLE_ADMIN']) =>
             act(() => {
                 authenticationStore.setState({
-                    account: {authorities: ['ROLE_ADMIN'], login} as never,
+                    account: {authorities, login} as never,
                     authenticated: true,
                 });
             });
@@ -330,8 +330,17 @@ describe('ConnectionDialog', () => {
             expect(screen.getByRole('button', {name: 'Update credentials'})).toBeInTheDocument();
         });
 
-        it('stays in name and tags mode for an admin who did not create the connection', () => {
+        it('switches into credentials mode for a tenant admin who did not create the connection', async () => {
             authenticateAs('admin@localhost.com');
+
+            renderEditDialog(true);
+
+            expect(await screen.findByText('These credentials were rejected')).toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Update credentials'})).toBeInTheDocument();
+        });
+
+        it('stays in name and tags mode for a member who did not create the connection', () => {
+            authenticateAs('member@localhost.com', ['ROLE_USER']);
 
             renderEditDialog(true);
 
