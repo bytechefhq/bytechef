@@ -139,7 +139,9 @@ const McpToolFormFields = ({displayConditions, form, loadOptions, properties, va
                 />
             )}
 
-            <LetAiFillAllButton disabled={!hasEligibleFields || isFilling} onClick={handleClick} />
+            {bodyProperties.length > 0 && (
+                <LetAiFillAllButton disabled={!hasEligibleFields || isFilling} onClick={handleClick} />
+            )}
 
             {bodyProperties.length > 0 && (
                 <Properties
