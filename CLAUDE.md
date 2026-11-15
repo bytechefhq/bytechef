@@ -98,6 +98,7 @@ docker compose -f docker-compose.dev.server.yml up -d
     - `automation-ai/` - AI-powered automation features, including `automation-ai-mcp-*` (MCP / Model Context Protocol integration)
     - `automation-configuration/` - Project and workflow configuration
     - `automation-data-table/` - Data table management
+    - `automation-getting-started/` - Getting Started checklist status (the Embedded counterpart is `server/ee/libs/embedded/embedded-getting-started/`)
     - `automation-knowledge-base/` - Knowledge base integration
     - `automation-search/` - Search services for automation entities
     - `automation-swagger/` - OpenAPI/Swagger surface for automation APIs
