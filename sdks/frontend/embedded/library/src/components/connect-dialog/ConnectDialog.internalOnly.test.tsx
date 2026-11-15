@@ -46,8 +46,8 @@ describe('ConnectDialog — internalOnly inputs', () => {
                     {
                         enabled: true,
                         inputs: [
-                            {label: 'Recipient', name: 'recipient', type: 'string'},
-                            {internalOnly: true, label: 'Signing Secret', name: 'signingSecret', type: 'string'},
+                            {label: 'Recipient', name: 'recipient', type: 'STRING'},
+                            {internalOnly: true, label: 'Signing Secret', name: 'signingSecret', type: 'STRING'},
                         ],
                         label: 'Test Tool Workflow',
                         workflowUuid: 'mcp-workflow-abc',
