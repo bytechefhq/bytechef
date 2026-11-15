@@ -86,6 +86,10 @@ const IntegrationListItem = ({
 
     const {captureIntegrationWorkflowCreated, captureIntegrationWorkflowImported} = useAnalytics();
 
+    const canCreateConfiguration = useHasEmbeddedScope(
+        'INTEGRATION_INSTANCE_CONFIGURATION_CREATE',
+        DEVELOPMENT_ENVIRONMENT
+    );
     const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
     const canDeleteIntegration = useHasEmbeddedScope('INTEGRATION_DELETE', UNION_ENVIRONMENT_ID);
     const canEditIntegration = useHasEmbeddedScope('WORKFLOW_EDIT', UNION_ENVIRONMENT_ID);
@@ -411,28 +415,34 @@ const IntegrationListItem = ({
                                     )}
                                 </DropdownMenuGroup>
 
-                                <DropdownMenuSeparator />
+                                {canCreateConfiguration && (
+                                    <>
+                                        <DropdownMenuSeparator />
 
-                                <DropdownMenuGroup aria-label="Configuration Actions">
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <span className="block">
-                                                <DropdownMenuItem
-                                                    disabled={!isConfigurable}
-                                                    icon={<Settings2Icon />}
-                                                    label="New Configuration"
-                                                    onSelect={() => setShowIntegrationInstanceConfigurationDialog(true)}
-                                                />
-                                            </span>
-                                        </TooltipTrigger>
+                                        <DropdownMenuGroup aria-label="Configuration Actions">
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <span className="block">
+                                                        <DropdownMenuItem
+                                                            disabled={!isConfigurable}
+                                                            icon={<Settings2Icon />}
+                                                            label="New Configuration"
+                                                            onSelect={() =>
+                                                                setShowIntegrationInstanceConfigurationDialog(true)
+                                                            }
+                                                        />
+                                                    </span>
+                                                </TooltipTrigger>
 
-                                        {!isConfigurable && (
-                                            <TooltipContent>
-                                                Publish the integration before configuring it.
-                                            </TooltipContent>
-                                        )}
-                                    </Tooltip>
-                                </DropdownMenuGroup>
+                                                {!isConfigurable && (
+                                                    <TooltipContent>
+                                                        Publish the integration before configuring it.
+                                                    </TooltipContent>
+                                                )}
+                                            </Tooltip>
+                                        </DropdownMenuGroup>
+                                    </>
+                                )}
 
                                 {canDeleteIntegration && (
                                     <>
@@ -500,7 +510,10 @@ const IntegrationListItem = ({
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </ButtonGroup>
-                        ) : activeTab === 'configurations' && isConfigurable && configurationCount !== 0 ? (
+                        ) : activeTab === 'configurations' &&
+                          canCreateConfiguration &&
+                          isConfigurable &&
+                          configurationCount !== 0 ? (
                             <IntegrationInstanceConfigurationDialog
                                 integrationInstanceConfiguration={
                                     {

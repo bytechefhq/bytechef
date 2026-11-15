@@ -4,8 +4,11 @@ import {Integration, IntegrationInstanceConfiguration} from '@/ee/shared/middlew
 import {fireEvent, render, screen, within} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
+const ALL_SCOPES = ['INTEGRATION_INSTANCE_CONFIGURATION_CREATE', 'INTEGRATION_PUBLISH', 'WORKFLOW_EDIT'];
+
 const hoisted = vi.hoisted(() => ({
     error: null as Error | null,
+    grantedScopes: new Set<string>(),
     integrationInstanceConfigurations: [] as IntegrationInstanceConfiguration[] | undefined,
     isLoading: false,
     queryRequests: [] as Array<{enabled?: boolean; filters: unknown}>,
@@ -23,6 +26,11 @@ vi.mock('@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries'
             refetch: hoisted.refetch,
         };
     },
+}));
+
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: (scope: string) => hoisted.grantedScopes.has(scope),
 }));
 
 vi.mock('@/ee/shared/queries/embedded/componentDefinitions.queries', () => ({
@@ -100,6 +108,7 @@ const renderPanel = (integrationOverrides: Partial<Integration> = {}) =>
 describe('IntegrationInstanceConfigurationsPanel', () => {
     beforeEach(() => {
         hoisted.error = null;
+        hoisted.grantedScopes = new Set(ALL_SCOPES);
         hoisted.integrationInstanceConfigurations = [];
         hoisted.isLoading = false;
         hoisted.queryRequests = [];
@@ -133,6 +142,15 @@ describe('IntegrationInstanceConfigurationsPanel', () => {
         expect(screen.getByText('Configuration dialog for integration 7 in environment 0')).toBeInTheDocument();
     });
 
+    it('does not offer creating a configuration to a member who may not create one', () => {
+        hoisted.grantedScopes.delete('INTEGRATION_INSTANCE_CONFIGURATION_CREATE');
+
+        renderPanel();
+
+        expect(screen.getByText('No configurations in Development')).toBeInTheDocument();
+        expect(screen.queryByText(/Configuration dialog/)).not.toBeInTheDocument();
+    });
+
     it('asks to publish the integration first when it has workflows but no published version', () => {
         renderPanel({integrationWorkflowIds: [1], lastPublishedDate: undefined});
 
@@ -148,6 +166,15 @@ describe('IntegrationInstanceConfigurationsPanel', () => {
         fireEvent.click(screen.getByRole('button', {name: 'Publish'}));
 
         expect(screen.getByText('Publish dialog for integration 7')).toBeInTheDocument();
+    });
+
+    it('does not offer publishing to a member who may not publish the integration', () => {
+        hoisted.grantedScopes.delete('INTEGRATION_PUBLISH');
+
+        renderPanel({integrationWorkflowIds: [3], lastPublishedDate: undefined});
+
+        expect(screen.getByText('Publish the integration to configure it')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Publish'})).not.toBeInTheDocument();
     });
 
     it('offers creating a configuration of an unpublished integration without workflows', () => {

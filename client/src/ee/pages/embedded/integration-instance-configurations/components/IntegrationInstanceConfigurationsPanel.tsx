@@ -13,6 +13,7 @@ import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/provide
 import PublishButton from '@/shared/components/PublishButton';
 import WorkflowGroupCardSkeleton from '@/shared/components/WorkflowGroupCardSkeleton';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {AlertTriangleIcon, SendIcon, Settings2Icon} from 'lucide-react';
 import {useMemo, useState} from 'react';
@@ -27,6 +28,13 @@ const IntegrationInstanceConfigurationsPanel = ({
     integration,
 }: IntegrationInstanceConfigurationsPanelProps) => {
     const [showPublishIntegrationDialog, setShowPublishIntegrationDialog] = useState(false);
+
+    const canCreateConfiguration = useHasEmbeddedScope(
+        'INTEGRATION_INSTANCE_CONFIGURATION_CREATE',
+        DEVELOPMENT_ENVIRONMENT
+    );
+    const canEditIntegration = useHasEmbeddedScope('WORKFLOW_EDIT', UNION_ENVIRONMENT_ID);
+    const canPublishIntegrationScope = useHasEmbeddedScope('INTEGRATION_PUBLISH', UNION_ENVIRONMENT_ID);
 
     const {
         data: integrationInstanceConfigurations,
@@ -107,15 +115,17 @@ const IntegrationInstanceConfigurationsPanel = ({
                 (isConfigurable ? (
                     <EmptyState
                         actions={
-                            <IntegrationInstanceConfigurationDialog
-                                integrationInstanceConfiguration={
-                                    {
-                                        environmentId: DEVELOPMENT_ENVIRONMENT,
-                                        integrationId: integration.id,
-                                    } as IntegrationInstanceConfiguration
-                                }
-                                triggerNode={<Button icon={<Settings2Icon />} label="Configure" />}
-                            />
+                            canCreateConfiguration && (
+                                <IntegrationInstanceConfigurationDialog
+                                    integrationInstanceConfiguration={
+                                        {
+                                            environmentId: DEVELOPMENT_ENVIRONMENT,
+                                            integrationId: integration.id,
+                                        } as IntegrationInstanceConfiguration
+                                    }
+                                    triggerNode={<Button icon={<Settings2Icon />} label="Configure" />}
+                                />
+                            )
                         }
                         description="Configure this integration to run its workflows here."
                         icon={<Settings2Icon />}
@@ -123,7 +133,12 @@ const IntegrationInstanceConfigurationsPanel = ({
                     />
                 ) : (
                     <EmptyState
-                        actions={<PublishButton onClick={() => setShowPublishIntegrationDialog(true)} />}
+                        actions={
+                            canEditIntegration &&
+                            canPublishIntegrationScope && (
+                                <PublishButton onClick={() => setShowPublishIntegrationDialog(true)} />
+                            )
+                        }
                         description="Configurations run a published, read-only version of an integration. Publish this integration to create its first version."
                         icon={<SendIcon />}
                         title="Publish the integration to configure it"
