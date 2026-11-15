@@ -1,5 +1,11 @@
-query dataTableRowsPage($environmentId: ID!, $tableId: ID!, $limit: Int, $offset: Int) {
-    dataTableRowsPage(environmentId: $environmentId, tableId: $tableId, limit: $limit, offset: $offset) {
+query dataTableRowsPage($environmentId: ID!, $tableId: ID!, $limit: Int, $offset: Int, $expand: [String!]) {
+    dataTableRowsPage(
+        environmentId: $environmentId
+        tableId: $tableId
+        limit: $limit
+        offset: $offset
+        expand: $expand
+    ) {
         items {
             id
             values

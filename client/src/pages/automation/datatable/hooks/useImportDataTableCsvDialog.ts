@@ -11,6 +11,7 @@ interface UseImportDataTableCsvDialogI {
     handleOpen: () => void;
     handleOpenChange: (open: boolean) => void;
     isPending: boolean;
+    linkColumnNames: string[];
     open: boolean;
 }
 
@@ -20,6 +21,10 @@ export default function useImportDataTableCsvDialog(): UseImportDataTableCsvDial
     const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const queryClient = useQueryClient();
+
+    const linkColumnNames = (dataTable?.columns ?? [])
+        .filter((column) => column.type === 'LINK')
+        .map((column) => column.name);
 
     const importCsvMutation = useImportDataTableCsvMutation({
         onSuccess: () => {
@@ -59,6 +64,7 @@ export default function useImportDataTableCsvDialog(): UseImportDataTableCsvDial
         handleOpen,
         handleOpenChange,
         isPending: importCsvMutation.isPending,
+        linkColumnNames,
         open,
     };
 }

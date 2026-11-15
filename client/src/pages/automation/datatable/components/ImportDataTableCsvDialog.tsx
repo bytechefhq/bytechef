@@ -18,7 +18,7 @@ import useImportDataTableCsvDialog from '../hooks/useImportDataTableCsvDialog';
 const ImportDataTableCsvDialog = () => {
     const [importFile, setImportFile] = useState<File | null>(null);
 
-    const {handleImport, handleOpenChange, isPending, open} = useImportDataTableCsvDialog();
+    const {handleImport, handleOpenChange, isPending, linkColumnNames, open} = useImportDataTableCsvDialog();
 
     const handleDialogOpenChange = (nextOpen: boolean) => {
         handleOpenChange(nextOpen);
@@ -81,6 +81,14 @@ const ImportDataTableCsvDialog = () => {
                                         />
                                     </div>
                                 </div>
+                            )}
+
+                            {linkColumnNames.length > 0 && (
+                                <p className="pt-1 text-sm text-muted-foreground">
+                                    {`Row ids differ between environments. Include ${linkColumnNames
+                                        .map((name) => `${name}.externalId`)
+                                        .join(', ')} columns to link rows reliably.`}
+                                </p>
                             )}
                         </div>
                     </DialogBody>

@@ -8,6 +8,7 @@ const hoisted = vi.hoisted(() => {
         mockHandleImport: vi.fn(),
         mockHandleOpenChange: vi.fn(),
         mockIsPending: false,
+        mockLinkColumnNames: [] as string[],
         mockOpen: true,
     };
 });
@@ -17,6 +18,7 @@ vi.mock('../../hooks/useImportDataTableCsvDialog', () => ({
         handleImport: hoisted.mockHandleImport,
         handleOpenChange: hoisted.mockHandleOpenChange,
         isPending: hoisted.mockIsPending,
+        linkColumnNames: hoisted.mockLinkColumnNames,
         open: hoisted.mockOpen,
     }),
 }));
@@ -25,6 +27,7 @@ beforeEach(() => {
     windowResizeObserver();
     hoisted.mockOpen = true;
     hoisted.mockIsPending = false;
+    hoisted.mockLinkColumnNames = [];
 });
 
 afterEach(() => {
@@ -73,6 +76,26 @@ describe('ImportDataTableCsvDialog', () => {
             const importButton = screen.getByRole('button', {name: 'Import'});
 
             expect(importButton).toBeDisabled();
+        });
+    });
+
+    describe('link columns', () => {
+        it('warns about row ids when the table has link columns', () => {
+            hoisted.mockLinkColumnNames = ['customer'];
+
+            render(<ImportDataTableCsvDialog />);
+
+            expect(
+                screen.getByText(
+                    'Row ids differ between environments. Include customer.externalId columns to link rows reliably.'
+                )
+            ).toBeInTheDocument();
+        });
+
+        it('does not warn when the table has no link columns', () => {
+            render(<ImportDataTableCsvDialog />);
+
+            expect(screen.queryByText(/Row ids differ between environments/)).not.toBeInTheDocument();
         });
     });
 

@@ -1,4 +1,11 @@
-import {ColumnType, useAddDataTableColumnMutation} from '@/shared/middleware/graphql';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {
+    ColumnLinkInput,
+    ColumnType,
+    DataTable,
+    useAddDataTableColumnMutation,
+    useDataTablesQuery,
+} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 
@@ -6,19 +13,28 @@ import {useAddDataTableColumnDialogStore} from '../stores/useAddDataTableColumnD
 import {useCurrentDataTableStore} from '../stores/useCurrentDataTableStore';
 
 interface UseAddDataTableColumnDialogI {
-    handleAdd: (name: string, type: ColumnType) => void;
+    handleAdd: (name: string, type: ColumnType, link?: ColumnLinkInput) => void;
     handleClose: () => void;
     handleOpen: () => void;
     handleOpenChange: (open: boolean) => void;
     open: boolean;
+    targetTables: DataTable[];
 }
 
 export default function useAddDataTableColumnDialog(): UseAddDataTableColumnDialogI {
     const {clearDialog, open, setOpen} = useAddDataTableColumnDialogStore();
     const {dataTable} = useCurrentDataTableStore();
     const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const queryClient = useQueryClient();
+
+    const {data: tablesData} = useDataTablesQuery({
+        environmentId: String(environmentId),
+        workspaceId: String(workspaceId),
+    });
+
+    const targetTables = (tablesData?.dataTables ?? []).filter((table) => table.id !== dataTable?.id) as DataTable[];
 
     const addColumnMutation = useAddDataTableColumnMutation({
         onSuccess: () => {
@@ -35,11 +51,15 @@ export default function useAddDataTableColumnDialog(): UseAddDataTableColumnDial
         setOpen(true);
     };
 
-    const handleAdd = (name: string, type: ColumnType) => {
+    const handleAdd = (name: string, type: ColumnType, link?: ColumnLinkInput) => {
         if (!dataTable?.id) return;
 
         addColumnMutation.mutate({
-            input: {column: {name, type}, environmentId: String(environmentId), tableId: dataTable.id},
+            input: {
+                column: {...(link ? {link} : {}), name, type},
+                environmentId: String(environmentId),
+                tableId: dataTable.id,
+            },
         });
     };
 
@@ -57,5 +77,6 @@ export default function useAddDataTableColumnDialog(): UseAddDataTableColumnDial
         handleOpen,
         handleOpenChange,
         open,
+        targetTables,
     };
 }

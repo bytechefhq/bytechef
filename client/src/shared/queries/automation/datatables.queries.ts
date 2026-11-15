@@ -9,8 +9,8 @@ import {InfiniteData, UseInfiniteQueryOptions, useInfiniteQuery} from '@tanstack
 export const DataTableKeys = {
     list: (environmentId: string, workspaceId: string) => ['dataTables', {environmentId, workspaceId}] as const,
     rows: (environmentId: string, tableId: string) => ['dataTableRows', {environmentId, tableId}] as const,
-    rowsPage: (environmentId: string, tableId: string, limit = 100) =>
-        ['dataTableRowsPage', {environmentId, limit, tableId}] as const,
+    rowsPage: (environmentId: string, tableId: string, limit = 100, expand: string[] = []) =>
+        ['dataTableRowsPage', {environmentId, ...(expand.length > 0 ? {expand} : {}), limit, tableId}] as const,
 };
 
 async function gqlFetch<TData, TVars>(query: string | {toString(): string}, variables?: TVars): Promise<TData> {
@@ -30,13 +30,14 @@ async function gqlFetch<TData, TVars>(query: string | {toString(): string}, vari
 }
 
 export const useDataTableRowsInfiniteQuery = (
-    variables: {environmentId: string; tableId: string; limit?: number},
+    variables: {environmentId: string; expand?: string[]; tableId: string; limit?: number},
     options?: Omit<
         UseInfiniteQueryOptions<DataTableRowsPageQuery, Error, InfiniteData<DataTableRowsPageQuery, number>>,
         'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
     >
 ) => {
     const limit = variables.limit ?? 100;
+    const expand = variables.expand ?? [];
 
     return useInfiniteQuery({
         getNextPageParam: (lastPage) => {
@@ -48,11 +49,12 @@ export const useDataTableRowsInfiniteQuery = (
         queryFn: ({pageParam}) =>
             gqlFetch<DataTableRowsPageQuery, DataTableRowsPageQueryVariables>(DataTableRowsPageDocument, {
                 environmentId: variables.environmentId,
+                expand: expand.length > 0 ? expand : undefined,
                 limit,
                 offset: typeof pageParam === 'number' ? pageParam : 0,
                 tableId: variables.tableId,
             }),
-        queryKey: DataTableKeys.rowsPage(variables.environmentId, variables.tableId, limit),
+        queryKey: DataTableKeys.rowsPage(variables.environmentId, variables.tableId, limit, expand),
         ...options,
     });
 };

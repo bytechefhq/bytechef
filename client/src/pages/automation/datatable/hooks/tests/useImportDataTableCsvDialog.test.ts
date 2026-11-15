@@ -25,7 +25,13 @@ vi.mock('../../stores/useImportDataTableCsvDialogStore', () => ({
 
 vi.mock('../../stores/useCurrentDataTableStore', () => ({
     useCurrentDataTableStore: () => ({
-        dataTable: {id: 'table-456'},
+        dataTable: {
+            columns: [
+                {id: '1', name: 'name', type: 'STRING'},
+                {id: '2', name: 'customer', type: 'LINK'},
+            ],
+            id: 'table-456',
+        },
     }),
 }));
 
@@ -190,6 +196,14 @@ describe('useImportDataTableCsvDialog', () => {
             const {result} = renderHook(() => useImportDataTableCsvDialog());
 
             expect(result.current.isPending).toBe(true);
+        });
+    });
+
+    describe('linkColumnNames', () => {
+        it('lists the link columns of the current table', () => {
+            const {result} = renderHook(() => useImportDataTableCsvDialog());
+
+            expect(result.current.linkColumnNames).toEqual(['customer']);
         });
     });
 });
