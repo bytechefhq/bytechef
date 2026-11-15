@@ -83,6 +83,9 @@ public interface DataTableRowService {
     @Nullable
     DataTableRow getRow(long dataTableId, long id, long environmentId);
 
+    @Nullable
+    DataTableRow getRow(long dataTableId, long id, List<String> expand, long environmentId);
+
     /**
      * Inserts a row with provided values. Returns the created row including generated id.
      *
@@ -134,6 +137,10 @@ public interface DataTableRowService {
     List<DataTableRow> findRows(
         long dataTableId, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int limit,
         int offset, long environmentId);
+
+    List<DataTableRow> findRows(
+        long dataTableId, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int limit,
+        int offset, List<String> expand, long environmentId);
 
     long countRows(long dataTableId, DataTableRowConditions conditions, long environmentId);
 
