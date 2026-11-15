@@ -745,9 +745,11 @@ class IntegrationFacadesAuditIntTest {
             when(connectedUserService.getConnectedUser(CONNECTED_USER_ID))
                 .thenThrow(new NoSuchElementException("Connected user not found"));
 
+            Map<String, Object> connectionParameters = Map.of("token", "s3cr3t");
+
             assertThatThrownBy(
                 () -> connectedUserIntegrationFacade.provisionIntegrationInstance(
-                    CONNECTED_USER_ID, 7L, Map.of("token", "s3cr3t"), null, "admin"))
+                    CONNECTED_USER_ID, 7L, connectionParameters, null, "admin"))
                         .isInstanceOf(NoSuchElementException.class);
 
             assertThat(findSingleEvent(IntegrationAuditEvents.INTEGRATION_INSTANCE_PROVISIONED).getData())

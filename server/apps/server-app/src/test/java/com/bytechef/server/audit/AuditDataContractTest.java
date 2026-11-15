@@ -481,11 +481,11 @@ class AuditDataContractTest {
                 String name = parameter.getName();
                 Class<?> type = parameter.getType();
 
-                if ((name.equals("mcpServerId") || name.equals("id")) &&
-                    (type.equals(Long.class) || type.equals(long.class))) {
+                boolean mcpServerIdParameter = (name.equals("mcpServerId") || name.equals("id")) &&
+                    (type.equals(Long.class) || type.equals(long.class));
+                boolean mcpServerParameter = name.equals("mcpServer") && McpServer.class.equals(type);
 
-                    exposesMcpServer = true;
-                } else if (name.equals("mcpServer") && McpServer.class.equals(type)) {
+                if (mcpServerIdParameter || mcpServerParameter) {
                     exposesMcpServer = true;
                 }
             }
@@ -841,7 +841,7 @@ class AuditDataContractTest {
 
         try {
             field = type.getField(propertyName);
-        } catch (NoSuchFieldException noSuchFieldException) {
+        } catch (NoSuchFieldException _) {
             return false;
         }
 
