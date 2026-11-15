@@ -1360,9 +1360,6 @@ class ConnectedUserProjectFacadeIntTest {
                 {"label":"Post","triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
                 """;
 
-        @Autowired
-        private ConnectedUserConnectionService connectedUserConnectionService;
-
         @MockitoSpyBean
         private ConnectedUserProjectService connectedUserProjectService;
 
