@@ -30,6 +30,8 @@ import com.bytechef.platform.data.table.config.DataTableIntTestUtils;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
 import com.bytechef.platform.data.table.configuration.exception.DataTableException;
+import com.bytechef.platform.data.table.configuration.repository.DataTableLinkColumnRepository;
+import com.bytechef.platform.data.table.configuration.repository.DataTableRepository;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
@@ -101,6 +103,12 @@ class DataTableRowServiceH2IntTest {
 
     @Autowired
     private DataTableRowService dataTableRowService;
+
+    @Autowired
+    private DataTableLinkColumnRepository dataTableLinkColumnRepository;
+
+    @Autowired
+    private DataTableRepository dataTableRepository;
 
     @Autowired
     private DataSource dataSource;
@@ -655,7 +663,8 @@ class DataTableRowServiceH2IntTest {
         };
 
         DataTableRowService transactionDataTableRowService = new DataTableRowServiceImpl(
-            mock(ApplicationEventPublisher.class), new JdbcTemplate(countingDataSource));
+            mock(ApplicationEventPublisher.class), dataTableLinkColumnRepository, dataTableRepository,
+            new JdbcTemplate(countingDataSource));
         TransactionTemplate transactionTemplate = new TransactionTemplate(
             new DataSourceTransactionManager(countingDataSource));
 
@@ -698,7 +707,8 @@ class DataTableRowServiceH2IntTest {
         };
 
         DataTableRowService failingDataTableRowService = new DataTableRowServiceImpl(
-            mock(ApplicationEventPublisher.class), new JdbcTemplate(failingDataSource));
+            mock(ApplicationEventPublisher.class), dataTableLinkColumnRepository, dataTableRepository,
+            new JdbcTemplate(failingDataSource));
 
         List<DataTableRow> firstInsertedDataTableRows = failingDataTableRowService.insertRows(
             itemsId, List.of(Map.of("title", "Pear", "amount", 1)), DEV_ENVIRONMENT_ID);
