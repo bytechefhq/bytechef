@@ -1,4 +1,13 @@
-import {APIRequestContext, APIResponse, Browser, BrowserContext, Page, expect, request} from '@playwright/test';
+import {
+    APIRequestContext,
+    APIResponse,
+    Browser,
+    BrowserContext,
+    Locator,
+    Page,
+    expect,
+    request,
+} from '@playwright/test';
 import {readFileSync} from 'fs';
 
 import {readInvitationKey} from './accountUtils';
@@ -430,6 +439,12 @@ async function preselectWorkspaceAndEnvironment(
 ): Promise<void> {
     await context.addInitScript(
         ({environmentId, selectedWorkspaceId}) => {
+            if (window.sessionStorage.getItem('bytechef.e2e.environmentSeeded')) {
+                return;
+            }
+
+            window.sessionStorage.setItem('bytechef.e2e.environmentSeeded', 'true');
+
             window.localStorage.setItem(
                 'bytechef.workspace',
                 JSON.stringify({state: {currentWorkspaceId: selectedWorkspaceId}, version: 0})
@@ -544,9 +559,9 @@ export async function requestWorkflowTestAs(page: Page, workflowId: string): Pro
 export const PAGE_BODY_TEXT = {
     apiCollections: /^(No API Collections|Filter by:)$/,
     connections: /^(Connect your first app|Filter by:)$/,
-    dataTables: /^(No Data Tables|Filter by:)$/,
+    dataTables: /^(Create your first data table|Filter by:)$/,
     deployments: /^(Nothing to deploy yet|Publish a project to deploy it|Create your first deployment|Filter by:)$/,
-    mcpServers: /^(No MCP Servers|Filter by:)$/,
+    mcpServers: /^(Create your first MCP server|Filter by:)$/,
     workspaceUsers: /^(Email|You do not have permission to manage members of this workspace\.)$/,
 };
 
@@ -556,4 +571,18 @@ export async function openPage(page: Page, path: string, pageBodyText: RegExp): 
     const pageMain = page.locator('main:not(:has(main))');
 
     await expect(pageMain.getByText(pageBodyText).filter({visible: true}).first()).toBeVisible({timeout: 30000});
+}
+
+export async function openDevelopmentProjectDeployments(page: Page, projectId: number | string): Promise<void> {
+    await openPage(page, `/automation/projects?projectId=${projectId}&tab=deployments`, /^No deployments in /);
+}
+
+export async function expandProjectItem(page: Page, projectId: number | string): Promise<Locator> {
+    const projectContainer = page.locator(`[data-project-id="${projectId}"]`);
+
+    await projectContainer.getByRole('button', {name: 'Toggle project'}).click();
+
+    await expect(projectContainer.getByRole('tab', {name: 'Workflows'})).toBeVisible();
+
+    return projectContainer;
 }

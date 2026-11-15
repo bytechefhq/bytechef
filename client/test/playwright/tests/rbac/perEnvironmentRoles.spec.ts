@@ -10,6 +10,7 @@ import {
     expectPresence,
     openAsRoleUser,
     openAsTenantAdmin,
+    openDevelopmentProjectDeployments,
     openPage,
     postGraphQl,
     publishRbacWorkspaceProject,
@@ -70,9 +71,9 @@ test.describe('Member with per-environment roles', () => {
 
             context = developmentSession.context;
 
-            await openPage(developmentSession.page, '/automation/deployments', PAGE_BODY_TEXT.deployments);
+            await openDevelopmentProjectDeployments(developmentSession.page, rbacWorkspace.projectId);
 
-            await expectPresence(developmentSession.page, /^(New|Create) Deployment$/, true, 'button');
+            await expectPresence(developmentSession.page, 'Deploy', true, 'button');
 
             await developmentSession.context.close();
         });
@@ -104,7 +105,9 @@ test.describe('Member with per-environment roles', () => {
                 )
                 .toBe(0);
 
-            await expectPresence(page, /^(New|Create) Deployment$/, true, 'button');
+            await openDevelopmentProjectDeployments(page, rbacWorkspace.projectId);
+
+            await expectPresence(page, 'Deploy', true, 'button');
 
             await page
                 .getByRole('button', {name: /^DEV(ELOPMENT)?$/})
@@ -144,9 +147,9 @@ test.describe('Member with per-environment roles', () => {
 
             context = developmentSession.context;
 
-            await openPage(developmentSession.page, '/automation/deployments', PAGE_BODY_TEXT.deployments);
+            await openDevelopmentProjectDeployments(developmentSession.page, rbacWorkspace.projectId);
 
-            await expectPresence(developmentSession.page, /^(New|Create) Deployment$/, false, 'button');
+            await expectPresence(developmentSession.page, 'Deploy', false, 'button');
 
             await developmentSession.context.close();
         });
