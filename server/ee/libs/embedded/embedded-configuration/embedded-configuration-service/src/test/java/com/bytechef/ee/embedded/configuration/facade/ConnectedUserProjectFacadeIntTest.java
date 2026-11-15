@@ -250,10 +250,10 @@ class ConnectedUserProjectFacadeIntTest {
     @Autowired
     private ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;
 
-    @Autowired
+    @MockitoSpyBean
     private ConnectedUserService connectedUserService;
 
-    @Autowired
+    @MockitoSpyBean
     private ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
 
     @Autowired
@@ -1344,12 +1344,6 @@ class ConnectedUserProjectFacadeIntTest {
             reset(connectedUserConnectionFacade);
         }
 
-        @Autowired
-        private ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;
-
-        @Autowired
-        private ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
-
         private static final AtomicLong NEXT_CONNECTION_ID = new AtomicLong(1000L);
 
         private static final String CHANNEL_INPUT_WORKFLOW_DEFINITION = """
@@ -1367,51 +1361,18 @@ class ConnectedUserProjectFacadeIntTest {
                 """;
 
         @Autowired
-        private AutomationProjectConfigurationService automationProjectConfigurationService;
-
-        @Autowired
-        private AutomationProjectFacade automationProjectFacade;
-
-        @Autowired
-        private ComponentConnectionFacade componentConnectionFacade;
-
-        @Autowired
-        private ComponentDefinitionService componentDefinitionService;
-
-        @Autowired
         private ConnectedUserConnectionService connectedUserConnectionService;
-
-        @Autowired
-        private ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService;
 
         @MockitoSpyBean
         private ConnectedUserProjectService connectedUserProjectService;
 
-        @MockitoSpyBean
-        private ConnectedUserService connectedUserService;
-
-        @Autowired
-        private ConnectedUserProjectFacade connectedUserProjectFacade;
-
         @Autowired
         private AutomationProjectConfigurationFacade automationProjectConfigurationFacade;
-
-        @MockitoSpyBean
-        private ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
 
         @Autowired
         private ConnectionFacade connectionFacade;
 
-        @Autowired
-        private ConnectionService connectionService;
-
         private final Map<Long, Connection> embeddedConnections = new ConcurrentHashMap<>();
-
-        @Autowired
-        private EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
-
-        @Autowired
-        private PrincipalJobService principalJobService;
 
         @Test
         void testGetProvisionableProjectsListsReleasedProjectsWithTheirEnabledWorkflows() {

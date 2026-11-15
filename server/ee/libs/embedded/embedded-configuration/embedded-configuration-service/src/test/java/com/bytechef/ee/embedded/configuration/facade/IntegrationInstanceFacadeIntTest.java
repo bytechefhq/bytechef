@@ -207,7 +207,7 @@ class IntegrationInstanceFacadeIntTest {
     @Autowired
     private IntegrationInstanceFacade integrationInstanceFacade;
 
-    @Autowired
+    @MockitoSpyBean
     private IntegrationInstanceService integrationInstanceService;
 
     @Autowired
@@ -723,9 +723,6 @@ class IntegrationInstanceFacadeIntTest {
         @MockitoBean
         private ConnectedUserIntegrationFacade connectedUserIntegrationFacade;
 
-        @MockitoSpyBean
-        private IntegrationInstanceService integrationInstanceService;
-
         @Test
         void testProvisionIntegrationInstanceIsDeniedForConnectedUsersAndNonAdmins() {
             authenticate(createConnectedUserAuthentication(Environment.PRODUCTION, connectedUserA));
@@ -832,9 +829,11 @@ class IntegrationInstanceFacadeIntTest {
         void testUpdateIntegrationInstanceCredentialsThrowsForSelfActivatedInstance() {
             authenticate(createTenantAdminAuthentication());
 
+            Map<String, String> parameters = Map.of("token", "new");
+
             assertThatThrownBy(
                 () -> integrationInstanceFacade.updateIntegrationInstanceCredentials(
-                    integrationInstanceAId, Map.of("token", "new"), 4))
+                    integrationInstanceAId, parameters, 4))
                         .isInstanceOf(NoSuchElementException.class)
                         .hasMessage("Integration instance id=%s not found".formatted(integrationInstanceAId));
 
