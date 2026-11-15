@@ -12,11 +12,12 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
-    useHasEmbeddedScope: () => true,
+    useHasEmbeddedScope: (scope: string) => !hoisted.deniedScopes.has(scope),
 }));
 
 const hoisted = vi.hoisted(() => ({
     configurationDialogOnSuccess: {current: undefined as ((id: number) => void) | undefined},
+    deniedScopes: new Set<string>(),
     navigate: vi.fn(),
     onTabChange: vi.fn(),
 }));
@@ -167,6 +168,7 @@ describe('IntegrationListItem', () => {
         vi.clearAllMocks();
 
         hoisted.configurationDialogOnSuccess.current = undefined;
+        hoisted.deniedScopes.clear();
     });
 
     describe('actions menu', () => {
@@ -250,6 +252,15 @@ describe('IntegrationListItem', () => {
             await userEvent.click(screen.getByRole('menuitem', {name: 'New Configuration'}));
 
             expect(screen.getByText('Configuration dialog for integration 1 in environment 0')).toBeInTheDocument();
+        });
+
+        it('should not offer New Configuration to a member who may not create configurations', async () => {
+            hoisted.deniedScopes.add('INTEGRATION_INSTANCE_CONFIGURATION_CREATE');
+
+            await openMenu();
+
+            expect(screen.queryByRole('menuitem', {name: 'New Configuration'})).not.toBeInTheDocument();
+            expect(screen.getByRole('menuitem', {name: 'New Workflow'})).toBeInTheDocument();
         });
 
         it('should disable New Configuration and explain why until the integration is published', async () => {
@@ -465,6 +476,14 @@ describe('IntegrationListItem', () => {
             expect(screen.getByLabelText('Create Configuration')).toHaveTextContent('New Configuration');
             expect(screen.getByText('Configuration dialog for integration 1 in environment 0')).toBeInTheDocument();
             expect(screen.queryByLabelText('Create Workflow')).not.toBeInTheDocument();
+        });
+
+        it('hides New Configuration on the configurations tab from a member who may not create configurations', () => {
+            hoisted.deniedScopes.add('INTEGRATION_INSTANCE_CONFIGURATION_CREATE');
+
+            renderItem({}, 'configurations');
+
+            expect(screen.queryByLabelText('Create Configuration')).not.toBeInTheDocument();
         });
 
         it('hides New Workflow while the integration has no workflows', () => {
