@@ -24,7 +24,7 @@ import com.bytechef.ee.embedded.configuration.domain.ConnectionOrigin;
 import com.bytechef.ee.embedded.configuration.facade.AppEventFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
-import com.bytechef.ee.embedded.configuration.facade.ConnectionAdminFacade;
+import com.bytechef.ee.embedded.configuration.facade.ConnectionFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
@@ -116,7 +116,7 @@ class ConnectionApiControllerIntTest {
     private WorkflowService workflowService;
 
     @Autowired
-    private ConnectionAdminFacade connectionAdminFacade;
+    private ConnectionFacade connectionFacade;
 
     @Autowired
     private ConnectedUserConnectionFacade connectedUserConnectionFacade;
@@ -162,14 +162,14 @@ class ConnectionApiControllerIntTest {
             .expectStatus()
             .isNoContent();
 
-        verify(connectionAdminFacade).deleteConnection(1L);
+        verify(connectionFacade).deleteConnection(1L);
     }
 
     @Test
     void testGetConnection() {
         ConnectionDTO connectionDTO = getConnection();
 
-        when(connectionAdminFacade.getConnection(1L))
+        when(connectionFacade.getConnection(1L))
             .thenReturn(connectionDTO);
 
         this.webTestClient
@@ -186,7 +186,7 @@ class ConnectionApiControllerIntTest {
 
     @Test
     void testGetConnectionTags() {
-        when(connectionAdminFacade.getConnectionTags())
+        when(connectionFacade.getConnectionTags())
             .thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
 
         this.webTestClient
@@ -229,14 +229,14 @@ class ConnectionApiControllerIntTest {
             .jsonPath("$.[0].name")
             .isEqualTo("tag3");
 
-        verify(connectionAdminFacade, never()).getConnectionTags();
+        verify(connectionFacade, never()).getConnectionTags();
     }
 
     @Test
     void testGetConnections() {
         ConnectionDTO connectionDTO = getConnection();
 
-        when(connectionAdminFacade.getConnections((String) null, null, null, null))
+        when(connectionFacade.getConnections((String) null, null, null, null))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -251,7 +251,7 @@ class ConnectionApiControllerIntTest {
                 .parameters(null))
             .hasSize(1);
 
-        when(connectionAdminFacade.getConnections("component1", null, null, null))
+        when(connectionFacade.getConnections("component1", null, null, null))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -264,7 +264,7 @@ class ConnectionApiControllerIntTest {
             .expectBodyList(ConnectionModel.class)
             .hasSize(1);
 
-        when(connectionAdminFacade.getConnections((String) null, 1, null, null))
+        when(connectionFacade.getConnections((String) null, 1, null, null))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -277,7 +277,7 @@ class ConnectionApiControllerIntTest {
             .expectBodyList(ConnectionModel.class)
             .hasSize(1);
 
-        when(connectionAdminFacade.getConnections("component1", 1, null, null))
+        when(connectionFacade.getConnections("component1", 1, null, null))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -296,7 +296,7 @@ class ConnectionApiControllerIntTest {
             .name("name")
             .parameters(Map.of("key1", "value1"));
 
-        when(connectionAdminFacade.createConnection(any(), anyBoolean())).thenReturn(getConnection().id());
+        when(connectionFacade.createConnection(any(), anyBoolean())).thenReturn(getConnection().id());
 
         assertThat(connectionDTO.id()).isNotNull();
 
@@ -314,7 +314,7 @@ class ConnectionApiControllerIntTest {
 
         ArgumentCaptor<ConnectionDTO> connectionArgumentCaptor = ArgumentCaptor.forClass(ConnectionDTO.class);
 
-        verify(connectionAdminFacade).createConnection(connectionArgumentCaptor.capture(), eq(false));
+        verify(connectionFacade).createConnection(connectionArgumentCaptor.capture(), eq(false));
 
         assertThat(connectionArgumentCaptor.getValue())
             .hasFieldOrPropertyWithValue("componentName", "componentName")
@@ -509,7 +509,7 @@ class ConnectionApiControllerIntTest {
 
         ArgumentCaptor<List<Tag>> tagsArgumentCaptor = ArgumentCaptor.forClass(List.class);
 
-        verify(connectionAdminFacade).updateConnection(
+        verify(connectionFacade).updateConnection(
             eq(1L), eq("name2"), tagsArgumentCaptor.capture(), isNull(), eq(3));
 
         assertThat(tagsArgumentCaptor.getValue())
@@ -530,7 +530,7 @@ class ConnectionApiControllerIntTest {
             .expectStatus()
             .isNoContent();
 
-        verify(connectionAdminFacade).updateConnectionCredentials(1L, Map.of("token", "secret"), 3);
+        verify(connectionFacade).updateConnectionCredentials(1L, Map.of("token", "secret"), 3);
     }
 
     @Test
@@ -565,7 +565,7 @@ class ConnectionApiControllerIntTest {
 
         ArgumentCaptor<List<Tag>> tagsArgumentCaptor = ArgumentCaptor.forClass(List.class);
 
-        verify(connectionAdminFacade).updateConnectionTags(eq(1L), tagsArgumentCaptor.capture());
+        verify(connectionFacade).updateConnectionTags(eq(1L), tagsArgumentCaptor.capture());
         verify(connectedUserConnectionFacade, never()).updateConnectedUserConnectionTags(anyLong(), anyLong(),
             anyList());
 
@@ -593,7 +593,7 @@ class ConnectionApiControllerIntTest {
 
         verify(connectedUserConnectionFacade).updateConnectedUserConnectionTags(
             eq(5L), eq(1L), tagsArgumentCaptor.capture());
-        verify(connectionAdminFacade, never()).updateConnectionTags(anyLong(), anyList());
+        verify(connectionFacade, never()).updateConnectionTags(anyLong(), anyList());
 
         assertThat(tagsArgumentCaptor.getValue())
             .singleElement()

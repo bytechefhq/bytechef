@@ -8,7 +8,7 @@
 package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.ee.embedded.configuration.facade.WebhookTriggerTestAdminFacade;
+import com.bytechef.ee.embedded.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.StartWebhookTriggerTest200ResponseModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import org.springframework.http.ResponseEntity;
@@ -26,17 +26,17 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnEEVersion
 public class WebhookTriggerTestApiController implements WebhookTriggerTestApi {
 
-    private final WebhookTriggerTestAdminFacade webhookTriggerTestAdminFacade;
+    private final WebhookTriggerTestFacade webhookTriggerTestFacade;
 
-    public WebhookTriggerTestApiController(WebhookTriggerTestAdminFacade webhookTriggerTestAdminFacade) {
-        this.webhookTriggerTestAdminFacade = webhookTriggerTestAdminFacade;
+    public WebhookTriggerTestApiController(WebhookTriggerTestFacade webhookTriggerTestFacade) {
+        this.webhookTriggerTestFacade = webhookTriggerTestFacade;
     }
 
     @Override
     public ResponseEntity<StartWebhookTriggerTest200ResponseModel> startWebhookTriggerTest(
         String workflowId, Long environmentId, String triggerName) {
 
-        String webhookUrl = webhookTriggerTestAdminFacade.startWebhookTriggerTest(
+        String webhookUrl = webhookTriggerTestFacade.startWebhookTriggerTest(
             workflowId, triggerName, environmentId);
 
         return ResponseEntity.ok(
@@ -46,7 +46,7 @@ public class WebhookTriggerTestApiController implements WebhookTriggerTestApi {
 
     @Override
     public ResponseEntity<Void> stopWebhookTriggerTest(String workflowId, Long environmentId, String triggerName) {
-        webhookTriggerTestAdminFacade.stopWebhookTriggerTest(
+        webhookTriggerTestFacade.stopWebhookTriggerTest(
             workflowId, triggerName, environmentId);
 
         return ResponseEntity.noContent()

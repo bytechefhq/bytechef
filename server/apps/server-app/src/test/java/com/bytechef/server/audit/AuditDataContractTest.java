@@ -87,7 +87,8 @@ class AuditDataContractTest {
     private static final String TRIGGER_INTERNAL = "trigger bookkeeping of an audited enable";
     private static final String WORKFLOW_INPUTS = "workflow input or connection values";
     private static final Map<String, String> UNAUDITED_GUARDED_CLASSES = Map.of(
-        "WebhookTriggerTestAdminFacadeImpl", "editor-time webhook trigger test");
+        "com.bytechef.ee.embedded.configuration.facade.WebhookTriggerTestFacadeImpl",
+        "editor-time webhook trigger test");
     private static final Map<String, String> UNAUDITED_GUARDED_METHODS = Map.ofEntries(
         Map.entry("A2aProjectWorkflowFacadeImpl.updateA2aProjectWorkflowSkill", TOOL_SETTING),
         Map.entry("A2aServerFacadeImpl.updateA2aServerTags", TAGS),
@@ -96,7 +97,7 @@ class AuditDataContractTest {
         Map.entry("ConnectedUserConnectionFacadeImpl.updateConnectedUserConnectionTags", TAGS),
         Map.entry("ConnectedUserConnectionFacadeImpl.updateIntegrationInstanceConnectionCredentials",
             RECORDED_BY_CALLER),
-        Map.entry("ConnectionAdminFacadeImpl.updateConnectionTags", TAGS),
+        Map.entry("com.bytechef.ee.embedded.configuration.facade.ConnectionFacadeImpl.updateConnectionTags", TAGS),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpComponent", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpServer", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.deleteEmbeddedMcpComponent", DELEGATES),
@@ -186,6 +187,21 @@ class AuditDataContractTest {
             Class<?> declaringClass = method.getDeclaringClass();
 
             String className = declaringClass.getSimpleName();
+            String qualifiedClassName = declaringClass.getName();
+
+            if (UNAUDITED_GUARDED_CLASSES.containsKey(qualifiedClassName)) {
+                usedSkips.add(qualifiedClassName);
+
+                continue;
+            }
+
+            String fullyQualifiedMethodName = qualifiedClassName + "." + methodName;
+
+            if (UNAUDITED_GUARDED_METHODS.containsKey(fullyQualifiedMethodName)) {
+                usedSkips.add(fullyQualifiedMethodName);
+
+                continue;
+            }
 
             if (UNAUDITED_GUARDED_CLASSES.containsKey(className)) {
                 usedSkips.add(className);

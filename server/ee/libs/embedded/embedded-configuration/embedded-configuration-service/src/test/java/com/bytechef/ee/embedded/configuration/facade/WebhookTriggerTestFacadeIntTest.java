@@ -17,7 +17,6 @@ import com.bytechef.automation.configuration.security.AutomationMethodSecurityEx
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
-import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -47,12 +46,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @SpringBootTest(
     classes = {
-        IntegrationIntTestConfiguration.class, WebhookTriggerTestAdminFacadeIntTest.MethodSecurityConfiguration.class
+        IntegrationIntTestConfiguration.class, WebhookTriggerTestFacadeIntTest.MethodSecurityConfiguration.class
     },
     properties = "bytechef.workflow.repository.jdbc.enabled=true")
 @Import(PostgreSQLContainerConfiguration.class)
 @IntegrationIntTestConfigurationSharedMocks
-class WebhookTriggerTestAdminFacadeIntTest {
+class WebhookTriggerTestFacadeIntTest {
 
     private static final long ENVIRONMENT_ID = 0L;
     private static final String TRIGGER_NAME = "trigger_1";
@@ -62,10 +61,10 @@ class WebhookTriggerTestAdminFacadeIntTest {
     private PermissionService permissionService;
 
     @Autowired
-    private WebhookTriggerTestAdminFacade webhookTriggerTestAdminFacade;
+    private WebhookTriggerTestFacade webhookTriggerTestFacade;
 
     @Autowired
-    private WebhookTriggerTestFacade webhookTriggerTestFacade;
+    private com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade platformWebhookTriggerTestFacade;
 
     @BeforeEach
     void beforeEach() {
@@ -85,27 +84,28 @@ class WebhookTriggerTestAdminFacadeIntTest {
         when(permissionService.isTenantAdmin()).thenReturn(false);
 
         assertThatThrownBy(
-            () -> webhookTriggerTestAdminFacade.startWebhookTriggerTest(WORKFLOW_ID, TRIGGER_NAME, ENVIRONMENT_ID))
+            () -> webhookTriggerTestFacade.startWebhookTriggerTest(WORKFLOW_ID, TRIGGER_NAME, ENVIRONMENT_ID))
                 .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(
-            () -> webhookTriggerTestAdminFacade.stopWebhookTriggerTest(WORKFLOW_ID, TRIGGER_NAME, ENVIRONMENT_ID))
+            () -> webhookTriggerTestFacade.stopWebhookTriggerTest(WORKFLOW_ID, TRIGGER_NAME, ENVIRONMENT_ID))
                 .isInstanceOf(AccessDeniedException.class);
 
-        verifyNoInteractions(webhookTriggerTestFacade);
+        verifyNoInteractions(platformWebhookTriggerTestFacade);
     }
 
     @Test
     void testTenantAdminReachesTheSharedFacadeTypedEmbedded() {
         when(permissionService.isTenantAdmin()).thenReturn(true);
-        when(webhookTriggerTestFacade.enableTrigger(WORKFLOW_ID, TRIGGER_NAME, ENVIRONMENT_ID, PlatformType.EMBEDDED))
-            .thenReturn("https://example.org/webhook");
+        when(platformWebhookTriggerTestFacade.enableTrigger(WORKFLOW_ID, TRIGGER_NAME, ENVIRONMENT_ID,
+            PlatformType.EMBEDDED))
+                .thenReturn("https://example.org/webhook");
 
-        assertThat(webhookTriggerTestAdminFacade.startWebhookTriggerTest(WORKFLOW_ID, TRIGGER_NAME, ENVIRONMENT_ID))
+        assertThat(webhookTriggerTestFacade.startWebhookTriggerTest(WORKFLOW_ID, TRIGGER_NAME, ENVIRONMENT_ID))
             .isEqualTo("https://example.org/webhook");
 
-        webhookTriggerTestAdminFacade.stopWebhookTriggerTest(WORKFLOW_ID, TRIGGER_NAME, ENVIRONMENT_ID);
+        webhookTriggerTestFacade.stopWebhookTriggerTest(WORKFLOW_ID, TRIGGER_NAME, ENVIRONMENT_ID);
 
-        verify(webhookTriggerTestFacade).disableTrigger(
+        verify(platformWebhookTriggerTestFacade).disableTrigger(
             WORKFLOW_ID, TRIGGER_NAME, ENVIRONMENT_ID, PlatformType.EMBEDDED);
     }
 

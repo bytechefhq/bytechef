@@ -19,7 +19,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Ivica Cardic
  */
-public interface ConnectionAdminFacade {
+public interface ConnectionFacade {
 
     long createConnection(ConnectionDTO connectionDTO, boolean shared);
 

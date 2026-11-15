@@ -40,7 +40,6 @@ import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
-import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
@@ -83,20 +82,20 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @SpringBootTest(
     classes = {
-        IntegrationIntTestConfiguration.class, ConnectionAdminFacadeIntTest.MethodSecurityConfiguration.class
+        IntegrationIntTestConfiguration.class, ConnectionFacadeIntTest.MethodSecurityConfiguration.class
     },
     properties = {
         "bytechef.workflow.repository.jdbc.enabled=true", "bytechef.audit.enabled=true"
     })
 @Import(PostgreSQLContainerConfiguration.class)
 @IntegrationIntTestConfigurationSharedMocks
-class ConnectionAdminFacadeIntTest {
-
-    @Autowired
-    private ConnectionAdminFacade connectionAdminFacade;
+class ConnectionFacadeIntTest {
 
     @Autowired
     private ConnectionFacade connectionFacade;
+
+    @Autowired
+    private com.bytechef.platform.connection.facade.ConnectionFacade platformConnectionFacade;
 
     @Autowired
     private ConnectionService connectionService;
@@ -157,23 +156,23 @@ class ConnectionAdminFacadeIntTest {
             .build();
 
         when(permissionService.isTenantAdmin()).thenReturn(true);
-        when(connectionFacade.create(connectionDTO, PlatformType.EMBEDDED)).thenReturn(7L);
+        when(platformConnectionFacade.create(connectionDTO, PlatformType.EMBEDDED)).thenReturn(7L);
         when(connectionService.fetchConnection(7L)).thenReturn(Optional.of(connection(7L, PlatformType.EMBEDDED)));
 
-        assertThat(connectionAdminFacade.createConnection(connectionDTO, true)).isEqualTo(7L);
+        assertThat(connectionFacade.createConnection(connectionDTO, true)).isEqualTo(7L);
 
-        connectionAdminFacade.deleteConnection(7L);
-        connectionAdminFacade.getConnection(7L);
-        connectionAdminFacade.getConnections("slack", 1, 2L, 3L);
-        connectionAdminFacade.getSharedConnectionIds();
-        connectionAdminFacade.updateConnection(7L, "name", List.of(), true, 0);
-        connectionAdminFacade.updateConnectionCredentials(7L, Map.of("token", "secret"), 0);
+        connectionFacade.deleteConnection(7L);
+        connectionFacade.getConnection(7L);
+        connectionFacade.getConnections("slack", 1, 2L, 3L);
+        connectionFacade.getSharedConnectionIds();
+        connectionFacade.updateConnection(7L, "name", List.of(), true, 0);
+        connectionFacade.updateConnectionCredentials(7L, Map.of("token", "secret"), 0);
 
-        verify(connectionFacade).updateCredentials(7L, Map.of("token", "secret"), 0);
-        verify(connectionFacade).delete(7L);
-        verify(connectionFacade).getConnection(7L);
-        verify(connectionFacade).getConnections("slack", 1, List.of(), 3L, 2L, PlatformType.EMBEDDED);
-        verify(connectionFacade).update(7L, "name", List.of(), 0);
+        verify(platformConnectionFacade).updateCredentials(7L, Map.of("token", "secret"), 0);
+        verify(platformConnectionFacade).delete(7L);
+        verify(platformConnectionFacade).getConnection(7L);
+        verify(platformConnectionFacade).getConnections("slack", 1, List.of(), 3L, 2L, PlatformType.EMBEDDED);
+        verify(platformConnectionFacade).update(7L, "name", List.of(), 0);
         verify(connectedUserConnectionService, times(2)).updateShared(7L, true);
         verify(connectedUserConnectionService).deleteByConnectionId(7L);
         verify(connectedUserConnectionService).getSharedConnectionIds();
@@ -229,20 +228,20 @@ class ConnectionAdminFacadeIntTest {
             .componentName("slack")
             .build();
 
-        assertThatThrownBy(() -> connectionAdminFacade.createConnection(connectionDTO, false))
+        assertThatThrownBy(() -> connectionFacade.createConnection(connectionDTO, false))
             .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> connectionAdminFacade.deleteConnection(7L))
+        assertThatThrownBy(() -> connectionFacade.deleteConnection(7L))
             .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> connectionAdminFacade.getConnection(7L))
+        assertThatThrownBy(() -> connectionFacade.getConnection(7L))
             .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> connectionAdminFacade.getConnections(null, null, null, null))
+        assertThatThrownBy(() -> connectionFacade.getConnections(null, null, null, null))
             .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> connectionAdminFacade.getSharedConnectionIds())
+        assertThatThrownBy(() -> connectionFacade.getSharedConnectionIds())
             .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> connectionAdminFacade.updateConnection(7L, "name", List.of(), null, 0))
+        assertThatThrownBy(() -> connectionFacade.updateConnection(7L, "name", List.of(), null, 0))
             .isInstanceOf(AccessDeniedException.class);
 
-        verifyNoInteractions(connectionFacade, connectionService, connectedUserConnectionService);
+        verifyNoInteractions(platformConnectionFacade, connectionService, connectedUserConnectionService);
     }
 
     private static Connection connection(long id, PlatformType type) {
@@ -279,10 +278,10 @@ class ConnectionAdminFacadeIntTest {
 
         @Test
         void testDeleteConnectionRejectsAutomationConnection() {
-            assertThatThrownBy(() -> connectionAdminFacade.deleteConnection(AUTOMATION_CONNECTION_ID))
+            assertThatThrownBy(() -> connectionFacade.deleteConnection(AUTOMATION_CONNECTION_ID))
                 .isInstanceOf(NoSuchElementException.class);
 
-            verify(connectionFacade, never()).delete(anyLong());
+            verify(platformConnectionFacade, never()).delete(anyLong());
             verify(connectedUserConnectionService, never()).deleteByConnectionId(anyLong());
 
             assertThat(findSingleEvent(ConnectionAuditEvents.CONNECTION_DELETED).getData())
@@ -293,31 +292,31 @@ class ConnectionAdminFacadeIntTest {
 
         @Test
         void testGetConnectionRejectsAutomationConnection() {
-            assertThatThrownBy(() -> connectionAdminFacade.getConnection(AUTOMATION_CONNECTION_ID))
+            assertThatThrownBy(() -> connectionFacade.getConnection(AUTOMATION_CONNECTION_ID))
                 .isInstanceOf(NoSuchElementException.class);
 
-            verify(connectionFacade, never()).getConnection(anyLong());
+            verify(platformConnectionFacade, never()).getConnection(anyLong());
         }
 
         @Test
         void testUpdateConnectionRejectsAutomationConnection() {
             assertThatThrownBy(
-                () -> connectionAdminFacade.updateConnection(AUTOMATION_CONNECTION_ID, "name", List.of(), true, 0))
+                () -> connectionFacade.updateConnection(AUTOMATION_CONNECTION_ID, "name", List.of(), true, 0))
                     .isInstanceOf(NoSuchElementException.class);
 
-            verify(connectionFacade, never()).update(anyLong(), anyString(), any(), anyInt());
+            verify(platformConnectionFacade, never()).update(anyLong(), anyString(), any(), anyInt());
             verify(connectedUserConnectionService, never()).updateShared(anyLong(), anyBoolean());
         }
 
         @Test
         void testUnknownConnectionIsRejectedLikeAnAutomationConnection() {
-            assertThatThrownBy(() -> connectionAdminFacade.deleteConnection(UNKNOWN_CONNECTION_ID))
+            assertThatThrownBy(() -> connectionFacade.deleteConnection(UNKNOWN_CONNECTION_ID))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("Connection id=%s not found".formatted(UNKNOWN_CONNECTION_ID));
-            assertThatThrownBy(() -> connectionAdminFacade.getConnection(AUTOMATION_CONNECTION_ID))
+            assertThatThrownBy(() -> connectionFacade.getConnection(AUTOMATION_CONNECTION_ID))
                 .hasMessage("Connection id=%s not found".formatted(AUTOMATION_CONNECTION_ID));
 
-            verify(connectionFacade, never()).delete(anyLong());
+            verify(platformConnectionFacade, never()).delete(anyLong());
         }
     }
 
@@ -358,7 +357,7 @@ class ConnectionAdminFacadeIntTest {
                 connectionDTO(ADMIN_CONNECTION_ID, List.of()),
                 connectionDTO(INTEGRATION_INSTANCE_CONNECTION_ID, List.of()));
 
-            List<ConnectionDTO> connectionDTOs = connectionAdminFacade.getConnections(null, null, null, null);
+            List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(null, null, null, null);
 
             assertThat(connectionDTOs).extracting(ConnectionDTO::id)
                 .containsExactly(ADMIN_CONNECTION_ID);
@@ -368,10 +367,10 @@ class ConnectionAdminFacadeIntTest {
         void testGetConnectionThrowsForIntegrationInstanceConnection() {
             stubEmbedded(INTEGRATION_INSTANCE_CONNECTION_ID);
 
-            assertThatThrownBy(() -> connectionAdminFacade.getConnection(INTEGRATION_INSTANCE_CONNECTION_ID))
+            assertThatThrownBy(() -> connectionFacade.getConnection(INTEGRATION_INSTANCE_CONNECTION_ID))
                 .isInstanceOf(NoSuchElementException.class);
 
-            verify(connectionFacade, never()).getConnection(anyLong());
+            verify(platformConnectionFacade, never()).getConnection(anyLong());
         }
 
         @Test
@@ -379,7 +378,7 @@ class ConnectionAdminFacadeIntTest {
             stubConnections(
                 connectionDTO(ADMIN_CONNECTION_ID, List.of()), connectionDTO(CONNECTED_USER_CONNECTION_ID, List.of()));
 
-            List<ConnectionDTO> connectionDTOs = connectionAdminFacade.getConnections(null, null, null, null);
+            List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(null, null, null, null);
 
             assertThat(connectionDTOs).extracting(ConnectionDTO::id)
                 .containsExactly(ADMIN_CONNECTION_ID);
@@ -392,7 +391,7 @@ class ConnectionAdminFacadeIntTest {
 
             when(connectedUserConnectionService.getSharedConnectionIds()).thenReturn(Set.of(SHARED_CONNECTION_ID));
 
-            List<ConnectionDTO> connectionDTOs = connectionAdminFacade.getConnections(null, null, null, null);
+            List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(null, null, null, null);
 
             assertThat(connectionDTOs).extracting(ConnectionDTO::id)
                 .containsExactly(ADMIN_CONNECTION_ID, SHARED_CONNECTION_ID);
@@ -402,10 +401,10 @@ class ConnectionAdminFacadeIntTest {
         void testGetConnectionThrowsForConnectedUserConnection() {
             stubEmbedded(CONNECTED_USER_CONNECTION_ID);
 
-            assertThatThrownBy(() -> connectionAdminFacade.getConnection(CONNECTED_USER_CONNECTION_ID))
+            assertThatThrownBy(() -> connectionFacade.getConnection(CONNECTED_USER_CONNECTION_ID))
                 .isInstanceOf(NoSuchElementException.class);
 
-            verify(connectionFacade, never()).getConnection(anyLong());
+            verify(platformConnectionFacade, never()).getConnection(anyLong());
         }
 
         @Test
@@ -413,21 +412,21 @@ class ConnectionAdminFacadeIntTest {
             stubEmbedded(CONNECTED_USER_CONNECTION_ID);
 
             assertThatThrownBy(
-                () -> connectionAdminFacade.updateConnection(
+                () -> connectionFacade.updateConnection(
                     CONNECTED_USER_CONNECTION_ID, "name", List.of(), null, 0))
                         .isInstanceOf(NoSuchElementException.class);
 
-            verify(connectionFacade, never()).update(anyLong(), anyString(), any(), anyInt());
+            verify(platformConnectionFacade, never()).update(anyLong(), anyString(), any(), anyInt());
         }
 
         @Test
         void testDeleteConnectionThrowsForConnectedUserConnection() {
             stubEmbedded(CONNECTED_USER_CONNECTION_ID);
 
-            assertThatThrownBy(() -> connectionAdminFacade.deleteConnection(CONNECTED_USER_CONNECTION_ID))
+            assertThatThrownBy(() -> connectionFacade.deleteConnection(CONNECTED_USER_CONNECTION_ID))
                 .isInstanceOf(NoSuchElementException.class);
 
-            verify(connectionFacade, never()).delete(anyLong());
+            verify(platformConnectionFacade, never()).delete(anyLong());
             verify(connectedUserConnectionService, never()).deleteByConnectionId(anyLong());
         }
 
@@ -437,9 +436,9 @@ class ConnectionAdminFacadeIntTest {
 
             Map<String, Object> parameters = Map.of("token", "secret");
 
-            connectionAdminFacade.updateConnectionCredentials(ADMIN_CONNECTION_ID, parameters, 2);
+            connectionFacade.updateConnectionCredentials(ADMIN_CONNECTION_ID, parameters, 2);
 
-            verify(connectionFacade).updateCredentials(ADMIN_CONNECTION_ID, parameters, 2);
+            verify(platformConnectionFacade).updateCredentials(ADMIN_CONNECTION_ID, parameters, 2);
         }
 
         @Test
@@ -447,11 +446,11 @@ class ConnectionAdminFacadeIntTest {
             stubEmbedded(CONNECTED_USER_CONNECTION_ID);
 
             assertThatThrownBy(
-                () -> connectionAdminFacade.updateConnectionCredentials(
+                () -> connectionFacade.updateConnectionCredentials(
                     CONNECTED_USER_CONNECTION_ID, Map.of("token", "secret"), 0))
                         .isInstanceOf(NoSuchElementException.class);
 
-            verify(connectionFacade, never()).updateCredentials(anyLong(), any(), anyInt());
+            verify(platformConnectionFacade, never()).updateCredentials(anyLong(), any(), anyInt());
         }
 
         @Test
@@ -459,10 +458,10 @@ class ConnectionAdminFacadeIntTest {
             stubEmbedded(CONNECTED_USER_CONNECTION_ID);
 
             assertThatThrownBy(
-                () -> connectionAdminFacade.updateConnectionTags(CONNECTED_USER_CONNECTION_ID, List.of()))
+                () -> connectionFacade.updateConnectionTags(CONNECTED_USER_CONNECTION_ID, List.of()))
                     .isInstanceOf(NoSuchElementException.class);
 
-            verify(connectionFacade, never()).update(anyLong(), anyList());
+            verify(platformConnectionFacade, never()).update(anyLong(), anyList());
         }
 
         @Test
@@ -471,9 +470,9 @@ class ConnectionAdminFacadeIntTest {
 
             List<Tag> tags = List.of(new Tag(11L, "admin"));
 
-            connectionAdminFacade.updateConnectionTags(ADMIN_CONNECTION_ID, tags);
+            connectionFacade.updateConnectionTags(ADMIN_CONNECTION_ID, tags);
 
-            verify(connectionFacade).update(ADMIN_CONNECTION_ID, tags);
+            verify(platformConnectionFacade).update(ADMIN_CONNECTION_ID, tags);
         }
 
         @Test
@@ -497,11 +496,11 @@ class ConnectionAdminFacadeIntTest {
             when(connectionService.getConnections(PlatformType.EMBEDDED))
                 .thenReturn(List.of(adminConnection, sharedConnection, connectedUserConnection));
 
-            assertThat(connectionAdminFacade.getConnectionTags())
+            assertThat(connectionFacade.getConnectionTags())
                 .extracting(Tag::getName)
                 .containsExactly(alphaTag.getName(), zetaTag.getName());
 
-            verify(connectionFacade, never()).getConnections(any(), any(), anyList(), any(), any(), any());
+            verify(platformConnectionFacade, never()).getConnections(any(), any(), anyList(), any(), any(), any());
         }
 
         private ConnectionDTO connectionDTO(long id, List<Tag> tags) {
@@ -512,8 +511,9 @@ class ConnectionAdminFacadeIntTest {
         }
 
         private void stubConnections(ConnectionDTO... connectionDTOs) {
-            when(connectionFacade.getConnections(any(), any(), anyList(), any(), any(), any(PlatformType.class)))
-                .thenReturn(List.of(connectionDTOs));
+            when(
+                platformConnectionFacade.getConnections(any(), any(), anyList(), any(), any(), any(PlatformType.class)))
+                    .thenReturn(List.of(connectionDTOs));
         }
 
         private void stubEmbedded(long id) {

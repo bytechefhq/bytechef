@@ -16,7 +16,6 @@ import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
-import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
@@ -37,21 +36,22 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Ivica Cardic
  */
-@Service
+@Service("com.bytechef.ee.embedded.configuration.facade.ConnectionFacade")
 @ConditionalOnEEVersion
 @PreAuthorize("isTenantAdmin()")
-public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
+public class ConnectionFacadeImpl implements ConnectionFacade {
 
     private final ConnectedUserConnectionMembership connectedUserConnectionMembership;
     private final ConnectedUserConnectionService connectedUserConnectionService;
-    private final ConnectionFacade connectionFacade;
+    private final com.bytechef.platform.connection.facade.ConnectionFacade connectionFacade;
     private final ConnectionService connectionService;
     private final TagService tagService;
 
     @SuppressFBWarnings("EI")
-    public ConnectionAdminFacadeImpl(
+    public ConnectionFacadeImpl(
         ConnectedUserConnectionMembership connectedUserConnectionMembership,
-        ConnectedUserConnectionService connectedUserConnectionService, ConnectionFacade connectionFacade,
+        ConnectedUserConnectionService connectedUserConnectionService,
+        com.bytechef.platform.connection.facade.ConnectionFacade connectionFacade,
         ConnectionService connectionService, TagService tagService) {
 
         this.connectedUserConnectionMembership = connectedUserConnectionMembership;

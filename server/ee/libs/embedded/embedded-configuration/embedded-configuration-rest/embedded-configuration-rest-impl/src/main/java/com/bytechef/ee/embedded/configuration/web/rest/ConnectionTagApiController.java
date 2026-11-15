@@ -9,7 +9,7 @@ package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
-import com.bytechef.ee.embedded.configuration.facade.ConnectionAdminFacade;
+import com.bytechef.ee.embedded.configuration.facade.ConnectionFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.TagModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentication;
@@ -36,16 +36,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConnectionTagApiController implements ConnectionTagApi {
 
     private final ConnectedUserConnectionFacade connectedUserConnectionFacade;
-    private final ConnectionAdminFacade connectionAdminFacade;
+    private final ConnectionFacade connectionFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
     public ConnectionTagApiController(
-        ConnectedUserConnectionFacade connectedUserConnectionFacade, ConnectionAdminFacade connectionAdminFacade,
+        ConnectedUserConnectionFacade connectedUserConnectionFacade, ConnectionFacade connectionFacade,
         ConversionService conversionService) {
 
         this.connectedUserConnectionFacade = connectedUserConnectionFacade;
-        this.connectionAdminFacade = connectionAdminFacade;
+        this.connectionFacade = connectionFacade;
         this.conversionService = conversionService;
     }
 
@@ -57,7 +57,7 @@ public class ConnectionTagApiController implements ConnectionTagApi {
         List<Tag> tags = connectedUserAuthenticationOptional
             .map(connectedUserAuthentication -> connectedUserConnectionFacade.getConnectedUserConnectionTags(
                 connectedUserAuthentication.connectedUserId()))
-            .orElseGet(connectionAdminFacade::getConnectionTags);
+            .orElseGet(connectionFacade::getConnectionTags);
 
         return ResponseEntity.ok(
             tags
@@ -82,7 +82,7 @@ public class ConnectionTagApiController implements ConnectionTagApi {
             connectedUserConnectionFacade.updateConnectedUserConnectionTags(
                 connectedUserAuthentication.connectedUserId(), id, tags);
         } else {
-            connectionAdminFacade.updateConnectionTags(id, tags);
+            connectionFacade.updateConnectionTags(id, tags);
         }
 
         return ResponseEntity.noContent()
