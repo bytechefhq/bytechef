@@ -107,6 +107,11 @@ class McpAutomationProjectConfigurationGraphQlController {
     }
 
     @QueryMapping
+    List<String> mcpAutomationProjectConfigurationToolWorkflowUuids(@Argument long automationProjectConfigurationId) {
+        return mcpAutomationProjectConfigurationFacade.getToolWorkflowUuids(automationProjectConfigurationId);
+    }
+
+    @QueryMapping
     List<Property> mcpAutomationProjectConfigurationWorkflowProperties(
         @Argument long mcpAutomationProjectConfigurationWorkflowId) {
 

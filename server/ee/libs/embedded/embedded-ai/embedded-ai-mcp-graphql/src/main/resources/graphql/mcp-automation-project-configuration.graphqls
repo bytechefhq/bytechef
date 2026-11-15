@@ -1,4 +1,5 @@
 extend type Query {
+    mcpAutomationProjectConfigurationToolWorkflowUuids(automationProjectConfigurationId: ID!): [String!]!
     mcpAutomationProjectConfigurationsByServerId(mcpServerId: ID!): [McpAutomationProjectConfiguration!]!
     mcpAutomationProjectConfigurationWorkflowProperties(mcpAutomationProjectConfigurationWorkflowId: ID!): [Property]
 }
@@ -18,6 +19,7 @@ type McpAutomationProjectConfiguration {
     automationProjectConfigurationName: String!
     automationProjectConfigurationEnabled: Boolean!
     projectId: ID!
+    projectName: String!
     projectVersion: Int!
     workflows: [McpAutomationProjectConfigurationWorkflow!]!
 }

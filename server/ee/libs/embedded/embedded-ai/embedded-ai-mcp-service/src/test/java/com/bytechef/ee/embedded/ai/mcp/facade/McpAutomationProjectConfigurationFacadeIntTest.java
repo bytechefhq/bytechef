@@ -22,6 +22,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.ProjectServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectWorkflowServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.audit.McpAutomationProjectConfigurationAuditEvents;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpAuditIntTestConfiguration;
@@ -542,6 +543,26 @@ class McpAutomationProjectConfigurationFacadeIntTest {
         }
 
         @Test
+        void testGetToolWorkflowUuidsSkipsWorkflowsWithoutWorkflowCallTrigger() {
+            automationProjectConfigurationService.updateWorkflowEnabled(
+                automationProjectConfigurationId, UUID.fromString(SECOND_WORKFLOW_UUID), false);
+
+            assertThat(mcpAutomationProjectConfigurationFacade.getToolWorkflowUuids(automationProjectConfigurationId))
+                .containsExactlyInAnyOrder(FIRST_WORKFLOW_UUID, SECOND_WORKFLOW_UUID);
+        }
+
+        @Test
+        void testListReturnsProjectName() {
+            mcpAutomationProjectConfigurationFacade.createMcpAutomationProjectConfiguration(
+                mcpServerId, automationProjectConfigurationId, List.of(FIRST_WORKFLOW_UUID), List.of());
+
+            assertThat(
+                mcpAutomationProjectConfigurationFacade.getMcpServerMcpAutomationProjectConfigurations(mcpServerId))
+                    .extracting(McpAutomationProjectConfigurationDTO::projectName)
+                    .containsExactly("template");
+        }
+
+        @Test
         void testListMarksWorkflowWithoutTriggerAtPinnedVersionUnavailable() {
             McpAutomationProjectConfiguration mcpAutomationProjectConfiguration =
                 mcpAutomationProjectConfigurationFacade.createMcpAutomationProjectConfiguration(
@@ -744,7 +765,7 @@ class McpAutomationProjectConfigurationFacadeIntTest {
             IntegrationInstanceServiceImpl.class, McpAutomationProjectConfigurationFacadeImpl.class,
             McpAutomationRowFacadeImpl.class, McpComponentServiceImpl.class,
             McpIntegrationInstanceConfigurationServiceImpl.class, McpServerMembership.class,
-            McpServerServiceImpl.class, ProjectWorkflowServiceImpl.class
+            McpServerServiceImpl.class, ProjectServiceImpl.class, ProjectWorkflowServiceImpl.class
         })
         static class LinkConfiguration {
 
