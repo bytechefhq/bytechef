@@ -14,7 +14,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Ivica Cardic
  */
-public interface WebhookTriggerTestAdminFacade {
+public interface WebhookTriggerTestFacade {
 
     String startWebhookTriggerTest(String workflowId, @Nullable String triggerName, long environmentId);
 

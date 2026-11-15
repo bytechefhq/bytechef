@@ -10,7 +10,7 @@ package com.bytechef.ee.embedded.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.domain.ConnectionOrigin;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
-import com.bytechef.ee.embedded.configuration.facade.ConnectionAdminFacade;
+import com.bytechef.ee.embedded.configuration.facade.ConnectionFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectionModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionCredentialsRequestModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionRequestModel;
@@ -42,23 +42,23 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConnectionApiController implements ConnectionApi {
 
     private final ConnectedUserConnectionFacade connectedUserConnectionFacade;
-    private final ConnectionAdminFacade connectionAdminFacade;
+    private final ConnectionFacade connectionFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
     public ConnectionApiController(
-        ConnectedUserConnectionFacade connectedUserConnectionFacade, ConnectionAdminFacade connectionAdminFacade,
+        ConnectedUserConnectionFacade connectedUserConnectionFacade, ConnectionFacade connectionFacade,
         ConversionService conversionService) {
 
         this.connectedUserConnectionFacade = connectedUserConnectionFacade;
-        this.connectionAdminFacade = connectionAdminFacade;
+        this.connectionFacade = connectionFacade;
         this.conversionService = conversionService;
     }
 
     @Override
     public ResponseEntity<Long> createConnection(ConnectionModel connectionModel) {
         return ResponseEntity.ok(
-            connectionAdminFacade.createConnection(
+            connectionFacade.createConnection(
                 conversionService.convert(connectionModel, ConnectionDTO.class),
                 Boolean.TRUE.equals(connectionModel.getShared())));
     }
@@ -86,7 +86,7 @@ public class ConnectionApiController implements ConnectionApi {
 
     @Override
     public ResponseEntity<Void> deleteConnection(Long id) {
-        connectionAdminFacade.deleteConnection(id);
+        connectionFacade.deleteConnection(id);
 
         return ResponseEntity.noContent()
             .build();
@@ -110,18 +110,18 @@ public class ConnectionApiController implements ConnectionApi {
     public ResponseEntity<ConnectionModel> getConnection(Long id) {
         return ResponseEntity.ok(
             toConnectionModel(
-                connectionAdminFacade.getConnection(Validate.notNull(id, "id")),
-                connectionAdminFacade.getSharedConnectionIds()));
+                connectionFacade.getConnection(Validate.notNull(id, "id")),
+                connectionFacade.getSharedConnectionIds()));
     }
 
     @Override
     public ResponseEntity<List<ConnectionModel>> getConnections(
         String componentName, Integer connectionVersion, Long environmentId, Long tagId) {
 
-        Set<Long> sharedConnectionIds = connectionAdminFacade.getSharedConnectionIds();
+        Set<Long> sharedConnectionIds = connectionFacade.getSharedConnectionIds();
 
         return ResponseEntity.ok(
-            connectionAdminFacade.getConnections(componentName, connectionVersion, environmentId, tagId)
+            connectionFacade.getConnections(componentName, connectionVersion, environmentId, tagId)
                 .stream()
                 .map(connectionDTO -> toConnectionModel(connectionDTO, sharedConnectionIds))
                 .toList());
@@ -134,7 +134,7 @@ public class ConnectionApiController implements ConnectionApi {
             .map(tagModel -> conversionService.convert(tagModel, Tag.class))
             .toList();
 
-        connectionAdminFacade.updateConnection(
+        connectionFacade.updateConnection(
             id, updateConnectionRequestModel.getName(), list, updateConnectionRequestModel.getShared(),
             Objects.requireNonNull(updateConnectionRequestModel.getVersion()));
 
@@ -159,7 +159,7 @@ public class ConnectionApiController implements ConnectionApi {
     public ResponseEntity<Void> updateConnectionCredentials(
         Long id, UpdateConnectionCredentialsRequestModel updateConnectionCredentialsRequestModel) {
 
-        connectionAdminFacade.updateConnectionCredentials(
+        connectionFacade.updateConnectionCredentials(
             id, updateConnectionCredentialsRequestModel.getParameters(),
             Objects.requireNonNull(updateConnectionCredentialsRequestModel.getVersion()));
 

@@ -21,7 +21,7 @@ import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
-import com.bytechef.ee.embedded.configuration.facade.WebhookTriggerTestAdminFacade;
+import com.bytechef.ee.embedded.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.ee.embedded.configuration.service.AppEventService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
@@ -105,7 +105,7 @@ class WebhookTriggerTestApiControllerIntTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private WebhookTriggerTestAdminFacade webhookTriggerTestAdminFacade;
+    private WebhookTriggerTestFacade webhookTriggerTestFacade;
 
     private WebTestClient webTestClient;
 
@@ -123,19 +123,19 @@ class WebhookTriggerTestApiControllerIntTest {
 
     @Test
     void testStartWebhookTriggerTestHonoursSessionPrincipalRequestedEnvironment() {
-        when(webhookTriggerTestAdminFacade.startWebhookTriggerTest(eq(WORKFLOW_ID), eq(TRIGGER_NAME), anyLong()))
+        when(webhookTriggerTestFacade.startWebhookTriggerTest(eq(WORKFLOW_ID), eq(TRIGGER_NAME), anyLong()))
             .thenReturn(WEBHOOK_URL);
 
         startWebhookTriggerTest(sessionAuthentication());
 
-        verify(webhookTriggerTestAdminFacade).startWebhookTriggerTest(WORKFLOW_ID, TRIGGER_NAME, DEVELOPMENT_ORDINAL);
+        verify(webhookTriggerTestFacade).startWebhookTriggerTest(WORKFLOW_ID, TRIGGER_NAME, DEVELOPMENT_ORDINAL);
     }
 
     @Test
     void testStopWebhookTriggerTestHonoursSessionPrincipalRequestedEnvironment() {
         stopWebhookTriggerTest(sessionAuthentication());
 
-        verify(webhookTriggerTestAdminFacade).stopWebhookTriggerTest(WORKFLOW_ID, TRIGGER_NAME, DEVELOPMENT_ORDINAL);
+        verify(webhookTriggerTestFacade).stopWebhookTriggerTest(WORKFLOW_ID, TRIGGER_NAME, DEVELOPMENT_ORDINAL);
     }
 
     private void startWebhookTriggerTest(Authentication principalAuthentication) {

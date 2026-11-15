@@ -8,7 +8,6 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
@@ -20,15 +19,16 @@ import org.springframework.stereotype.Service;
  *
  * @author Ivica Cardic
  */
-@Service
+@Service("com.bytechef.ee.embedded.configuration.facade.WebhookTriggerTestFacade")
 @ConditionalOnEEVersion
 @PreAuthorize("isTenantAdmin()")
-public class WebhookTriggerTestAdminFacadeImpl implements WebhookTriggerTestAdminFacade {
+public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
 
-    private final WebhookTriggerTestFacade webhookTriggerTestFacade;
+    private final com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade webhookTriggerTestFacade;
 
     @SuppressFBWarnings("EI")
-    public WebhookTriggerTestAdminFacadeImpl(WebhookTriggerTestFacade webhookTriggerTestFacade) {
+    public WebhookTriggerTestFacadeImpl(
+        com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade webhookTriggerTestFacade) {
         this.webhookTriggerTestFacade = webhookTriggerTestFacade;
     }
 

@@ -204,7 +204,7 @@ class IntegrationInstanceApiControllerIntTest {
     }
 
     @Test
-    void testProvisionIntegrationInstancePassesBodyToTheAdminFacade() {
+    void testProvisionIntegrationInstancePassesBodyToTheFacade() {
         when(integrationInstanceFacade.provisionIntegrationInstance(eq(5L), eq(9L), eq(Map.of("token", "t")),
             any()))
                 .thenReturn(123L);
