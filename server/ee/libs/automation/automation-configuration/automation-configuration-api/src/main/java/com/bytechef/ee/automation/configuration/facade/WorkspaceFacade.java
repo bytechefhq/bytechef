@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author Ivica Cardic
  */
-public interface AdminWorkspaceFacade {
+public interface WorkspaceFacade {
 
     Workspace createWorkspace(Workspace workspace);
 

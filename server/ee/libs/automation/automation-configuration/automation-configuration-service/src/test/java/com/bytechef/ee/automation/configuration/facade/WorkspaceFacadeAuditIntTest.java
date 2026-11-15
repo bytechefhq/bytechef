@@ -51,19 +51,19 @@ import org.springframework.security.core.context.SecurityContextImpl;
  */
 @SpringBootTest(
     classes = {
-        WorkspacePermissionIntTestConfiguration.class, AdminWorkspaceFacadeAuditIntTest.AuditConfiguration.class
+        WorkspacePermissionIntTestConfiguration.class, WorkspaceFacadeAuditIntTest.AuditConfiguration.class
     },
     properties = {
         "bytechef.edition=ee", "bytechef.audit.enabled=true"
     })
-class AdminWorkspaceFacadeAuditIntTest {
+class WorkspaceFacadeAuditIntTest {
 
     private static final String ADMIN_LOGIN = "admin";
 
     private final List<Long> workspaceIds = new ArrayList<>();
 
     @Autowired
-    private AdminWorkspaceFacade adminWorkspaceFacade;
+    private WorkspaceFacade workspaceFacade;
 
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
@@ -96,7 +96,7 @@ class AdminWorkspaceFacadeAuditIntTest {
     void testCreateWorkspaceRecordsTheWorkspace() {
         String name = "workspace-" + UUID.randomUUID();
 
-        Workspace workspace = adminWorkspaceFacade.createWorkspace(new Workspace(name));
+        Workspace workspace = workspaceFacade.createWorkspace(new Workspace(name));
 
         workspaceIds.add(workspace.getId());
 
@@ -110,7 +110,7 @@ class AdminWorkspaceFacadeAuditIntTest {
     void testCreateOfAWorkspaceWithAnIdRecordsAFailure() {
         Workspace workspace = new Workspace(Long.MAX_VALUE, "workspace-with-id");
 
-        assertThatThrownBy(() -> adminWorkspaceFacade.createWorkspace(workspace))
+        assertThatThrownBy(() -> workspaceFacade.createWorkspace(workspace))
             .isInstanceOf(IllegalArgumentException.class);
 
         assertThat(findSingleEvent(WorkspaceAuditEvents.WORKSPACE_CREATED).getData())
@@ -128,9 +128,9 @@ class AdminWorkspaceFacadeAuditIntTest {
 
         renamedWorkspace.setVersion(workspace.getVersion());
 
-        adminWorkspaceFacade.updateWorkspace(renamedWorkspace);
+        workspaceFacade.updateWorkspace(renamedWorkspace);
 
-        assertThat(adminWorkspaceFacade.getWorkspace(workspace.getId())
+        assertThat(workspaceFacade.getWorkspace(workspace.getId())
             .getName()).isEqualTo("renamed");
 
         assertThat(findSingleEvent(WorkspaceAuditEvents.WORKSPACE_UPDATED).getData())
@@ -143,7 +143,7 @@ class AdminWorkspaceFacadeAuditIntTest {
     void testUpdateOfAnUnknownWorkspaceRecordsAFailure() {
         Workspace workspace = new Workspace(Long.MAX_VALUE, "unknown");
 
-        assertThatThrownBy(() -> adminWorkspaceFacade.updateWorkspace(workspace))
+        assertThatThrownBy(() -> workspaceFacade.updateWorkspace(workspace))
             .isInstanceOf(NoSuchElementException.class);
 
         assertThat(findSingleEvent(WorkspaceAuditEvents.WORKSPACE_UPDATED).getData())
@@ -157,7 +157,7 @@ class AdminWorkspaceFacadeAuditIntTest {
     void testDeleteWorkspaceRecordsTheWorkspaceId() {
         Workspace workspace = saveWorkspace();
 
-        adminWorkspaceFacade.deleteWorkspace(workspace.getId());
+        workspaceFacade.deleteWorkspace(workspace.getId());
 
         assertThat(workspaceRepository.findById(workspace.getId())).isEmpty();
 
@@ -168,7 +168,7 @@ class AdminWorkspaceFacadeAuditIntTest {
 
     @Test
     void testDeleteOfAnUnknownWorkspaceRecordsAFailure() {
-        assertThatThrownBy(() -> adminWorkspaceFacade.deleteWorkspace(Long.MAX_VALUE))
+        assertThatThrownBy(() -> workspaceFacade.deleteWorkspace(Long.MAX_VALUE))
             .isInstanceOf(NoSuchElementException.class);
 
         assertThat(findSingleEvent(WorkspaceAuditEvents.WORKSPACE_DELETED).getData())
@@ -206,7 +206,7 @@ class AdminWorkspaceFacadeAuditIntTest {
 
     @Configuration
     @Import({
-        AdminWorkspaceFacadeImpl.class, AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class,
+        WorkspaceFacadeImpl.class, AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class,
         AuditMapperResolver.class, WorkspaceServiceImpl.class
     })
     static class AuditConfiguration {
