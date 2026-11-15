@@ -1,7 +1,6 @@
 import Badge from '@/components/Badge/Badge';
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ComponentIcon} from 'lucide-react';
@@ -23,15 +22,7 @@ const McpIntegrationInstanceConfigurationListItem = ({
 }: McpIntegrationInstanceConfigurationListItemProps) => {
     const [expanded, setExpanded] = useState(false);
 
-    const {
-        handleOnIntegrationInstanceConfigurationDialogClose,
-        integrationInstanceConfiguration,
-        mcpWorkflowUuids,
-        setShowEditWorkflowsDialog,
-        setShowUpdateIntegrationVersionDialog,
-        showEditWorkflowsDialog,
-        showUpdateIntegrationVersionDialog,
-    } = useMcpIntegrationInstanceConfigurationListItem(mcpIntegrationInstanceConfiguration);
+    const {setShowEditWorkflowsDialog, showEditWorkflowsDialog} = useMcpIntegrationInstanceConfigurationListItem();
 
     const {data: componentDefinition} = useGetComponentDefinitionQuery(
         {
@@ -97,7 +88,6 @@ const McpIntegrationInstanceConfigurationListItem = ({
                     <McpIntegrationInstanceConfigurationListItemDropdownMenu
                         mcpIntegrationInstanceConfiguration={mcpIntegrationInstanceConfiguration}
                         onEditWorkflowsClick={() => setShowEditWorkflowsDialog(true)}
-                        onUpdateIntegrationVersionClick={() => setShowUpdateIntegrationVersionDialog(true)}
                     />
                 </div>
 
@@ -121,15 +111,6 @@ const McpIntegrationInstanceConfigurationListItem = ({
                 <McpIntegrationInstanceConfigurationWorkflowDialog
                     mcpIntegrationInstanceConfiguration={mcpIntegrationInstanceConfiguration}
                     onClose={() => setShowEditWorkflowsDialog(false)}
-                />
-            )}
-
-            {showUpdateIntegrationVersionDialog && (
-                <IntegrationInstanceConfigurationDialog
-                    filterWorkflowUuids={mcpWorkflowUuids}
-                    integrationInstanceConfiguration={integrationInstanceConfiguration}
-                    onClose={handleOnIntegrationInstanceConfigurationDialogClose}
-                    updateIntegrationVersion={true}
                 />
             )}
         </>

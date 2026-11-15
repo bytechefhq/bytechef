@@ -7,7 +7,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
-import {EditIcon, EllipsisVerticalIcon, RefreshCwIcon, Trash2Icon} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 
 import {McpIntegrationInstanceConfigurationItemType} from './hooks/useMcpIntegrationInstanceConfigurationList';
 import useMcpIntegrationInstanceConfigurationListItemDropdownMenu from './hooks/useMcpIntegrationInstanceConfigurationListItemDropdownMenu';
@@ -15,13 +15,11 @@ import useMcpIntegrationInstanceConfigurationListItemDropdownMenu from './hooks/
 interface McpIntegrationInstanceConfigurationListItemDropdownMenuProps {
     mcpIntegrationInstanceConfiguration: McpIntegrationInstanceConfigurationItemType;
     onEditWorkflowsClick: () => void;
-    onUpdateIntegrationVersionClick: () => void;
 }
 
 const McpIntegrationInstanceConfigurationListItemDropdownMenu = ({
     mcpIntegrationInstanceConfiguration,
     onEditWorkflowsClick,
-    onUpdateIntegrationVersionClick,
 }: McpIntegrationInstanceConfigurationListItemDropdownMenuProps) => {
     const {handleConfirmDelete, isDeletePending, setShowDeleteDialog, showDeleteDialog} =
         useMcpIntegrationInstanceConfigurationListItemDropdownMenu(mcpIntegrationInstanceConfiguration.id.toString());
@@ -35,12 +33,6 @@ const McpIntegrationInstanceConfigurationListItemDropdownMenu = ({
 
                 <DropdownMenuContent align="end">
                     <DropdownMenuItem icon={<EditIcon />} label="Edit Workflows" onClick={onEditWorkflowsClick} />
-
-                    <DropdownMenuItem
-                        icon={<RefreshCwIcon />}
-                        label="Change Integration Version"
-                        onClick={onUpdateIntegrationVersionClick}
-                    />
 
                     <DropdownMenuSeparator />
 
