@@ -67,14 +67,14 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.security.domain.ResourceVisibility;
-import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
-import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
 import com.bytechef.platform.external.invocation.ExternalInvocationRecorderImpl;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
+import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
+import com.bytechef.platform.security.domain.ResourceVisibility;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.sun.net.httpserver.HttpServer;
@@ -323,7 +323,8 @@ class AppExecutionFacadeIntTest {
 
         assertThat(result).isEqualTo(Map.of("id", "001"));
 
-        ArgumentCaptor<ExternalInvocationEvent.Builder> captor = ArgumentCaptor.forClass(ExternalInvocationEvent.Builder.class);
+        ArgumentCaptor<ExternalInvocationEvent.Builder> captor =
+            ArgumentCaptor.forClass(ExternalInvocationEvent.Builder.class);
 
         verify(toolExecutionRecorder).record(captor.capture(), any());
 
@@ -625,7 +626,8 @@ class AppExecutionFacadeIntTest {
 
         assertThat(result).isEqualTo(List.of("hit"));
 
-        ArgumentCaptor<ExternalInvocationEvent.Builder> captor = ArgumentCaptor.forClass(ExternalInvocationEvent.Builder.class);
+        ArgumentCaptor<ExternalInvocationEvent.Builder> captor =
+            ArgumentCaptor.forClass(ExternalInvocationEvent.Builder.class);
 
         verify(toolExecutionRecorder).record(captor.capture(), any());
 
@@ -926,7 +928,8 @@ class AppExecutionFacadeIntTest {
 
         assertThat(appExecutionFacade.proxy("crm", request)).isSameAs(response);
 
-        ArgumentCaptor<ExternalInvocationEvent.Builder> captor = ArgumentCaptor.forClass(ExternalInvocationEvent.Builder.class);
+        ArgumentCaptor<ExternalInvocationEvent.Builder> captor =
+            ArgumentCaptor.forClass(ExternalInvocationEvent.Builder.class);
 
         verify(toolExecutionRecorder).recordWithErrorMessage(captor.capture(), any(), any());
 
@@ -956,7 +959,8 @@ class AppExecutionFacadeIntTest {
 
         when(toolExecutionRecorder.recordWithErrorMessage(any(ExternalInvocationEvent.Builder.class), any(), any()))
             .thenAnswer(
-                invocation -> realRecorder.recordWithErrorMessage(invocation.<ExternalInvocationEvent.Builder>getArgument(0),
+                invocation -> realRecorder.recordWithErrorMessage(
+                    invocation.<ExternalInvocationEvent.Builder>getArgument(0),
                     invocation.<Supplier<Object>>getArgument(1), invocation.<Function<Object, String>>getArgument(2)));
 
         assertThatThrownBy(
@@ -992,7 +996,8 @@ class AppExecutionFacadeIntTest {
         when(toolExecutionRecorder.recordWithErrorMessage(any(ExternalInvocationEvent.Builder.class), any(), any()))
             .thenAnswer(
                 invocation -> realRecorder.recordWithErrorMessage(
-                    invocation.<ExternalInvocationEvent.Builder>getArgument(0), invocation.<Supplier<Object>>getArgument(1),
+                    invocation.<ExternalInvocationEvent.Builder>getArgument(0),
+                    invocation.<Supplier<Object>>getArgument(1),
                     invocation.<Function<Object, String>>getArgument(2)));
 
         for (int status : List.of(302, 404, 503)) {
@@ -1029,7 +1034,8 @@ class AppExecutionFacadeIntTest {
 
         appExecutionFacade.proxy("crm", request);
 
-        ArgumentCaptor<ExternalInvocationEvent.Builder> captor = ArgumentCaptor.forClass(ExternalInvocationEvent.Builder.class);
+        ArgumentCaptor<ExternalInvocationEvent.Builder> captor =
+            ArgumentCaptor.forClass(ExternalInvocationEvent.Builder.class);
 
         verify(toolExecutionRecorder).recordWithErrorMessage(captor.capture(), any(), any());
 
@@ -1051,7 +1057,8 @@ class AppExecutionFacadeIntTest {
         assertConfigurationError(
             () -> appExecutionFacade.proxy("crm", request), AppErrorType.APP_PROXY_REQUEST_INVALID);
 
-        ArgumentCaptor<ExternalInvocationEvent.Builder> captor = ArgumentCaptor.forClass(ExternalInvocationEvent.Builder.class);
+        ArgumentCaptor<ExternalInvocationEvent.Builder> captor =
+            ArgumentCaptor.forClass(ExternalInvocationEvent.Builder.class);
 
         verify(toolExecutionRecorder).recordWithErrorMessage(captor.capture(), any(), any());
 

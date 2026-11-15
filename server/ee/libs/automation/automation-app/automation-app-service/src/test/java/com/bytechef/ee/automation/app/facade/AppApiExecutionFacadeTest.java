@@ -198,7 +198,8 @@ class AppApiExecutionFacadeTest {
     @Test
     @SuppressWarnings("unchecked")
     void testRecordApiCallRecordsWorkflowChosenErrorStatusAsError() {
-        when(toolExecutionRecorder.recordWithErrorMessage(any(ExternalInvocationEvent.Builder.class), any(Supplier.class),
+        when(toolExecutionRecorder.recordWithErrorMessage(any(ExternalInvocationEvent.Builder.class),
+            any(Supplier.class),
             any(Function.class)))
                 .thenAnswer(invocation -> ((Supplier<Object>) invocation.getArgument(1)).get());
 
@@ -223,7 +224,8 @@ class AppApiExecutionFacadeTest {
     @Test
     @SuppressWarnings("unchecked")
     void testRecordApiCallRecordsTheCallingApp() {
-        when(toolExecutionRecorder.recordWithErrorMessage(any(ExternalInvocationEvent.Builder.class), any(Supplier.class),
+        when(toolExecutionRecorder.recordWithErrorMessage(any(ExternalInvocationEvent.Builder.class),
+            any(Supplier.class),
             any(Function.class)))
                 .thenAnswer(invocation -> ((Supplier<Object>) invocation.getArgument(1)).get());
 
