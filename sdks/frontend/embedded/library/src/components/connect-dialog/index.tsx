@@ -66,6 +66,7 @@ interface UseConnectDialogBaseProps {
     mapObjectFields?: MapObjectFieldsType;
     mode?: 'dark' | 'light';
     onClose?: () => void;
+    toolsOnly?: boolean;
 }
 
 interface FullModePropsI {
@@ -109,6 +110,7 @@ export default function useConnectDialog({
     onConnected,
     onReauthorized,
     reauthorizeConnectionId,
+    toolsOnly = false,
 }: UseConnectDialogProps): ConnectionDialogHookReturnType {
     const [integration, setIntegration] = useState<IntegrationType | undefined>(undefined);
     const [isOpen, setIsOpen] = useState(false);
@@ -1090,6 +1092,7 @@ export default function useConnectDialog({
                         ? `Reconnect ${integration?.name ?? ''}`.trim()
                         : undefined
                 }
+                toolsOnly={toolsOnly}
                 workflowsView={workflowsView}
             />
         );
@@ -1120,6 +1123,7 @@ export default function useConnectDialog({
         reauthorizeTargetConnectionId,
         registerFormSubmit,
         saveError,
+        toolsOnly,
         workflowsView,
         currentIntegrationInstanceId,
     ]);
