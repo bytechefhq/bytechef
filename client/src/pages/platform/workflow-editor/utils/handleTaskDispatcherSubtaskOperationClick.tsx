@@ -14,13 +14,13 @@ import InlineSVG from 'react-inlinesvg';
 import {WorkflowDataType} from '../stores/useWorkflowDataStore';
 import getFormattedName from './getFormattedName';
 import getParametersWithDefaultValues from './getParametersWithDefaultValues';
+import getTaskDispatcherComponentName from './getTaskDispatcherComponentName';
 import handleComponentAddedSuccess, {
     handleComponentAddedError,
     openNodeDetailsPanelForNewNode,
 } from './handleComponentAddedSuccess';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
-import {getWorkflowNodeComponentName} from './workflowNodeNameUtils';
 
 interface HandleTaskDispatcherSubtaskOperationClickProps {
     clusterRoot?: boolean;
@@ -51,7 +51,10 @@ export default function handleTaskDispatcherSubtaskOperationClick({
 
     const taskDispatcherId = taskDispatcherContext!.taskDispatcherId;
 
-    const componentName = getWorkflowNodeComponentName(taskDispatcherId) as keyof typeof TASK_DISPATCHER_CONFIG;
+    const componentName = getTaskDispatcherComponentName(
+        taskDispatcherId,
+        workflow.tasks
+    ) as keyof typeof TASK_DISPATCHER_CONFIG;
 
     const taskDispatcherConfig = TASK_DISPATCHER_CONFIG[componentName];
 

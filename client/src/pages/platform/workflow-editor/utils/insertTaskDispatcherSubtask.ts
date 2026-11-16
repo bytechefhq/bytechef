@@ -5,9 +5,9 @@ import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
+import getTaskDispatcherComponentName from './getTaskDispatcherComponentName';
 import {applyGraphMemberInsertion} from './graph/graphMemberInsertion';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
-import {getWorkflowNodeComponentName} from './workflowNodeNameUtils';
 
 interface InsertTaskDispatcherSubtaskProps {
     newTask: WorkflowTask;
@@ -27,7 +27,10 @@ export default function insertTaskDispatcherSubtask({
 }: InsertTaskDispatcherSubtaskProps): Array<WorkflowTask> {
     const taskDispatcherId = taskDispatcherContext.taskDispatcherId;
 
-    const componentName = getWorkflowNodeComponentName(taskDispatcherId ?? '') as keyof typeof TASK_DISPATCHER_CONFIG;
+    const componentName = getTaskDispatcherComponentName(
+        taskDispatcherId ?? '',
+        tasks
+    ) as keyof typeof TASK_DISPATCHER_CONFIG;
 
     const config = TASK_DISPATCHER_CONFIG[componentName];
 
