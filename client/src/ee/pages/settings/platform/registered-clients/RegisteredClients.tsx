@@ -153,7 +153,7 @@ const RegisteredClients = () => {
                 header={
                     <Header
                         centerTitle
-                        description="OAuth2 clients registered with the embedded authorization server, typically created through Dynamic Client Registration."
+                        description="OAuth2 clients registered with the built-in authorization server, typically created through Dynamic Client Registration."
                         position="main"
                         title="OAuth2 Clients"
                     />
