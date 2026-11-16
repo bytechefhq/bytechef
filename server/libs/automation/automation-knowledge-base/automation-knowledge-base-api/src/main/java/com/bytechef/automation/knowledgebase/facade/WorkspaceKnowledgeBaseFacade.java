@@ -17,6 +17,7 @@
 package com.bytechef.automation.knowledgebase.facade;
 
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseStorageUsage;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
@@ -41,6 +42,42 @@ public interface WorkspaceKnowledgeBaseFacade {
      * @return a list of {@code KnowledgeBase} objects associated with the workspace and environment
      */
     List<KnowledgeBase> getWorkspaceKnowledgeBases(Long workspaceId, long environmentId);
+
+    /**
+     * Retrieves a knowledge base.
+     *
+     * @param knowledgeBaseId the id of the knowledge base
+     * @return the knowledge base
+     */
+    KnowledgeBase getKnowledgeBase(long knowledgeBaseId);
+
+    /**
+     * Updates a knowledge base.
+     *
+     * @param knowledgeBaseId the id of the knowledge base
+     * @param knowledgeBase   the new values
+     * @return the updated knowledge base
+     */
+    KnowledgeBase updateKnowledgeBase(long knowledgeBaseId, KnowledgeBase knowledgeBase);
+
+    /**
+     * Searches the chunks of a knowledge base.
+     *
+     * @param knowledgeBaseId the id of the knowledge base
+     * @param query           the search query
+     * @param metadataFilters optional metadata filter expression
+     * @return the matching chunks
+     */
+    List<KnowledgeBaseDocumentChunk> searchKnowledgeBase(
+        long knowledgeBaseId, String query, @Nullable String metadataFilters);
+
+    /**
+     * Replaces the tags of a knowledge base.
+     *
+     * @param knowledgeBaseId the id of the knowledge base
+     * @param tags            the new tags
+     */
+    void updateKnowledgeBaseTags(long knowledgeBaseId, List<Tag> tags);
 
     /**
      * Retrieves the distinct tags assigned to the knowledge bases of the specified workspace.

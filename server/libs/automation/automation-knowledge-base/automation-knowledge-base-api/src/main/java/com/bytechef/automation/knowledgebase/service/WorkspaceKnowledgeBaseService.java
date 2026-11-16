@@ -18,6 +18,7 @@ package com.bytechef.automation.knowledgebase.service;
 
 import com.bytechef.automation.knowledgebase.domain.WorkspaceKnowledgeBase;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service interface for managing workspace knowledge base relationships.
@@ -33,6 +34,14 @@ public interface WorkspaceKnowledgeBaseService {
      * @return a list of workspace knowledge base relationships in the specified workspace
      */
     List<WorkspaceKnowledgeBase> getWorkspaceKnowledgeBases(Long workspaceId);
+
+    /**
+     * Gets the id of the workspace a knowledge base belongs to.
+     *
+     * @param knowledgeBaseId the knowledge base ID
+     * @return the workspace ID, or empty when the knowledge base is not assigned to a workspace
+     */
+    Optional<Long> fetchWorkspaceId(long knowledgeBaseId);
 
     /**
      * Assigns a knowledge base to a workspace.

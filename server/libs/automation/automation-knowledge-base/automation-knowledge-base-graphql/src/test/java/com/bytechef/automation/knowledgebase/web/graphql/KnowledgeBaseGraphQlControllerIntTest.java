@@ -30,9 +30,7 @@ import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseStorageUsage;
-import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,12 +73,6 @@ class KnowledgeBaseGraphQlControllerIntTest {
     private KnowledgeBaseDocumentService knowledgeBaseDocumentService;
 
     @Autowired
-    private KnowledgeBaseFacade knowledgeBaseFacade;
-
-    @Autowired
-    private KnowledgeBaseService knowledgeBaseService;
-
-    @Autowired
     private WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade;
 
     @Test
@@ -116,7 +108,7 @@ class KnowledgeBaseGraphQlControllerIntTest {
         Long knowledgeBaseId = 1L;
         KnowledgeBase mockKnowledgeBase = createMockKnowledgeBase(knowledgeBaseId, "Test KnowledgeBase");
 
-        when(knowledgeBaseService.getKnowledgeBase(knowledgeBaseId)).thenReturn(mockKnowledgeBase);
+        when(workspaceKnowledgeBaseFacade.getKnowledgeBase(knowledgeBaseId)).thenReturn(mockKnowledgeBase);
 
         this.graphQlTester
             .document("""
@@ -136,7 +128,7 @@ class KnowledgeBaseGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("Test KnowledgeBase");
 
-        verify(knowledgeBaseService).getKnowledgeBase(knowledgeBaseId);
+        verify(workspaceKnowledgeBaseFacade).getKnowledgeBase(knowledgeBaseId);
     }
 
     @Test
@@ -148,7 +140,8 @@ class KnowledgeBaseGraphQlControllerIntTest {
             createMockChunk(1L, "chunk content 1"),
             createMockChunk(2L, "chunk content 2"));
 
-        when(knowledgeBaseFacade.searchKnowledgeBase(eq(knowledgeBaseId), eq(query), any())).thenReturn(mockChunks);
+        when(workspaceKnowledgeBaseFacade.searchKnowledgeBase(eq(knowledgeBaseId), eq(query), any()))
+            .thenReturn(mockChunks);
 
         this.graphQlTester
             .document("""
@@ -163,7 +156,7 @@ class KnowledgeBaseGraphQlControllerIntTest {
             .entityList(Object.class)
             .hasSize(2);
 
-        verify(knowledgeBaseFacade).searchKnowledgeBase(eq(knowledgeBaseId), eq(query), any());
+        verify(workspaceKnowledgeBaseFacade).searchKnowledgeBase(eq(knowledgeBaseId), eq(query), any());
     }
 
     @Test
@@ -206,7 +199,7 @@ class KnowledgeBaseGraphQlControllerIntTest {
         Long knowledgeBaseId = 1L;
         KnowledgeBase mockKnowledgeBase = createMockKnowledgeBase(knowledgeBaseId, "Updated KnowledgeBase");
 
-        when(knowledgeBaseService.updateKnowledgeBase(eq(knowledgeBaseId), any(KnowledgeBase.class)))
+        when(workspaceKnowledgeBaseFacade.updateKnowledgeBase(eq(knowledgeBaseId), any(KnowledgeBase.class)))
             .thenReturn(mockKnowledgeBase);
 
         this.graphQlTester
@@ -226,7 +219,7 @@ class KnowledgeBaseGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("Updated KnowledgeBase");
 
-        verify(knowledgeBaseService).updateKnowledgeBase(eq(knowledgeBaseId), any(KnowledgeBase.class));
+        verify(workspaceKnowledgeBaseFacade).updateKnowledgeBase(eq(knowledgeBaseId), any(KnowledgeBase.class));
     }
 
     @Test
@@ -319,7 +312,7 @@ class KnowledgeBaseGraphQlControllerIntTest {
             createMockDocument(1L, "Document 1"),
             createMockDocument(2L, "Document 2"));
 
-        when(knowledgeBaseService.getKnowledgeBase(knowledgeBaseId)).thenReturn(mockKnowledgeBase);
+        when(workspaceKnowledgeBaseFacade.getKnowledgeBase(knowledgeBaseId)).thenReturn(mockKnowledgeBase);
         when(knowledgeBaseDocumentService.getKnowledgeBaseDocuments(knowledgeBaseId)).thenReturn(mockDocuments);
 
         this.graphQlTester

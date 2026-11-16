@@ -16,8 +16,8 @@
 
 package com.bytechef.automation.knowledgebase.web.graphql;
 
+import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
-import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,11 +31,13 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI")
 class KnowledgeBaseDocumentChunkGraphQlController {
 
-    private final KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade;
+    private final WorkspaceKnowledgeBaseDocumentFacade workspaceKnowledgeBaseDocumentFacade;
 
     @SuppressFBWarnings("EI")
-    KnowledgeBaseDocumentChunkGraphQlController(KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade) {
-        this.knowledgeBaseDocumentChunkFacade = knowledgeBaseDocumentChunkFacade;
+    KnowledgeBaseDocumentChunkGraphQlController(
+        WorkspaceKnowledgeBaseDocumentFacade workspaceKnowledgeBaseDocumentFacade) {
+
+        this.workspaceKnowledgeBaseDocumentFacade = workspaceKnowledgeBaseDocumentFacade;
     }
 
     @SchemaMapping(typeName = "KnowledgeBaseDocumentChunk", field = "content")
@@ -58,13 +60,13 @@ class KnowledgeBaseDocumentChunkGraphQlController {
         @Argument Long id,
         @Argument("knowledgeBaseDocumentChunk") KnowledgeBaseDocumentChunkInput knowledgeBaseDocumentChunk) {
 
-        return knowledgeBaseDocumentChunkFacade.updateKnowledgeBaseDocumentChunk(
+        return workspaceKnowledgeBaseDocumentFacade.updateKnowledgeBaseDocumentChunk(
             id, knowledgeBaseDocumentChunk.content());
     }
 
     @MutationMapping
     boolean deleteKnowledgeBaseDocumentChunk(@Argument Long id) {
-        knowledgeBaseDocumentChunkFacade.deleteKnowledgeBaseDocumentChunk(id);
+        workspaceKnowledgeBaseDocumentFacade.deleteKnowledgeBaseDocumentChunk(id);
 
         return true;
     }
