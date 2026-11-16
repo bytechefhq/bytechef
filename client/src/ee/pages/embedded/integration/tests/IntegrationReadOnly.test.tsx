@@ -52,20 +52,17 @@ vi.mock('@/ee/pages/embedded/integration/components/integration-header/hooks/use
     }),
 }));
 
-vi.mock(
-    '@/ee/pages/embedded/automation/components/automation-editor/hooks/useAutomationEditorHeader',
-    () => ({
-        useAutomationEditorHeader: () => ({
-            handlePublishProjectSubmit: vi.fn(),
-            handleRunClick: vi.fn(),
-            handleShowOutputClick: vi.fn(),
-            handleStopClick: vi.fn(),
-            handleWorkflowValueChange: vi.fn(),
-            project: {id: 'project-1', name: 'Mailing', workflowTemplates: []},
-            publishProjectMutationIsPending: false,
-        }),
-    })
-);
+vi.mock('@/ee/pages/embedded/automation/components/automation-editor/hooks/useAutomationEditorHeader', () => ({
+    useAutomationEditorHeader: () => ({
+        handlePublishProjectSubmit: vi.fn(),
+        handleRunClick: vi.fn(),
+        handleShowOutputClick: vi.fn(),
+        handleStopClick: vi.fn(),
+        handleWorkflowValueChange: vi.fn(),
+        project: {id: 'project-1', name: 'Mailing', workflowTemplates: []},
+        publishProjectMutationIsPending: false,
+    }),
+}));
 
 vi.mock('@/ee/pages/embedded/automation/hooks/useCreateAutomationProjectWorkflow', () => ({
     useCreateAutomationProjectWorkflow: () => ({
@@ -123,10 +120,9 @@ vi.mock('@/ee/pages/embedded/integration/components/integration-header/component
     default: ({itemSelect}: {itemSelect: ReactNode}) => <nav>{itemSelect}</nav>,
 }));
 
-vi.mock(
-    '@/ee/pages/embedded/automation/components/automation-editor/components/AutomationEditorBreadcrumb',
-    () => ({default: ({itemSelect}: {itemSelect: ReactNode}) => <nav>{itemSelect}</nav>})
-);
+vi.mock('@/ee/pages/embedded/automation/components/automation-editor/components/AutomationEditorBreadcrumb', () => ({
+    default: ({itemSelect}: {itemSelect: ReactNode}) => <nav>{itemSelect}</nav>,
+}));
 
 vi.mock(
     '@/ee/pages/embedded/automation/components/automation-editor/components/AutomationEditorWorkflowSelect',
@@ -146,28 +142,25 @@ vi.mock('@/ee/pages/embedded/integration/components/integration-header/component
     default: () => <button>Publish</button>,
 }));
 
-vi.mock(
-    '@/ee/pages/embedded/automation/components/automation-editor/components/PublishPopover',
-    () => ({default: () => <button>Publish</button>})
-);
+vi.mock('@/ee/pages/embedded/automation/components/automation-editor/components/PublishPopover', () => ({
+    default: () => <button>Publish</button>,
+}));
 
 vi.mock('@/ee/pages/embedded/integration/components/integration-header/components/OutputButton', () => ({
     default: () => <button>Output</button>,
 }));
 
-vi.mock(
-    '@/ee/pages/embedded/automation/components/automation-editor/components/OutputButton',
-    () => ({default: () => <button>Output</button>})
-);
+vi.mock('@/ee/pages/embedded/automation/components/automation-editor/components/OutputButton', () => ({
+    default: () => <button>Output</button>,
+}));
 
 vi.mock('@/ee/pages/embedded/integration/components/integration-header/components/settings-menu/SettingsMenu', () => ({
     default: () => <button>Settings</button>,
 }));
 
-vi.mock(
-    '@/ee/pages/embedded/automation/components/automation-editor/components/AutomationEditorSettingsMenu',
-    () => ({default: () => <button>Settings</button>})
-);
+vi.mock('@/ee/pages/embedded/automation/components/automation-editor/components/AutomationEditorSettingsMenu', () => ({
+    default: () => <button>Settings</button>,
+}));
 
 vi.mock('@/shared/components/copilot/hooks/useCopilotLayoutShifted', () => ({default: () => false}));
 

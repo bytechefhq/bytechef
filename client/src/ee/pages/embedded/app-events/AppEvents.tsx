@@ -89,11 +89,7 @@ const AppEvents = () => {
                         <JourneySteps aria-label="Getting started" steps={APP_EVENT_STEPS} />
                     </EmptyState>
                 ) : (
-                    <EmptyState
-                        description="There are no app events yet."
-                        icon={<ZapIcon />}
-                        title="No App Events"
-                    />
+                    <EmptyState description="There are no app events yet." icon={<ZapIcon />} title="No App Events" />
                 )}
             </LayoutContainer>
         </PageLoader>

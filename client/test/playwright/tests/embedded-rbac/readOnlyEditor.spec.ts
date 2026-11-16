@@ -88,13 +88,9 @@ async function createEditorResources(adminApi: APIRequestContext): Promise<Edito
 }
 
 async function deleteEditorResources(adminApi: APIRequestContext, resources: EditorResourcesI): Promise<void> {
-    await graphql(
-        adminApi,
-        'mutation DeleteAutomationProject($id: ID!) { deleteAutomationProject(id: $id) }',
-        {
-            id: resources.hubProjectId,
-        }
-    ).catch((error: unknown) => console.warn(`readOnlyEditor teardown: Hub project: ${error}`));
+    await graphql(adminApi, 'mutation DeleteAutomationProject($id: ID!) { deleteAutomationProject(id: $id) }', {
+        id: resources.hubProjectId,
+    }).catch((error: unknown) => console.warn(`readOnlyEditor teardown: Hub project: ${error}`));
 
     await embeddedInternalApi(adminApi, 'DELETE', `/integrations/${resources.integrationId}`).catch((error: unknown) =>
         console.warn(`readOnlyEditor teardown: integration: ${error}`)
