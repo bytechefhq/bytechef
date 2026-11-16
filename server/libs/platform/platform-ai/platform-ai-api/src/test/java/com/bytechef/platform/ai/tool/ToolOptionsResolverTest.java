@@ -35,6 +35,7 @@ import com.bytechef.component.definition.ClusterElementDefinition.OptionsFunctio
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
+import com.bytechef.tenant.TenantContext;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -53,7 +54,7 @@ class ToolOptionsResolverTest {
     private static final OptionsFunction<String> OPTIONS_FUNCTION =
         (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> List.of();
 
-    private final AtomicLong currentTimeMillis = new AtomicLong(1_000);
+    private final AtomicLong currentTimeNanos = new AtomicLong(1_000);
 
     @Mock
     private ClusterElementDefinitionFacade clusterElementDefinitionFacade;
@@ -62,7 +63,7 @@ class ToolOptionsResolverTest {
 
     @BeforeEach
     void beforeEach() {
-        toolOptionsResolver = new ToolOptionsResolver(clusterElementDefinitionFacade, currentTimeMillis::get);
+        toolOptionsResolver = new ToolOptionsResolver(clusterElementDefinitionFacade, currentTimeNanos::get);
     }
 
     @Test
@@ -90,7 +91,7 @@ class ToolOptionsResolverTest {
             anyString(), eq(1), anyString(), anyString(), anyMap(), anyMap(), anyList(), any(), any(), anyMap(),
             anyMap());
 
-        currentTimeMillis.addAndGet(ToolOptionsResolver.CACHE_TTL_MILLIS);
+        currentTimeNanos.addAndGet(ToolOptionsResolver.CACHE_TTL.toNanos());
 
         resolveChannelOptions(7L);
 
@@ -112,6 +113,18 @@ class ToolOptionsResolverTest {
     }
 
     @Test
+    void testResolveOptionsCachesEachTenantSeparately() {
+        mockOptions(List.of(option("General", "general")));
+
+        TenantContext.runWithTenantId("tenant1", () -> resolveChannelOptions(7L));
+        TenantContext.runWithTenantId("tenant2", () -> resolveChannelOptions(7L));
+
+        verify(clusterElementDefinitionFacade, times(2)).executeOptions(
+            anyString(), eq(1), anyString(), anyString(), anyMap(), anyMap(), anyList(), any(), any(), anyMap(),
+            anyMap());
+    }
+
+    @Test
     void testResolveOptionsReturnsNullWhenTheOptionsCannotBeLoaded() {
         when(clusterElementDefinitionFacade.executeOptions(
             anyString(), eq(1), anyString(), anyString(), anyMap(), anyMap(), anyList(), any(), any(), anyMap(),
@@ -119,6 +132,29 @@ class ToolOptionsResolverTest {
                 .thenThrow(new IllegalStateException("connection expired"));
 
         assertThat(resolveChannelOptions(7L)).isNull();
+    }
+
+    @Test
+    void testResolveOptionsDoesNotRetryAFailedLoadUntilItExpires() {
+        when(clusterElementDefinitionFacade.executeOptions(
+            anyString(), eq(1), anyString(), anyString(), anyMap(), anyMap(), anyList(), any(), any(), anyMap(),
+            anyMap()))
+                .thenThrow(new IllegalStateException("connection expired"));
+
+        resolveChannelOptions(7L);
+        resolveChannelOptions(7L);
+
+        verify(clusterElementDefinitionFacade, times(1)).executeOptions(
+            anyString(), eq(1), anyString(), anyString(), anyMap(), anyMap(), anyList(), any(), any(), anyMap(),
+            anyMap());
+
+        currentTimeNanos.addAndGet(ToolOptionsResolver.CACHE_TTL.toNanos());
+
+        resolveChannelOptions(7L);
+
+        verify(clusterElementDefinitionFacade, times(2)).executeOptions(
+            anyString(), eq(1), anyString(), anyString(), anyMap(), anyMap(), anyList(), any(), any(), anyMap(),
+            anyMap());
     }
 
     @Test
