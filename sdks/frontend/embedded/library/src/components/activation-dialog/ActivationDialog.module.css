@@ -68,6 +68,14 @@
     padding-right: 40px;
 }
 
+.connectButton {
+    flex-shrink: 0;
+    font-size: 1.125rem;
+    line-height: 1;
+    padding: 0;
+    width: 38px;
+}
+
 .field {
     display: flex;
     flex-direction: column;
@@ -122,8 +130,54 @@
 
 .switchRow {
     align-items: center;
+    cursor: pointer;
     display: flex;
     font-size: 0.875rem;
     font-weight: 500;
     gap: 8px;
+    justify-content: space-between;
+}
+
+.switch {
+    appearance: none;
+    background-color: #e2e8f0;
+    border-radius: 100px;
+    cursor: pointer;
+    flex-shrink: 0;
+    height: 20px;
+    margin: 0;
+    position: relative;
+    transition: background-color 0.2s;
+    width: 36px;
+}
+
+.switch::after {
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 2px 0 rgba(10, 10, 10, 0.29);
+    content: '';
+    height: 16px;
+    left: 2px;
+    position: absolute;
+    top: 2px;
+    transition: left 0.2s;
+    width: 16px;
+}
+
+.switch:checked {
+    background-color: #1071e5;
+}
+
+.switch:checked::after {
+    left: 18px;
+}
+
+.switch:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.switch:focus-visible {
+    outline: 2px solid #1071e5;
+    outline-offset: 2px;
 }
