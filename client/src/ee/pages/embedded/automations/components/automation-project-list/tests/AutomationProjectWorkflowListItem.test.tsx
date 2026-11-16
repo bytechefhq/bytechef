@@ -103,13 +103,14 @@ describe('AutomationProjectWorkflowListItem', () => {
     });
 
     describe('menu', () => {
-        it('should render the shared workflow row menu with Edit, Duplicate, Export and Delete', async () => {
+        it('should render the shared workflow row menu with Edit, Duplicate, Copy Workflow UUID, Export and Delete', async () => {
             await openMenu();
 
             expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
             expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent)).toEqual([
                 'Edit',
                 'Duplicate',
+                'Copy Workflow UUID',
                 'Export',
                 'Delete',
             ]);
