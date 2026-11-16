@@ -2,12 +2,14 @@ mutation testWorkflowNodeScript(
     $workflowId: String!
     $workflowNodeName: String!
     $environmentId: Long!
+    $executionId: String
     $inputParameters: Map
 ) {
     testWorkflowNodeScript(
         workflowId: $workflowId
         workflowNodeName: $workflowNodeName
         environmentId: $environmentId
+        executionId: $executionId
         inputParameters: $inputParameters
     ) {
         error {
