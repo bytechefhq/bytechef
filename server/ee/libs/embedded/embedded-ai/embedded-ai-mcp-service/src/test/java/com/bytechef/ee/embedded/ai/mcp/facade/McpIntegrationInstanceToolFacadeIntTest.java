@@ -15,6 +15,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
+import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
+import com.bytechef.atlas.configuration.repository.WorkflowRepository;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -33,6 +36,7 @@ import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationServiceImpl;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowServiceImpl;
@@ -45,6 +49,7 @@ import com.bytechef.encryption.Encryption;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -63,6 +68,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -458,14 +464,28 @@ class McpIntegrationInstanceToolFacadeIntTest {
     @EnableMethodSecurity
     @Import({
         ConnectedUserIntegrationInstanceFacadeImpl.class, ConnectedUserServiceImpl.class,
-        IntegrationInstanceConfigurationServiceImpl.class, IntegrationInstanceServiceImpl.class,
+        IntegrationInstanceConfigurationServiceImpl.class, IntegrationInstanceConfigurationWorkflowServiceImpl.class,
+        IntegrationInstanceServiceImpl.class,
         IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class,
         IntegrationWorkflowServiceImpl.class, McpComponentServiceImpl.class,
         McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpIntegrationInstanceToolFacadeImpl.class,
-        McpIntegrationInstanceWorkflowFacadeImpl.class, McpServerServiceImpl.class, WorkflowServiceImpl.class,
+        McpIntegrationInstanceWorkflowFacadeImpl.class, McpServerServiceImpl.class,
         EmbeddedMcpAuditIntTestConfiguration.class
     })
     static class FacadeIntTestConfiguration {
+
+        @Bean
+        WorkflowService workflowService(
+            CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
+            List<WorkflowRepository> workflowRepositories) {
+
+            return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
+        }
+
+        @Bean
+        ConnectionService connectionService() {
+            return mock(ConnectionService.class);
+        }
 
         @Bean
         EmbeddedPermissionEvaluator embeddedPermissionEvaluator() {

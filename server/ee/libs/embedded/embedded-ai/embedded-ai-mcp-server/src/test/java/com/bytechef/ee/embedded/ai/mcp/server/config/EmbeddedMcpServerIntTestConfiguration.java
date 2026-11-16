@@ -7,6 +7,9 @@
 
 package com.bytechef.ee.embedded.ai.mcp.server.config;
 
+import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
+import com.bytechef.atlas.configuration.repository.WorkflowRepository;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
@@ -42,6 +45,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -67,10 +71,18 @@ import tools.jackson.databind.ObjectMapper;
     McpIntegrationInstanceConfigurationServiceImpl.class,
     McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpIntegrationInstanceToolServiceImpl.class,
     McpIntegrationInstanceWorkflowServiceImpl.class,
-    McpServerServiceImpl.class, PostgreSQLContainerConfiguration.class, WorkflowServiceImpl.class
+    McpServerServiceImpl.class, PostgreSQLContainerConfiguration.class
 })
 @Configuration
 public class EmbeddedMcpServerIntTestConfiguration {
+
+    @Bean
+    WorkflowService workflowService(
+        CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
+        List<WorkflowRepository> workflowRepositories) {
+
+        return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
+    }
 
     @Bean
     EncryptionKey encryptionKey() {
