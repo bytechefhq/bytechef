@@ -61,7 +61,7 @@ const McpAutomationProjectConfigurationWorkflowListItem = ({
             <Popover onOpenChange={setShowPropertiesPopover} open={showPropertiesPopover}>
                 <PopoverAnchor asChild>
                     <div
-                        className="flex min-h-10 items-center gap-2 text-sm"
+                        className="-mx-3 flex min-h-10 items-center gap-2 pl-3 text-sm"
                         data-available={String(workflow.available)}
                     >
                         <WorkflowToolRowLabel
