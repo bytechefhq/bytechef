@@ -21,13 +21,17 @@ extend type Mutation {
         clusterElementType: String!
         clusterElementWorkflowNodeName: String!
         environmentId: Long!
+        executionId: String
         inputParameters: Map
     ): ScriptTestExecution!
+
+    stopScriptTest(executionId: String!): Boolean!
 
     testWorkflowNodeScript(
         workflowId: String!
         workflowNodeName: String!
         environmentId: Long!
+        executionId: String
         inputParameters: Map
     ): ScriptTestExecution!
 }

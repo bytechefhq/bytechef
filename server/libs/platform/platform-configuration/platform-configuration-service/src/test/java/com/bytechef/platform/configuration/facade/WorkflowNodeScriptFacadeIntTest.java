@@ -46,13 +46,21 @@ import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -63,6 +71,84 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @PlatformConfigurationIntTestConfigurationSharedMocks
 @SpringBootTest(classes = PlatformConfigurationIntTestConfiguration.class)
 class WorkflowNodeScriptFacadeIntTest {
+
+    @Test
+    void testStopScriptTestStopsTheRunningTestAndClearsTheInterrupt() throws Exception {
+        Workflow workflow = createWorkflow(WORKFLOW_NODE_SCRIPT_WORKFLOW_DEFINITION);
+
+        CountDownLatch performStarted = stubScriptPerformBlocksUntilInterrupted();
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+        try {
+            Future<ScriptTestRun> scriptTestRunFuture = executorService.submit(() -> {
+                ScriptTestExecutionDTO scriptTestExecutionDTO = workflowNodeScriptFacade.testWorkflowNodeScript(
+                    workflow.getId(), "script_1", ENVIRONMENT_ID, "execution-1", null);
+
+                Thread currentThread = Thread.currentThread();
+
+                return new ScriptTestRun(scriptTestExecutionDTO, currentThread.isInterrupted());
+            });
+
+            assertThat(performStarted.await(10, TimeUnit.SECONDS)).isTrue();
+
+            assertThat(workflowNodeScriptFacade.stopScriptTest("execution-1")).isTrue();
+
+            ScriptTestRun scriptTestRun = scriptTestRunFuture.get(10, TimeUnit.SECONDS);
+
+            assertThat(scriptTestRun.scriptTestExecutionDTO()
+                .error()
+                .getMessage()).isEqualTo(WorkflowNodeScriptFacadeImpl.SCRIPT_TEST_STOPPED_MESSAGE);
+            assertThat(scriptTestRun.interrupted()).isFalse();
+            assertThat(workflowNodeScriptFacade.stopScriptTest("execution-1")).isFalse();
+        } finally {
+            executorService.shutdownNow();
+        }
+    }
+
+    @Test
+    void testStopScriptTestStopsOnlyATestOfTheCurrentUser() throws Exception {
+        Workflow workflow = createWorkflow(WORKFLOW_NODE_SCRIPT_WORKFLOW_DEFINITION);
+
+        CountDownLatch performStarted = stubScriptPerformBlocksUntilInterrupted();
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+        try {
+            Future<ScriptTestExecutionDTO> scriptTestExecutionFuture = executorService.submit(() -> {
+                authenticate("owner@localhost.com");
+
+                try {
+                    return workflowNodeScriptFacade.testWorkflowNodeScript(
+                        workflow.getId(), "script_1", ENVIRONMENT_ID, "execution-2", null);
+                } finally {
+                    SecurityContextHolder.clearContext();
+                }
+            });
+
+            assertThat(performStarted.await(10, TimeUnit.SECONDS)).isTrue();
+
+            authenticate("other@localhost.com");
+
+            assertThat(workflowNodeScriptFacade.stopScriptTest("execution-2")).isFalse();
+
+            authenticate("owner@localhost.com");
+
+            assertThat(workflowNodeScriptFacade.stopScriptTest("execution-2")).isTrue();
+
+            ScriptTestExecutionDTO scriptTestExecutionDTO = scriptTestExecutionFuture.get(10, TimeUnit.SECONDS);
+
+            assertThat(scriptTestExecutionDTO.error()
+                .getMessage()).isEqualTo(WorkflowNodeScriptFacadeImpl.SCRIPT_TEST_STOPPED_MESSAGE);
+        } finally {
+            executorService.shutdownNow();
+        }
+    }
+
+    @Test
+    void testStopScriptTestReturnsFalseForAnExecutionThatIsNotRunning() {
+        assertThat(workflowNodeScriptFacade.stopScriptTest("unknown-execution")).isFalse();
+    }
 
     private static final long ENVIRONMENT_ID = 1L;
 
@@ -132,6 +218,8 @@ class WorkflowNodeScriptFacadeIntTest {
 
     @AfterEach
     void afterEach() {
+        SecurityContextHolder.clearContext();
+
         workflowNodeTestOutputRepository.deleteAll();
         workflowTestConfigurationRepository.deleteAll();
         jdbcWorkflowRepository.deleteAll();
@@ -145,7 +233,7 @@ class WorkflowNodeScriptFacadeIntTest {
         stubScriptPerform(Map.of("result", "ok"));
 
         ScriptTestExecutionDTO scriptTestExecutionDTO = workflowNodeScriptFacade.testClusterElementScript(
-            workflow.getId(), "node_1", "processor", "script_1", ENVIRONMENT_ID, null);
+            workflow.getId(), "node_1", "processor", "script_1", ENVIRONMENT_ID, null, null);
 
         assertThat(scriptTestExecutionDTO.error()).isNull();
         assertThat(scriptTestExecutionDTO.output()).isEqualTo(Map.of("result", "ok"));
@@ -164,7 +252,7 @@ class WorkflowNodeScriptFacadeIntTest {
         stubScriptPerform(Map.of("result", "ok"));
 
         ScriptTestExecutionDTO scriptTestExecutionDTO = workflowNodeScriptFacade.testClusterElementScript(
-            workflow.getId(), "node_1", "processor", "script_1", ENVIRONMENT_ID, inputParameters);
+            workflow.getId(), "node_1", "processor", "script_1", ENVIRONMENT_ID, null, inputParameters);
 
         assertThat(scriptTestExecutionDTO.error()).isNull();
         assertThat(scriptTestExecutionDTO.output()).isEqualTo(Map.of("result", "ok"));
@@ -180,7 +268,7 @@ class WorkflowNodeScriptFacadeIntTest {
         stubScriptPerform(Map.of("result", "ok"));
 
         ScriptTestExecutionDTO scriptTestExecutionDTO = workflowNodeScriptFacade.testWorkflowNodeScript(
-            workflow.getId(), "script_1", ENVIRONMENT_ID, null);
+            workflow.getId(), "script_1", ENVIRONMENT_ID, null, null);
 
         assertThat(scriptTestExecutionDTO.error()).isNull();
         assertThat(scriptTestExecutionDTO.output()).isEqualTo(Map.of("result", "ok"));
@@ -198,7 +286,7 @@ class WorkflowNodeScriptFacadeIntTest {
         stubScriptPerform(Map.of("result", "ok"));
 
         ScriptTestExecutionDTO scriptTestExecutionDTO = workflowNodeScriptFacade.testWorkflowNodeScript(
-            workflow.getId(), "script_1", ENVIRONMENT_ID, inputParameters);
+            workflow.getId(), "script_1", ENVIRONMENT_ID, null, inputParameters);
 
         assertThat(scriptTestExecutionDTO.error()).isNull();
         assertThat(scriptTestExecutionDTO.output()).isEqualTo(Map.of("result", "ok"));
@@ -214,7 +302,7 @@ class WorkflowNodeScriptFacadeIntTest {
         stubScriptPerformThrows(new RuntimeException("Script execution failed"));
 
         ScriptTestExecutionDTO scriptTestExecutionDTO = workflowNodeScriptFacade.testWorkflowNodeScript(
-            workflow.getId(), "script_1", ENVIRONMENT_ID, null);
+            workflow.getId(), "script_1", ENVIRONMENT_ID, null, null);
 
         assertThat(scriptTestExecutionDTO.error()).isNotNull();
         assertThat(scriptTestExecutionDTO.error()
@@ -231,7 +319,7 @@ class WorkflowNodeScriptFacadeIntTest {
         stubScriptPerformThrows(new RuntimeException("Element execution failed"));
 
         ScriptTestExecutionDTO scriptTestExecutionDTO = workflowNodeScriptFacade.testClusterElementScript(
-            workflow.getId(), "node_1", "processor", "script_1", ENVIRONMENT_ID, null);
+            workflow.getId(), "node_1", "processor", "script_1", ENVIRONMENT_ID, null, null);
 
         assertThat(scriptTestExecutionDTO.error()).isNotNull();
         assertThat(scriptTestExecutionDTO.error()
@@ -247,7 +335,7 @@ class WorkflowNodeScriptFacadeIntTest {
         stubScriptPerform(null);
 
         ScriptTestExecutionDTO scriptTestExecutionDTO = workflowNodeScriptFacade.testWorkflowNodeScript(
-            workflow.getId(), "script_1", ENVIRONMENT_ID, null);
+            workflow.getId(), "script_1", ENVIRONMENT_ID, null, null);
 
         assertThat(scriptTestExecutionDTO.error()).isNull();
         assertThat(scriptTestExecutionDTO.output()).isNull();
@@ -338,5 +426,34 @@ class WorkflowNodeScriptFacadeIntTest {
             eq("script"), eq(1), eq("java"), any(), any(), any(), any(), any(), anyMap(), anyMap(), anyMap(), any(),
             any(), anyBoolean(), any(), any(), any()))
                 .thenThrow(exception);
+    }
+
+    private void authenticate(String login) {
+        SecurityContextHolder.getContext()
+            .setAuthentication(new UsernamePasswordAuthenticationToken(login, null, List.of()));
+    }
+
+    private CountDownLatch stubScriptPerformBlocksUntilInterrupted() {
+        CountDownLatch performStarted = new CountDownLatch(1);
+
+        when(actionDefinitionFacade.executePerform(
+            eq("script"), eq(1), eq("java"), any(), any(), any(), any(), any(), anyMap(), anyMap(), anyMap(), any(),
+            any(), anyBoolean(), any(), any(), any()))
+                .thenAnswer(invocation -> {
+                    performStarted.countDown();
+
+                    try {
+                        new CountDownLatch(1).await();
+                    } catch (InterruptedException interruptedException) {
+                        throw new IllegalStateException("Thread was interrupted", interruptedException);
+                    }
+
+                    return null;
+                });
+
+        return performStarted;
+    }
+
+    private record ScriptTestRun(ScriptTestExecutionDTO scriptTestExecutionDTO, boolean interrupted) {
     }
 }
