@@ -93,8 +93,9 @@ The mapping is stored on the MCP server's attachment to the workflow, not in the
     - It does **not** start with the **Workflow → New Workflow Call** trigger
       (`workflow/v1/newWorkflowCall`). Only that trigger makes a workflow callable as a tool.
     - Its tool name is blank and its label has no letters or digits to build one from. A blank tool
-      name otherwise falls back to the workflow's label, with every run of characters other than
-      letters, digits, `_` and `-` replaced by `_`.
+      name otherwise falls back to the workflow's label in upper case, with every run of characters
+      other than letters, digits, `_` and `-` replaced by `_` (`Send Email` becomes `SEND_EMAIL`),
+      matching the `COMPONENT_ACTION` style of component tools.
     - The server has [Enforce tool authorization](#enforce-tool-authorization) on, which hides every
       workflow tool.
     - Its **Enabled** toggle is off.
