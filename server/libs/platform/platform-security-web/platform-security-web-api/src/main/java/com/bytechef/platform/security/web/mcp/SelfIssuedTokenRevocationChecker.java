@@ -17,7 +17,7 @@
 package com.bytechef.platform.security.web.mcp;
 
 /**
- * Reports whether an access token issued by the embedded authorization server has been revoked.
+ * Reports whether an access token issued by the built-in authorization server has been revoked.
  *
  * @author Ivica Cardic
  */

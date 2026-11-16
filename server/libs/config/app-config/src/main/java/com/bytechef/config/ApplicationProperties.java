@@ -4714,7 +4714,7 @@ public class ApplicationProperties {
     public static class Oauth2 {
 
         /**
-         * Embedded OAuth2 authorization server configuration.
+         * Built-in OAuth2 authorization server configuration.
          */
         private AuthorizationServer authorizationServer = new AuthorizationServer();
 
@@ -4763,13 +4763,13 @@ public class ApplicationProperties {
         }
 
         /**
-         * Embedded OAuth2 authorization server configuration. When disabled (the default), the authorization server
-         * endpoints are not exposed.
+         * Built-in OAuth2 authorization server configuration. When disabled, the authorization server endpoints are not
+         * exposed.
          */
         public static class AuthorizationServer {
 
             /**
-             * Whether the embedded OAuth2 authorization server is enabled.
+             * Whether the built-in OAuth2 authorization server is enabled.
              */
             private boolean enabled;
 
