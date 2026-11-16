@@ -36,7 +36,7 @@ export default function useDataTables(): UseDataTablesI {
     const tagIdParam = searchParams.get('tagId');
     const tagId = tagIdParam ?? undefined;
 
-    const {data: tagsByTableQueryData} = useDataTableTagsByTableQuery();
+    const {data: tagsByTableQueryData} = useDataTableTagsByTableQuery({workspaceId: String(workspaceId)});
     const {data: allTagsData} = useDataTableTagsQuery({workspaceId: String(workspaceId)});
 
     const tagsByTableData = useMemo(

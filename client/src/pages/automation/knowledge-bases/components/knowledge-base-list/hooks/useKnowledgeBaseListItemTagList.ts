@@ -1,3 +1,4 @@
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
     KnowledgeBaseTagsEntry,
     Tag,
@@ -23,20 +24,24 @@ export default function useKnowledgeBaseListItemTagList({
     remainingTags,
     tags,
 }: UseKnowledgeBaseListItemTagListProps) {
+    const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
     const queryClient = useQueryClient();
+
+    const tagsByKnowledgeBaseQueryKey = ['knowledgeBaseTagsByKnowledgeBase', {workspaceId: String(workspaceId)}];
 
     const updateTagsMutation = useUpdateKnowledgeBaseTagsMutation({
         onError: (_err, _vars, ctx) => {
             if (ctx?.previous) {
-                queryClient.setQueryData(['knowledgeBaseTagsByKnowledgeBase'], ctx.previous);
+                queryClient.setQueryData(tagsByKnowledgeBaseQueryKey, ctx.previous);
             }
         },
         onMutate: async (variables: UpdateKnowledgeBaseTagsVarsI) => {
             await queryClient.cancelQueries({queryKey: ['knowledgeBaseTagsByKnowledgeBase']});
 
-            const previous = queryClient.getQueryData<{knowledgeBaseTagsByKnowledgeBase: KnowledgeBaseTagsEntry[]}>([
-                'knowledgeBaseTagsByKnowledgeBase',
-            ]);
+            const previous = queryClient.getQueryData<{knowledgeBaseTagsByKnowledgeBase: KnowledgeBaseTagsEntry[]}>(
+                tagsByKnowledgeBaseQueryKey
+            );
 
             const next = (() => {
                 if (!previous?.knowledgeBaseTagsByKnowledgeBase) return previous;
@@ -65,7 +70,7 @@ export default function useKnowledgeBaseListItemTagList({
                       };
             })();
 
-            queryClient.setQueryData(['knowledgeBaseTagsByKnowledgeBase'], next);
+            queryClient.setQueryData(tagsByKnowledgeBaseQueryKey, next);
 
             return {previous};
         },

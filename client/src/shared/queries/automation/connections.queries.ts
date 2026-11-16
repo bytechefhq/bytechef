@@ -1,4 +1,5 @@
 /* eslint-disable sort-keys */
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
     Connection,
     ConnectionApi,
@@ -12,6 +13,7 @@ import {useQuery} from '@tanstack/react-query';
 export const ConnectionKeys = {
     connection: (id: number) => [...ConnectionKeys.connections, id],
     connectionTags: ['automation_connectionTags'],
+    workspaceConnectionTags: (workspaceId: number) => [...ConnectionKeys.connectionTags, workspaceId],
     connections: ['automation_connections'],
     filteredConnections: (filters: {
         id?: number;
@@ -21,11 +23,15 @@ export const ConnectionKeys = {
     }) => [...ConnectionKeys.connections, filters],
 };
 
-export const useGetConnectionTagsQuery = () =>
-    useQuery<Tag[], Error>({
-        queryKey: ConnectionKeys.connectionTags,
-        queryFn: () => new ConnectionTagApi().getConnectionTags(),
+export const useGetConnectionTagsQuery = () => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    return useQuery<Tag[], Error>({
+        queryKey: ConnectionKeys.workspaceConnectionTags(currentWorkspaceId!),
+        queryFn: () => new ConnectionTagApi().getConnectionTags({id: currentWorkspaceId!}),
+        enabled: currentWorkspaceId !== undefined,
     });
+};
 
 export const useGetWorkspaceConnectionsQuery = (request: GetWorkspaceConnectionsRequest, enabled?: boolean) =>
     useQuery<Connection[], Error>({
