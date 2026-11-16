@@ -113,9 +113,9 @@ class DataTableRowServiceH2IntTest {
     @Autowired
     private DataSource dataSource;
 
-    private long itemsId;
+    private Long itemsId;
 
-    private long typedId;
+    private Long typedId;
 
     @AfterEach
     void afterEach() {

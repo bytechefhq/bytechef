@@ -73,6 +73,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -122,9 +123,9 @@ class DataTableWebhookEventListenerIntTest {
     @Autowired
     private WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
 
-    private long invoicesId;
+    private Long invoicesId;
 
-    private long ordersId;
+    private Long ordersId;
 
     @AfterEach
     void afterEach() {
@@ -323,7 +324,7 @@ class DataTableWebhookEventListenerIntTest {
             jdbcTemplate.execute("ALTER TABLE data_table_webhook_unavailable RENAME TO data_table_webhook");
         }
 
-        assertThat(jdbcTemplate.queryForObject("SELECT count(*) FROM dt_0_" + ordersId, Long.class)).isZero();
+        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "dt_0_" + ordersId)).isZero();
         assertThat(triggerEvents()).isEmpty();
         assertThat(capturedOutput).contains("could not be listed");
     }
@@ -386,7 +387,7 @@ class DataTableWebhookEventListenerIntTest {
             reset(workflowNodeTestOutputFacade);
         }
 
-        assertThat(jdbcTemplate.queryForObject("SELECT count(*) FROM dt_0_" + ordersId, Long.class)).isOne();
+        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "dt_0_" + ordersId)).isOne();
         assertThat(capturedOutput).contains("test output could not be saved");
     }
 
