@@ -1,0 +1,3 @@
+mutation stopScriptTest($executionId: String!) {
+    stopScriptTest(executionId: $executionId)
+}

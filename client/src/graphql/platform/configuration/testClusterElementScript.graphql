@@ -4,6 +4,7 @@ mutation testClusterElementScript(
     $clusterElementType: String!
     $clusterElementWorkflowNodeName: String!
     $environmentId: Long!
+    $executionId: String
     $inputParameters: Map
 ) {
     testClusterElementScript(
@@ -12,6 +13,7 @@ mutation testClusterElementScript(
         clusterElementType: $clusterElementType
         clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
         environmentId: $environmentId
+        executionId: $executionId
         inputParameters: $inputParameters
     ) {
         error {
