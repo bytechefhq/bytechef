@@ -566,7 +566,7 @@ class AbstractToolFacadeTest {
 
     @Test
     void testGetWorkflowToolNameFallsBackToTheWorkflowLabel() {
-        assertEquals("Send_Email", AbstractToolFacade.getWorkflowToolName(Map.of(), "Send Email"));
+        assertEquals("SEND_EMAIL", AbstractToolFacade.getWorkflowToolName(Map.of(), "Send Email"));
     }
 
     @Test
@@ -583,12 +583,12 @@ class AbstractToolFacadeTest {
     // Tool names reach the model as identifiers, so a label cannot be used verbatim.
     @Test
     void testToToolNameSanitizesALabel() {
-        assertEquals("Order_Sync_v2", AbstractToolFacade.toToolName("Order Sync (v2)"));
+        assertEquals("ORDER_SYNC_V2", AbstractToolFacade.toToolName("Order Sync (v2)"));
     }
 
     @Test
-    void testToToolNameKeepsAnAlreadyValidLabel() {
-        assertEquals("order-sync_2", AbstractToolFacade.toToolName("order-sync_2"));
+    void testToToolNameUpperCasesAnAlreadyValidLabel() {
+        assertEquals("ORDER-SYNC_2", AbstractToolFacade.toToolName("order-sync_2"));
     }
 
     @Test

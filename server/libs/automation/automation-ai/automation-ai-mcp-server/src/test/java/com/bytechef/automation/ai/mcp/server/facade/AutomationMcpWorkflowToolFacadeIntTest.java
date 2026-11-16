@@ -117,7 +117,7 @@ class AutomationMcpWorkflowToolFacadeIntTest {
     void testToolNameFallsBackToTheWorkflowLabel() {
         ToolDefinition toolDefinition = getToolDefinition(Map.of());
 
-        assertEquals("Send_Email", toolDefinition.name());
+        assertEquals("SEND_EMAIL", toolDefinition.name());
     }
 
     @Test
