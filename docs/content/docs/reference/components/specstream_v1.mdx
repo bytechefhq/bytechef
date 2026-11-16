@@ -1,0 +1,248 @@
+---
+title: "SpecStream"
+description: "SpecStream is a live web data engine providing web search and web page content extraction."
+---
+
+
+Categories: Helpers, Artificial Intelligence
+
+
+Type: specstream/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | API Key | STRING | Your SpecStream API key from Agents &amp; API in your SpecStream workspace. | true |
+
+
+
+## Connection Setup
+
+### Create an API Key
+
+1. Sign in to your [SpecStream](https://specstream.ai/) workspace.
+2. Open **Agents & API** (`https://specstream.ai/workspace/agents?tab=keys`).
+3. Create an API key with the `finds:spend` scope and a spending limit.
+4. Copy the API key and paste it into the **API Key** field.
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Web Search
+Name: webSearch
+
+`Search the live web and return answers, structured rows, and ranked sources.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| q | Query | STRING | The search query in plain words, in any language. Supports operators such as site:, filetype:, and quoted phrases. | true |
+| speed | Speed | STRING <details> <summary> Options </summary> <span>default</span>, <span>fast</span> </details> | Search tier. Default returns answers, rows, and sources. Fast skips model reading and returns sources. | false |
+| num | Number of Results | INTEGER | Maximum number of sources to return (1 to 100 for web search, up to 200 with images enabled). | false |
+| page | Page | INTEGER | Page number (1 to 10) to continue the ranked result list. | false |
+| passages | Include Passages | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | When true, reads source pages and returns relevant text passages. | false |
+| news | News | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | When true, searches news results on the fast tier. | false |
+| images | Images | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | When true, returns image search results instead of web results. | false |
+| country | Country | STRING | Two-letter country code to target results (for example US or DE). | false |
+| language | Language | STRING | Two-letter language code for results (for example en or de). | false |
+| safe | Safe Search | STRING <details> <summary> Options </summary> <span>off</span>, <span>moderate</span>, <span>strict</span> </details> | Safe search filtering level. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Web Search",
+  "name" : "webSearch",
+  "parameters" : {
+    "q" : "",
+    "speed" : "",
+    "num" : 1,
+    "page" : 1,
+    "passages" : false,
+    "news" : false,
+    "images" : false,
+    "country" : "",
+    "language" : "",
+    "safe" : ""
+  },
+  "type" : "specstream/v1/webSearch"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(request_id), STRING\(query), STRING\(kind), [STRING]\(columns), &#123;STRING\(value), STRING\(page), STRING\(seen_at), BOOLEAN\(confirmed), [STRING]\(sources)&#125;\(answer), [&#123;STRING\(name), STRING\(page), STRING\(snippet), NUMBER\(probability), &#123;&#125;\(fields), [INTEGER]\(sources)&#125;]\(rows), [&#123;STRING\(url), STRING\(title), STRING\(site), STRING\(snippet), BOOLEAN\(cited), STRING\(published), STRING\(modified), STRING\(file_type)&#125;]\(sources), [&#123;STRING\(url), STRING\(title), STRING\(text)&#125;]\(passages), INTEGER\(page), INTEGER\(next_page), STRING\(corrected_query), INTEGER\(took_ms), NUMBER\(price_usd)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "id" : "",
+    "request_id" : "",
+    "query" : "",
+    "kind" : "",
+    "columns" : [ "" ],
+    "answer" : {
+      "value" : "",
+      "page" : "",
+      "seen_at" : "",
+      "confirmed" : false,
+      "sources" : [ "" ]
+    },
+    "rows" : [ {
+      "name" : "",
+      "page" : "",
+      "snippet" : "",
+      "probability" : 0.0,
+      "fields" : { },
+      "sources" : [ 1 ]
+    } ],
+    "sources" : [ {
+      "url" : "",
+      "title" : "",
+      "site" : "",
+      "snippet" : "",
+      "cited" : false,
+      "published" : "",
+      "modified" : "",
+      "file_type" : ""
+    } ],
+    "passages" : [ {
+      "url" : "",
+      "title" : "",
+      "text" : ""
+    } ],
+    "page" : 1,
+    "next_page" : 1,
+    "corrected_query" : "",
+    "took_ms" : 1,
+    "price_usd" : 0.0
+  }
+}
+```
+
+
+
+
+### Extract Pages
+Name: extract
+
+`Extract the main text of up to 20 web pages or documents as Markdown, plain text, or HTML.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| urls | URLs | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of 1 to 20 HTTP or HTTPS URLs to read. | true |
+| format | Format | STRING <details> <summary> Options </summary> <span>markdown</span>, <span>text</span>, <span>html</span> </details> | Output format for the extracted main content. | false |
+| include | Include | ARRAY <details> <summary> Items </summary> [STRING] </details> | Additional fields to include on each extracted page. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Extract Pages",
+  "name" : "extract",
+  "parameters" : {
+    "urls" : [ "" ],
+    "format" : "",
+    "include" : [ "" ]
+  },
+  "type" : "specstream/v1/extract"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(request_id), [&#123;STRING\(url), STRING\(status), STRING\(reason), STRING\(title), STRING\(text), BOOLEAN\(text_truncated), STRING\(published), STRING\(modified), STRING\(read_from), STRING\(captured_at), STRING\(read_from_url), [&#123;STRING\(address), STRING\(found_in)&#125;]\(emails), STRING\(html), BOOLEAN\(html_truncated), STRING\(full_text), BOOLEAN\(full_text_truncated), [&#123;STRING\(url), STRING\(text)&#125;]\(links), INTEGER\(status_code), STRING\(final_url)&#125;]\(results), INTEGER\(took_ms), NUMBER\(price_usd)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : {
+    "request_id" : "",
+    "results" : [ {
+      "url" : "",
+      "status" : "",
+      "reason" : "",
+      "title" : "",
+      "text" : "",
+      "text_truncated" : false,
+      "published" : "",
+      "modified" : "",
+      "read_from" : "",
+      "captured_at" : "",
+      "read_from_url" : "",
+      "emails" : [ {
+        "address" : "",
+        "found_in" : ""
+      } ],
+      "html" : "",
+      "html_truncated" : false,
+      "full_text" : "",
+      "full_text_truncated" : false,
+      "links" : [ {
+        "url" : "",
+        "text" : ""
+      } ],
+      "status_code" : 1,
+      "final_url" : ""
+    } ],
+    "took_ms" : 1,
+    "price_usd" : 0.0
+  }
+}
+```
+
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
