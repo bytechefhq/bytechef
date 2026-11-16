@@ -37,6 +37,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
@@ -44,8 +45,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -58,9 +61,12 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowNodeScriptFacadeImpl.class);
 
+    static final String SCRIPT_TEST_STOPPED_MESSAGE = "The script execution was stopped.";
+
     private final List<CodeEditorScriptInputProvider> codeEditorScriptInputProviders;
     private final ConnectionService connectionService;
     private final Evaluator evaluator;
+    private final Map<String, RunningScriptTest> runningScriptTests = new ConcurrentHashMap<>();
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
     private final WorkflowService workflowService;
@@ -181,11 +187,26 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
     }
 
     @Override
+    public boolean stopScriptTest(String executionId) {
+        RunningScriptTest runningScriptTest = runningScriptTests.get(executionId);
+
+        if (runningScriptTest == null ||
+            !Objects.equals(runningScriptTest.userLogin(), SecurityUtils.fetchCurrentUserLogin()
+                .orElse(null))) {
+
+            return false;
+        }
+
+        return runningScriptTest.stop();
+    }
+
+    @Override
     public ScriptTestExecutionDTO testClusterElementScript(
         String workflowId, String workflowNodeName, String clusterElementType,
-        String clusterElementWorkflowNodeName, long environmentId, Map<String, Object> inputParameters) {
+        String clusterElementWorkflowNodeName, long environmentId, @Nullable String executionId,
+        Map<String, Object> inputParameters) {
 
-        return executeTestAndBuildResult(() -> {
+        return executeTestAndBuildResult(executionId, () -> {
             if (inputParameters == null) {
                 return workflowNodeTestOutputFacade.saveClusterElementTestOutput(
                     workflowId, workflowNodeName, clusterElementType.toUpperCase(Locale.ROOT),
@@ -200,9 +221,10 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
 
     @Override
     public ScriptTestExecutionDTO testWorkflowNodeScript(
-        String workflowId, String workflowNodeName, long environmentId, Map<String, Object> inputParameters) {
+        String workflowId, String workflowNodeName, long environmentId, @Nullable String executionId,
+        Map<String, Object> inputParameters) {
 
-        return executeTestAndBuildResult(() -> {
+        return executeTestAndBuildResult(executionId, () -> {
             if (inputParameters == null) {
                 return workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
                     workflowId, workflowNodeName, environmentId);
@@ -213,16 +235,25 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         });
     }
 
-    private ScriptTestExecutionDTO executeTestAndBuildResult(Supplier<WorkflowNodeTestOutput> testOutputSupplier) {
+    private ScriptTestExecutionDTO executeTestAndBuildResult(
+        @Nullable String executionId, Supplier<WorkflowNodeTestOutput> testOutputSupplier) {
+
         ExecutionError executionError = null;
+        RunningScriptTest runningScriptTest = registerRunningScriptTest(executionId);
         WorkflowNodeTestOutput workflowNodeTestOutput = null;
 
         try {
             workflowNodeTestOutput = testOutputSupplier.get();
         } catch (Exception exception) {
-            log.warn(exception.getMessage(), exception);
+            if (runningScriptTest != null && runningScriptTest.isStopped()) {
+                executionError = new ExecutionError(SCRIPT_TEST_STOPPED_MESSAGE, List.of());
+            } else {
+                log.warn(exception.getMessage(), exception);
 
-            executionError = extractExecutionError(exception);
+                executionError = extractExecutionError(exception);
+            }
+        } finally {
+            unregisterRunningScriptTest(executionId, runningScriptTest);
         }
 
         OutputResponse outputResponse = null;
@@ -245,6 +276,36 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         }
 
         return new ExecutionError(message, Arrays.asList(ExceptionUtils.getStackFrames(exception)));
+    }
+
+    private @Nullable RunningScriptTest registerRunningScriptTest(@Nullable String executionId) {
+        if (executionId == null) {
+            return null;
+        }
+
+        RunningScriptTest runningScriptTest = new RunningScriptTest(
+            Thread.currentThread(), SecurityUtils.fetchCurrentUserLogin()
+                .orElse(null));
+
+        if (runningScriptTests.putIfAbsent(executionId, runningScriptTest) != null) {
+            throw new IllegalArgumentException("A script test with execution id " + executionId + " is running");
+        }
+
+        return runningScriptTest;
+    }
+
+    private void unregisterRunningScriptTest(
+        @Nullable String executionId, @Nullable RunningScriptTest runningScriptTest) {
+
+        if (executionId == null || runningScriptTest == null) {
+            return;
+        }
+
+        runningScriptTests.remove(executionId, runningScriptTest);
+
+        if (runningScriptTest.finish()) {
+            Thread.interrupted();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -287,5 +348,51 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         return new ComponentConnection(
             connection.getComponentName(), connection.getConnectionVersion(), connection.getId(),
             connection.getParameters(), connection.getAuthorizationType());
+    }
+
+    /**
+     * A script test running on {@link #thread}. Stopping interrupts that thread, which the polyglot guest languages
+     * check while they run; once the test finishes, it can no longer be interrupted.
+     */
+    private static final class RunningScriptTest {
+
+        private final Thread thread;
+        private final @Nullable String userLogin;
+        private boolean finished;
+        private boolean stopped;
+
+        private RunningScriptTest(Thread thread, @Nullable String userLogin) {
+            this.thread = thread;
+            this.userLogin = userLogin;
+        }
+
+        /**
+         * @return {@code true} when the test was stopped, so the finishing thread must clear its interrupt flag
+         */
+        private synchronized boolean finish() {
+            finished = true;
+
+            return stopped;
+        }
+
+        private synchronized boolean isStopped() {
+            return stopped;
+        }
+
+        private synchronized boolean stop() {
+            if (finished) {
+                return false;
+            }
+
+            stopped = true;
+
+            thread.interrupt();
+
+            return true;
+        }
+
+        private @Nullable String userLogin() {
+            return userLogin;
+        }
     }
 }

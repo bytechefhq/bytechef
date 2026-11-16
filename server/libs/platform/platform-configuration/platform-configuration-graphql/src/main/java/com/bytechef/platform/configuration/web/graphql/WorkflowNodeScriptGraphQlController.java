@@ -20,6 +20,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.configuration.dto.ScriptTestExecutionDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeScriptFacade;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -53,20 +54,25 @@ public class WorkflowNodeScriptGraphQlController {
     public ScriptTestExecutionDTO testClusterElementScript(
         @Argument String workflowId, @Argument String workflowNodeName, @Argument String clusterElementType,
         @Argument String clusterElementWorkflowNodeName, @Argument Long environmentId,
-        @Argument Map<String, Object> inputParameters) {
+        @Argument @Nullable String executionId, @Argument Map<String, Object> inputParameters) {
 
         return workflowNodeScriptFacade.testClusterElementScript(
             workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, environmentId,
-            inputParameters);
+            executionId, inputParameters);
+    }
+
+    @MutationMapping
+    public boolean stopScriptTest(@Argument String executionId) {
+        return workflowNodeScriptFacade.stopScriptTest(executionId);
     }
 
     @MutationMapping
     public ScriptTestExecutionDTO testWorkflowNodeScript(
         @Argument String workflowId, @Argument String workflowNodeName, @Argument Long environmentId,
-        @Argument Map<String, Object> inputParameters) {
+        @Argument @Nullable String executionId, @Argument Map<String, Object> inputParameters) {
 
         return workflowNodeScriptFacade.testWorkflowNodeScript(
-            workflowId, workflowNodeName, environmentId, inputParameters);
+            workflowId, workflowNodeName, environmentId, executionId, inputParameters);
     }
 
     @QueryMapping
