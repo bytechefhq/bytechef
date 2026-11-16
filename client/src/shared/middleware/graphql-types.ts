@@ -4272,6 +4272,11 @@ export type QueryDataTableTagsArgs = {
 };
 
 
+export type QueryDataTableTagsByTableArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type QueryDataTableWebhooksArgs = {
   environmentId: Scalars['ID']['input'];
   tableId: Scalars['ID']['input'];
@@ -4422,6 +4427,16 @@ export type QueryKnowledgeBaseDocumentTagsByDocumentArgs = {
 
 export type QueryKnowledgeBaseEmbeddingActiveArgs = {
   environment: Scalars['Int']['input'];
+};
+
+
+export type QueryKnowledgeBaseTagsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryKnowledgeBaseTagsByKnowledgeBaseArgs = {
+  workspaceId: Scalars['ID']['input'];
 };
 
 

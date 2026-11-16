@@ -999,7 +999,9 @@ export type DataTableTagsQueryVariables = Exact<{
 
 export type DataTableTagsQuery = { dataTableTags: Array<{ id: string, name: string }> };
 
-export type DataTableTagsByTableQueryVariables = Exact<{ [key: string]: never; }>;
+export type DataTableTagsByTableQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
 
 
 export type DataTableTagsByTableQuery = { dataTableTagsByTable: Array<{ tableId: string, tags: Array<{ id: string, name: string }> }> };
@@ -1167,12 +1169,16 @@ export type KnowledgeBaseStorageUsageQueryVariables = Exact<{ [key: string]: nev
 
 export type KnowledgeBaseStorageUsageQuery = { knowledgeBaseStorageUsage: { limitBytes: any, percentage: number, unlimited: boolean, usedBytes: any } };
 
-export type KnowledgeBaseTagsQueryVariables = Exact<{ [key: string]: never; }>;
+export type KnowledgeBaseTagsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
 
 
 export type KnowledgeBaseTagsQuery = { knowledgeBaseTags: Array<{ id: string, name: string }> | null };
 
-export type KnowledgeBaseTagsByKnowledgeBaseQueryVariables = Exact<{ [key: string]: never; }>;
+export type KnowledgeBaseTagsByKnowledgeBaseQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
 
 
 export type KnowledgeBaseTagsByKnowledgeBaseQuery = { knowledgeBaseTagsByKnowledgeBase: Array<{ knowledgeBaseId: string, tags: Array<{ id: string, name: string }> }> | null };
@@ -6426,8 +6432,8 @@ export const useDataTableTagsQuery = <
     )};
 
 export const DataTableTagsByTableDocument = new TypedDocumentString(`
-    query dataTableTagsByTable {
-  dataTableTagsByTable {
+    query dataTableTagsByTable($workspaceId: ID!) {
+  dataTableTagsByTable(workspaceId: $workspaceId) {
     tableId
     tags {
       id
@@ -6441,13 +6447,13 @@ export const useDataTableTagsByTableQuery = <
       TData = DataTableTagsByTableQuery,
       TError = unknown
     >(
-      variables?: DataTableTagsByTableQueryVariables,
+      variables: DataTableTagsByTableQueryVariables,
       options?: Omit<UseQueryOptions<DataTableTagsByTableQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableTagsByTableQuery, TError, TData>['queryKey'] }
     ) => {
     
     return useQuery<DataTableTagsByTableQuery, TError, TData>(
       {
-    queryKey: variables === undefined ? ['dataTableTagsByTable'] : ['dataTableTagsByTable', variables],
+    queryKey: ['dataTableTagsByTable', variables],
     queryFn: fetcher<DataTableTagsByTableQuery, DataTableTagsByTableQueryVariables>(DataTableTagsByTableDocument, variables),
     ...options
   }
@@ -6990,8 +6996,8 @@ export const useKnowledgeBaseStorageUsageQuery = <
     )};
 
 export const KnowledgeBaseTagsDocument = new TypedDocumentString(`
-    query knowledgeBaseTags {
-  knowledgeBaseTags {
+    query knowledgeBaseTags($workspaceId: ID!) {
+  knowledgeBaseTags(workspaceId: $workspaceId) {
     id
     name
   }
@@ -7002,21 +7008,21 @@ export const useKnowledgeBaseTagsQuery = <
       TData = KnowledgeBaseTagsQuery,
       TError = unknown
     >(
-      variables?: KnowledgeBaseTagsQueryVariables,
+      variables: KnowledgeBaseTagsQueryVariables,
       options?: Omit<UseQueryOptions<KnowledgeBaseTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseTagsQuery, TError, TData>['queryKey'] }
     ) => {
     
     return useQuery<KnowledgeBaseTagsQuery, TError, TData>(
       {
-    queryKey: variables === undefined ? ['knowledgeBaseTags'] : ['knowledgeBaseTags', variables],
+    queryKey: ['knowledgeBaseTags', variables],
     queryFn: fetcher<KnowledgeBaseTagsQuery, KnowledgeBaseTagsQueryVariables>(KnowledgeBaseTagsDocument, variables),
     ...options
   }
     )};
 
 export const KnowledgeBaseTagsByKnowledgeBaseDocument = new TypedDocumentString(`
-    query knowledgeBaseTagsByKnowledgeBase {
-  knowledgeBaseTagsByKnowledgeBase {
+    query knowledgeBaseTagsByKnowledgeBase($workspaceId: ID!) {
+  knowledgeBaseTagsByKnowledgeBase(workspaceId: $workspaceId) {
     knowledgeBaseId
     tags {
       id
@@ -7030,13 +7036,13 @@ export const useKnowledgeBaseTagsByKnowledgeBaseQuery = <
       TData = KnowledgeBaseTagsByKnowledgeBaseQuery,
       TError = unknown
     >(
-      variables?: KnowledgeBaseTagsByKnowledgeBaseQueryVariables,
+      variables: KnowledgeBaseTagsByKnowledgeBaseQueryVariables,
       options?: Omit<UseQueryOptions<KnowledgeBaseTagsByKnowledgeBaseQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseTagsByKnowledgeBaseQuery, TError, TData>['queryKey'] }
     ) => {
     
     return useQuery<KnowledgeBaseTagsByKnowledgeBaseQuery, TError, TData>(
       {
-    queryKey: variables === undefined ? ['knowledgeBaseTagsByKnowledgeBase'] : ['knowledgeBaseTagsByKnowledgeBase', variables],
+    queryKey: ['knowledgeBaseTagsByKnowledgeBase', variables],
     queryFn: fetcher<KnowledgeBaseTagsByKnowledgeBaseQuery, KnowledgeBaseTagsByKnowledgeBaseQueryVariables>(KnowledgeBaseTagsByKnowledgeBaseDocument, variables),
     ...options
   }
