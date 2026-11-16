@@ -426,7 +426,7 @@ class EmbeddedMcpToolFacadeIntTest {
     void testWorkflowToolNameFallsBackToTheWorkflowLabel() {
         ToolDefinition toolDefinition = getUnconnectedWorkflowToolDefinition(Map.of());
 
-        assertThat(toolDefinition.name()).isEqualTo("Send_Email");
+        assertThat(toolDefinition.name()).isEqualTo("SEND_EMAIL");
     }
 
     @Test

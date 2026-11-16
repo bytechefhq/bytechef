@@ -239,7 +239,7 @@ class EmbeddedMcpToolFacadeAutomationIntTest {
             .extracting(ToolCallback::getToolDefinition)
             .extracting(ToolDefinition::name, ToolDefinition::description)
             .containsExactlyInAnyOrder(
-                tuple("postToChannel", "Posts to the channel"), tuple("Post_Message", WORKFLOW_DESCRIPTION));
+                tuple("postToChannel", "Posts to the channel"), tuple("POST_MESSAGE", WORKFLOW_DESCRIPTION));
     }
 
     @Test
@@ -408,7 +408,7 @@ class EmbeddedMcpToolFacadeAutomationIntTest {
 
         ToolDefinition toolDefinition = toolCallback.getToolDefinition();
 
-        assertThat(toolDefinition.name()).isEqualTo("Old_Post");
+        assertThat(toolDefinition.name()).isEqualTo("OLD_POST");
         assertThat(toolDefinition.description()).isEqualTo("The deployed version");
         assertThat(toolDefinition.inputSchema()).contains("\"city\"");
 
