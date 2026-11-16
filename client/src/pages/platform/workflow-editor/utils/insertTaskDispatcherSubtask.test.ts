@@ -88,6 +88,46 @@ describe('insertTaskDispatcherSubtask', () => {
 
         expect(branches[0].map((subtask) => subtask.name)).toEqual(['first_action', 'second_action']);
     });
+
+    it('should insert into a custom-named dispatcher, reading its kind from the task type', () => {
+        const loopTask = task({
+            name: 'deleteRows',
+            parameters: {iteratee: [task({name: 'first_action'})]},
+            type: 'loop/v1',
+        });
+
+        const updatedTasks = insertTaskDispatcherSubtask({
+            newTask: task({name: 'second_action'}),
+            taskDispatcherContext: {index: 1, loopId: 'deleteRows', taskDispatcherId: 'deleteRows'},
+            tasks: [loopTask],
+        });
+
+        const iteratee = updatedTasks[0].parameters?.iteratee as WorkflowTask[];
+
+        expect(iteratee.map((subtask) => subtask.name)).toEqual(['first_action', 'second_action']);
+    });
+
+    it('should set the iteratee of a custom-named each nested inside a condition', () => {
+        const conditionTask = task({
+            name: 'condition_1',
+            parameters: {
+                caseFalse: [task({name: 'deleteSubjects', parameters: {items: []}, type: 'each/v1'})],
+                caseTrue: [],
+            },
+            type: 'condition/v1',
+        });
+
+        const updatedTasks = insertTaskDispatcherSubtask({
+            newTask: task({name: 'deleteSubjectsEntry'}),
+            placeholderId: 'deleteSubjects-each-placeholder-0',
+            taskDispatcherContext: {eachId: 'deleteSubjects', index: 0, taskDispatcherId: 'deleteSubjects'},
+            tasks: [conditionTask],
+        });
+
+        const eachTask = (updatedTasks[0].parameters?.caseFalse as WorkflowTask[])[0];
+
+        expect((eachTask.parameters?.iteratee as WorkflowTask).name).toBe('deleteSubjectsEntry');
+    });
 });
 
 describe('insertTaskDispatcherSubtask - graph', () => {
