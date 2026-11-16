@@ -430,12 +430,12 @@ does not support.
 | `BYTECHEF_OAUTH2_REDIRECT_URI` | OAuth2 redirect URI | `BYTECHEF_PUBLIC_URL/callback` |
 | `BYTECHEF_OAUTH2_PREDEFINED_APPS_<APP_NAME>_CLIENT_ID` | Client ID for predefined OAuth2 app (sensitive) | - |
 | `BYTECHEF_OAUTH2_PREDEFINED_APPS_<APP_NAME>_CLIENT_SECRET` | Client secret for predefined OAuth2 app (sensitive) | - |
-| `BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED` | Enable the embedded OAuth2 authorization server (clients are managed under **Settings > OAuth2 Clients**, Enterprise Edition). When disabled, the authorization server endpoints and the OAuth2 resource-server support on the MCP endpoints are not exposed | `false` |
-| `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_URI` | Issuer identifier (`iss` claim / issuer URI) whose JWTs are trusted on the MCP endpoints. Repeat with `_1_`, `_2_`, … for additional issuers | - |
-| `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_TENANT_CLAIM` | JWT claim whose value is the ByteChef tenant id (for the embedded authorization server this is the minted `tenant_id` claim) | - |
+| `BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED` | Enable the built-in OAuth2 authorization server (clients are managed under **Settings > OAuth2 Clients**, Enterprise Edition). When disabled, the authorization server endpoints and the OAuth2 resource-server support on the MCP endpoints are not exposed | `true` |
+| `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_URI` | Issuer identifier (`iss` claim / issuer URI) whose JWTs are trusted on the MCP endpoints. Repeat with `_1_`, `_2_`, … for additional issuers. Setting any issuer variable replaces the default list, which holds only the self issuer | `BYTECHEF_PUBLIC_URL` |
+| `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_TENANT_CLAIM` | JWT claim whose value is the ByteChef tenant id (for the built-in authorization server this is the minted `tenant_id` claim) | `tenant_id` |
 | `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_AUTHORITIES_CLAIM` | JWT claim (e.g. `groups`, `roles`) whose values are mapped to granted authorities. When unset, authorities are resolved from the ByteChef user identified by `sub` | - |
 | `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_AUTHORITIES_0` | Authority granted to every token from this issuer, in addition to any mapped from the authorities claim | - |
-| `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_SELF` | Whether this issuer is the ByteChef embedded authorization server; when `true`, audience validation enforces that a token's `aud` contains the requested MCP endpoint URL | `false` |
+| `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_SELF` | Whether this issuer is the ByteChef built-in authorization server; when `true`, audience validation enforces that a token's `aud` contains the requested MCP endpoint URL | `true` |
 | `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_AUDIENCE` | For an external issuer, the fixed audience value its tokens must carry. When unset, audience validation is skipped for this issuer | - |
 
 ## Plan Limits Configuration

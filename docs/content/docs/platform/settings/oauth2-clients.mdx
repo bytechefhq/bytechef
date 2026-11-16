@@ -1,13 +1,13 @@
 ---
 title: OAuth2 Clients
-description: View OAuth2 clients registered with the embedded authorization server, see which users granted them access, and revoke that access.
+description: View OAuth2 clients registered with the built-in authorization server, see which users granted them access, and revoke that access.
 ee: true
 ---
 
 When ByteChef runs its own OAuth2 authorization server, MCP clients and other OAuth2-capable integrations register themselves with it automatically through Dynamic Client Registration (DCR). **Settings → OAuth2 Clients** is the admin surface for that client store: it lists every registered client, shows which users have granted it access, and lets an administrator revoke that access for a single user or for the whole client.
 
 <Callout title="Availability">
-    This page is Enterprise Edition and requires the `ADMIN` authority, which the server also enforces for API calls. The list only has content when the embedded authorization server is enabled with `bytechef.oauth2.authorization-server.enabled=true` (`BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED`), which is off by default.
+    This page is Enterprise Edition and requires the `ADMIN` authority, which the server also enforces for API calls. The list only has content when the built-in authorization server is enabled with `bytechef.oauth2.authorization-server.enabled=true` (`BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED`), which is on by default.
 </Callout>
 
 ---
@@ -81,17 +81,17 @@ Removing a client revokes everything it holds. What the button does depends on h
 
 ## Turn the authorization server on
 
-The embedded authorization server is off by default. Two settings are needed. First, turn the server on with `BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED=true`. Second, tell ByteChef to trust its own tokens by adding an issuer entry for itself:
+The built-in authorization server is on by default. The shipped configuration also trusts its own tokens through this issuer entry:
 
 ```
 BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_SELF=true
-BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_URI=<your public URL>
+BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_URI=${BYTECHEF_PUBLIC_URL}
 BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_TENANT_CLAIM=tenant_id
 ```
 
-The self issuer URI must be exactly the value of `bytechef.public-url` (`BYTECHEF_PUBLIC_URL`), without a trailing slash. The authorization server uses that URL as its issuer, so a different value means ByteChef rejects its own tokens.
+It only needs `BYTECHEF_PUBLIC_URL` (`bytechef.public-url`), set without a trailing slash to the address clients use. The authorization server uses that URL as its issuer, so a different value means ByteChef rejects its own tokens. A blank public URL leaves the issuer URI blank, and ByteChef refuses to start. To turn the authorization server off, set `BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED=false`.
 
-If an external issuer already uses index `0`, add the self issuer at the next free index instead (for example `_1_`). Discovery advertises the first issuer, so put the self issuer at index `0` only when it should be the advertised sign-in.
+Setting any `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_*` variable replaces the whole default issuer list. When you add an external issuer, repeat the three self issuer lines above at a free index (for example `_1_`), or ByteChef rejects its own tokens. Discovery advertises the first issuer, so put the self issuer at index `0` only when it should be the advertised sign-in.
 
 To check that the server is on after a restart, request its metadata. It needs no credentials:
 

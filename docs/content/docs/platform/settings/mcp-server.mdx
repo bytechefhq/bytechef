@@ -20,7 +20,7 @@ See the [AI MCP Server configuration reference](/platform/use-bytechef/self-host
 
 {/* TODO screenshot: Settings → MCP Server page - the MCP server URL with the client tabs (Claude / Cursor / Windsurf / Other) */}
 
-The management server has one URL: `https://<your-host>/api/management/mcp`. It is the same for every ByteChef account and contains no secret, so you can add it to an MCP directory or share it with teammates. ByteChef works out which account a request belongs to from the credential: an admin API key, or the account you signed in with (this requires the embedded authorization server - see [Sign in with ByteChef](#sign-in-with-bytechef-optional)).
+The management server has one URL: `https://<your-host>/api/management/mcp`. It is the same for every ByteChef account and contains no secret, so you can add it to an MCP directory or share it with teammates. ByteChef works out which account a request belongs to from the credential: an admin API key, or the account you signed in with (this requires the built-in authorization server - see [Sign in with ByteChef](#sign-in-with-bytechef-optional)).
 
 1. Open ByteChef and go to **Settings** → **MCP Server**
 2. Copy the **MCP server URL**. The snippets are grouped into per-client tabs - **Claude**, **Cursor**, **Windsurf**, and **Other**.
@@ -53,17 +53,19 @@ The connection snippets below include this header. An admin API key works in eve
 
 ### Sign in with ByteChef (optional)
 
-When the embedded OAuth2 authorization server is enabled, an MCP client that supports OAuth can connect to `https://<your-host>/api/management/mcp` without an API key. The client registers itself, you sign in with your ByteChef account and approve the connection, and the client then acts with your permissions. An administrator can see and revoke these connections under [OAuth2 Clients](/platform/settings/oauth2-clients); a revoked connection stops working on its next request.
+When the built-in OAuth2 authorization server is enabled, an MCP client that supports OAuth can connect to `https://<your-host>/api/management/mcp` without an API key. The client registers itself, you sign in with your ByteChef account and approve the connection, and the client then acts with your permissions. An administrator can see and revoke these connections under [OAuth2 Clients](/platform/settings/oauth2-clients); a revoked connection stops working on its next request.
 
-Two settings are needed. First, turn the server on with `BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED=true`. Second, tell ByteChef to trust its own tokens by adding an issuer entry for itself:
+The authorization server is on by default. The shipped configuration also trusts its own tokens through this issuer entry:
 
 ```
 BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_SELF=true
-BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_URI=<your public URL>
+BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_URI=${BYTECHEF_PUBLIC_URL}
 BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_TENANT_CLAIM=tenant_id
 ```
 
-If an external issuer already uses index `0`, add the self issuer at the next free index instead (for example `_1_`). Discovery advertises the first issuer, so put the self issuer at index `0` only when it should be the advertised sign-in.
+To turn it off, set `BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED=false`.
+
+Setting any `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_*` variable replaces the whole default issuer list. When you add an external issuer, repeat the three self issuer lines above at a free index (for example `_1_`), or sign-in with ByteChef stops working. Discovery advertises the first issuer, so put the self issuer at index `0` only when it should be the advertised sign-in.
 
 Set `BYTECHEF_PUBLIC_URL` to the address clients use to reach ByteChef. The issuer, the discovery documents and the `401` challenge all name that address, and an MCP client refuses a server whose discovery names a different one - which is what happens behind a proxy when the public URL is not set.
 
@@ -84,7 +86,7 @@ See [Environment Variables](/platform/use-bytechef/self-hosted/configuration/env
 
 **Claude.ai (web)**
 
-> claude.ai integrations cannot send custom headers, so they cannot send the admin API key this server requires. Use Claude Desktop instead - unless the embedded authorization server is enabled, in which case claude.ai can connect to the tenant-less URL by signing in with ByteChef (see [Sign in with ByteChef](#sign-in-with-bytechef-optional)).
+> claude.ai integrations cannot send custom headers, so they cannot send the admin API key this server requires. Use Claude Desktop instead - unless the built-in authorization server is enabled, in which case claude.ai can connect to the tenant-less URL by signing in with ByteChef (see [Sign in with ByteChef](#sign-in-with-bytechef-optional)).
 
 **Claude Desktop**
 
