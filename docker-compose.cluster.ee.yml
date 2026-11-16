@@ -1,0 +1,17 @@
+x-bytechef-ee-environment: &bytechef-ee-environment
+  BYTECHEF_EDITION: EE
+  BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED: "true"
+
+services:
+  migrate:
+    environment:
+      <<: *bytechef-ee-environment
+  coordinator:
+    environment:
+      <<: *bytechef-ee-environment
+  worker:
+    environment:
+      <<: *bytechef-ee-environment
+  webhook:
+    environment:
+      <<: *bytechef-ee-environment
