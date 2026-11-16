@@ -567,6 +567,34 @@ public class ProjectFacadeIntTest {
     }
 
     @Test
+    public void testGetProjectTagsExcludesTagsOfOtherWorkspaces() {
+        Workspace otherWorkspace = workspaceRepository.save(new Workspace("other"));
+
+        Project project = new Project();
+
+        project.setName("name");
+        project.setTags(List.of(tagRepository.save(new Tag("workspace-tag"))));
+        project.setWorkspaceId(workspace.getId());
+
+        projectRepository.save(project);
+
+        Project otherProject = new Project();
+
+        otherProject.setName("other");
+        otherProject.setTags(List.of(tagRepository.save(new Tag("other-workspace-tag"))));
+        otherProject.setWorkspaceId(otherWorkspace.getId());
+
+        projectRepository.save(otherProject);
+
+        assertThat(projectTagFacade.getProjectTags(workspace.getId()))
+            .extracting(Tag::getName)
+            .containsExactly("workspace-tag");
+        assertThat(projectTagFacade.getProjectTags(otherWorkspace.getId()))
+            .extracting(Tag::getName)
+            .containsExactly("other-workspace-tag");
+    }
+
+    @Test
     public void testGetProjectTags() {
         Project project = new Project();
 
@@ -581,7 +609,7 @@ public class ProjectFacadeIntTest {
         projectRepository.save(project);
 
         assertThat(
-            projectTagFacade.getProjectTags()
+            projectTagFacade.getProjectTags(workspace.getId())
                 .stream()
                 .map(Tag::getName)
                 .collect(Collectors.toSet())).contains("tag1", "tag2");
@@ -599,7 +627,7 @@ public class ProjectFacadeIntTest {
         projectRepository.save(project);
 
         assertThat(
-            projectTagFacade.getProjectTags()
+            projectTagFacade.getProjectTags(workspace.getId())
                 .stream()
                 .map(Tag::getName)
                 .collect(Collectors.toSet())).contains("tag1", "tag2", "tag3");
@@ -607,7 +635,7 @@ public class ProjectFacadeIntTest {
         projectRepository.deleteById(Validate.notNull(project.getId(), "id"));
 
         assertThat(
-            projectTagFacade.getProjectTags()
+            projectTagFacade.getProjectTags(workspace.getId())
                 .stream()
                 .map(Tag::getName)
                 .collect(Collectors.toSet())).contains("tag1", "tag2");

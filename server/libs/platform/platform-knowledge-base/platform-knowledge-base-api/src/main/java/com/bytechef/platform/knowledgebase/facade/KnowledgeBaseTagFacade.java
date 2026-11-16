@@ -28,26 +28,20 @@ import java.util.Map;
 public interface KnowledgeBaseTagFacade {
 
     /**
-     * Retrieves a list of all tags.
+     * Retrieves the distinct tags assigned to the given knowledge bases.
      *
-     * @return a list of Tag objects representing all available tags
+     * @param knowledgeBaseIds the ids of the knowledge bases whose tags are returned
+     * @return a list of Tag objects assigned to at least one of the given knowledge bases
      */
-    List<Tag> getAllTags();
+    List<Tag> getTags(List<Long> knowledgeBaseIds);
 
     /**
      * Retrieves a mapping from knowledgebase ID to list of tags assigned to that knowledgeBase.
      *
+     * @param knowledgeBaseIds the ids of the knowledge bases to include
      * @return a map where keys are knowledgebase IDs and values are lists of Tag objects assigned to each knowledgebase
      */
-    Map<Long, List<Tag>> getTagsByKnowledgeBaseId();
-
-    /**
-     * Retrieves a mapping from knowledgebase name to list of tags assigned to that knowledgeBase.
-     *
-     * @return a map where keys are knowledgebase names and values are lists of Tag objects assigned to each
-     *         knowledgebase
-     */
-    Map<String, List<Tag>> getTagsByKnowledgeBaseName();
+    Map<Long, List<Tag>> getTagsByKnowledgeBaseId(List<Long> knowledgeBaseIds);
 
     /**
      * Updates the tags associated with a specific knowledgeBase.

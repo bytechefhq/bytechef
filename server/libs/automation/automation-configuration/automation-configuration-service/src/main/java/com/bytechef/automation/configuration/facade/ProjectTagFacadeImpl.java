@@ -46,8 +46,9 @@ public class ProjectTagFacadeImpl implements ProjectTagFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Tag> getProjectTags() {
-        List<Project> projects = projectService.getProjects(null, null, null, null, null, null);
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
+    public List<Tag> getProjectTags(long workspaceId) {
+        List<Project> projects = projectService.getProjects(projectService.getWorkspaceProjectIds(workspaceId));
 
         return tagService.getTags(CollectionUtils.flatMap(projects, Project::getTagIds));
     }

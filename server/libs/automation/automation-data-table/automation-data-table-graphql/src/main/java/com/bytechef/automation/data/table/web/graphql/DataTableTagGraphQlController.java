@@ -18,7 +18,6 @@ package com.bytechef.automation.data.table.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
-import com.bytechef.platform.data.table.configuration.service.DataTableTagService;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -27,7 +26,6 @@ import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -38,14 +36,10 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI")
 public class DataTableTagGraphQlController {
 
-    private final DataTableTagService dataTableTagService;
     private final WorkspaceDataTableFacade workspaceDataTableFacade;
 
     @SuppressFBWarnings("EI")
-    public DataTableTagGraphQlController(
-        DataTableTagService dataTableTagService, WorkspaceDataTableFacade workspaceDataTableFacade) {
-
-        this.dataTableTagService = dataTableTagService;
+    public DataTableTagGraphQlController(WorkspaceDataTableFacade workspaceDataTableFacade) {
         this.workspaceDataTableFacade = workspaceDataTableFacade;
     }
 
@@ -55,9 +49,8 @@ public class DataTableTagGraphQlController {
     }
 
     @QueryMapping
-    @PreAuthorize("isAuthenticated()")
-    public List<DataTableTagsEntry> dataTableTagsByTable() {
-        Map<Long, List<Tag>> tagsByTableId = dataTableTagService.getTagsByTableId();
+    public List<DataTableTagsEntry> dataTableTagsByTable(@Argument long workspaceId) {
+        Map<Long, List<Tag>> tagsByTableId = workspaceDataTableFacade.getTagsByTableId(workspaceId);
 
         return tagsByTableId.entrySet()
             .stream()

@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.knowledgebase.web.graphql;
 
+import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseTagFacade;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -36,20 +37,24 @@ import org.springframework.stereotype.Controller;
 public class KnowledgeBaseTagGraphQlController {
 
     private final KnowledgeBaseTagFacade knowledgeBaseTagFacade;
+    private final WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade;
 
     @SuppressFBWarnings("EI")
-    public KnowledgeBaseTagGraphQlController(KnowledgeBaseTagFacade knowledgeBaseTagFacade) {
+    public KnowledgeBaseTagGraphQlController(
+        KnowledgeBaseTagFacade knowledgeBaseTagFacade, WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade) {
+
         this.knowledgeBaseTagFacade = knowledgeBaseTagFacade;
+        this.workspaceKnowledgeBaseFacade = workspaceKnowledgeBaseFacade;
     }
 
     @QueryMapping
-    public List<Tag> knowledgeBaseTags() {
-        return knowledgeBaseTagFacade.getAllTags();
+    public List<Tag> knowledgeBaseTags(@Argument long workspaceId) {
+        return workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBaseTags(workspaceId);
     }
 
     @QueryMapping
-    public List<KnowledgeBaseTagsEntry> knowledgeBaseTagsByKnowledgeBase() {
-        return knowledgeBaseTagFacade.getTagsByKnowledgeBaseId()
+    public List<KnowledgeBaseTagsEntry> knowledgeBaseTagsByKnowledgeBase(@Argument long workspaceId) {
+        return workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBaseTagsByKnowledgeBaseId(workspaceId)
             .entrySet()
             .stream()
             .map(entry -> new KnowledgeBaseTagsEntry(entry.getKey(), entry.getValue()))

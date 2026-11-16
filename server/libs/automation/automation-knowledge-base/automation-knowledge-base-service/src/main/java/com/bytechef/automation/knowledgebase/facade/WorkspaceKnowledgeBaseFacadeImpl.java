@@ -26,11 +26,14 @@ import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseStorageUsage;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseTagFacade;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseStorageService;
+import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -52,19 +55,21 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
     private final KnowledgeBaseService knowledgeBaseService;
     private final KnowledgeBaseStorageService knowledgeBaseStorageService;
+    private final KnowledgeBaseTagFacade knowledgeBaseTagFacade;
     private final WorkspaceKnowledgeBaseService workspaceKnowledgeBaseService;
 
     @SuppressFBWarnings("EI")
     public WorkspaceKnowledgeBaseFacadeImpl(
         KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
         KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseService knowledgeBaseService,
-        KnowledgeBaseStorageService knowledgeBaseStorageService,
+        KnowledgeBaseStorageService knowledgeBaseStorageService, KnowledgeBaseTagFacade knowledgeBaseTagFacade,
         WorkspaceKnowledgeBaseService workspaceKnowledgeBaseService) {
 
         this.knowledgeBaseDocumentFacade = knowledgeBaseDocumentFacade;
         this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
         this.knowledgeBaseService = knowledgeBaseService;
         this.knowledgeBaseStorageService = knowledgeBaseStorageService;
+        this.knowledgeBaseTagFacade = knowledgeBaseTagFacade;
         this.workspaceKnowledgeBaseService = workspaceKnowledgeBaseService;
     }
 
@@ -79,6 +84,18 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
                 workspaceKnowledgeBase.getKnowledgeBaseId()))
             .filter(knowledgeBase -> knowledgeBase.getEnvironmentId() == environmentId)
             .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Tag> getWorkspaceKnowledgeBaseTags(long workspaceId) {
+        return knowledgeBaseTagFacade.getTags(getWorkspaceKnowledgeBaseIds(workspaceId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, List<Tag>> getWorkspaceKnowledgeBaseTagsByKnowledgeBaseId(long workspaceId) {
+        return knowledgeBaseTagFacade.getTagsByKnowledgeBaseId(getWorkspaceKnowledgeBaseIds(workspaceId));
     }
 
     @Override
@@ -183,5 +200,12 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     @Transactional(readOnly = true)
     public KnowledgeBaseStorageUsage getStorageUsage() {
         return knowledgeBaseStorageService.getUsage();
+    }
+
+    private List<Long> getWorkspaceKnowledgeBaseIds(long workspaceId) {
+        return workspaceKnowledgeBaseService.getWorkspaceKnowledgeBases(workspaceId)
+            .stream()
+            .map(WorkspaceKnowledgeBase::getKnowledgeBaseId)
+            .toList();
     }
 }

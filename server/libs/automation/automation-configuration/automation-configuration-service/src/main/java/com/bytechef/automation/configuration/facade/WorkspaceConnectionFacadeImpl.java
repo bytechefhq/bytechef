@@ -31,6 +31,7 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -51,6 +52,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     private final ConnectionLifecycleFacade connectionLifecycleFacade;
     private final ConnectionService connectionService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+    private final TagService tagService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkspaceConnectionService workspaceConnectionService;
 
@@ -58,13 +60,14 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     public WorkspaceConnectionFacadeImpl(
         ConnectionFacade connectionFacade, ConnectionLifecycleFacade connectionLifecycleFacade,
         ConnectionService connectionService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        WorkflowTestConfigurationService workflowTestConfigurationService,
+        TagService tagService, WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkspaceConnectionService workspaceConnectionService) {
 
         this.connectionFacade = connectionFacade;
         this.connectionLifecycleFacade = connectionLifecycleFacade;
         this.connectionService = connectionService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
+        this.tagService = tagService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workspaceConnectionService = workspaceConnectionService;
     }
@@ -120,6 +123,27 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
         return connectionFacade.getConnections(
             componentName, connectionVersion, connectionIds, tagId, environmentId, PlatformType.AUTOMATION);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
+    public List<Tag> getConnectionTags(long workspaceId) {
+        List<Long> connectionIds = CollectionUtils.map(
+            workspaceConnectionService.getWorkspaceConnections(workspaceId), WorkspaceConnection::getConnectionId);
+
+        if (connectionIds.isEmpty()) {
+            return List.of();
+        }
+
+        List<Connection> connections = connectionService.getConnections(connectionIds);
+
+        return tagService.getTags(
+            connections.stream()
+                .filter(connection -> connection.getType() == PlatformType.AUTOMATION)
+                .flatMap(connection -> CollectionUtils.stream(connection.getTagIds()))
+                .distinct()
+                .toList());
     }
 
     @Override
