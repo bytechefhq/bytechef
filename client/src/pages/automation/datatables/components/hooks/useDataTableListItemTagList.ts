@@ -1,3 +1,4 @@
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
     DataTableTagsByTableQuery,
     UpdateDataTableTagsMutationVariables,
@@ -12,20 +13,24 @@ interface UseDataTableListItemTagListProps {
 }
 
 export default function useDataTableListItemTagList({tableId}: UseDataTableListItemTagListProps) {
+    const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
     const queryClient = useQueryClient();
+
+    const tagsByTableQueryKey = ['dataTableTagsByTable', {workspaceId: String(workspaceId)}];
 
     const updateTagsMutation = useUpdateDataTableTagsMutation({
         onError: (_err, _vars, ctx) => {
             if (ctx?.previous) {
-                queryClient.setQueryData(['dataTableTagsByTable'], ctx.previous);
+                queryClient.setQueryData(tagsByTableQueryKey, ctx.previous);
             }
         },
         onMutate: async (variables: UpdateDataTableTagsMutationVariables) => {
             await queryClient.cancelQueries({queryKey: ['dataTableTagsByTable']});
 
-            const previous = queryClient.getQueryData<{dataTableTagsByTable: DataTableTagsByTableEntryType[]}>([
-                'dataTableTagsByTable',
-            ]);
+            const previous = queryClient.getQueryData<{dataTableTagsByTable: DataTableTagsByTableEntryType[]}>(
+                tagsByTableQueryKey
+            );
 
             const next = (() => {
                 if (!previous?.dataTableTagsByTable) return previous;
@@ -49,7 +54,7 @@ export default function useDataTableListItemTagList({tableId}: UseDataTableListI
                       };
             })();
 
-            queryClient.setQueryData(['dataTableTagsByTable'], next);
+            queryClient.setQueryData(tagsByTableQueryKey, next);
 
             return {previous};
         },
