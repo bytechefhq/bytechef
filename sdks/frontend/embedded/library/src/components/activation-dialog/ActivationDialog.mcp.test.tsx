@@ -92,6 +92,47 @@ describe('ActivationDialog Available to AI agents switch', () => {
         expect(calls.filter((call) => call.url.endsWith('/automation/workflows'))).toHaveLength(1);
     });
 
+    it('deactivatesAnActivatedAutomationAfterConfirming', async () => {
+        userWorkflows = [{automationUuid: 'wf-plain', kind: 'REFERENCE', mcpEnabled: true}];
+
+        const onClose = vi.fn();
+        const onDeactivated = vi.fn();
+
+        render(
+            <ActivationDialog
+                baseUrl="https://api.example.com"
+                environment="PRODUCTION"
+                jwtToken="ey"
+                onClose={onClose}
+                onDeactivated={onDeactivated}
+                workflowTemplateId="wf-plain"
+            />
+        );
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Deactivate'}));
+
+        const deprovisionCalls = () =>
+            calls.filter((call) => call.method === 'DELETE' && call.url.endsWith('/wf-plain/provision'));
+
+        expect(deprovisionCalls()).toHaveLength(0);
+        expect(onClose).not.toHaveBeenCalled();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Confirm deactivate'}));
+
+        await waitFor(() => expect(onClose).toHaveBeenCalled());
+
+        expect(deprovisionCalls()).toHaveLength(1);
+        expect(onDeactivated).toHaveBeenCalledWith('wf-plain');
+    });
+
+    it('hidesDeactivateForAnAutomationThatIsNotActivated', async () => {
+        renderDialog();
+
+        await waitFor(() => expect(screen.queryByText('Loading...')).not.toBeInTheDocument());
+
+        expect(screen.queryByRole('button', {name: 'Deactivate'})).not.toBeInTheDocument();
+    });
+
     it('hidesAiAgentsSwitchWhenNotOffered', async () => {
         userWorkflows = [{automationUuid: 'wf-plain', kind: 'REFERENCE', mcpEnabled: null}];
 
