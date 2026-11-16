@@ -5,6 +5,127 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": false,
+    "description": "Checks a password against a BCrypt hash ($2a$, $2b$ or $2y$). Returns false for a hash that cannot be read.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/crypto-helper_v1#bcrypt-verify"
+    },
+    "metadata": { },
+    "name": "bcryptVerify",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": false,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "Whether the password matches the hash",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": true,
+          "hidden": false,
+          "label": null,
+          "metadata": { },
+          "name": null,
+          "options": [ {
+            "description": null,
+            "label": "True",
+            "value": true
+          }, {
+            "description": null,
+            "label": "False",
+            "value": false
+          } ],
+          "placeholder": null,
+          "required": false,
+          "type": "BOOLEAN"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": false,
+        "controlType": "SELECT",
+        "defaultValue": null,
+        "description": "Whether the password matches the hash",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": true,
+        "hidden": false,
+        "label": null,
+        "metadata": { },
+        "name": null,
+        "options": [ {
+          "description": null,
+          "label": "True",
+          "value": true
+        }, {
+          "description": null,
+          "label": "False",
+          "value": false
+        } ],
+        "placeholder": null,
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The password to check.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Password",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "password",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The stored BCrypt hash, e.g. $2a$10$...",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Hash",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "hash",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "resumePerform": null,
+    "title": "BCrypt Verify",
+    "workflowNodeDescription": null
+  }, {
+    "batch": false,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": false,
     "description": "Computes and returns the hash of the input.",
     "help": {
       "body": "",
@@ -2425,6 +2546,124 @@
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
+    "name": "bcryptVerify",
+    "description": "Checks a password against a BCrypt hash ($2a$, $2b$ or $2y$). Returns false for a hash that cannot be read.",
+    "element": { },
+    "help": null,
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": {
+        "outputSchema": {
+          "advancedOption": false,
+          "controlType": "SELECT",
+          "defaultValue": null,
+          "description": "Whether the password matches the hash",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": true,
+          "hidden": false,
+          "label": null,
+          "metadata": { },
+          "name": null,
+          "options": [ {
+            "description": null,
+            "label": "True",
+            "value": true
+          }, {
+            "description": null,
+            "label": "False",
+            "value": false
+          } ],
+          "placeholder": null,
+          "required": false,
+          "type": "BOOLEAN"
+        },
+        "placeholder": null,
+        "sampleOutput": null
+      },
+      "outputSchema": {
+        "advancedOption": false,
+        "controlType": "SELECT",
+        "defaultValue": null,
+        "description": "Whether the password matches the hash",
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": true,
+        "hidden": false,
+        "label": null,
+        "metadata": { },
+        "name": null,
+        "options": [ {
+          "description": null,
+          "label": "True",
+          "value": true
+        }, {
+          "description": null,
+          "label": "False",
+          "value": false
+        } ],
+        "placeholder": null,
+        "required": false,
+        "type": "BOOLEAN"
+      },
+      "sampleOutput": null
+    },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The password to check.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Password",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "password",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The stored BCrypt hash, e.g. $2a$10$...",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Hash",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "hash",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "BCrypt Verify",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
     "name": "hash",
     "description": "Computes and returns the hash of the input.",
     "element": { },
