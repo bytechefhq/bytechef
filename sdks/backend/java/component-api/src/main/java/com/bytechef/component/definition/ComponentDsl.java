@@ -2448,8 +2448,14 @@ public final class ComponentDsl {
         implements Property.FileEntryProperty {
 
         private final List<? extends ValueProperty<?>> properties = List.of(
-            string("extension").required(true), string("mimeType").required(true),
-            string("name").required(true), string("url").required(true));
+            string("extension").exampleValue("xlsx")
+                .required(true),
+            string("mimeType").exampleValue("application/vnd.openxmlformats-officedocument")
+                .required(true),
+            string("name").exampleValue("deposit-20261101.xlsx")
+                .required(true),
+            string("url").exampleValue("file:/editor/temp/5f0b3d46-548b-42d3-8c30-b1bf5e0d1de2.xlsx")
+                .required(true));
 
         private ModifiableFileEntryProperty() {
             this(null);
