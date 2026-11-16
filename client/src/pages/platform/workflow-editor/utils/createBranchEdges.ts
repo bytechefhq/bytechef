@@ -84,7 +84,7 @@ function createEdgesForSingleCase(
 
     edges.push(...createSubtaskChainEdges(caseTasks));
 
-    const lastNodeId = getSubtaskExitNodeId(caseTasks[caseTasks.length - 1].name);
+    const lastNodeId = getSubtaskExitNodeId(caseTasks[caseTasks.length - 1]);
 
     edges.push({
         ...(isMiddle ? {data: {isMiddleCase: true}} : {}),

@@ -1,4 +1,5 @@
-import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
+import {CHILDLESS_TASK_DISPATCHER_NAMES, TASK_DISPATCHER_NAMES} from '@/shared/constants';
+import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 
 import {getGraphFrameId} from './graph/graphFrameGeometry';
 
@@ -19,9 +20,18 @@ export function getWorkflowNodeComponentName(workflowNodeName: string): string {
     return COMPONENT_NAME_BY_NODE_NAME_PREFIX[nodeNamePrefix] || nodeNamePrefix;
 }
 
-export function getNestedBottomGhostId(taskNodeId: string): string {
-    const componentName = getWorkflowNodeComponentName(taskNodeId);
+export function getWorkflowTaskComponentName(task: WorkflowTask): string {
+    return task.type?.split('/')[0] || getWorkflowNodeComponentName(task.name);
+}
 
+export function isNestingTaskDispatcher(componentName: string): boolean {
+    return TASK_DISPATCHER_NAMES.includes(componentName) && !CHILDLESS_TASK_DISPATCHER_NAMES.includes(componentName);
+}
+
+export function getNestedBottomGhostId(
+    taskNodeId: string,
+    componentName: string = getWorkflowNodeComponentName(taskNodeId)
+): string {
     if (componentName === 'graph') {
         return getGraphFrameId(taskNodeId);
     }

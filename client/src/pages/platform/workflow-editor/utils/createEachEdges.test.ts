@@ -63,3 +63,19 @@ describe('createEachEdges nested dispatcher exit edge', () => {
         expect(mergeEdge?.source).toBe('mailchimp_1');
     });
 });
+
+describe('createEachEdges with a custom-named iteratee dispatcher', () => {
+    it('wires the nested dispatcher to the each bottom ghost from its task type', () => {
+        const eachNode = eachNodeWithIteratee(undefined);
+
+        (eachNode.data as {parameters: object}).parameters = {
+            iteratee: {name: 'deleteRows', type: 'loop/v1'},
+        };
+
+        const mergeEdge = createEachEdges(eachNode).find(
+            (edge) => edge.target === 'each_1-each-bottom-ghost' && !edge.source.includes('-taskDispatcher-left-ghost')
+        );
+
+        expect(mergeEdge?.source).toBe('deleteRows-loop-bottom-ghost');
+    });
+});
