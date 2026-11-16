@@ -5,6 +5,7 @@ bytechef:
     mcp:
       server:
         enabled: false
+  public-url: http://localhost:8080
   security:
     remember-me:
       key: test

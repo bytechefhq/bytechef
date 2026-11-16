@@ -256,7 +256,16 @@ bytechef:
       control-provider: SQS
   oauth2:
     authorization-server:
-      enabled: false
+      # Built-in OAuth2 authorization server for MCP clients. It needs the self issuer below and a non-blank
+      # bytechef.public-url, which becomes the token issuer.
+      enabled: true
+    resource-server:
+      issuers:
+        - uri: ${bytechef.public-url}
+          # Tokens minted by the built-in authorization server
+          self: true
+          # JWT claim holding the ByteChef tenant id; the built-in authorization server mints it as tenant_id
+          tenant-claim: tenant_id
 #    predefinedApps:
 #      mailchimp:
 #        clientId: 123456789
