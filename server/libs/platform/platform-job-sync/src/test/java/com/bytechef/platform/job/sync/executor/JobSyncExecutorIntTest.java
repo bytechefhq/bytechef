@@ -90,6 +90,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -842,11 +843,15 @@ class JobSyncExecutorIntTest {
             .when(recordingTaskExecutionService)
             .fetchLastJobTaskExecution(jobId);
 
-        CompletableFuture<Job> awaitedJobFuture = CompletableFuture.supplyAsync(
-            () -> jobSyncExecutor.awaitJob(jobId, true));
+        FutureTask<Job> awaitedJobFuture = new FutureTask<>(() -> jobSyncExecutor.awaitJob(jobId, true));
 
-        assertThatThrownBy(() -> awaitedJobFuture.get(500, TimeUnit.MILLISECONDS))
-            .isInstanceOf(TimeoutException.class);
+        Thread waitingThread = Thread.ofVirtual()
+            .start(awaitedJobFuture);
+
+        awaitCondition()
+            .until(() -> isParkedOnALatch(waitingThread));
+
+        assertThat(awaitedJobFuture).isNotDone();
 
         taskGates.release(jobId);
 
