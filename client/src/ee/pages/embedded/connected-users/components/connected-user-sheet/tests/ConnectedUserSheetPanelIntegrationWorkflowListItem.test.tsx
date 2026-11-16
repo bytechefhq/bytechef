@@ -11,6 +11,14 @@ import {
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+const hoisted = vi.hoisted(() => ({
+    copyToClipboard: vi.fn(),
+}));
+
+vi.mock('@uidotdev/usehooks', () => ({
+    useCopyToClipboard: () => [null, hoisted.copyToClipboard],
+}));
+
 vi.mock('@/ee/shared/mutations/embedded/integrationInstanceWorkflows.mutations', () => ({
     useEnableIntegrationInstanceWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
 }));
@@ -202,5 +210,25 @@ describe('ConnectedUserSheetPanelIntegrationWorkflowListItem', () => {
         );
 
         expect(screen.getByText('No executions')).toBeInTheDocument();
+    });
+
+    it('copies the workflow uuid that the request trigger runs the workflow by', async () => {
+        render(
+            <TooltipProvider>
+                <ul>
+                    <ConnectedUserSheetPanelIntegrationWorkflowListItem
+                        integrationInstance={integrationInstance}
+                        integrationInstanceConfiguration={integrationInstanceConfiguration}
+                        integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
+                        workflow={{...workflow, workflowUuid: 'workflow-uuid-1'} as Workflow}
+                    />
+                </ul>
+            </TooltipProvider>
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Copy Workflow UUID'}));
+
+        expect(hoisted.copyToClipboard).toHaveBeenCalledWith('workflow-uuid-1');
     });
 });

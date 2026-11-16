@@ -6,13 +6,14 @@ import {
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {EditIcon, EllipsisVerticalIcon, KeyRoundIcon, RefreshCcwIcon, Trash2Icon} from 'lucide-react';
+import {ClipboardIcon, EditIcon, EllipsisVerticalIcon, KeyRoundIcon, RefreshCcwIcon, Trash2Icon} from 'lucide-react';
 
 interface ConnectedUserSheetDeleteDropdownMenuProps {
     changeConfigurationDisabled?: boolean;
     changeConfigurationDisabledReason?: string;
     credentialsDisabledReason?: string;
     onChangeConfigurationClick?: () => void;
+    onCopyWorkflowUuidClick?: () => void;
     onCredentialsClick?: () => void;
     onDeleteClick?: () => void;
     onEditClick?: () => void;
@@ -23,6 +24,7 @@ const ConnectedUserSheetDeleteDropdownMenu = ({
     changeConfigurationDisabledReason,
     credentialsDisabledReason,
     onChangeConfigurationClick,
+    onCopyWorkflowUuidClick,
     onCredentialsClick,
     onDeleteClick,
     onEditClick,
@@ -74,6 +76,14 @@ const ConnectedUserSheetDeleteDropdownMenu = ({
                         <TooltipContent side="left">{changeConfigurationDisabledReason}</TooltipContent>
                     )}
                 </Tooltip>
+            )}
+
+            {onCopyWorkflowUuidClick && (
+                <DropdownMenuItem
+                    icon={<ClipboardIcon />}
+                    label="Copy Workflow UUID"
+                    onClick={onCopyWorkflowUuidClick}
+                />
             )}
 
             {onDeleteClick && (

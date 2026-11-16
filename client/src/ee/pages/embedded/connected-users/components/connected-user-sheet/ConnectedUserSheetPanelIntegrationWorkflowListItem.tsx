@@ -1,6 +1,7 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
 import McpToolBadge from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/McpToolBadge';
 import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/ee/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
 import {
@@ -20,7 +21,9 @@ import useWorkflowComponentDefinitions, {
     getWorkflowComponentNames,
 } from '@/shared/hooks/useWorkflowComponentDefinitions';
 import {useQueryClient} from '@tanstack/react-query';
+import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {useMemo} from 'react';
+import {toast} from 'sonner';
 
 const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
     integrationInstance,
@@ -47,6 +50,7 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
         (state) => state.openIntegrationInstanceConfigurationWorkflowSheet
     );
 
+    const [, copyToClipboard] = useCopyToClipboard();
     const queryClient = useQueryClient();
 
     const enableIntegrationInstanceWorkflowMutation = useEnableIntegrationInstanceWorkflowMutation({
@@ -70,6 +74,14 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
             integrationVersion: integrationInstanceConfiguration.integrationVersion,
             workflow,
         });
+    };
+
+    const handleCopyWorkflowUuidClick = async () => {
+        if (workflow.workflowUuid) {
+            await copyToClipboard(workflow.workflowUuid);
+
+            toast('Workflow UUID copied to clipboard');
+        }
     };
 
     return (
@@ -116,21 +128,27 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
                         <TooltipContent side="left">Last Execution Date</TooltipContent>
                     </Tooltip>
 
-                    <div className="relative mr-11 flex items-center">
-                        {enableIntegrationInstanceWorkflowMutation.isPending && (
-                            <LoadingIcon className="absolute top-[3px] left-[-15px]" />
-                        )}
+                    <div className="flex items-center gap-x-1">
+                        <div className="relative flex items-center">
+                            {enableIntegrationInstanceWorkflowMutation.isPending && (
+                                <LoadingIcon className="absolute top-[3px] left-[-15px]" />
+                            )}
 
-                        <Switch
-                            checked={integrationInstanceWorkflow?.enabled}
-                            disabled={!integrationInstanceConfigurationWorkflow?.enabled}
-                            onCheckedChange={(value) => {
-                                enableIntegrationInstanceWorkflowMutation.mutate({
-                                    enable: value,
-                                    id: integrationInstance.id!,
-                                    workflowId: workflow.id!,
-                                });
-                            }}
+                            <Switch
+                                checked={integrationInstanceWorkflow?.enabled}
+                                disabled={!integrationInstanceConfigurationWorkflow?.enabled}
+                                onCheckedChange={(value) => {
+                                    enableIntegrationInstanceWorkflowMutation.mutate({
+                                        enable: value,
+                                        id: integrationInstance.id!,
+                                        workflowId: workflow.id!,
+                                    });
+                                }}
+                            />
+                        </div>
+
+                        <ConnectedUserSheetDeleteDropdownMenu
+                            onCopyWorkflowUuidClick={workflow.workflowUuid ? handleCopyWorkflowUuidClick : undefined}
                         />
                     </div>
                 </div>

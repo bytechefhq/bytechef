@@ -6,8 +6,10 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
-import {DownloadIcon, EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
+import {useCopyToClipboard} from '@uidotdev/usehooks';
+import {ClipboardIcon, DownloadIcon, EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 import {ReactNode} from 'react';
+import {toast} from 'sonner';
 
 interface WorkflowListRowDropdownMenuProps {
     children?: ReactNode;
@@ -15,6 +17,7 @@ interface WorkflowListRowDropdownMenuProps {
     onDeleteClick: () => void;
     onEditClick: () => void;
     workflowLabel?: string;
+    workflowUuid?: string;
 }
 
 const WorkflowListRowDropdownMenu = ({
@@ -23,33 +26,54 @@ const WorkflowListRowDropdownMenu = ({
     onDeleteClick,
     onEditClick,
     workflowLabel,
-}: WorkflowListRowDropdownMenuProps) => (
-    <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-            <Button
-                aria-label={workflowLabel ? `Workflow actions for ${workflowLabel}` : 'Workflow actions'}
-                icon={<EllipsisVerticalIcon />}
-                size="icon"
-                variant="ghost"
-            />
-        </DropdownMenuTrigger>
+    workflowUuid,
+}: WorkflowListRowDropdownMenuProps) => {
+    const [, copyToClipboard] = useCopyToClipboard();
 
-        <DropdownMenuContent align="end">
-            <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={onEditClick} />
+    const handleCopyWorkflowUuidClick = async () => {
+        if (workflowUuid) {
+            await copyToClipboard(workflowUuid);
 
-            {children}
+            toast('Workflow UUID copied to clipboard');
+        }
+    };
 
-            <DropdownMenuItem
-                icon={<DownloadIcon />}
-                label="Export"
-                onClick={() => (window.location.href = exportUrl)}
-            />
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button
+                    aria-label={workflowLabel ? `Workflow actions for ${workflowLabel}` : 'Workflow actions'}
+                    icon={<EllipsisVerticalIcon />}
+                    size="icon"
+                    variant="ghost"
+                />
+            </DropdownMenuTrigger>
 
-            <DropdownMenuSeparator />
+            <DropdownMenuContent align="end">
+                <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={onEditClick} />
 
-            <DropdownMenuItem icon={<Trash2Icon />} label="Delete" onClick={onDeleteClick} variant="destructive" />
-        </DropdownMenuContent>
-    </DropdownMenu>
-);
+                {children}
+
+                {workflowUuid && (
+                    <DropdownMenuItem
+                        icon={<ClipboardIcon />}
+                        label="Copy Workflow UUID"
+                        onClick={handleCopyWorkflowUuidClick}
+                    />
+                )}
+
+                <DropdownMenuItem
+                    icon={<DownloadIcon />}
+                    label="Export"
+                    onClick={() => (window.location.href = exportUrl)}
+                />
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem icon={<Trash2Icon />} label="Delete" onClick={onDeleteClick} variant="destructive" />
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+};
 
 export default WorkflowListRowDropdownMenu;
