@@ -3,7 +3,7 @@ import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 
-import {getWorkflowNodeComponentName} from './workflowNodeNameUtils';
+import {getWorkflowTaskComponentName} from './workflowNodeNameUtils';
 
 /**
  * Creates the base loop structure edges (loop -> top ghost -> left ghost -> bottom ghost)
@@ -97,7 +97,7 @@ function createLoopSubtaskEdges(loopId: string, loopChildTasks: Array<WorkflowTa
 
     loopChildTasks.forEach((task, index) => {
         const sourceTaskName = task.name;
-        const sourceTaskComponentName = getWorkflowNodeComponentName(task.name);
+        const sourceTaskComponentName = getWorkflowTaskComponentName(task);
 
         const isTaskDispatcher = TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName);
         const isLeafTaskDispatcher = CHILDLESS_TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName);

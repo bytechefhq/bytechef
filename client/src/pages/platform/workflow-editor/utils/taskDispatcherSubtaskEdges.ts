@@ -1,17 +1,17 @@
-import {CHILDLESS_TASK_DISPATCHER_NAMES, EDGE_STYLES, TASK_DISPATCHER_NAMES} from '@/shared/constants';
+import {CHILDLESS_TASK_DISPATCHER_NAMES, EDGE_STYLES} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {Edge, Node} from '@xyflow/react';
 
-import {getNestedBottomGhostId, getWorkflowNodeComponentName} from './workflowNodeNameUtils';
+import {getNestedBottomGhostId, getWorkflowTaskComponentName, isNestingTaskDispatcher} from './workflowNodeNameUtils';
 
-export function getSubtaskExitNodeId(taskNodeId: string): string {
-    const componentName = getWorkflowNodeComponentName(taskNodeId);
+export function getSubtaskExitNodeId(task: WorkflowTask): string {
+    const componentName = getWorkflowTaskComponentName(task);
 
-    if (TASK_DISPATCHER_NAMES.includes(componentName) && !CHILDLESS_TASK_DISPATCHER_NAMES.includes(componentName)) {
-        return getNestedBottomGhostId(taskNodeId);
+    if (isNestingTaskDispatcher(componentName)) {
+        return getNestedBottomGhostId(task.name, componentName);
     }
 
-    return taskNodeId;
+    return task.name;
 }
 
 export function createSubtaskChainEdges(subtasks: WorkflowTask[], nestedExitHandlePosition?: string): Edge[] {
@@ -24,7 +24,7 @@ export function createSubtaskChainEdges(subtasks: WorkflowTask[], nestedExitHand
             return;
         }
 
-        const sourceNodeId = getSubtaskExitNodeId(subtask.name);
+        const sourceNodeId = getSubtaskExitNodeId(subtask);
         const leavesNestedDispatcher = sourceNodeId !== subtask.name;
 
         edges.push({
@@ -52,15 +52,15 @@ export function createBranchExitEdges(
         return [];
     }
 
-    const lastTaskNodeId = branchTasks[branchTasks.length - 1].name;
-    const lastTaskNode = allNodes.find((node) => node.id === lastTaskNodeId);
+    const lastTask = branchTasks[branchTasks.length - 1];
+    const lastTaskNode = allNodes.find((node) => node.id === lastTask.name);
 
-    const lastTaskComponentName = getWorkflowNodeComponentName(lastTaskNodeId);
+    const lastTaskComponentName = getWorkflowTaskComponentName(lastTask);
 
     const sourceNodeId =
         lastTaskNode?.data.taskDispatcher && !CHILDLESS_TASK_DISPATCHER_NAMES.includes(lastTaskComponentName)
-            ? getNestedBottomGhostId(lastTaskNodeId)
-            : lastTaskNodeId;
+            ? getNestedBottomGhostId(lastTask.name, lastTaskComponentName)
+            : lastTask.name;
 
     return [
         {

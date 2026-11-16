@@ -101,7 +101,7 @@ function createForkJoinTaskEdges(
 
     edges.push(...createSubtaskChainEdges(branch));
 
-    const lastNodeId = getSubtaskExitNodeId(branch[branch.length - 1].name);
+    const lastNodeId = getSubtaskExitNodeId(branch[branch.length - 1]);
 
     edges.push({
         id: `${lastNodeId}=>${bottomGhostId}`,
