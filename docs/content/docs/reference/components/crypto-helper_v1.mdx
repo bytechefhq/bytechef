@@ -17,6 +17,46 @@ Type: cryptoHelper/v1
 ## Actions
 
 
+### BCrypt Verify
+Name: bcryptVerify
+
+`Checks a password against a BCrypt hash ($2a$, $2b$ or $2y$). Returns false for a hash that cannot be read.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| password | Password | STRING | The password to check. | true |
+| hash | Hash | STRING | The stored BCrypt hash, e.g. $2a$10$... | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "BCrypt Verify",
+  "name" : "bcryptVerify",
+  "parameters" : {
+    "password" : "",
+    "hash" : ""
+  },
+  "type" : "cryptoHelper/v1/bcryptVerify"
+}
+```
+
+#### Output
+
+
+
+Type: BOOLEAN
+
+
+
+
+
+
+
+
+
+
 ### Hash
 Name: hash
 
