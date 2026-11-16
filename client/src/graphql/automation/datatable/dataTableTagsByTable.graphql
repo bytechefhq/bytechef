@@ -1,5 +1,5 @@
-query dataTableTagsByTable {
-    dataTableTagsByTable {
+query dataTableTagsByTable($workspaceId: ID!) {
+    dataTableTagsByTable(workspaceId: $workspaceId) {
         tableId
         tags {
             id
