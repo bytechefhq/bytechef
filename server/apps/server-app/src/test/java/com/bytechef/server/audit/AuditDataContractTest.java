@@ -79,6 +79,7 @@ class AuditDataContractTest {
     private static final String RESULT_VARIABLE = "result";
     private static final List<String> READ_METHOD_PREFIXES = List.of(
         "count", "exists", "fetch", "find", "get", "has", "is", "list", "load", "read", "search");
+    private static final String CHUNK_DATA = "knowledge base chunks are document data and are not recorded";
     private static final String DEFINITION_EDIT = "workflow definition edit";
     private static final String DELEGATES = "delegates to an audited method";
     private static final String TAGS = "tag assignment";
@@ -164,6 +165,12 @@ class AuditDataContractTest {
         Map.entry("WorkspaceDataTableFacadeImpl.updateRow", ROW_DATA),
         Map.entry("WorkspaceDataTableFacadeImpl.updateTags", TAGS),
         Map.entry("WorkspaceDataTableFacadeImpl.upsertRow", ROW_DATA),
+        Map.entry("WorkspaceKnowledgeBaseDocumentFacadeImpl.deleteKnowledgeBaseDocument", DELEGATES),
+        Map.entry("WorkspaceKnowledgeBaseDocumentFacadeImpl.deleteKnowledgeBaseDocumentChunk", CHUNK_DATA),
+        Map.entry("WorkspaceKnowledgeBaseDocumentFacadeImpl.updateKnowledgeBaseDocumentChunk", CHUNK_DATA),
+        Map.entry("WorkspaceKnowledgeBaseDocumentFacadeImpl.updateKnowledgeBaseDocumentTags", TAGS),
+        Map.entry("WorkspaceKnowledgeBaseFacadeImpl.updateKnowledgeBase", DELEGATES),
+        Map.entry("WorkspaceKnowledgeBaseFacadeImpl.updateKnowledgeBaseTags", TAGS),
         Map.entry("WorkspaceMcpServerFacadeImpl.createWorkspaceMcpServer", DELEGATES),
         Map.entry("WorkspaceMcpServerFacadeImpl.deleteWorkspaceMcpServer", DELEGATES),
         Map.entry("WorkspaceMcpServerFacadeImpl.updateWorkspaceMcpServer", DELEGATES));
