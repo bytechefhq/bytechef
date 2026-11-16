@@ -40,6 +40,7 @@ import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -147,7 +148,7 @@ public class ToolFacadeImpl implements ToolFacade {
         ExternalInvocationEvent.Builder eventBuilder = ExternalInvocationEvent
             .builder(PlatformType.EMBEDDED, ExternalInvocationSource.API_TOOL,
                 ExternalInvocationKind.COMPONENT,
-                toolName)
+                toolName.toUpperCase(Locale.ROOT))
             .componentName(result.componentName())
             .operationName(result.clusterElementName())
             .connectionId(connectionId)
