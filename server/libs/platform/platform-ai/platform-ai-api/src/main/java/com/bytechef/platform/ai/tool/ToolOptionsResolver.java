@@ -24,14 +24,17 @@ import com.bytechef.platform.component.domain.OptionsDataSourceAware;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.tenant.TenantContext;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Ticker;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.LongSupplier;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,24 +46,25 @@ public final class ToolOptionsResolver {
 
     private static final Logger log = LoggerFactory.getLogger(ToolOptionsResolver.class);
 
-    static final long CACHE_TTL_MILLIS = 60_000;
-    static final int MAX_CACHE_ENTRIES = 1_000;
+    static final Duration CACHE_TTL = Duration.ofMinutes(1);
+    private static final int MAX_CACHE_ENTRIES = 1_000;
 
-    private final Map<CacheKey, CacheEntry> cache = new ConcurrentHashMap<>();
+    private final Cache<CacheKey, Optional<List<Object>>> cache;
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
-    private final LongSupplier currentTimeMillisSupplier;
 
     @SuppressFBWarnings("EI")
     public ToolOptionsResolver(ClusterElementDefinitionFacade clusterElementDefinitionFacade) {
-        this(clusterElementDefinitionFacade, System::currentTimeMillis);
+        this(clusterElementDefinitionFacade, Ticker.systemTicker());
     }
 
     @SuppressFBWarnings("EI")
-    ToolOptionsResolver(
-        ClusterElementDefinitionFacade clusterElementDefinitionFacade, LongSupplier currentTimeMillisSupplier) {
-
+    ToolOptionsResolver(ClusterElementDefinitionFacade clusterElementDefinitionFacade, Ticker ticker) {
+        this.cache = Caffeine.newBuilder()
+            .expireAfterWrite(CACHE_TTL)
+            .maximumSize(MAX_CACHE_ENTRIES)
+            .ticker(ticker)
+            .build();
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
-        this.currentTimeMillisSupplier = currentTimeMillisSupplier;
     }
 
     public static boolean hasRuntimeOptions(Property property) {
@@ -103,36 +107,13 @@ public final class ToolOptionsResolver {
             TenantContext.getCurrentTenantId(), componentName, componentVersion, clusterElementName,
             property.getName(), connectionId, lookupDependsOnValues);
 
-        long now = currentTimeMillisSupplier.getAsLong();
+        Optional<List<Object>> options = cache.get(
+            cacheKey, key -> Optional.ofNullable(
+                loadOptions(
+                    componentName, componentVersion, clusterElementName, property.getName(), inputParameters,
+                    lookupDependsOnPaths, connectionId)));
 
-        CacheEntry cacheEntry = cache.get(cacheKey);
-
-        if (cacheEntry != null && cacheEntry.expiresAtMillis() > now) {
-            return cacheEntry.options();
-        }
-
-        List<Object> options = loadOptions(
-            componentName, componentVersion, clusterElementName, property.getName(), inputParameters,
-            lookupDependsOnPaths, connectionId);
-
-        evictIfFull(now);
-
-        cache.put(cacheKey, new CacheEntry(options, now + CACHE_TTL_MILLIS));
-
-        return options;
-    }
-
-    private void evictIfFull(long now) {
-        if (cache.size() < MAX_CACHE_ENTRIES) {
-            return;
-        }
-
-        cache.values()
-            .removeIf(cacheEntry -> cacheEntry.expiresAtMillis() <= now);
-
-        if (cache.size() >= MAX_CACHE_ENTRIES) {
-            cache.clear();
-        }
+        return options.orElse(null);
     }
 
     private static Map<String, Object> getFixedParameters(Map<String, ?> parameters) {
@@ -188,9 +169,6 @@ public final class ToolOptionsResolver {
         }
 
         return optionValues.isEmpty() ? null : List.copyOf(optionValues);
-    }
-
-    private record CacheEntry(@Nullable List<Object> options, long expiresAtMillis) {
     }
 
     private record CacheKey(
