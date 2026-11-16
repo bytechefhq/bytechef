@@ -18,7 +18,9 @@ package com.bytechef.automation.knowledgebase.facade;
 
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseStorageUsage;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -39,6 +41,22 @@ public interface WorkspaceKnowledgeBaseFacade {
      * @return a list of {@code KnowledgeBase} objects associated with the workspace and environment
      */
     List<KnowledgeBase> getWorkspaceKnowledgeBases(Long workspaceId, long environmentId);
+
+    /**
+     * Retrieves the distinct tags assigned to the knowledge bases of the specified workspace.
+     *
+     * @param workspaceId the unique identifier of the workspace
+     * @return the tags used by the workspace's knowledge bases
+     */
+    List<Tag> getWorkspaceKnowledgeBaseTags(long workspaceId);
+
+    /**
+     * Retrieves a mapping from knowledge base id to its tags, for the knowledge bases of the specified workspace.
+     *
+     * @param workspaceId the unique identifier of the workspace
+     * @return a map where keys are the workspace's knowledge base ids and values are their tags
+     */
+    Map<Long, List<Tag>> getWorkspaceKnowledgeBaseTagsByKnowledgeBaseId(long workspaceId);
 
     /**
      * Creates a new knowledge base and assigns it to the specified workspace.

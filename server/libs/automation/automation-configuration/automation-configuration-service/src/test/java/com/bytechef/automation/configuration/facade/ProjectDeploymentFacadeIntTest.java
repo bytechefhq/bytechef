@@ -410,11 +410,33 @@ public class ProjectDeploymentFacadeIntTest {
         projectDeploymentFacade.updateProjectDeploymentTags(
             otherProjectDeploymentDTO.id(), List.of(new Tag("deployment-tag-z")));
 
-        List<Tag> tags = projectDeploymentFacade.getProjectDeploymentTags();
+        List<Tag> tags = projectDeploymentFacade.getProjectDeploymentTags(workspace.getId());
 
         assertThat(tags)
             .extracting(Tag::getName)
             .containsExactlyInAnyOrder("deployment-tag-x", "deployment-tag-y", "deployment-tag-z");
+    }
+
+    @Test
+    public void testGetProjectDeploymentTagsExcludesTagsOfOtherWorkspaces() {
+        Workspace otherWorkspace = workspaceRepository.save(new Workspace("other"));
+
+        ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeployment(
+            workspace.getId(), projectDeploymentFacadeHelper.createProject(workspace.getId()));
+        ProjectDeploymentDTO otherProjectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeployment(
+            otherWorkspace.getId(), projectDeploymentFacadeHelper.createProject(otherWorkspace.getId()));
+
+        projectDeploymentFacade.updateProjectDeploymentTags(
+            projectDeploymentDTO.id(), List.of(new Tag("workspace-deployment-tag")));
+        projectDeploymentFacade.updateProjectDeploymentTags(
+            otherProjectDeploymentDTO.id(), List.of(new Tag("other-workspace-deployment-tag")));
+
+        assertThat(projectDeploymentFacade.getProjectDeploymentTags(workspace.getId()))
+            .extracting(Tag::getName)
+            .containsExactly("workspace-deployment-tag");
+        assertThat(projectDeploymentFacade.getProjectDeploymentTags(otherWorkspace.getId()))
+            .extracting(Tag::getName)
+            .containsExactly("other-workspace-deployment-tag");
     }
 
     @Test

@@ -376,8 +376,10 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Tag> getProjectDeploymentTags() {
-        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments();
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
+    public List<Tag> getProjectDeploymentTags(long workspaceId) {
+        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(
+            false, null, null, null, workspaceId);
 
         return tagService.getTags(
             projectDeployments.stream()

@@ -34,12 +34,14 @@ import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationS
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.domain.WorkspaceConnection;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflowRepository;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
+import com.bytechef.automation.configuration.repository.WorkspaceConnectionRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
@@ -128,6 +130,9 @@ public class WorkspaceConnectionFacadeIntTest {
     private WorkspaceConnectionFacade workspaceConnectionFacade;
 
     @Autowired
+    private WorkspaceConnectionRepository workspaceConnectionRepository;
+
+    @Autowired
     private WorkspaceRepository workspaceRepository;
 
     private ProjectDeploymentFacadeHelper projectDeploymentFacadeHelper;
@@ -141,6 +146,7 @@ public class WorkspaceConnectionFacadeIntTest {
         projectWorkflowRepository.deleteAll();
         projectDeploymentRepository.deleteAll();
         projectRepository.deleteAll();
+        workspaceConnectionRepository.deleteAll();
         workspaceRepository.deleteAll();
 
         categoryRepository.deleteAll();
@@ -303,6 +309,50 @@ public class WorkspaceConnectionFacadeIntTest {
         assertThatThrownBy(() -> workspaceConnectionFacade.disconnectConnection(unknownConnectionId))
             .isInstanceOf(NoSuchElementException.class)
             .hasMessage("Connection does not exist for id=" + unknownConnectionId);
+    }
+
+    @Test
+    public void testGetConnectionTagsExcludesTagsOfOtherWorkspaces() {
+        Workspace otherWorkspace = workspaceRepository.save(new Workspace("other"));
+
+        Tag workspaceTag = tagRepository.save(new Tag("workspace-connection-tag"));
+        Tag otherWorkspaceTag = tagRepository.save(new Tag("other-workspace-connection-tag"));
+
+        workspaceConnectionRepository.save(new WorkspaceConnection(10L, workspace.getId()));
+        workspaceConnectionRepository.save(new WorkspaceConnection(20L, otherWorkspace.getId()));
+
+        Connection connection = createConnection(ConnectionStatus.ACTIVE, 0);
+
+        connection.setTags(List.of(workspaceTag));
+
+        Connection otherConnection = createConnection(ConnectionStatus.ACTIVE, 0);
+
+        otherConnection.setTags(List.of(otherWorkspaceTag));
+
+        when(connectionService.getConnections(List.of(10L))).thenReturn(List.of(connection));
+        when(connectionService.getConnections(List.of(20L))).thenReturn(List.of(otherConnection));
+
+        assertThat(workspaceConnectionFacade.getConnectionTags(workspace.getId()))
+            .extracting(Tag::getName)
+            .containsExactly("workspace-connection-tag");
+        assertThat(workspaceConnectionFacade.getConnectionTags(otherWorkspace.getId()))
+            .extracting(Tag::getName)
+            .containsExactly("other-workspace-connection-tag");
+    }
+
+    @Test
+    public void testGetConnectionTagsLeavesOutEmbeddedConnections() {
+        Tag embeddedTag = tagRepository.save(new Tag("embedded-connection-tag"));
+
+        workspaceConnectionRepository.save(new WorkspaceConnection(30L, workspace.getId()));
+
+        Connection embeddedConnection = createEmbeddedConnection();
+
+        embeddedConnection.setTags(List.of(embeddedTag));
+
+        when(connectionService.getConnections(List.of(30L))).thenReturn(List.of(embeddedConnection));
+
+        assertThat(workspaceConnectionFacade.getConnectionTags(workspace.getId())).isEmpty();
     }
 
     @Test

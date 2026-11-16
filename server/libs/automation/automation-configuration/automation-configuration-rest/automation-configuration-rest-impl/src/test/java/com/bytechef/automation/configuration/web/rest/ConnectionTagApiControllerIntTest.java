@@ -40,7 +40,6 @@ import com.bytechef.automation.configuration.web.rest.model.TagModel;
 import com.bytechef.automation.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -87,12 +86,12 @@ class ConnectionTagApiControllerIntTest {
 
     @Test
     void testGetConnectionTags() {
-        when(connectionFacade.getConnectionTags(PlatformType.AUTOMATION))
+        when(workspaceConnectionFacade.getConnectionTags(1L))
             .thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
 
         webTestClient
             .get()
-            .uri("/internal/connections/tags")
+            .uri("/internal/workspaces/1/connection-tags")
             .exchange()
             .expectStatus()
             .isOk()
@@ -108,7 +107,7 @@ class ConnectionTagApiControllerIntTest {
             .jsonPath("$[1].name")
             .isEqualTo("tag2");
 
-        verify(connectionFacade).getConnectionTags(PlatformType.AUTOMATION);
+        verify(workspaceConnectionFacade).getConnectionTags(1L);
     }
 
     @Test
