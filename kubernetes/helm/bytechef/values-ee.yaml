@@ -1,0 +1,6 @@
+env:
+  normal:
+    BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED: "true"
+    ## With the authorization server on, BYTECHEF_PUBLIC_URL must be set to the public endpoint, or app user
+    ## tokens do not verify. Set it here or in values.yaml; a value here wins when both files are passed.
+    # BYTECHEF_PUBLIC_URL: "https://bytechef.example.com"
