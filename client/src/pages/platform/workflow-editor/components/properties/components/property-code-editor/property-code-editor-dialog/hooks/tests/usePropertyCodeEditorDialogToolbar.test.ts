@@ -14,6 +14,7 @@ const hoisted = vi.hoisted(() => {
         mockSetSaving: vi.fn(),
         mockSetScriptIsRunning: vi.fn(),
         mockSetScriptTestExecution: vi.fn(),
+        mockStopScriptTestMutate: vi.fn(),
         storeState: {
             ai: {copilot: {enabled: true}},
             currentEnvironmentId: 1,
@@ -81,6 +82,9 @@ vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
+    useStopScriptTestMutation: () => ({
+        mutate: hoisted.mockStopScriptTestMutate,
+    }),
     useTestClusterElementScriptMutation: () => ({
         mutateAsync: hoisted.mockMutateAsyncClusterElement,
     }),
@@ -230,6 +234,7 @@ describe('usePropertyCodeEditorDialogToolbar', () => {
 
             expect(hoisted.mockMutateAsyncWorkflowNode).toHaveBeenCalledWith({
                 environmentId: 1,
+                executionId: expect.any(String),
                 workflowId: 'workflow-1',
                 workflowNodeName: 'testNode',
             });
@@ -292,6 +297,7 @@ describe('usePropertyCodeEditorDialogToolbar', () => {
                     clusterElementType: 'TOOL',
                     clusterElementWorkflowNodeName: 'tool_1',
                     environmentId: 1,
+                    executionId: expect.any(String),
                     workflowId: 'workflow-1',
                     workflowNodeName: 'aiAgent_1',
                 });
@@ -441,16 +447,54 @@ describe('usePropertyCodeEditorDialogToolbar', () => {
     });
 
     describe('handleStopClick', () => {
-        it('should be a callable function', async () => {
+        it('should do nothing before a script was run', async () => {
             const {usePropertyCodeEditorDialogToolbar} = await import('../usePropertyCodeEditorDialogToolbar');
             const {result} = renderHook(() => usePropertyCodeEditorDialogToolbar(defaultProps));
 
-            expect(typeof result.current.handleStopClick).toBe('function');
-
-            // Should not throw
             act(() => {
                 result.current.handleStopClick();
             });
+
+            expect(hoisted.mockStopScriptTestMutate).not.toHaveBeenCalled();
+        });
+
+        it('should stop the running script with the execution id the run sent', async () => {
+            hoisted.mockMutateAsyncWorkflowNode.mockReturnValue(new Promise(() => {}));
+
+            const {usePropertyCodeEditorDialogToolbar} = await import('../usePropertyCodeEditorDialogToolbar');
+            const {result} = renderHook(() => usePropertyCodeEditorDialogToolbar(defaultProps));
+
+            act(() => {
+                result.current.handleRunClick();
+            });
+
+            act(() => {
+                result.current.handleStopClick();
+            });
+
+            const [{executionId}] = hoisted.mockMutateAsyncWorkflowNode.mock.calls[0];
+
+            expect(executionId).toEqual(expect.any(String));
+            expect(hoisted.mockStopScriptTestMutate).toHaveBeenCalledWith({executionId});
+        });
+
+        it('should send a new execution id for every run', async () => {
+            const {usePropertyCodeEditorDialogToolbar} = await import('../usePropertyCodeEditorDialogToolbar');
+            const {result} = renderHook(() => usePropertyCodeEditorDialogToolbar(defaultProps));
+
+            act(() => {
+                result.current.handleRunClick();
+            });
+
+            act(() => {
+                result.current.handleRunClick();
+            });
+
+            const executionIds = hoisted.mockMutateAsyncWorkflowNode.mock.calls.map(
+                ([variables]) => variables.executionId
+            );
+
+            expect(new Set(executionIds).size).toBe(2);
         });
     });
 });
