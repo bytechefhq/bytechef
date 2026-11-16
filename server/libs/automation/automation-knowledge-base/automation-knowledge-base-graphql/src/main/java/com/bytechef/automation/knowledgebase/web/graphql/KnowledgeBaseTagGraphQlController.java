@@ -17,7 +17,6 @@
 package com.bytechef.automation.knowledgebase.web.graphql;
 
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
-import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseTagFacade;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -36,14 +35,10 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI")
 public class KnowledgeBaseTagGraphQlController {
 
-    private final KnowledgeBaseTagFacade knowledgeBaseTagFacade;
     private final WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade;
 
     @SuppressFBWarnings("EI")
-    public KnowledgeBaseTagGraphQlController(
-        KnowledgeBaseTagFacade knowledgeBaseTagFacade, WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade) {
-
-        this.knowledgeBaseTagFacade = knowledgeBaseTagFacade;
+    public KnowledgeBaseTagGraphQlController(WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade) {
         this.workspaceKnowledgeBaseFacade = workspaceKnowledgeBaseFacade;
     }
 
@@ -78,7 +73,7 @@ public class KnowledgeBaseTagGraphQlController {
             })
             .collect(Collectors.toList());
 
-        knowledgeBaseTagFacade.updateTags(input.knowledgeBaseId(), tags);
+        workspaceKnowledgeBaseFacade.updateKnowledgeBaseTags(input.knowledgeBaseId(), tags);
 
         return true;
     }

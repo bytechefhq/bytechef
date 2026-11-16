@@ -18,7 +18,13 @@ package com.bytechef.automation.knowledgebase.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.knowledgebase.config.AutomationKnowledgeBaseIntTestConfiguration;
 import com.bytechef.automation.knowledgebase.repository.WorkspaceKnowledgeBaseRepository;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
@@ -35,19 +41,27 @@ import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.Callable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  * @author Ivica Cardic
@@ -55,13 +69,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @SpringBootTest(
     classes = {
         AutomationKnowledgeBaseIntTestConfiguration.class,
-        WorkspaceKnowledgeBaseFacadeAuditIntTest.AuditConfiguration.class
+        WorkspaceKnowledgeBaseFacadeIntTest.AuditConfiguration.class
     },
     properties = {
         "bytechef.edition=ee", "bytechef.audit.enabled=true"
     })
 @Import(PostgreSQLContainerConfiguration.class)
-class WorkspaceKnowledgeBaseFacadeAuditIntTest {
+class WorkspaceKnowledgeBaseFacadeIntTest {
 
     private static final String ADMIN_LOGIN = "admin";
     private static final long DEVELOPMENT_ENVIRONMENT_ID = 0;
@@ -254,6 +268,190 @@ class WorkspaceKnowledgeBaseFacadeAuditIntTest {
         knowledgeBase.setName(name);
 
         return knowledgeBase;
+    }
+
+    @Nested
+    @ContextConfiguration(classes = PreAuthorizeEnforcement.MethodSecurityConfiguration.class)
+    class PreAuthorizeEnforcement {
+
+        private static final String KNOWLEDGE_BASE_CREATE = "KNOWLEDGE_BASE_CREATE";
+        private static final String KNOWLEDGE_BASE_EDIT = "KNOWLEDGE_BASE_EDIT";
+        private static final String KNOWLEDGE_BASE_VIEW = "KNOWLEDGE_BASE_VIEW";
+
+        @Autowired
+        private PermissionService permissionService;
+
+        @BeforeEach
+        void beforeEach() {
+            reset(permissionService);
+        }
+
+        @Test
+        void testCreateWorkspaceKnowledgeBaseRequiresCreateScopeOnTheWorkspace() {
+            assertRequiresScope(
+                () -> workspaceKnowledgeBaseFacade.createWorkspaceKnowledgeBase(
+                    newKnowledgeBase("Support articles"), WORKSPACE_ID, DEVELOPMENT_ENVIRONMENT_ID),
+                WORKSPACE_ID, "Workspace", KNOWLEDGE_BASE_CREATE, KNOWLEDGE_BASE_VIEW);
+
+            assertThat(knowledgeBaseRepository.count()).isEqualTo(1);
+        }
+
+        @Test
+        void testCloneWorkspaceKnowledgeBaseRequiresCreateScopeOnTheWorkspace() {
+            KnowledgeBase knowledgeBase = createKnowledgeBase("Support articles");
+
+            assertRequiresScope(
+                () -> workspaceKnowledgeBaseFacade.cloneWorkspaceKnowledgeBase(
+                    knowledgeBase.getId(), WORKSPACE_ID, STAGING_ENVIRONMENT_ID, "Staging articles"),
+                WORKSPACE_ID, "Workspace", KNOWLEDGE_BASE_CREATE, KNOWLEDGE_BASE_VIEW);
+
+            assertThat(knowledgeBaseRepository.count()).isEqualTo(2);
+        }
+
+        @Test
+        void testGetWorkspaceKnowledgeBasesRequiresViewScopeOnTheWorkspace() {
+            KnowledgeBase knowledgeBase = createKnowledgeBase("Support articles");
+
+            List<KnowledgeBase> knowledgeBases = assertRequiresScope(
+                () -> workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBases(
+                    WORKSPACE_ID, DEVELOPMENT_ENVIRONMENT_ID),
+                WORKSPACE_ID, "Workspace", KNOWLEDGE_BASE_VIEW, null);
+
+            assertThat(knowledgeBases)
+                .extracting(KnowledgeBase::getId)
+                .containsExactly(knowledgeBase.getId());
+        }
+
+        @Test
+        void testGetWorkspaceKnowledgeBaseTagsRequiresViewScopeOnTheWorkspace() {
+            assertRequiresScope(
+                () -> workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBaseTags(WORKSPACE_ID),
+                WORKSPACE_ID, "Workspace", KNOWLEDGE_BASE_VIEW, null);
+        }
+
+        @Test
+        void testGetWorkspaceKnowledgeBaseTagsByKnowledgeBaseIdRequiresViewScopeOnTheWorkspace() {
+            assertRequiresScope(
+                () -> workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBaseTagsByKnowledgeBaseId(WORKSPACE_ID),
+                WORKSPACE_ID, "Workspace", KNOWLEDGE_BASE_VIEW, null);
+        }
+
+        @Test
+        void testGetKnowledgeBaseRequiresViewScopeOnTheKnowledgeBase() {
+            KnowledgeBase knowledgeBase = createKnowledgeBase("Support articles");
+
+            KnowledgeBase fetchedKnowledgeBase = assertRequiresScope(
+                () -> workspaceKnowledgeBaseFacade.getKnowledgeBase(knowledgeBase.getId()),
+                knowledgeBase.getId(), "KnowledgeBase", KNOWLEDGE_BASE_VIEW, null);
+
+            assertThat(fetchedKnowledgeBase.getName()).isEqualTo("Support articles");
+        }
+
+        @Test
+        void testSearchKnowledgeBaseRequiresViewScopeOnTheKnowledgeBase() {
+            KnowledgeBase knowledgeBase = createKnowledgeBase("Support articles");
+
+            assertRequiresScope(
+                () -> workspaceKnowledgeBaseFacade.searchKnowledgeBase(knowledgeBase.getId(), "refunds", null),
+                knowledgeBase.getId(), "KnowledgeBase", KNOWLEDGE_BASE_VIEW, null);
+        }
+
+        @Test
+        void testUpdateKnowledgeBaseRequiresEditScopeOnTheKnowledgeBase() {
+            KnowledgeBase knowledgeBase = createKnowledgeBase("Support articles");
+
+            KnowledgeBase updatedKnowledgeBase = assertRequiresScope(
+                () -> workspaceKnowledgeBaseFacade.updateKnowledgeBase(
+                    knowledgeBase.getId(), newKnowledgeBase("Renamed articles")),
+                knowledgeBase.getId(), "KnowledgeBase", KNOWLEDGE_BASE_EDIT, KNOWLEDGE_BASE_VIEW);
+
+            assertThat(updatedKnowledgeBase.getName()).isEqualTo("Renamed articles");
+        }
+
+        @Test
+        void testUpdateKnowledgeBaseTagsRequiresEditScopeOnTheKnowledgeBase() {
+            KnowledgeBase knowledgeBase = createKnowledgeBase("Support articles");
+
+            assertRequiresScope(
+                () -> {
+                    workspaceKnowledgeBaseFacade.updateKnowledgeBaseTags(knowledgeBase.getId(), List.of());
+
+                    return null;
+                },
+                knowledgeBase.getId(), "KnowledgeBase", KNOWLEDGE_BASE_EDIT, KNOWLEDGE_BASE_VIEW);
+        }
+
+        @Test
+        void testDeleteWorkspaceKnowledgeBaseRequiresEditScopeOnTheKnowledgeBase() {
+            KnowledgeBase knowledgeBase = createKnowledgeBase("Support articles");
+
+            assertRequiresScope(
+                () -> {
+                    workspaceKnowledgeBaseFacade.deleteWorkspaceKnowledgeBase(knowledgeBase.getId());
+
+                    return null;
+                },
+                knowledgeBase.getId(), "KnowledgeBase", KNOWLEDGE_BASE_EDIT, KNOWLEDGE_BASE_VIEW);
+
+            assertThat(knowledgeBaseRepository.findById(knowledgeBase.getId())).isEmpty();
+        }
+
+        @Test
+        void testGetStorageUsageNeedsNoResourceScope() {
+            assertThat(workspaceKnowledgeBaseFacade.getStorageUsage()).isNotNull();
+
+            verifyNoInteractions(permissionService);
+        }
+
+        private <T> T assertRequiresScope(
+            Callable<T> callable, long resourceId, String resourceType, String scope, @Nullable String lesserScope) {
+
+            assertThatThrownBy(callable::call).isInstanceOf(AccessDeniedException.class);
+
+            if (lesserScope != null) {
+                when(permissionService.hasResourceScope(resourceId, resourceType, lesserScope)).thenReturn(true);
+
+                assertThatThrownBy(callable::call).isInstanceOf(AccessDeniedException.class);
+
+                reset(permissionService);
+            }
+
+            when(permissionService.hasResourceScope(resourceId + 1, resourceType, scope)).thenReturn(true);
+
+            assertThatThrownBy(callable::call).isInstanceOf(AccessDeniedException.class);
+
+            reset(permissionService);
+
+            when(permissionService.hasResourceScope(resourceId, resourceType, scope)).thenReturn(true);
+
+            try {
+                return callable.call();
+            } catch (Exception exception) {
+                throw new AssertionError("Expected the granted call to succeed", exception);
+            }
+        }
+
+        private KnowledgeBase createKnowledgeBase(String name) {
+            when(permissionService.hasResourceScope(WORKSPACE_ID, "Workspace", KNOWLEDGE_BASE_CREATE))
+                .thenReturn(true);
+
+            KnowledgeBase knowledgeBase = workspaceKnowledgeBaseFacade.createWorkspaceKnowledgeBase(
+                newKnowledgeBase(name), WORKSPACE_ID, DEVELOPMENT_ENVIRONMENT_ID);
+
+            reset(permissionService);
+
+            return knowledgeBase;
+        }
+
+        @EnableMethodSecurity
+        @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
+        static class MethodSecurityConfiguration {
+
+            @Bean("permissionService")
+            PermissionService permissionService() {
+                return mock(PermissionService.class);
+            }
+        }
     }
 
     @Configuration

@@ -18,6 +18,7 @@ import com.bytechef.ee.automation.configuration.security.scope.A2aPermissionScop
 import com.bytechef.ee.automation.configuration.security.scope.ApiKeyPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.DataTablePermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.DeploymentPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.KnowledgeBasePermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.McpPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ProjectPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.WorkflowPermissionScopeProvider;
@@ -137,7 +138,7 @@ class PermissionScopeRegistryTest {
             List.<PermissionScopeProvider>of(
                 new A2aPermissionScopeProvider(), new ApiKeyPermissionScopeProvider(),
                 new DataTablePermissionScopeProvider(), new DeploymentPermissionScopeProvider(),
-                new McpPermissionScopeProvider(),
+                new KnowledgeBasePermissionScopeProvider(), new McpPermissionScopeProvider(),
                 new ProjectPermissionScopeProvider(), new WorkflowPermissionScopeProvider()));
 
         @Test
@@ -168,6 +169,16 @@ class PermissionScopeRegistryTest {
                 "DATA_TABLE_VIEW", "DATA_TABLE_CREATE", "DATA_TABLE_EDIT");
             assertThat(shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER)).doesNotContain(
                 "DATA_TABLE_CREATE", "DATA_TABLE_EDIT");
+        }
+
+        @Test
+        void testKnowledgeBaseScopesAreGrantedFromViewerAndEditor() {
+            assertThat(shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER)).contains(
+                "KNOWLEDGE_BASE_VIEW");
+            assertThat(shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR)).contains(
+                "KNOWLEDGE_BASE_VIEW", "KNOWLEDGE_BASE_CREATE", "KNOWLEDGE_BASE_EDIT");
+            assertThat(shippedPermissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER)).doesNotContain(
+                "KNOWLEDGE_BASE_CREATE", "KNOWLEDGE_BASE_EDIT");
         }
 
         @Test

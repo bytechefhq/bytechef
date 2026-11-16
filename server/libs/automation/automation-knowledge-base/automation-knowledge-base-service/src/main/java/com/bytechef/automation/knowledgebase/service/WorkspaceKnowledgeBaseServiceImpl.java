@@ -19,6 +19,7 @@ package com.bytechef.automation.knowledgebase.service;
 import com.bytechef.automation.knowledgebase.domain.WorkspaceKnowledgeBase;
 import com.bytechef.automation.knowledgebase.repository.WorkspaceKnowledgeBaseRepository;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +44,15 @@ public class WorkspaceKnowledgeBaseServiceImpl implements WorkspaceKnowledgeBase
     @Transactional(readOnly = true)
     public List<WorkspaceKnowledgeBase> getWorkspaceKnowledgeBases(Long workspaceId) {
         return workspaceKnowledgeBaseRepository.findAllByWorkspaceId(workspaceId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Long> fetchWorkspaceId(long knowledgeBaseId) {
+        return workspaceKnowledgeBaseRepository.findByKnowledgeBaseId(knowledgeBaseId)
+            .stream()
+            .map(WorkspaceKnowledgeBase::getWorkspaceId)
+            .findFirst();
     }
 
     @Override
