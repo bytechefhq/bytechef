@@ -68,7 +68,11 @@ public class FilesystemLsAction {
                                 string("filename")
                                     .description("Name of the file."),
                                 string("relativePath")
-                                    .description("Relative path of the file."),
+                                    .description(
+                                        "Path of the file relative to the directory set in the Path property. For " +
+                                            "example, if Path is '/data/inbox' and the file is " +
+                                            "'/data/inbox/2024/report.csv', the relative path is '2024/report.csv'. " +
+                                            "When Recursive is off, this is the same as the filename."),
                                 integer("size")
                                     .description("Size of the file.")))))
         .help("", "https://docs.bytechef.io/reference/components/filesystem_v1#list")
