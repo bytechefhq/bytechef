@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.helper.action.CryptoHelperBcryptVerifyAction;
 import com.bytechef.component.helper.action.CryptoHelperHashAction;
 import com.bytechef.component.helper.action.CryptoHelperHmacAction;
 import com.bytechef.component.helper.action.CryptoHelperPgpDecryptAction;
@@ -44,6 +45,7 @@ public class CryptoHelperComponentHandler implements ComponentHandler {
         .icon("path:assets/crypto-helper.svg")
         .categories(ComponentCategory.HELPERS)
         .actions(
+            CryptoHelperBcryptVerifyAction.ACTION_DEFINITION,
             CryptoHelperHashAction.ACTION_DEFINITION,
             CryptoHelperHmacAction.ACTION_DEFINITION,
             CryptoHelperPgpDecryptAction.ACTION_DEFINITION,
@@ -53,6 +55,7 @@ public class CryptoHelperComponentHandler implements ComponentHandler {
             CryptoHelperSignAction.ACTION_DEFINITION,
             CryptoHelperVerifyAction.ACTION_DEFINITION)
         .clusterElements(
+            tool(CryptoHelperBcryptVerifyAction.ACTION_DEFINITION),
             tool(CryptoHelperHashAction.ACTION_DEFINITION),
             tool(CryptoHelperHmacAction.ACTION_DEFINITION),
             tool(CryptoHelperPgpDecryptAction.ACTION_DEFINITION),
