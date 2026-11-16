@@ -4105,7 +4105,7 @@ public class ApplicationProperties {
         /**
          * Maximum total size in bytes of all data tables in a tenant. 0 means unlimited. Default 50 MB.
          */
-        private long maxSizeBytes = 52_428_800L;
+        private long maxSizeBytes;
 
         public long getMaxSizeBytes() {
             return maxSizeBytes;

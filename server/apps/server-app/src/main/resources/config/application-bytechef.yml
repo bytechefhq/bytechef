@@ -206,6 +206,8 @@ bytechef:
     # Maximum JDBC connections. Shared by Quartz's 10 job-store threads, workflow task execution and request
     # threads, so it must stay comfortably above Quartz's thread count on its own.
     maximum-pool-size: 30
+  data-table:
+    maxSizeBytes:  52428800
   # Microservice discovery service provider. Possible value: REDIS.
   discovery-service:
     provider: REDIS
