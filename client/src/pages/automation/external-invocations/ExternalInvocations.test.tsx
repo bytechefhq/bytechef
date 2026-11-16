@@ -209,7 +209,7 @@ describe('ExternalInvocations', () => {
 
         renderExternalInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
 
-        expect(screen.getByText('slack_sendMessage')).toBeInTheDocument();
+        expect(screen.getByText('SLACK_SEND_MESSAGE')).toBeInTheDocument();
         expect(screen.queryByText('First-run guide')).not.toBeInTheDocument();
         expect(screen.getByText(/Showing/)).toHaveTextContent('Showing 1 to 1 of 2 results');
 
@@ -225,9 +225,9 @@ describe('ExternalInvocations', () => {
 
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
-        await userEvent.click(screen.getByText('slack_sendMessage'));
+        await userEvent.click(screen.getByText('SLACK_SEND_MESSAGE'));
 
-        expect(screen.getByRole('dialog', {name: 'slack_sendMessage'})).toHaveTextContent('slack / sendMessage');
+        expect(screen.getByRole('dialog', {name: 'SLACK_SEND_MESSAGE'})).toHaveTextContent('slack / sendMessage');
     });
 
     it('refreshes the invocations from the header button', async () => {
