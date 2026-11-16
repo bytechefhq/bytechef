@@ -1,5 +1,5 @@
-query knowledgeBaseTags {
-    knowledgeBaseTags {
+query knowledgeBaseTags($workspaceId: ID!) {
+    knowledgeBaseTags(workspaceId: $workspaceId) {
         id
         name
     }
