@@ -143,6 +143,8 @@ const ConnectedUserProjectWorkflowListItem = ({
 
     const {automationUuid, staticWebhookUrl} = connectedUserProjectWorkflow;
 
+    const triggerWorkflowUuid = automationUuid ?? connectedUserProjectWorkflow.workflowUuid;
+
     const editable = !!automationUuid && !!configuration;
 
     const handleWorkflowClick = () => {
@@ -164,6 +166,12 @@ const ConnectedUserProjectWorkflowListItem = ({
 
             toast('Webhook URL copied to clipboard');
         }
+    };
+
+    const handleCopyWorkflowUuidClick = async () => {
+        await copyToClipboard(triggerWorkflowUuid);
+
+        toast('Workflow UUID copied to clipboard');
     };
 
     return (
@@ -301,6 +309,7 @@ const ConnectedUserProjectWorkflowListItem = ({
                         </div>
 
                         <ConnectedUserSheetDeleteDropdownMenu
+                            onCopyWorkflowUuidClick={handleCopyWorkflowUuidClick}
                             onDeleteClick={() => setShowDeleteDialog(true)}
                             onEditClick={editable ? () => setShowEditDialog(true) : undefined}
                         />

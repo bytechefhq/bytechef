@@ -185,6 +185,7 @@ const IntegrationWorkflowListItem = ({
                         setShowEditDialog(true);
                     }}
                     workflowLabel={workflow.label}
+                    workflowUuid={workflow.workflowUuid}
                 />
             </div>
 

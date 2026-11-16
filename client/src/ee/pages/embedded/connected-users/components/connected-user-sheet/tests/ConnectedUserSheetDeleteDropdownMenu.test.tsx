@@ -191,4 +191,31 @@ describe('ConnectedUserSheetDeleteDropdownMenu', () => {
             expect((await screen.findAllByText('No other configuration in this environment')).length).toBeGreaterThan(0)
         );
     });
+
+    it('should call onCopyWorkflowUuidClick when clicking Copy Workflow UUID', async () => {
+        const onCopyWorkflowUuidClick = vi.fn();
+
+        render(
+            <TooltipProvider>
+                <ConnectedUserSheetDeleteDropdownMenu onCopyWorkflowUuidClick={onCopyWorkflowUuidClick} />
+            </TooltipProvider>
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Copy Workflow UUID'}));
+
+        expect(onCopyWorkflowUuidClick).toHaveBeenCalled();
+    });
+
+    it('should leave Copy Workflow UUID out when no copy handler is given', async () => {
+        render(
+            <TooltipProvider>
+                <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={hoisted.onDeleteClick} />
+            </TooltipProvider>
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+
+        expect(screen.queryByRole('menuitem', {name: 'Copy Workflow UUID'})).not.toBeInTheDocument();
+    });
 });

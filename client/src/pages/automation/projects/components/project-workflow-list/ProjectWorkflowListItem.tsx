@@ -174,6 +174,7 @@ const ProjectWorkflowListItem = ({
                     onDeleteClick={() => setShowDeleteDialog(true)}
                     onEditClick={() => setShowEditDialog(true)}
                     workflowLabel={workflow.label}
+                    workflowUuid={workflow.workflowUuid}
                 >
                     {project && workflow && (
                         <DropdownMenuItem

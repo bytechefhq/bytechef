@@ -135,6 +135,7 @@ const AutomationProjectWorkflowListItem = ({
                     onDeleteClick={() => onDeleteWorkflow(workflow.workflowUuid)}
                     onEditClick={() => onEditWorkflow(workflow)}
                     workflowLabel={workflow.label || workflow.workflowUuid}
+                    workflowUuid={workflow.workflowUuid}
                 >
                     <DropdownMenuItem
                         icon={<CopyIcon />}

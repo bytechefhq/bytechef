@@ -354,4 +354,22 @@ describe('ConnectedUserProjectWorkflowListItem', () => {
         expect(screen.getByRole('switch')).toBeInTheDocument();
         expect(screen.queryByText('Tool only')).not.toBeInTheDocument();
     });
+
+    it('copies the referenced automation uuid for a reference, which the request trigger runs it by', async () => {
+        renderListItem(createConnectedUserProjectWorkflow(null, {automationUuid: 'template-uuid'}));
+
+        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Copy Workflow UUID'}));
+
+        expect(hoisted.copyToClipboard).toHaveBeenCalledWith('template-uuid');
+    });
+
+    it('copies the own workflow uuid for a copy', async () => {
+        renderListItem(createConnectedUserProjectWorkflow(null));
+
+        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Copy Workflow UUID'}));
+
+        expect(hoisted.copyToClipboard).toHaveBeenCalledWith('be530417-2226-41d4-aae9-c4fc76f0791a');
+    });
 });
