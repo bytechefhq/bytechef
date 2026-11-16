@@ -14,6 +14,9 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
+import com.bytechef.atlas.configuration.repository.WorkflowRepository;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
@@ -81,7 +84,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -314,7 +319,7 @@ public class ConnectedUserMcpServerFacadeIntTest {
                     archiveEmailMcpWorkflowId, integrationInstanceId, "gmail", 6, ARCHIVE_EMAIL_WORKFLOW_ID,
                     "archiveEmail", "Archives the email", false, null),
                 new ConnectedUserMcpServerWorkflowDTO(
-                    sendEmailMcpWorkflowId, integrationInstanceId, "gmail", 6, SEND_EMAIL_WORKFLOW_ID, "Send Email",
+                    sendEmailMcpWorkflowId, integrationInstanceId, "gmail", 6, SEND_EMAIL_WORKFLOW_ID, "SEND_EMAIL",
                     "Sends an email", true, LAST_EXECUTION_DATE));
     }
 
@@ -828,7 +833,7 @@ public class ConnectedUserMcpServerFacadeIntTest {
         assertThat(automationsConnectedUserMcpServer.automations())
             .containsExactly(
                 new ConnectedUserMcpServerAutomationDTO(
-                    automation.rowId(), automation.referenceId(), "template", SEND_AUTOMATION_UUID, "Send mail",
+                    automation.rowId(), automation.referenceId(), "template", SEND_AUTOMATION_UUID, "SEND_MAIL",
                     "Sends mail", true, true, null));
     }
 
@@ -1017,8 +1022,8 @@ public class ConnectedUserMcpServerFacadeIntTest {
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(provisionableMcpServer.coveredAutomationNames()).containsExactly("Send mail");
-        assertThat(provisionableMcpServer.missingAutomationNames()).containsExactly("Archive mail");
+        assertThat(provisionableMcpServer.coveredAutomationNames()).containsExactly("SEND_MAIL");
+        assertThat(provisionableMcpServer.missingAutomationNames()).containsExactly("ARCHIVE_MAIL");
         assertThat(provisionableMcpServer.coveredComponentNames()).isEmpty();
     }
 
@@ -1265,12 +1270,20 @@ public class ConnectedUserMcpServerFacadeIntTest {
         McpIntegrationInstanceConfigurationServiceImpl.class,
         McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpIntegrationInstanceRowFacadeImpl.class,
         McpServerMembership.class,
-        McpServerServiceImpl.class, WorkflowServiceImpl.class, EmbeddedMcpAuditIntTestConfiguration.class,
+        McpServerServiceImpl.class, EmbeddedMcpAuditIntTestConfiguration.class,
         IntegrationWorkflowServiceImpl.class, AutomationProjectConfigurationServiceImpl.class,
         ConnectedUserProjectConfigurationServiceImpl.class, ConnectedUserProjectServiceImpl.class,
         ConnectedUserProjectWorkflowServiceImpl.class, McpAutomationRowFacadeImpl.class, ProjectServiceImpl.class,
         ProjectWorkflowServiceImpl.class
     })
     static class FacadeIntTestConfiguration {
+
+        @Bean
+        WorkflowService workflowService(
+            CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
+            List<WorkflowRepository> workflowRepositories) {
+
+            return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
+        }
     }
 }

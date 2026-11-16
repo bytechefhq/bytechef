@@ -32,6 +32,7 @@ import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigura
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkflowService;
+import com.bytechef.platform.ai.tool.facade.AbstractToolFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
@@ -68,7 +69,6 @@ class ConnectedUserMcpAutomations {
     private static final Logger log = LoggerFactory.getLogger(ConnectedUserMcpAutomations.class);
 
     private static final String TOOL_DESCRIPTION = "toolDescription";
-    private static final String TOOL_NAME = "toolName";
 
     private final AutomationProjectConfigurationService automationProjectConfigurationService;
     private final ConnectedUserMcpAutomationResolver connectedUserMcpAutomationResolver;
@@ -364,15 +364,11 @@ class ConnectedUserMcpAutomations {
     private static String getToolName(
         McpAutomationProjectConfigurationWorkflow linkWorkflow, @Nullable Workflow workflow) {
 
-        Map<String, ?> parameters = linkWorkflow.getParameters();
-
-        if (parameters != null && parameters.get(TOOL_NAME) instanceof String toolName && !toolName.isBlank()) {
-            return toolName;
-        }
-
         String label = workflow == null ? null : workflow.getLabel();
 
-        return Objects.requireNonNullElse(label, linkWorkflow.getWorkflowUuid());
+        return Objects.requireNonNullElse(
+            AbstractToolFacade.getWorkflowToolName(linkWorkflow.getParameters(), label),
+            linkWorkflow.getWorkflowUuid());
     }
 
     private ConnectedUserMcpServerAutomationDTO toIsolatedAutomationDTO(
