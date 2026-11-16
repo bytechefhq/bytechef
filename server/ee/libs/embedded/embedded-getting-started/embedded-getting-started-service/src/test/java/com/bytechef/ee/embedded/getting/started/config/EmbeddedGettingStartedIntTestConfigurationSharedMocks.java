@@ -26,6 +26,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
@@ -81,7 +82,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     ConnectionDefinitionService.class, TriggerDefinitionFacade.class, ConnectionFacade.class, ConnectionService.class,
     ConnectedUserService.class, EmbeddedPermissionEvaluator.class, EnvironmentService.class,
     PrincipalJobFacade.class,
-    PrincipalJobService.class, JobFacade.class, JobService.class, McpComponentService.class,
+    PrincipalJobService.class, JobFacade.class, JobService.class, McpAutomationRowFacade.class,
+    McpComponentService.class,
     McpIntegrationComponentService.class,
     McpIntegrationInstanceConfigurationService.class, McpIntegrationInstanceConfigurationWorkflowService.class,
     McpIntegrationInstanceToolService.class,
