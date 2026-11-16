@@ -41,7 +41,7 @@ describe('ExternalInvocationsTable', () => {
     it('renders a row with the tool name, mapped source label and status', () => {
         render(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} />);
 
-        expect(screen.getByText('slack_sendMessage')).toBeInTheDocument();
+        expect(screen.getByText('SLACK_SEND_MESSAGE')).toBeInTheDocument();
         expect(screen.getByText('MCP')).toBeInTheDocument();
         expect(screen.getByText('SUCCESS')).toBeInTheDocument();
         expect(screen.getByText('42ms')).toBeInTheDocument();
@@ -136,7 +136,7 @@ describe('ExternalInvocationsTable', () => {
             />
         );
 
-        expect(screen.getByText('send_message')).toBeInTheDocument();
+        expect(screen.getByText('SEND_MESSAGE')).toBeInTheDocument();
         expect(screen.getByText('Send Message')).toBeInTheDocument();
     });
 
@@ -171,7 +171,7 @@ describe('ExternalInvocationsTable', () => {
 
         expect(screen.getByText('Sales MCP')).toBeInTheDocument();
 
-        const unknownServerRow = screen.getByText('unknown_server_tool').closest('tr');
+        const unknownServerRow = screen.getByText('UNKNOWN_SERVER_TOOL').closest('tr');
 
         expect(unknownServerRow).toHaveTextContent('—');
     });
@@ -204,7 +204,7 @@ describe('ExternalInvocationsTable', () => {
 
         render(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} onSelect={onSelect} />);
 
-        fireEvent.click(screen.getByText('slack_sendMessage'));
+        fireEvent.click(screen.getByText('SLACK_SEND_MESSAGE'));
 
         expect(onSelect).toHaveBeenCalledWith(baseLog);
     });
@@ -214,7 +214,7 @@ describe('ExternalInvocationsTable', () => {
 
         render(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} onSelect={onSelect} />);
 
-        const row = screen.getByText('slack_sendMessage').closest('tr')!;
+        const row = screen.getByText('SLACK_SEND_MESSAGE').closest('tr')!;
 
         expect(row).toHaveAttribute('tabindex', '0');
 
@@ -228,7 +228,7 @@ describe('ExternalInvocationsTable', () => {
     it('does not make a row without an action focusable', () => {
         render(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} />);
 
-        expect(screen.getByText('slack_sendMessage').closest('tr')).not.toHaveAttribute('tabindex');
+        expect(screen.getByText('SLACK_SEND_MESSAGE').closest('tr')).not.toHaveAttribute('tabindex');
     });
 
     it('hides the source column when showSource is false', () => {
@@ -277,7 +277,7 @@ describe('ExternalInvocationsTable', () => {
 
         expect(screen.getByText(formatDateTime(new Date(createdDate)))).toBeInTheDocument();
 
-        const undatedRow = screen.getByText('undated_tool').closest('tr');
+        const undatedRow = screen.getByText('UNDATED_TOOL').closest('tr');
 
         expect(undatedRow?.lastElementChild).toHaveTextContent(/^$/);
     });
@@ -293,8 +293,8 @@ describe('ExternalInvocationsTable', () => {
         );
 
         expect(screen.getAllByRole('row')).toHaveLength(3);
-        expect(screen.getByText('first_tool')).toBeInTheDocument();
-        expect(screen.getByText('second_tool')).toBeInTheDocument();
+        expect(screen.getByText('FIRST_TOOL')).toBeInTheDocument();
+        expect(screen.getByText('SECOND_TOOL')).toBeInTheDocument();
     });
     it('adds an Actions column only when the page can open a workflow run', () => {
         const {unmount} = render(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} />);

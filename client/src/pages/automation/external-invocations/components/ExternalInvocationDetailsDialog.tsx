@@ -7,6 +7,7 @@ import {
     SOURCE_LABELS,
     STATUS_STYLE_TYPES,
     formatCreatedDate,
+    invocationNameLabel,
     targetLabel,
 } from '../utils/externalInvocationLabels';
 
@@ -29,7 +30,7 @@ const ExternalInvocationDetailsDialog = ({externalInvocationLog, onClose}: Exter
             <DialogMain>
                 <DialogHeader
                     description={formatCreatedDate(externalInvocationLog.createdDate)}
-                    title={externalInvocationLog.invocationName || targetLabel(externalInvocationLog)}
+                    title={invocationNameLabel(externalInvocationLog) || targetLabel(externalInvocationLog)}
                 />
 
                 <DialogBody>
