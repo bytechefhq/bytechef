@@ -3,11 +3,15 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {resolveMainClusterRootName} from '@/pages/platform/workflow-editor/utils/resolveClusterRootId';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
-import {useTestClusterElementScriptMutation, useTestWorkflowNodeScriptMutation} from '@/shared/middleware/graphql';
+import {
+    useStopScriptTestMutation,
+    useTestClusterElementScriptMutation,
+    useTestWorkflowNodeScriptMutation,
+} from '@/shared/middleware/graphql';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {useCallback} from 'react';
+import {useCallback, useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 interface UsePropertyCodeEditorDialogToolbarProps {
@@ -23,6 +27,8 @@ export const usePropertyCodeEditorDialogToolbar = ({
     workflowId,
     workflowNodeName,
 }: UsePropertyCodeEditorDialogToolbarProps) => {
+    const scriptExecutionIdRef = useRef<string | undefined>(undefined);
+
     const {
         dirty,
         editorValue,
@@ -59,6 +65,7 @@ export const usePropertyCodeEditorDialogToolbar = ({
 
     const copilotEnabled = ai.copilot.enabled && ff_1570;
 
+    const stopScriptTestMutation = useStopScriptTestMutation();
     const testClusterElementScriptMutation = useTestClusterElementScriptMutation();
     const testWorkflowNodeScriptMutation = useTestWorkflowNodeScriptMutation();
 
@@ -86,6 +93,10 @@ export const usePropertyCodeEditorDialogToolbar = ({
     }, [language, setContext, setConversationToken, setCopilotPanelOpen]);
 
     const handleRunClick = useCallback(() => {
+        const executionId = crypto.randomUUID();
+
+        scriptExecutionIdRef.current = executionId;
+
         setScriptIsRunning(true);
 
         const mainClusterRootName = resolveMainClusterRootName(currentNode, rootClusterElementNodeData);
@@ -97,6 +108,7 @@ export const usePropertyCodeEditorDialogToolbar = ({
                     clusterElementType: currentNode.clusterElementType!,
                     clusterElementWorkflowNodeName: currentNode.name,
                     environmentId: currentEnvironmentId!,
+                    executionId,
                     inputParameters,
                     workflowId,
                     workflowNodeName: mainClusterRootName as string,
@@ -123,6 +135,7 @@ export const usePropertyCodeEditorDialogToolbar = ({
             testWorkflowNodeScriptMutation
                 .mutateAsync({
                     environmentId: currentEnvironmentId!,
+                    executionId,
                     inputParameters,
                     workflowId,
                     workflowNodeName,
@@ -166,8 +179,14 @@ export const usePropertyCodeEditorDialogToolbar = ({
     }, [editorValue, onChange, setSaving]);
 
     const handleStopClick = useCallback(() => {
-        console.warn('Stop functionality not yet implemented');
-    }, []);
+        const executionId = scriptExecutionIdRef.current;
+
+        if (!executionId) {
+            return;
+        }
+
+        stopScriptTestMutation.mutate({executionId});
+    }, [stopScriptTestMutation]);
 
     return {
         copilotEnabled,
