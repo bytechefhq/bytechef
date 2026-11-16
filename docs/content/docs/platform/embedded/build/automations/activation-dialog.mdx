@@ -42,7 +42,7 @@ export function ActivateButton({jwtToken, templateId}: {jwtToken: string; templa
 | `jwtToken` | `string` | - | **Required.** The connected user's signed token. |
 | `baseUrl` | `string` | `https://app.bytechef.io` | Your ByteChef host. |
 | `environment` | `string` | `'PRODUCTION'` | The environment whose templates and connections the dialog uses. |
-| `connectionCreationAllowed` | `boolean` | `true` | Whether users can create a connection from the dialog. When `false`, **Connect** is hidden and they can only pick existing connections. |
+| `connectionCreationAllowed` | `boolean` | `true` | Whether users can create a connection from the dialog. When `false`, the **+** button is hidden and they can only pick existing connections. |
 | `mode` | `'dark' \| 'light'` | `'light'` | The dialog's color mode. See [Theming and Localization](/platform/embedded/build/theming-and-localization#styling-the-connect-and-activation-dialogs). |
 | `onActivated` | `(workflowUuid: string) => void` | - | Runs after the template is activated. |
 | `onEditWorkflow` | `(workflowUuid: string) => void` | - | Runs after **Edit workflow** copies the template, with the uuid of the copy. Omit it to hide **Edit workflow**. |
@@ -53,7 +53,7 @@ export function ActivateButton({jwtToken, templateId}: {jwtToken: string; templa
 
 The dialog has up to three steps. A step with nothing to show is skipped.
 
-1. **Connect** - one row per component that needs a connection. **Connect** reuses the user's existing connection for that integration without showing a form when its credentials are valid. Otherwise it opens the [Connect dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog) for the integration behind that component; if an existing connection's credentials are invalid, the form reconnects it. The connection it creates belongs to an integration instance. Skipped when the template needs no connections.
+1. **Connect** - one row per component that needs a connection, with a list of the user's connections and a **+** button (named "Connect" for screen readers). **+** reuses the user's existing connection for that integration without showing a form when its credentials are valid. Otherwise it opens the [Connect dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog) for the integration behind that component; if an existing connection's credentials are invalid, the form reconnects it. The connection it creates belongs to an integration instance. Skipped when the template needs no connections.
 2. **Configure** - one field per workflow input. Required inputs must be filled. Skipped when the template has no inputs.
 3. **Activate** - the dialog provisions the template and turns it on.
 
@@ -80,6 +80,10 @@ const {openDialog} = useActivationDialog({
 Saving only changes what the user chooses: their connections and input values. The workflow itself, its name, description, steps and the inputs it asks for, comes from the template and changes only when you publish a new version. Saving also does not switch the automation on or off; leave that to your own control, such as a switch that calls `POST` or `DELETE /api/embedded/v1/automation/workflows/{workflowUuid}/enable`. If the automation still needs a connection, the dialog returns to **Connect** and highlights that component.
 
 If the dialog cannot load the user's automations, it opens to activate. **Activate** checks the list again before it provisions, so an automation that already exists is never removed.
+
+When an MCP server offers the automation, the dialog also shows an **Available to AI agents** switch at the top. It takes effect at once, not on **Save**: it calls `POST` or `DELETE /api/embedded/v1/automation/workflows/{workflowUuid}/mcp/enable`. See [MCP Servers](/platform/embedded/configure/mcp-servers).
+
+The dialog does not deactivate an automation. To remove the user's activation, with its connections and input values, call `DELETE /api/embedded/v1/automation/workflow-templates/{workflowTemplateId}/provision` from your own control. The template then shows as not activated again.
 
 ## What Edit workflow does
 
