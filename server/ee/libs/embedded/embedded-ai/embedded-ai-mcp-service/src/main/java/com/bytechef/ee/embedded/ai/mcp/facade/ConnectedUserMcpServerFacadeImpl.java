@@ -40,6 +40,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.ai.tool.facade.AbstractToolFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
@@ -79,7 +80,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerFacade {
 
     private static final String TOOL_DESCRIPTION = "toolDescription";
-    private static final String TOOL_NAME = "toolName";
 
     private final ConnectedUserMcpAutomations connectedUserMcpAutomations;
     private final ConnectedUserService connectedUserService;
@@ -672,13 +672,10 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     private static String getWorkflowToolName(
         McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow, Workflow workflow) {
 
-        Map<String, ?> parameters = mcpIntegrationInstanceConfigurationWorkflow.getParameters();
-
-        if (parameters != null && parameters.get(TOOL_NAME) instanceof String toolName && !toolName.isBlank()) {
-            return toolName;
-        }
-
-        return Objects.requireNonNullElse(workflow.getLabel(), workflow.getId());
+        return Objects.requireNonNullElse(
+            AbstractToolFacade.getWorkflowToolName(
+                mcpIntegrationInstanceConfigurationWorkflow.getParameters(), workflow.getLabel()),
+            workflow.getId());
     }
 
     private record McpServerCoverage(Set<String> coveredComponentNames, Set<String> missingComponentNames) {

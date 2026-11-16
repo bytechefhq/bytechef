@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-api"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     implementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
@@ -44,5 +45,6 @@ dependencies {
     testImplementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-service"))
     testImplementation(project(":server:ee:libs:embedded:embedded-security-web:embedded-security-web-impl"))
     testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
+    testImplementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-service"))
     testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
 }
