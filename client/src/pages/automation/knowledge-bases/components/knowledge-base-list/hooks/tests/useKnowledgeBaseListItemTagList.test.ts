@@ -1,7 +1,18 @@
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useUpdateKnowledgeBaseTagsMutation} from '@/shared/middleware/graphql';
 import {renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import useKnowledgeBaseListItemTagList from '../useKnowledgeBaseListItemTagList';
+
+interface MutationCallbacksI {
+    onError: (error: Error, variables: unknown, context: {previous?: unknown}) => void;
+    onMutate: (variables: {
+        input: {knowledgeBaseId: string; tags: {id?: string; name: string}[]};
+    }) => Promise<{previous?: unknown}>;
+}
+
+const CURRENT_WORKSPACE_KEY = ['knowledgeBaseTagsByKnowledgeBase', {workspaceId: '7'}];
 
 const hoisted = vi.hoisted(() => {
     return {
@@ -39,6 +50,8 @@ const mockRemainingTags = [
 describe('useKnowledgeBaseListItemTagList', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
+        useWorkspaceStore.setState({currentWorkspaceId: 7});
     });
 
     describe('convertedTags', () => {
@@ -110,6 +123,68 @@ describe('useKnowledgeBaseListItemTagList', () => {
             );
 
             expect(result.current.updateTagsMutation).toBe(hoisted.updateTagsMutation);
+        });
+    });
+
+    describe('optimistic tag update', () => {
+        function renderMutationCallbacks(): MutationCallbacksI {
+            renderHook(() =>
+                useKnowledgeBaseListItemTagList({
+                    knowledgeBaseId: 'kb-1',
+                    remainingTags: mockRemainingTags,
+                    tags: mockTags,
+                })
+            );
+
+            return vi.mocked(useUpdateKnowledgeBaseTagsMutation).mock.calls[0][0] as unknown as MutationCallbacksI;
+        }
+
+        it('replaces the knowledge base tags in the current workspace cache entry', async () => {
+            const previous = {
+                knowledgeBaseTagsByKnowledgeBase: [
+                    {knowledgeBaseId: 'kb-1', tags: [{id: '1', name: 'Tag 1'}]},
+                    {knowledgeBaseId: 'kb-2', tags: [{id: '2', name: 'Tag 2'}]},
+                ],
+            };
+
+            hoisted.getQueryData.mockReturnValue(previous);
+
+            const mutationCallbacks = renderMutationCallbacks();
+
+            const context = await mutationCallbacks.onMutate({
+                input: {knowledgeBaseId: 'kb-1', tags: [{id: '3', name: 'Tag 3'}]},
+            });
+
+            expect(hoisted.getQueryData).toHaveBeenCalledWith(CURRENT_WORKSPACE_KEY);
+            expect(hoisted.setQueryData).toHaveBeenCalledWith(CURRENT_WORKSPACE_KEY, {
+                knowledgeBaseTagsByKnowledgeBase: [
+                    {knowledgeBaseId: 'kb-1', tags: [{id: '3', name: 'Tag 3'}]},
+                    {knowledgeBaseId: 'kb-2', tags: [{id: '2', name: 'Tag 2'}]},
+                ],
+            });
+            expect(context.previous).toBe(previous);
+        });
+
+        it('adds an entry for a knowledge base that had no tags', async () => {
+            hoisted.getQueryData.mockReturnValue({knowledgeBaseTagsByKnowledgeBase: []});
+
+            const mutationCallbacks = renderMutationCallbacks();
+
+            await mutationCallbacks.onMutate({input: {knowledgeBaseId: 'kb-1', tags: [{id: '3', name: 'Tag 3'}]}});
+
+            expect(hoisted.setQueryData).toHaveBeenCalledWith(CURRENT_WORKSPACE_KEY, {
+                knowledgeBaseTagsByKnowledgeBase: [{knowledgeBaseId: 'kb-1', tags: [{id: '3', name: 'Tag 3'}]}],
+            });
+        });
+
+        it('restores the current workspace cache entry when the update fails', () => {
+            const previous = {knowledgeBaseTagsByKnowledgeBase: []};
+
+            const mutationCallbacks = renderMutationCallbacks();
+
+            mutationCallbacks.onError(new Error('failed'), undefined, {previous});
+
+            expect(hoisted.setQueryData).toHaveBeenCalledWith(CURRENT_WORKSPACE_KEY, previous);
         });
     });
 });
