@@ -1,0 +1,314 @@
+---
+title: "Vercel"
+description: "Vercel is a cloud platform that builds, deploys and hosts web applications from Git."
+---
+
+
+Categories: Developer Tools
+
+
+Type: vercel/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### Bearer Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Access Token | STRING |  | true |
+
+
+
+## Connection Setup
+
+### Create a Vercel access token
+
+1. Sign in to Vercel and open **Account Settings**, then **Tokens**.
+2. Click **Create**, give the token a name and choose the scope (your personal account or a team) and an expiration.
+3. Copy the token. Vercel shows it only once.
+4. Paste it into the **Access Token** field of the ByteChef connection.
+
+Good to know:
+- A token scoped to a team can only act on that team. When you work with a team's projects, enter the Team ID (it starts with `team_`) in each action. Leave it empty for your personal account.
+- Revoking the token in Vercel immediately stops every workflow that uses the connection.
+
+Helpful links:
+- Vercel REST API: https://vercel.com/docs/rest-api
+- Vercel access tokens: https://vercel.com/account/tokens
+
+
+
+<hr />
+
+
+## Actions
+
+
+### List Projects
+Name: listProjects
+
+`Lists the Vercel projects of the connected account or team.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| teamId | Team ID | STRING | The team to act on behalf of. Leave empty to use the personal account. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Projects",
+  "name" : "listProjects",
+  "parameters" : {
+    "teamId" : ""
+  },
+  "type" : "vercel/v1/listProjects"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| name | STRING |  |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "name" : ""
+} ]
+```
+
+
+
+
+### Create Deployment
+Name: createDeployment
+
+`Creates a deployment of a Git branch or commit in a Vercel project.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| project | Project | STRING | The Vercel project to deploy. | true |
+| org | Repository Owner | STRING | The GitHub organization or user that owns the repository. | true |
+| repo | Repository | STRING | The name of the GitHub repository. | true |
+| ref | Git Ref | STRING | The branch or tag to deploy. | true |
+| sha | Commit SHA | STRING | The commit to deploy. Leave empty to deploy the latest commit of the ref. | false |
+| target | Target | STRING <details> <summary> Options </summary> <span>preview</span>, <span>production</span> </details> | The environment to deploy to. A preview deployment is created when not production. | false |
+| teamId | Team ID | STRING | The team to act on behalf of. Leave empty to use the personal account. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Deployment",
+  "name" : "createDeployment",
+  "parameters" : {
+    "project" : "",
+    "org" : "",
+    "repo" : "",
+    "ref" : "",
+    "sha" : "",
+    "target" : "",
+    "teamId" : ""
+  },
+  "type" : "vercel/v1/createDeployment"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| url | STRING |  |
+| state | STRING |  |
+| errorCode | STRING |  |
+| errorMessage | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "url" : "",
+  "state" : "",
+  "errorCode" : "",
+  "errorMessage" : ""
+}
+```
+
+
+
+
+### Get Deployment
+Name: getDeployment
+
+`Retrieves a Vercel deployment with its state and, when it failed, the error reported by Vercel.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| deploymentId | Deployment ID | STRING | The ID of the deployment. | true |
+| teamId | Team ID | STRING | The team to act on behalf of. Leave empty to use the personal account. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Deployment",
+  "name" : "getDeployment",
+  "parameters" : {
+    "deploymentId" : "",
+    "teamId" : ""
+  },
+  "type" : "vercel/v1/getDeployment"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| url | STRING |  |
+| state | STRING |  |
+| errorCode | STRING |  |
+| errorMessage | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "url" : "",
+  "state" : "",
+  "errorCode" : "",
+  "errorMessage" : ""
+}
+```
+
+
+
+
+### Cancel Deployment
+Name: cancelDeployment
+
+`Cancels a Vercel deployment that is still queued or building.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| deploymentId | Deployment ID | STRING | The ID of the deployment. | true |
+| teamId | Team ID | STRING | The team to act on behalf of. Leave empty to use the personal account. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Cancel Deployment",
+  "name" : "cancelDeployment",
+  "parameters" : {
+    "deploymentId" : "",
+    "teamId" : ""
+  },
+  "type" : "vercel/v1/cancelDeployment"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING |  |
+| url | STRING |  |
+| state | STRING |  |
+| errorCode | STRING |  |
+| errorMessage | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "url" : "",
+  "state" : "",
+  "errorCode" : "",
+  "errorMessage" : ""
+}
+```
+
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+## Additional Instructions
+
+#### Before you start
+
+- The component works with Git-connected Vercel projects. Create Deployment builds a branch, tag or commit of a GitHub repository that is linked to the project.
+- A deployment is a preview unless the Target is set to Production.
+- Create Deployment returns as soon as Vercel queues the build. Use Get Deployment to follow the state until it is `READY`, `ERROR` or `CANCELED`.
