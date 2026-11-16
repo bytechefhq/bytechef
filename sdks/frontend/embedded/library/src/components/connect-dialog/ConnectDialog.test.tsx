@@ -485,6 +485,27 @@ describe('ConnectDialog', () => {
 
             expect(within(toolsContainer).getByText('sendEmail')).toBeInTheDocument();
         });
+
+        it('shows the tools without tabs or workflows when toolsOnly is set', () => {
+            render(
+                <ConnectDialog
+                    {...editConnectionProps}
+                    mergedMcpTools={[{enabled: true, id: 1051, label: 'Send Email', name: 'sendEmail'}]}
+                    toolsOnly
+                />
+            );
+
+            expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
+            expect(screen.queryByText('Test Workflow')).not.toBeInTheDocument();
+            expect(within(screen.getByTestId('tools-container')).getByText('Send Email')).toBeInTheDocument();
+        });
+
+        it('shows the tools container instead of the workflows when toolsOnly is set and there are no tools', () => {
+            render(<ConnectDialog {...editConnectionProps} toolsOnly />);
+
+            expect(screen.queryByText('Test Workflow')).not.toBeInTheDocument();
+            expect(screen.getByTestId('tools-container')).toBeInTheDocument();
+        });
     });
 
     describe('Field Mapping Tests', () => {
