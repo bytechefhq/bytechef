@@ -170,7 +170,7 @@ Only workspace API keys are accepted; an admin API key is rejected with `401`. W
 
 ### Sign in with ByteChef (optional)
 
-When the embedded OAuth2 authorization server is turned on, an OAuth-capable MCP client can connect to the server URL without an API key: you sign in with your ByteChef account and approve the `mcp:automation` scope. The server then accepts the client only if you are a member of the server's workspace (or a tenant administrator), and only for that server. The token does not work on another MCP server. A request that names another environment in `X-ENVIRONMENT` is rejected with `403`. See [MCP Server → Sign in with ByteChef](/platform/settings/mcp-server#sign-in-with-bytechef-optional) for the setup and how long tokens last.
+When the built-in OAuth2 authorization server is turned on, an OAuth-capable MCP client can connect to the server URL without an API key: you sign in with your ByteChef account and approve the `mcp:automation` scope. The server then accepts the client only if you are a member of the server's workspace (or a tenant administrator), and only for that server. The token does not work on another MCP server. A request that names another environment in `X-ENVIRONMENT` is rejected with `403`. See [MCP Server → Sign in with ByteChef](/platform/settings/mcp-server#sign-in-with-bytechef-optional) for the setup and how long tokens last.
 
 ### JWT from a trusted issuer (optional)
 
