@@ -2586,12 +2586,20 @@ export type SaveWorkflowTestConfigurationConnectionMutationVariables = Exact<{
 
 export type SaveWorkflowTestConfigurationConnectionMutation = { saveWorkflowTestConfigurationConnection: boolean | null };
 
+export type StopScriptTestMutationVariables = Exact<{
+  executionId: string;
+}>;
+
+
+export type StopScriptTestMutation = { stopScriptTest: boolean };
+
 export type TestClusterElementScriptMutationVariables = Exact<{
   workflowId: string;
   workflowNodeName: string;
   clusterElementType: string;
   clusterElementWorkflowNodeName: string;
   environmentId: any;
+  executionId?: string | null | undefined;
   inputParameters?: any;
 }>;
 
@@ -2602,6 +2610,7 @@ export type TestWorkflowNodeScriptMutationVariables = Exact<{
   workflowId: string;
   workflowNodeName: string;
   environmentId: any;
+  executionId?: string | null | undefined;
   inputParameters?: any;
 }>;
 
@@ -12489,14 +12498,34 @@ export const useSaveWorkflowTestConfigurationConnectionMutation = <
   }
     )};
 
+export const StopScriptTestDocument = new TypedDocumentString(`
+    mutation stopScriptTest($executionId: String!) {
+  stopScriptTest(executionId: $executionId)
+}
+    `);
+
+export const useStopScriptTestMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<StopScriptTestMutation, TError, StopScriptTestMutationVariables, TContext>) => {
+    
+    return useMutation<StopScriptTestMutation, TError, StopScriptTestMutationVariables, TContext>(
+      {
+    mutationKey: ['stopScriptTest'],
+    mutationFn: (variables?: StopScriptTestMutationVariables) => fetcher<StopScriptTestMutation, StopScriptTestMutationVariables>(StopScriptTestDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const TestClusterElementScriptDocument = new TypedDocumentString(`
-    mutation testClusterElementScript($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!, $environmentId: Long!, $inputParameters: Map) {
+    mutation testClusterElementScript($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!, $environmentId: Long!, $executionId: String, $inputParameters: Map) {
   testClusterElementScript(
     workflowId: $workflowId
     workflowNodeName: $workflowNodeName
     clusterElementType: $clusterElementType
     clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
     environmentId: $environmentId
+    executionId: $executionId
     inputParameters: $inputParameters
   ) {
     error {
@@ -12522,11 +12551,12 @@ export const useTestClusterElementScriptMutation = <
     )};
 
 export const TestWorkflowNodeScriptDocument = new TypedDocumentString(`
-    mutation testWorkflowNodeScript($workflowId: String!, $workflowNodeName: String!, $environmentId: Long!, $inputParameters: Map) {
+    mutation testWorkflowNodeScript($workflowId: String!, $workflowNodeName: String!, $environmentId: Long!, $executionId: String, $inputParameters: Map) {
   testWorkflowNodeScript(
     workflowId: $workflowId
     workflowNodeName: $workflowNodeName
     environmentId: $environmentId
+    executionId: $executionId
     inputParameters: $inputParameters
   ) {
     error {

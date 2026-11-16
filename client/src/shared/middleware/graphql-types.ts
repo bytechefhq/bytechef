@@ -2139,6 +2139,7 @@ export type Mutation = {
   startDiscoverEndpoints: EndpointDiscoveryResult;
   startGenerateForEndpoints: GenerationJobStatus;
   startGenerateFromDocumentationPreview: GenerationJobStatus;
+  stopScriptTest: Scalars['Boolean']['output'];
   testClusterElementScript: ScriptTestExecution;
   testWorkflowNodeScript: ScriptTestExecution;
   updateA2aProject?: Maybe<A2aProject>;
@@ -2896,10 +2897,16 @@ export type MutationStartGenerateFromDocumentationPreviewArgs = {
 };
 
 
+export type MutationStopScriptTestArgs = {
+  executionId: Scalars['String']['input'];
+};
+
+
 export type MutationTestClusterElementScriptArgs = {
   clusterElementType: Scalars['String']['input'];
   clusterElementWorkflowNodeName: Scalars['String']['input'];
   environmentId: Scalars['Long']['input'];
+  executionId?: InputMaybe<Scalars['String']['input']>;
   inputParameters?: InputMaybe<Scalars['Map']['input']>;
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
@@ -2908,6 +2915,7 @@ export type MutationTestClusterElementScriptArgs = {
 
 export type MutationTestWorkflowNodeScriptArgs = {
   environmentId: Scalars['Long']['input'];
+  executionId?: InputMaybe<Scalars['String']['input']>;
   inputParameters?: InputMaybe<Scalars['Map']['input']>;
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
