@@ -81,6 +81,17 @@ describe('ActivationDialog Available to AI agents switch', () => {
         expect(await screen.findByRole('switch', {name: 'Available to AI agents'})).not.toBeChecked();
     });
 
+    it('showsAiAgentsSwitchWithTheFirstStep', async () => {
+        userWorkflows = [{automationUuid: 'wf-plain', kind: 'REFERENCE', mcpEnabled: true}];
+
+        renderDialog();
+
+        await waitFor(() => expect(screen.queryByText('Loading...')).not.toBeInTheDocument());
+
+        expect(screen.getByRole('switch', {name: 'Available to AI agents'})).toBeChecked();
+        expect(calls.filter((call) => call.url.endsWith('/automation/workflows'))).toHaveLength(1);
+    });
+
     it('hidesAiAgentsSwitchWhenNotOffered', async () => {
         userWorkflows = [{automationUuid: 'wf-plain', kind: 'REFERENCE', mcpEnabled: null}];
 

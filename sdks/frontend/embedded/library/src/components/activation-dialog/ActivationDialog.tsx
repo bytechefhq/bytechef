@@ -149,6 +149,7 @@ const findExistingReference = (
 };
 
 interface LoadResultType {
+    aiAgentsWorkflow?: ConnectedUserWorkflowType;
     error?: string;
     existingReference?: ExistingReferenceType;
     key: string;
@@ -214,8 +215,14 @@ const ConnectRow = ({
                     </select>
 
                     {connectionCreationAllowed && (
-                        <button className={dialogStyles.buttonSecondary} onClick={onConnect} type="button">
-                            Connect
+                        <button
+                            aria-label="Connect"
+                            className={`${dialogStyles.buttonSecondary} ${styles.connectButton}`}
+                            onClick={onConnect}
+                            title={`Connect a new ${title} account`}
+                            type="button"
+                        >
+                            +
                         </button>
                     )}
                 </div>
@@ -246,6 +253,7 @@ interface ActivationBodyProps {
     environment: string;
     existingReference?: ExistingReferenceType;
     fetch: ReturnType<typeof createApiClient>['fetch'];
+    initialAiAgentsWorkflow?: ConnectedUserWorkflowType;
     jwtToken: string;
     mode?: 'dark' | 'light';
     onActivated?: (workflowUuid: string) => void;
@@ -263,6 +271,7 @@ const ActivationBody = ({
     environment,
     existingReference,
     fetch,
+    initialAiAgentsWorkflow,
     jwtToken,
     mode,
     onActivated,
@@ -276,7 +285,9 @@ const ActivationBody = ({
     const [connectionLoadFailures, setConnectionLoadFailures] = useState<Record<string, boolean>>({});
     const [connectionsByComponent, setConnectionsByComponent] = useState<Record<string, ConnectionType[]>>({});
     const [aiAgentsError, setAiAgentsError] = useState<string>();
-    const [aiAgentsWorkflow, setAiAgentsWorkflow] = useState<ConnectedUserWorkflowType>();
+    const [aiAgentsWorkflow, setAiAgentsWorkflow] = useState<ConnectedUserWorkflowType | undefined>(
+        initialAiAgentsWorkflow
+    );
 
     const [state, dispatch] = useReducer(activationReducer, template, (initialTemplate) =>
         initialActivationState(templateComponents(initialTemplate), templateInputs(initialTemplate), existingReference)
@@ -640,24 +651,6 @@ const ActivationBody = ({
         };
     }, [fetch, state.requiredComponents]);
 
-    useEffect(() => {
-        let cancelled = false;
-
-        fetch<ConnectedUserWorkflowType[]>('/api/embedded/v1/automation/workflows')
-            .then((workflows) => {
-                if (!cancelled) {
-                    setAiAgentsWorkflow(findAiAgentsWorkflow(workflows, template.id));
-                }
-            })
-            .catch((error: unknown) => {
-                console.error('Failed to load the AI agents availability:', error);
-            });
-
-        return () => {
-            cancelled = true;
-        };
-    }, [fetch, template.id]);
-
     const providedRows = providedComponents.map((component) => (
         <div className={styles.componentRow} data-testid={`provided-row-${component.name}`} key={component.name}>
             <div className={styles.componentTitle}>
@@ -689,15 +682,16 @@ const ActivationBody = ({
 
                 {aiAgentsWorkflow?.mcpEnabled != null && (
                     <label className={styles.switchRow}>
+                        <span>{AI_AGENTS_SWITCH_LABEL}</span>
+
                         <input
                             checked={aiAgentsWorkflow.mcpEnabled === true}
+                            className={styles.switch}
                             disabled={busy}
                             onChange={(event) => void toggleAiAgents(event.target.checked)}
                             role="switch"
                             type="checkbox"
                         />
-
-                        <span>{AI_AGENTS_SWITCH_LABEL}</span>
                     </label>
                 )}
 
@@ -912,8 +906,11 @@ const ActivationDialog = ({
                     return {error: TEMPLATE_NOT_FOUND_MESSAGE, key: workflowTemplateId};
                 }
 
+                const workflows = await workflowsPromise;
+
                 return {
-                    existingReference: findExistingReference(await workflowsPromise, loadedTemplate.id),
+                    aiAgentsWorkflow: findAiAgentsWorkflow(workflows, loadedTemplate.id),
+                    existingReference: findExistingReference(workflows, loadedTemplate.id),
                     key: workflowTemplateId,
                     template: loadedTemplate,
                 };
@@ -1035,6 +1032,7 @@ const ActivationDialog = ({
                         environment={environment}
                         existingReference={existingReference}
                         fetch={fetch}
+                        initialAiAgentsWorkflow={loadResult?.aiAgentsWorkflow}
                         jwtToken={jwtToken}
                         mode={mode}
                         onActivated={onActivated}
