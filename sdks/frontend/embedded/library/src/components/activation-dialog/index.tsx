@@ -70,6 +70,7 @@ export default function useActivationDialog({
         dialogProps.jwtToken,
         dialogProps.mode,
         dialogProps.onActivated,
+        dialogProps.onDeactivated,
         dialogProps.onEditWorkflow,
         dialogProps.onSaved,
         dialogProps.workflowTemplateId,

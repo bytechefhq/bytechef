@@ -31,6 +31,7 @@ export interface ActivationDialogProps {
     mode?: 'dark' | 'light';
     onActivated?: (workflowUuid: string) => void;
     onClose: () => void;
+    onDeactivated?: (workflowTemplateId: string) => void;
     onEditWorkflow?: (workflowUuid: string) => void;
     onSaved?: (workflowUuid: string) => void;
     workflowTemplateId: string;
@@ -258,6 +259,7 @@ interface ActivationBodyProps {
     mode?: 'dark' | 'light';
     onActivated?: (workflowUuid: string) => void;
     onClose: () => void;
+    onDeactivated?: (workflowTemplateId: string) => void;
     onEditWorkflow?: (workflowUuid: string) => void;
     onSaved?: (workflowUuid: string) => void;
     template: AutomationTemplateType;
@@ -276,11 +278,13 @@ const ActivationBody = ({
     mode,
     onActivated,
     onClose,
+    onDeactivated,
     onEditWorkflow,
     onSaved,
     template,
 }: ActivationBodyProps) => {
     const [busy, setBusy] = useState(false);
+    const [confirmingDeactivate, setConfirmingDeactivate] = useState(false);
     const [connectingComponent, setConnectingComponent] = useState<TemplateComponentType>();
     const [connectionLoadFailures, setConnectionLoadFailures] = useState<Record<string, boolean>>({});
     const [connectionsByComponent, setConnectionsByComponent] = useState<Record<string, ConnectionType[]>>({});
@@ -541,6 +545,38 @@ const ActivationBody = ({
         template.id,
     ]);
 
+    const deactivate = useCallback(async () => {
+        if (!confirmingDeactivate) {
+            setConfirmingDeactivate(true);
+
+            return;
+        }
+
+        setBusy(true);
+
+        try {
+            await fetch(`/api/embedded/v1/automation/workflow-templates/${template.id}/provision`, {
+                method: 'DELETE',
+            });
+        } catch (error) {
+            console.error(`Failed to deactivate template ${template.id}:`, error);
+
+            dispatch({error: describeError(error), type: 'FAILED'});
+            setConfirmingDeactivate(false);
+            setBusy(false);
+
+            return;
+        }
+
+        setBusy(false);
+
+        if (onDeactivated) {
+            runHostCallback('onDeactivated', () => onDeactivated(template.id));
+        }
+
+        onClose();
+    }, [confirmingDeactivate, fetch, onClose, onDeactivated, template.id]);
+
     const editWorkflow = useCallback(async () => {
         setBusy(true);
 
@@ -790,6 +826,17 @@ const ActivationBody = ({
                 <div className={styles.footerActions}>
                     {state.step !== 'done' && (
                         <>
+                            {existingReference && (
+                                <button
+                                    className={dialogStyles.buttonDestructive}
+                                    disabled={busy}
+                                    onClick={() => void deactivate()}
+                                    type="button"
+                                >
+                                    {confirmingDeactivate ? 'Confirm deactivate' : 'Deactivate'}
+                                </button>
+                            )}
+
                             {onEditWorkflow && editable && (
                                 <button
                                     className={dialogStyles.buttonSecondary}
@@ -868,6 +915,7 @@ const ActivationDialog = ({
     mode = 'light',
     onActivated,
     onClose,
+    onDeactivated,
     onEditWorkflow,
     onSaved,
     workflowTemplateId,
@@ -1037,6 +1085,7 @@ const ActivationDialog = ({
                         mode={mode}
                         onActivated={onActivated}
                         onClose={onClose}
+                        onDeactivated={onDeactivated}
                         onEditWorkflow={onEditWorkflow}
                         onSaved={onSaved}
                         key={template.id}
