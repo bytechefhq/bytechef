@@ -33,8 +33,9 @@ Every table has an automatic `id` column that uniquely identifies each row. `id`
 | `DATE` | A calendar date |
 | `DATE_TIME` | A date and time |
 | `BOOLEAN` | `true` or `false` |
+| `LINK` | A link to one row of another table - see [Link columns](#link-columns) |
 
-Values written from a workflow or imported from CSV are converted to the column's type.
+Values written from a workflow or imported from CSV are converted to the column's type. A `LINK` column can't be added when you create a table; add it to an existing table with **Add column**.
 
 ---
 
@@ -42,7 +43,7 @@ Values written from a workflow or imported from CSV are converted to the column'
 
 Open a table to manage its columns:
 
-- **Add a column** - Click the **Add column** button at the right end of the header row, then enter a **Name** and a **Type** and click **Add**.
+- **Add a column** - Click the **Add column** button at the right end of the header row, then enter a **Name** and a **Type** and click **Add**. A `LINK` column also asks for a target table, an optional display column and a delete rule - see [Link columns](#link-columns).
 - **Rename a column** - Open the column header's menu and click **Rename**.
 - **Delete a column** - Open the column header's menu and click **Delete**. This removes the column's values from every row.
 
@@ -210,16 +211,6 @@ the change is saved; a change that is rolled back starts none. The rows of one c
 that fails shows up in the workflow's execution history like any other run.
 
 For example, a workflow with **Record Created** on a *Customers* table can send a welcome email for each new row.
-
----
-
-## Public REST API
-
-Tables, columns and rows are also available over `/api/automation/v1` - see the
-[Data Tables API reference](/openapi/automation-data-tables-data-table) for tables and columns, and
-the [Data Table Rows reference](/openapi/automation-data-tables-data-table-row) for rows. Rows can be
-queried with `filter=column:OPERATOR:value`, written in batches, imported and exported as CSV, and
-upserted on a caller-supplied `externalId`.
 
 ---
 
