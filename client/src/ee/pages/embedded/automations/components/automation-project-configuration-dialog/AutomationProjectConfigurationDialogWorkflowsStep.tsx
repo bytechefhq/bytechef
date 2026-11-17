@@ -22,6 +22,10 @@ const AutomationProjectConfigurationDialogWorkflowsStep = ({
     workflowDrafts,
     workflows,
 }: AutomationProjectConfigurationDialogWorkflowsStepProps) => {
+    const sortedWorkflows = [...workflows].sort((workflow, otherWorkflow) =>
+        workflow.label.localeCompare(otherWorkflow.label, undefined, {sensitivity: 'base'})
+    );
+
     if (isLoading) {
         return (
             <div className="flex justify-center py-12">
@@ -39,8 +43,8 @@ const AutomationProjectConfigurationDialogWorkflowsStep = ({
                         : 'Every workflow lets each user connect and fill. Provided connections and inputs can be set for each workflow once the configuration is created.')}
             </p>
 
-            {workflows.length > 0 ? (
-                workflows.map((workflow) => (
+            {sortedWorkflows.length > 0 ? (
+                sortedWorkflows.map((workflow) => (
                     <AutomationProjectConfigurationDialogWorkflowsStepItem
                         configurationId={configurationId}
                         key={workflow.workflowUuid}

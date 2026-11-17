@@ -17,9 +17,17 @@ const IntegrationInstanceConfigurationDialogWorkflowsStep = ({
     setValue,
     workflows,
 }: IntegrationInstanceConfigurationDialogWorkflowsStepProps) => {
+    const sortedWorkflowEntries = (workflows || [])
+        .map((workflow, workflowIndex) => ({workflow, workflowIndex}))
+        .sort((workflowEntry, otherWorkflowEntry) =>
+            (workflowEntry.workflow.label || '').localeCompare(otherWorkflowEntry.workflow.label || '', undefined, {
+                sensitivity: 'base',
+            })
+        );
+
     return (
         <div className="min-h-full space-y-5">
-            {workflows?.map((workflow, workflowIndex) => (
+            {sortedWorkflowEntries.map(({workflow, workflowIndex}) => (
                 <IntegrationInstanceConfigurationDialogWorkflowsStepItem
                     componentName={componentName}
                     control={control}
