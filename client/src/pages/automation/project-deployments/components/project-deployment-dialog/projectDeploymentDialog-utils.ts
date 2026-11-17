@@ -36,7 +36,7 @@ const collectSubflowConnections = (
 
     const nestedConnections: ComponentConnection[] = [];
 
-    if (nestedSubflows.length) {
+    if (nestedSubflows?.length) {
         for (const nestedSubflow of nestedSubflows) {
             const nestedWorkflowUuid = nestedSubflow.parameters?.workflowUuid;
 
@@ -91,7 +91,7 @@ const walkWorkflowConnections = (
     const seenUuids = new Set<string>();
     const stubs: SubflowDuplicateStubI[] = [];
 
-    if (subflows.length && workflows?.length) {
+    if (subflows?.length && workflows?.length) {
         for (const subflow of subflows) {
             const subflowWorkflowUuid = subflow.parameters?.workflowUuid;
 
@@ -157,7 +157,7 @@ const collectSubflowInputs = (
 
     const nestedInputs: WorkflowInput[] = [];
 
-    if (nestedSubflows.length) {
+    if (nestedSubflows?.length) {
         for (const nestedSubflow of nestedSubflows) {
             const nestedWorkflowUuid = nestedSubflow.parameters?.workflowUuid;
 
@@ -211,7 +211,7 @@ const walkWorkflowInputs = (
     const seenUuids = new Set<string>();
     const stubs: SubflowDuplicateStubI[] = [];
 
-    if (subflows.length && workflows?.length) {
+    if (subflows?.length && workflows?.length) {
         for (const subflow of subflows) {
             const subflowWorkflowUuid = subflow.parameters?.workflowUuid;
 

@@ -1,7 +1,10 @@
 import {ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {describe, expect, it} from 'vitest';
 
-import getWorkflowComponentConnections, {buildDeploymentWorkflows} from './projectDeploymentDialog-utils';
+import getWorkflowComponentConnections, {
+    buildDeploymentWorkflows,
+    getWorkflowInputs,
+} from './projectDeploymentDialog-utils';
 
 const workflows = [
     {
@@ -105,5 +108,65 @@ describe('getWorkflowComponentConnections', () => {
                 (componentConnection) => componentConnection.workflowNodeName
             )
         ).toEqual(['oracle_1']);
+    });
+
+    it('should skip disabled tasks and disabled subflow calls inside subflows', () => {
+        const parentWorkflow = {
+            definition: JSON.stringify({
+                tasks: [
+                    {name: 'subflow_1', type: 'subflow/v1'},
+                    {disabled: true, name: 'subflow_2', type: 'subflow/v1'},
+                ],
+            }),
+            id: 'parent',
+            tasks: [
+                {name: 'subflow_1', parameters: {workflowUuid: 'sub-uuid'}, type: 'subflow/v1'},
+                {disabled: true, name: 'subflow_2', parameters: {workflowUuid: 'skipped-uuid'}, type: 'subflow/v1'},
+            ],
+            workflowUuid: 'parent-uuid',
+        } as unknown as Workflow;
+
+        const subWorkflow = {
+            definition: JSON.stringify({
+                tasks: [
+                    {name: 'oracle_1', type: 'oracle/v1/execute'},
+                    {disabled: true, name: 'oracle_2', type: 'oracle/v1/execute'},
+                    {disabled: true, name: 'subflow_3', type: 'subflow/v1'},
+                ],
+            }),
+            id: 'sub',
+            inputs: [{name: 'subInput'}],
+            tasks: [
+                {connections: [buildTaskConnection('oracle_1')], name: 'oracle_1', type: 'oracle/v1/execute'},
+                {connections: [buildTaskConnection('oracle_2')], name: 'oracle_2', type: 'oracle/v1/execute'},
+                {name: 'subflow_3', parameters: {workflowUuid: 'nested-uuid'}, type: 'subflow/v1'},
+            ],
+            workflowUuid: 'sub-uuid',
+        } as unknown as Workflow;
+
+        const skippedWorkflow = {
+            id: 'skipped',
+            inputs: [{name: 'skippedInput'}],
+            tasks: [{connections: [buildTaskConnection('oracle_9')], name: 'oracle_9', type: 'oracle/v1/execute'}],
+            workflowUuid: 'skipped-uuid',
+        } as unknown as Workflow;
+
+        const nestedWorkflow = {
+            id: 'nested',
+            inputs: [{name: 'nestedInput'}],
+            tasks: [{connections: [buildTaskConnection('oracle_8')], name: 'oracle_8', type: 'oracle/v1/execute'}],
+            workflowUuid: 'nested-uuid',
+        } as unknown as Workflow;
+
+        const allWorkflows = [parentWorkflow, subWorkflow, skippedWorkflow, nestedWorkflow];
+
+        expect(
+            getWorkflowComponentConnections(parentWorkflow, allWorkflows).map(
+                (componentConnection) => componentConnection.workflowNodeName
+            )
+        ).toEqual(['oracle_1']);
+        expect(getWorkflowInputs(parentWorkflow, allWorkflows).map((input) => input.name)).toEqual([
+            'sub-uuid::subInput',
+        ]);
     });
 });
