@@ -328,6 +328,12 @@ class HttpClientActionUtilsTest {
         Object result = HttpClientActionUtils.execute(mockedParameters, RequestMethod.GET, mockedContext);
 
         assertEquals(expectedBody, result);
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+
+        Http.Configuration configuration = configurationBuilder.build();
+
+        assertTrue(configuration.isIgnoreResponseCode());
     }
 
     @Test

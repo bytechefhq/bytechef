@@ -66,6 +66,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -183,6 +184,150 @@ class HttpClientExecutorIntTest {
             }
 
             return false;
+        }
+    }
+
+    @Nested
+    @DisplayName("Ignore Response Code Tests")
+    class IgnoreResponseCodeTests {
+
+        private ActionDefinitionService actionDefinitionService;
+
+        @BeforeEach
+        void setUp() {
+            actionDefinitionService = mock(ActionDefinitionService.class);
+
+            when(applicationContext.getBean(ActionDefinitionService.class))
+                .thenReturn(actionDefinitionService);
+            when(actionDefinitionService.executeProcessErrorResponse(
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(),
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyInt(), ArgumentMatchers.any(),
+                ArgumentMatchers.any()))
+                    .thenAnswer(invocation -> ProviderException.getProviderException(
+                        invocation.getArgument(4, Integer.class), invocation.getArgument(5)));
+            when(connectionDefinitionService.getAuthorizationRefreshOn(
+                ArgumentMatchers.anyString(), ArgumentMatchers.anyInt(), ArgumentMatchers.any()))
+                    .thenReturn(List.of(401));
+        }
+
+        @Test
+        @DisplayName("Should throw on an error response with a connection when ignoreResponseCode is false")
+        void testErrorResponseThrowsWhenIgnoreResponseCodeIsFalse() {
+            stubFor(get(urlPathEqualTo("/api/error"))
+                .willReturn(aResponse()
+                    .withStatus(500)
+                    .withBody("boom")));
+
+            ComponentConnection componentConnection = new ComponentConnection(
+                "httpClient", 1, 1L, Map.of("token", "secret-token"), AuthorizationType.BEARER_TOKEN);
+
+            Configuration configuration = Http.responseType(Http.ResponseType.TEXT)
+                .build();
+
+            assertThrows(
+                Exception.class,
+                () -> httpClientExecutor.execute(
+                    baseUrl + "/api/error", Collections.emptyMap(), Collections.emptyMap(), null, configuration,
+                    RequestMethod.GET, "httpClient", 1, "get", componentConnection, actionContext));
+        }
+
+        @Test
+        @DisplayName("Should return an error response with a connection when ignoreResponseCode is true")
+        void testErrorResponseIsReturnedWhenIgnoreResponseCodeIsTrue() throws Exception {
+            stubFor(get(urlPathEqualTo("/api/error"))
+                .willReturn(aResponse()
+                    .withStatus(500)
+                    .withHeader("Content-Type", "text/plain")
+                    .withBody("boom")));
+
+            ComponentConnection componentConnection = new ComponentConnection(
+                "httpClient", 1, 1L, Map.of("token", "secret-token"), AuthorizationType.BEARER_TOKEN);
+
+            Configuration configuration = Http.responseType(Http.ResponseType.TEXT)
+                .ignoreResponseCode(true)
+                .build();
+
+            Response response = httpClientExecutor.execute(
+                baseUrl + "/api/error", Collections.emptyMap(), Collections.emptyMap(), null, configuration,
+                RequestMethod.GET, "httpClient", 1, "get", componentConnection, actionContext);
+
+            assertEquals(500, response.getStatusCode());
+            assertEquals("boom", response.getBody());
+        }
+
+        @Test
+        @DisplayName("Should return a refresh-triggering response when the connection cannot be refreshed")
+        void testRefreshStatusIsReturnedWhenCredentialsCannotBeRefreshed() throws Exception {
+            stubFor(get(urlPathEqualTo("/api/error"))
+                .willReturn(aResponse()
+                    .withStatus(401)
+                    .withHeader("Content-Type", "text/plain")
+                    .withBody("unauthorized")));
+
+            ComponentConnection componentConnection = new ComponentConnection(
+                "httpClient", 1, 1L, Map.of("token", "secret-token"), AuthorizationType.BEARER_TOKEN);
+
+            Configuration configuration = Http.responseType(Http.ResponseType.TEXT)
+                .ignoreResponseCode(true)
+                .build();
+
+            Response response = httpClientExecutor.execute(
+                baseUrl + "/api/error", Collections.emptyMap(), Collections.emptyMap(), null, configuration,
+                RequestMethod.GET, "httpClient", 1, "get", componentConnection, actionContext);
+
+            assertEquals(401, response.getStatusCode());
+        }
+
+        @Test
+        @DisplayName("Should still throw a refresh-triggering response so the credentials can be refreshed")
+        void testRefreshStatusThrowsWhenCredentialsCanBeRefreshed() {
+            stubFor(get(urlPathEqualTo("/api/error"))
+                .willReturn(aResponse()
+                    .withStatus(401)
+                    .withBody("unauthorized")));
+
+            ComponentConnection componentConnection = new ComponentConnection(
+                "httpClient", 1, 1L, Map.of("access_token", "expired-token"),
+                AuthorizationType.OAUTH2_AUTHORIZATION_CODE);
+
+            Configuration configuration = Http.responseType(Http.ResponseType.TEXT)
+                .ignoreResponseCode(true)
+                .build();
+
+            Exception exception = assertThrows(
+                Exception.class,
+                () -> httpClientExecutor.execute(
+                    baseUrl + "/api/error", Collections.emptyMap(), Collections.emptyMap(), null, configuration,
+                    RequestMethod.GET, "httpClient", 1, "get", componentConnection, actionContext));
+
+            assertTrue(
+                ExceptionUtils.indexOfThrowable(exception, ProviderException.UnauthorizedException.class) >= 0,
+                exception.toString());
+        }
+
+        @Test
+        @DisplayName("Should return a non-refresh error response when the connection can be refreshed")
+        void testNonRefreshErrorIsReturnedWhenCredentialsCanBeRefreshed() throws Exception {
+            stubFor(get(urlPathEqualTo("/api/error"))
+                .willReturn(aResponse()
+                    .withStatus(404)
+                    .withHeader("Content-Type", "text/plain")
+                    .withBody("missing")));
+
+            ComponentConnection componentConnection = new ComponentConnection(
+                "httpClient", 1, 1L, Map.of("access_token", "valid-token"),
+                AuthorizationType.OAUTH2_AUTHORIZATION_CODE);
+
+            Configuration configuration = Http.responseType(Http.ResponseType.TEXT)
+                .ignoreResponseCode(true)
+                .build();
+
+            Response response = httpClientExecutor.execute(
+                baseUrl + "/api/error", Collections.emptyMap(), Collections.emptyMap(), null, configuration,
+                RequestMethod.GET, "httpClient", 1, "get", componentConnection, actionContext);
+
+            assertEquals(404, response.getStatusCode());
+            assertEquals("missing", response.getBody());
         }
     }
 
