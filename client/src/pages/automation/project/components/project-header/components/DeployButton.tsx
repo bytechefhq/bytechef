@@ -94,6 +94,7 @@ const DeployButton = ({onDeploymentSaved, onOpenChange, open, project}: DeployBu
     return (
         <Tooltip>
             <ProjectDeploymentDialog
+                key={project.id}
                 onSuccess={onDeploymentSaved}
                 projectDeployment={{
                     name: project.name,
@@ -114,6 +115,7 @@ const DeployButton = ({onDeploymentSaved, onOpenChange, open, project}: DeployBu
 
             {open && openRefetchSettled && (
                 <ProjectDeploymentDialog
+                    key={project.id}
                     onClose={() => onOpenChange?.(false)}
                     onSuccess={onDeploymentSaved}
                     projectDeployment={{

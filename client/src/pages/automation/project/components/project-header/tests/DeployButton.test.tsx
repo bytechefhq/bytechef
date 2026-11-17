@@ -3,26 +3,41 @@ import {TooltipProvider} from '@/components/ui/tooltip';
 import DeployButton from '@/pages/automation/project/components/project-header/components/DeployButton';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
-import {ReactNode} from 'react';
+import {ReactNode, useState} from 'react';
 import {describe, expect, it, vi} from 'vitest';
 
+function MockProjectDeploymentDialog({
+    onClose,
+    projectDeployment,
+    triggerNode,
+}: {
+    onClose?: () => void;
+    projectDeployment?: {name?: string};
+    triggerNode?: ReactNode;
+}) {
+    const [initialProjectName] = useState(projectDeployment?.name);
+
+    return triggerNode ? (
+        <Dialog>
+            <DialogTrigger asChild>{triggerNode}</DialogTrigger>
+
+            <DialogContent>
+                <DialogTitle>Deploy Project</DialogTitle>
+
+                <span>Deploying {initialProjectName}</span>
+            </DialogContent>
+        </Dialog>
+    ) : (
+        <div>
+            <span>Controlled Deploy Dialog</span>
+
+            <button onClick={onClose}>Close controlled</button>
+        </div>
+    );
+}
+
 vi.mock('@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog', () => ({
-    default: ({onClose, triggerNode}: {onClose?: () => void; triggerNode?: ReactNode}) =>
-        triggerNode ? (
-            <Dialog>
-                <DialogTrigger asChild>{triggerNode}</DialogTrigger>
-
-                <DialogContent>
-                    <DialogTitle>Deploy Project</DialogTitle>
-                </DialogContent>
-            </Dialog>
-        ) : (
-            <div>
-                <span>Controlled Deploy Dialog</span>
-
-                <button onClick={onClose}>Close controlled</button>
-            </div>
-        ),
+    default: MockProjectDeploymentDialog,
 }));
 
 const renderDeployButton = (
@@ -50,6 +65,20 @@ describe('DeployButton', () => {
         await userEvent.click(deployButton);
 
         expect(await screen.findByText('Deploy Project')).toBeInTheDocument();
+    });
+
+    it('offers the current project after switching to another project', async () => {
+        const {rerender} = renderDeployButton(publishedProject);
+
+        rerender(
+            <TooltipProvider>
+                <DeployButton project={{...publishedProject, id: 8, name: 'Invoices'}} />
+            </TooltipProvider>
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'Deploy'}));
+
+        expect(await screen.findByText('Deploying Invoices')).toBeInTheDocument();
     });
 
     it('explains why deploying is disabled for an unpublished project', async () => {
