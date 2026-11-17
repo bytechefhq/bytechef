@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -61,7 +62,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class PolyglotEngine {
 
+    private static final List<String> CONTEXT_MEMBER_KEYS = List.of("component", "log");
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
+    private static final List<String> LOG_LEVELS = List.of("trace", "debug", "info", "warn", "error");
     private static final ReentrantLock LOCK = new ReentrantLock();
 
     private static Engine engine;
@@ -121,6 +124,38 @@ public class PolyglotEngine {
             }
 
             return copyFromPolyglotContext(copyToJavaValue(value));
+        }
+    }
+
+    private static String toLogLevel(Value levelValue) {
+        String level = levelValue.isString() ? levelValue.asString() : String.valueOf(levelValue);
+
+        String normalizedLevel = level.toLowerCase(Locale.ROOT);
+
+        if (!LOG_LEVELS.contains(normalizedLevel)) {
+            throw new IllegalArgumentException(
+                "Unknown log level '%s', valid levels are: %s".formatted(level, String.join(", ", LOG_LEVELS)));
+        }
+
+        return normalizedLevel;
+    }
+
+    private static String toLogMessage(Value messageValue) {
+        if (messageValue.isString()) {
+            return messageValue.asString();
+        }
+
+        return String.valueOf(messageValue);
+    }
+
+    private static void writeLog(com.bytechef.component.definition.Context.Log log, String level, String message) {
+        switch (level) {
+            case "trace" -> log.trace(message);
+            case "debug" -> log.debug(message);
+            case "info" -> log.info(message);
+            case "warn" -> log.warn(message);
+            case "error" -> log.error(message);
+            default -> throw new IllegalArgumentException("Unknown log level '%s'".formatted(level));
         }
     }
 
@@ -605,22 +640,41 @@ public class PolyglotEngine {
                 return new ComponentProxyObject(languageId, componentConnections, jobContextAware);
             }
 
+            if (Objects.equals(name, "log")) {
+                return (ProxyExecutable) this::log;
+            }
+
             return null;
         }
 
         @Override
         public Object getMemberKeys() {
-            throw new UnsupportedOperationException();
+            return ProxyArray.fromList(new ArrayList<>(CONTEXT_MEMBER_KEYS));
         }
 
         @Override
         public boolean hasMember(String name) {
-            return Objects.equals(name, "component");
+            return CONTEXT_MEMBER_KEYS.contains(name);
         }
 
         @Override
         public void putMember(String key, Value value) {
             throw new UnsupportedOperationException();
+        }
+
+        private Object log(Value... arguments) {
+            if (arguments.length < 2) {
+                throw new IllegalArgumentException("context.log requires a level and a message");
+            }
+
+            String level = toLogLevel(arguments[0]);
+            String message = toLogMessage(arguments[1]);
+
+            if (jobContextAware instanceof com.bytechef.component.definition.Context context) {
+                context.log(log -> writeLog(log, level, message));
+            }
+
+            return null;
         }
 
         public String languageId() {
