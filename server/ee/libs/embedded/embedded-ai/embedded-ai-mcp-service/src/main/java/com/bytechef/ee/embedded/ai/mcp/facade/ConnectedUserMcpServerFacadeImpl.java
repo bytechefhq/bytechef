@@ -40,7 +40,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
-import com.bytechef.platform.ai.tool.facade.AbstractToolFacade;
+import com.bytechef.platform.ai.tool.util.ToolNameUtils;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
@@ -673,7 +673,7 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow, Workflow workflow) {
 
         return Objects.requireNonNullElse(
-            AbstractToolFacade.getWorkflowToolName(
+            ToolNameUtils.getWorkflowToolName(
                 mcpIntegrationInstanceConfigurationWorkflow.getParameters(), workflow.getLabel()),
             workflow.getId());
     }
