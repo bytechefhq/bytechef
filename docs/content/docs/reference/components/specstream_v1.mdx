@@ -1,6 +1,6 @@
 ---
 title: "SpecStream"
-description: "SpecStream is a live web data engine providing web search and web page content extraction."
+description: "SpecStream is a live web data engine. It searches the web for answers with sources and extracts the main text of web pages and documents."
 ---
 
 
@@ -25,7 +25,7 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| token | API Key | STRING | Your SpecStream API key from Agents &amp; API in your SpecStream workspace. | true |
+| token | API Key | STRING | SpecStream API key. Create it in your SpecStream workspace under Agents &amp; API. The key must have the finds:spend scope. | true |
 
 
 
@@ -49,22 +49,22 @@ Version: 1
 ### Web Search
 Name: webSearch
 
-`Search the live web and return answers, structured rows, and ranked sources.`
+`Searches the live web for a query. Returns an answer or structured rows, and the ranked source pages that support each value.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| q | Query | STRING | The search query in plain words, in any language. Supports operators such as site:, filetype:, and quoted phrases. | true |
-| speed | Speed | STRING <details> <summary> Options </summary> <span>default</span>, <span>fast</span> </details> | Search tier. Default returns answers, rows, and sources. Fast skips model reading and returns sources. | false |
-| num | Number of Results | INTEGER | Maximum number of sources to return (1 to 100 for web search, up to 200 with images enabled). | false |
-| page | Page | INTEGER | Page number (1 to 10) to continue the ranked result list. | false |
-| passages | Include Passages | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | When true, reads source pages and returns relevant text passages. | false |
-| news | News | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | When true, searches news results on the fast tier. | false |
-| images | Images | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | When true, returns image search results instead of web results. | false |
-| country | Country | STRING | Two-letter country code to target results (for example US or DE). | false |
-| language | Language | STRING | Two-letter language code for results (for example en or de). | false |
-| safe | Safe Search | STRING <details> <summary> Options </summary> <span>off</span>, <span>moderate</span>, <span>strict</span> </details> | Safe search filtering level. | false |
+| q | Search Query | STRING | Question or request in plain words, in any language, from 1 to 2000 characters. Accepts the operators site:, -site:, -word, -"phrase", filetype:, after: and before: (YYYY, YYYY-MM or YYYY-MM-DD). | true |
+| speed | Search Tier | STRING <details> <summary> Options </summary> <span>default</span>, <span>fast</span> </details> | Default reads the result pages and returns an answer, structured rows and sources. Fast returns only the search engine results with snippets in approximately 1 second, with no answer, rows or passages. Fast costs less per call. | false |
+| num | Number of Sources | INTEGER | Maximum number of sources to return: 1 to 100, or 1 to 200 when Image Search is true. If empty, the response contains all sources that the answer used. | false |
+| page | Result Page | INTEGER | Page of the ranked source list to return, from 1 to 10. Each page has Number of Sources results (10 if empty). Only page 1 contains the answer and the rows. | false |
+| passages | Return Page Passages | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, returns text passages from the top source pages that match the query. Adds up to approximately 1 second. Do not use together with News Search. | false |
+| news | News Search | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, returns news items, newest first, instead of web results. Always uses the Fast search tier. Do not use together with Return Page Passages. | false |
+| images | Image Search | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, returns image results instead of web results. Always uses the Fast search tier. | false |
+| country | Country Code | STRING | Two-letter ISO 3166-1 code of the country that the results are for. SpecStream sends it to each search engine that supports a country. | false |
+| language | Language Code | STRING | Two-letter ISO 639-1 code of the result language. SpecStream sends it to each search engine that supports a language. | false |
+| safe | Safe Search Level | STRING <details> <summary> Options </summary> <span>off</span>, <span>moderate</span>, <span>strict</span> </details> | Filter level for explicit content. SpecStream sends it to each search engine that supports one. If empty, each search engine uses its own default level. | false |
 
 #### Example JSON Structure
 ```json
@@ -154,23 +154,23 @@ Type: OBJECT
 
 
 
-### Extract Pages
+### Extract Page Content
 Name: extract
 
-`Extract the main text of up to 20 web pages or documents as Markdown, plain text, or HTML.`
+`Reads up to 20 web pages or documents (PDF, Word, Excel, EPUB) and returns the main text of each, without menus, footers and ads, as Markdown, plain text or HTML.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| urls | URLs | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of 1 to 20 HTTP or HTTPS URLs to read. | true |
-| format | Format | STRING <details> <summary> Options </summary> <span>markdown</span>, <span>text</span>, <span>html</span> </details> | Output format for the extracted main content. | false |
-| include | Include | ARRAY <details> <summary> Items </summary> [STRING] </details> | Additional fields to include on each extracted page. | false |
+| urls | Page URLs | ARRAY <details> <summary> Items </summary> [STRING] </details> | Public HTTP or HTTPS URLs of the web pages or documents to read, from 1 to 20. SpecStream reads a duplicate URL only once. | true |
+| format | Text Format | STRING <details> <summary> Options </summary> <span>markdown</span>, <span>text</span>, <span>html</span> </details> | Format of the main text in the text field of each result. | false |
+| include | Additional Result Fields | ARRAY <details> <summary> Items </summary> [STRING] </details> | Fields to add to each result: the raw page HTML, the links on the page, the HTTP response (status code and final URL after redirects), or the full page text. | false |
 
 #### Example JSON Structure
 ```json
 {
-  "label" : "Extract Pages",
+  "label" : "Extract Page Content",
   "name" : "extract",
   "parameters" : {
     "urls" : [ "" ],
