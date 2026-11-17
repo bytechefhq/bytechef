@@ -40,12 +40,28 @@ vi.mock('../../../../providers/workflowEditorProvider', () => ({
 
 const subPropertyDefinitions = [
     {
-        controlType: 'OBJECT_BUILDER',
-        defaultValue: {},
+        controlType: 'TEXT',
+        defaultValue: 'defaultText',
         name: 'testField',
-        type: 'OBJECT',
+        type: 'STRING',
     },
 ];
+
+const renderObjectProperty = async (properties: Array<Record<string, unknown>>) => {
+    const {useObjectProperty} = await import('../useObjectProperty');
+
+    return renderHook(() =>
+        useObjectProperty({
+            path: 'response.outputSchema',
+            property: {
+                controlType: 'OBJECT_BUILDER',
+                name: 'outputSchema',
+                properties,
+                type: 'OBJECT',
+            } as unknown as Parameters<typeof useObjectProperty>[0]['property'],
+        })
+    );
+};
 
 describe('useObjectProperty — default value save guard', () => {
     beforeEach(() => {
@@ -86,6 +102,61 @@ describe('useObjectProperty — default value save guard', () => {
                 path: 'response.outputSchema',
                 type: 'OBJECT',
                 workflowId: 'workflow-1',
+            })
+        );
+    });
+
+    it('should not save when no sub-property has a default value', async () => {
+        await renderObjectProperty([
+            {controlType: 'TEXT', name: 'firstField', type: 'STRING'},
+            {controlType: 'INTEGER', name: 'secondField', type: 'INTEGER'},
+        ]);
+
+        await act(async () => {
+            vi.advanceTimersByTime(700);
+        });
+
+        expect(hoisted.mockSaveProperty).not.toHaveBeenCalled();
+    });
+
+    it('should not save when the defaults hold only empty objects and arrays', async () => {
+        await renderObjectProperty([
+            {
+                controlType: 'OBJECT_BUILDER',
+                name: 'nestedObject',
+                properties: [{controlType: 'TEXT', name: 'innerField', type: 'STRING'}],
+                type: 'OBJECT',
+            },
+            {controlType: 'OBJECT_BUILDER', defaultValue: {}, name: 'emptyObject', type: 'OBJECT'},
+            {controlType: 'ARRAY_BUILDER', defaultValue: [], name: 'emptyArray', type: 'ARRAY'},
+        ]);
+
+        await act(async () => {
+            vi.advanceTimersByTime(700);
+        });
+
+        expect(hoisted.mockSaveProperty).not.toHaveBeenCalled();
+    });
+
+    it('should save when a nested sub-property has a default value', async () => {
+        await renderObjectProperty([
+            {controlType: 'TEXT', name: 'firstField', type: 'STRING'},
+            {
+                controlType: 'OBJECT_BUILDER',
+                name: 'nestedObject',
+                properties: [{controlType: 'INTEGER', defaultValue: 5, name: 'innerField', type: 'INTEGER'}],
+                type: 'OBJECT',
+            },
+        ]);
+
+        await act(async () => {
+            vi.advanceTimersByTime(700);
+        });
+
+        expect(hoisted.mockSaveProperty).toHaveBeenCalledTimes(1);
+        expect(hoisted.mockSaveProperty).toHaveBeenCalledWith(
+            expect.objectContaining({
+                value: {firstField: undefined, nestedObject: {innerField: 5}},
             })
         );
     });
@@ -192,17 +263,31 @@ describe('useObjectProperty — default value save guard', () => {
         const {useObjectProperty} = await import('../useObjectProperty');
 
         const {rerender} = renderHook(
-            ({path, propertyName}: {path: string; propertyName: string}) =>
+            ({
+                path,
+                properties,
+                propertyName,
+            }: {
+                path: string;
+                properties: Array<Record<string, unknown>>;
+                propertyName: string;
+            }) =>
                 useObjectProperty({
                     path,
                     property: {
                         controlType: 'OBJECT_BUILDER',
                         name: propertyName,
-                        properties: subPropertyDefinitions,
+                        properties,
                         type: 'OBJECT',
                     } as unknown as Parameters<typeof useObjectProperty>[0]['property'],
                 }),
-            {initialProps: {path: 'response.outputSchema', propertyName: 'outputSchema'}}
+            {
+                initialProps: {
+                    path: 'response.outputSchema',
+                    properties: subPropertyDefinitions,
+                    propertyName: 'outputSchema',
+                },
+            }
         );
 
         await act(async () => {
@@ -211,7 +296,7 @@ describe('useObjectProperty — default value save guard', () => {
 
         expect(hoisted.mockSaveProperty).toHaveBeenCalledTimes(1);
 
-        rerender({path: 'response.newSchema', propertyName: 'newSchema'});
+        rerender({path: 'response.newSchema', properties: [...subPropertyDefinitions], propertyName: 'newSchema'});
 
         await act(async () => {
             vi.advanceTimersByTime(700);
@@ -221,6 +306,7 @@ describe('useObjectProperty — default value save guard', () => {
         expect(hoisted.mockSaveProperty).toHaveBeenLastCalledWith(
             expect.objectContaining({
                 path: 'response.newSchema',
+                value: {testField: 'defaultText'},
             })
         );
     });
