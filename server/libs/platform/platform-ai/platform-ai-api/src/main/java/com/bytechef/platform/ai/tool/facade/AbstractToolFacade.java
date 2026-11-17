@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.ai.tool.facade;
 
+import static com.bytechef.platform.ai.tool.util.ToolPropertyUtils.TOOL_NAME_MAX_LENGTH;
+
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.ai.tool.FromAiResult;
@@ -39,7 +41,12 @@ import org.jspecify.annotations.Nullable;
  */
 public abstract class AbstractToolFacade {
 
+    private static final Pattern EDGE_NON_TOOL_NAME_CHARACTERS = Pattern.compile("^[^a-zA-Z0-9_-]+|[^a-zA-Z0-9_-]+$");
+
     private static final Pattern NON_TOOL_NAME_CHARACTERS = Pattern.compile("[^a-zA-Z0-9_-]+");
+
+    private static final String TOOL_NAME_LETTERS_AND_DIGITS =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     private final Evaluator evaluator;
 
@@ -277,10 +284,10 @@ public abstract class AbstractToolFacade {
         String componentName, String clusterElementName, Map<String, ?> inputParameters) {
 
         if (inputParameters != null) {
-            Object toolName = inputParameters.get(ToolConstants.TOOL_NAME);
+            String toolName = cleanToolName(inputParameters.get(ToolConstants.TOOL_NAME));
 
-            if (toolName instanceof String string && !string.isBlank()) {
-                return string;
+            if (toolName != null) {
+                return toolName;
             }
         }
 
@@ -307,10 +314,10 @@ public abstract class AbstractToolFacade {
 
     public static @Nullable String getWorkflowToolName(@Nullable Map<String, ?> parameters, @Nullable String label) {
         if (parameters != null) {
-            Object toolName = parameters.get(ToolConstants.TOOL_NAME);
+            String toolName = cleanToolName(parameters.get(ToolConstants.TOOL_NAME));
 
-            if (toolName instanceof String string && !string.isBlank()) {
-                return string;
+            if (toolName != null) {
+                return toolName;
             }
         }
 
@@ -427,7 +434,25 @@ public abstract class AbstractToolFacade {
             .replaceAll("_");
 
         toolName = StringUtils.strip(toolName, "_");
+        toolName = StringUtils.left(toolName, TOOL_NAME_MAX_LENGTH);
+        toolName = StringUtils.stripEnd(toolName, "_");
 
         return toolName.isBlank() ? null : toolName.toUpperCase(Locale.ROOT);
+    }
+
+    private static @Nullable String cleanToolName(@Nullable Object name) {
+        if (!(name instanceof String string)) {
+            return null;
+        }
+
+        String toolName = EDGE_NON_TOOL_NAME_CHARACTERS.matcher(string)
+            .replaceAll("");
+
+        toolName = NON_TOOL_NAME_CHARACTERS.matcher(toolName)
+            .replaceAll("_");
+
+        toolName = StringUtils.left(toolName, TOOL_NAME_MAX_LENGTH);
+
+        return StringUtils.containsAny(toolName, TOOL_NAME_LETTERS_AND_DIGITS) ? toolName : null;
     }
 }
