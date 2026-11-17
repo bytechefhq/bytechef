@@ -40,7 +40,7 @@ final class McpToolWorkflowProperties {
 
         List<Property> properties = new ArrayList<>();
 
-        properties.add(ToolPropertyUtils.toolNameProperty("workflow"));
+        properties.add(ToolPropertyUtils.toolNameProperty("SEND_EMAIL"));
 
         properties.add(ToolPropertyUtils.toolDescriptionProperty("workflow"));
 

@@ -28,19 +28,20 @@ import java.util.List;
  */
 public class ToolPropertyUtils {
 
-    private static final int TOOL_NAME_MAX_LENGTH = 64;
+    public static final int TOOL_NAME_MAX_LENGTH = 64;
 
-    private static final String TOOL_NAME_DISALLOWED_CHARACTERS_REGEX = "[^A-Za-z0-9_./-]";
+    private static final String TOOL_NAME_DISALLOWED_CHARACTERS_REGEX = "[^A-Za-z0-9_-]";
 
-    public static Property toolNameProperty(String defaultSourceName) {
+    public static Property toolNameProperty(String defaultToolNameExample) {
         return Property.toProperty(
             string(ToolConstants.TOOL_NAME)
                 .label("Tool Name")
                 .description(
-                    "The tool name exposed to the AI model. Defaults to the " + defaultSourceName +
-                        " name when left blank. Up to " + TOOL_NAME_MAX_LENGTH +
-                        " characters, limited to letters, digits, '_', '-', '.' and '/'.")
-                .placeholder("Defaults to " + defaultSourceName + " name")
+                    "The name AI clients use to call this tool. Leave it blank to use the default upper-case name, " +
+                        "for example " + defaultToolNameExample + ". A name you enter is used exactly as typed, so " +
+                        "changing it later breaks clients and prompts that call the old name. " +
+                        "Up to " + TOOL_NAME_MAX_LENGTH + " characters: letters, digits, '_' and '-'.")
+                .placeholder("Defaults to " + defaultToolNameExample)
                 .expressionEnabled(false)
                 .maxLength(TOOL_NAME_MAX_LENGTH)
                 .regex(TOOL_NAME_DISALLOWED_CHARACTERS_REGEX)
@@ -52,8 +53,9 @@ public class ToolPropertyUtils {
             string(ToolConstants.TOOL_DESCRIPTION)
                 .label("Tool Description")
                 .description(
-                    "The tool description exposed to the AI model. Defaults to the " + defaultSourceName +
-                        " description when left blank.")
+                    "Tells the AI model what this tool does and when to call it. The model chooses tools by " +
+                        "their descriptions, so say what the tool does, what its inputs mean and what it returns. " +
+                        "Leave it blank to use the " + defaultSourceName + " description.")
                 .placeholder("Defaults to " + defaultSourceName + " description")
                 .controlType(ControlType.TEXT_AREA)
                 .expressionEnabled(false)

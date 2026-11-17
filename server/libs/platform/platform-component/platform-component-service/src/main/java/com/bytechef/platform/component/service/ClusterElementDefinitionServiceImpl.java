@@ -80,7 +80,7 @@ import org.springframework.stereotype.Service;
 @Service("clusterElementDefinitionService")
 public class ClusterElementDefinitionServiceImpl implements ClusterElementDefinitionService {
 
-    private static final Property TOOL_NAME_PROPERTY = ToolPropertyUtils.toolNameProperty("tool");
+    private static final Property TOOL_NAME_PROPERTY = ToolPropertyUtils.toolNameProperty("SLACK_SEND_MESSAGE");
 
     private static final Property TOOL_DESCRIPTION_PROPERTY = ToolPropertyUtils.toolDescriptionProperty("tool");
 
