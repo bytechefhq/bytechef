@@ -49,69 +49,87 @@ public class SpecStreamWebSearchAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("webSearch")
         .title("Web Search")
-        .description("Search the live web and return answers, structured rows, and ranked sources.")
+        .description(
+            "Searches the live web for a query. Returns an answer or structured rows, and the ranked source pages " +
+                "that support each value.")
         .properties(
             string(Q)
-                .label("Query")
+                .label("Search Query")
                 .description(
-                    "The search query in plain words, in any language. Supports operators such as site:, " +
-                        "filetype:, and quoted phrases.")
+                    "Question or request in plain words, in any language, from 1 to 2000 characters. Accepts the " +
+                        "operators site:, -site:, -word, -\"phrase\", filetype:, after: and before: (YYYY, YYYY-MM " +
+                        "or YYYY-MM-DD).")
                 .minLength(1)
                 .maxLength(2000)
                 .required(true),
             string(SPEED)
-                .label("Speed")
+                .label("Search Tier")
                 .description(
-                    "Search tier. Default returns answers, rows, and sources. Fast skips model reading and " +
-                        "returns sources.")
+                    "Default reads the result pages and returns an answer, structured rows and sources. Fast " +
+                        "returns only the search engine results with snippets in approximately 1 second, with no " +
+                        "answer, rows or passages. Fast costs less per call.")
                 .options(
-                    option("Default", "default"),
-                    option("Fast", "fast"))
+                    option("Default (Answer, Rows and Sources)", "default"),
+                    option("Fast (Sources Only)", "fast"))
                 .defaultValue("default")
                 .required(false),
             integer(NUM)
-                .label("Number of Results")
+                .label("Number of Sources")
                 .description(
-                    "Maximum number of sources to return (1 to 100 for web search, up to 200 with images enabled).")
+                    "Maximum number of sources to return: 1 to 100, or 1 to 200 when Image Search is true. If " +
+                        "empty, the response contains all sources that the answer used.")
                 .minValue(1)
                 .maxValue(200)
                 .advancedOption(true)
                 .required(false),
             integer(PAGE)
-                .label("Page")
-                .description("Page number (1 to 10) to continue the ranked result list.")
+                .label("Result Page")
+                .description(
+                    "Page of the ranked source list to return, from 1 to 10. Each page has Number of Sources " +
+                        "results (10 if empty). Only page 1 contains the answer and the rows.")
                 .minValue(1)
                 .maxValue(10)
                 .advancedOption(true)
                 .required(false),
             bool(PASSAGES)
-                .label("Include Passages")
-                .description("When true, reads source pages and returns relevant text passages.")
+                .label("Return Page Passages")
+                .description(
+                    "If true, returns text passages from the top source pages that match the query. Adds up to " +
+                        "approximately 1 second. Do not use together with News Search.")
                 .advancedOption(true)
                 .required(false),
             bool(NEWS)
-                .label("News")
-                .description("When true, searches news results on the fast tier.")
+                .label("News Search")
+                .description(
+                    "If true, returns news items, newest first, instead of web results. Always uses the Fast search " +
+                        "tier. Do not use together with Return Page Passages.")
                 .advancedOption(true)
                 .required(false),
             bool(IMAGES)
-                .label("Images")
-                .description("When true, returns image search results instead of web results.")
+                .label("Image Search")
+                .description(
+                    "If true, returns image results instead of web results. Always uses the Fast search tier.")
                 .advancedOption(true)
                 .required(false),
             string(COUNTRY)
-                .label("Country")
-                .description("Two-letter country code to target results (for example US or DE).")
+                .label("Country Code")
+                .description(
+                    "Two-letter ISO 3166-1 code of the country that the results are for. SpecStream sends it to " +
+                        "each search engine that supports a country.")
                 .advancedOption(true)
                 .required(false),
             string(LANGUAGE)
-                .label("Language")
-                .description("Two-letter language code for results (for example en or de).")
+                .label("Language Code")
+                .description(
+                    "Two-letter ISO 639-1 code of the result language. SpecStream sends it to each search engine " +
+                        "that supports a language.")
                 .advancedOption(true)
                 .required(false),
             string(SAFE)
-                .label("Safe Search")
-                .description("Safe search filtering level.")
+                .label("Safe Search Level")
+                .description(
+                    "Filter level for explicit content. SpecStream sends it to each search engine that supports " +
+                        "one. If empty, each search engine uses its own default level.")
                 .options(
                     option("Off", "off"),
                     option("Moderate", "moderate"),

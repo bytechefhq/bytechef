@@ -37,7 +37,9 @@ public class SpecStreamConnection {
                 .properties(
                     string(TOKEN)
                         .label("API Key")
-                        .description("Your SpecStream API key from Agents & API in your SpecStream workspace.")
+                        .description(
+                            "SpecStream API key. Create it in your SpecStream workspace under Agents & API. The " +
+                                "key must have the finds:spend scope.")
                         .required(true)))
         .version(1)
         .help("", "https://docs.bytechef.io/reference/components/specstream_v1#connection-setup");

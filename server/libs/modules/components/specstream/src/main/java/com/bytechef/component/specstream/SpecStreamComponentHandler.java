@@ -35,7 +35,9 @@ public class SpecStreamComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("specstream")
         .title("SpecStream")
-        .description("SpecStream is a live web data engine providing web search and web page content extraction.")
+        .description(
+            "SpecStream is a live web data engine. It searches the web for answers with sources and extracts the " +
+                "main text of web pages and documents.")
         .icon("path:assets/specstream.svg")
         .categories(ComponentCategory.HELPERS, ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(SpecStreamConnection.CONNECTION_DEFINITION)

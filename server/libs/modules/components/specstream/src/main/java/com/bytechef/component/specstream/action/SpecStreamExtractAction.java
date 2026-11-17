@@ -43,35 +43,41 @@ import java.util.List;
 public class SpecStreamExtractAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("extract")
-        .title("Extract Pages")
-        .description("Extract the main text of up to 20 web pages or documents as Markdown, plain text, or HTML.")
+        .title("Extract Page Content")
+        .description(
+            "Reads up to 20 web pages or documents (PDF, Word, Excel, EPUB) and returns the main text of each, " +
+                "without menus, footers and ads, as Markdown, plain text or HTML.")
         .properties(
             array(URLS)
-                .label("URLs")
-                .description("List of 1 to 20 HTTP or HTTPS URLs to read.")
+                .label("Page URLs")
+                .description(
+                    "Public HTTP or HTTPS URLs of the web pages or documents to read, from 1 to 20. SpecStream reads " +
+                        "a duplicate URL only once.")
                 .items(string())
                 .minItems(1)
                 .maxItems(20)
                 .required(true),
             string(FORMAT)
-                .label("Format")
-                .description("Output format for the extracted main content.")
+                .label("Text Format")
+                .description("Format of the main text in the text field of each result.")
                 .options(
                     option("Markdown", "markdown"),
-                    option("Text", "text"),
+                    option("Plain Text", "text"),
                     option("HTML", "html"))
                 .defaultValue("markdown")
                 .required(false),
             array(INCLUDE)
-                .label("Include")
-                .description("Additional fields to include on each extracted page.")
+                .label("Additional Result Fields")
+                .description(
+                    "Fields to add to each result: the raw page HTML, the links on the page, the HTTP response " +
+                        "(status code and final URL after redirects), or the full page text.")
                 .items(string())
                 .options(
                     List.of(
-                        option("HTML", "html"),
-                        option("Links", "links"),
-                        option("Response Metadata", "response"),
-                        option("Full Text", "full_text")))
+                        option("Raw HTML", "html"),
+                        option("Page Links", "links"),
+                        option("HTTP Status Code and Final URL", "response"),
+                        option("Full Page Text", "full_text")))
                 .advancedOption(true)
                 .required(false))
         .output(
@@ -116,7 +122,7 @@ public class SpecStreamExtractAction {
                                                 string("final_url"))),
                                 integer("took_ms"),
                                 number("price_usd")))))
-        .help("", "https://docs.bytechef.io/reference/components/specstream_v1#extract-pages")
+        .help("", "https://docs.bytechef.io/reference/components/specstream_v1#extract-page-content")
         .perform(SpecStreamExtractAction::perform);
 
     private SpecStreamExtractAction() {
