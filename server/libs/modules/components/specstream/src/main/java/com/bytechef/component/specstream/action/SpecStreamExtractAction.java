@@ -26,9 +26,9 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.FORMAT;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.INCLUDE;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.URLS;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.ADDITIONAL_RESULT_FIELDS;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.PAGE_URLS;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.TEXT_FORMAT;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -48,7 +48,7 @@ public class SpecStreamExtractAction {
             "Reads up to 20 web pages or documents (PDF, Word, Excel, EPUB) and returns the main text of each, " +
                 "without menus, footers and ads, as Markdown, plain text or HTML.")
         .properties(
-            array(URLS)
+            array(PAGE_URLS)
                 .label("Page URLs")
                 .exampleValue("https://en.wikipedia.org/wiki/Narbonne", "https://example.com/report.pdf")
                 .description(
@@ -58,7 +58,7 @@ public class SpecStreamExtractAction {
                 .minItems(1)
                 .maxItems(20)
                 .required(true),
-            string(FORMAT)
+            string(TEXT_FORMAT)
                 .label("Text Format")
                 .exampleValue("markdown")
                 .description("Format of the main text in the text field of each result.")
@@ -68,7 +68,7 @@ public class SpecStreamExtractAction {
                     option("HTML", "html"))
                 .defaultValue("markdown")
                 .required(false),
-            array(INCLUDE)
+            array(ADDITIONAL_RESULT_FIELDS)
                 .label("Additional Result Fields")
                 .exampleValue("links", "response")
                 .description(
@@ -132,15 +132,17 @@ public class SpecStreamExtractAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        List<String> include = inputParameters.getList(INCLUDE, String.class);
+        List<String> additionalResultFields = inputParameters.getList(ADDITIONAL_RESULT_FIELDS, String.class);
 
         return context
             .http(http -> http.post("/extract"))
             .body(
                 Body.of(
-                    URLS, inputParameters.getRequiredList(URLS, String.class),
-                    FORMAT, inputParameters.getString(FORMAT),
-                    INCLUDE, (include != null && !include.isEmpty()) ? include : null))
+                    PAGE_URLS, inputParameters.getRequiredList(PAGE_URLS, String.class),
+                    TEXT_FORMAT, inputParameters.getString(TEXT_FORMAT),
+                    ADDITIONAL_RESULT_FIELDS,
+                    (additionalResultFields != null && !additionalResultFields.isEmpty()) ? additionalResultFields
+                        : null))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody();

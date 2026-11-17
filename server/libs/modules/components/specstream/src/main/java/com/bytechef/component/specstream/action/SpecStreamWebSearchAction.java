@@ -26,16 +26,16 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.COUNTRY;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.IMAGES;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.LANGUAGE;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.NEWS;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.NUM;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.PAGE;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.PASSAGES;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.Q;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.SAFE;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.SPEED;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.COUNTRY_CODE;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.IMAGE_SEARCH;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.LANGUAGE_CODE;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.NEWS_SEARCH;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.NUMBER_OF_SOURCES;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.RESULT_PAGE;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.RETURN_PAGE_PASSAGES;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.SAFE_SEARCH_LEVEL;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.SEARCH_QUERY;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.SEARCH_TIER;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -53,7 +53,7 @@ public class SpecStreamWebSearchAction {
             "Searches the live web for a query. Returns an answer or structured rows, and the ranked source pages " +
                 "that support each value.")
         .properties(
-            string(Q)
+            string(SEARCH_QUERY)
                 .label("Search Query")
                 .exampleValue("site:stripe.com who is the CEO of Stripe")
                 .description(
@@ -63,7 +63,7 @@ public class SpecStreamWebSearchAction {
                 .minLength(1)
                 .maxLength(2000)
                 .required(true),
-            string(SPEED)
+            string(SEARCH_TIER)
                 .label("Search Tier")
                 .exampleValue("fast")
                 .description(
@@ -75,7 +75,7 @@ public class SpecStreamWebSearchAction {
                     option("Fast (Sources Only)", "fast"))
                 .defaultValue("default")
                 .required(false),
-            integer(NUM)
+            integer(NUMBER_OF_SOURCES)
                 .label("Number of Sources")
                 .exampleValue(20)
                 .description(
@@ -85,7 +85,7 @@ public class SpecStreamWebSearchAction {
                 .maxValue(200)
                 .advancedOption(true)
                 .required(false),
-            integer(PAGE)
+            integer(RESULT_PAGE)
                 .label("Result Page")
                 .exampleValue(2)
                 .description(
@@ -95,7 +95,7 @@ public class SpecStreamWebSearchAction {
                 .maxValue(10)
                 .advancedOption(true)
                 .required(false),
-            bool(PASSAGES)
+            bool(RETURN_PAGE_PASSAGES)
                 .label("Return Page Passages")
                 .exampleValue(true)
                 .description(
@@ -103,7 +103,7 @@ public class SpecStreamWebSearchAction {
                         "approximately 1 second. Do not use together with News Search.")
                 .advancedOption(true)
                 .required(false),
-            bool(NEWS)
+            bool(NEWS_SEARCH)
                 .label("News Search")
                 .exampleValue(true)
                 .description(
@@ -111,14 +111,14 @@ public class SpecStreamWebSearchAction {
                         "tier. Do not use together with Return Page Passages.")
                 .advancedOption(true)
                 .required(false),
-            bool(IMAGES)
+            bool(IMAGE_SEARCH)
                 .label("Image Search")
                 .exampleValue(true)
                 .description(
                     "If true, returns image results instead of web results. Always uses the Fast search tier.")
                 .advancedOption(true)
                 .required(false),
-            string(COUNTRY)
+            string(COUNTRY_CODE)
                 .label("Country Code")
                 .exampleValue("DE")
                 .description(
@@ -126,7 +126,7 @@ public class SpecStreamWebSearchAction {
                         "each search engine that supports a country.")
                 .advancedOption(true)
                 .required(false),
-            string(LANGUAGE)
+            string(LANGUAGE_CODE)
                 .label("Language Code")
                 .exampleValue("de")
                 .description(
@@ -134,7 +134,7 @@ public class SpecStreamWebSearchAction {
                         "that supports a language.")
                 .advancedOption(true)
                 .required(false),
-            string(SAFE)
+            string(SAFE_SEARCH_LEVEL)
                 .label("Safe Search Level")
                 .exampleValue("moderate")
                 .description(
@@ -211,16 +211,16 @@ public class SpecStreamWebSearchAction {
         return context
             .http(http -> http.get("/web-search"))
             .queryParameters(
-                Q, inputParameters.getRequiredString(Q),
-                SPEED, inputParameters.getString(SPEED),
-                NUM, inputParameters.getInteger(NUM),
-                PAGE, inputParameters.getInteger(PAGE),
-                PASSAGES, inputParameters.getBoolean(PASSAGES),
-                NEWS, inputParameters.getBoolean(NEWS),
-                IMAGES, inputParameters.getBoolean(IMAGES),
-                COUNTRY, inputParameters.getString(COUNTRY),
-                LANGUAGE, inputParameters.getString(LANGUAGE),
-                SAFE, inputParameters.getString(SAFE))
+                SEARCH_QUERY, inputParameters.getRequiredString(SEARCH_QUERY),
+                SEARCH_TIER, inputParameters.getString(SEARCH_TIER),
+                NUMBER_OF_SOURCES, inputParameters.getInteger(NUMBER_OF_SOURCES),
+                RESULT_PAGE, inputParameters.getInteger(RESULT_PAGE),
+                RETURN_PAGE_PASSAGES, inputParameters.getBoolean(RETURN_PAGE_PASSAGES),
+                NEWS_SEARCH, inputParameters.getBoolean(NEWS_SEARCH),
+                IMAGE_SEARCH, inputParameters.getBoolean(IMAGE_SEARCH),
+                COUNTRY_CODE, inputParameters.getString(COUNTRY_CODE),
+                LANGUAGE_CODE, inputParameters.getString(LANGUAGE_CODE),
+                SAFE_SEARCH_LEVEL, inputParameters.getString(SAFE_SEARCH_LEVEL))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody();

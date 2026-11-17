@@ -21,19 +21,19 @@ package com.bytechef.component.specstream.constant;
  */
 public class SpecStreamConstants {
 
-    public static final String COUNTRY = "country";
-    public static final String FORMAT = "format";
-    public static final String IMAGES = "images";
-    public static final String INCLUDE = "include";
-    public static final String LANGUAGE = "language";
-    public static final String NEWS = "news";
-    public static final String NUM = "num";
-    public static final String PAGE = "page";
-    public static final String PASSAGES = "passages";
-    public static final String Q = "q";
-    public static final String SAFE = "safe";
-    public static final String SPEED = "speed";
-    public static final String URLS = "urls";
+    public static final String ADDITIONAL_RESULT_FIELDS = "include";
+    public static final String COUNTRY_CODE = "country";
+    public static final String IMAGE_SEARCH = "images";
+    public static final String LANGUAGE_CODE = "language";
+    public static final String NEWS_SEARCH = "news";
+    public static final String NUMBER_OF_SOURCES = "num";
+    public static final String PAGE_URLS = "urls";
+    public static final String RESULT_PAGE = "page";
+    public static final String RETURN_PAGE_PASSAGES = "passages";
+    public static final String SAFE_SEARCH_LEVEL = "safe";
+    public static final String SEARCH_QUERY = "q";
+    public static final String SEARCH_TIER = "speed";
+    public static final String TEXT_FORMAT = "format";
 
     private SpecStreamConstants() {
     }

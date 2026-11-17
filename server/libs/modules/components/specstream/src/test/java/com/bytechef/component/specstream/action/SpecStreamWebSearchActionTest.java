@@ -17,16 +17,16 @@
 package com.bytechef.component.specstream.action;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.COUNTRY;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.IMAGES;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.LANGUAGE;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.NEWS;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.NUM;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.PAGE;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.PASSAGES;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.Q;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.SAFE;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.SPEED;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.COUNTRY_CODE;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.IMAGE_SEARCH;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.LANGUAGE_CODE;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.NEWS_SEARCH;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.NUMBER_OF_SOURCES;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.RESULT_PAGE;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.RETURN_PAGE_PASSAGES;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.SAFE_SEARCH_LEVEL;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.SEARCH_QUERY;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.SEARCH_TIER;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -58,7 +58,7 @@ class SpecStreamWebSearchActionTest {
     private final Parameters mockedConnectionParameters = MockParametersFactory.create(
         Map.of(TOKEN, "test-api-token"));
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(Q, "Who is the CEO of Stripe", SPEED, "fast", NUM, 5));
+        Map.of(SEARCH_QUERY, "Who is the CEO of Stripe", SEARCH_TIER, "fast", NUMBER_OF_SOURCES, 5));
     private final ArgumentCaptor<Object[]> queryArgumentCaptor = forClass(Object[].class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
@@ -90,16 +90,16 @@ class SpecStreamWebSearchActionTest {
         assertEquals(ResponseType.JSON, configuration.getResponseType());
 
         Object[] expectedQueryParameters = {
-            Q, "Who is the CEO of Stripe",
-            SPEED, "fast",
-            NUM, 5,
-            PAGE, null,
-            PASSAGES, null,
-            NEWS, null,
-            IMAGES, null,
-            COUNTRY, null,
-            LANGUAGE, null,
-            SAFE, null
+            SEARCH_QUERY, "Who is the CEO of Stripe",
+            SEARCH_TIER, "fast",
+            NUMBER_OF_SOURCES, 5,
+            RESULT_PAGE, null,
+            RETURN_PAGE_PASSAGES, null,
+            NEWS_SEARCH, null,
+            IMAGE_SEARCH, null,
+            COUNTRY_CODE, null,
+            LANGUAGE_CODE, null,
+            SAFE_SEARCH_LEVEL, null
         };
 
         assertArrayEquals(expectedQueryParameters, queryArgumentCaptor.getValue());

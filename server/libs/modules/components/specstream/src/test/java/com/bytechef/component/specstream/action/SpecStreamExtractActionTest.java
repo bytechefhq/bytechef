@@ -17,9 +17,9 @@
 package com.bytechef.component.specstream.action;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.FORMAT;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.INCLUDE;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.URLS;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.ADDITIONAL_RESULT_FIELDS;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.PAGE_URLS;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.TEXT_FORMAT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -54,9 +54,9 @@ class SpecStreamExtractActionTest {
         Map.of(TOKEN, "test-api-token"));
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
-            URLS, List.of("https://en.wikipedia.org/wiki/Narbonne"),
-            FORMAT, "markdown",
-            INCLUDE, List.of("links")));
+            PAGE_URLS, List.of("https://en.wikipedia.org/wiki/Narbonne"),
+            TEXT_FORMAT, "markdown",
+            ADDITIONAL_RESULT_FIELDS, List.of("links")));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -87,9 +87,9 @@ class SpecStreamExtractActionTest {
         assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals(
             Body.of(
-                URLS, List.of("https://en.wikipedia.org/wiki/Narbonne"),
-                FORMAT, "markdown",
-                INCLUDE, List.of("links")),
+                PAGE_URLS, List.of("https://en.wikipedia.org/wiki/Narbonne"),
+                TEXT_FORMAT, "markdown",
+                ADDITIONAL_RESULT_FIELDS, List.of("links")),
             bodyArgumentCaptor.getValue());
     }
 
@@ -98,7 +98,7 @@ class SpecStreamExtractActionTest {
         Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
 
         Parameters minimalParameters = MockParametersFactory.create(
-            Map.of(URLS, List.of("https://example.com")));
+            Map.of(PAGE_URLS, List.of("https://example.com")));
         Map<String, Object> expectedBody = Map.of("data", Map.of("results", List.of()));
 
         when(mockedHttp.post(stringArgumentCaptor.capture()))
@@ -111,6 +111,6 @@ class SpecStreamExtractActionTest {
         Object result = SpecStreamExtractAction.perform(minimalParameters, mockedConnectionParameters, mockedContext);
 
         assertEquals(expectedBody, result);
-        assertEquals(Body.of(URLS, List.of("https://example.com")), bodyArgumentCaptor.getValue());
+        assertEquals(Body.of(PAGE_URLS, List.of("https://example.com")), bodyArgumentCaptor.getValue());
     }
 }
