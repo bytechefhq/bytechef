@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.web.graphql;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -91,10 +92,8 @@ public class WorkflowNodeScriptGraphQlControllerIntTest {
             .path("testClusterElementScript.output")
             .entity(Map.class)
             .satisfies(output -> {
-                assert output.get("result")
-                    .equals("test output");
-                assert output.get("count")
-                    .equals(42);
+                assertThat(output.get("result")).isEqualTo("test output");
+                assertThat(output.get("count")).isEqualTo(42);
             });
 
         verify(workflowNodeScriptFacade).testClusterElementScript(
@@ -200,10 +199,8 @@ public class WorkflowNodeScriptGraphQlControllerIntTest {
             .path("testWorkflowNodeScript.output")
             .entity(Map.class)
             .satisfies(output -> {
-                assert output.get("result")
-                    .equals("script output");
-                assert output.get("value")
-                    .equals(100);
+                assertThat(output.get("result")).isEqualTo("script output");
+                assertThat(output.get("value")).isEqualTo(100);
             });
 
         verify(workflowNodeScriptFacade).testWorkflowNodeScript(
@@ -307,8 +304,7 @@ public class WorkflowNodeScriptGraphQlControllerIntTest {
             .path("testClusterElementScript.output")
             .entity(Map.class)
             .satisfies(output -> {
-                assert output.get("processed")
-                    .equals(true);
+                assertThat(output.get("processed")).isEqualTo(true);
             });
 
         verify(workflowNodeScriptFacade).testClusterElementScript(
@@ -346,8 +342,7 @@ public class WorkflowNodeScriptGraphQlControllerIntTest {
             .path("testWorkflowNodeScript.output")
             .entity(Map.class)
             .satisfies(output -> {
-                assert output.get("transformed")
-                    .equals("data");
+                assertThat(output.get("transformed")).isEqualTo("data");
             });
 
         verify(workflowNodeScriptFacade).testWorkflowNodeScript(
@@ -424,14 +419,12 @@ public class WorkflowNodeScriptGraphQlControllerIntTest {
             .path("clusterElementScriptInput")
             .entity(Map.class)
             .satisfies(result -> {
-                assert result.get("field1")
-                    .equals("value1");
-                assert result.get("field2")
-                    .equals(42);
+                assertThat(result.get("field1")).isEqualTo("value1");
+                assertThat(result.get("field2")).isEqualTo(42);
             });
 
         verify(workflowNodeScriptFacade).getClusterElementScriptInput(
-            eq("workflow-123"), eq("data-stream_1"), eq("PROCESSOR"), eq("script_1"), eq(1L));
+            "workflow-123", "data-stream_1", "PROCESSOR", "script_1", 1L);
     }
 
     @Test
@@ -455,11 +448,10 @@ public class WorkflowNodeScriptGraphQlControllerIntTest {
             .path("workflowNodeScriptInput")
             .entity(Map.class)
             .satisfies(result -> {
-                assert result.get("data")
-                    .equals("sample input");
+                assertThat(result.get("data")).isEqualTo("sample input");
             });
 
         verify(workflowNodeScriptFacade).getWorkflowNodeScriptInput(
-            eq("workflow-456"), eq("script_1"), eq(1L));
+            "workflow-456", "script_1", 1L);
     }
 }
