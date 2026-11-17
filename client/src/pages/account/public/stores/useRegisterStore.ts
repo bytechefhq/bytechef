@@ -33,8 +33,8 @@ export const useRegisterStore = create<RegisterI>()(
             registerErrorMessage: '',
 
             register: async (email: string, password: string): Promise<void> => {
-                return fetchRegister(JSON.stringify({email, langKey: 'en', login: email, password})).then(
-                    (response) => {
+                return fetchRegister(JSON.stringify({email, langKey: 'en', login: email, password}))
+                    .then((response) => {
                         if (response.status === 201) {
                             set(() => ({
                                 registerSuccess: true,
@@ -49,8 +49,12 @@ export const useRegisterStore = create<RegisterI>()(
                                     }));
                                 });
                         }
-                    }
-                );
+                    })
+                    .catch(() => {
+                        set(() => ({
+                            registerErrorMessage: REGISTER_FAILED_MESSAGE,
+                        }));
+                    });
             },
 
             reset: () => {
