@@ -28,11 +28,15 @@ import static org.mockito.Mockito.when;
 import com.bytechef.platform.oauth2.authorizationserver.config.MultiTenantSchemaIntTestConfiguration;
 import com.bytechef.platform.oauth2.authorizationserver.config.RegisteredClientIntTestConfiguration;
 import com.bytechef.platform.oauth2.authorizationserver.config.RegisteredClientIntTestFixtures;
+import com.bytechef.platform.oauth2.authorizationserver.domain.OAuth2AuthorizationGrant;
 import com.bytechef.platform.oauth2.authorizationserver.service.OAuth2AuthorizationGrantService;
+import com.bytechef.platform.security.web.authentication.TenantWebAuthenticationDetails;
+import com.bytechef.security.web.authentication.TenantUser;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.security.Principal;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -48,6 +52,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.authentication.RememberMeAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -81,6 +88,7 @@ class TenantRoutingOAuth2AuthorizationServiceIntTest {
     private static final OAuth2TokenType AUTHORIZATION_CODE_TOKEN_TYPE = new OAuth2TokenType(OAuth2ParameterNames.CODE);
     private static final String CLIENT_ID = "routing-client";
     private static final String PUBLIC_SCHEMA = TenantContext.DEFAULT_TENANT_ID;
+    private static final String REMEMBER_ME_PRINCIPAL_NAME = "carol@example.com";
     private static final OAuth2TokenType STATE_TOKEN_TYPE = new OAuth2TokenType(OAuth2ParameterNames.STATE);
 
     @Autowired
@@ -313,6 +321,75 @@ class TenantRoutingOAuth2AuthorizationServiceIntTest {
     }
 
     @Test
+    void testStateLookupReadsBackRememberMeTenantPrincipal() {
+        String state = "state-" + UUID.randomUUID();
+
+        OAuth2Authorization authorization = authorizationBuilder(AuthorizationGrantType.AUTHORIZATION_CODE)
+            .principalName(REMEMBER_ME_PRINCIPAL_NAME)
+            .attribute(OAuth2ParameterNames.STATE, state)
+            .attribute(Principal.class.getName(), createRememberMeAuthentication())
+            .build();
+
+        TenantScope.run(ACME_TENANT_ID, () -> tenantRoutingOAuth2AuthorizationService.save(authorization));
+
+        OAuth2Authorization foundAuthorization = TenantScope.call(
+            ACME_TENANT_ID, () -> tenantRoutingOAuth2AuthorizationService.findByToken(state, STATE_TOKEN_TYPE));
+
+        assertThat(foundAuthorization).isNotNull();
+
+        Object principal = foundAuthorization.getAttribute(Principal.class.getName());
+
+        assertThat(principal).isInstanceOfSatisfying(RememberMeAuthenticationToken.class, authentication -> {
+            assertThat(authentication.getPrincipal())
+                .isInstanceOfSatisfying(
+                    TenantUser.class, tenantUser -> assertThat(tenantUser.getTenantId()).isEqualTo(ACME_TENANT_ID));
+            assertThat(authentication.getDetails())
+                .isInstanceOfSatisfying(
+                    TenantWebAuthenticationDetails.class,
+                    details -> assertThat(details.getTenantId()).isEqualTo(ACME_TENANT_ID));
+        });
+    }
+
+    @Test
+    void testGrantsIncludeAuthorizationOfRememberMeTenantPrincipal() {
+        RegisteredClient registeredClient = Objects.requireNonNull(registeredClientRepository.findById(CLIENT_ID));
+
+        OAuth2AuthorizationRequest authorizationRequest = OAuth2AuthorizationRequest.authorizationCode()
+            .authorizationUri("http://localhost/oauth2/authorize")
+            .clientId(registeredClient.getClientId())
+            .redirectUri("http://127.0.0.1/callback")
+            .additionalParameters(Map.of(OAuth2ParameterNames.RESOURCE, MANAGEMENT_URL))
+            .build();
+
+        OAuth2Authorization consentAuthorization = authorizationBuilder(AuthorizationGrantType.AUTHORIZATION_CODE)
+            .principalName(REMEMBER_ME_PRINCIPAL_NAME)
+            .attribute(OAuth2AuthorizationRequest.class.getName(), authorizationRequest)
+            .attribute(Principal.class.getName(), createRememberMeAuthentication())
+            .build();
+
+        Instant now = Instant.now();
+        Instant expiresAt = now.plus(Duration.ofHours(1));
+
+        OAuth2Authorization issuedAuthorization = OAuth2Authorization.from(consentAuthorization)
+            .token(new OAuth2AuthorizationCode(TenantKeyedTokenValues.generate(ACME_TENANT_ID), now, expiresAt))
+            .token(new OAuth2AccessToken(
+                OAuth2AccessToken.TokenType.BEARER, "access-" + UUID.randomUUID(), now, expiresAt))
+            .build();
+
+        TenantScope.run(ACME_TENANT_ID, () -> {
+            tenantRoutingOAuth2AuthorizationService.save(consentAuthorization);
+            tenantRoutingOAuth2AuthorizationService.save(issuedAuthorization);
+        });
+
+        List<OAuth2AuthorizationGrant> grants = TenantScope.call(
+            ACME_TENANT_ID, () -> oAuth2AuthorizationGrantService.getGrants(CLIENT_ID));
+
+        assertThat(grants)
+            .extracting(OAuth2AuthorizationGrant::principalName)
+            .containsExactly(REMEMBER_ME_PRINCIPAL_NAME);
+    }
+
+    @Test
     void testSaveOfConsentStateAuthorizationInsertsWithoutExistenceCheck() {
         OAuth2Authorization authorization = authorizationBuilder(AuthorizationGrantType.AUTHORIZATION_CODE)
             .attribute(OAuth2ParameterNames.STATE, "state-" + UUID.randomUUID())
@@ -426,6 +503,22 @@ class TenantRoutingOAuth2AuthorizationServiceIntTest {
                 .getErrorCode()).isEqualTo(OAuth2ErrorCodes.INVALID_GRANT));
 
         assertThat(countRows(getDatabaseSchema(ACME_TENANT_ID), "oauth2_authorization")).isZero();
+    }
+
+    private static RememberMeAuthenticationToken createRememberMeAuthentication() {
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+
+        TenantUser tenantUser = new TenantUser(REMEMBER_ME_PRINCIPAL_NAME, "", authorities, ACME_TENANT_ID);
+
+        tenantUser.eraseCredentials();
+
+        RememberMeAuthenticationToken authentication = new RememberMeAuthenticationToken(
+            "remember-me-key", tenantUser, authorities);
+
+        authentication.setDetails(
+            new TenantWebAuthenticationDetails("localhost", "session-id", ACME_TENANT_ID));
+
+        return authentication;
     }
 
     private OAuth2Authorization.Builder authorizationBuilder(AuthorizationGrantType authorizationGrantType) {
