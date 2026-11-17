@@ -31,6 +31,7 @@ import static com.bytechef.component.specstream.constant.SpecStreamConstants.IMA
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.LANGUAGE_CODE;
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.NEWS_SEARCH;
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.NUMBER_OF_SOURCES;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.PREFER_POST_OVER_GET;
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.RESULT_PAGE;
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.RETURN_PAGE_PASSAGES;
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.SAFE_SEARCH_LEVEL;
@@ -44,6 +45,7 @@ import com.bytechef.component.definition.Parameters;
 
 /**
  * @author Tarek Etman
+ * @author Igor Beslic
  */
 public class SpecStreamWebSearchAction {
 
@@ -117,6 +119,7 @@ public class SpecStreamWebSearchAction {
                 .description(
                     "If true, returns image results instead of web results. Always uses the Fast search tier.")
                 .advancedOption(true)
+                .displayCondition(PREFER_POST_OVER_GET + " == true")
                 .required(false),
             string(COUNTRY_CODE)
                 .label("Country Code")
@@ -144,6 +147,14 @@ public class SpecStreamWebSearchAction {
                     option("Off", "off"),
                     option("Moderate", "moderate"),
                     option("Strict", "strict"))
+                .advancedOption(true)
+                .required(false),
+            bool(PREFER_POST_OVER_GET)
+                .label("Use http POST")
+                .description(
+                    "Send request using http POST method. Parameter names and values are encoded in JSON and loaded " +
+                        "into requests body. Using POST allows caller more reliable response to parameters like " +
+                        "Image Search.")
                 .advancedOption(true)
                 .required(false))
         .output(
@@ -208,19 +219,40 @@ public class SpecStreamWebSearchAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context
-            .http(http -> http.get("/web-search"))
-            .queryParameters(
-                SEARCH_QUERY, inputParameters.getRequiredString(SEARCH_QUERY),
-                SEARCH_TIER, inputParameters.getString(SEARCH_TIER),
-                NUMBER_OF_SOURCES, inputParameters.getInteger(NUMBER_OF_SOURCES),
-                RESULT_PAGE, inputParameters.getInteger(RESULT_PAGE),
-                RETURN_PAGE_PASSAGES, inputParameters.getBoolean(RETURN_PAGE_PASSAGES),
-                NEWS_SEARCH, inputParameters.getBoolean(NEWS_SEARCH),
-                IMAGE_SEARCH, inputParameters.getBoolean(IMAGE_SEARCH),
-                COUNTRY_CODE, inputParameters.getString(COUNTRY_CODE),
-                LANGUAGE_CODE, inputParameters.getString(LANGUAGE_CODE),
-                SAFE_SEARCH_LEVEL, inputParameters.getString(SAFE_SEARCH_LEVEL))
+        boolean preferPostMethod = inputParameters.getBoolean(PREFER_POST_OVER_GET, false);
+
+        Context.Http.Executor executor;
+
+        if (preferPostMethod) {
+            executor = context
+                .http(http -> http.get("/web-search"))
+                .queryParameters(
+                    SEARCH_QUERY, inputParameters.getRequiredString(SEARCH_QUERY),
+                    SEARCH_TIER, inputParameters.getString(SEARCH_TIER),
+                    NUMBER_OF_SOURCES, inputParameters.getInteger(NUMBER_OF_SOURCES),
+                    RESULT_PAGE, inputParameters.getInteger(RESULT_PAGE),
+                    RETURN_PAGE_PASSAGES, inputParameters.getBoolean(RETURN_PAGE_PASSAGES),
+                    NEWS_SEARCH, inputParameters.getBoolean(NEWS_SEARCH),
+                    IMAGE_SEARCH, inputParameters.getBoolean(IMAGE_SEARCH),
+                    COUNTRY_CODE, inputParameters.getString(COUNTRY_CODE),
+                    LANGUAGE_CODE, inputParameters.getString(LANGUAGE_CODE),
+                    SAFE_SEARCH_LEVEL, inputParameters.getString(SAFE_SEARCH_LEVEL));
+        } else {
+            executor = context
+                .http(http -> http.post("/web-search"))
+                .body(Context.Http.Body.of(SEARCH_QUERY, inputParameters.getRequiredString(SEARCH_QUERY),
+                    SEARCH_TIER, inputParameters.getString(SEARCH_TIER),
+                    NUMBER_OF_SOURCES, inputParameters.getInteger(NUMBER_OF_SOURCES),
+                    RESULT_PAGE, inputParameters.getInteger(RESULT_PAGE),
+                    RETURN_PAGE_PASSAGES, inputParameters.getBoolean(RETURN_PAGE_PASSAGES),
+                    NEWS_SEARCH, inputParameters.getBoolean(NEWS_SEARCH),
+                    IMAGE_SEARCH, inputParameters.getBoolean(IMAGE_SEARCH),
+                    COUNTRY_CODE, inputParameters.getString(COUNTRY_CODE),
+                    LANGUAGE_CODE, inputParameters.getString(LANGUAGE_CODE),
+                    SAFE_SEARCH_LEVEL, inputParameters.getString(SAFE_SEARCH_LEVEL)));
+        }
+
+        return executor
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody();

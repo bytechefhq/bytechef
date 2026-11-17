@@ -18,6 +18,7 @@ package com.bytechef.component.specstream.constant;
 
 /**
  * @author Tarek Etman
+ * @author Igor Beslic
  */
 public class SpecStreamConstants {
 
@@ -28,6 +29,7 @@ public class SpecStreamConstants {
     public static final String NEWS_SEARCH = "news";
     public static final String NUMBER_OF_SOURCES = "num";
     public static final String PAGE_URLS = "urls";
+    public static final String PREFER_POST_OVER_GET = "preferPost";
     public static final String RESULT_PAGE = "page";
     public static final String RETURN_PAGE_PASSAGES = "passages";
     public static final String SAFE_SEARCH_LEVEL = "safe";
