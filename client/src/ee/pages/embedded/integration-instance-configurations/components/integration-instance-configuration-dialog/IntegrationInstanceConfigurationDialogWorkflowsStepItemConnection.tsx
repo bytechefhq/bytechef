@@ -55,13 +55,13 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
     );
 
     return (
-        <>
+        <div>
             <FormField
                 control={control}
                 name={`integrationInstanceConfigurationWorkflows.${workflowIndex!}.connections.${componentConnectionIndex}.connectionId`}
                 render={({field}) => (
-                    <FormItem>
-                        <FormLabel className="flex items-center">
+                    <FormItem className="space-y-1">
+                        <FormLabel className="flex items-center leading-normal">
                             {componentDefinition?.icon && (
                                 <InlineSVG className="size-4 flex-none" src={componentDefinition.icon} />
                             )}
@@ -155,7 +155,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
                     />
                 </Portal.Root>
             )}
-        </>
+        </div>
     );
 };
 
