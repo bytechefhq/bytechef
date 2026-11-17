@@ -234,7 +234,8 @@ class ToolFacadeIntTest {
 
         stubConnectedUserSlackIntegration(
             List.of(
-                ToolPropertyUtils.toolNameProperty("tool"), ToolPropertyUtils.toolDescriptionProperty("tool"),
+                ToolPropertyUtils.toolNameProperty("SLACK_SEND_MESSAGE"),
+                ToolPropertyUtils.toolDescriptionProperty("tool"),
                 textProperty));
 
         Map<String, List<ToolDTO>> tools = toolFacade.getTools(

@@ -37,7 +37,7 @@ class ToolPropertyUtilsTest {
 
     @Test
     void testIsToolOverrideProperty() {
-        assertTrue(ToolPropertyUtils.isToolOverrideProperty(ToolPropertyUtils.toolNameProperty("tool")));
+        assertTrue(ToolPropertyUtils.isToolOverrideProperty(ToolPropertyUtils.toolNameProperty("SLACK_SEND_MESSAGE")));
         assertTrue(ToolPropertyUtils.isToolOverrideProperty(ToolPropertyUtils.toolDescriptionProperty("tool")));
         assertFalse(ToolPropertyUtils.isToolOverrideProperty(TEXT_PROPERTY));
     }
@@ -46,7 +46,8 @@ class ToolPropertyUtilsTest {
     void testWithoutToolOverridePropertiesKeepsOnlyInputProperties() {
         List<? extends Property> properties = ToolPropertyUtils.withoutToolOverrideProperties(
             List.of(
-                ToolPropertyUtils.toolNameProperty("tool"), ToolPropertyUtils.toolDescriptionProperty("tool"),
+                ToolPropertyUtils.toolNameProperty("SLACK_SEND_MESSAGE"),
+                ToolPropertyUtils.toolDescriptionProperty("tool"),
                 TEXT_PROPERTY));
 
         assertEquals(1, properties.size());
