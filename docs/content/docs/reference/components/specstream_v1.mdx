@@ -33,10 +33,27 @@ Version: 1
 
 ### Create an API Key
 
-1. Sign in to your [SpecStream](https://specstream.ai/) workspace.
-2. Open **Agents & API** (`https://specstream.ai/workspace/agents?tab=keys`).
-3. Create an API key with the `finds:spend` scope and a spending limit.
-4. Copy the API key and paste it into the **API Key** field.
+1. Sign in to your [SpecStream](https://specstream.ai/) workspace. If you do not have an account, create one.
+2. Open **Agents & API** at [https://specstream.ai/workspace/agents?tab=keys](https://specstream.ai/workspace/agents?tab=keys).
+3. Create an API key.
+4. Give the `finds:spend` scope to the API key. Without this scope, SpecStream refuses each call.
+5. Set a spending limit for the API key.
+6. Copy the API key.
+7. Paste the API key into the **API Key** field.
+
+Keep the API key secret. Do not put the API key in workflow parameters or in logs.
+
+### Billing
+
+SpecStream charges each call to the balance of your workspace. The **Fast** search tier costs less than the **Default** search tier. SpecStream does not charge for a page that has no text. For the current prices, refer to [SpecStream Pricing](https://specstream.ai/pricing.md) and [Billing](https://specstream.ai/docs/billing.md).
+
+### Additional Resources
+
+- [SpecStream API overview](https://specstream.ai/docs/api)
+- [Search API reference](https://specstream.ai/docs/search-api.md)
+- [Extract API reference](https://specstream.ai/docs/extract-api.md)
+- [Account and API keys](https://specstream.ai/docs/account.md)
+- [OpenAPI specification](https://api.specstream.ai/openapi.json)
 
 
 
@@ -56,15 +73,15 @@ Name: webSearch
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | q | Search Query | STRING | Question or request in plain words, in any language, from 1 to 2000 characters. Accepts the operators site:, -site:, -word, -"phrase", filetype:, after: and before: (YYYY, YYYY-MM or YYYY-MM-DD). | true |
-| speed | Search Tier | STRING <details> <summary> Options </summary> <span>default</span>, <span>fast</span> </details> | Default reads the result pages and returns an answer, structured rows and sources. Fast returns only the search engine results with snippets in approximately 1 second, with no answer, rows or passages. Fast costs less per call. | false |
+| speed | Search Tier | STRING <details> <summary> Options </summary> <span>default</span>, <span>fast</span> </details> | Default reads the result pages and returns an answer, structured rows and sources. Fast returns only the search engine results with snippets in about 1 second, with no answer, rows or passages. Fast costs less per call. | false |
 | num | Number of Sources | INTEGER | Maximum number of sources to return: 1 to 100, or 1 to 200 when Image Search is true. If empty, the response contains all sources that the answer used. | false |
 | page | Result Page | INTEGER | Page of the ranked source list to return, from 1 to 10. Each page has Number of Sources results (10 if empty). Only page 1 contains the answer and the rows. | false |
-| passages | Return Page Passages | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, returns text passages from the top source pages that match the query. Adds up to approximately 1 second. Do not use together with News Search. | false |
+| passages | Return Page Passages | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, returns text passages from the top source pages that match the query. Adds up to about 1 second. Do not use together with News Search. | false |
 | news | News Search | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, returns news items, newest first, instead of web results. Always uses the Fast search tier. Do not use together with Return Page Passages. | false |
 | images | Image Search | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, returns image results instead of web results. Always uses the Fast search tier. | false |
-| country | Country Code | STRING | Two-letter ISO 3166-1 code of the country that the results are for. SpecStream sends it to each search engine that supports a country. | false |
-| language | Language Code | STRING | Two-letter ISO 639-1 code of the result language. SpecStream sends it to each search engine that supports a language. | false |
-| safe | Safe Search Level | STRING <details> <summary> Options </summary> <span>off</span>, <span>moderate</span>, <span>strict</span> </details> | Filter level for explicit content. SpecStream sends it to each search engine that supports one. If empty, each search engine uses its own default level. | false |
+| country | Country Code | STRING | Two-letter ISO 3166-1 code of the country that the results are for. SpecStream sends it to each search engine that can use a country code. | false |
+| language | Language Code | STRING | Two-letter ISO 639-1 code of the result language. SpecStream sends it to each search engine that can use a language code. | false |
+| safe | Safe Search Level | STRING <details> <summary> Options </summary> <span>off</span>, <span>moderate</span>, <span>strict</span> </details> | Filter level for explicit content. SpecStream sends it to each search engine that can use a level. If empty, each search engine uses its own default level. | false |
 
 #### Example JSON Structure
 ```json
