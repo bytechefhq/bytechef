@@ -32,7 +32,7 @@ import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigura
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkflowService;
-import com.bytechef.platform.ai.tool.facade.AbstractToolFacade;
+import com.bytechef.platform.ai.tool.util.ToolNameUtils;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
@@ -367,7 +367,7 @@ class ConnectedUserMcpAutomations {
         String label = workflow == null ? null : workflow.getLabel();
 
         return Objects.requireNonNullElse(
-            AbstractToolFacade.getWorkflowToolName(linkWorkflow.getParameters(), label),
+            ToolNameUtils.getWorkflowToolName(linkWorkflow.getParameters(), label),
             linkWorkflow.getWorkflowUuid());
     }
 

@@ -587,51 +587,6 @@ class AbstractToolFacadeTest {
     }
 
     @Test
-    void testGetWorkflowToolNameFallsBackToTheWorkflowLabel() {
-        assertEquals("SEND_EMAIL", AbstractToolFacade.getWorkflowToolName(Map.of(), "Send Email"));
-    }
-
-    @Test
-    void testGetWorkflowToolNamePrefersTheConfiguredName() {
-        assertEquals(
-            "sendEmail", AbstractToolFacade.getWorkflowToolName(Map.of("toolName", "sendEmail"), "Send Email"));
-    }
-
-    @Test
-    void testGetWorkflowToolNameKeepsTheCaseOfACleanedConfiguredName() {
-        assertEquals(
-            "send_Email", AbstractToolFacade.getWorkflowToolName(Map.of("toolName", "send.Email"), "Send Email"));
-    }
-
-    @Test
-    void testGetWorkflowToolNameCutsAConfiguredNameToTheMaximumLength() {
-        String toolName = AbstractToolFacade.getWorkflowToolName(Map.of("toolName", "a".repeat(70)), "Send Email");
-
-        assertEquals("a".repeat(64), toolName);
-    }
-
-    @Test
-    void testGetWorkflowToolNameReturnsNullWithoutAConfiguredNameOrLabel() {
-        assertNull(AbstractToolFacade.getWorkflowToolName(Map.of(), null));
-    }
-
-    // Tool names reach the model as identifiers, so a label cannot be used verbatim.
-    @Test
-    void testToToolNameSanitizesALabel() {
-        assertEquals("ORDER_SYNC_V2", AbstractToolFacade.toToolName("Order Sync (v2)"));
-    }
-
-    @Test
-    void testToToolNameUpperCasesAnAlreadyValidLabel() {
-        assertEquals("ORDER-SYNC_2", AbstractToolFacade.toToolName("order-sync_2"));
-    }
-
-    @Test
-    void testToToolNameReturnsNullForALabelWithNothingUsable() {
-        assertNull(AbstractToolFacade.toToolName("()"));
-    }
-
-    @Test
     void testApplyRuntimeOptionsReplacesStoredOptionsWithTheLoadedOnes() {
         FromAiResult channelFromAiResult = new FromAiResult(
             "channel", "STRING", null, null, List.<Object>of("stale"), true);

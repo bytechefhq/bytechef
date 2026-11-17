@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class ToolPropertyUtils {
 
-    public static final int TOOL_NAME_MAX_LENGTH = 64;
+    static final int TOOL_NAME_MAX_LENGTH = 64;
 
     private static final String TOOL_NAME_DISALLOWED_CHARACTERS_REGEX = "[^A-Za-z0-9_-]";
 

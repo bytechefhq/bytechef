@@ -54,6 +54,7 @@ import com.bytechef.platform.ai.tool.FromAiResult;
 import com.bytechef.platform.ai.tool.ToolOptionsResolver;
 import com.bytechef.platform.ai.tool.facade.AbstractToolFacade;
 import com.bytechef.platform.ai.tool.util.FromAiInputSchemaUtils;
+import com.bytechef.platform.ai.tool.util.ToolNameUtils;
 import com.bytechef.platform.ai.tool.util.ToolParameterDefaultsUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.constant.WorkflowConstants;
@@ -459,7 +460,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         Function<String, Function<Map<String, Object>, Object>> toolCallbackFunctionFactory) {
 
         String toolName = Objects.requireNonNull(
-            getWorkflowToolName(workflowParameters, workflow.getLabel()),
+            ToolNameUtils.getWorkflowToolName(workflowParameters, workflow.getLabel()),
             () -> "Workflow %s exposes no tool name: configure one or give the workflow a label"
                 .formatted(workflow.getId()));
 

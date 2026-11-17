@@ -16,23 +16,20 @@
 
 package com.bytechef.platform.ai.tool.facade;
 
-import static com.bytechef.platform.ai.tool.util.ToolPropertyUtils.TOOL_NAME_MAX_LENGTH;
-
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.ai.tool.FromAiResult;
 import com.bytechef.platform.ai.tool.ToolOptionsResolver;
 import com.bytechef.platform.ai.tool.constant.ToolConstants;
+import com.bytechef.platform.ai.tool.util.ToolNameUtils;
 import com.bytechef.platform.component.domain.ObjectProperty;
 import com.bytechef.platform.component.domain.Property;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 
@@ -40,13 +37,6 @@ import org.jspecify.annotations.Nullable;
  * @author Matija Petanjek
  */
 public abstract class AbstractToolFacade {
-
-    private static final Pattern EDGE_NON_TOOL_NAME_CHARACTERS = Pattern.compile("^[^a-zA-Z0-9_-]+|[^a-zA-Z0-9_-]+$");
-
-    private static final Pattern NON_TOOL_NAME_CHARACTERS = Pattern.compile("[^a-zA-Z0-9_-]+");
-
-    private static final String TOOL_NAME_LETTERS_AND_DIGITS =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     private final Evaluator evaluator;
 
@@ -283,12 +273,10 @@ public abstract class AbstractToolFacade {
     protected String getToolName(
         String componentName, String clusterElementName, Map<String, ?> inputParameters) {
 
-        if (inputParameters != null) {
-            String toolName = cleanToolName(inputParameters.get(ToolConstants.TOOL_NAME));
+        String toolName = ToolNameUtils.getCustomToolName(inputParameters);
 
-            if (toolName != null) {
-                return toolName;
-            }
+        if (toolName != null) {
+            return toolName;
         }
 
         StringBuilder sb = new StringBuilder();
@@ -310,18 +298,6 @@ public abstract class AbstractToolFacade {
         }
 
         return sb.toString();
-    }
-
-    public static @Nullable String getWorkflowToolName(@Nullable Map<String, ?> parameters, @Nullable String label) {
-        if (parameters != null) {
-            String toolName = cleanToolName(parameters.get(ToolConstants.TOOL_NAME));
-
-            if (toolName != null) {
-                return toolName;
-            }
-        }
-
-        return toToolName(label);
     }
 
     protected Object resolveParameterValue(Object value, Map<String, Object> request) {
@@ -423,36 +399,5 @@ public abstract class AbstractToolFacade {
         }
 
         return "'" + string.replace("'", "''") + "'";
-    }
-
-    protected static @Nullable String toToolName(@Nullable String label) {
-        if (label == null) {
-            return null;
-        }
-
-        String toolName = NON_TOOL_NAME_CHARACTERS.matcher(label.trim())
-            .replaceAll("_");
-
-        toolName = StringUtils.strip(toolName, "_");
-        toolName = StringUtils.left(toolName, TOOL_NAME_MAX_LENGTH);
-        toolName = StringUtils.stripEnd(toolName, "_");
-
-        return toolName.isBlank() ? null : toolName.toUpperCase(Locale.ROOT);
-    }
-
-    private static @Nullable String cleanToolName(@Nullable Object name) {
-        if (!(name instanceof String string)) {
-            return null;
-        }
-
-        String toolName = EDGE_NON_TOOL_NAME_CHARACTERS.matcher(string)
-            .replaceAll("");
-
-        toolName = NON_TOOL_NAME_CHARACTERS.matcher(toolName)
-            .replaceAll("_");
-
-        toolName = StringUtils.left(toolName, TOOL_NAME_MAX_LENGTH);
-
-        return StringUtils.containsAny(toolName, TOOL_NAME_LETTERS_AND_DIGITS) ? toolName : null;
     }
 }

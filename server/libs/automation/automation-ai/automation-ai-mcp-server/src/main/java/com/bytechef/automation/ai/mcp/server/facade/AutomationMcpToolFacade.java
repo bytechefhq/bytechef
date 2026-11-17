@@ -42,6 +42,7 @@ import com.bytechef.platform.ai.tool.FromAiResult;
 import com.bytechef.platform.ai.tool.ToolOptionsResolver;
 import com.bytechef.platform.ai.tool.facade.AbstractToolFacade;
 import com.bytechef.platform.ai.tool.util.FromAiInputSchemaUtils;
+import com.bytechef.platform.ai.tool.util.ToolNameUtils;
 import com.bytechef.platform.ai.tool.util.ToolParameterDefaultsUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.SuspendUtils;
@@ -228,7 +229,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
 
             Map<String, ?> workflowParameters = mcpProjectWorkflow.getParameters();
 
-            String toolName = getWorkflowToolName(workflowParameters, workflow.getLabel());
+            String toolName = ToolNameUtils.getWorkflowToolName(workflowParameters, workflow.getLabel());
 
             if (toolName == null) {
                 log.warn(
