@@ -50,6 +50,7 @@ public class SpecStreamExtractAction {
         .properties(
             array(URLS)
                 .label("Page URLs")
+                .exampleValue("https://en.wikipedia.org/wiki/Narbonne", "https://example.com/report.pdf")
                 .description(
                     "Public HTTP or HTTPS URLs of the web pages or documents to read, from 1 to 20. SpecStream reads " +
                         "a duplicate URL only once.")
@@ -59,6 +60,7 @@ public class SpecStreamExtractAction {
                 .required(true),
             string(FORMAT)
                 .label("Text Format")
+                .exampleValue("markdown")
                 .description("Format of the main text in the text field of each result.")
                 .options(
                     option("Markdown", "markdown"),
@@ -68,6 +70,7 @@ public class SpecStreamExtractAction {
                 .required(false),
             array(INCLUDE)
                 .label("Additional Result Fields")
+                .exampleValue("links", "response")
                 .description(
                     "Fields to add to each result: the raw page HTML, the links on the page, the HTTP response " +
                         "(status code and final URL after redirects), or the full page text.")

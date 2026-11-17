@@ -55,6 +55,7 @@ public class SpecStreamWebSearchAction {
         .properties(
             string(Q)
                 .label("Search Query")
+                .exampleValue("site:stripe.com who is the CEO of Stripe")
                 .description(
                     "Question or request in plain words, in any language, from 1 to 2000 characters. Accepts the " +
                         "operators site:, -site:, -word, -\"phrase\", filetype:, after: and before: (YYYY, YYYY-MM " +
@@ -64,6 +65,7 @@ public class SpecStreamWebSearchAction {
                 .required(true),
             string(SPEED)
                 .label("Search Tier")
+                .exampleValue("fast")
                 .description(
                     "Default reads the result pages and returns an answer, structured rows and sources. Fast " +
                         "returns only the search engine results with snippets in approximately 1 second, with no " +
@@ -75,6 +77,7 @@ public class SpecStreamWebSearchAction {
                 .required(false),
             integer(NUM)
                 .label("Number of Sources")
+                .exampleValue(20)
                 .description(
                     "Maximum number of sources to return: 1 to 100, or 1 to 200 when Image Search is true. If " +
                         "empty, the response contains all sources that the answer used.")
@@ -84,6 +87,7 @@ public class SpecStreamWebSearchAction {
                 .required(false),
             integer(PAGE)
                 .label("Result Page")
+                .exampleValue(2)
                 .description(
                     "Page of the ranked source list to return, from 1 to 10. Each page has Number of Sources " +
                         "results (10 if empty). Only page 1 contains the answer and the rows.")
@@ -93,6 +97,7 @@ public class SpecStreamWebSearchAction {
                 .required(false),
             bool(PASSAGES)
                 .label("Return Page Passages")
+                .exampleValue(true)
                 .description(
                     "If true, returns text passages from the top source pages that match the query. Adds up to " +
                         "approximately 1 second. Do not use together with News Search.")
@@ -100,6 +105,7 @@ public class SpecStreamWebSearchAction {
                 .required(false),
             bool(NEWS)
                 .label("News Search")
+                .exampleValue(true)
                 .description(
                     "If true, returns news items, newest first, instead of web results. Always uses the Fast search " +
                         "tier. Do not use together with Return Page Passages.")
@@ -107,12 +113,14 @@ public class SpecStreamWebSearchAction {
                 .required(false),
             bool(IMAGES)
                 .label("Image Search")
+                .exampleValue(true)
                 .description(
                     "If true, returns image results instead of web results. Always uses the Fast search tier.")
                 .advancedOption(true)
                 .required(false),
             string(COUNTRY)
                 .label("Country Code")
+                .exampleValue("DE")
                 .description(
                     "Two-letter ISO 3166-1 code of the country that the results are for. SpecStream sends it to " +
                         "each search engine that supports a country.")
@@ -120,6 +128,7 @@ public class SpecStreamWebSearchAction {
                 .required(false),
             string(LANGUAGE)
                 .label("Language Code")
+                .exampleValue("de")
                 .description(
                     "Two-letter ISO 639-1 code of the result language. SpecStream sends it to each search engine " +
                         "that supports a language.")
@@ -127,6 +136,7 @@ public class SpecStreamWebSearchAction {
                 .required(false),
             string(SAFE)
                 .label("Safe Search Level")
+                .exampleValue("moderate")
                 .description(
                     "Filter level for explicit content. SpecStream sends it to each search engine that supports " +
                         "one. If empty, each search engine uses its own default level.")
