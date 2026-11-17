@@ -555,6 +555,28 @@ class AbstractToolFacadeTest {
     }
 
     @Test
+    void testGetToolNameReplacesCharactersAiClientsReject() {
+        AbstractToolFacade toolFacade = createToolFacade();
+
+        assertEquals(
+            "crm_sync_v1_2", toolFacade.getToolName("httpClient", "post", Map.of("toolName", " crm/sync v1.2! ")));
+    }
+
+    @Test
+    void testGetToolNameFallsBackWhenTheConfiguredNameHasNothingUsable() {
+        AbstractToolFacade toolFacade = createToolFacade();
+
+        assertEquals("HTTPCLIENT_POST", toolFacade.getToolName("httpClient", "post", Map.of("toolName", "/._!")));
+    }
+
+    @Test
+    void testGetToolNameKeepsAValidConfiguredNameAsTyped() {
+        AbstractToolFacade toolFacade = createToolFacade();
+
+        assertEquals("_post-Thing_", toolFacade.getToolName("httpClient", "post", Map.of("toolName", "_post-Thing_")));
+    }
+
+    @Test
     void testGetToolDescriptionReturnsNullWhenUnconfigured() {
         assertNull(AbstractToolFacade.getToolDescription(Map.of(), null));
     }
@@ -573,6 +595,19 @@ class AbstractToolFacadeTest {
     void testGetWorkflowToolNamePrefersTheConfiguredName() {
         assertEquals(
             "sendEmail", AbstractToolFacade.getWorkflowToolName(Map.of("toolName", "sendEmail"), "Send Email"));
+    }
+
+    @Test
+    void testGetWorkflowToolNameKeepsTheCaseOfACleanedConfiguredName() {
+        assertEquals(
+            "send_Email", AbstractToolFacade.getWorkflowToolName(Map.of("toolName", "send.Email"), "Send Email"));
+    }
+
+    @Test
+    void testGetWorkflowToolNameCutsAConfiguredNameToTheMaximumLength() {
+        String toolName = AbstractToolFacade.getWorkflowToolName(Map.of("toolName", "a".repeat(70)), "Send Email");
+
+        assertEquals("a".repeat(64), toolName);
     }
 
     @Test
