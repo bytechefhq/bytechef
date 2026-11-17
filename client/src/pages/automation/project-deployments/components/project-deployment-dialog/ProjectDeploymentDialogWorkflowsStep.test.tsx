@@ -47,6 +47,7 @@ describe('ProjectDeploymentDialogWorkflowsStep', () => {
             {id: 'setup-id', label: 'Setup leads sheet', tasks: [], triggers: [], workflowUuid: 'setup-uuid'},
             {id: 'connection-id', label: 'Connection check', tasks: [], triggers: [], workflowUuid: 'connection-uuid'},
             {id: 'archive-id', label: 'archive old leads', tasks: [], triggers: [], workflowUuid: 'archive-uuid'},
+            {id: 'unlabeled-id', tasks: [], triggers: [], workflowUuid: 'unlabeled-uuid'},
         ] as Workflow[];
 
         render(
@@ -60,6 +61,11 @@ describe('ProjectDeploymentDialogWorkflowsStep', () => {
 
         const renderedLabels = screen.getAllByText(/:\d+$/).map((element) => element.textContent);
 
-        expect(renderedLabels).toEqual(['archive old leads:2', 'Connection check:1', 'Setup leads sheet:0']);
+        expect(renderedLabels).toEqual([
+            'undefined:3',
+            'archive old leads:2',
+            'Connection check:1',
+            'Setup leads sheet:0',
+        ]);
     });
 });
