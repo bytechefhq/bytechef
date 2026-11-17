@@ -1,5 +1,6 @@
 import IntegrationInstanceConfigurationDialogWorkflowsStepItem from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogWorkflowsStepItem';
 import {IntegrationInstanceConfiguration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
+import compareWorkflowLabels from '@/shared/util/compareWorkflowLabels';
 import {Control, FormState, UseFormSetValue} from 'react-hook-form';
 
 export interface IntegrationInstanceConfigurationDialogWorkflowsStepProps {
@@ -17,12 +18,10 @@ const IntegrationInstanceConfigurationDialogWorkflowsStep = ({
     setValue,
     workflows,
 }: IntegrationInstanceConfigurationDialogWorkflowsStepProps) => {
-    const sortedWorkflowEntries = (workflows || [])
+    const sortedWorkflowEntries = workflows
         .map((workflow, workflowIndex) => ({workflow, workflowIndex}))
         .sort((workflowEntry, otherWorkflowEntry) =>
-            (workflowEntry.workflow.label || '').localeCompare(otherWorkflowEntry.workflow.label || '', undefined, {
-                sensitivity: 'base',
-            })
+            compareWorkflowLabels(workflowEntry.workflow.label, otherWorkflowEntry.workflow.label)
         );
 
     return (

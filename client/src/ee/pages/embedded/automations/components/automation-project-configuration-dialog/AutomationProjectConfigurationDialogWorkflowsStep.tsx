@@ -1,4 +1,5 @@
 import LoadingDots from '@/components/LoadingDots';
+import compareWorkflowLabels from '@/shared/util/compareWorkflowLabels';
 
 import AutomationProjectConfigurationDialogWorkflowsStepItem from './AutomationProjectConfigurationDialogWorkflowsStepItem';
 import {ConfigurationDialogWorkflowI, WorkflowDraftI} from './automationProjectConfigurationDialog-utils';
@@ -23,7 +24,7 @@ const AutomationProjectConfigurationDialogWorkflowsStep = ({
     workflows,
 }: AutomationProjectConfigurationDialogWorkflowsStepProps) => {
     const sortedWorkflows = [...workflows].sort((workflow, otherWorkflow) =>
-        workflow.label.localeCompare(otherWorkflow.label, undefined, {sensitivity: 'base'})
+        compareWorkflowLabels(workflow.label, otherWorkflow.label)
     );
 
     if (isLoading) {

@@ -389,13 +389,7 @@ const ProjectDeploymentDialogBasicStep = ({
 
                                                 <SelectContent>
                                                     {projectDeployments.map((deployment) => (
-                                                        <SelectItem
-                                                            key={
-                                                                deployment.id?.toString() ??
-                                                                `${deployment.name ?? 'deployment'}-${deployment.projectVersion}`
-                                                            }
-                                                            value={deployment.id?.toString() ?? ''}
-                                                        >
+                                                        <SelectItem key={deployment.id} value={String(deployment.id)}>
                                                             {deployment.name || `Deployment ${deployment.id}`}
                                                         </SelectItem>
                                                     ))}

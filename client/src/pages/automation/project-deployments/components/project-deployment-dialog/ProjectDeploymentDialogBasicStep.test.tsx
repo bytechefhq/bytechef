@@ -225,6 +225,17 @@ describe('ProjectDeploymentDialogBasicStep', () => {
         expect(screen.getByText('Environment')).toBeInTheDocument();
     });
 
+    it('should name a deployment without a name after its id', () => {
+        render(
+            <ChangeVersionHarness
+                onDeploymentSelect={vi.fn()}
+                projectDeployments={[{environmentId: 1, id: 7, projectId: 1, projectVersion: 3}] as ProjectDeployment[]}
+            />
+        );
+
+        expect(screen.getByText('Deployment 7')).toBeInTheDocument();
+    });
+
     it('should leave the deployment unselected when a project has several', () => {
         const onDeploymentSelect = vi.fn();
 

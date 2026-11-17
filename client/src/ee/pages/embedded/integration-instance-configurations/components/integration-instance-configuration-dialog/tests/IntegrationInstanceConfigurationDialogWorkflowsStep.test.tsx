@@ -20,6 +20,7 @@ describe('IntegrationInstanceConfigurationDialogWorkflowsStep', () => {
             {id: 'setup-id', label: 'Setup leads sheet'},
             {id: 'connection-id', label: 'Connection check'},
             {id: 'archive-id', label: 'archive old leads'},
+            {id: 'unlabeled-id'},
         ] as Workflow[];
 
         render(
@@ -34,6 +35,11 @@ describe('IntegrationInstanceConfigurationDialogWorkflowsStep', () => {
 
         const renderedLabels = screen.getAllByText(/:\d+$/).map((element) => element.textContent);
 
-        expect(renderedLabels).toEqual(['archive old leads:2', 'Connection check:1', 'Setup leads sheet:0']);
+        expect(renderedLabels).toEqual([
+            'undefined:3',
+            'archive old leads:2',
+            'Connection check:1',
+            'Setup leads sheet:0',
+        ]);
     });
 });

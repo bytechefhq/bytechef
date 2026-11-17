@@ -1,5 +1,6 @@
 import ProjectDeploymentDialogWorkflowsStepItem from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItem';
 import {Connection, ProjectDeployment, Workflow} from '@/shared/middleware/automation/configuration';
+import compareWorkflowLabels from '@/shared/util/compareWorkflowLabels';
 import {Control, FormState, UseFormSetValue} from 'react-hook-form';
 
 import {getReachableSubflowUuids} from './projectDeploymentDialog-utils';
@@ -25,9 +26,7 @@ const ProjectDeploymentDialogWorkflowsStep = ({
 
     const nonSubflowWorkflows = workflows
         .filter((workflow) => !(workflow.workflowUuid && reachableSubflowUuids.has(workflow.workflowUuid)))
-        .sort((workflow, otherWorkflow) =>
-            (workflow.label || '').localeCompare(otherWorkflow.label || '', undefined, {sensitivity: 'base'})
-        );
+        .sort((workflow, otherWorkflow) => compareWorkflowLabels(workflow.label, otherWorkflow.label));
 
     return (
         <div className="min-h-full space-y-5">
