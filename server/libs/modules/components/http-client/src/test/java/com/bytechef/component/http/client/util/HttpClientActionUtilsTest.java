@@ -23,10 +23,14 @@ import static com.bytechef.component.http.client.constant.HttpClientConstants.BO
 import static com.bytechef.component.http.client.constant.HttpClientConstants.BODY_CONTENT_MIME_TYPE;
 import static com.bytechef.component.http.client.constant.HttpClientConstants.BODY_CONTENT_TYPE;
 import static com.bytechef.component.http.client.constant.HttpClientConstants.FULL_RESPONSE;
+import static com.bytechef.component.http.client.constant.HttpClientConstants.IGNORE_RESPONSE_CODE;
 import static com.bytechef.component.http.client.constant.HttpClientConstants.URI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -42,11 +46,13 @@ import com.bytechef.component.definition.Context.Http.RequestMethod;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -67,6 +73,12 @@ class HttpClientActionUtilsTest {
     private final Response mockedResponse = mock(Response.class);
     private final ArgumentCaptor<Http.RequestMethod> requestMethodArgumentCaptor = forClass(Http.RequestMethod.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+
+    @BeforeEach
+    void beforeEach() {
+        when(mockedResponse.getStatusCode())
+            .thenReturn(200);
+    }
 
     @Test
     void testExecuteReturnsResponseBodyWhenFullResponseFalseAndNoBody() throws Exception {
@@ -252,6 +264,85 @@ class HttpClientActionUtilsTest {
     }
 
     @Test
+    void testExecuteThrowsProviderExceptionWhenStatusCodeIsNot2xx() {
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(URI, "http://example.com"));
+
+        stubExchange(500, Map.of("error", "boom"), Map.of());
+
+        ProviderException providerException = assertThrows(
+            ProviderException.class,
+            () -> HttpClientActionUtils.execute(mockedParameters, RequestMethod.GET, mockedContext));
+
+        assertEquals(500, providerException.getStatusCode());
+        assertEquals("500: {error=boom}", providerException.getMessage());
+    }
+
+    @Test
+    void testExecuteThrowsRetryableProviderExceptionWhenServiceUnavailableWithoutBody() {
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(URI, "http://example.com"));
+
+        stubExchange(503, null, Map.of());
+
+        ProviderException providerException = assertThrows(
+            ProviderException.class,
+            () -> HttpClientActionUtils.executeV2(mockedParameters, RequestMethod.GET, mockedContext));
+
+        assertEquals(503, providerException.getStatusCode());
+        assertEquals("503", providerException.getMessage());
+        assertTrue(providerException.isRetryable());
+    }
+
+    @Test
+    void testExecuteThrowsNotFoundExceptionWhenStatusCodeIs404() {
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(URI, "http://example.com"));
+
+        stubExchange(404, "missing", Map.of());
+
+        assertThrows(
+            ProviderException.NotFoundException.class,
+            () -> HttpClientActionUtils.execute(mockedParameters, RequestMethod.GET, mockedContext));
+    }
+
+    @Test
+    void testExecuteThrowsProviderExceptionWithRetryAfterHeader() {
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(URI, "http://example.com"));
+
+        stubExchange(429, null, Map.of("Retry-After", List.of("30")));
+
+        ProviderException providerException = assertThrows(
+            ProviderException.class,
+            () -> HttpClientActionUtils.execute(mockedParameters, RequestMethod.GET, mockedContext));
+
+        assertEquals("30", providerException.getRetryAfter());
+    }
+
+    @Test
+    void testExecuteReturnsBodyWhenStatusCodeIsNot2xxAndIgnoreResponseCodeIsTrue() {
+        Parameters mockedParameters = MockParametersFactory.create(
+            Map.of(IGNORE_RESPONSE_CODE, true, URI, "http://example.com"));
+
+        Map<String, String> expectedBody = Map.of("error", "boom");
+
+        stubExchange(500, expectedBody, Map.of());
+
+        Object result = HttpClientActionUtils.execute(mockedParameters, RequestMethod.GET, mockedContext);
+
+        assertEquals(expectedBody, result);
+    }
+
+    @Test
+    void testExecuteReturnsFullResponseWhenStatusCodeIsNot2xxAndIgnoreResponseCodeIsTrue() {
+        Parameters mockedParameters = MockParametersFactory.create(
+            Map.of(FULL_RESPONSE, true, IGNORE_RESPONSE_CODE, true, URI, "http://example.com"));
+
+        stubExchange(503, null, Map.of());
+
+        Object result = HttpClientActionUtils.execute(mockedParameters, RequestMethod.GET, mockedContext);
+
+        assertSame(mockedResponse, result);
+    }
+
+    @Test
     void testToArrayMergesLists() {
         List<Property> list1 = List.of(string("a"));
         List<Property> list2 = List.of(integer("b"));
@@ -261,6 +352,30 @@ class HttpClientActionUtilsTest {
         assertEquals(2, merged.length);
         assertEquals("a", merged[0].getName());
         assertEquals("b", merged[1].getName());
+    }
+
+    private void stubExchange(int statusCode, Object body, Map<String, List<String>> headers) {
+        when(mockedContext.http(contextFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> contextFunctionArgumentCaptor.getValue()
+                .apply(mockedHttp));
+        when(mockedHttp.exchange(stringArgumentCaptor.capture(), requestMethodArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.headers(mapArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(mapArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getStatusCode())
+            .thenReturn(statusCode);
+        when(mockedResponse.getBody())
+            .thenReturn(body);
+        when(mockedResponse.getHeaders())
+            .thenReturn(headers);
     }
 
     private Body executeWithBody(BodyContentType bodyContentType, Object bodyContent) {

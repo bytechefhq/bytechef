@@ -76,6 +76,8 @@ public class HttpClientActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
+        when(mockedResponse.getStatusCode())
+            .thenReturn(200);
 
         return performFunction.apply(mockedParameters, null, mockedActionContext);
     }
