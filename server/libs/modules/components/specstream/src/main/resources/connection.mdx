@@ -2,7 +2,24 @@
 
 ### Create an API Key
 
-1. Sign in to your [SpecStream](https://specstream.ai/) workspace.
-2. Open **Agents & API** (`https://specstream.ai/workspace/agents?tab=keys`).
-3. Create an API key with the `finds:spend` scope and a spending limit.
-4. Copy the API key and paste it into the **API Key** field.
+1. Sign in to your [SpecStream](https://specstream.ai/) workspace. If you do not have an account, create one.
+2. Open **Agents & API** at [https://specstream.ai/workspace/agents?tab=keys](https://specstream.ai/workspace/agents?tab=keys).
+3. Create an API key.
+4. Give the `finds:spend` scope to the API key. Without this scope, SpecStream refuses each call.
+5. Set a spending limit for the API key.
+6. Copy the API key.
+7. Paste the API key into the **API Key** field.
+
+Keep the API key secret. Do not put the API key in workflow parameters or in logs.
+
+### Billing
+
+SpecStream charges each call to the balance of your workspace. The **Fast** search tier costs less than the **Default** search tier. SpecStream does not charge for a page that has no text. For the current prices, refer to [SpecStream Pricing](https://specstream.ai/pricing.md) and [Billing](https://specstream.ai/docs/billing.md).
+
+### Additional Resources
+
+- [SpecStream API overview](https://specstream.ai/docs/api)
+- [Search API reference](https://specstream.ai/docs/search-api.md)
+- [Extract API reference](https://specstream.ai/docs/extract-api.md)
+- [Account and API keys](https://specstream.ai/docs/account.md)
+- [OpenAPI specification](https://api.specstream.ai/openapi.json)

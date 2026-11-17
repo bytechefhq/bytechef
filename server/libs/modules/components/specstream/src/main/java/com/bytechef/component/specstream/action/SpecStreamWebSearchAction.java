@@ -68,7 +68,7 @@ public class SpecStreamWebSearchAction {
                 .exampleValue("fast")
                 .description(
                     "Default reads the result pages and returns an answer, structured rows and sources. Fast " +
-                        "returns only the search engine results with snippets in approximately 1 second, with no " +
+                        "returns only the search engine results with snippets in about 1 second, with no " +
                         "answer, rows or passages. Fast costs less per call.")
                 .options(
                     option("Default (Answer, Rows and Sources)", "default"),
@@ -100,7 +100,7 @@ public class SpecStreamWebSearchAction {
                 .exampleValue(true)
                 .description(
                     "If true, returns text passages from the top source pages that match the query. Adds up to " +
-                        "approximately 1 second. Do not use together with News Search.")
+                        "about 1 second. Do not use together with News Search.")
                 .advancedOption(true)
                 .required(false),
             bool(NEWS_SEARCH)
@@ -123,7 +123,7 @@ public class SpecStreamWebSearchAction {
                 .exampleValue("DE")
                 .description(
                     "Two-letter ISO 3166-1 code of the country that the results are for. SpecStream sends it to " +
-                        "each search engine that supports a country.")
+                        "each search engine that can use a country code.")
                 .advancedOption(true)
                 .required(false),
             string(LANGUAGE_CODE)
@@ -131,15 +131,15 @@ public class SpecStreamWebSearchAction {
                 .exampleValue("de")
                 .description(
                     "Two-letter ISO 639-1 code of the result language. SpecStream sends it to each search engine " +
-                        "that supports a language.")
+                        "that can use a language code.")
                 .advancedOption(true)
                 .required(false),
             string(SAFE_SEARCH_LEVEL)
                 .label("Safe Search Level")
                 .exampleValue("moderate")
                 .description(
-                    "Filter level for explicit content. SpecStream sends it to each search engine that supports " +
-                        "one. If empty, each search engine uses its own default level.")
+                    "Filter level for explicit content. SpecStream sends it to each search engine that can use " +
+                        "a level. If empty, each search engine uses its own default level.")
                 .options(
                     option("Off", "off"),
                     option("Moderate", "moderate"),
