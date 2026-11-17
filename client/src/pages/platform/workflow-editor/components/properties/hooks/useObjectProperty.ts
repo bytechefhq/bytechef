@@ -36,6 +36,22 @@ interface UseObjectPropertyProps {
     property: PropertyAllType;
 }
 
+const hasPersistableValue = (value: unknown): boolean => {
+    if (value === undefined) {
+        return false;
+    }
+
+    if (Array.isArray(value)) {
+        return value.some(hasPersistableValue);
+    }
+
+    if (isObject(value)) {
+        return Object.values(value).some(hasPersistableValue);
+    }
+
+    return true;
+};
+
 export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectPropertyProps) => {
     const [subProperties, setSubProperties] = useState<Array<PropertyAllType>>();
 
@@ -461,6 +477,10 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
             }, {});
 
         const defaultValueObject = buildObject(subProperties);
+
+        if (!hasPersistableValue(defaultValueObject)) {
+            return;
+        }
 
         const timeoutId = setTimeout(() => {
             defaultValueSavedRef.current = true;
