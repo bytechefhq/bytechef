@@ -83,7 +83,7 @@ Use the **Guardrails** handle to attach a [Check For Violations](/reference/comp
 
 In **Tools this agent can use**, click **Add Tool** to expose a component action, a script, an MCP server or another AI Agent as a tool. The model sees each tool's name and description and decides which to call.
 
-Every tool has optional **Tool Name** and **Tool Description** fields above its own properties. When left blank, the underlying operation's name and description are used. Set them when the default reads poorly to a model or when two tools are hard to tell apart. A tool name can have up to 64 characters: letters, digits, `_`, `-`, `.` and `/`. Any other character, including a space, is rejected as you type.
+Every tool has optional **Tool Name** and **Tool Description** fields above its own properties. When left blank, the underlying operation's name and description are used. Set them when the default reads poorly to a model or when two tools are hard to tell apart. A tool name can have up to 64 characters: letters, digits, `_` and `-`. Any other character, including a space, is rejected as you type.
 
 A tool placed inside an **Approval Gate Tool** appears in a group marked **requires approval**, with its own **Add Tool** and **Add Channel** buttons. See [Agent Utils Tools](agent-utils#approval-gate-tool).
 
