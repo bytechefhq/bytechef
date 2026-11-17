@@ -330,7 +330,7 @@ const AutomationProjectConfigurationDialog = ({
     const configurationItems = useMemo(
         () =>
             environmentConfigurations.map((existingConfiguration) => ({
-                label: `${existingConfiguration.name} - V${existingConfiguration.projectVersion}`,
+                label: existingConfiguration.name,
                 value: existingConfiguration.id,
             })),
         [environmentConfigurations]
@@ -655,9 +655,9 @@ const AutomationProjectConfigurationDialog = ({
                 activeTab={basicStepTab}
                 changeVersionContent={
                     <>
-                        {versionFieldset}
-
                         {environmentBadgeFieldset}
+
+                        {versionFieldset}
                     </>
                 }
                 configurationItems={configurationItems}
