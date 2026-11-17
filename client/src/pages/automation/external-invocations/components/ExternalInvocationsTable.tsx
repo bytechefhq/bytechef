@@ -20,7 +20,6 @@ import {
     SOURCE_LABELS,
     STATUS_STYLE_TYPES,
     formatCreatedDate,
-    invocationNameLabel,
     targetLabel,
 } from '../utils/externalInvocationLabels';
 import ExternalInvocationsDropdownMenu from './ExternalInvocationsDropdownMenu';
@@ -173,7 +172,7 @@ const ExternalInvocationsTable = ({
                         </TableCell>
 
                         <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
-                            {invocationNameLabel(externalInvocationLog) || '—'}
+                            {externalInvocationLog.invocationName || '—'}
                         </TableCell>
 
                         <TableCell className={twMerge(EXECUTIONS_TABLE_CELL_CLASS_NAME, 'text-center')}>
