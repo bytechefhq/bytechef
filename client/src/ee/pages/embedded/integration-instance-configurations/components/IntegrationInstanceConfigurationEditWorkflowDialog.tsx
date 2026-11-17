@@ -18,6 +18,7 @@ import {
 } from '@/ee/shared/middleware/embedded/configuration';
 import {useUpdateIntegrationInstanceConfigurationWorkflowMutation} from '@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
 import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
+import {getEnabledWorkflowTasks} from '@/pages/platform/workflow-editor/utils/getEnabledWorkflowTasks';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';
@@ -83,7 +84,7 @@ const IntegrationInstanceConfigurationEditWorkflowDialog = ({
         let newIntegrationInstanceConfigurationWorkflowConnections: IntegrationInstanceConfigurationWorkflowConnection[] =
             [];
 
-        const componentConnections: ComponentConnection[] = (workflow?.tasks ?? [])
+        const componentConnections: ComponentConnection[] = (workflow ? getEnabledWorkflowTasks(workflow) : [])
             .flatMap((task) => task.connections ?? [])
             .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []))
             .filter((connection) => connection.componentName !== componentName);
