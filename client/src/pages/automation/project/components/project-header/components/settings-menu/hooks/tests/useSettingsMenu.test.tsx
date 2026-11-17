@@ -10,6 +10,8 @@ import {useSettingsMenu} from '../useSettingsMenu';
 
 const hoisted = vi.hoisted(() => ({
     clearWorkflowHistory: vi.fn(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    deleteProjectOptions: undefined as any,
     deleteProjectVersionMutate: vi.fn(),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     deleteProjectVersionOptions: undefined as any,
@@ -28,7 +30,12 @@ vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowDataStore', () => ({
 }));
 
 vi.mock('@/shared/mutations/automation/projects.mutations', () => ({
-    useDeleteProjectMutation: hoisted.noopMutation,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    useDeleteProjectMutation: (options: any) => {
+        hoisted.deleteProjectOptions = options;
+
+        return {isPending: false, mutate: vi.fn()};
+    },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     useDeleteProjectVersionMutation: (options: any) => {
         hoisted.deleteProjectVersionOptions = options;
@@ -172,6 +179,40 @@ describe('useSettingsMenu', () => {
         });
 
         expect(hoisted.navigate).toHaveBeenCalledWith('/automation/projects');
+    });
+
+    it('leaves the deleted project page before dropping its queries so they are not fetched again', async () => {
+        let resolveNavigation: () => void = () => {};
+
+        hoisted.navigate.mockReturnValue(
+            new Promise<void>((resolve) => {
+                resolveNavigation = resolve;
+            })
+        );
+
+        const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+        const removeQueriesSpy = vi.spyOn(queryClient, 'removeQueries');
+
+        renderSettingsMenu();
+
+        let deletion: Promise<void> = Promise.resolve();
+
+        act(() => {
+            deletion = hoisted.deleteProjectOptions.onSuccess(undefined, 7);
+        });
+
+        expect(hoisted.navigate).toHaveBeenCalledWith('/automation/projects');
+        expect(removeQueriesSpy).not.toHaveBeenCalled();
+        expect(invalidateQueriesSpy).not.toHaveBeenCalled();
+
+        await act(async () => {
+            resolveNavigation();
+
+            await deletion;
+        });
+
+        expect(removeQueriesSpy).toHaveBeenCalledWith({queryKey: ['projects', 7]});
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['projects']});
     });
 
     it('opens the first workflow of the duplicated project after duplicating', () => {
