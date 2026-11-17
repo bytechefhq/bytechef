@@ -41,4 +41,25 @@ describe('ProjectDeploymentDialogWorkflowsStep', () => {
         expect(screen.getByText('parent:1')).toBeInTheDocument();
         expect(screen.getByText('other:2')).toBeInTheDocument();
     });
+
+    it('lists workflows alphabetically by label while keeping each card bound to its form index', () => {
+        const workflows = [
+            {id: 'setup-id', label: 'Setup leads sheet', tasks: [], triggers: [], workflowUuid: 'setup-uuid'},
+            {id: 'connection-id', label: 'Connection check', tasks: [], triggers: [], workflowUuid: 'connection-uuid'},
+            {id: 'archive-id', label: 'archive old leads', tasks: [], triggers: [], workflowUuid: 'archive-uuid'},
+        ] as Workflow[];
+
+        render(
+            <ProjectDeploymentDialogWorkflowsStep
+                control={{} as Control<ProjectDeployment>}
+                formState={{} as FormState<ProjectDeployment>}
+                setValue={vi.fn() as unknown as UseFormSetValue<ProjectDeployment>}
+                workflows={workflows}
+            />
+        );
+
+        const renderedLabels = screen.getAllByText(/:\d+$/).map((element) => element.textContent);
+
+        expect(renderedLabels).toEqual(['archive old leads:2', 'Connection check:1', 'Setup leads sheet:0']);
+    });
 });
