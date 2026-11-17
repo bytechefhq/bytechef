@@ -265,7 +265,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         for (IntegrationWorkflow oldIntegrationWorkflow : oldIntegrationWorkflows) {
             String oldWorkflowId = oldIntegrationWorkflow.getWorkflowId();
 
-            Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(oldWorkflowId);
+            Workflow duplicatedWorkflow = workflowService.duplicateWorkflowPreservingAudit(oldWorkflowId);
 
             oldIntegrationWorkflow.setIntegrationVersion(newIntegrationVersion);
             oldIntegrationWorkflow.setWorkflowId(duplicatedWorkflow.getId());

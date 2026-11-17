@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.config.TestOwnerContributors;
@@ -64,6 +65,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -130,6 +132,9 @@ public class ProjectFacadeIntTest {
 
     @Autowired
     private WorkflowCrudRepository workflowRepository;
+
+    @Autowired
+    private WorkflowService workflowService;
 
     @MockitoBean
     private SharedTemplateFileStorage sharedTemplateFileStorage;
@@ -1173,6 +1178,43 @@ public class ProjectFacadeIntTest {
             RuntimeException.class, () -> projectFacade.importProjectTemplate(projectUuid, workspace.getId(), true));
 
         assertThat(exception.getMessage()).contains("Missing files in a shared project file");
+    }
+
+    @Test
+    public void testPublishProjectKeepsWorkflowAuditFieldsInNextDraft() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
+
+        String publishedWorkflowId = projectWorkflowRepository
+            .findAllByProjectIdAndProjectVersion(projectDTO.id(), 1)
+            .getFirst()
+            .getWorkflowId();
+
+        Instant createdDate = Instant.parse("2026-01-02T03:04:05Z");
+        Instant lastModifiedDate = Instant.parse("2026-02-03T04:05:06Z");
+
+        workflowRepository.updateAuditFields(
+            publishedWorkflowId, "creator@localhost.com", createdDate, "modifier@localhost.com", lastModifiedDate);
+
+        workflowService.refreshCache(publishedWorkflowId);
+
+        projectFacade.publishProject(projectDTO.id(), "first", false);
+
+        String draftWorkflowId = projectWorkflowRepository
+            .findAllByProjectIdAndProjectVersion(projectDTO.id(), 2)
+            .getFirst()
+            .getWorkflowId();
+
+        assertThat(draftWorkflowId).isNotEqualTo(publishedWorkflowId);
+
+        Workflow draftWorkflow = workflowRepository.findById(draftWorkflowId)
+            .orElseThrow();
+
+        assertThat(draftWorkflow.getCreatedBy()).isEqualTo("creator@localhost.com");
+        assertThat(draftWorkflow.getCreatedDate()).isEqualTo(createdDate);
+        assertThat(draftWorkflow.getLastModifiedBy()).isEqualTo("modifier@localhost.com");
+        assertThat(draftWorkflow.getLastModifiedDate()).isEqualTo(lastModifiedDate);
     }
 
     @Test
