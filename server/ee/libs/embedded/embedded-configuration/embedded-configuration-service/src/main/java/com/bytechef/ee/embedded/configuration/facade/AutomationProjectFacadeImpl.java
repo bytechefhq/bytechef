@@ -527,7 +527,7 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         for (ProjectWorkflow oldProjectWorkflow : oldProjectWorkflows) {
             String oldWorkflowId = oldProjectWorkflow.getWorkflowId();
 
-            Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(oldWorkflowId);
+            Workflow duplicatedWorkflow = workflowService.duplicateWorkflowPreservingAudit(oldWorkflowId);
 
             oldProjectWorkflow.setProjectVersion(newProjectVersion);
             oldProjectWorkflow.setWorkflowId(duplicatedWorkflow.getId());
