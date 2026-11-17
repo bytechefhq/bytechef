@@ -105,8 +105,8 @@ const ConnectionConfigurationListFormField = ({
             key={index}
             name={`${fieldNamePrefix}.${index}.connectionId`}
             render={({field}) => (
-                <FormItem>
-                    <FormLabel className="flex items-center gap-1">
+                <FormItem className="space-y-1">
+                    <FormLabel className="flex items-center gap-1 leading-normal">
                         {componentDefinition?.icon && (
                             <InlineSVG className="size-4 flex-none" src={componentDefinition.icon} />
                         )}
@@ -128,83 +128,85 @@ const ConnectionConfigurationListFormField = ({
                         )}
                     </FormLabel>
 
-                    <Select
-                        defaultValue={currentConnectionId != null ? currentConnectionId.toString() : undefined}
-                        name={field.name}
-                        onValueChange={handleConnectionValueChange}
-                        value={
-                            (currentConnectionId != null
-                                ? currentConnectionId.toString()
-                                : field.value
-                                  ? field.value.toString()
-                                  : undefined) || ''
-                        }
-                    >
-                        <FormControl>
-                            <div className="flex min-w-0 space-x-2 bg-surface-neutral-primary">
-                                <SelectTrigger className="min-w-0 overflow-hidden text-left shadow-none [&>span]:block [&>span]:min-w-0 [&>span]:flex-1 [&>span]:overflow-hidden">
-                                    {currentConnectionId ? (
-                                        <SelectValue placeholder="Select a connection...">
-                                            {currentConnection && (
-                                                <div className="flex w-full min-w-0 items-center space-x-1">
-                                                    <span className="min-w-0 flex-1 truncate">
-                                                        {currentConnection.name}
-                                                    </span>
+                    <div>
+                        <Select
+                            defaultValue={currentConnectionId != null ? currentConnectionId.toString() : undefined}
+                            name={field.name}
+                            onValueChange={handleConnectionValueChange}
+                            value={
+                                (currentConnectionId != null
+                                    ? currentConnectionId.toString()
+                                    : field.value
+                                      ? field.value.toString()
+                                      : undefined) || ''
+                            }
+                        >
+                            <FormControl>
+                                <div className="flex min-w-0 space-x-2 bg-surface-neutral-primary">
+                                    <SelectTrigger className="min-w-0 overflow-hidden text-left shadow-none [&>span]:block [&>span]:min-w-0 [&>span]:flex-1 [&>span]:overflow-hidden">
+                                        {currentConnectionId ? (
+                                            <SelectValue placeholder="Select a connection...">
+                                                {currentConnection && (
+                                                    <div className="flex w-full min-w-0 items-center space-x-1">
+                                                        <span className="min-w-0 flex-1 truncate">
+                                                            {currentConnection.name}
+                                                        </span>
 
-                                                    <span className="shrink-0">
-                                                        <EnvironmentBadge
-                                                            environmentId={currentConnection.environmentId!}
-                                                        />
-                                                    </span>
-                                                </div>
-                                            )}
-                                        </SelectValue>
-                                    ) : (
-                                        <SelectValue placeholder="Select a connection...">
-                                            <span className="text-content-neutral-secondary/80">
-                                                Select a connection...
+                                                        <span className="shrink-0">
+                                                            <EnvironmentBadge
+                                                                environmentId={currentConnection.environmentId!}
+                                                            />
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </SelectValue>
+                                        ) : (
+                                            <SelectValue placeholder="Select a connection...">
+                                                <span className="text-content-neutral-secondary/80">
+                                                    Select a connection...
+                                                </span>
+                                            </SelectValue>
+                                        )}
+                                    </SelectTrigger>
+
+                                    {connectionDialogAllowed && (
+                                        <Button
+                                            className="mt-auto p-2"
+                                            icon={<PlusIcon className="size-5" />}
+                                            onClick={openConnectionDialog}
+                                            title="Create a new connection"
+                                            type="button"
+                                            variant="outline"
+                                        />
+                                    )}
+                                </div>
+                            </FormControl>
+
+                            <SelectContent>
+                                <SelectItem value={NO_CONNECTION_VALUE}>Select a connection...</SelectItem>
+
+                                {connectionList.map((connection) => (
+                                    <SelectItem
+                                        className="w-full [&>span[id]]:flex [&>span[id]]:w-full [&>span[id]]:min-w-0 [&>span[id]]:items-center [&>span[id]]:overflow-hidden"
+                                        key={connection.id}
+                                        value={connection.id!.toString()}
+                                    >
+                                        <span className="mr-1 min-w-0 flex-1 truncate">{connection.name}</span>
+
+                                        {!!connection?.tags?.length && (
+                                            <span className="mr-1 min-w-0 flex-none truncate text-xs text-content-neutral-secondary">
+                                                {connection.tags?.map((tag) => tag.name).join(', ')}
                                             </span>
-                                        </SelectValue>
-                                    )}
-                                </SelectTrigger>
+                                        )}
 
-                                {connectionDialogAllowed && (
-                                    <Button
-                                        className="mt-auto p-2"
-                                        icon={<PlusIcon className="size-5" />}
-                                        onClick={openConnectionDialog}
-                                        title="Create a new connection"
-                                        type="button"
-                                        variant="outline"
-                                    />
-                                )}
-                            </div>
-                        </FormControl>
-
-                        <SelectContent>
-                            <SelectItem value={NO_CONNECTION_VALUE}>Select a connection...</SelectItem>
-
-                            {connectionList.map((connection) => (
-                                <SelectItem
-                                    className="w-full [&>span[id]]:flex [&>span[id]]:w-full [&>span[id]]:min-w-0 [&>span[id]]:items-center [&>span[id]]:overflow-hidden"
-                                    key={connection.id}
-                                    value={connection.id!.toString()}
-                                >
-                                    <span className="mr-1 min-w-0 flex-1 truncate">{connection.name}</span>
-
-                                    {!!connection?.tags?.length && (
-                                        <span className="mr-1 min-w-0 flex-none truncate text-xs text-content-neutral-secondary">
-                                            {connection.tags?.map((tag) => tag.name).join(', ')}
+                                        <span className="flex-none">
+                                            <EnvironmentBadge environmentId={connection.environmentId!} />
                                         </span>
-                                    )}
-
-                                    <span className="flex-none">
-                                        <EnvironmentBadge environmentId={connection.environmentId!} />
-                                    </span>
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
 
                     {componentConnection.required && connectionList.length === 0 && (
                         <div className="flex items-center gap-1">

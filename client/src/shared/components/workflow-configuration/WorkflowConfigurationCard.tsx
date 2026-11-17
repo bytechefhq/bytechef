@@ -112,16 +112,16 @@ const WorkflowConfigurationCard = ({
                     )}
                 </TabsList>
 
-                <TabsContent className="mt-0 space-y-4" tabIndex={-1} value="connections">
+                <TabsContent className="mt-0 space-y-4 pt-3.5" tabIndex={-1} value="connections">
                     {connectionsContent}
                 </TabsContent>
 
-                <TabsContent className="mt-0" tabIndex={-1} value="inputs">
+                <TabsContent className="mt-0 pt-3.5" tabIndex={-1} value="inputs">
                     {inputsContent}
                 </TabsContent>
 
                 {toolContent && (
-                    <TabsContent className="mt-0" tabIndex={-1} value="tool">
+                    <TabsContent className="mt-0 pt-3.5" tabIndex={-1} value="tool">
                         {toolContent}
                     </TabsContent>
                 )}
