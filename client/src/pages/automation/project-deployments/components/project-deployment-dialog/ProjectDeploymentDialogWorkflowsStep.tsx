@@ -23,9 +23,11 @@ const ProjectDeploymentDialogWorkflowsStep = ({
 }: ProjectDeploymentDialogWorkflowsStepProps) => {
     const reachableSubflowUuids = getReachableSubflowUuids(workflows, workflows);
 
-    const nonSubflowWorkflows = workflows.filter(
-        (workflow) => !(workflow.workflowUuid && reachableSubflowUuids.has(workflow.workflowUuid))
-    );
+    const nonSubflowWorkflows = workflows
+        .filter((workflow) => !(workflow.workflowUuid && reachableSubflowUuids.has(workflow.workflowUuid)))
+        .sort((workflow, otherWorkflow) =>
+            (workflow.label || '').localeCompare(otherWorkflow.label || '', undefined, {sensitivity: 'base'})
+        );
 
     return (
         <div className="min-h-full space-y-5">
