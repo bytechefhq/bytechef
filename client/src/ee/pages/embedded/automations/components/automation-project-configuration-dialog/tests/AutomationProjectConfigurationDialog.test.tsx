@@ -669,7 +669,7 @@ describe('AutomationProjectConfigurationDialog', () => {
             );
 
             await user.click(screen.getByRole('switch', {name: 'Send Digest'}));
-            await user.click(screen.getAllByRole('tab', {name: /Inputs/})[0]);
+            await user.click(screen.getAllByRole('tab', {name: /Inputs/})[1]);
             await user.type(screen.getAllByLabelText('Region')[0], 'eu');
 
             await user.click(screen.getByRole('button', {name: 'Save'}));
@@ -767,7 +767,7 @@ describe('AutomationProjectConfigurationDialog', () => {
             );
 
             await user.click(screen.getByRole('switch', {name: 'Send Digest'}));
-            await user.click(screen.getAllByRole('tab', {name: /Inputs/})[0]);
+            await user.click(screen.getAllByRole('tab', {name: /Inputs/})[1]);
             await user.type(screen.getAllByLabelText('Region')[0], 'eu');
             await user.click(screen.getByRole('button', {name: 'Save'}));
 
