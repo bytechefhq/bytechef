@@ -605,6 +605,19 @@ public interface Context {
 
         /**
          *
+         * @param ignoreResponseCode
+         * @return
+         */
+        static ConfigurationBuilder ignoreResponseCode(boolean ignoreResponseCode) {
+            ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
+
+            configurationBuilder.ignoreResponseCode = ignoreResponseCode;
+
+            return configurationBuilder;
+        }
+
+        /**
+         *
          */
         class Body {
 
@@ -830,6 +843,7 @@ public interface Context {
             private ResponseType responseType;
             private Duration connectTimeout;
             private boolean disableAuthorization;
+            private boolean ignoreResponseCode;
 
             public Configuration() {
             }
@@ -910,6 +924,17 @@ public interface Context {
                 return disableAuthorization;
             }
 
+            /**
+             * Whether a response with a non-2xx status code is returned to the caller instead of being turned into a
+             * {@link com.bytechef.component.exception.ProviderException}. An error response that requires the
+             * connection's credentials to be refreshed is still thrown, so the refresh can happen.
+             *
+             * @return true if non-2xx responses are returned to the caller
+             */
+            public boolean isIgnoreResponseCode() {
+                return ignoreResponseCode;
+            }
+
             public static final class ConfigurationBuilder {
 
                 private boolean allowUnauthorizedCerts;
@@ -921,6 +946,7 @@ public interface Context {
                 private ResponseType responseType;
                 private Duration connectTimeout;
                 private boolean disableAuthorization;
+                private boolean ignoreResponseCode;
 
                 private ConfigurationBuilder() {
                 }
@@ -939,6 +965,7 @@ public interface Context {
                         Objects.equals(followAllRedirects, that.followAllRedirects) &&
                         Objects.equals(followRedirect, that.followRedirect) &&
                         Objects.equals(disableAuthorization, that.disableAuthorization) &&
+                        Objects.equals(ignoreResponseCode, that.ignoreResponseCode) &&
                         Objects.equals(filename, that.filename) &&
                         Objects.equals(proxy, that.proxy) &&
                         Objects.equals(requestTimeout, that.requestTimeout) &&
@@ -950,7 +977,7 @@ public interface Context {
                 public int hashCode() {
                     return Objects.hash(
                         allowUnauthorizedCerts, connectTimeout, filename, followAllRedirects, followRedirect,
-                        proxy, requestTimeout, responseType, disableAuthorization);
+                        proxy, requestTimeout, responseType, disableAuthorization, ignoreResponseCode);
                 }
 
                 public ConfigurationBuilder allowUnauthorizedCerts(boolean allowUnauthorizedCerts) {
@@ -1006,6 +1033,11 @@ public interface Context {
                     return this;
                 }
 
+                public ConfigurationBuilder ignoreResponseCode(boolean ignoreResponseCode) {
+                    this.ignoreResponseCode = ignoreResponseCode;
+                    return this;
+                }
+
                 public Configuration build() {
                     Configuration configuration = new Configuration();
 
@@ -1018,6 +1050,7 @@ public interface Context {
                     configuration.allowUnauthorizedCerts = this.allowUnauthorizedCerts;
                     configuration.filename = this.filename;
                     configuration.disableAuthorization = this.disableAuthorization;
+                    configuration.ignoreResponseCode = this.ignoreResponseCode;
 
                     return configuration;
                 }

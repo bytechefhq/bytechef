@@ -33,6 +33,7 @@ import com.bytechef.component.definition.Context.Http.RequestMethod;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -186,7 +187,7 @@ class HttpClientExecutor {
                 getInterceptor(
                     componentName, componentVersion, componentOperationName, componentConnection.version(),
                     componentConnection.authorizationType(), componentConnection.canCredentialsBeRefreshed(),
-                    context));
+                    configuration.isIgnoreResponseCode(), context));
         }
 
         if (configuration.isFollowRedirect()) {
@@ -446,11 +447,14 @@ class HttpClientExecutor {
      * @param connectionVersion      the version of the connection
      * @param authorizationType      the type of authorization
      * @param credentialsBeRefreshed whether credentials can be refreshed
+     * @param ignoreResponseCode     whether an error response that does not require a credentials refresh is returned
+     *                               instead of thrown
      * @return the Methanol interceptor
      */
     private Methanol.Interceptor getInterceptor(
         String componentName, int componentVersion, @Nullable String componentOperationName, int connectionVersion,
-        AuthorizationType authorizationType, boolean credentialsBeRefreshed, Context context) {
+        AuthorizationType authorizationType, boolean credentialsBeRefreshed, boolean ignoreResponseCode,
+        Context context) {
 
         return new Methanol.Interceptor() {
             @Override
@@ -492,9 +496,30 @@ class HttpClientExecutor {
                 Object body = httpResponse.body();
                 HttpHeaders headers = httpResponse.headers();
 
-                throw operationDefinitionService.executeProcessErrorResponse(
+                ProviderException providerException = operationDefinitionService.executeProcessErrorResponse(
                     componentName, componentVersion, connectionVersion, componentOperationName,
                     httpResponse.statusCode(), body, headers.map());
+
+                if (ignoreResponseCode &&
+                    !requiresCredentialsRefresh(connectionDefinitionService, providerException)) {
+
+                    return httpResponse;
+                }
+
+                throw providerException;
+            }
+
+            private boolean requiresCredentialsRefresh(
+                ConnectionDefinitionService connectionDefinitionService, ProviderException providerException) {
+
+                if (!credentialsBeRefreshed) {
+                    return false;
+                }
+
+                List<Object> refreshOn = connectionDefinitionService.getAuthorizationRefreshOn(
+                    componentName, connectionVersion, authorizationType);
+
+                return RefreshCredentialsUtils.matches(refreshOn, providerException);
             }
 
             @Override

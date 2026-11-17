@@ -236,6 +236,7 @@ public class HttpClientActionUtils {
                         .filename(inputParameters.getString(RESPONSE_FILENAME))
                         .followAllRedirects(inputParameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
                         .followRedirect(inputParameters.getBoolean(FOLLOW_REDIRECT, false))
+                        .ignoreResponseCode(inputParameters.getBoolean(IGNORE_RESPONSE_CODE, false))
                         .proxy(inputParameters.getString(PROXY))
                         .responseType(getResponseType(inputParameters))
                         .connectTimeout(Duration.ofMillis(inputParameters.getInteger(TIMEOUT, 10000))))
