@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jspecify.annotations.Nullable;
@@ -350,49 +351,53 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
             connection.getParameters(), connection.getAuthorizationType());
     }
 
-    /**
-     * A script test running on {@link #thread}. Stopping interrupts that thread, which the polyglot guest languages
-     * check while they run; once the test finishes, it can no longer be interrupted.
-     */
     private static final class RunningScriptTest {
 
+        private final AtomicReference<State> state = new AtomicReference<>(State.RUNNING);
         private final Thread thread;
         private final @Nullable String userLogin;
-        private boolean finished;
-        private boolean stopped;
 
         private RunningScriptTest(Thread thread, @Nullable String userLogin) {
             this.thread = thread;
             this.userLogin = userLogin;
         }
 
-        /**
-         * @return {@code true} when the test was stopped, so the finishing thread must clear its interrupt flag
-         */
-        private synchronized boolean finish() {
-            finished = true;
-
-            return stopped;
-        }
-
-        private synchronized boolean isStopped() {
-            return stopped;
-        }
-
-        private synchronized boolean stop() {
-            if (finished) {
+        private boolean finish() {
+            if (state.compareAndSet(State.RUNNING, State.FINISHED)) {
                 return false;
             }
 
-            stopped = true;
+            while (state.get() == State.STOPPING) {
+                Thread.onSpinWait();
+            }
+
+            return true;
+        }
+
+        private boolean isStopped() {
+            State currentState = state.get();
+
+            return currentState == State.STOPPING || currentState == State.STOPPED;
+        }
+
+        private boolean stop() {
+            if (!state.compareAndSet(State.RUNNING, State.STOPPING)) {
+                return isStopped();
+            }
 
             thread.interrupt();
+
+            state.set(State.STOPPED);
 
             return true;
         }
 
         private @Nullable String userLogin() {
             return userLogin;
+        }
+
+        private enum State {
+            FINISHED, RUNNING, STOPPED, STOPPING
         }
     }
 }

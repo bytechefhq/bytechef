@@ -31,11 +31,6 @@ public interface WorkflowNodeScriptFacade {
 
     Map<String, Object> getWorkflowNodeScriptInput(String workflowId, String workflowNodeName, long environmentId);
 
-    /**
-     * Stops the running script test that the current user started with {@code executionId}.
-     *
-     * @return {@code true} when a running test of the current user was stopped
-     */
     boolean stopScriptTest(String executionId);
 
     ScriptTestExecutionDTO testClusterElementScript(
