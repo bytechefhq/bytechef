@@ -20,6 +20,7 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.oauth2.authorizationserver.annotation.ConditionalOnOauth2AuthorizationServerEnabled;
 import com.bytechef.platform.oauth2.authorizationserver.domain.OAuth2AuthorizationGrant;
 import com.bytechef.platform.oauth2.authorizationserver.exception.RegisteredClientErrorType;
+import com.bytechef.platform.oauth2.authorizationserver.jackson.OAuth2AuthorizationJsonMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Collection;
@@ -237,7 +238,18 @@ public class OAuth2AuthorizationGrantServiceImpl implements OAuth2AuthorizationG
         private final RegisteredClient registeredClient;
 
         private ActiveAuthorizationReader(JdbcOperations jdbcOperations, RegisteredClient registeredClient) {
-            super(jdbcOperations, new SingleRegisteredClientRepository(registeredClient));
+            this(jdbcOperations, registeredClient, new SingleRegisteredClientRepository(registeredClient));
+        }
+
+        private ActiveAuthorizationReader(
+            JdbcOperations jdbcOperations, RegisteredClient registeredClient,
+            SingleRegisteredClientRepository singleRegisteredClientRepository) {
+
+            super(jdbcOperations, singleRegisteredClientRepository);
+
+            setAuthorizationRowMapper(
+                new JsonMapperOAuth2AuthorizationRowMapper(
+                    singleRegisteredClientRepository, OAuth2AuthorizationJsonMapper.get()));
 
             this.registeredClient = registeredClient;
         }

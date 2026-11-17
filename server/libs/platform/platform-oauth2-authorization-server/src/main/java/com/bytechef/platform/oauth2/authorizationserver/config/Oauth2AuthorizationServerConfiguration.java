@@ -23,6 +23,7 @@ import com.bytechef.encryption.Encryption;
 import com.bytechef.platform.oauth2.authorizationserver.annotation.ConditionalOnOauth2AuthorizationServerEnabled;
 import com.bytechef.platform.oauth2.authorizationserver.authentication.PublicClientRefreshTokenAuthenticationConverter;
 import com.bytechef.platform.oauth2.authorizationserver.authentication.PublicClientRefreshTokenAuthenticationProvider;
+import com.bytechef.platform.oauth2.authorizationserver.jackson.OAuth2AuthorizationJsonMapper;
 import com.bytechef.platform.oauth2.authorizationserver.jwk.PersistentJwkSource;
 import com.bytechef.platform.oauth2.authorizationserver.registration.McpAuthorizationConsentRequired;
 import com.bytechef.platform.oauth2.authorizationserver.registration.McpClientRegistrationValidator;
@@ -85,6 +86,7 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -173,9 +175,18 @@ public class Oauth2AuthorizationServerConfiguration {
         JdbcOperations jdbcOperations, RegisteredClientRepository registeredClientRepository,
         PlatformTransactionManager transactionManager) {
 
+        JdbcOAuth2AuthorizationService jdbcOAuth2AuthorizationService = new JdbcOAuth2AuthorizationService(
+            jdbcOperations, registeredClientRepository);
+        JsonMapper jsonMapper = OAuth2AuthorizationJsonMapper.get();
+
+        jdbcOAuth2AuthorizationService.setAuthorizationRowMapper(
+            new JdbcOAuth2AuthorizationService.JsonMapperOAuth2AuthorizationRowMapper(
+                registeredClientRepository, jsonMapper));
+        jdbcOAuth2AuthorizationService.setAuthorizationParametersMapper(
+            new JdbcOAuth2AuthorizationService.JsonMapperOAuth2AuthorizationParametersMapper(jsonMapper));
+
         return new TenantRoutingOAuth2AuthorizationService(
-            new JdbcOAuth2AuthorizationService(jdbcOperations, registeredClientRepository), jdbcOperations,
-            new TransactionTemplate(transactionManager));
+            jdbcOAuth2AuthorizationService, jdbcOperations, new TransactionTemplate(transactionManager));
     }
 
     @Bean
