@@ -20,10 +20,18 @@ import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.Context.ContextConsumer;
+import com.bytechef.component.definition.Context.Log;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.JobContextAware;
@@ -163,6 +171,108 @@ class PolyglotEngineTest {
                 "else 'connection'");
 
         assertThat(result).isEqualTo("context");
+    }
+
+    @Test
+    void testExecuteJavaScriptLogsAtLevel() {
+        Log log = mock(Log.class);
+        JobContextAware actionContext = mockActionContext(log);
+
+        Object result = execute(
+            "js", "function perform(input, context) {\n\tcontext.log('info', 'my-task ran');\n\treturn 1;\n}",
+            actionContext);
+
+        assertThat(result).isEqualTo(1);
+
+        verify(log).info("my-task ran");
+    }
+
+    @Test
+    void testExecutePythonLogsAtCaseInsensitiveLevel() {
+        Log log = mock(Log.class);
+        JobContextAware actionContext = mockActionContext(log);
+
+        execute("python", "def perform(input, context):\n\tcontext.log('WARN', 'careful')\n\treturn 1", actionContext);
+
+        verify(log).warn("careful");
+    }
+
+    @Test
+    void testExecuteJavaScriptLogsAtEveryLevel() {
+        Log log = mock(Log.class);
+        JobContextAware actionContext = mockActionContext(log);
+
+        execute(
+            "js",
+            "function perform(input, context) {\n\t['trace', 'Debug', 'info', 'warn', 'ERROR'].forEach(" +
+                "level => context.log(level, level));\n\treturn 1;\n}",
+            actionContext);
+
+        verify(log).trace("trace");
+        verify(log).debug("Debug");
+        verify(log).info("info");
+        verify(log).warn("warn");
+        verify(log).error("ERROR");
+    }
+
+    @Test
+    void testExecuteJavaScriptLogWithUnknownLevel() {
+        Log log = mock(Log.class);
+        JobContextAware actionContext = mockActionContext(log);
+
+        assertThatThrownBy(
+            () -> execute(
+                "js", "function perform(input, context) {\n\tcontext.log('verbose', 'message');\n}", actionContext))
+                    .hasMessageContaining("Unknown log level 'verbose'")
+                    .hasMessageContaining("trace, debug, info, warn, error");
+
+        verify(log, never()).info(any(String.class));
+    }
+
+    @Test
+    void testExecuteJavaScriptLogWithoutLogSink() {
+        Object result = execute(
+            "js", "function perform(input, context) {\n\tcontext.log('info', 'message');\n\treturn 1;\n}");
+
+        assertThat(result).isEqualTo(1);
+    }
+
+    @Test
+    void testExecuteJavaScriptContextMemberKeysContainLog() {
+        Object result = execute("js", "function perform(input, context) {\n\treturn Object.keys(context);\n}");
+
+        assertThat(result).isEqualTo(List.of("component", "log"));
+    }
+
+    @Test
+    void testExecutePythonContextHasLog() {
+        Object result = execute(
+            "python", "def perform(input, context):\n\treturn 'log' if hasattr(context, 'log') else 'none'");
+
+        assertThat(result).isEqualTo("log");
+    }
+
+    @SuppressWarnings("unchecked")
+    private static JobContextAware mockActionContext(Log log) {
+        ActionContext actionContext = mock(
+            ActionContext.class, withSettings().extraInterfaces(JobContextAware.class));
+
+        doAnswer(invocation -> {
+            ContextConsumer<Log> logConsumer = invocation.getArgument(0);
+
+            logConsumer.accept(log);
+
+            return null;
+        }).when(actionContext)
+            .log(any(ContextConsumer.class));
+
+        return (JobContextAware) actionContext;
+    }
+
+    private Object execute(String languageId, String script, JobContextAware contextAware) {
+        Parameters inputParameters = ParametersFactory.create(Map.of(INPUT, Map.of(), SCRIPT, script));
+
+        return polyglotEngine.execute(languageId, inputParameters, COMPONENT_CONNECTIONS, contextAware);
     }
 
     private Object execute(String languageId, String script) {
