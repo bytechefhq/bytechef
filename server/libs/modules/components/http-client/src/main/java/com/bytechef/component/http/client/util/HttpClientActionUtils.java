@@ -57,6 +57,7 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -242,6 +243,12 @@ public class HttpClientActionUtils {
                 .queryParameters(queryParameters)
                 .body(getBody(inputParameters, getBodyContentType(inputParameters)))
                 .execute();
+
+        int statusCode = response.getStatusCode();
+
+        if (!inputParameters.getBoolean(IGNORE_RESPONSE_CODE, false) && (statusCode < 200 || statusCode > 299)) {
+            throw ProviderException.getProviderException(statusCode, response.getBody(), response.getHeaders());
+        }
 
         if (inputParameters.getBoolean(FULL_RESPONSE, false)) {
             return response;
