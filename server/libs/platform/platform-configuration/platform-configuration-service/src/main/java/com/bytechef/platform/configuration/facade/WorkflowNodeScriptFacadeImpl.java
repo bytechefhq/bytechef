@@ -190,10 +190,10 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
     @Override
     public boolean stopScriptTest(String executionId) {
         RunningScriptTest runningScriptTest = runningScriptTests.get(executionId);
+        Optional<String> currentUserLoginOptional = SecurityUtils.fetchCurrentUserLogin();
 
         if (runningScriptTest == null ||
-            !Objects.equals(runningScriptTest.userLogin(), SecurityUtils.fetchCurrentUserLogin()
-                .orElse(null))) {
+            !Objects.equals(runningScriptTest.userLogin(), currentUserLoginOptional.orElse(null))) {
 
             return false;
         }
@@ -284,9 +284,10 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
             return null;
         }
 
+        Optional<String> currentUserLoginOptional = SecurityUtils.fetchCurrentUserLogin();
+
         RunningScriptTest runningScriptTest = new RunningScriptTest(
-            Thread.currentThread(), SecurityUtils.fetchCurrentUserLogin()
-                .orElse(null));
+            Thread.currentThread(), currentUserLoginOptional.orElse(null));
 
         if (runningScriptTests.putIfAbsent(executionId, runningScriptTest) != null) {
             throw new IllegalArgumentException("A script test with execution id " + executionId + " is running");
