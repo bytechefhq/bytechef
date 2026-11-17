@@ -21,6 +21,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -37,7 +38,10 @@ import com.bytechef.platform.user.service.PersistentTokenService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.security.web.rememberme.PersistentTokenRememberMeServices;
 import com.bytechef.tenant.service.TenantService;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -60,6 +64,7 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
@@ -305,6 +310,87 @@ class SecurityConfigurationIntTest {
                 @GetMapping("/workflow-builder.html")
                 String workflowBuilder() {
                     return "workflow-builder";
+                }
+            }
+        }
+    }
+
+    @Nested
+    @NestedTestConfiguration(OVERRIDE)
+    @AutoConfigureMockMvc
+    @EnableConfigurationProperties(ApplicationProperties.class)
+    @SpringBootTest(
+        classes = {
+            SecurityConfiguration.class, ApplicationProperties.class, RememberMeKey.class,
+            ErrorDispatch.ErrorDispatchConfiguration.class
+        })
+    class ErrorDispatch {
+
+        @MockitoBean
+        private AuthenticationFailureHandler authenticationFailureHandler;
+
+        @MockitoBean
+        private AuthenticationSuccessHandler authenticationSuccessHandler;
+
+        @MockitoBean(name = "corsConfigurationSource")
+        private CorsConfigurationSource corsConfigurationSource;
+
+        @Autowired
+        private MockMvc mockMvc;
+
+        @MockitoBean
+        private PasswordEncoder passwordEncoder;
+
+        @MockitoBean
+        private RememberMeServices rememberMeServices;
+
+        @Test
+        void testErrorDispatchKeepsTheOriginalStatus() throws Exception {
+            mockMvc.perform(
+                get("/error")
+                    .requestAttr(RequestDispatcher.ERROR_STATUS_CODE, 400)
+                    .requestAttr(RequestDispatcher.ERROR_REQUEST_URI, "/oauth2/authorize")
+                    .with(request -> {
+                        request.setDispatcherType(DispatcherType.ERROR);
+
+                        return request;
+                    }))
+                .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        void testDirectErrorPageRequestIsForwardedToTheSpa() throws Exception {
+            mockMvc.perform(get("/error"))
+                .andExpect(forwardedUrl("/index.html"));
+        }
+
+        @TestConfiguration
+        static class ErrorDispatchConfiguration {
+
+            @Bean
+            List<AuthorizeHttpRequestContributor> authorizeHttpRequestContributors() {
+                return List.of();
+            }
+
+            @Bean
+            List<SecurityConfigurerContributor> securityConfigurerContributors() {
+                return List.of();
+            }
+
+            @Bean
+            List<SpaWebFilterContributor> spaWebFilterContributors() {
+                return List.of();
+            }
+
+            @RestController
+            static class ErrorController {
+
+                @GetMapping("/error")
+                ResponseEntity<Void> error(HttpServletRequest request) {
+                    Object statusCode = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+
+                    return ResponseEntity.status(statusCode instanceof Integer status ? status : 500)
+                        .build();
                 }
             }
         }
