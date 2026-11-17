@@ -33,6 +33,7 @@ import com.bytechef.security.web.filter.CsrfCookieIssuingFilter;
 import com.bytechef.security.web.filter.SpaWebFilter;
 import com.bytechef.security.web.filter.TwoFactorVerificationFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -391,6 +392,8 @@ public class SecurityConfiguration {
                 }
 
                 authz
+                    .dispatcherTypeMatchers(DispatcherType.ERROR)
+                    .permitAll()
                     .requestMatchers(mvc.matcher("/*.ico"), mvc.matcher("/*.png"), mvc.matcher("/*.svg"))
                     .permitAll()
                     .requestMatchers(mvc.matcher("/assets/**"))
