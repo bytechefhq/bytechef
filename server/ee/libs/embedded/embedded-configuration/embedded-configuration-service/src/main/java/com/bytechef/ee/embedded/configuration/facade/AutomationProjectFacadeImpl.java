@@ -77,6 +77,7 @@ import tools.jackson.core.type.TypeReference;
  * @version ee
  *
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 @Service
 @Transactional

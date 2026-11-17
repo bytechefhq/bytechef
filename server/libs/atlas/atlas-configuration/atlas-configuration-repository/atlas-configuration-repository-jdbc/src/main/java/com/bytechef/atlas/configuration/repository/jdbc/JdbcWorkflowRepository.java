@@ -32,6 +32,7 @@ import org.springframework.stereotype.Repository;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 @Order(5)
 @Repository

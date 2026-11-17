@@ -87,6 +87,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 @Transactional
 @Service

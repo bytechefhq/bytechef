@@ -43,6 +43,7 @@ import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 @Transactional
 public class WorkflowServiceImpl implements WorkflowService {
