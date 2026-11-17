@@ -35,6 +35,13 @@ public interface WorkflowService {
 
     Workflow duplicateWorkflow(String id);
 
+    /**
+     * Duplicates the workflow while keeping the source workflow's created/last modified audit fields, instead of
+     * stamping the copy with the current time. Used when a workflow is carried over unchanged into a new version (e.g.
+     * a project publish creating the next draft), so the copy still reflects when the workflow was actually modified.
+     */
+    Workflow duplicateWorkflowPreservingAudit(String id);
+
     Optional<Workflow> fetchWorkflow(String id);
 
     List<Workflow> getWorkflows();

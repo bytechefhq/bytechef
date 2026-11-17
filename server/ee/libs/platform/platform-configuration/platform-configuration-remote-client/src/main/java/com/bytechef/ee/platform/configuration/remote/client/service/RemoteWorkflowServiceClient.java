@@ -57,6 +57,11 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
     }
 
     @Override
+    public Workflow duplicateWorkflowPreservingAudit(String id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<Workflow> fetchWorkflow(String id) {
         return Optional.empty();
     }
