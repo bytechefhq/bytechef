@@ -120,6 +120,28 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
+    public Workflow duplicateWorkflowPreservingAudit(String id) {
+        Workflow workflow = getWorkflow(id);
+
+        Workflow duplicatedWorkflow = create(workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType());
+
+        String duplicatedWorkflowId = Validate.notNull(duplicatedWorkflow.getId(), "id");
+
+        WorkflowCrudRepository workflowCrudRepository = CollectionUtils.getFirst(
+            workflowCrudRepositories,
+            curWorkflowCrudRepository -> Objects.equals(
+                curWorkflowCrudRepository.getSourceType(), duplicatedWorkflow.getSourceType()));
+
+        workflowCrudRepository.updateAuditFields(
+            duplicatedWorkflowId, workflow.getCreatedBy(), workflow.getCreatedDate(), workflow.getLastModifiedBy(),
+            workflow.getLastModifiedDate());
+
+        refreshCache(duplicatedWorkflowId);
+
+        return getWorkflow(duplicatedWorkflowId);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Optional<Workflow> fetchWorkflow(String id) {
         Assert.notNull(id, "'id' must not be null");
