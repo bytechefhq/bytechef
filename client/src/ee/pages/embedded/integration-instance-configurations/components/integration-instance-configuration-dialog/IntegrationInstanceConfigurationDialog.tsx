@@ -42,6 +42,7 @@ import {
 } from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {IntegrationKeys, useGetIntegrationQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {getEnabledWorkflowTasks} from '@/pages/platform/workflow-editor/utils/getEnabledWorkflowTasks';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
@@ -645,7 +646,7 @@ const IntegrationInstanceConfigurationDialog = ({
                     !!(integrationInstanceConfigurationWorkflow && integrationInstanceConfigurationWorkflow.enabled)
                 );
 
-                const componentConnections: ComponentConnection[] = (workflow?.tasks ?? [])
+                const componentConnections: ComponentConnection[] = getEnabledWorkflowTasks(workflow)
                     .flatMap((task) => task.connections ?? [])
                     .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []))
                     .filter((connection) => connection.componentName !== integration?.componentName);
@@ -708,7 +709,7 @@ const IntegrationInstanceConfigurationDialog = ({
                 return;
             }
 
-            const componentConnections: ComponentConnection[] = (workflow.tasks ?? [])
+            const componentConnections: ComponentConnection[] = getEnabledWorkflowTasks(workflow)
                 .flatMap((task) => task.connections ?? [])
                 .concat((workflow.triggers ?? []).flatMap((trigger) => trigger.connections ?? []))
                 .filter((connection) => connection.componentName !== integration.componentName);

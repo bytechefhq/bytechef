@@ -1,6 +1,7 @@
 import IntegrationInstanceConfigurationDialogWorkflowsStepItemConnections from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogWorkflowsStepItemConnections';
 import {useWorkflowsEnabledStore} from '@/ee/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
 import {ComponentConnection, IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
+import {getEnabledWorkflowTasks} from '@/pages/platform/workflow-editor/utils/getEnabledWorkflowTasks';
 import InputConfigurationList from '@/shared/components/InputConfigurationList';
 import WorkflowConfigurationCard from '@/shared/components/workflow-configuration/WorkflowConfigurationCard';
 import {Workflow} from '@/shared/middleware/automation/configuration';
@@ -41,7 +42,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItem = ({
         useShallow(({setWorkflowEnabled, workflowEnabledMap}) => [setWorkflowEnabled, workflowEnabledMap])
     );
 
-    const componentConnections: ComponentConnection[] = (workflow?.tasks ?? [])
+    const componentConnections: ComponentConnection[] = getEnabledWorkflowTasks(workflow)
         .flatMap((task) => task.connections ?? [])
         .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []))
         .filter((connection) => connection.componentName !== componentName);
