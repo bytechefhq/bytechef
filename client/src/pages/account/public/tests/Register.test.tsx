@@ -138,6 +138,29 @@ it('should navigate to the account error page with a message when registration f
     vi.restoreAllMocks();
 });
 
+it('should navigate to the account error page with a message when the registration request fails', async () => {
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(new TypeError('Failed to fetch'));
+
+    render(
+        <MemoryRouter initialEntries={['/register']}>
+            <Routes>
+                <Route element={<Register />} path="/register" />
+
+                <Route element={<AccountErrorPage />} path="/account-error" />
+            </Routes>
+        </MemoryRouter>
+    );
+
+    await triggerShowPasswordInputField();
+
+    await userEvent.type(await screen.findByLabelText('Password'), 'Password1');
+    await userEvent.click(screen.getByRole('button', {name: 'Continue with password'}));
+
+    expect(await screen.findByText('Registration failed. Please try again.')).toBeInTheDocument();
+
+    vi.restoreAllMocks();
+});
+
 it('should navigate to the verify email page after a successful registration', async () => {
     const applicationInfoStore = createMockApplicationInfoStore({signUp: {activationRequired: true, enabled: true}});
 
