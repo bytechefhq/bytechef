@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -829,6 +830,38 @@ class IntegrationInstanceConfigurationFacadeIntTest {
 
         verify(mcpIntegrationInstanceRowFacade).addMissingRowsForIntegrationInstanceConfiguration(
             cronFixture.integrationInstanceConfigurationId());
+    }
+
+    @Test
+    void testEnableConfigurationWorkflowIgnoresConnectionsOfDisabledTasks() {
+        CronFixture cronFixture = createCronFixture(List.of());
+
+        authenticate(admin());
+
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            getConfigurationWorkflow(cronFixture);
+
+        String workflowId = integrationInstanceConfigurationWorkflow.getWorkflowId();
+
+        integrationInstanceConfigurationFacade.enableIntegrationInstanceConfigurationWorkflow(
+            cronFixture.integrationInstanceConfigurationId(), workflowId, false);
+
+        String definition = CRON_WORKFLOW_DEFINITION.replace(
+            "\"tasks\": []",
+            """
+                "tasks": [
+                    {"name": "postToSlack", "type": "slack/v1/sendChannelMessage", "disabled": true}
+                ]""");
+
+        when(workflowService.getWorkflow(workflowId))
+            .thenReturn(new Workflow(workflowId, definition, Workflow.Format.JSON));
+        when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class)))
+            .thenReturn(List.of(new ComponentConnection("slack", 1, "postToSlack", "slack", true)));
+
+        integrationInstanceConfigurationFacade.enableIntegrationInstanceConfigurationWorkflow(
+            cronFixture.integrationInstanceConfigurationId(), workflowId, true);
+
+        assertThat(getConfigurationWorkflow(cronFixture).isEnabled()).isTrue();
     }
 
     @Test

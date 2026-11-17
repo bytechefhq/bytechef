@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.util.WorkflowTaskUtils;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
@@ -757,6 +758,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         if (enable) {
             Workflow workflow = workflowService.getWorkflow(workflowId);
 
+            List<String> disabledTaskNames = WorkflowTaskUtils.getDisabledTaskNames(workflow.getTasks());
+
             List<ComponentConnection> requiredComponentConnections = CollectionUtils.concat(
                 WorkflowTrigger.of(workflow)
                     .stream()
@@ -766,6 +769,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                     .toList(),
                 workflow.getTasks(true)
                     .stream()
+                    .filter(workflowTask -> !disabledTaskNames.contains(workflowTask.getName()))
                     .flatMap(workflowTask -> CollectionUtils.stream(
                         componentConnectionFacade.getComponentConnections(workflowTask)))
                     .filter(ComponentConnection::required)
