@@ -209,7 +209,20 @@ describe('ProjectDeploymentDialogBasicStep', () => {
         );
 
         expect(onDeploymentSelect).toHaveBeenCalledWith(projectDeployment);
-        expect(screen.getByText('Production - V3')).toBeInTheDocument();
+        expect(screen.getByText('Production')).toBeInTheDocument();
+    });
+
+    it('should show the environment in the change version tab', () => {
+        const projectDeployment = {environmentId: 1, id: 7, name: 'Production', projectId: 1, projectVersion: 3};
+
+        render(
+            <ChangeVersionHarness
+                onDeploymentSelect={vi.fn()}
+                projectDeployments={[projectDeployment] as ProjectDeployment[]}
+            />
+        );
+
+        expect(screen.getByText('Environment')).toBeInTheDocument();
     });
 
     it('should leave the deployment unselected when a project has several', () => {

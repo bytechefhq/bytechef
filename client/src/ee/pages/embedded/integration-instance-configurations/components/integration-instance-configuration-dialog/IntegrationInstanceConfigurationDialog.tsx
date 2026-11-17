@@ -383,7 +383,7 @@ const IntegrationInstanceConfigurationDialog = ({
     const configurationItems = useMemo(
         () =>
             (integrationInstanceConfigurations ?? []).map((configuration) => ({
-                label: `${configuration.name} - V${configuration.integrationVersion}`,
+                label: configuration.name,
                 value: String(configuration.id),
             })),
         [integrationInstanceConfigurations]

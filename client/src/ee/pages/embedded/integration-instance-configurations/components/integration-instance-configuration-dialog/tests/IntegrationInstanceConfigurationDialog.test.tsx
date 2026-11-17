@@ -1101,7 +1101,7 @@ describe('IntegrationInstanceConfigurationDialog', () => {
             );
 
             await user.click(await screen.findByRole('combobox', {name: 'Configuration'}));
-            await user.click(await screen.findByRole('option', {name: 'Everyone - V2'}));
+            await user.click(await screen.findByRole('option', {name: 'Everyone'}));
 
             expect(screen.getByTestId('basic-step-mode')).toHaveTextContent('update:Everyone');
 

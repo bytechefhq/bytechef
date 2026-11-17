@@ -1010,7 +1010,7 @@ describe('AutomationProjectConfigurationDialog', () => {
             );
 
             await user.click(screen.getByRole('combobox', {name: 'Configuration'}));
-            await user.click(await screen.findByRole('option', {name: 'BETA - V1'}));
+            await user.click(await screen.findByRole('option', {name: 'BETA'}));
 
             expect(screen.getByRole('combobox', {name: 'Version'})).toHaveTextContent(/^V3$/);
 
@@ -1040,7 +1040,7 @@ describe('AutomationProjectConfigurationDialog', () => {
                 </TooltipProvider>
             );
 
-            expect(screen.getByRole('combobox', {name: 'Configuration'})).toHaveTextContent('PRODUCTION - V3');
+            expect(screen.getByRole('combobox', {name: 'Configuration'})).toHaveTextContent(/^PRODUCTION$/);
 
             await user.click(screen.getByRole('tab', {name: 'New'}));
 
