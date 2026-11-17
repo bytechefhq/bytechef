@@ -169,6 +169,55 @@ class WorkflowConnectionSlotIntTest {
                 tuple("jira", "createIssue1"));
     }
 
+    @Test
+    void testGetSlotsSkipsDisabledTasksAndTasksNestedInsideThem() {
+        Workflow workflow = workflowService.create(
+            """
+                {
+                  "label": "Disabled",
+                  "tasks": [
+                    {"name": "createIssue1", "type": "jira/v1/createIssue", "parameters": {"summary": "s"}},
+                    {
+                      "name": "createIssue2",
+                      "type": "jira/v1/createIssue",
+                      "disabled": true,
+                      "parameters": {"summary": "s"}
+                    },
+                    {
+                      "name": "condition1",
+                      "type": "condition/v1",
+                      "disabled": true,
+                      "parameters": {
+                        "rawExpression": true,
+                        "caseTrue": [
+                          {"name": "createIssue3", "type": "jira/v1/createIssue", "parameters": {"summary": "s"}}
+                        ],
+                        "caseFalse": []
+                      }
+                    }
+                  ]
+                }
+                """,
+            Workflow.Format.JSON, Workflow.SourceType.JDBC);
+
+        when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class)))
+            .thenAnswer(invocation -> {
+                WorkflowTask workflowTask = invocation.getArgument(0);
+
+                String workflowTaskName = workflowTask.getName();
+
+                return workflowTaskName.startsWith("createIssue")
+                    ? List.of(new ComponentConnection("jira", 1, workflowTaskName, "jira", true))
+                    : List.of();
+            });
+
+        List<ComponentConnection> slots = workflowConnectionSlot.getSlots(workflow.getId());
+
+        assertThat(slots)
+            .extracting(ComponentConnection::workflowNodeName)
+            .containsExactly("createIssue1");
+    }
+
     @Configuration
     @ComponentScan("com.bytechef.ee.embedded.connected.user.service")
     static class ConnectedUserServiceConfiguration {

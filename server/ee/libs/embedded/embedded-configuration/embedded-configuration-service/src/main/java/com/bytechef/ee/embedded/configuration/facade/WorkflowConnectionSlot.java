@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.util.WorkflowTaskUtils;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -62,6 +63,8 @@ public class WorkflowConnectionSlot {
     public List<ComponentConnection> getSlots(String workflowId) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
+        List<String> disabledTaskNames = WorkflowTaskUtils.getDisabledTaskNames(workflow.getTasks());
+
         return CollectionUtils.concat(
             WorkflowTrigger.of(workflow)
                 .stream()
@@ -70,6 +73,7 @@ public class WorkflowConnectionSlot {
                 .toList(),
             workflow.getTasks(true)
                 .stream()
+                .filter(workflowTask -> !disabledTaskNames.contains(workflowTask.getName()))
                 .flatMap(workflowTask -> CollectionUtils.stream(
                     componentConnectionFacade.getComponentConnections(workflowTask)))
                 .toList());

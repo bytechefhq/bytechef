@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.util.WorkflowTaskUtils;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.commons.util.CollectionUtils;
@@ -1591,6 +1592,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     private List<ComponentConnection> getRequiredComponentConnections(Workflow workflow, Integration integration) {
+        List<String> disabledTaskNames = WorkflowTaskUtils.getDisabledTaskNames(workflow.getTasks());
+
         List<ComponentConnection> requiredComponentConnections = CollectionUtils.concat(
             WorkflowTrigger.of(workflow)
                 .stream()
@@ -1600,6 +1603,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 .toList(),
             workflow.getTasks(true)
                 .stream()
+                .filter(workflowTask -> !disabledTaskNames.contains(workflowTask.getName()))
                 .flatMap(workflowTask -> CollectionUtils.stream(
                     componentConnectionFacade.getComponentConnections(workflowTask)))
                 .filter(ComponentConnection::required)
