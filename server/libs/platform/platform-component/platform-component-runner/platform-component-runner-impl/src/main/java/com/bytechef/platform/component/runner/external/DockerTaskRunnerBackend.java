@@ -131,6 +131,7 @@ public class DockerTaskRunnerBackend implements RemoteTaskRunnerBackend {
     private static final Pattern MEMORY_PATTERN = Pattern.compile("^(\\d+)\\s*([bkmg])?$", Pattern.CASE_INSENSITIVE);
 
     private static final Map<ExternalLanguage, String> DEFAULT_IMAGES = Map.of(
+        ExternalLanguage.BASH, "ubuntu:24.04",
         ExternalLanguage.JAVASCRIPT, "node:22-alpine",
         ExternalLanguage.PYTHON, "python:3.12-slim",
         ExternalLanguage.SHELL, "ubuntu:24.04");

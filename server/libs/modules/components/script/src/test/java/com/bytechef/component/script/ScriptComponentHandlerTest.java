@@ -84,6 +84,8 @@ import org.junit.jupiter.api.Test;
  */
 public class ScriptComponentHandlerTest {
 
+    private static final String BASH = "bash";
+
     private static final List<String> ALWAYS_VISIBLE_PROPERTY_NAMES = List.of("input", "script", TASK_RUNNER);
 
     private final ComponentDefinition componentDefinition = new ScriptComponentHandler(
@@ -95,37 +97,46 @@ public class ScriptComponentHandlerTest {
     }
 
     @Test
-    public void testEveryActionOffersEveryEnabledTaskRunner() {
-        List<ActionDefinition> actionDefinitions = componentDefinition.getActions()
-            .orElseThrow();
+    public void testEveryInlineScriptActionOffersEveryEnabledTaskRunner() {
+        List<ActionDefinition> actionDefinitions = componentDefinition.getActions();
 
         assertThat(actionDefinitions).isNotEmpty();
 
         for (ActionDefinition actionDefinition : actionDefinitions) {
+            if (BASH.equals(actionDefinition.getName())) {
+                continue;
+            }
+
             StringProperty typeProperty = findTaskRunnerTypeProperty(actionDefinition);
 
-            List<String> optionValues = typeProperty.getOptions()
-                .orElseThrow()
-                .stream()
-                .map(Option::getValue)
-                .toList();
-
-            assertThat(optionValues).containsExactly(DOCKER, GRAALVM, PROCESS);
+            assertThat(optionValues(typeProperty)).containsExactly(DOCKER, GRAALVM, PROCESS);
             assertThat(typeProperty.getDefaultValue()).contains(GRAALVM);
         }
     }
 
     @Test
-    public void testEveryActionOffersTheDockerRunnerProperties() {
-        List<ActionDefinition> actionDefinitions = componentDefinition.getActions()
+    public void testTheBashActionOffersOnlyTheExternalTaskRunners() {
+        ActionDefinition actionDefinition = componentDefinition.getActions()
+            .stream()
+            .filter(candidate -> BASH.equals(candidate.getName()))
+            .findFirst()
             .orElseThrow();
+
+        StringProperty typeProperty = findTaskRunnerTypeProperty(actionDefinition);
+
+        assertThat(optionValues(typeProperty)).containsExactly(DOCKER, PROCESS);
+        assertThat(typeProperty.getDefaultValue()).contains(PROCESS);
+    }
+
+    @Test
+    public void testEveryActionOffersTheDockerRunnerProperties() {
+        List<ActionDefinition> actionDefinitions = componentDefinition.getActions();
 
         for (ActionDefinition actionDefinition : actionDefinitions) {
             ObjectProperty taskRunnerProperty = findTaskRunnerProperty(actionDefinition);
 
             Map<String, Optional<String>> displayConditions = displayConditionsByName(
-                taskRunnerProperty.getProperties()
-                    .orElseThrow());
+                taskRunnerProperty.getProperties());
 
             assertThat(displayConditions).containsKeys(
                 CPU, ENTRYPOINT, EXTRA_HOSTS, IMAGE, MEMORY, NETWORK_MODE, PULL_POLICY, USER, PRIVILEGED, CREDENTIALS,
@@ -135,13 +146,11 @@ public class ScriptComponentHandlerTest {
 
     @Test
     public void testEveryRunnerContributedPropertyCarriesADisplayCondition() {
-        List<ActionDefinition> actionDefinitions = componentDefinition.getActions()
-            .orElseThrow();
+        List<ActionDefinition> actionDefinitions = componentDefinition.getActions();
 
         for (ActionDefinition actionDefinition : actionDefinitions) {
             Map<String, Optional<String>> displayConditions = displayConditionsByName(
-                actionDefinition.getProperties()
-                    .orElseThrow());
+                actionDefinition.getProperties());
 
             ALWAYS_VISIBLE_PROPERTY_NAMES.forEach(displayConditions::remove);
 
@@ -152,8 +161,7 @@ public class ScriptComponentHandlerTest {
             ObjectProperty taskRunnerProperty = findTaskRunnerProperty(actionDefinition);
 
             Map<String, Optional<String>> runnerDisplayConditions = displayConditionsByName(
-                taskRunnerProperty.getProperties()
-                    .orElseThrow());
+                taskRunnerProperty.getProperties());
 
             runnerDisplayConditions.remove(TYPE);
 
@@ -182,11 +190,17 @@ public class ScriptComponentHandlerTest {
         return displayConditions;
     }
 
+    private static List<String> optionValues(StringProperty typeProperty) {
+        return typeProperty.getOptions()
+            .stream()
+            .map(Option::getValue)
+            .toList();
+    }
+
     private static StringProperty findTaskRunnerTypeProperty(ActionDefinition actionDefinition) {
         ObjectProperty taskRunnerProperty = findTaskRunnerProperty(actionDefinition);
 
         return taskRunnerProperty.getProperties()
-            .orElseThrow()
             .stream()
             .filter(property -> TYPE.equals(property.getName()))
             .map(StringProperty.class::cast)
@@ -195,8 +209,7 @@ public class ScriptComponentHandlerTest {
     }
 
     private static ObjectProperty findTaskRunnerProperty(ActionDefinition actionDefinition) {
-        List<? extends Property> properties = actionDefinition.getProperties()
-            .orElseThrow();
+        List<? extends Property> properties = actionDefinition.getProperties();
 
         return properties.stream()
             .filter(property -> TASK_RUNNER.equals(property.getName()))
