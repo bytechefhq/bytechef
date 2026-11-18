@@ -220,7 +220,7 @@ const Memories = () => {
             groups.push({
                 allValue: ALL_OWNERS,
                 key: 'owner',
-                label: 'Owner',
+                label: 'Project Deployment/Integration Instance',
                 onChange: (value) => setSelectedPrincipalKey(value === ALL_OWNERS ? null : value),
                 options: [
                     {label: 'All', value: ALL_OWNERS},
@@ -318,7 +318,8 @@ const Memories = () => {
                             <TriangleAlertIcon className="size-4 shrink-0" />
 
                             <span className="flex-1">
-                                Could not load memory owners, so the Owner filter is unavailable.
+                                Could not load memory owners, so the Project Deployment/Integration Instance filter is
+                                unavailable.
                             </span>
 
                             <Button label="Retry" onClick={() => refetchPrincipals()} size="sm" variant="outline" />
