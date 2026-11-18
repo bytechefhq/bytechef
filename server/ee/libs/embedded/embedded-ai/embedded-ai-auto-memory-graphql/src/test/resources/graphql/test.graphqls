@@ -16,3 +16,9 @@ enum AiAutoMemoryType {
     PROJECT
     REFERENCE
 }
+
+enum AiAutoMemoryPrincipalType {
+    USER
+    PROJECT_DEPLOYMENT
+    INTEGRATION_INSTANCE
+}

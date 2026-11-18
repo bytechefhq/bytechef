@@ -14,11 +14,16 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPatch;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalType;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
@@ -56,6 +61,12 @@ class EmbeddedAiAutoMemoryFacadeMethodSecurityTest {
     private AiAutoMemoryService aiAutoMemoryService;
 
     @MockitoBean
+    private ConnectedUserProjectService connectedUserProjectService;
+
+    @MockitoBean
+    private ConnectedUserReferenceDeploymentService connectedUserReferenceDeploymentService;
+
+    @MockitoBean
     private ConnectedUserService connectedUserService;
 
     @Autowired
@@ -69,6 +80,12 @@ class EmbeddedAiAutoMemoryFacadeMethodSecurityTest {
 
     @MockitoBean
     private IntegrationService integrationService;
+
+    @MockitoBean
+    private ProjectOwnershipService projectOwnershipService;
+
+    @MockitoBean
+    private ProjectService projectService;
 
     @AfterEach
     void afterEach() {
@@ -85,9 +102,10 @@ class EmbeddedAiAutoMemoryFacadeMethodSecurityTest {
                 Environment.DEVELOPMENT));
         assertThatExceptionOfType(AccessDeniedException.class)
             .isThrownBy(() -> embeddedAiAutoMemoryFacade.updateEmbeddedAiAutoMemory(
-                Environment.DEVELOPMENT, 1L, 1L, 1L, PATCH));
+                Environment.DEVELOPMENT, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, 1L, 1L, 1L, PATCH));
         assertThatExceptionOfType(AccessDeniedException.class)
-            .isThrownBy(() -> embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(Environment.DEVELOPMENT, 1L, 1L));
+            .isThrownBy(() -> embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(
+                Environment.DEVELOPMENT, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, 1L, 1L));
     }
 
     @Test
@@ -102,9 +120,10 @@ class EmbeddedAiAutoMemoryFacadeMethodSecurityTest {
                 Environment.DEVELOPMENT));
         assertThatExceptionOfType(AccessDeniedException.class)
             .isThrownBy(() -> embeddedAiAutoMemoryFacade.updateEmbeddedAiAutoMemory(
-                Environment.DEVELOPMENT, 1L, 1L, 1L, PATCH));
+                Environment.DEVELOPMENT, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, 1L, 1L, 1L, PATCH));
         assertThatExceptionOfType(AccessDeniedException.class)
-            .isThrownBy(() -> embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(Environment.DEVELOPMENT, 1L, 1L));
+            .isThrownBy(() -> embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(
+                Environment.DEVELOPMENT, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, 1L, 1L));
     }
 
     @Test

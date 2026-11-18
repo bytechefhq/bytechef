@@ -15,6 +15,7 @@ import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryConcurrentModificationException;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryNotFoundException;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPatch;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalType;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryType;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -75,15 +76,17 @@ public class EmbeddedAiAutoMemoryGraphQlController {
             input.title(), input.description(), input.memoryType(), input.content());
 
         return embeddedAiAutoMemoryFacade.updateEmbeddedAiAutoMemory(
-            toEnvironment(input.environment()), input.integrationInstanceId(), input.id(), input.expectedVersion(),
-            patch);
+            toEnvironment(input.environment()), input.principalType(), input.principalId(), input.id(),
+            input.expectedVersion(), patch);
     }
 
     @MutationMapping
     public boolean deleteEmbeddedAiAutoMemory(
-        @Argument long id, @Argument long integrationInstanceId, @Argument int environment) {
+        @Argument long id, @Argument AiAutoMemoryPrincipalType principalType, @Argument long principalId,
+        @Argument int environment) {
 
-        embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(toEnvironment(environment), integrationInstanceId, id);
+        embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(toEnvironment(environment), principalType, principalId,
+            id);
 
         return true;
     }
@@ -163,11 +166,32 @@ public class EmbeddedAiAutoMemoryGraphQlController {
         return toEpochMilli(aiAutoMemory.getUpdatedAt());
     }
 
-    @SchemaMapping(typeName = "EmbeddedAiAutoMemory", field = "integrationInstanceId")
-    public long integrationInstanceId(EmbeddedAiAutoMemory embeddedAiAutoMemory) {
+    @SchemaMapping(typeName = "EmbeddedAiAutoMemory", field = "principalType")
+    public String principalType(EmbeddedAiAutoMemory embeddedAiAutoMemory) {
+        AiAutoMemory aiAutoMemory = embeddedAiAutoMemory.memory();
+
+        AiAutoMemoryPrincipalType principalType = aiAutoMemory.getPrincipalType();
+
+        return principalType.name();
+    }
+
+    @SchemaMapping(typeName = "EmbeddedAiAutoMemory", field = "principalId")
+    public long principalId(EmbeddedAiAutoMemory embeddedAiAutoMemory) {
         AiAutoMemory aiAutoMemory = embeddedAiAutoMemory.memory();
 
         return aiAutoMemory.getPrincipalId();
+    }
+
+    @SchemaMapping(typeName = "EmbeddedAiAutoMemory", field = "automation")
+    @Nullable
+    public AutomationRef automation(EmbeddedAiAutoMemory embeddedAiAutoMemory) {
+        Long automationId = embeddedAiAutoMemory.automationId();
+
+        if (automationId == null) {
+            return null;
+        }
+
+        return new AutomationRef(automationId, embeddedAiAutoMemory.automationName());
     }
 
     @SchemaMapping(typeName = "EmbeddedAiAutoMemory", field = "connectedUser")
@@ -248,6 +272,9 @@ public class EmbeddedAiAutoMemoryGraphQlController {
         return instant.toEpochMilli();
     }
 
+    public record AutomationRef(long id, @Nullable String name) {
+    }
+
     public record ConnectedUserRef(long id, @Nullable String name, @Nullable String email,
         @Nullable String externalId) {
     }
@@ -256,7 +283,8 @@ public class EmbeddedAiAutoMemoryGraphQlController {
     }
 
     public record UpdateEmbeddedAiAutoMemoryInput(
-        long id, long integrationInstanceId, int environment, long expectedVersion, @Nullable String title,
+        long id, AiAutoMemoryPrincipalType principalType, long principalId, int environment, long expectedVersion,
+        @Nullable String title,
         @Nullable String description,
         @Nullable AiAutoMemoryType memoryType, @Nullable String content) {
     }

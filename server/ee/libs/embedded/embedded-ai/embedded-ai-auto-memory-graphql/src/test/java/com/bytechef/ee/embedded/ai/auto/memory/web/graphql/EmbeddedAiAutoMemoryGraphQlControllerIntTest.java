@@ -82,9 +82,11 @@ class EmbeddedAiAutoMemoryGraphQlControllerIntTest {
                             version
                             createdAt
                             updatedAt
-                            integrationInstanceId
+                            principalType
+                            principalId
                             connectedUser { id name email externalId }
                             integration { id name componentName }
+                            automation { id name }
                         }
                     }
                     """)
@@ -103,10 +105,12 @@ class EmbeddedAiAutoMemoryGraphQlControllerIntTest {
             .containsEntry("content", "Customer is on the Pro plan.")
             .containsEntry("environmentId", 2)
             .containsEntry("version", 4)
-            .containsEntry("integrationInstanceId", 11)
+            .containsEntry("principalType", "INTEGRATION_INSTANCE")
+            .containsEntry("principalId", 11)
             .containsEntry("connectedUser", Map.of(
                 "id", "21", "name", "Ada", "email", "ada@example.com", "externalId", "ext-ada"))
-            .containsEntry("integration", Map.of("id", "31", "name", "Memory Demo", "componentName", "memoryDemo"));
+            .containsEntry("integration", Map.of("id", "31", "name", "Memory Demo", "componentName", "memoryDemo"))
+            .containsEntry("automation", null);
         assertThat(memory.get("createdAt")).isNotNull();
         assertThat(memory.get("updatedAt")).isNotNull();
     }
@@ -117,7 +121,7 @@ class EmbeddedAiAutoMemoryGraphQlControllerIntTest {
 
         when(embeddedAiAutoMemoryFacade.getEmbeddedAiAutoMemories(Environment.PRODUCTION, null, null))
             .thenReturn(List.of(
-                new EmbeddedAiAutoMemory(aiAutoMemory, null, null, null, null, null, null, null)));
+                new EmbeddedAiAutoMemory(aiAutoMemory, null, null, null, null, null, null, null, null, null)));
 
         graphQlTester
             .document(
@@ -126,6 +130,57 @@ class EmbeddedAiAutoMemoryGraphQlControllerIntTest {
             .path("embeddedAiAutoMemories[0].connectedUser")
             .valueIsNull()
             .path("embeddedAiAutoMemories[0].integration")
+            .valueIsNull();
+    }
+
+    @Test
+    void testListSerializesAnEmbeddedAutomationMemory() {
+        AiAutoMemory aiAutoMemory = AiAutoMemory.restore(
+            new AiAutoMemoryOwner(1049L, AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, 41L, Environment.PRODUCTION),
+            5L, "contact_preference", "Contact preference", null, AiAutoMemoryType.USER, "Prefers email.", null, null,
+            1L);
+
+        when(embeddedAiAutoMemoryFacade.getEmbeddedAiAutoMemories(Environment.PRODUCTION, null, null))
+            .thenReturn(List.of(
+                new EmbeddedAiAutoMemory(
+                    aiAutoMemory, 21L, "Ada", "ada@example.com", "ext-ada", null, null, null, 51L, "Lead Notes")));
+
+        Map<String, Object> memory = graphQlTester
+            .document(
+                """
+                    query {
+                        embeddedAiAutoMemories(environment: 2) {
+                            principalType principalId integration { id } automation { id name }
+                        }
+                    }
+                    """)
+            .execute()
+            .path("embeddedAiAutoMemories[0]")
+            .entity(Map.class)
+            .get();
+
+        assertThat(memory)
+            .containsEntry("principalType", "PROJECT_DEPLOYMENT")
+            .containsEntry("principalId", 41)
+            .containsEntry("integration", null)
+            .containsEntry("automation", Map.of("id", "51", "name", "Lead Notes"));
+    }
+
+    @Test
+    void testListReturnsNoAutomationForTheConnectedUsersOwnWorkflows() {
+        AiAutoMemory aiAutoMemory = AiAutoMemory.restore(
+            new AiAutoMemoryOwner(1049L, AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, 42L, Environment.PRODUCTION),
+            6L, "language", "Language", null, AiAutoMemoryType.USER, "Speaks German.", null, null, 1L);
+
+        when(embeddedAiAutoMemoryFacade.getEmbeddedAiAutoMemories(Environment.PRODUCTION, null, null))
+            .thenReturn(List.of(
+                new EmbeddedAiAutoMemory(
+                    aiAutoMemory, 21L, "Ada", "ada@example.com", "ext-ada", null, null, null, null, null)));
+
+        graphQlTester
+            .document("query { embeddedAiAutoMemories(environment: 2) { automation { id name } } }")
+            .execute()
+            .path("embeddedAiAutoMemories[0].automation")
             .valueIsNull();
     }
 
@@ -178,7 +233,7 @@ class EmbeddedAiAutoMemoryGraphQlControllerIntTest {
     @Test
     void testUpdateMapsTheInputToAPatch() {
         when(embeddedAiAutoMemoryFacade.updateEmbeddedAiAutoMemory(
-            eq(Environment.PRODUCTION), eq(11L), eq(3L), eq(4L), eq(
+            eq(Environment.PRODUCTION), eq(AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT), eq(11L), eq(3L), eq(4L), eq(
                 new AiAutoMemoryPatch("New title", "New description", AiAutoMemoryType.FEEDBACK, "New content"))))
                     .thenReturn(newEmbeddedAiAutoMemory());
 
@@ -187,8 +242,9 @@ class EmbeddedAiAutoMemoryGraphQlControllerIntTest {
                 """
                     mutation {
                         updateEmbeddedAiAutoMemory(input: {
-                            id: "3", integrationInstanceId: "11", environment: 2, expectedVersion: 4, title: "New title",
-                            description: "New description", memoryType: FEEDBACK, content: "New content"
+                            id: "3", principalType: PROJECT_DEPLOYMENT, principalId: "11", environment: 2,
+                            expectedVersion: 4, title: "New title", description: "New description", memoryType: FEEDBACK,
+                            content: "New content"
                         }) { id }
                     }
                     """)
@@ -202,20 +258,31 @@ class EmbeddedAiAutoMemoryGraphQlControllerIntTest {
     void testDeleteReturnsTrue() {
         graphQlTester
             .document(
-                "mutation { deleteEmbeddedAiAutoMemory(id: \"3\", integrationInstanceId: \"11\", environment: 2) }")
+                """
+                    mutation {
+                        deleteEmbeddedAiAutoMemory(
+                            id: "3", principalType: INTEGRATION_INSTANCE, principalId: "11", environment: 2)
+                    }
+                    """)
             .execute()
             .path("deleteEmbeddedAiAutoMemory")
             .entity(Boolean.class)
             .isEqualTo(true);
 
-        verify(embeddedAiAutoMemoryFacade).deleteEmbeddedAiAutoMemory(Environment.PRODUCTION, 11L, 3L);
+        verify(embeddedAiAutoMemoryFacade).deleteEmbeddedAiAutoMemory(
+            Environment.PRODUCTION, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, 11L, 3L);
     }
 
     @Test
     void testUnknownEnvironmentIsABadRequest() {
         graphQlTester
             .document(
-                "mutation { deleteEmbeddedAiAutoMemory(id: \"3\", integrationInstanceId: \"11\", environment: 9) }")
+                """
+                    mutation {
+                        deleteEmbeddedAiAutoMemory(
+                            id: "3", principalType: INTEGRATION_INSTANCE, principalId: "11", environment: 9)
+                    }
+                    """)
             .execute()
             .errors()
             .satisfy(errors -> assertThat(errors)
@@ -226,7 +293,8 @@ class EmbeddedAiAutoMemoryGraphQlControllerIntTest {
     @Test
     void testMissingMemoryIsNotFound() {
         when(embeddedAiAutoMemoryFacade.updateEmbeddedAiAutoMemory(
-            eq(Environment.PRODUCTION), anyLong(), anyLong(), anyLong(),
+            eq(Environment.PRODUCTION), eq(AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE), anyLong(), anyLong(),
+            anyLong(),
             eq(new AiAutoMemoryPatch("x", null, null, null))))
                 .thenThrow(new AiAutoMemoryNotFoundException("Memory not found"));
 
@@ -235,7 +303,10 @@ class EmbeddedAiAutoMemoryGraphQlControllerIntTest {
                 """
                     mutation {
                         updateEmbeddedAiAutoMemory(
-                            input: {id: "3", integrationInstanceId: "11", environment: 2, expectedVersion: 4, title: "x"}
+                            input: {
+                                id: "3", principalType: INTEGRATION_INSTANCE, principalId: "11", environment: 2,
+                                expectedVersion: 4, title: "x"
+                            }
                         ) {
                             id
                         }
@@ -261,7 +332,7 @@ class EmbeddedAiAutoMemoryGraphQlControllerIntTest {
 
     private static EmbeddedAiAutoMemory newEmbeddedAiAutoMemory() {
         return new EmbeddedAiAutoMemory(
-            newAiAutoMemory(), 21L, "Ada", "ada@example.com", "ext-ada", 31L, "Memory Demo", "memoryDemo");
+            newAiAutoMemory(), 21L, "Ada", "ada@example.com", "ext-ada", 31L, "Memory Demo", "memoryDemo", null, null);
     }
 
     @TestConfiguration
