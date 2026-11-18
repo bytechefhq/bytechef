@@ -5,22 +5,26 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {useDynamicPropertiesLoader} from './useDynamicPropertiesLoader';
 
-const {getWorkflowNodeComponentActionDynamicPropertiesMock} = vi.hoisted(() => ({
-    getWorkflowNodeComponentActionDynamicPropertiesMock: vi.fn(),
+import type {DynamicPropertiesRequestType} from './completionTypes';
+
+const {getWorkflowNodeComponentOperationDynamicPropertiesMock} = vi.hoisted(() => ({
+    getWorkflowNodeComponentOperationDynamicPropertiesMock: vi.fn(),
 }));
 
 vi.mock('@/shared/middleware/platform/configuration', () => ({
+    ComponentOperationDynamicPropertiesRequestOperationTypeEnum: {Action: 'ACTION', Trigger: 'TRIGGER'},
     WorkflowNodeDynamicPropertiesApi: class {
-        getWorkflowNodeComponentActionDynamicProperties = getWorkflowNodeComponentActionDynamicPropertiesMock;
+        getWorkflowNodeComponentOperationDynamicProperties = getWorkflowNodeComponentOperationDynamicPropertiesMock;
     },
 }));
 
-const request = {
-    actionName: 'createRecord',
+const request: DynamicPropertiesRequestType = {
     componentName: 'airtable',
     componentVersion: 1,
     connectionKey: 'at',
     lookupDependsOnPaths: ['baseId'],
+    operationKind: 'action',
+    operationName: 'createRecord',
     parameters: {baseId: 'app1'},
     propertyName: 'fields',
     workflowNodeName: 'script_1',
@@ -38,7 +42,7 @@ describe('useDynamicPropertiesLoader', () => {
 
         queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
 
-        getWorkflowNodeComponentActionDynamicPropertiesMock.mockResolvedValue([{name: 'Email'}]);
+        getWorkflowNodeComponentOperationDynamicPropertiesMock.mockResolvedValue([{name: 'Email'}]);
     });
 
     it('has no loader without a workflow', () => {
@@ -54,14 +58,15 @@ describe('useDynamicPropertiesLoader', () => {
 
         await result.current!(request);
 
-        expect(getWorkflowNodeComponentActionDynamicPropertiesMock).toHaveBeenCalledTimes(1);
-        expect(getWorkflowNodeComponentActionDynamicPropertiesMock).toHaveBeenCalledWith({
-            componentActionDynamicPropertiesRequest: {
-                actionName: 'createRecord',
+        expect(getWorkflowNodeComponentOperationDynamicPropertiesMock).toHaveBeenCalledTimes(1);
+        expect(getWorkflowNodeComponentOperationDynamicPropertiesMock).toHaveBeenCalledWith({
+            componentOperationDynamicPropertiesRequest: {
                 componentName: 'airtable',
                 componentVersion: 1,
                 connectionKey: 'at',
                 lookupDependsOnPaths: ['baseId'],
+                operationName: 'createRecord',
+                operationType: 'ACTION',
                 parameters: {baseId: 'app1'},
             },
             environmentId: 2,
@@ -71,12 +76,34 @@ describe('useDynamicPropertiesLoader', () => {
         });
     });
 
+    it('sends a trigger operation and the cluster element that declares the connection', async () => {
+        const {result} = renderHook(() => useDynamicPropertiesLoader('workflow1', 2), {wrapper});
+
+        await result.current!({
+            ...request,
+            clusterElementNode: {clusterElementType: 'tools', clusterElementWorkflowNodeName: 'script_1'},
+            operationKind: 'trigger',
+            workflowNodeName: 'aiAgent_1',
+        });
+
+        expect(getWorkflowNodeComponentOperationDynamicPropertiesMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+                componentOperationDynamicPropertiesRequest: expect.objectContaining({
+                    clusterElementType: 'tools',
+                    clusterElementWorkflowNodeName: 'script_1',
+                    operationType: 'TRIGGER',
+                }),
+                workflowNodeName: 'aiAgent_1',
+            })
+        );
+    });
+
     it('requests again when the written values change', async () => {
         const {result} = renderHook(() => useDynamicPropertiesLoader('workflow1', 2), {wrapper});
 
         await result.current!(request);
         await result.current!({...request, parameters: {baseId: 'app2'}});
 
-        expect(getWorkflowNodeComponentActionDynamicPropertiesMock).toHaveBeenCalledTimes(2);
+        expect(getWorkflowNodeComponentOperationDynamicPropertiesMock).toHaveBeenCalledTimes(2);
     });
 });

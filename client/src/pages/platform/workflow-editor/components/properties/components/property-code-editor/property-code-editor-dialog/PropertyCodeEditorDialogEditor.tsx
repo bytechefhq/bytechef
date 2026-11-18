@@ -38,7 +38,12 @@ const PropertyCodeEditorDialogEditor = ({
             }))
         );
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const clusterElementType = useWorkflowNodeDetailsPanelStore((state) => state.currentNode?.clusterElementType);
+    const {clusterElementType, currentNodeName} = useWorkflowNodeDetailsPanelStore(
+        useShallow((state) => ({
+            clusterElementType: state.currentNode?.clusterElementType,
+            currentNodeName: state.currentNode?.name,
+        }))
+    );
     const rootClusterElementNodeName = useWorkflowEditorStore(
         (state) => state.rootClusterElementNodeData?.workflowNodeName
     );
@@ -46,7 +51,13 @@ const PropertyCodeEditorDialogEditor = ({
     const components = useComponentCatalog();
     const loadDynamicProperties = useDynamicPropertiesLoader(workflowId, currentEnvironmentId);
 
-    const isClusterElement = !!clusterElementType && !!rootClusterElementNodeName;
+    const clusterElementNode = useMemo(
+        () =>
+            clusterElementType && rootClusterElementNodeName && currentNodeName
+                ? {clusterElementType, clusterElementWorkflowNodeName: currentNodeName}
+                : undefined,
+        [clusterElementType, currentNodeName, rootClusterElementNodeName]
+    );
 
     const completionContext = useMemo<CompletionContextType | undefined>(() => {
         const scriptLanguage = language.toLowerCase();
@@ -56,20 +67,23 @@ const PropertyCodeEditorDialogEditor = ({
         }
 
         return {
+            clusterElementNode,
             components,
             connections: componentConnections,
             input: inputParameters ?? scriptInput,
             kind: 'script',
             language: scriptLanguage as ScriptLanguageType,
-            ...(!isClusterElement && {loadDynamicProperties, workflowNodeName}),
+            loadDynamicProperties,
+            workflowNodeName: clusterElementNode ? rootClusterElementNodeName : workflowNodeName,
         };
     }, [
+        clusterElementNode,
         componentConnections,
         components,
         inputParameters,
-        isClusterElement,
         language,
         loadDynamicProperties,
+        rootClusterElementNodeName,
         scriptInput,
         workflowNodeName,
     ]);

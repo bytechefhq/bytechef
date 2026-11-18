@@ -285,7 +285,9 @@ async function actionPropertyItems(
         actionName,
         'action'
     );
-    const {loadDynamicProperties, workflowNodeName} = context.kind === 'script' ? context : {};
+    const {loadDynamicProperties} = context;
+    const workflowNodeName = context.kind === 'script' ? context.workflowNodeName : findTask(request)?.name;
+    const clusterElementNode = context.kind === 'script' ? context.clusterElementNode : undefined;
 
     return getPropertyCompletionItems({
         existingKeys: keySlot.existingKeys,
@@ -295,11 +297,13 @@ async function actionPropertyItems(
             loadDynamicProperties && workflowNodeName && declaredVersion !== undefined
                 ? (propertyName, lookupDependsOnPaths, parameters) =>
                       loadDynamicProperties({
-                          actionName,
+                          clusterElementNode,
                           componentName,
                           componentVersion: declaredVersion,
                           connectionKey: declaredConnection?.name,
                           lookupDependsOnPaths,
+                          operationKind: 'action',
+                          operationName: actionName,
                           parameters,
                           propertyName,
                           workflowNodeName,

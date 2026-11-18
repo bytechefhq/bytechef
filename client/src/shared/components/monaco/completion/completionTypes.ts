@@ -39,12 +39,19 @@ export type ComponentCatalogType = {
 
 export type OperationKindType = 'action' | 'trigger';
 
+export type ClusterElementNodeType = {
+    clusterElementType: string;
+    clusterElementWorkflowNodeName: string;
+};
+
 export type DynamicPropertiesRequestType = {
-    actionName: string;
+    clusterElementNode?: ClusterElementNodeType;
     componentName: string;
     componentVersion: number;
     connectionKey?: string;
     lookupDependsOnPaths: string[];
+    operationKind: OperationKindType;
+    operationName: string;
     parameters: Record<string, unknown>;
     propertyName: string;
     workflowNodeName: string;
@@ -53,6 +60,7 @@ export type DynamicPropertiesRequestType = {
 export type DynamicPropertiesLoaderType = (request: DynamicPropertiesRequestType) => Promise<Property[]>;
 
 export interface ScriptCompletionContextI {
+    clusterElementNode?: ClusterElementNodeType;
     components: ComponentCatalogType;
     connections: ConnectionDeclarationType[];
     input: Record<string, unknown>;
@@ -71,6 +79,7 @@ export interface CodeWorkflowCompletionContextI {
     components: ComponentCatalogType;
     kind: 'codeWorkflow';
     language: ScriptLanguageType;
+    loadDynamicProperties?: DynamicPropertiesLoaderType;
 }
 
 export interface WorkflowDefinitionCompletionContextI {
