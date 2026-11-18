@@ -25,6 +25,7 @@ export type CompletionItemDraftType = {
     insertText: string;
     kind: 'function' | 'module' | 'method' | 'property' | 'value' | 'variable';
     label: string;
+    retrigger?: boolean;
     sortText?: string;
 };
 
