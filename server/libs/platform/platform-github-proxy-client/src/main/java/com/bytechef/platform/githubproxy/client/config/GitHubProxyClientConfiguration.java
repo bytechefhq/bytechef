@@ -17,14 +17,18 @@
 package com.bytechef.platform.githubproxy.client.config;
 
 import com.bytechef.platform.githubproxy.client.GitHubProxyClient;
+import com.bytechef.platform.githubproxy.client.OAuthAppProxyClient;
 import com.bytechef.platform.githubproxy.client.WorkflowTemplateProxyClient;
 import com.bytechef.platform.githubproxy.client.internal.RestGitHubProxyClient;
+import com.bytechef.platform.githubproxy.client.internal.RestOAuthAppProxyClient;
 import com.bytechef.platform.githubproxy.client.internal.RestWorkflowTemplateProxyClient;
 import java.net.http.HttpClient;
 import java.time.Duration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
@@ -54,6 +58,27 @@ class GitHubProxyClientConfiguration {
         RestClient restClient = getRestClient(properties, httpClient);
 
         return new RestWorkflowTemplateProxyClient(restClient);
+    }
+
+    @Bean
+    @ConditionalOnExpression("!'${github-proxy.oauth-apps-api-key:}'.isBlank()")
+    OAuthAppProxyClient oAuthAppProxyClient(GitHubProxyClientProperties properties) {
+        HttpClient httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(30))
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .build();
+
+        JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);
+
+        requestFactory.setReadTimeout(Duration.ofSeconds(10));
+
+        RestClient restClient = RestClient.builder()
+            .baseUrl(properties.getBaseUrl())
+            .requestFactory(requestFactory)
+            .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + properties.getOauthAppsApiKey())
+            .build();
+
+        return new RestOAuthAppProxyClient(restClient);
     }
 
     private static RestClient getRestClient(GitHubProxyClientProperties properties, HttpClient httpClient) {
