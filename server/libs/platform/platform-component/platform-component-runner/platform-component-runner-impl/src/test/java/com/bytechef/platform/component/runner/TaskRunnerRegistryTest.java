@@ -25,6 +25,8 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.component.runner.external.RemoteTaskRunner;
+import com.bytechef.platform.component.runner.remote.RemoteTaskRunnerBackend;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -199,7 +201,7 @@ public class TaskRunnerRegistryTest {
                 .put(taskRunner.getType(), runner);
         }
 
-        return new TaskRunnerRegistryImpl(taskRunners, applicationProperties);
+        return new TaskRunnerRegistryImpl(taskRunners, List.of(), applicationProperties);
     }
 
     private static TaskRunner newTaskRunner(String type, Set<TaskRunnerCapability> capabilities) {
@@ -224,6 +226,43 @@ public class TaskRunnerRegistryTest {
                 .put(entry.getKey(), runner);
         }
 
-        return new TaskRunnerRegistryImpl(taskRunners, applicationProperties);
+        return new TaskRunnerRegistryImpl(taskRunners, List.of(), applicationProperties);
+    }
+
+    @Test
+    public void testWrapsEveryBackendInARemoteTaskRunner() {
+        RemoteTaskRunnerBackend backend = mock(RemoteTaskRunnerBackend.class);
+
+        when(backend.getType()).thenReturn("docker");
+
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        ApplicationProperties.Script.Runner runner = new ApplicationProperties.Script.Runner();
+
+        runner.setEnabled(true);
+
+        applicationProperties.getScript()
+            .getRunners()
+            .put("docker", runner);
+
+        TaskRunnerRegistry taskRunnerRegistry = new TaskRunnerRegistryImpl(
+            List.of(), List.of(backend), applicationProperties);
+
+        assertThat(taskRunnerRegistry.getTaskRunner("docker")).isInstanceOf(RemoteTaskRunner.class);
+    }
+
+    @Test
+    public void testTwoRunnersWithTheSameTypeFailFast() {
+        RemoteTaskRunnerBackend backend = mock(RemoteTaskRunnerBackend.class);
+
+        when(backend.getType()).thenReturn("docker");
+
+        List<TaskRunner> taskRunners = List.of(newTaskRunner("docker", Set.of()));
+        List<RemoteTaskRunnerBackend> backends = List.of(backend);
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        assertThatThrownBy(() -> new TaskRunnerRegistryImpl(taskRunners, backends, applicationProperties))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("'docker'");
     }
 }
