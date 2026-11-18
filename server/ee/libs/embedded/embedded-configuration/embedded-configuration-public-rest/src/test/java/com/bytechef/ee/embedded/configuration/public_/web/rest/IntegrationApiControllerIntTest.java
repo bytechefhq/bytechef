@@ -98,7 +98,7 @@ class IntegrationApiControllerIntTest {
         IntegrationDTO integrationDTO = new IntegrationDTO(
             null, false, null, "slack", 1, null, null, "Slack integration", null, "slack-icon", INTEGRATION_ID,
             List.of(), List.of(),
-            null, null, null, null, 2, true, "slack", null, List.of(), "Slack", 0);
+            null, null, null, null, 2, true, "slack", null, List.of(), "Slack", 0, false);
 
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
             IntegrationInstanceConfigurationDTO.builder()
@@ -147,8 +147,9 @@ class IntegrationApiControllerIntTest {
     @WithMockUser(username = EXTERNAL_USER_ID)
     void testGetIntegrationReturnsInternalOnlyOnMcpWorkflowInputs() {
         IntegrationDTO integrationDTO = new IntegrationDTO(
-            null, "slack", 1, null, null, "Slack integration", null, "slack-icon", INTEGRATION_ID, List.of(), List.of(),
-            null, null, null, null, 2, true, "slack", null, List.of(), "Slack", 0);
+            null, false, null, "slack", 1, null, null, "Slack integration", null, "slack-icon", INTEGRATION_ID,
+            List.of(),
+            List.of(), null, null, null, null, 2, true, "slack", null, List.of(), "Slack", 0, false);
 
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
             IntegrationInstanceConfigurationDTO.builder()
