@@ -1325,6 +1325,53 @@ export type DynamicPropertiesProperty = Property & {
   type: PropertyType;
 };
 
+/** A memory an Embedded integration's agent saved for one connected user's integration instance. */
+export type EmbeddedAiAutoMemory = {
+  __typename?: 'EmbeddedAiAutoMemory';
+  /** Null when the instance's connected user was deleted while its memories remain. */
+  connectedUser?: Maybe<EmbeddedAiAutoMemoryConnectedUserRef>;
+  content: Scalars['String']['output'];
+  createdAt?: Maybe<Scalars['Long']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  /** The Environment ordinal the memory belongs to. */
+  environmentId: Scalars['Long']['output'];
+  id: Scalars['ID']['output'];
+  /** Null when the instance's integration was deleted while its memories remain. */
+  integration?: Maybe<EmbeddedAiAutoMemoryIntegration>;
+  integrationInstanceId: Scalars['Long']['output'];
+  memoryType: AiAutoMemoryType;
+  name: Scalars['String']['output'];
+  title: Scalars['String']['output'];
+  updatedAt?: Maybe<Scalars['Long']['output']>;
+  /** Changes on every write. Send it back as UpdateEmbeddedAiAutoMemoryInput.expectedVersion. */
+  version: Scalars['Long']['output'];
+};
+
+/** A connected user holding at least one memory in the environment, for the Connected User filter. */
+export type EmbeddedAiAutoMemoryConnectedUser = {
+  __typename?: 'EmbeddedAiAutoMemoryConnectedUser';
+  email?: Maybe<Scalars['String']['output']>;
+  externalId: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  memoryCount: Scalars['Int']['output'];
+  name?: Maybe<Scalars['String']['output']>;
+};
+
+export type EmbeddedAiAutoMemoryConnectedUserRef = {
+  __typename?: 'EmbeddedAiAutoMemoryConnectedUserRef';
+  email?: Maybe<Scalars['String']['output']>;
+  externalId: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  name?: Maybe<Scalars['String']['output']>;
+};
+
+export type EmbeddedAiAutoMemoryIntegration = {
+  __typename?: 'EmbeddedAiAutoMemoryIntegration';
+  componentName?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name?: Maybe<Scalars['String']['output']>;
+};
+
 export type EmbeddedGettingStarted = {
   __typename?: 'EmbeddedGettingStarted';
   apiBaseUrl?: Maybe<Scalars['String']['output']>;
@@ -2074,6 +2121,8 @@ export type Mutation = {
   deleteConnectedUserProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   deleteCustomComponent: Scalars['Boolean']['output'];
   deleteDataTableRow: Scalars['Boolean']['output'];
+  /** Deletes an integration instance's memory. Fails with BAD_REQUEST when it does not exist in the environment. Admin only. */
+  deleteEmbeddedAiAutoMemory: Scalars['Boolean']['output'];
   deleteEmbeddedMcpComponent?: Maybe<Scalars['Boolean']['output']>;
   deleteEmbeddedMcpServer?: Maybe<Scalars['Boolean']['output']>;
   deleteEmbeddedMcpTool?: Maybe<Scalars['Boolean']['output']>;
@@ -2179,6 +2228,11 @@ export type Mutation = {
   updateConnectionCredentials: Scalars['Boolean']['output'];
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
+  /**
+   * Partial update of an integration instance's memory. Fails with BAD_REQUEST when the memory does not exist in the
+   * environment, and with CONFLICT when it changed since expectedVersion. Admin only.
+   */
+  updateEmbeddedAiAutoMemory: EmbeddedAiAutoMemory;
   updateEmbeddedMcpComponent?: Maybe<McpComponent>;
   updateEmbeddedMcpServer?: Maybe<McpServer>;
   updateEmbeddedMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
@@ -2522,6 +2576,12 @@ export type MutationDeleteCustomComponentArgs = {
 
 export type MutationDeleteDataTableRowArgs = {
   input: DeleteRowInput;
+};
+
+
+export type MutationDeleteEmbeddedAiAutoMemoryArgs = {
+  environment: Scalars['Int']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
@@ -3087,6 +3147,11 @@ export type MutationUpdateDataTableRowArgs = {
 
 export type MutationUpdateDataTableTagsArgs = {
   input: UpdateDataTableTagsInput;
+};
+
+
+export type MutationUpdateEmbeddedAiAutoMemoryArgs = {
+  input: UpdateEmbeddedAiAutoMemoryInput;
 };
 
 
@@ -3701,6 +3766,13 @@ export type Query = {
   editorJobFileLogs: LogPage;
   editorJobFileLogsExist: Scalars['Boolean']['output'];
   editorTaskExecutionFileLogs: Array<LogEntry>;
+  /**
+   * Lists the memories of every Embedded integration instance in the environment (the Environment ordinal: 0
+   * DEVELOPMENT, 1 STAGING, 2 PRODUCTION). connectedUserId and memoryType narrow the list. Admin only.
+   */
+  embeddedAiAutoMemories: Array<EmbeddedAiAutoMemory>;
+  /** The connected users holding at least one memory in the environment. Admin only. */
+  embeddedAiAutoMemoryConnectedUsers: Array<EmbeddedAiAutoMemoryConnectedUser>;
   embeddedGettingStarted: EmbeddedGettingStarted;
   embeddedGettingStartedCompleted: Scalars['Boolean']['output'];
   embeddedMcpComponentsByServerId?: Maybe<Array<Maybe<McpComponent>>>;
@@ -4313,6 +4385,18 @@ export type QueryEditorJobFileLogsExistArgs = {
 export type QueryEditorTaskExecutionFileLogsArgs = {
   jobId: Scalars['ID']['input'];
   taskExecutionId: Scalars['ID']['input'];
+};
+
+
+export type QueryEmbeddedAiAutoMemoriesArgs = {
+  connectedUserId?: InputMaybe<Scalars['ID']['input']>;
+  environment: Scalars['Int']['input'];
+  memoryType?: InputMaybe<AiAutoMemoryType>;
+};
+
+
+export type QueryEmbeddedAiAutoMemoryConnectedUsersArgs = {
+  environment: Scalars['Int']['input'];
 };
 
 
@@ -5083,6 +5167,20 @@ export type UpdateConnectionCredentialsInput = {
 export type UpdateDataTableTagsInput = {
   tableId: Scalars['ID']['input'];
   tags?: InputMaybe<Array<TagInput>>;
+};
+
+/**
+ * A partial update. An omitted field keeps the stored value; a blank description clears it, while a blank title or
+ * content is rejected.
+ */
+export type UpdateEmbeddedAiAutoMemoryInput = {
+  content?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  environment: Scalars['Int']['input'];
+  expectedVersion: Scalars['Long']['input'];
+  id: Scalars['ID']['input'];
+  memoryType?: InputMaybe<AiAutoMemoryType>;
+  title?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateKnowledgeBaseDocumentTagsInput = {

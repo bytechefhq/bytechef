@@ -1248,6 +1248,37 @@ export type AutomationSearchQuery = { automationSearch: Array<
     | { projectId: string, label: string, id: string, name: string, description: string | null, type: Types.SearchAssetType }
   > };
 
+export type DeleteEmbeddedAiAutoMemoryMutationVariables = Exact<{
+  id: string | number;
+  environment: number;
+}>;
+
+
+export type DeleteEmbeddedAiAutoMemoryMutation = { deleteEmbeddedAiAutoMemory: boolean };
+
+export type EmbeddedAiAutoMemoriesQueryVariables = Exact<{
+  environment: number;
+  connectedUserId?: string | number | null | undefined;
+  memoryType?: Types.AiAutoMemoryType | null | undefined;
+}>;
+
+
+export type EmbeddedAiAutoMemoriesQuery = { embeddedAiAutoMemories: Array<{ id: string, name: string, title: string, description: string | null, memoryType: Types.AiAutoMemoryType, content: string, environmentId: any, version: any, createdAt: any, updatedAt: any, integrationInstanceId: any, connectedUser: { id: string, name: string | null, email: string | null, externalId: string } | null, integration: { id: string, name: string | null, componentName: string | null } | null }> };
+
+export type EmbeddedAiAutoMemoryConnectedUsersQueryVariables = Exact<{
+  environment: number;
+}>;
+
+
+export type EmbeddedAiAutoMemoryConnectedUsersQuery = { embeddedAiAutoMemoryConnectedUsers: Array<{ id: string, name: string | null, email: string | null, externalId: string, memoryCount: number }> };
+
+export type UpdateEmbeddedAiAutoMemoryMutationVariables = Exact<{
+  input: Types.UpdateEmbeddedAiAutoMemoryInput;
+}>;
+
+
+export type UpdateEmbeddedAiAutoMemoryMutation = { updateEmbeddedAiAutoMemory: { id: string, version: any } };
+
 export type AutomationProjectCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -7244,6 +7275,124 @@ export const useAutomationSearchQuery = <
       {
     queryKey: ['automationSearch', variables],
     queryFn: fetcher<AutomationSearchQuery, AutomationSearchQueryVariables>(AutomationSearchDocument, variables),
+    ...options
+  }
+    )};
+
+export const DeleteEmbeddedAiAutoMemoryDocument = new TypedDocumentString(`
+    mutation deleteEmbeddedAiAutoMemory($id: ID!, $environment: Int!) {
+  deleteEmbeddedAiAutoMemory(id: $id, environment: $environment)
+}
+    `);
+
+export const useDeleteEmbeddedAiAutoMemoryMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteEmbeddedAiAutoMemoryMutation, TError, DeleteEmbeddedAiAutoMemoryMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteEmbeddedAiAutoMemoryMutation, TError, DeleteEmbeddedAiAutoMemoryMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteEmbeddedAiAutoMemory'],
+    mutationFn: (variables?: DeleteEmbeddedAiAutoMemoryMutationVariables) => fetcher<DeleteEmbeddedAiAutoMemoryMutation, DeleteEmbeddedAiAutoMemoryMutationVariables>(DeleteEmbeddedAiAutoMemoryDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EmbeddedAiAutoMemoriesDocument = new TypedDocumentString(`
+    query embeddedAiAutoMemories($environment: Int!, $connectedUserId: ID, $memoryType: AiAutoMemoryType) {
+  embeddedAiAutoMemories(
+    environment: $environment
+    connectedUserId: $connectedUserId
+    memoryType: $memoryType
+  ) {
+    id
+    name
+    title
+    description
+    memoryType
+    content
+    environmentId
+    version
+    createdAt
+    updatedAt
+    integrationInstanceId
+    connectedUser {
+      id
+      name
+      email
+      externalId
+    }
+    integration {
+      id
+      name
+      componentName
+    }
+  }
+}
+    `);
+
+export const useEmbeddedAiAutoMemoriesQuery = <
+      TData = EmbeddedAiAutoMemoriesQuery,
+      TError = unknown
+    >(
+      variables: EmbeddedAiAutoMemoriesQueryVariables,
+      options?: Omit<UseQueryOptions<EmbeddedAiAutoMemoriesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EmbeddedAiAutoMemoriesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<EmbeddedAiAutoMemoriesQuery, TError, TData>(
+      {
+    queryKey: ['embeddedAiAutoMemories', variables],
+    queryFn: fetcher<EmbeddedAiAutoMemoriesQuery, EmbeddedAiAutoMemoriesQueryVariables>(EmbeddedAiAutoMemoriesDocument, variables),
+    ...options
+  }
+    )};
+
+export const EmbeddedAiAutoMemoryConnectedUsersDocument = new TypedDocumentString(`
+    query embeddedAiAutoMemoryConnectedUsers($environment: Int!) {
+  embeddedAiAutoMemoryConnectedUsers(environment: $environment) {
+    id
+    name
+    email
+    externalId
+    memoryCount
+  }
+}
+    `);
+
+export const useEmbeddedAiAutoMemoryConnectedUsersQuery = <
+      TData = EmbeddedAiAutoMemoryConnectedUsersQuery,
+      TError = unknown
+    >(
+      variables: EmbeddedAiAutoMemoryConnectedUsersQueryVariables,
+      options?: Omit<UseQueryOptions<EmbeddedAiAutoMemoryConnectedUsersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EmbeddedAiAutoMemoryConnectedUsersQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<EmbeddedAiAutoMemoryConnectedUsersQuery, TError, TData>(
+      {
+    queryKey: ['embeddedAiAutoMemoryConnectedUsers', variables],
+    queryFn: fetcher<EmbeddedAiAutoMemoryConnectedUsersQuery, EmbeddedAiAutoMemoryConnectedUsersQueryVariables>(EmbeddedAiAutoMemoryConnectedUsersDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateEmbeddedAiAutoMemoryDocument = new TypedDocumentString(`
+    mutation updateEmbeddedAiAutoMemory($input: UpdateEmbeddedAiAutoMemoryInput!) {
+  updateEmbeddedAiAutoMemory(input: $input) {
+    id
+    version
+  }
+}
+    `);
+
+export const useUpdateEmbeddedAiAutoMemoryMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateEmbeddedAiAutoMemoryMutation, TError, UpdateEmbeddedAiAutoMemoryMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateEmbeddedAiAutoMemoryMutation, TError, UpdateEmbeddedAiAutoMemoryMutationVariables, TContext>(
+      {
+    mutationKey: ['updateEmbeddedAiAutoMemory'],
+    mutationFn: (variables?: UpdateEmbeddedAiAutoMemoryMutationVariables) => fetcher<UpdateEmbeddedAiAutoMemoryMutation, UpdateEmbeddedAiAutoMemoryMutationVariables>(UpdateEmbeddedAiAutoMemoryDocument, variables)(),
     ...options
   }
     )};
