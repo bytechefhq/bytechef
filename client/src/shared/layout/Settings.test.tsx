@@ -137,6 +137,42 @@ describe('Settings', () => {
         expect(screen.queryByText('Custom Components')).not.toBeInTheDocument();
         expect(screen.getByText('Users')).toBeInTheDocument();
     });
+
+    it('hides a feature-flagged page behind an absolute Organization link while its flag is off', () => {
+        renderSettings([
+            {href: '/settings/users', title: 'Users'},
+            {href: '/settings/api-connectors', title: 'API Connectors'},
+        ]);
+
+        expect(screen.queryByText('API Connectors')).not.toBeInTheDocument();
+    });
+
+    it('shows a feature-flagged page behind an absolute Organization link once its flag is on', () => {
+        hoisted.enabledFeatureFlags = ['ff-207'];
+
+        renderSettings([
+            {href: '/settings/users', title: 'Users'},
+            {href: '/settings/api-connectors', title: 'API Connectors'},
+        ]);
+
+        expect(screen.getByText('API Connectors')).toBeInTheDocument();
+    });
+
+    it('does not mark the workspace API Keys page current on the Organization Admin API Keys page', () => {
+        hoisted.enabledFeatureFlags = ['ff-1024'];
+
+        renderSettings(
+            [
+                {href: '/automation/settings/workspace-api-keys', title: 'API Keys'},
+                {href: '/settings/admin-api-keys', title: 'Admin API Keys'},
+            ],
+            '/settings/admin-api-keys'
+        );
+
+        expect(screen.getByRole('link', {name: 'API Keys'})).not.toHaveAttribute('aria-current');
+        expect(screen.getByRole('link', {name: 'Admin API Keys'})).toHaveAttribute('aria-current', 'page');
+    });
+
     it('names the browser tab after the current settings page', () => {
         renderSettings([aiNavGroup], '/automation/settings/ai/skills/1056');
 
