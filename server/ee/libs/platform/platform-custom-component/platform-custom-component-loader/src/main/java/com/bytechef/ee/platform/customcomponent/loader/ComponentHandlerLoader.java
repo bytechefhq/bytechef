@@ -31,7 +31,6 @@ public class ComponentHandlerLoader {
     @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     public static ComponentHandler loadComponentHandler(
         URL url, Language language, String cacheKey, CacheManager cacheManager) {
-
         try {
             return switch (language) {
                 case JAVA -> loadJavaComponentHandler(url, cacheKey, cacheManager);
@@ -43,13 +42,11 @@ public class ComponentHandlerLoader {
     }
 
     private static ComponentHandler loadJavaComponentHandler(
-        URL url, String cacheKey, CacheManager cacheManager) throws IOException {
+        URL url, String cacheKey, CacheManager cacheManager) {
+        ComponentHandlerClassLoader componentHandlerClassLoader =
+            ComponentHandlerClassLoader.of(url, cacheKey, cacheManager);
 
-        try (ComponentHandlerClassLoader codeComponentHandlerClassLoader = ComponentHandlerClassLoader.of(
-            url, cacheKey, cacheManager)) {
-
-            return codeComponentHandlerClassLoader.loadComponentHandler();
-        }
+        return componentHandlerClassLoader.loadComponentHandler();
     }
 
     /**

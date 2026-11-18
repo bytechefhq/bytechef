@@ -16,11 +16,14 @@
 
 package com.bytechef.classloader;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 import org.springframework.cache.Cache;
@@ -56,7 +59,27 @@ public abstract class IsolatingClassLoader<T> extends URLClassLoader {
     protected T get(String key) {
         Cache cache = Objects.requireNonNull(cacheManager.getCache(ISOLATING_CLASS_LOADER_CACHE));
 
-        return cache.get(key, () -> cacheMappingFunction.apply(key, this));
+        AtomicBoolean created = new AtomicBoolean();
+
+        T value;
+
+        try {
+            value = cache.get(key, () -> {
+                created.set(true);
+
+                return cacheMappingFunction.apply(key, this);
+            });
+        } catch (RuntimeException exception) {
+            closeClassLoader();
+
+            throw exception;
+        }
+
+        if (!created.get() || value == null) {
+            closeClassLoader();
+        }
+
+        return value;
     }
 
     @Override
@@ -71,7 +94,7 @@ public abstract class IsolatingClassLoader<T> extends URLClassLoader {
     }
 
     @Override
-    public Enumeration<URL> getResources(String name) throws java.io.IOException {
+    public Enumeration<URL> getResources(String name) throws IOException {
         Stream<String> stream = Arrays.stream(RESOURCE_PREFIXES);
 
         if (stream.anyMatch(name::startsWith)) {
@@ -100,6 +123,14 @@ public abstract class IsolatingClassLoader<T> extends URLClassLoader {
                         });
                     }))
             .toArray(Package[]::new);
+    }
+
+    private void closeClassLoader() {
+        try {
+            close();
+        } catch (IOException exception) {
+            throw new UncheckedIOException(exception);
+        }
     }
 
     protected void invalidateCache(String componentName) {
