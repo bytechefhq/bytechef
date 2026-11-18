@@ -11,7 +11,7 @@ All URIs are relative to */api/embedded/v1*
 
 ## deployAutomationProjectCodeWorkflow
 
-> AutomationProjectCodeWorkflowDeployResult deployAutomationProjectCodeWorkflow(xEnvironment, projectFile, release)
+> AutomationProjectCodeWorkflowDeployResult deployAutomationProjectCodeWorkflow(projectFile, xEnvironment, release)
 
 Deploy a new automation code workflow into the embedded catalog
 
@@ -35,10 +35,10 @@ async function example() {
   const api = new AutomationProjectCodeWorkflowApi(config);
 
   const body = {
+    // Blob | The file of a code-native automation project.
+    projectFile: BINARY_DATA_HERE,
     // Environment | The environment. (optional)
     xEnvironment: ...,
-    // Blob | The file of a code-native automation project. (optional)
-    projectFile: BINARY_DATA_HERE,
     // boolean | Whether to also point the configuration of the request environment at the newly published version. (optional)
     release: true,
   } satisfies DeployAutomationProjectCodeWorkflowRequest;
@@ -60,8 +60,8 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
+| **projectFile** | `Blob` | The file of a code-native automation project. | [Defaults to `undefined`] |
 | **xEnvironment** | `Environment` | The environment. | [Optional] [Defaults to `undefined`] [Enum: DEVELOPMENT, STAGING, PRODUCTION] |
-| **projectFile** | `Blob` | The file of a code-native automation project. | [Optional] [Defaults to `undefined`] |
 | **release** | `boolean` | Whether to also point the configuration of the request environment at the newly published version. | [Optional] [Defaults to `false`] |
 
 ### Return type
