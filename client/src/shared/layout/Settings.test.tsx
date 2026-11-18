@@ -93,21 +93,21 @@ describe('Settings', () => {
     });
 
     it('opens the nav group holding the current route', () => {
-        renderSettings([{title: 'Organization'}, aiNavGroup], '/automation/settings/ai/skills');
+        renderSettings([{title: 'Organization'}, aiNavGroup], '/settings/ai/skills');
 
         expect(screen.getByRole('link', {name: 'Providers'})).toBeInTheDocument();
         expect(screen.getByRole('link', {name: 'Skills'})).toBeInTheDocument();
     });
 
     it('keeps a nav group closed while the current route sits outside it', () => {
-        renderSettings([{title: 'Organization'}, aiNavGroup], '/automation/settings/users');
+        renderSettings([{title: 'Organization'}, aiNavGroup], '/settings/users');
 
         expect(screen.getByRole('button', {name: 'AI'})).toBeInTheDocument();
         expect(screen.queryByRole('link', {name: 'Providers'})).not.toBeInTheDocument();
     });
 
     it('opens a closed nav group when its parent row is clicked', async () => {
-        renderSettings([{title: 'Organization'}, aiNavGroup], '/automation/settings/users');
+        renderSettings([{title: 'Organization'}, aiNavGroup], '/settings/users');
 
         await userEvent.click(screen.getByRole('button', {name: 'AI'}));
 
@@ -115,7 +115,7 @@ describe('Settings', () => {
     });
 
     it('marks a collapsed nav group as current so closing it does not lose the you-are-here mark', async () => {
-        renderSettings([{title: 'Organization'}, aiNavGroup], '/automation/settings/ai/skills');
+        renderSettings([{title: 'Organization'}, aiNavGroup], '/settings/ai/skills');
 
         const groupRow = screen.getByRole('button', {name: 'AI'});
 
@@ -174,7 +174,7 @@ describe('Settings', () => {
     });
 
     it('names the browser tab after the current settings page', () => {
-        renderSettings([aiNavGroup], '/automation/settings/ai/skills/1056');
+        renderSettings([aiNavGroup], '/settings/ai/skills/1056');
 
         expect(document.title).toBe('Skills');
     });

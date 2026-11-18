@@ -51,7 +51,7 @@ vi.mock('@/components/DropdownMenu/DropdownMenu', () => ({
 
 const {navigateMock} = vi.hoisted(() => ({navigateMock: vi.fn()}));
 
-const renderComponent = (pathname = '/automation/settings/ai/skills', trigger?: React.ReactNode) =>
+const renderComponent = (pathname = '/settings/ai/skills', trigger?: React.ReactNode) =>
     render(
         <MemoryRouter initialEntries={[pathname]}>
             <AiSkillsCreateDropdown trigger={trigger} />
@@ -99,15 +99,15 @@ describe('AiSkillsCreateDropdown', () => {
 
         screen.getByTestId('upload-created').click();
 
-        expect(navigateMock).toHaveBeenCalledWith('/automation/settings/ai/skills/99');
+        expect(navigateMock).toHaveBeenCalledWith('/settings/ai/skills/99');
     });
 
-    it('keeps an embedded visitor on the embedded mount', () => {
-        renderComponent('/embedded/settings/ai/skills');
+    it('opens the created skill under Organization settings from outside the settings pages', () => {
+        renderComponent('/automation/projects/7');
 
         screen.getByTestId('upload-created').click();
 
-        expect(navigateMock).toHaveBeenCalledWith('/embedded/settings/ai/skills/99');
+        expect(navigateMock).toHaveBeenCalledWith('/settings/ai/skills/99');
     });
 
     it('stays put when the dialog reports no created skill', () => {
@@ -119,7 +119,7 @@ describe('AiSkillsCreateDropdown', () => {
     });
 
     it('renders a caller-supplied trigger instead of the default button', () => {
-        renderComponent('/automation/settings/ai/skills', <button type="button">Add</button>);
+        renderComponent('/settings/ai/skills', <button type="button">Add</button>);
 
         expect(screen.getByText('Add')).toBeInTheDocument();
         expect(screen.queryByText('Create Skill')).not.toBeInTheDocument();

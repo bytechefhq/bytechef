@@ -32,7 +32,7 @@ const renderListItem = () => {
     const onUpdate = vi.fn();
 
     render(
-        <MemoryRouter initialEntries={['/automation/settings/ai/skills']}>
+        <MemoryRouter initialEntries={['/settings/ai/skills']}>
             <AiSkillListItem deleteSkill={deleteSkill} onDownload={onDownload} onUpdate={onUpdate} skill={skill} />
         </MemoryRouter>
     );

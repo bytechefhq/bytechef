@@ -1,6 +1,5 @@
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
 import downloadAiSkill from '@/pages/automation/ai/skills/utils/downloadAiSkill';
-import getAiSkillsBasePath from '@/pages/automation/ai/skills/utils/getAiSkillsBasePath';
 import parseFrontmatter from '@/pages/automation/ai/skills/utils/parseFrontmatter';
 import {
     useAiSkillFileContentQuery,
@@ -12,9 +11,10 @@ import {
     useUpdateAiSkillContentMutation,
     useUpdateAiSkillMutation,
 } from '@/shared/middleware/graphql';
+import {AI_SKILLS_SETTINGS_PATH} from '@/shared/navigation/settingsPaths';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useEffect, useMemo, useState} from 'react';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {toast} from 'sonner';
 
 interface FileTreeNodeI {
@@ -94,7 +94,6 @@ export default function useAiSkillDetail() {
 
     const {closeSkillDetail, selectedSkillId} = useAiSkillsStore();
 
-    const location = useLocation();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
@@ -221,7 +220,7 @@ export default function useAiSkillDetail() {
         const idToDelete = selectedSkillId;
 
         closeSkillDetail();
-        void navigate(getAiSkillsBasePath(location.pathname));
+        void navigate(AI_SKILLS_SETTINGS_PATH);
 
         try {
             await deleteAiSkill({id: idToDelete});
@@ -243,7 +242,7 @@ export default function useAiSkillDetail() {
                 description: error instanceof Error ? error.message : 'An unexpected error occurred',
             });
         }
-    }, [closeSkillDetail, deleteAiSkill, location.pathname, navigate, queryClient, selectedSkillId]);
+    }, [closeSkillDetail, deleteAiSkill, navigate, queryClient, selectedSkillId]);
 
     const handleRemoveFile = useCallback(
         async (path: string) => {

@@ -44,16 +44,16 @@ vi.mock('react-router-dom', async (importOriginal) => ({
     useNavigate: () => navigateMock,
 }));
 
-const LIST_PATH = '/automation/settings/ai/skills';
+const LIST_PATH = '/settings/ai/skills';
 
 const renderPage = (pathname = LIST_PATH) =>
     render(
         <TooltipProvider>
             <MemoryRouter initialEntries={[pathname]}>
                 <Routes>
-                    <Route element={<AiSkills />} path="/:platform/settings/ai/skills/:skillId" />
+                    <Route element={<AiSkills />} path="/settings/ai/skills/:skillId" />
 
-                    <Route element={<AiSkills />} path="/:platform/settings/ai/skills" />
+                    <Route element={<AiSkills />} path="/settings/ai/skills" />
                 </Routes>
             </MemoryRouter>
         </TooltipProvider>
@@ -130,12 +130,12 @@ describe('AiSkills', () => {
         expect(screen.getByText('Skill')).toBeInTheDocument();
     });
 
-    it('sends the back control to the skills mount the visitor is already on', () => {
-        renderPage('/embedded/settings/ai/skills/42');
+    it('sends the back control to the Organization skills list', () => {
+        renderPage('/settings/ai/skills/42');
 
         screen.getByLabelText('Back to skills').click();
 
-        expect(navigateMock).toHaveBeenCalledWith('/embedded/settings/ai/skills');
+        expect(navigateMock).toHaveBeenCalledWith('/settings/ai/skills');
     });
 
     it('refreshes the skill queries after a copilot turn', () => {

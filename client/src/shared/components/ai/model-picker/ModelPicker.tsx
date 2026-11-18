@@ -10,13 +10,12 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {useAiProviderCatalogQuery} from '@/shared/middleware/graphql';
+import {AI_PROVIDERS_SETTINGS_PATH} from '@/shared/navigation/settingsPaths';
 import {BotIcon, BrainCircuitIcon, ChevronDownIcon, PlusIcon, SettingsIcon, WorkflowIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
-
-const AI_PROVIDERS_SETTINGS_PATH = '/automation/settings/ai-providers';
 
 export interface ModelPickerPersonalAgentI {
     id: number;

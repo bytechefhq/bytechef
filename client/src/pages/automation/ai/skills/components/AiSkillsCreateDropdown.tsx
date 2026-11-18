@@ -7,14 +7,14 @@ import {
 } from '@/components/DropdownMenu/DropdownMenu';
 import AiSkillUploadDialog from '@/pages/automation/ai/skills/components/AiSkillUploadDialog';
 import AiSkillWriteDialog from '@/pages/automation/ai/skills/components/AiSkillWriteDialog';
-import getAiSkillsBasePath from '@/pages/automation/ai/skills/utils/getAiSkillsBasePath';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {AI_SKILLS_SETTINGS_PATH} from '@/shared/navigation/settingsPaths';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ChevronDownIcon, PencilIcon, SparklesIcon, UploadIcon} from 'lucide-react';
 import {ReactNode, useState} from 'react';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
 interface AiSkillsCreateDropdownProps {
     trigger?: ReactNode;
@@ -29,12 +29,11 @@ const AiSkillsCreateDropdown = ({trigger}: AiSkillsCreateDropdownProps = {}) => 
     const copilotEnabled = useApplicationInfoStore((state) => state.ai.copilot.enabled);
     const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
 
-    const location = useLocation();
     const navigate = useNavigate();
 
     const handleCreated = (createdSkillId: string | null) => {
         if (createdSkillId) {
-            void navigate(`${getAiSkillsBasePath(location.pathname)}/${createdSkillId}`);
+            void navigate(`${AI_SKILLS_SETTINGS_PATH}/${createdSkillId}`);
         }
     };
 

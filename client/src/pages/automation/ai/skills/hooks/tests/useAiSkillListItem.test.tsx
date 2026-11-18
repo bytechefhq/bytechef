@@ -24,7 +24,7 @@ const skill = {id: '7', name: 'billing-runbook'} as AiSkill;
 
 const renderListItem = (
     overrides: Partial<Parameters<typeof useAiSkillListItem>[0]> = {},
-    pathname = '/automation/settings/ai/skills'
+    pathname = '/settings/ai/skills'
 ) => {
     const deleteSkill = vi.fn().mockResolvedValue(undefined);
     const onDownload = vi.fn();
@@ -52,15 +52,15 @@ describe('useAiSkillListItem', () => {
         act(() => result.current.handleClick());
 
         expect(openSkillDetailMock).toHaveBeenCalledWith('7', 'billing-runbook');
-        expect(navigateMock).toHaveBeenCalledWith('/automation/settings/ai/skills/7');
+        expect(navigateMock).toHaveBeenCalledWith('/settings/ai/skills/7');
     });
 
-    it('keeps an embedded visitor on the embedded mount', () => {
-        const {result} = renderListItem({}, '/embedded/settings/ai/skills');
+    it('opens a skill under Organization settings from outside the settings pages', () => {
+        const {result} = renderListItem({}, '/automation/projects/7');
 
         act(() => result.current.handleClick());
 
-        expect(navigateMock).toHaveBeenCalledWith('/embedded/settings/ai/skills/7');
+        expect(navigateMock).toHaveBeenCalledWith('/settings/ai/skills/7');
     });
 
     it('closes the delete dialog once the skill is gone', async () => {

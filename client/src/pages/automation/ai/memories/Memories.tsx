@@ -11,7 +11,7 @@ import EmptyList from '@/components/EmptyList';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
 import {Input} from '@/components/ui/input';
-import {DEFAULT_WORKSPACE_ID, useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {MEMORIES_DOCUMENTATION_URL} from '@/pages/settings/settingsDocumentationUrls';
 import FilterBadges from '@/shared/components/filters/FilterBadges';
 import FilterMenu, {type FilterGroupI, hasActiveFilters} from '@/shared/components/filters/FilterMenu';
@@ -22,7 +22,6 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {formatDistanceToNow} from 'date-fns';
 import {BrainIcon, EllipsisVerticalIcon, PencilIcon, SearchIcon, Trash2Icon, TriangleAlertIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
-import {useLocation} from 'react-router-dom';
 
 import MemoryDeleteDialog from './dialogs/MemoryDeleteDialog';
 import MemoryDetailDialog from './dialogs/MemoryDetailDialog';
@@ -185,15 +184,11 @@ const Memories = () => {
 
     const isAdmin = useIsTenantAdmin();
 
-    const {pathname} = useLocation();
-
-    const memoriesWorkspaceId = pathname.startsWith('/embedded/') ? DEFAULT_WORKSPACE_ID : currentWorkspaceId;
-
     const {
         data: principals,
         isError: isPrincipalsError,
         refetch: refetchPrincipals,
-    } = useAiAutoMemoryPrincipalsQuery(memoriesWorkspaceId, currentEnvironmentId);
+    } = useAiAutoMemoryPrincipalsQuery(currentWorkspaceId, currentEnvironmentId);
 
     const memoryType = activeFilter === 'ALL' ? undefined : activeFilter;
 
@@ -206,7 +201,7 @@ const Memories = () => {
         isLoading,
         refetch: refetchMemories,
     } = useAiAutoMemoriesQuery(
-        memoriesWorkspaceId,
+        currentWorkspaceId,
         currentEnvironmentId,
         memoryType,
         selectedPrincipal?.principalType,
@@ -403,7 +398,7 @@ const Memories = () => {
                 memory={viewTarget}
                 onClose={() => setViewTargetId(null)}
                 open={viewTarget !== null}
-                workspaceId={memoriesWorkspaceId}
+                workspaceId={currentWorkspaceId}
             />
 
             <MemoryEditDialog
@@ -411,7 +406,7 @@ const Memories = () => {
                 memory={editTarget}
                 onClose={() => setEditTargetId(null)}
                 open={editTargetId !== null}
-                workspaceId={memoriesWorkspaceId}
+                workspaceId={currentWorkspaceId}
             />
 
             <MemoryDeleteDialog
@@ -419,7 +414,7 @@ const Memories = () => {
                 memory={deleteTarget}
                 onClose={() => setDeleteTargetId(null)}
                 open={deleteTarget !== null}
-                workspaceId={memoriesWorkspaceId}
+                workspaceId={currentWorkspaceId}
             />
         </LayoutContainer>
     );

@@ -679,10 +679,10 @@ describe('Memories page', () => {
         expect(mockUseMemoriesQuery.mock.calls.at(-1)?.[0]).toBe(7);
     });
 
-    it('lists the default workspace memories, where embedded agents store them, under Embedded', () => {
+    it('lists the selected workspace memories whatever the URL prefix', () => {
         renderAt('/embedded/settings/ai/memories');
 
-        expect(mockUsePrincipalsQuery).toHaveBeenLastCalledWith(1049, 0);
-        expect(mockUseMemoriesQuery.mock.calls.at(-1)?.[0]).toBe(1049);
+        expect(mockUsePrincipalsQuery).toHaveBeenLastCalledWith(7, 0);
+        expect(mockUseMemoriesQuery.mock.calls.at(-1)?.[0]).toBe(7);
     });
 });

@@ -1,12 +1,12 @@
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
-import getAiSkillsBasePath from '@/pages/automation/ai/skills/utils/getAiSkillsBasePath';
 import invalidateSkillQueries from '@/pages/automation/ai/skills/utils/invalidateSkillQueries';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
+import {AI_SKILLS_SETTINGS_PATH} from '@/shared/navigation/settingsPaths';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useEffect} from 'react';
-import {useLocation, useNavigate, useParams} from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 
 type AiSkillsRouteType = 'detail' | 'list';
 
@@ -25,7 +25,6 @@ export default function useAiSkills() {
 
     const {skillId} = useParams<{skillId?: string}>();
 
-    const location = useLocation();
     const navigate = useNavigate();
 
     const queryClient = useQueryClient();
@@ -39,9 +38,7 @@ export default function useAiSkills() {
     const showToolbar = route === 'list';
     const showSearchAndCreate = skillsView !== 'empty';
 
-    const skillsBasePath = getAiSkillsBasePath(location.pathname);
-
-    const handleBack = useCallback(() => navigate(skillsBasePath), [navigate, skillsBasePath]);
+    const handleBack = useCallback(() => navigate(AI_SKILLS_SETTINGS_PATH), [navigate]);
 
     useEffect(() => {
         return registerPostTurn(Source.SKILLS, () => {

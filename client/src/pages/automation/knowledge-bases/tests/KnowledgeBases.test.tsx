@@ -336,7 +336,7 @@ describe('KnowledgeBases embedding gate', () => {
 
         await userEvent.click(screen.getByText('Go to AI Providers'));
 
-        expect(hoisted.navigate).toHaveBeenCalledWith('/automation/settings/ai-providers');
+        expect(hoisted.navigate).toHaveBeenCalledWith('/settings/ai-providers');
         expect(screen.queryByTestId('knowledge-base-list')).not.toBeInTheDocument();
         expect(screen.queryByTestId('empty-list')).not.toBeInTheDocument();
         expect(screen.queryByTestId('filter-title')).not.toBeInTheDocument();

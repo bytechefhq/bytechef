@@ -2,6 +2,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {AI_SKILLS_SETTINGS_PATH} from '@/shared/navigation/settingsPaths';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {NodeDataType} from '@/shared/types';
@@ -190,7 +191,7 @@ const ClusterFrameShell = ({children, data, nodeId, nodeMenu}: ClusterFrameShell
                                     <a
                                         aria-label="Manage AI Skills"
                                         className={twMerge(HEADER_BUTTON_CLASSNAME, 'relative')}
-                                        href="/automation/settings/ai/skills"
+                                        href={AI_SKILLS_SETTINGS_PATH}
                                         rel="noreferrer"
                                         target="_blank"
                                     >
