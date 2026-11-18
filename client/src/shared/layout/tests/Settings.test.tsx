@@ -3,7 +3,7 @@ import {ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import Settings, {SettingsNavItemI} from './Settings';
+import Settings, {SettingsNavItemI} from '../Settings';
 
 const hoisted = vi.hoisted(() => ({
     enabledFeatureFlags: [] as string[],

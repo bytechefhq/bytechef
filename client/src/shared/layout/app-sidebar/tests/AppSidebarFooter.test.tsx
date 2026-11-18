@@ -4,7 +4,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {AppSidebarFooter} from './AppSidebarFooter';
+import {AppSidebarFooter} from '../AppSidebarFooter';
 
 const DOCS = {
     changelogUrl: 'https://changelog.example.com',

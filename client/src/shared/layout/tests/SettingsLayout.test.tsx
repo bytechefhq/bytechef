@@ -4,7 +4,7 @@ import {ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import SettingsLayout from './SettingsLayout';
+import SettingsLayout from '../SettingsLayout';
 
 vi.mock('@/shared/layout/Header', () => ({
     default: () => null,

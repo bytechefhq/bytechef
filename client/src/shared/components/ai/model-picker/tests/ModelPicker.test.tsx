@@ -1,7 +1,7 @@
 import {render, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import ModelPicker from './ModelPicker';
+import ModelPicker from '../ModelPicker';
 
 const {navigateMock, useAiProviderCatalogQueryMock} = vi.hoisted(() => ({
     navigateMock: vi.fn(),

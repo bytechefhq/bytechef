@@ -1,8 +1,8 @@
 import {PlatformType} from '@/pages/home/stores/usePlatformTypeStore';
 import {describe, expect, it} from 'vitest';
 
-import {SettingsNavItemI} from './Settings';
-import {getSettingsNavItems} from './settingsNavItems';
+import {SettingsNavItemI} from '../Settings';
+import {getSettingsNavItems} from '../settingsNavItems';
 
 const flattenHrefs = (navItems: SettingsNavItemI[]): string[] =>
     navItems.flatMap((navItem) => (navItem.items ? flattenHrefs(navItem.items) : navItem.href ? [navItem.href] : []));
