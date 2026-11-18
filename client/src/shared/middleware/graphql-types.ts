@@ -1325,10 +1325,18 @@ export type DynamicPropertiesProperty = Property & {
   type: PropertyType;
 };
 
-/** A memory an Embedded integration's agent saved for one connected user's integration instance. */
+/**
+ * A memory an Embedded agent saved for one connected user: in an integration instance (principalType
+ * INTEGRATION_INSTANCE) or in an automation deployment (principalType PROJECT_DEPLOYMENT).
+ */
 export type EmbeddedAiAutoMemory = {
   __typename?: 'EmbeddedAiAutoMemory';
-  /** Null when the instance's connected user was deleted while its memories remain. */
+  /**
+   * The automation the connected user enabled, for an automation memory. Null for an integration memory, and for a
+   * memory of the connected user's own workflows, which run in their own deployment.
+   */
+  automation?: Maybe<EmbeddedAiAutoMemoryAutomation>;
+  /** Null when the owner's connected user was deleted while its memories remain. */
   connectedUser?: Maybe<EmbeddedAiAutoMemoryConnectedUserRef>;
   content: Scalars['String']['output'];
   createdAt?: Maybe<Scalars['Long']['output']>;
@@ -1336,15 +1344,24 @@ export type EmbeddedAiAutoMemory = {
   /** The Environment ordinal the memory belongs to. */
   environmentId: Scalars['Long']['output'];
   id: Scalars['ID']['output'];
-  /** Null when the instance's integration was deleted while its memories remain. */
+  /** An integration instance's integration. Null for an automation memory, or when the integration was deleted. */
   integration?: Maybe<EmbeddedAiAutoMemoryIntegration>;
-  integrationInstanceId: Scalars['Long']['output'];
   memoryType: AiAutoMemoryType;
   name: Scalars['String']['output'];
+  /** The integration instance or project deployment that holds the memory. */
+  principalId: Scalars['Long']['output'];
+  /** INTEGRATION_INSTANCE or PROJECT_DEPLOYMENT. Send it back with principalId to update or delete the memory. */
+  principalType: AiAutoMemoryPrincipalType;
   title: Scalars['String']['output'];
   updatedAt?: Maybe<Scalars['Long']['output']>;
   /** Changes on every write. Send it back as UpdateEmbeddedAiAutoMemoryInput.expectedVersion. */
   version: Scalars['Long']['output'];
+};
+
+export type EmbeddedAiAutoMemoryAutomation = {
+  __typename?: 'EmbeddedAiAutoMemoryAutomation';
+  id: Scalars['ID']['output'];
+  name?: Maybe<Scalars['String']['output']>;
 };
 
 /** A connected user holding at least one memory in the environment, for the Connected User filter. */
@@ -2122,8 +2139,8 @@ export type Mutation = {
   deleteCustomComponent: Scalars['Boolean']['output'];
   deleteDataTableRow: Scalars['Boolean']['output'];
   /**
-   * Deletes an integration instance's memory. Fails with NOT_FOUND when the instance holds no such memory in the
-   * environment. Admin only.
+   * Deletes an Embedded memory. Fails with NOT_FOUND when the owner holds no such memory in the environment or is not
+   * an Embedded owner. Admin only.
    */
   deleteEmbeddedAiAutoMemory: Scalars['Boolean']['output'];
   deleteEmbeddedMcpComponent?: Maybe<Scalars['Boolean']['output']>;
@@ -2232,8 +2249,8 @@ export type Mutation = {
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
   /**
-   * Partial update of an integration instance's memory. Fails with NOT_FOUND when the instance holds no such memory in
-   * the environment, and with CONFLICT when it changed since expectedVersion. Admin only.
+   * Partial update of an Embedded memory. Fails with NOT_FOUND when the owner holds no such memory in the environment
+   * or is not an Embedded owner, and with CONFLICT when it changed since expectedVersion. Admin only.
    */
   updateEmbeddedAiAutoMemory: EmbeddedAiAutoMemory;
   updateEmbeddedMcpComponent?: Maybe<McpComponent>;
@@ -2585,7 +2602,8 @@ export type MutationDeleteDataTableRowArgs = {
 export type MutationDeleteEmbeddedAiAutoMemoryArgs = {
   environment: Scalars['Int']['input'];
   id: Scalars['ID']['input'];
-  integrationInstanceId: Scalars['ID']['input'];
+  principalId: Scalars['ID']['input'];
+  principalType: AiAutoMemoryPrincipalType;
 };
 
 
@@ -3771,7 +3789,7 @@ export type Query = {
   editorJobFileLogsExist: Scalars['Boolean']['output'];
   editorTaskExecutionFileLogs: Array<LogEntry>;
   /**
-   * Lists the memories of every Embedded integration instance in the environment (the Environment ordinal: 0
+   * Lists the memories of every Embedded integration instance and automation deployment in the environment (the Environment ordinal: 0
    * DEVELOPMENT, 1 STAGING, 2 PRODUCTION). connectedUserId and memoryType narrow the list. Admin only.
    */
   embeddedAiAutoMemories: Array<EmbeddedAiAutoMemory>;
@@ -5183,9 +5201,11 @@ export type UpdateEmbeddedAiAutoMemoryInput = {
   environment: Scalars['Int']['input'];
   expectedVersion: Scalars['Long']['input'];
   id: Scalars['ID']['input'];
-  /** The integration instance that holds the memory: the memory's integrationInstanceId. */
-  integrationInstanceId: Scalars['ID']['input'];
   memoryType?: InputMaybe<AiAutoMemoryType>;
+  /** The memory's principalId. */
+  principalId: Scalars['ID']['input'];
+  /** The memory's principalType. */
+  principalType: AiAutoMemoryPrincipalType;
   title?: InputMaybe<Scalars['String']['input']>;
 };
 

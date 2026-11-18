@@ -1250,7 +1250,8 @@ export type AutomationSearchQuery = { automationSearch: Array<
 
 export type DeleteEmbeddedAiAutoMemoryMutationVariables = Exact<{
   id: string | number;
-  integrationInstanceId: string | number;
+  principalType: Types.AiAutoMemoryPrincipalType;
+  principalId: string | number;
   environment: number;
 }>;
 
@@ -1264,7 +1265,7 @@ export type EmbeddedAiAutoMemoriesQueryVariables = Exact<{
 }>;
 
 
-export type EmbeddedAiAutoMemoriesQuery = { embeddedAiAutoMemories: Array<{ id: string, name: string, title: string, description: string | null, memoryType: Types.AiAutoMemoryType, content: string, environmentId: any, version: any, createdAt: any, updatedAt: any, integrationInstanceId: any, connectedUser: { id: string, name: string | null, email: string | null, externalId: string } | null, integration: { id: string, name: string | null, componentName: string | null } | null }> };
+export type EmbeddedAiAutoMemoriesQuery = { embeddedAiAutoMemories: Array<{ id: string, name: string, title: string, description: string | null, memoryType: Types.AiAutoMemoryType, content: string, environmentId: any, version: any, createdAt: any, updatedAt: any, principalType: Types.AiAutoMemoryPrincipalType, principalId: any, connectedUser: { id: string, name: string | null, email: string | null, externalId: string } | null, integration: { id: string, name: string | null, componentName: string | null } | null, automation: { id: string, name: string | null } | null }> };
 
 export type EmbeddedAiAutoMemoryConnectedUsersQueryVariables = Exact<{
   environment: number;
@@ -7281,10 +7282,11 @@ export const useAutomationSearchQuery = <
     )};
 
 export const DeleteEmbeddedAiAutoMemoryDocument = new TypedDocumentString(`
-    mutation deleteEmbeddedAiAutoMemory($id: ID!, $integrationInstanceId: ID!, $environment: Int!) {
+    mutation deleteEmbeddedAiAutoMemory($id: ID!, $principalType: AiAutoMemoryPrincipalType!, $principalId: ID!, $environment: Int!) {
   deleteEmbeddedAiAutoMemory(
     id: $id
-    integrationInstanceId: $integrationInstanceId
+    principalType: $principalType
+    principalId: $principalId
     environment: $environment
   )
 }
@@ -7320,7 +7322,8 @@ export const EmbeddedAiAutoMemoriesDocument = new TypedDocumentString(`
     version
     createdAt
     updatedAt
-    integrationInstanceId
+    principalType
+    principalId
     connectedUser {
       id
       name
@@ -7331,6 +7334,10 @@ export const EmbeddedAiAutoMemoriesDocument = new TypedDocumentString(`
       id
       name
       componentName
+    }
+    automation {
+      id
+      name
     }
   }
 }
