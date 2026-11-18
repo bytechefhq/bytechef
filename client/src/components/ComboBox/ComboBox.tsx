@@ -9,6 +9,7 @@ import {Popover as PopoverPrimitive} from 'radix-ui';
 import {FC, FocusEventHandler, ReactNode, useLayoutEffect, useRef, useState} from 'react';
 
 export type ComboBoxItemType = {
+    group?: string;
     icon?: string;
     label: string | ReactNode;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -27,6 +28,7 @@ export interface ComboBoxProps {
     onChange?: (item?: ComboBoxItemType) => void;
     onOpen?: () => void;
     onSearchChange?: (search: string) => void;
+    placeholder?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     value?: any;
 }
@@ -73,6 +75,7 @@ const ComboBox: FC<ComboBoxProps> = ({
     onChange,
     onOpen,
     onSearchChange,
+    placeholder = 'Select...',
     value,
 }: ComboBoxProps) => {
     const [open, setOpen] = useState(false);
@@ -89,7 +92,7 @@ const ComboBox: FC<ComboBoxProps> = ({
         }
     };
 
-    const commandItems = items.map((comboBoxItem) => (
+    const renderCommandItem = (comboBoxItem: ComboBoxItemType) => (
         <ComboBoxCommandItem
             key={comboBoxItem.value}
             onSelect={() => {
@@ -108,7 +111,19 @@ const ComboBox: FC<ComboBoxProps> = ({
 
             <CheckIcon className={cn('ml-auto size-4', comboBoxItem.value === value ? 'opacity-100' : 'opacity-0')} />
         </ComboBoxCommandItem>
-    ));
+    );
+
+    const itemGroups = items.reduce<{group?: string; items: ComboBoxItemType[]}[]>((groups, comboBoxItem) => {
+        const itemGroup = groups.find((group) => group.group === comboBoxItem.group);
+
+        if (itemGroup) {
+            itemGroup.items.push(comboBoxItem);
+        } else {
+            groups.push({group: comboBoxItem.group, items: [comboBoxItem]});
+        }
+
+        return groups;
+    }, []);
 
     const item = items.find((item) => item.value === value);
 
@@ -131,7 +146,7 @@ const ComboBox: FC<ComboBoxProps> = ({
                             {item?.label}
                         </span>
                     ) : (
-                        'Select...'
+                        placeholder
                     )}
 
                     <ChevronsUpDownIcon className="ml-2 size-4 shrink-0 opacity-50" />
@@ -153,7 +168,11 @@ const ComboBox: FC<ComboBoxProps> = ({
                         <CommandList>
                             <CommandEmpty>{emptyMessage ?? 'No item found.'}</CommandEmpty>
 
-                            <CommandGroup>{commandItems}</CommandGroup>
+                            {itemGroups.map((itemGroup) => (
+                                <CommandGroup heading={itemGroup.group} key={itemGroup.group ?? ''}>
+                                    {itemGroup.items.map(renderCommandItem)}
+                                </CommandGroup>
+                            ))}
                         </CommandList>
                     </Command>
                 </PopoverPrimitive.Content>
