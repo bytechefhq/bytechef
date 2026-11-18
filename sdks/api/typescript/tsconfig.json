@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "declaration": true,
+        "lib": ["dom", "esnext"],
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "outDir": "dist",
+        "rootDir": "src",
+        "skipLibCheck": true,
+        "strict": true,
+        "target": "es2020"
+    },
+    "include": ["src"]
+}
