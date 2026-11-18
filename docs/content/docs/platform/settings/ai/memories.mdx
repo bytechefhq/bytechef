@@ -16,7 +16,7 @@ Agents create memory entries. This page has no button to create one. Use it to r
 | | Where it happens | Who acts |
 |---|---|---|
 | **Writing a memory** | An agent calls the [Auto Memory tool](/platform/automation/build/workflows/ai/agent/agent-utils#auto-memory) mid-run | The agent, automatically |
-| **Managing memories** | The Memories page (**Settings → AI → Memories**, `/automation/settings/ai/memories`) | You |
+| **Managing memories** | The Memories page (**Settings → Current Workspace → Memories**, `/automation/settings/ai/memories`) | You |
 
 Auto Memory complements chat memory: chat memory replays the *current* conversation, while Auto Memory persists facts across *all* future conversations of the same scope. See [Chat memory vs Auto Memory](/platform/automation/build/workflows/ai/agent#chat-memory-vs-auto-memory) for the distinction.
 
@@ -26,7 +26,7 @@ The agent sets each entry's name when it first stores the memory, and the name c
 
 ## Accessing Memories
 
-Memories live under **Settings → AI → Memories**, alongside **Providers** and [Skills](skills) in the **AI** group of the settings navigation. The page opens at `/automation/settings/ai/memories`; the older `/automation/ai/memories` address redirects there.
+Memories live in the Automation settings under **Settings → Current Workspace → Memories**, because they belong to the current workspace rather than to the whole organization. The page opens at `/automation/settings/ai/memories`; the older `/automation/ai/memories` and `/embedded/settings/ai/memories` addresses redirect there.
 
 The page has no left sidebar of its own. Its header shows the title **AI Memories** with the description "Facts the agent has stored while working in this workspace.", and on the right:
 
