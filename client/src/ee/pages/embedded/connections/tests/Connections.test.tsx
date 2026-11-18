@@ -11,6 +11,7 @@ const hoisted = vi.hoisted(() => ({
     adminConnections: [] as Connection[],
     connectedUser: undefined as {environmentId: number; externalId: string; id: number; name: string} | undefined,
     connectedUserConnections: [] as Connection[],
+    connectedUserConnectionsError: null as Error | null,
     connectedUserIsLoading: false,
     useGetAllConnectedUserConnectionsQuery: vi.fn(),
     useGetConnectionsQuery: vi.fn(),
@@ -23,7 +24,7 @@ vi.mock('@/ee/shared/queries/embedded/connections.queries', () => ({
 
         return {
             data: enabled ? hoisted.connectedUserConnections : undefined,
-            error: null,
+            error: enabled ? hoisted.connectedUserConnectionsError : null,
             isLoading: false,
         };
     },
@@ -124,6 +125,7 @@ describe('Connections', () => {
         hoisted.adminConnections = [createConnection(1, 'slack')];
         hoisted.connectedUser = {environmentId: 1, externalId: 'acme-1', id: 42, name: 'Acme Corp'};
         hoisted.connectedUserIsLoading = false;
+        hoisted.connectedUserConnectionsError = null;
         hoisted.connectedUserConnections = [
             createConnection(10, 'gmail', [3]),
             createConnection(11, 'gmail'),
@@ -201,9 +203,35 @@ describe('Connections', () => {
 
         renderPage('/?connectedUserId=42');
 
+        expect(screen.getByText('No Matching Connections')).toBeInTheDocument();
         expect(screen.queryByText('Create your first connection')).not.toBeInTheDocument();
         expect(screen.queryByTestId('connection-list')).not.toBeInTheDocument();
         expect(screen.getByTestId('connected-user-filter-nav')).toBeInTheDocument();
+    });
+
+    it("shows an error instead of an empty list when the connected user's connections cannot be loaded", () => {
+        hoisted.connectedUserConnectionsError = new Error('boom');
+
+        renderPage('/?connectedUserId=42');
+
+        expect(screen.getByText('Some error occurred.')).toBeInTheDocument();
+        expect(screen.queryByText('No Matching Connections')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('connection-list')).not.toBeInTheDocument();
+    });
+
+    it('lists the admin connections and drops a connected user id that is not a number', async () => {
+        renderPage('/?connectedUserId=abc');
+
+        expect(screen.getByText('Connection 1')).toBeInTheDocument();
+        expect(screen.getByTestId('connection-list')).toHaveAttribute('data-connected-user-id', '');
+        expect(hoisted.useGetAllConnectedUserConnectionsQuery).not.toHaveBeenCalledWith(expect.anything(), true);
+
+        await waitFor(
+            () => {
+                expect(screen.getByTestId('location-search')).not.toHaveTextContent('connectedUserId');
+            },
+            {interval: 5, timeout: 5000}
+        );
     });
 
     it('drops the connected user when the environment changes', async () => {

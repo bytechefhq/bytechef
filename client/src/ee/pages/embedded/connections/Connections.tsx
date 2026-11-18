@@ -53,7 +53,12 @@ export const Connections = () => {
     const tagId = searchParams.get('tagId');
     const connectedUserIdParam = searchParams.get('connectedUserId');
 
-    const connectedUserId = connectedUserIdParam ? parseInt(connectedUserIdParam) : undefined;
+    const parsedConnectedUserId = connectedUserIdParam !== null ? Number(connectedUserIdParam) : undefined;
+
+    const connectedUserIdInvalid =
+        parsedConnectedUserId !== undefined && !(Number.isInteger(parsedConnectedUserId) && parsedConnectedUserId > 0);
+
+    const connectedUserId = connectedUserIdInvalid ? undefined : parsedConnectedUserId;
 
     const connectedUserView = connectedUserId !== undefined;
 
@@ -137,6 +142,8 @@ export const Connections = () => {
     const connectedUserInOtherEnvironment =
         connectedUser !== undefined && connectedUser.environmentId !== currentEnvironmentId;
 
+    const dropConnectedUserParam = connectedUserIdInvalid || (connectedUserView && connectedUserInOtherEnvironment);
+
     const connectedUserReady = connectedUser !== undefined && !connectedUserInOtherEnvironment;
 
     const visibleConnections = connectedUserView
@@ -168,7 +175,7 @@ export const Connections = () => {
         );
 
     useEffect(() => {
-        if (!connectedUserInOtherEnvironment) {
+        if (!dropConnectedUserParam) {
             return;
         }
 
@@ -177,7 +184,7 @@ export const Connections = () => {
         nextSearchParams.delete('connectedUserId');
 
         setSearchParams(nextSearchParams, {replace: true});
-    }, [connectedUserInOtherEnvironment, searchParams, setSearchParams]);
+    }, [dropConnectedUserParam, searchParams, setSearchParams]);
 
     return (
         <LayoutContainer
