@@ -318,8 +318,14 @@ bytechef:
     # Task runner allowlist. A runner absent from this map is disabled, which is the intended default for the
     # out-of-process runners but not for GraalVM, the in-process runner every script action falls back to.
     runners:
+      aws-batch:
+        # Enterprise. Runs script and commands tasks as AWS Batch jobs in the account the task's aws connection names.
+        enabled: false
       graalvm:
         enabled: true
+      kubernetes:
+        # Enterprise. Runs script and commands tasks as pods on the cluster the task's kubernetes connection names.
+        enabled: false
     # Ceilings on what a remote task runner may cost this server: a held worker permit, captured log bytes, and
     # bytes moved in or out of the execution. A runner may override them under its own properties.
     runner-limits:
