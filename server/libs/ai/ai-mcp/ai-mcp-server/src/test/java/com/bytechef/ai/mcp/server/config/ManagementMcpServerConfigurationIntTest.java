@@ -365,7 +365,7 @@ class ManagementMcpServerConfigurationIntTest {
         void testQueryDataTableResultCarriesTheRowsForTheViewer() {
             when(workspaceFacade.getMyWorkspaces()).thenReturn(List.of(new Workspace(42L, "Workspace 42")));
             when(workspaceDataTableFacade.listTables(42L, 0L)).thenReturn(
-                List.of(new DataTableInfo(7L, "leads", null, List.of(), Instant.EPOCH)));
+                List.of(new DataTableInfo(7L, "leads", null, null, List.of(), Instant.EPOCH)));
             when(workspaceDataTableFacade.listRows(7L, 50, 0, 0L)).thenReturn(
                 List.of(new DataTableRow(1L, Map.of("name", "Ada"))));
 
