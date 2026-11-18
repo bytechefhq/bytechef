@@ -4,6 +4,7 @@
   "description": "Integrations, workflows, connections, and the component kit.",
   "pages": [
     "integrations",
+    "code-integrations",
     "integration-marketplace",
     "workflows",
     "automations",
