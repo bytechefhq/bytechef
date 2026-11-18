@@ -99,6 +99,7 @@ const IntegrationDialog = ({integration, onClose, onSuccess, triggerNode}: Integ
         void queryClient.invalidateQueries({
             queryKey: IntegrationTagKeys.integrationTags,
         });
+        void queryClient.invalidateQueries({queryKey: ['integrationCodeWorkflowSource']});
 
         if (onSuccess) {
             onSuccess(integrationId);

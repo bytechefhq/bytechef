@@ -1,5 +1,5 @@
 import Switch from '@/components/Switch/Switch';
-import {ConnectedUserProjectWorkflow} from '@/ee/shared/middleware/embedded/public';
+import {ConnectedUserProjectWorkflow} from '@bytechef/embedded-api';
 
 interface AutomationAiAgentsSwitchProps {
     automation: ConnectedUserProjectWorkflow;

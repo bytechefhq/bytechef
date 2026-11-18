@@ -1,0 +1,3 @@
+mutation updateIntegrationCodeWorkflowSource($integrationId: ID!, $content: String!) {
+    updateIntegrationCodeWorkflowSource(integrationId: $integrationId, content: $content)
+}

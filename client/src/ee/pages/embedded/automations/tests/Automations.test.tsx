@@ -33,12 +33,15 @@ const hoisted = vi.hoisted(() => {
             projectVersion: number;
             workflows: Array<{enabled: boolean; label: string | null; workflowUuid: string}>;
         }>,
+        createCodeWorkflowMutate: vi.fn(),
         createProjectMutate: vi.fn(),
         createWorkflowMutate: vi.fn(),
         deleteProjectMutate: vi.fn(),
         deleteWorkflowMutate: vi.fn(),
         navigateMock: vi.fn(),
         projects: [] as Array<{
+            codeWorkflowLanguage?: string;
+            codeWorkflowProject?: boolean;
             categoryId: string | null;
             description: string | null;
             id: string;
@@ -70,6 +73,7 @@ vi.mock('@/shared/queries/platform/environments.queries', () => ({
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
+    CodeWorkflowLanguage: {Java: 'JAVA', Javascript: 'JAVASCRIPT', Python: 'PYTHON'},
     useAutomationProjectCategoriesQuery: () => ({
         data: {automationProjectCategories: hoisted.categories},
         error: null,
@@ -88,6 +92,10 @@ vi.mock('@/shared/middleware/graphql', () => ({
         data: {automationProjects: hoisted.projects},
         error: null,
         isLoading: false,
+    }),
+    useCreateAutomationProjectCodeWorkflowMutation: () => ({
+        isPending: false,
+        mutate: hoisted.createCodeWorkflowMutate,
     }),
     useCreateAutomationProjectMutation: () => ({
         isPending: false,
@@ -168,6 +176,7 @@ beforeEach(() => {
     hoisted.categories = [];
     hoisted.categoriesIsLoading = false;
     hoisted.configurations = [];
+    hoisted.createCodeWorkflowMutate.mockReset();
     hoisted.createProjectMutate.mockReset();
     hoisted.createWorkflowMutate.mockReset();
     hoisted.deleteProjectMutate.mockReset();
@@ -342,6 +351,70 @@ describe('Automations', () => {
 
         expect(await screen.findByPlaceholderText('My CRM Project')).toBeInTheDocument();
         expect(screen.getByText('Use this to create a project which will contain workflows')).toBeInTheDocument();
+    });
+
+    it('lists New Project, New Code Project and Import Code Project in the create menu', async () => {
+        const user = userEvent.setup();
+
+        hoisted.projects = [];
+
+        renderWithProviders(<Automations />);
+
+        await user.click(screen.getByRole('button', {name: /more project options/i}));
+
+        const menuItems = await screen.findAllByRole('menuitem');
+
+        expect(menuItems.map((menuItem) => menuItem.textContent)).toEqual([
+            'New Project',
+            'New Code Project',
+            'Import Code Project',
+        ]);
+    });
+
+    it('creates a code project from the New Code Project menu item and opens its editor', async () => {
+        const user = userEvent.setup();
+
+        hoisted.projects = [];
+        hoisted.createCodeWorkflowMutate.mockImplementation((_variables, options) =>
+            options?.onSuccess?.({createAutomationProjectCodeWorkflow: '7'})
+        );
+
+        renderWithProviders(<Automations />);
+
+        await user.click(screen.getByRole('button', {name: /more project options/i}));
+        await user.click(await screen.findByRole('menuitem', {name: 'New Code Project'}));
+        await user.type(await screen.findByPlaceholderText('My CRM Project'), 'orders');
+        await user.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() =>
+            expect(hoisted.navigateMock).toHaveBeenCalledWith('/embedded/automations/projects/7/code')
+        );
+    });
+
+    it('opens the project dialog from the New Project menu item', async () => {
+        const user = userEvent.setup();
+
+        hoisted.projects = [];
+
+        renderWithProviders(<Automations />);
+
+        await user.click(screen.getByRole('button', {name: /more project options/i}));
+        await user.click(await screen.findByRole('menuitem', {name: 'New Project'}));
+
+        expect(await screen.findByPlaceholderText('My CRM Project')).toBeInTheDocument();
+    });
+
+    it('opens the import dialog from the Import Code Project menu item', async () => {
+        const user = userEvent.setup();
+
+        hoisted.projects = [];
+
+        renderWithProviders(<Automations />);
+
+        await user.click(screen.getByRole('button', {name: /more project options/i}));
+        await user.click(await screen.findByRole('menuitem', {name: 'Import Code Project'}));
+
+        expect(await screen.findByRole('dialog', {name: 'Import Code Project'})).toBeInTheDocument();
     });
 
     it('calls the create project mutation when the dialog is submitted', async () => {
@@ -615,5 +688,89 @@ describe('Automations', () => {
             expect.anything()
         );
         expect(screen.queryByRole('textbox', {name: /label/i})).not.toBeInTheDocument();
+    });
+
+    it('opens the code editor for a workflow of a code project and the visual editor otherwise', async () => {
+        const user = userEvent.setup();
+
+        hoisted.projects = [
+            {
+                categoryId: null,
+                codeWorkflowLanguage: 'JAVASCRIPT',
+                codeWorkflowProject: true,
+                description: null,
+                id: 'code-project-1',
+                lastPublishedVersion: null,
+                name: 'Code Project',
+                published: false,
+                tagIds: [],
+                workflowTemplates: [
+                    {components: [], description: null, label: 'Code Flow', triggers: [], workflowUuid: 'code-wf-1'},
+                ],
+            },
+            {
+                categoryId: null,
+                codeWorkflowProject: false,
+                description: null,
+                id: 'visual-project-1',
+                lastPublishedVersion: null,
+                name: 'Visual Project',
+                published: false,
+                tagIds: [],
+                workflowTemplates: [
+                    {
+                        components: [],
+                        description: null,
+                        label: 'Visual Flow',
+                        triggers: [],
+                        workflowUuid: 'visual-wf-1',
+                    },
+                ],
+            },
+        ];
+
+        renderWithProviders(<Automations />);
+
+        const [codeProjectWorkflowCount, visualProjectWorkflowCount] = screen.getAllByText('1 workflow');
+
+        await user.click(codeProjectWorkflowCount);
+        await user.click(await screen.findByText('Code Flow'));
+
+        expect(hoisted.navigateMock).toHaveBeenLastCalledWith(
+            '/embedded/automations/projects/code-project-1/code'
+        );
+
+        await user.click(visualProjectWorkflowCount);
+        await user.click(await screen.findByText('Visual Flow'));
+
+        expect(hoisted.navigateMock).toHaveBeenLastCalledWith('/embedded/automations/visual-wf-1/editor');
+    });
+
+    it('opens the visual editor for a workflow of a Java code project', async () => {
+        const user = userEvent.setup();
+
+        hoisted.projects = [
+            {
+                categoryId: null,
+                codeWorkflowLanguage: 'JAVA',
+                codeWorkflowProject: true,
+                description: null,
+                id: 'java-project-1',
+                lastPublishedVersion: null,
+                name: 'Java Project',
+                published: false,
+                tagIds: [],
+                workflowTemplates: [
+                    {components: [], description: null, label: 'Java Flow', triggers: [], workflowUuid: 'java-wf-1'},
+                ],
+            },
+        ];
+
+        renderWithProviders(<Automations />);
+
+        await user.click(screen.getByText('1 workflow'));
+        await user.click(await screen.findByText('Java Flow'));
+
+        expect(hoisted.navigateMock).toHaveBeenLastCalledWith('/embedded/automations/java-wf-1/editor');
     });
 });

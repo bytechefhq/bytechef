@@ -152,6 +152,10 @@ const WorkflowRightSidebar = ({
     const activeItemStyling =
         'bg-surface-brand-secondary text-content-brand-primary hover:bg-surface-brand-secondary-hover hover:text-content-brand-primary';
 
+    if (rightSidebarNavigation.length === 0) {
+        return null;
+    }
+
     return (
         <aside className="absolute right-0 m-2 flex flex-col items-center gap-1 rounded-md border border-stroke-neutral-secondary bg-background p-1">
             {rightSidebarNavigation.map((item) => {

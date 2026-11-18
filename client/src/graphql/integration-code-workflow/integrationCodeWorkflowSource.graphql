@@ -1,0 +1,3 @@
+query integrationCodeWorkflowSource($integrationId: ID!) {
+    integrationCodeWorkflowSource(integrationId: $integrationId)
+}
