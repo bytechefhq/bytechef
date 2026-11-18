@@ -33,7 +33,7 @@ import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 
 import com.bytechef.component.script.cluster.tool.definition.ScriptToolDefinition;
-import com.bytechef.component.script.engine.PolyglotEngine;
+import com.bytechef.platform.component.runner.PolyglotEngine;
 
 /**
  * @author Ivica Cardic
@@ -65,11 +65,11 @@ public class ScriptJavaScriptTool {
                                     //
                                     // connection holds the parameters of each connection defined in the
                                     // Connections panel (bottom right of this editor), keyed by its name:
-                                    // const token = connection["my-connection"].token;
+                                    // const token = connection["my_connection"].token;
                                     //
                                     // Reach another component's action through the context:
                                     // const response = context.component.httpClient.get(
-                                    //     {uri: "https://api.example.com/items"}, "my-connection");
+                                    //     {uri: "https://api.example.com/items"}, "my_connection");
 
                                     return null;
                                 }""")

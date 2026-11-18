@@ -10,9 +10,12 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-polyglot"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-runner:platform-component-runner-api"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-runner:platform-component-runner-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-context:platform-component-context-api"))
 
+    testImplementation(project(":server:libs:config:app-config"))
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
     testImplementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
     testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
