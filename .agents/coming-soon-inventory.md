@@ -23,7 +23,7 @@ Two ways something here is hidden, and the tables below mark both:
 
 Both are reversible and neither deletes anything.
 
-**27 whole-page** (9 hidden) · **31 partial** pages (7 with a commented-out section)
+**29 whole-page** (10 hidden) · **31 partial** pages (7 with a commented-out section)
 
 ---
 
@@ -40,6 +40,7 @@ Both are reversible and neither deletes anything.
 | Testing Voice In The Editor | [`/platform/automation/build/voice/editor-testing`](/platform/automation/build/voice/editor-testing) | — | **hidden** |
 | Voice Quickstart | [`/platform/automation/build/voice/quickstart`](/platform/automation/build/voice/quickstart) | — | **hidden** |
 | Evals | [`/platform/automation/build/workflows/ai/agent/evals`](/platform/automation/build/workflows/ai/agent/evals) | CE | visible |
+| Code Workflows | [`/platform/automation/build/workflows/code-workflows`](/platform/automation/build/workflows/code-workflows) | — | visible |
 | Data Streams | [`/platform/automation/build/workflows/data-streams`](/platform/automation/build/workflows/data-streams) | CE | visible |
 | Error Workflows | [`/platform/automation/build/workflows/error-workflows`](/platform/automation/build/workflows/error-workflows) | CE | visible |
 | Asset Files | [`/platform/automation/data/asset-files`](/platform/automation/data/asset-files) | CE | visible |
@@ -56,6 +57,7 @@ Both are reversible and neither deletes anything.
 | Page | Path | Edition | Sidebar |
 |---|---|---|---|
 | Automation Code Workflows | [`/platform/embedded/build/automations/automation-code-workflows`](/platform/embedded/build/automations/automation-code-workflows) | CE | visible |
+| Code Integrations | [`/platform/embedded/build/code-integrations`](/platform/embedded/build/code-integrations) | — | **hidden** |
 | Unified API | [`/platform/embedded/build/unified-api`](/platform/embedded/build/unified-api) | — | **hidden** |
 
 ### Platform Settings
