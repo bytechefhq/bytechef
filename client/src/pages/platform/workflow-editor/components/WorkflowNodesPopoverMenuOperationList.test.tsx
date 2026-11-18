@@ -86,13 +86,17 @@ const componentDefinitionWithBothActionsAndClusterElements = {
     version: 1,
 } as unknown as ComponentDefinition;
 
-function renderOperationList(clusterElementType?: string, queryClient: QueryClient = new QueryClient()) {
+function renderOperationList(
+    clusterElementType?: string,
+    queryClient: QueryClient = new QueryClient(),
+    componentDefinition: ComponentDefinition = componentDefinitionWithBothActionsAndClusterElements
+) {
     return render(
         (
             <QueryClientProvider client={queryClient}>
                 <WorkflowNodesPopoverMenuOperationList
                     clusterElementType={clusterElementType}
-                    componentDefinition={componentDefinitionWithBothActionsAndClusterElements}
+                    componentDefinition={componentDefinition}
                     setPopoverOpen={vi.fn()}
                     sourceNodeId="placeholder-1"
                 />
@@ -170,5 +174,26 @@ describe('WorkflowNodesPopoverMenuOperationList', () => {
 
         expect(screen.getByText('GPT-4')).toBeInTheDocument();
         expect(screen.queryByText('Create Chat Completion')).not.toBeInTheDocument();
+    });
+
+    it('labels a deprecated action and leaves the others unlabelled', () => {
+        renderOperationList(undefined, new QueryClient(), {
+            actions: [
+                {deprecated: true, description: 'Runs a Bash script', name: 'execute', title: 'Execute'},
+                {deprecated: false, description: 'Lists the files', name: 'list', title: 'List'},
+            ],
+            clusterElement: false,
+            clusterElements: [],
+            clusterRoot: false,
+            icon: '<svg/>',
+            name: 'bash',
+            title: 'Bash',
+            triggers: [],
+            version: 1,
+        } as unknown as ComponentDefinition);
+
+        expect(screen.getAllByText('Deprecated')).toHaveLength(1);
+        expect(screen.getByText('Execute').parentElement).toHaveTextContent('Deprecated');
+        expect(screen.getByText('List').parentElement).not.toHaveTextContent('Deprecated');
     });
 });
