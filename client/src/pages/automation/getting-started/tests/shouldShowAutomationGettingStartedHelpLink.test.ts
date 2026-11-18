@@ -1,7 +1,7 @@
 import {PlatformType} from '@/pages/home/stores/usePlatformTypeStore';
 import {describe, expect, it} from 'vitest';
 
-import shouldShowAutomationGettingStartedHelpLink from './shouldShowAutomationGettingStartedHelpLink';
+import shouldShowAutomationGettingStartedHelpLink from '../shouldShowAutomationGettingStartedHelpLink';
 
 describe('shouldShowAutomationGettingStartedHelpLink', () => {
     it('shows the help link on automation pages for users who can create projects', () => {

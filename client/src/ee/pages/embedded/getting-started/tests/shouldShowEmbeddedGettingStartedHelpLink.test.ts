@@ -3,7 +3,7 @@ import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {EditionType} from '@/shared/stores/useApplicationInfoStore';
 import {describe, expect, it} from 'vitest';
 
-import shouldShowEmbeddedGettingStartedHelpLink from './shouldShowEmbeddedGettingStartedHelpLink';
+import shouldShowEmbeddedGettingStartedHelpLink from '../shouldShowEmbeddedGettingStartedHelpLink';
 
 const STAGING_ENVIRONMENT = 1;
 

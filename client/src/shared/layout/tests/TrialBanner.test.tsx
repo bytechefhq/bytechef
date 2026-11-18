@@ -1,7 +1,7 @@
 import {fireEvent, render, screen} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {TrialBanner} from './TrialBanner';
+import {TrialBanner} from '../TrialBanner';
 
 const hoisted = vi.hoisted(() => ({
     navigate: vi.fn(),
