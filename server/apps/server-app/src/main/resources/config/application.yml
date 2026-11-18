@@ -33,6 +33,7 @@ docs:
 
 github-proxy:
   baseUrl: https://github-proxy.bytechef.io/
+  oauth-apps-api-key: ${GITHUB_PROXY_OAUTH_APPS_API_KEY:}
 
 info:
   ai:
