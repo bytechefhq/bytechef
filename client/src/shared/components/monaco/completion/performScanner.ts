@@ -1,3 +1,5 @@
+import {skipComment} from './sourceScanner';
+
 import type {PerformScopeType, ScriptLanguageType} from './completionTypes';
 
 type BodyKindType = 'braces' | 'expression' | 'indentation' | 'line' | 'ruby';
@@ -200,6 +202,14 @@ function braceBodyContains(source: string, bodyStart: number, cursorOffset: numb
             continue;
         }
 
+        const commentEnd = skipComment(source, index, language);
+
+        if (commentEnd !== undefined) {
+            index = commentEnd - 1;
+
+            continue;
+        }
+
         if (character === '{') {
             depth++;
         } else if (character === '}') {
@@ -230,6 +240,18 @@ function expressionBodyContains(source: string, bodyStart: number, cursorOffset:
             continue;
         }
 
+        const commentEnd = skipComment(source, index, 'javascript');
+
+        if (commentEnd !== undefined) {
+            if (source.slice(index, Math.min(commentEnd, cursorOffset)).includes('\n')) {
+                return false;
+            }
+
+            index = commentEnd - 1;
+
+            continue;
+        }
+
         if (character === '(' || character === '[' || character === '{') {
             depth++;
         } else if (character === ')' || character === ']' || character === '}') {
@@ -253,7 +275,7 @@ function indentationBodyContains(source: string, head: FunctionHeadI, cursorOffs
     for (let index = 1; index < lines.length; index++) {
         const line = lines[index];
 
-        if (!line.trim()) {
+        if (!line.trim() || line.trimStart().startsWith('#')) {
             continue;
         }
 
@@ -267,8 +289,35 @@ function indentationBodyContains(source: string, head: FunctionHeadI, cursorOffs
     return true;
 }
 
+function maskRubyCommentsAndStrings(source: string, bodyStart: number, cursorOffset: number): string {
+    let body = '';
+    let index = bodyStart;
+
+    while (index < cursorOffset) {
+        const character = source.charAt(index);
+        const commentEnd = skipComment(source, index, 'ruby');
+        const segmentEnd =
+            commentEnd ??
+            (character === '"' || character === "'" ? skipString(source, index, cursorOffset) + 1 : undefined);
+
+        if (segmentEnd === undefined) {
+            body += character;
+            index++;
+
+            continue;
+        }
+
+        const end = Math.min(segmentEnd, cursorOffset);
+
+        body += source.slice(index, end).replace(/[^\n]/g, ' ');
+        index = end;
+    }
+
+    return body;
+}
+
 function rubyBodyContains(source: string, bodyStart: number, cursorOffset: number): boolean {
-    const body = source.slice(bodyStart, cursorOffset);
+    const body = maskRubyCommentsAndStrings(source, bodyStart, cursorOffset);
     const tokenPattern =
         /(^[ \t]*(?:if|unless|while|until)\b)|(=[ \t]*(?:if|unless|while|until)\b)|\b(do|def|class|module|begin|case)\b|(\bend\b)|([{}])/gm;
 

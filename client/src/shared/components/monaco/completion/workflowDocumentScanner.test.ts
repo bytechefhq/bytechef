@@ -199,3 +199,69 @@ describe('scanWorkflowDocument empty values', () => {
         });
     });
 });
+
+describe('scanWorkflowDocument key slots', () => {
+    it('reports a JSON key being typed under parameters with the other keys and the node type', () => {
+        const source = '{"tasks": [{"name": "h", "type": "httpClient/v1/get", "parameters": {"uri": "x", "he": ""}}]}';
+        const offset = source.indexOf('"he"') + 3;
+        const position = scanWorkflowDocument(source, offset, 'json');
+
+        expect(position?.keySlot).toEqual({
+            containerPath: ['tasks', '0', 'parameters'],
+            existingKeys: ['uri'],
+            prefix: 'he',
+        });
+        expect(position?.typeOf(['tasks', '0'])).toBe('httpClient/v1/get');
+    });
+
+    it('reports a JSON key in a nested object', () => {
+        const source = '{"tasks": [{"type": "httpClient/v1/get", "parameters": {"headers": {""}}}]}';
+        const offset = source.indexOf('{""}') + 2;
+
+        expect(scanWorkflowDocument(source, offset, 'json')?.keySlot).toEqual({
+            containerPath: ['tasks', '0', 'parameters', 'headers'],
+            existingKeys: [],
+            prefix: '',
+        });
+    });
+
+    it('reports no key slot inside a JSON value string', () => {
+        const source = '{"tasks": [{"parameters": {"uri": "ht"}}]}';
+
+        expect(scanWorkflowDocument(source, source.indexOf('ht') + 2, 'json')?.keySlot).toBeUndefined();
+    });
+
+    it('reports a YAML bare word under parameters as a key slot', () => {
+        const source = 'tasks:\n  - name: h\n    type: httpClient/v1/get\n    parameters:\n      uri: x\n      he';
+        const position = scanWorkflowDocument(source, source.length, 'yaml');
+
+        expect(position?.keySlot).toEqual({
+            containerPath: ['tasks', '0', 'parameters'],
+            existingKeys: ['uri'],
+            prefix: 'he',
+        });
+        expect(position?.typeOf(['tasks', '0'])).toBe('httpClient/v1/get');
+    });
+
+    it('reports a blank YAML line under an empty parameters key as a key slot', () => {
+        const source = 'triggers:\n  - name: t\n    type: slack/v1/newMessage\n    parameters:\n      ';
+
+        expect(scanWorkflowDocument(source, source.length, 'yaml')?.keySlot).toEqual({
+            containerPath: ['triggers', '0', 'parameters'],
+            existingKeys: [],
+            prefix: '',
+        });
+    });
+
+    it('reports no YAML key slot on a value position', () => {
+        const source = 'tasks:\n  - parameters:\n      uri: ht';
+
+        expect(scanWorkflowDocument(source, source.length, 'yaml')?.keySlot).toBeUndefined();
+    });
+
+    it('reports no YAML key slot inside a block scalar', () => {
+        const source = 'tasks:\n  - type: script/v1/javascript\n    parameters:\n      script: |\n        retu';
+
+        expect(scanWorkflowDocument(source, source.length, 'yaml')?.keySlot).toBeUndefined();
+    });
+});

@@ -1,12 +1,16 @@
 import {ComponentDefinitionApi as EmbeddedComponentDefinitionApi} from '@/ee/shared/middleware/embedded/configuration';
 import {ComponentDefinitionApi as AutomationComponentDefinitionApi} from '@/shared/middleware/automation/configuration';
 import {
+    ActionDefinitionApi,
     ComponentDefinitionApi,
     ComponentDefinitionBasic,
     ConnectionDefinitionApi,
+    TriggerDefinitionApi,
 } from '@/shared/middleware/platform/configuration';
+import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ConnectDefinitionKeys} from '@/shared/queries/platform/connectionDefinitions.queries';
+import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
 import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {useMemo} from 'react';
@@ -79,6 +83,35 @@ export function useComponentCatalog(options?: {embedded?: boolean}): ComponentCa
                     queryKey: ComponentDefinitionKeys.componentDefinition(request),
                     staleTime: DEFINITION_STALE_TIME,
                 });
+            },
+            getOperationProperties: async (componentName, componentVersion, operationName, operationKind) => {
+                const resolvedVersion = resolveVersion(componentName, componentVersion);
+
+                if (resolvedVersion === undefined) {
+                    return [];
+                }
+
+                if (operationKind === 'trigger') {
+                    const request = {componentName, componentVersion: resolvedVersion, triggerName: operationName};
+
+                    const triggerDefinition = await queryClient.fetchQuery({
+                        queryFn: () => new TriggerDefinitionApi().getComponentTriggerDefinition(request),
+                        queryKey: TriggerDefinitionKeys.triggerDefinition(request),
+                        staleTime: DEFINITION_STALE_TIME,
+                    });
+
+                    return triggerDefinition.properties ?? [];
+                }
+
+                const request = {actionName: operationName, componentName, componentVersion: resolvedVersion};
+
+                const actionDefinition = await queryClient.fetchQuery({
+                    queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(request),
+                    queryKey: ActionDefinitionKeys.actionDefinition(request),
+                    staleTime: DEFINITION_STALE_TIME,
+                });
+
+                return actionDefinition.properties ?? [];
             },
         };
     }, [components, queryClient]);

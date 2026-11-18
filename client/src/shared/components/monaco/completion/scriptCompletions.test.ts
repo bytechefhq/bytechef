@@ -6,6 +6,7 @@ import type {
     ComponentDefinition,
     ComponentDefinitionBasic,
     ConnectionDefinition,
+    Property,
 } from '@/shared/middleware/platform/configuration';
 
 import type {
@@ -32,6 +33,14 @@ const catalog: ComponentCatalogType = {
                 name,
                 version: 1,
             }) as unknown as ComponentDefinition
+    ),
+    getOperationProperties: vi.fn(
+        async () =>
+            [
+                {name: 'latitude', required: true, type: 'NUMBER'},
+                {name: 'longitude', required: true, type: 'NUMBER'},
+                {name: 'options', properties: [{name: 'language', type: 'STRING'}], type: 'OBJECT'},
+            ] as unknown as Property[]
     ),
 };
 
@@ -320,5 +329,62 @@ describe('getScriptCompletions for a code workflow', () => {
         expect(
             await getScriptCompletions({context: pythonContext, cursorOffset: pythonSource.length, source: fullSource})
         ).toEqual([expect.objectContaining({insertText: 'name', replaceLength: 2})]);
+    });
+});
+
+describe('action property completions', () => {
+    const scriptContext: ScriptCompletionContextI = {
+        components: catalog,
+        connections: [{componentName: 'googleMaps', componentVersion: 2, name: 'gm'}],
+        input: {},
+        kind: 'script',
+        language: 'javascript',
+    };
+    const head = 'function perform(input, connection, context) {\n';
+    const labels = async (
+        context: ScriptCompletionContextI | CodeWorkflowCompletionContextI | CustomComponentCompletionContextI,
+        source: string,
+        cursorOffset = source.length
+    ) => (await getScriptCompletions({context, cursorOffset, source})).map((item) => item.label);
+
+    it('offers the action properties in the first argument with required ones first', async () => {
+        expect(await labels(scriptContext, `${head}context.component.googleMaps.getAddress({lat`)).toEqual([
+            'latitude',
+            'longitude',
+            'options',
+        ]);
+        expect(catalog.getOperationProperties).toHaveBeenCalledWith('googleMaps', 2, 'getAddress', 'action');
+    });
+
+    it('leaves out keys already written and walks into nested objects', async () => {
+        expect(await labels(scriptContext, `${head}context.component.googleMaps.getAddress({latitude: 1, `)).toEqual([
+            'longitude',
+            'options',
+        ]);
+        expect(await labels(scriptContext, `${head}context.component.googleMaps.getAddress({options: {`)).toEqual([
+            'language',
+        ]);
+    });
+
+    it('offers properties inside a Python dict key in a code workflow function', async () => {
+        const codeWorkflowContext: CodeWorkflowCompletionContextI = {
+            components: catalog,
+            kind: 'codeWorkflow',
+            language: 'python',
+        };
+        const before = 'def greet(context):\n    return context.component.googleMaps.getAddress({"';
+        const source = `${before}"})\n\nproject = {"workflows": [{"name": "w", "tasks": [{"name": "greet", "perform": greet}]}]}`;
+
+        expect(await labels(codeWorkflowContext, source, before.length)).toEqual(['latitude', 'longitude', 'options']);
+    });
+
+    it('offers nothing for a call that is not on the perform context or in a custom component', async () => {
+        expect(await labels(scriptContext, `${head}other.component.googleMaps.getAddress({`)).toEqual([]);
+        expect(
+            await labels(
+                {kind: 'customComponent', language: 'javascript'},
+                'actions: [{name: "a", perform: function (input, connection, context) {\ncontext.component.googleMaps.getAddress({'
+            )
+        ).toEqual([]);
     });
 });
