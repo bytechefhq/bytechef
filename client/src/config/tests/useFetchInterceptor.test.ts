@@ -260,11 +260,11 @@ describe('useFetchInterceptor', () => {
 
             hoisted.registeredHandlers!.response(response);
 
-            expect(hoisted.navigate).toHaveBeenCalledWith('/automation/settings/billing');
+            expect(hoisted.navigate).toHaveBeenCalledWith('/settings/billing');
         });
 
         it('does not navigate again when already on the billing settings page', () => {
-            window.history.pushState({}, '', '/automation/settings/billing');
+            window.history.pushState({}, '', '/settings/billing');
 
             renderHook(() => useFetchInterceptor());
 

@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {AI_SKILLS_SETTINGS_PATH} from '@/shared/navigation/settingsPaths';
 import {ExternalLinkIcon, FlaskConicalIcon, PlayIcon, SparklesIcon, TextInitialIcon, ZapIcon} from 'lucide-react';
 
 interface ClusterElementsWorkflowEditorHeaderProps {
@@ -48,7 +49,7 @@ const ClusterElementsWorkflowEditorHeader = ({
                         <TooltipTrigger asChild>
                             <a
                                 className="relative inline-flex size-9 items-center justify-center rounded-md text-content-neutral-secondary hover:bg-surface-neutral-primary"
-                                href="/automation/settings/ai/skills"
+                                href={AI_SKILLS_SETTINGS_PATH}
                                 rel="noreferrer"
                                 target="_blank"
                             >

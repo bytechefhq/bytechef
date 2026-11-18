@@ -145,6 +145,6 @@ describe('ModelPicker', () => {
         await userEvent.click(screen.getByText('Anthropic'));
         await userEvent.click(screen.getByText('Configure credentials'));
 
-        expect(navigateMock).toHaveBeenCalledWith('/automation/settings/ai-providers');
+        expect(navigateMock).toHaveBeenCalledWith('/settings/ai-providers');
     });
 });

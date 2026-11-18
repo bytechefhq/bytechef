@@ -74,6 +74,6 @@ describe('TrialBanner', () => {
 
         fireEvent.click(screen.getByText('Upgrade'));
 
-        expect(hoisted.navigate).toHaveBeenCalledWith('/automation/settings/billing');
+        expect(hoisted.navigate).toHaveBeenCalledWith('/settings/billing');
     });
 });

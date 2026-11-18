@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {BILLING_SETTINGS_PATH} from '@/shared/navigation/settingsPaths';
 import {useGetCurrentSubscriptionQuery} from '@/shared/queries/platform/billing.queries';
 import {InfoIcon} from 'lucide-react';
 import {useCallback, useMemo} from 'react';
@@ -22,7 +23,7 @@ export function TrialBanner() {
         return Math.max(0, Math.ceil(millisecondsRemaining / MILLISECONDS_PER_DAY));
     }, [subscription?.currentPeriodEnd]);
 
-    const handleUpgradeClick = useCallback(() => navigate('/automation/settings/billing'), [navigate]);
+    const handleUpgradeClick = useCallback(() => navigate(BILLING_SETTINGS_PATH), [navigate]);
 
     if (subscription?.planName !== 'TRIAL') {
         return null;

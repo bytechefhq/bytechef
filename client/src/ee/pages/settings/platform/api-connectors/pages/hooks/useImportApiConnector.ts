@@ -1,10 +1,11 @@
 import {useImportOpenApiSpecificationMutation} from '@/shared/middleware/graphql';
+import {API_CONNECTORS_SETTINGS_PATH} from '@/shared/navigation/settingsPaths';
 import {useQueryClient} from '@tanstack/react-query';
 import {useNavigate} from 'react-router-dom';
 
 import {useApiConnectorWizardStore} from '../../stores/useApiConnectorWizardStore';
 
-export const API_CONNECTORS_PATH = '/automation/settings/api-connectors';
+export const API_CONNECTORS_PATH = API_CONNECTORS_SETTINGS_PATH;
 
 interface UseImportApiConnectorI {
     handleCancel: () => void;

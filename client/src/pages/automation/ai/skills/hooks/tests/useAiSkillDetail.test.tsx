@@ -52,7 +52,7 @@ vi.mock('react-router-dom', async (importOriginal) => ({
 
 vi.mock('sonner', () => ({toast: {error: vi.fn(), success: vi.fn()}}));
 
-const renderDetail = (initialEntry = '/embedded/settings/ai/skills/42') => {
+const renderDetail = (initialEntry = '/settings/ai/skills/42') => {
     const wrapper = ({children}: {children: ReactNode}) => (
         <MemoryRouter initialEntries={[initialEntry]}>{createTestQueryClientWrapper()({children})}</MemoryRouter>
     );
@@ -158,7 +158,7 @@ describe('useAiSkillDetail', () => {
         });
 
         expect(closeSkillDetailMock).toHaveBeenCalled();
-        expect(navigateMock).toHaveBeenCalledWith('/embedded/settings/ai/skills');
+        expect(navigateMock).toHaveBeenCalledWith('/settings/ai/skills');
         expect(deleteAiSkillMock).toHaveBeenCalledWith({id: '42'});
     });
 });

@@ -11,6 +11,7 @@ import {CopilotRuntimeProvider} from '@/shared/components/copilot/runtime-provid
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useAiDefaultModelQuery} from '@/shared/middleware/graphql';
+import {AI_PROVIDERS_SETTINGS_PATH} from '@/shared/navigation/settingsPaths';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {type SuggestionConfig} from '@assistant-ui/react';
 import {BotMessageSquareIcon, BrainCircuitIcon, MessageSquareXIcon, XIcon} from 'lucide-react';
@@ -20,8 +21,6 @@ import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 const ANIMATION_DURATION_MS = 300;
-
-const AI_PROVIDERS_SETTINGS_PATH = '/automation/settings/ai-providers';
 
 const COPILOT_SUGGESTIONS: SuggestionConfig[] = [
     {

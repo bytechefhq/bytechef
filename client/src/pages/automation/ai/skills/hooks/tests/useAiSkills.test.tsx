@@ -23,7 +23,7 @@ vi.mock('react-router-dom', async (importOriginal) => ({
     useNavigate: () => navigateMock,
 }));
 
-const LIST_PATH = '/automation/settings/ai/skills';
+const LIST_PATH = '/settings/ai/skills';
 
 const renderAiSkills = (pathname = LIST_PATH) => {
     const wrapper = ({children}: {children: ReactNode}) => {
@@ -32,9 +32,9 @@ const renderAiSkills = (pathname = LIST_PATH) => {
         return (
             <MemoryRouter initialEntries={[pathname]}>
                 <Routes>
-                    <Route element={element} path="/:platform/settings/ai/skills/:skillId" />
+                    <Route element={element} path="/settings/ai/skills/:skillId" />
 
-                    <Route element={element} path="/:platform/settings/ai/skills" />
+                    <Route element={element} path="/settings/ai/skills" />
                 </Routes>
             </MemoryRouter>
         );
@@ -94,12 +94,12 @@ describe('useAiSkills', () => {
         expect(result.current.showSearchAndCreate).toBe(false);
     });
 
-    it('sends the back control to the skills mount the visitor is already on', () => {
-        const {result} = renderAiSkills('/embedded/settings/ai/skills/42');
+    it('sends the back control to the Organization skills list', () => {
+        const {result} = renderAiSkills('/settings/ai/skills/42');
 
         result.current.handleBack();
 
-        expect(navigateMock).toHaveBeenCalledWith('/embedded/settings/ai/skills');
+        expect(navigateMock).toHaveBeenCalledWith('/settings/ai/skills');
     });
 
     it('opens the skill the route points at', () => {
