@@ -21,6 +21,18 @@ const isCurrentHref = (pathname: string, href: string) => {
     return pathname.endsWith(`/${href}`) || pathname.includes(`/${href}/`);
 };
 
+const SETTINGS_PATH_SEGMENT = '/settings/';
+
+const getSettingsPageKey = (href: string | undefined) => {
+    if (!href) {
+        return href;
+    }
+
+    const segmentIndex = href.lastIndexOf(SETTINGS_PATH_SEGMENT);
+
+    return segmentIndex === -1 ? href : href.slice(segmentIndex + SETTINGS_PATH_SEGMENT.length);
+};
+
 interface SettingsProps {
     sidebarNavItems: SettingsNavItemI[];
     title?: string;
@@ -33,31 +45,33 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
     const location = useLocation();
 
     const isNavItemVisible = (navItem: SettingsNavItemI) => {
-        if (navItem.href === 'api-connectors') {
+        const pageKey = getSettingsPageKey(navItem.href);
+
+        if (pageKey === 'api-connectors') {
             return isFeatureFlagEnabled('ff-207');
         }
 
-        if (navItem.href === 'custom-components') {
+        if (pageKey === 'custom-components') {
             return isFeatureFlagEnabled('ff-1024');
         }
 
-        if (navItem.href === 'git-configuration') {
+        if (pageKey === 'git-configuration') {
             return isFeatureFlagEnabled('ff-1039');
         }
 
-        if (navItem.href === 'mcp-server') {
+        if (pageKey === 'mcp-server') {
             return isFeatureFlagEnabled('ff-2197');
         }
 
-        if (navItem.href === 'admin-api-keys') {
+        if (pageKey === 'admin-api-keys') {
             return isFeatureFlagEnabled('ff-1024');
         }
 
-        if (navItem.href === 'identity-providers') {
+        if (pageKey === 'identity-providers') {
             return isFeatureFlagEnabled('ff-1040');
         }
 
-        if (navItem.href === 'billing') {
+        if (pageKey === 'billing') {
             return billingEnabled;
         }
 
