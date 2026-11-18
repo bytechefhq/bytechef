@@ -7,7 +7,15 @@ export interface TemplateComponentType {
     title?: string;
 }
 
+export interface TemplateInputComponentReferenceType {
+    componentName: string;
+    componentVersion: number;
+    groupName: string;
+}
+
 export interface TemplateInputType {
+    /** Present when the input takes its value from a component input, whose options need a connection to load. */
+    componentReference?: TemplateInputComponentReferenceType;
     label?: string;
     name: string;
     required?: boolean;
@@ -22,6 +30,11 @@ export interface AutomationTemplateType {
     kind?: 'COPY' | 'REFERENCE';
     label?: string;
     triggers?: TemplateComponentType[];
+}
+
+export interface TemplateInputOptionType {
+    label: string;
+    value: string;
 }
 
 export interface ConnectionType {
