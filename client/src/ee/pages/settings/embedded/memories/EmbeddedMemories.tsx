@@ -34,6 +34,7 @@ import {useMemo, useState} from 'react';
 import {
     EMBEDDED_MEMORY_DIALOG_DATA,
     EMBEDDED_MEMORY_WORKSPACE_ID,
+    EmbeddedAiAutoMemoryConnectedUserI,
     EmbeddedAiAutoMemoryI,
     getConnectedUserLabel,
     useEmbeddedAiAutoMemoriesQuery,
@@ -163,7 +164,7 @@ const EmbeddedMemories = () => {
     const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
     const [editTargetId, setEditTargetId] = useState<number | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedConnectedUserId, setSelectedConnectedUserId] = useState<number | null>(null);
+    const [selectedConnectedUser, setSelectedConnectedUser] = useState<EmbeddedAiAutoMemoryConnectedUserI | null>(null);
     const [selectedMemoryType, setSelectedMemoryType] = useState<AiAutoMemoryTypeType | null>(null);
     const [viewTargetId, setViewTargetId] = useState<number | null>(null);
 
@@ -174,8 +175,6 @@ const EmbeddedMemories = () => {
         isError: isConnectedUsersError,
         refetch: refetchConnectedUsers,
     } = useEmbeddedAiAutoMemoryConnectedUsersQuery(currentEnvironmentId);
-
-    const selectedConnectedUser = connectedUsers?.find((connectedUser) => connectedUser.id === selectedConnectedUserId);
 
     const {
         data: memories,
@@ -189,18 +188,34 @@ const EmbeddedMemories = () => {
         selectedMemoryType || undefined
     );
 
+    const connectedUserOptions = useMemo(() => {
+        const listedConnectedUsers = connectedUsers || [];
+
+        if (
+            selectedConnectedUser &&
+            !listedConnectedUsers.some((connectedUser) => connectedUser.id === selectedConnectedUser.id)
+        ) {
+            return [...listedConnectedUsers, selectedConnectedUser];
+        }
+
+        return listedConnectedUsers;
+    }, [connectedUsers, selectedConnectedUser]);
+
     const filterGroups = useMemo<FilterGroupI[]>(() => {
         const groups: FilterGroupI[] = [];
 
-        if (connectedUsers && connectedUsers.length > 0) {
+        if (connectedUserOptions.length > 0) {
             groups.push({
                 allValue: ALL,
                 key: 'connectedUser',
                 label: 'Connected User',
-                onChange: (value) => setSelectedConnectedUserId(value === ALL ? null : Number(value)),
+                onChange: (value) =>
+                    setSelectedConnectedUser(
+                        connectedUserOptions.find((connectedUser) => String(connectedUser.id) === value) || null
+                    ),
                 options: [
                     {label: 'All', value: ALL},
-                    ...connectedUsers.map((connectedUser) => ({
+                    ...connectedUserOptions.map((connectedUser) => ({
                         label: getConnectedUserLabel(connectedUser),
                         value: String(connectedUser.id),
                     })),
@@ -219,7 +234,7 @@ const EmbeddedMemories = () => {
         });
 
         return groups;
-    }, [connectedUsers, selectedConnectedUser, selectedMemoryType]);
+    }, [connectedUserOptions, selectedConnectedUser, selectedMemoryType]);
 
     const filteredMemories = useMemo(() => {
         if (!memories) {

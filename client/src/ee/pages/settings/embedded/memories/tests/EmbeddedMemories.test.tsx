@@ -171,6 +171,43 @@ describe('EmbeddedMemories', () => {
         );
     });
 
+    it('keeps the picked connected user selected once their last memory is gone', async () => {
+        const {rerender} = renderPage();
+
+        await pickFilterOption('ext-bob');
+
+        mockMemories([]);
+
+        mockUseConnectedUsersQuery.mockImplementation(((
+            _variables: unknown,
+            options: {select: (data: EmbeddedAiAutoMemoryConnectedUsersQuery) => unknown}
+        ) =>
+            makeQueryResult(
+                options.select({
+                    embeddedAiAutoMemoryConnectedUsers: connectedUsersData.embeddedAiAutoMemoryConnectedUsers.slice(
+                        0,
+                        1
+                    ),
+                })
+            )) as never);
+
+        rerender(
+            <MemoryRouter>
+                <QueryClientProvider client={new QueryClient()}>
+                    <TooltipProvider>
+                        <EmbeddedMemories />
+                    </TooltipProvider>
+                </QueryClientProvider>
+            </MemoryRouter>
+        );
+
+        expect(mockUseMemoriesQuery).toHaveBeenLastCalledWith(
+            {connectedUserId: '22', environment: 2, memoryType: undefined},
+            expect.anything()
+        );
+        expect(screen.getByText('No memories match the selected filters.')).toBeInTheDocument();
+    });
+
     it('passes the memory type picked in the Type filter', async () => {
         renderPage();
 
