@@ -25,7 +25,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Oauth2;
 import com.bytechef.config.ApplicationProperties.Oauth2.OAuth2App;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +44,7 @@ class OAuth2ServiceTest {
 
     @BeforeEach
     void beforeEach() {
-        yamlApps = new HashMap<>();
+        yamlApps = new LinkedHashMap<>();
 
         Oauth2 oauth2 = applicationProperties.getOauth2();
 
@@ -113,9 +113,7 @@ class OAuth2ServiceTest {
 
         List<String> names = oAuth2Service.getPredefinedApps();
 
-        assertThat(names).containsExactlyInAnyOrder("slack", "googleDrive", "asana");
-        assertThat(names).doesNotHaveDuplicates();
-        assertThat(names.indexOf("asana")).isEqualTo(2);
+        assertThat(names).containsExactly("slack", "googleDrive", "asana");
     }
 
     private static OAuth2App app(String clientId, String clientSecret) {

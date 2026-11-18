@@ -54,6 +54,8 @@ public class RemoteOAuth2Apps {
 
     private volatile Snapshot snapshot = new Snapshot(Map.of(), null, null);
     private volatile Instant lastWarnAt;
+    private volatile boolean clientResolved;
+    private volatile OAuthAppProxyClient oAuthAppProxyClient;
 
     @Autowired
     public RemoteOAuth2Apps(ObjectProvider<OAuthAppProxyClient> oAuthAppProxyClientProvider) {
@@ -66,13 +68,25 @@ public class RemoteOAuth2Apps {
     }
 
     public Map<String, OAuth2App> getOAuth2Apps() {
+        OAuthAppProxyClient oAuthAppProxyClient = resolveClient();
+
+        if (oAuthAppProxyClient == null) {
+            return Map.of();
+        }
+
         Snapshot currentSnapshot = snapshot;
 
         if (isFresh(currentSnapshot)) {
             return currentSnapshot.apps();
         }
 
-        lock.lock();
+        if (currentSnapshot.fetchedAt() != null) {
+            if (!lock.tryLock()) {
+                return currentSnapshot.apps();
+            }
+        } else {
+            lock.lock();
+        }
 
         try {
             currentSnapshot = snapshot;
@@ -81,10 +95,19 @@ public class RemoteOAuth2Apps {
                 return currentSnapshot.apps();
             }
 
-            return refresh(currentSnapshot);
+            return refresh(oAuthAppProxyClient, currentSnapshot);
         } finally {
             lock.unlock();
         }
+    }
+
+    private OAuthAppProxyClient resolveClient() {
+        if (!clientResolved) {
+            oAuthAppProxyClient = oAuthAppProxyClientProvider.getIfAvailable();
+            clientResolved = true;
+        }
+
+        return oAuthAppProxyClient;
     }
 
     private boolean isFresh(Snapshot currentSnapshot) {
@@ -107,13 +130,7 @@ public class RemoteOAuth2Apps {
         return false;
     }
 
-    private Map<String, OAuth2App> refresh(Snapshot currentSnapshot) {
-        OAuthAppProxyClient oAuthAppProxyClient = oAuthAppProxyClientProvider.getIfAvailable();
-
-        if (oAuthAppProxyClient == null) {
-            return Map.of();
-        }
-
+    private Map<String, OAuth2App> refresh(OAuthAppProxyClient oAuthAppProxyClient, Snapshot currentSnapshot) {
         Instant now = clock.instant();
 
         try {
@@ -134,11 +151,11 @@ public class RemoteOAuth2Apps {
     }
 
     private static Map<String, OAuth2App> convert(Map<String, OAuthApp> oAuthApps) {
-        Map<String, OAuth2App> apps = new HashMap<>();
-
         if (oAuthApps == null) {
             return Map.of();
         }
+
+        Map<String, OAuth2App> apps = new HashMap<>();
 
         for (Map.Entry<String, OAuthApp> entry : oAuthApps.entrySet()) {
             OAuthApp oAuthApp = entry.getValue();
