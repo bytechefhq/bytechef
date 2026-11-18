@@ -26,6 +26,7 @@ public class McpIntegrationInstanceWorkflowMapper {
         extends Converter<IntegrationInstanceWorkflow, IntegrationInstanceWorkflowModel> {
 
         @Override
+        @Mapping(target = "staticWebhookUrl", ignore = true)
         @Mapping(target = "workflowUuid", ignore = true)
         IntegrationInstanceWorkflowModel convert(IntegrationInstanceWorkflow integrationInstanceWorkflow);
     }

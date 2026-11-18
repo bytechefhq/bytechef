@@ -19,6 +19,7 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Property.Type;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
@@ -197,6 +198,21 @@ class ConnectedUserIntegrationMapperTest {
         assertEquals("L", integrationInstanceModel.getAvailableWorkflows()
             .getFirst()
             .getLabel());
+    }
+
+    @Test
+    void testIntegrationInstanceWorkflowMapsStaticWebhookUrl() {
+        ConnectedUserIntegrationMapper.ConnectedUserIntegrationToIntegrationMapper generatedMapper =
+            new ConnectedUserIntegrationMapper$ConnectedUserIntegrationToIntegrationMapperImpl();
+
+        IntegrationInstanceWorkflowModel integrationInstanceWorkflowModel = generatedMapper.map(
+            new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstanceWorkflow(
+                new IntegrationInstanceWorkflow(1L, Map.of(), true), "u-1",
+                "https://bytechef.example.com/webhooks/abc"));
+
+        assertEquals("u-1", integrationInstanceWorkflowModel.getWorkflowUuid());
+        assertEquals(
+            "https://bytechef.example.com/webhooks/abc", integrationInstanceWorkflowModel.getStaticWebhookUrl());
     }
 
     @Test

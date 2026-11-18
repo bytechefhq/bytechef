@@ -28,8 +28,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * Resolves the static webhook url of a connected user's automation workflow, the same url the automation project
- * deployment exposes for a workflow that starts with a static webhook trigger (e.g. Request or Webhook).
+ * Resolves the static webhook url of a connected user's workflow that starts with a static webhook trigger (e.g.
+ * Webhook): an automation workflow, the same url the automation project deployment exposes, or an integration instance
+ * workflow, the url its trigger was enabled with.
  *
  * @version ee
  *
@@ -79,14 +80,29 @@ class ConnectedUserWorkflowWebhookUrlResolver {
             return null;
         }
 
-        Workflow workflow = workflowService.getWorkflow(workflowId.get());
+        return resolve(
+            PlatformType.AUTOMATION, projectDeploymentId, workflowUuid, workflowService.getWorkflow(workflowId.get()));
+    }
 
+    @Nullable
+    String resolveIntegrationInstanceWorkflow(
+        long integrationInstanceId, String workflowUuid, @Nullable Workflow workflow) {
+
+        if (workflow == null || webhookUrl == null) {
+            return null;
+        }
+
+        return resolve(PlatformType.EMBEDDED, integrationInstanceId, workflowUuid, workflow);
+    }
+
+    @Nullable
+    private String resolve(PlatformType platformType, long id, String workflowUuid, Workflow workflow) {
         for (WorkflowTrigger workflowTrigger : WorkflowTrigger.ofEnabled(workflow)) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
             if (isStaticWebhookTrigger(workflowNodeType)) {
                 WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                    PlatformType.AUTOMATION, projectDeploymentId, workflowUuid, workflowTrigger.getName());
+                    platformType, id, workflowUuid, workflowTrigger.getName());
 
                 return webhookUrl.replace("{id}", workflowExecutionId.toString());
             }

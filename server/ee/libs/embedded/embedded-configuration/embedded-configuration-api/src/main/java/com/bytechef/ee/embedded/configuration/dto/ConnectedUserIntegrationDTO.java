@@ -130,7 +130,19 @@ public record ConnectedUserIntegrationDTO(
     }
 
     public record ConnectedUserIntegrationInstanceWorkflow(
-        IntegrationInstanceWorkflow integrationInstanceWorkflow, String workflowUuid) {
+        IntegrationInstanceWorkflow integrationInstanceWorkflow, String workflowUuid,
+        @Nullable String staticWebhookUrl) {
+
+        public ConnectedUserIntegrationInstanceWorkflow(
+            IntegrationInstanceWorkflow integrationInstanceWorkflow, String workflowUuid) {
+
+            this(integrationInstanceWorkflow, workflowUuid, null);
+        }
+
+        public ConnectedUserIntegrationInstanceWorkflow withStaticWebhookUrl(@Nullable String staticWebhookUrl) {
+            return new ConnectedUserIntegrationInstanceWorkflow(
+                integrationInstanceWorkflow, workflowUuid, staticWebhookUrl);
+        }
     }
 
     public record ConnectionConfig(AuthorizationType authorizationType, List<Input> inputs, OAuth2 oauth2) {

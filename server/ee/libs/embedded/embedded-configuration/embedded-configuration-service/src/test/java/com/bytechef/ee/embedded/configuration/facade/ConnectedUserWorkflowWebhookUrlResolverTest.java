@@ -39,6 +39,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 })
 class ConnectedUserWorkflowWebhookUrlResolverTest {
 
+    private static final long INTEGRATION_INSTANCE_ID = 700L;
     private static final long PROJECT_DEPLOYMENT_ID = 900L;
     private static final String WORKFLOW_ID = "workflow-1";
     private static final String WORKFLOW_UUID = "be530417-2226-41d4-aae9-c4fc76f0791a";
@@ -140,6 +141,57 @@ class ConnectedUserWorkflowWebhookUrlResolverTest {
         assertThat(resolver.resolve(null, WORKFLOW_UUID)).isNull();
 
         verifyNoInteractions(projectWorkflowService);
+    }
+
+    @Test
+    void testResolveIntegrationInstanceWorkflowReturnsTheWebhookUrlOfAStaticWebhookTrigger() {
+        mockTriggerDefinition("webhook", "autoRespondWithHTTP200", TriggerType.STATIC_WEBHOOK);
+
+        String staticWebhookUrl = resolver.resolveIntegrationInstanceWorkflow(
+            INTEGRATION_INSTANCE_ID, WORKFLOW_UUID, getWorkflow("webhook/v1/autoRespondWithHTTP200"));
+
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            PlatformType.EMBEDDED, INTEGRATION_INSTANCE_ID, WORKFLOW_UUID, "trigger_1");
+
+        assertThat(staticWebhookUrl).isEqualTo("https://bytechef.example.com/webhooks/" + workflowExecutionId);
+
+        verifyNoInteractions(projectWorkflowService, workflowService);
+    }
+
+    @Test
+    void testResolveIntegrationInstanceWorkflowReturnsNullForARequestTrigger() {
+        assertThat(
+            resolver.resolveIntegrationInstanceWorkflow(
+                INTEGRATION_INSTANCE_ID, WORKFLOW_UUID, getWorkflow("request/v1/autoRespondWithHTTP200")))
+                    .isNull();
+
+        verifyNoInteractions(triggerDefinitionService);
+    }
+
+    @Test
+    void testResolveIntegrationInstanceWorkflowReturnsNullForATriggerThatIsNotAStaticWebhook() {
+        mockTriggerDefinition("infobip", "newWhatsappMessage", TriggerType.DYNAMIC_WEBHOOK);
+
+        assertThat(
+            resolver.resolveIntegrationInstanceWorkflow(
+                INTEGRATION_INSTANCE_ID, WORKFLOW_UUID, getWorkflow("infobip/v1/newWhatsappMessage")))
+                    .isNull();
+    }
+
+    @Test
+    void testResolveIntegrationInstanceWorkflowReturnsNullWithoutAWorkflow() {
+        assertThat(resolver.resolveIntegrationInstanceWorkflow(INTEGRATION_INSTANCE_ID, WORKFLOW_UUID, null))
+            .isNull();
+
+        verifyNoInteractions(triggerDefinitionService);
+    }
+
+    private static Workflow getWorkflow(String triggerType) {
+        String definition =
+            "{\"label\": \"Workflow\", \"triggers\": [{\"name\": \"trigger_1\", \"type\": \"" + triggerType +
+                "\"}], \"tasks\": []}";
+
+        return new Workflow(WORKFLOW_ID, definition, Workflow.Format.JSON);
     }
 
     private void mockDeployedWorkflow(String triggerType) {

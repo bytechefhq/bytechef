@@ -517,11 +517,19 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         WorkflowDTO workflowDTO = workflowFacade.getWorkflow(projectWorkflow.getWorkflowId());
 
-        return new ConnectedUserProjectWorkflowDTO(
+        ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflowDTO = new ConnectedUserProjectWorkflowDTO(
             connectedUserProject.getConnectedUserId(), connectedUserProjectWorkflow,
             isProjectDeploymentWorkflowEnabled(projectWorkflow, environment),
             getWorkflowLastExecutionDate(projectWorkflow), projectWorkflow, workflowDTO,
             toComponents(workflowDTO.getWorkflow()));
+
+        Long projectDeploymentId = projectDeploymentService.fetchProjectDeployment(
+            connectedUserProject.getProjectId(), environment)
+            .map(ProjectDeployment::getId)
+            .orElse(null);
+
+        return connectedUserProjectWorkflowDTO.withStaticWebhookUrl(
+            connectedUserWorkflowWebhookUrlResolver.resolve(projectDeploymentId, projectWorkflow.getUuidAsString()));
     }
 
     @Override

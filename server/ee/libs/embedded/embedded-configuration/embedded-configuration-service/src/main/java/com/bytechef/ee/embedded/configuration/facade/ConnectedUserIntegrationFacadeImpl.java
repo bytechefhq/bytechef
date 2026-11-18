@@ -115,6 +115,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserService connectedUserService;
+    private final ConnectedUserWorkflowWebhookUrlResolver connectedUserWorkflowWebhookUrlResolver;
     private final ConnectionFacade connectionFacade;
     private final ConnectionService connectionService;
     private final EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
@@ -146,6 +147,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
     public ConnectedUserIntegrationFacadeImpl(
         ClusterElementDefinitionService clusterElementDefinitionService,
         ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
+        ConnectedUserWorkflowWebhookUrlResolver connectedUserWorkflowWebhookUrlResolver,
         ConnectionFacade connectionFacade, ConnectionService connectionService,
         EmbeddedPermissionEvaluator embeddedPermissionEvaluator,
         IntegrationInstanceConfigurationDTOAssembler integrationInstanceConfigurationDTOAssembler,
@@ -169,6 +171,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.componentDefinitionService = componentDefinitionService;
         this.connectedUserService = connectedUserService;
+        this.connectedUserWorkflowWebhookUrlResolver = connectedUserWorkflowWebhookUrlResolver;
         this.connectionFacade = connectionFacade;
         this.connectionService = connectionService;
         this.embeddedPermissionEvaluator = embeddedPermissionEvaluator;
@@ -1076,9 +1079,41 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         return integrationInstances.stream()
             .map(integrationInstance -> new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance(
                 integrationInstance.connection(), integrationInstance.integrationInstance(),
-                integrationInstance.workflows(), getMcpInstanceTools(getIntegrationInstanceId(integrationInstance)),
+                getWorkflowsWithStaticWebhookUrl(integrationInstance),
+                getMcpInstanceTools(getIntegrationInstanceId(integrationInstance)),
                 getMcpInstanceWorkflows(integrationInstance.integrationInstance(), connectedUser),
                 integrationInstance.integrationInstanceConfiguration(), integrationInstance.connectionConfig()))
+            .toList();
+    }
+
+    private List<ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstanceWorkflow> getWorkflowsWithStaticWebhookUrl(
+        ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance connectedUserIntegrationInstance) {
+
+        long integrationInstanceId = getIntegrationInstanceId(connectedUserIntegrationInstance);
+
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
+            connectedUserIntegrationInstance.integrationInstanceConfiguration();
+
+        return connectedUserIntegrationInstance.workflows()
+            .stream()
+            .map(connectedUserIntegrationInstanceWorkflow -> {
+                IntegrationInstanceWorkflow integrationInstanceWorkflow =
+                    connectedUserIntegrationInstanceWorkflow.integrationInstanceWorkflow();
+
+                Workflow workflow = integrationInstanceConfigurationDTO.integrationInstanceConfigurationWorkflows()
+                    .stream()
+                    .filter(integrationInstanceConfigurationWorkflowDTO -> Objects.equals(
+                        integrationInstanceConfigurationWorkflowDTO.id(),
+                        integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId()))
+                    .map(IntegrationInstanceConfigurationWorkflowDTO::workflow)
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElse(null);
+
+                return connectedUserIntegrationInstanceWorkflow.withStaticWebhookUrl(
+                    connectedUserWorkflowWebhookUrlResolver.resolveIntegrationInstanceWorkflow(
+                        integrationInstanceId, connectedUserIntegrationInstanceWorkflow.workflowUuid(), workflow));
+            })
             .toList();
     }
 

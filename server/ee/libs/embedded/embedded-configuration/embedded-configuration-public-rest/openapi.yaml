@@ -2310,6 +2310,10 @@ components:
           description: "True when the workflow can only be started as an MCP tool, because its only enabled trigger is\
             \ the workflow call trigger."
           type: "boolean"
+        staticWebhookUrl:
+          description: "The url that starts the workflow when it begins with a static webhook trigger, for example\
+            \ Webhook. Null when the workflow is not deployed or starts with another trigger."
+          type: "string"
     Connection:
       description: "Contains all required information to open a connection to a service defined by componentName parameter"
       type: "object"
@@ -2534,6 +2538,10 @@ components:
           additionalProperties: true
         workflowUuid:
           description: "The reference code of a workflow."
+          type: "string"
+        staticWebhookUrl:
+          description: "The url that starts the workflow for this integration instance when it begins with a static\
+            \ webhook trigger, for example Webhook. Null when the workflow starts with another trigger."
           type: "string"
     McpIntegrationInstanceTool:
       description: "Contains user configurations for the execution of a particular MCP tool."
