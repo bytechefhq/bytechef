@@ -20,6 +20,7 @@ import {useOnLogout} from '@/shared/hooks/useOnLogout';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
 import {TrialBanner} from '@/shared/layout/TrialBanner';
 import {AppSidebar} from '@/shared/layout/app-sidebar/AppSidebar';
+import {resolveShellPlatformMode} from '@/shared/navigation/platformMode';
 import {isStandaloneRoute} from '@/shared/navigation/standaloneRoutes';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
@@ -221,8 +222,10 @@ function App() {
     const queryClient = useQueryClient();
     const userGuiding = useUserGuiding();
 
+    const platformMode = resolveShellPlatformMode(location.pathname, currentType);
+
     useFetchInterceptor();
-    useLoadWorkspaceScopes(location.pathname.includes('/automation/') ? currentWorkspaceId : undefined);
+    useLoadWorkspaceScopes(platformMode === PlatformType.AUTOMATION ? currentWorkspaceId : undefined);
 
     const canEditWorkspace = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_CREATE');
 
@@ -320,9 +323,9 @@ function App() {
 
     let navigation: NavigationType[] = [];
 
-    if (location.pathname.includes('/automation/')) {
+    if (platformMode === PlatformType.AUTOMATION) {
         navigation = filteredAutomationNavigation;
-    } else if (isEmbeddedPath) {
+    } else if (platformMode === PlatformType.EMBEDDED) {
         navigation = filteredEmbeddedNavigation;
     }
 
@@ -400,7 +403,7 @@ function App() {
 
     return authenticated ? (
         <div className="flex h-full flex-col">
-            {billingEnabled && location.pathname.includes('/automation/') && <TrialBanner />}
+            {billingEnabled && platformMode === PlatformType.AUTOMATION && <TrialBanner />}
 
             {/* transform-gpu gives fixed-position descendants (page sidebars) a containing
                 block scoped to this element, so they render below the banner instead of
