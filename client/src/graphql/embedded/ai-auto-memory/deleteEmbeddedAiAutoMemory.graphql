@@ -1,3 +1,13 @@
-mutation deleteEmbeddedAiAutoMemory($id: ID!, $integrationInstanceId: ID!, $environment: Int!) {
-    deleteEmbeddedAiAutoMemory(id: $id, integrationInstanceId: $integrationInstanceId, environment: $environment)
+mutation deleteEmbeddedAiAutoMemory(
+    $id: ID!
+    $principalType: AiAutoMemoryPrincipalType!
+    $principalId: ID!
+    $environment: Int!
+) {
+    deleteEmbeddedAiAutoMemory(
+        id: $id
+        principalType: $principalType
+        principalId: $principalId
+        environment: $environment
+    )
 }
