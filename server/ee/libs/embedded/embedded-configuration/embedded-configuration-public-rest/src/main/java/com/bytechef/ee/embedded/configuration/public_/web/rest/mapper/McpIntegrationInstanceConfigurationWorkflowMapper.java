@@ -29,6 +29,7 @@ public class McpIntegrationInstanceConfigurationWorkflowMapper {
         @Mapping(target = "description", ignore = true)
         @Mapping(target = "inputs", ignore = true)
         @Mapping(target = "label", ignore = true)
+        @Mapping(target = "staticWebhookTrigger", ignore = true)
         @Mapping(target = "workflowUuid", ignore = true)
         IntegrationWorkflowModel
             convert(McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow);

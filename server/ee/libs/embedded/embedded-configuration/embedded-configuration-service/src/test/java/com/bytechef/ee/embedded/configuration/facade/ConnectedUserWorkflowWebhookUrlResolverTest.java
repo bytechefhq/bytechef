@@ -109,6 +109,15 @@ class ConnectedUserWorkflowWebhookUrlResolverTest {
     }
 
     @Test
+    void testResolveReturnsNullForAnAppEventTrigger() {
+        mockDeployedWorkflow("appEvent/v1/newEvent");
+
+        assertThat(resolver.resolve(PROJECT_DEPLOYMENT_ID, WORKFLOW_UUID)).isNull();
+
+        verifyNoInteractions(triggerDefinitionService);
+    }
+
+    @Test
     void testResolveReturnsNullForATriggerThatIsNotAStaticWebhook() {
         mockDeployedWorkflow("infobip/v1/newWhatsappMessage");
         mockTriggerDefinition("infobip", "newWhatsappMessage", TriggerType.DYNAMIC_WEBHOOK);
@@ -169,6 +178,16 @@ class ConnectedUserWorkflowWebhookUrlResolverTest {
     }
 
     @Test
+    void testResolveIntegrationInstanceWorkflowReturnsNullForAnAppEventTrigger() {
+        assertThat(
+            resolver.resolveIntegrationInstanceWorkflow(
+                INTEGRATION_INSTANCE_ID, WORKFLOW_UUID, getWorkflow("appEvent/v1/newEvent")))
+                    .isNull();
+
+        verifyNoInteractions(triggerDefinitionService);
+    }
+
+    @Test
     void testResolveIntegrationInstanceWorkflowReturnsNullForATriggerThatIsNotAStaticWebhook() {
         mockTriggerDefinition("infobip", "newWhatsappMessage", TriggerType.DYNAMIC_WEBHOOK);
 
@@ -182,6 +201,34 @@ class ConnectedUserWorkflowWebhookUrlResolverTest {
     void testResolveIntegrationInstanceWorkflowReturnsNullWithoutAWorkflow() {
         assertThat(resolver.resolveIntegrationInstanceWorkflow(INTEGRATION_INSTANCE_ID, WORKFLOW_UUID, null))
             .isNull();
+
+        verifyNoInteractions(triggerDefinitionService);
+    }
+
+    @Test
+    void testHasStaticWebhookTriggerReturnsTrueForAStaticWebhookTrigger() {
+        mockTriggerDefinition("webhook", "awaitWorkflowAndRespond", TriggerType.STATIC_WEBHOOK);
+
+        assertThat(resolver.hasStaticWebhookTrigger(getWorkflow("webhook/v1/awaitWorkflowAndRespond"))).isTrue();
+    }
+
+    @Test
+    void testHasStaticWebhookTriggerReturnsFalseForAnAppEventTrigger() {
+        assertThat(resolver.hasStaticWebhookTrigger(getWorkflow("appEvent/v1/newEvent"))).isFalse();
+
+        verifyNoInteractions(triggerDefinitionService);
+    }
+
+    @Test
+    void testHasStaticWebhookTriggerReturnsFalseForATriggerThatIsNotAStaticWebhook() {
+        mockTriggerDefinition("infobip", "newWhatsappMessage", TriggerType.DYNAMIC_WEBHOOK);
+
+        assertThat(resolver.hasStaticWebhookTrigger(getWorkflow("infobip/v1/newWhatsappMessage"))).isFalse();
+    }
+
+    @Test
+    void testHasStaticWebhookTriggerReturnsFalseWithoutAWorkflow() {
+        assertThat(resolver.hasStaticWebhookTrigger(null)).isFalse();
 
         verifyNoInteractions(triggerDefinitionService);
     }

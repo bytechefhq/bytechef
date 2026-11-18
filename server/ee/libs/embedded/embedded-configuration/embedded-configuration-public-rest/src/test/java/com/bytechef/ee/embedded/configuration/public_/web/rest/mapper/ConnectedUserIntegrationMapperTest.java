@@ -49,6 +49,7 @@ import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -216,6 +217,35 @@ class ConnectedUserIntegrationMapperTest {
     }
 
     @Test
+    void testIntegrationWorkflowsFlagAStaticWebhookTrigger() {
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
+            IntegrationInstanceConfigurationDTO.builder()
+                .id(77L)
+                .integrationInstanceConfigurationWorkflows(
+                    List.of(getIntegrationInstanceConfigurationWorkflowDTO("u-1"),
+                        getIntegrationInstanceConfigurationWorkflowDTO("u-2")))
+                .build();
+
+        ConnectedUserIntegrationDTO connectedUserIntegrationDTO = new ConnectedUserIntegrationDTO(
+            null, integrationInstanceConfigurationDTO, List.of(), null, null, List.of(), List.of());
+
+        ConnectedUserIntegrationMapper.ConnectedUserIntegrationToIntegrationMapper generatedMapper =
+            new ConnectedUserIntegrationMapper$ConnectedUserIntegrationToIntegrationMapperImpl();
+
+        IntegrationModel integrationModel = generatedMapper.convert(
+            connectedUserIntegrationDTO.withStaticWebhookWorkflowUuids(Set.of("u-1")));
+
+        List<IntegrationWorkflowModel> integrationWorkflowModels = Objects.requireNonNull(
+            integrationModel.getWorkflows());
+
+        assertEquals(2, integrationWorkflowModels.size());
+        assertEquals(Boolean.TRUE, integrationWorkflowModels.get(0)
+            .getStaticWebhookTrigger());
+        assertEquals(Boolean.FALSE, integrationWorkflowModels.get(1)
+            .getStaticWebhookTrigger());
+    }
+
+    @Test
     void testBasicMapperIntegrationInstanceMapsConnectionId() {
         IntegrationInstance integrationInstance = new IntegrationInstance();
 
@@ -380,5 +410,17 @@ class ConnectedUserIntegrationMapperTest {
 
         return generatedMapper.map(connectionConfig.inputs()
             .getFirst());
+    }
+
+    private static IntegrationInstanceConfigurationWorkflowDTO getIntegrationInstanceConfigurationWorkflowDTO(
+        String workflowUuid) {
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflow.getLabel()).thenReturn(workflowUuid);
+
+        return new IntegrationInstanceConfigurationWorkflowDTO(
+            List.of(), null, null, Map.of(), true, 1L, null, null, null, 77L, 0, workflow, "workflow-" + workflowUuid,
+            workflowUuid, Map.of());
     }
 }
