@@ -51,11 +51,13 @@ fields of the JSON body are pills under `body`:
 | --- | --- |
 | `${trigger_1.body.firstName}` | `Ada` |
 | `${trigger_1.body['order-id']}` | `A-1001` |
+| `${produceReport.outputFiles['report.csv']}` | The `report.csv` entry of a map keyed by file path |
 | `${trigger_1.body.items}` | The whole `items` list |
 | `${trigger_1.body.items[0].sku}` | `KB-01` |
 
-A key that contains characters other than letters, digits, `_` and `$`, such as `order-id`, is
-written in bracket notation. The editor does this for you when you insert the pill.
+A key that contains characters other than letters, digits and `_`, or starts with a digit, such as `order-id`,
+`report.csv` or `charts/summary.txt`, is written in bracket notation. The editor does this for you when you insert the
+pill. A bracketed key cannot contain a `'`, a `\`, a `{`, a `}` or a line break.
 
 When you insert a field from inside a list, the pill points to the first item, `[0]`. Click the
 index on the pill to pick another item. To process every item, use a
