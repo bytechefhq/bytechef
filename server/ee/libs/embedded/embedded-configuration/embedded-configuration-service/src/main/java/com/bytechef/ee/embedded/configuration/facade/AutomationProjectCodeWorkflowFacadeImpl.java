@@ -224,13 +224,8 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
 
         Project project = projectService.getProject(automationProjectId);
 
-        String expectedName = project.getName();
-
-        if (!Objects.equals(projectDefinition.getName(), expectedName)) {
-            throw new ConfigurationException(
-                "Renaming a code project by editing its source is not supported (expected name '" + expectedName +
-                    "')",
-                CodeWorkflowErrorType.CODE_WORKFLOW_NAME_MISMATCH);
+        if (!Objects.equals(projectDefinition.getName(), project.getName())) {
+            project = renameProject(project, projectDefinition.getName());
         }
 
         projectCodeWorkflowDraftService.saveDraft(project, projectDefinition, bytes, language);
@@ -244,21 +239,24 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
         int projectVersion = Objects.requireNonNull(lastPublishedProjectVersion)
             .getVersion();
 
-        Optional<AutomationProjectConfigurationDTO> existingConfigurationOptional =
+        List<AutomationProjectConfigurationDTO> environmentConfigurations =
             automationProjectConfigurationFacade.getConfigurations(projectId)
                 .stream()
                 .filter(configuration -> configuration.environmentId() == environment.ordinal())
-                .findFirst();
+                .toList();
 
-        if (existingConfigurationOptional.isPresent()) {
-            AutomationProjectConfigurationDTO existingConfiguration = existingConfigurationOptional.get();
-
-            automationProjectConfigurationFacade.updateConfiguration(
-                existingConfiguration.id(), existingConfiguration.name(), existingConfiguration.permissionExpression(),
-                projectVersion, existingConfiguration.enabled(), existingConfiguration.automationHubVisible());
-        } else {
+        if (environmentConfigurations.isEmpty()) {
             automationProjectConfigurationFacade.createConfiguration(
                 projectId, environment.ordinal(), environment.name(), null, projectVersion, true, true);
+
+            return;
+        }
+
+        for (AutomationProjectConfigurationDTO environmentConfiguration : environmentConfigurations) {
+            automationProjectConfigurationFacade.updateConfiguration(
+                environmentConfiguration.id(), environmentConfiguration.name(),
+                environmentConfiguration.permissionExpression(), projectVersion, environmentConfiguration.enabled(),
+                environmentConfiguration.automationHubVisible());
         }
     }
 
@@ -285,6 +283,26 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
                 "Only JavaScript and Python code projects can be created and edited in the app",
                 CodeWorkflowErrorType.LANGUAGE_NOT_SUPPORTED);
         }
+    }
+
+    private Project renameProject(Project project, String name) {
+        validateName(name);
+
+        Long projectId = project.getId();
+
+        boolean nameTaken = automationProjectFacade.fetchProjectIdByName(name)
+            .filter(existingProjectId -> !Objects.equals(existingProjectId, projectId))
+            .isPresent();
+
+        if (nameTaken) {
+            throw new ConfigurationException(
+                "A catalog project named '" + name + "' already exists",
+                CodeWorkflowErrorType.CODE_WORKFLOW_ALREADY_EXISTS);
+        }
+
+        project.setName(name);
+
+        return projectService.update(project);
     }
 
     private static void validateName(String name) {
