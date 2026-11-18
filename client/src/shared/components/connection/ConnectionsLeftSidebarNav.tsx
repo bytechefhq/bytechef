@@ -14,9 +14,15 @@ interface ConnectionsLeftSidebarNavProps {
     connectionsAreLoading?: boolean;
     currentComponentName?: string;
     currentTagId?: number;
+    preservedSearchParams?: Record<string, string>;
     tags: ConnectionsLeftSidebarNavTagI[] | undefined;
     tagsIsLoading?: boolean;
 }
+
+const buildFilterLink = (
+    preservedSearchParams: Record<string, string> | undefined,
+    filterSearchParams: Record<string, string>
+) => `?${new URLSearchParams({...preservedSearchParams, ...filterSearchParams}).toString()}`;
 
 const ConnectionsLeftSidebarNav = ({
     componentDefinitions,
@@ -24,6 +30,7 @@ const ConnectionsLeftSidebarNav = ({
     connectionsAreLoading = false,
     currentComponentName,
     currentTagId,
+    preservedSearchParams,
     tags,
     tagsIsLoading = false,
 }: ConnectionsLeftSidebarNavProps) => {
@@ -36,9 +43,9 @@ const ConnectionsLeftSidebarNav = ({
                 current: currentComponentName === componentDefinition.name,
                 id: componentDefinition.name,
                 name: componentDefinition.title!,
-                toLink: `?componentName=${componentDefinition.name}`,
+                toLink: buildFilterLink(preservedSearchParams, {componentName: componentDefinition.name}),
             }));
-    }, [componentDefinitions, connections, currentComponentName]);
+    }, [componentDefinitions, connections, currentComponentName, preservedSearchParams]);
 
     return (
         <>
@@ -47,6 +54,7 @@ const ConnectionsLeftSidebarNav = ({
                 leadItem={{
                     current: !currentComponentName && currentTagId === undefined,
                     name: 'All Components',
+                    toLink: preservedSearchParams ? buildFilterLink(preservedSearchParams, {}) : undefined,
                 }}
                 loading={connectionsAreLoading}
                 title="Components"
@@ -59,7 +67,7 @@ const ConnectionsLeftSidebarNav = ({
                     current: currentTagId === tag.id,
                     id: tag.id!,
                     name: tag.name,
-                    toLink: `?tagId=${tag.id}`,
+                    toLink: buildFilterLink(preservedSearchParams, {tagId: String(tag.id)}),
                 }))}
                 loading={tagsIsLoading}
                 title="Tags"
