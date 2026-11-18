@@ -61,7 +61,7 @@ const ConnectedUserSheetPanelWorkflowList = ({
     );
 
     if (isLoading || automationProjectsIsLoading) {
-        return <ConnectedUserSheetPanelListSkeleton label="Loading automations" />;
+        return <ConnectedUserSheetPanelListSkeleton label="Loading automations" variant="automation" />;
     }
 
     const connectedUserProjects = data?.connectedUserProjects ?? [];

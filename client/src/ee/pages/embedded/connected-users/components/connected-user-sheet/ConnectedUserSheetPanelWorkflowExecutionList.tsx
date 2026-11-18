@@ -1,7 +1,9 @@
 import EmptyState from '@/components/EmptyState/EmptyState';
 import TablePagination from '@/components/TablePagination';
 import {Button} from '@/components/ui/button';
-import ConnectedUserSheetPanelTableSkeleton from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelTableSkeleton';
+import ConnectedUserSheetPanelTableSkeleton, {
+    ConnectedUserSheetPanelTableSkeletonColumnI,
+} from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelTableSkeleton';
 import {EMBEDDED_WORKFLOW_EXECUTIONS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
 import AnyWorkflowExecutionsTable from '@/ee/pages/embedded/workflow-executions/components/AnyWorkflowExecutionsTable';
 import EmbeddedWorkflowExecutionSheet from '@/ee/pages/embedded/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet';
@@ -13,6 +15,16 @@ import AutomationExecutionSheet from '@/pages/automation/workflow-executions/com
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ActivityIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
+
+const WORKFLOW_EXECUTION_SKELETON_COLUMNS: ConnectedUserSheetPanelTableSkeletonColumnI[] = [
+    {header: 'Status', skeletonClassName: 'w-20 rounded-full'},
+    {header: 'Workflow', skeletonClassName: 'w-40'},
+    {header: 'Source', skeletonClassName: 'w-24'},
+    {header: 'Version', skeletonClassName: 'w-8'},
+    {header: 'Duration', skeletonClassName: 'w-12'},
+    {header: 'Execution date', skeletonClassName: 'w-32'},
+    {header: 'Actions', pinned: true, skeletonClassName: 'size-5'},
+];
 
 interface ConnectedUserSheetPanelWorkflowExecutionListProps {
     connectedUserId: number;
@@ -43,7 +55,12 @@ const ConnectedUserSheetPanelWorkflowExecutionList = ({
     );
 
     if (workflowExecutionsIsLoading) {
-        return <ConnectedUserSheetPanelTableSkeleton label="Loading workflow executions" />;
+        return (
+            <ConnectedUserSheetPanelTableSkeleton
+                columns={WORKFLOW_EXECUTION_SKELETON_COLUMNS}
+                label="Loading workflow executions"
+            />
+        );
     }
 
     if (workflowExecutionsError) {

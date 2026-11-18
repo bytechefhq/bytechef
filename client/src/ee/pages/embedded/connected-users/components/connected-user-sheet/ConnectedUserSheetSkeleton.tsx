@@ -1,8 +1,10 @@
 import {Skeleton} from '@/components/ui/skeleton';
 import ConnectedUserSheetPanelListSkeleton from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelListSkeleton';
+import {twMerge} from 'tailwind-merge';
 
-const PROFILE_ROW_COUNT = 4;
-const TAB_COUNT = 6;
+const PROFILE_ROW_COUNT = 6;
+
+const TAB_LABEL_WIDTHS = ['w-20', 'w-20', 'w-20', 'w-20', 'w-32', 'w-32'];
 
 const ConnectedUserSheetSkeleton = () => (
     <div
@@ -25,14 +27,16 @@ const ConnectedUserSheetSkeleton = () => (
             </div>
         </div>
 
-        <div className="w-full space-y-4">
-            <div className="flex w-full gap-x-2 border-b border-border pb-2.5">
-                {Array.from({length: TAB_COUNT}, (_, tabIndex) => (
-                    <Skeleton className="h-5 flex-1" key={tabIndex} />
+        <div className="flex w-full flex-col gap-2">
+            <div className="inline-flex h-9 w-fit items-center gap-x-1 rounded-lg bg-muted p-[3px]">
+                {TAB_LABEL_WIDTHS.map((tabLabelWidth, tabIndex) => (
+                    <div className="flex h-full items-center px-2" key={tabIndex}>
+                        <Skeleton className={twMerge('h-4', tabLabelWidth)} />
+                    </div>
                 ))}
             </div>
 
-            <ConnectedUserSheetPanelListSkeleton label="Loading integrations" />
+            <ConnectedUserSheetPanelListSkeleton label="Loading integrations" variant="integration" />
         </div>
     </div>
 );

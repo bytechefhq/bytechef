@@ -1,6 +1,6 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import ConnectedUserSheetPanelExternalInvocationList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelExternalInvocationList';
-import {fireEvent, render, screen} from '@testing-library/react';
+import {fireEvent, render, screen, within} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
@@ -50,6 +50,12 @@ describe('ConnectedUserSheetPanelExternalInvocationList', () => {
 
         expect(hoisted.externalInvocationLogsQuery).toHaveBeenCalledWith({connectedUserId: 7, type: 'EMBEDDED'});
         expect(screen.getByRole('status', {name: 'Loading external invocations'})).toBeInTheDocument();
+
+        expect(
+            within(screen.getByRole('status'))
+                .getAllByRole('columnheader')
+                .map((columnHeader) => columnHeader.textContent)
+        ).toEqual(['Status', 'Name', 'Type', 'Source', 'Server', 'Target', 'Duration', 'Date']);
         expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
     });
 
