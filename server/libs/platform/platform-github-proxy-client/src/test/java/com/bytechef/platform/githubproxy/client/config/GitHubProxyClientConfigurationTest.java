@@ -46,4 +46,13 @@ class GitHubProxyClientConfigurationTest {
         contextRunner.withPropertyValues("github-proxy.oauth-apps-api-key=k1")
             .run(context -> assertThat(context).hasSingleBean(OAuthAppProxyClient.class));
     }
+
+    @Test
+    void testOAuthAppProxyClientPresentWithApiKeyContainingQuote() {
+        contextRunner.withPropertyValues("github-proxy.oauth-apps-api-key=k'1")
+            .run(context -> {
+                assertThat(context).hasNotFailed();
+                assertThat(context).hasSingleBean(OAuthAppProxyClient.class);
+            });
+    }
 }

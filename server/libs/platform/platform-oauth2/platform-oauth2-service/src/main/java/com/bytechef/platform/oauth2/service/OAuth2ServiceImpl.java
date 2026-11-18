@@ -59,7 +59,6 @@ public class OAuth2ServiceImpl implements OAuth2Service {
             }
 
             if (oAuth2App != null) {
-
                 newParameters.putAll(
                     Map.of(
                         Authorization.CLIENT_ID, oAuth2App.getClientId(),

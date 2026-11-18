@@ -24,9 +24,9 @@ import com.bytechef.platform.githubproxy.client.internal.RestOAuthAppProxyClient
 import com.bytechef.platform.githubproxy.client.internal.RestWorkflowTemplateProxyClient;
 import java.net.http.HttpClient;
 import java.time.Duration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
@@ -61,7 +61,7 @@ class GitHubProxyClientConfiguration {
     }
 
     @Bean
-    @ConditionalOnExpression("!'${github-proxy.oauth-apps-api-key:}'.isBlank()")
+    @Conditional(OAuthAppsApiKeyPresentCondition.class)
     OAuthAppProxyClient oAuthAppProxyClient(GitHubProxyClientProperties properties) {
         HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(5))
