@@ -7,10 +7,12 @@ import {useSearchParams} from 'react-router-dom';
 
 const ConnectionsFilterTitle = ({
     componentDefinitions,
+    connectedUserName,
     filterData,
     tags,
 }: {
     componentDefinitions: ComponentDefinitionBasic[] | undefined;
+    connectedUserName?: string;
     filterData: {id: string | number | null | undefined; type: Type};
     tags: Tag[] | undefined;
 }) => {
@@ -29,6 +31,15 @@ const ConnectionsFilterTitle = ({
     return (
         <div className="space-x-1">
             <span className="text-sm font-semibold text-muted-foreground uppercase">Filter by:</span>
+
+            {connectedUserName && (
+                <Badge
+                    className="border-transparent"
+                    label={`User: ${connectedUserName}`}
+                    styleType="primary-outline"
+                    weight="semibold"
+                />
+            )}
 
             <Badge
                 className="border-transparent"

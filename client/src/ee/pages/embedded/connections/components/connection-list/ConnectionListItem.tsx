@@ -19,15 +19,16 @@ import {
 } from '@/shared/queries/platform/componentDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {Trash2Icon} from 'lucide-react';
-import {useState} from 'react';
+import {ReactNode, useState} from 'react';
 
 interface ConnectionListItemProps {
+    badges?: ReactNode;
     componentDefinitions: ComponentDefinitionBasic[];
     connection: Connection;
     remainingTags?: Tag[];
 }
 
-const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: ConnectionListItemProps) => {
+const ConnectionListItem = ({badges, componentDefinitions, connection, remainingTags}: ConnectionListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -79,9 +80,10 @@ const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: C
         <ConnectionListItemLayout
             active={connection.active}
             badges={
-                connection.shared && (
+                badges ??
+                (connection.shared && (
                     <Badge className="uppercase" label="Shared" styleType="secondary-outline" weight="semibold" />
-                )
+                ))
             }
             createdDate={connection.createdDate}
             credentialStatus={connection.credentialStatus}
