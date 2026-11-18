@@ -17,6 +17,7 @@ import com.bytechef.ee.embedded.ai.auto.memory.domain.EmbeddedAiAutoMemory;
 import com.bytechef.ee.embedded.ai.auto.memory.domain.EmbeddedAiAutoMemoryConnectedUser;
 import com.bytechef.ee.embedded.ai.auto.memory.facade.EmbeddedAiAutoMemoryFacade;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryNotFoundException;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryOwner;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPatch;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalType;
@@ -177,7 +178,7 @@ class EmbeddedAiAutoMemoryGraphQlControllerIntTest {
     @Test
     void testUpdateMapsTheInputToAPatch() {
         when(embeddedAiAutoMemoryFacade.updateEmbeddedAiAutoMemory(
-            eq(Environment.PRODUCTION), eq(3L), eq(4L), eq(
+            eq(Environment.PRODUCTION), eq(11L), eq(3L), eq(4L), eq(
                 new AiAutoMemoryPatch("New title", "New description", AiAutoMemoryType.FEEDBACK, "New content"))))
                     .thenReturn(newEmbeddedAiAutoMemory());
 
@@ -186,7 +187,7 @@ class EmbeddedAiAutoMemoryGraphQlControllerIntTest {
                 """
                     mutation {
                         updateEmbeddedAiAutoMemory(input: {
-                            id: "3", environment: 2, expectedVersion: 4, title: "New title",
+                            id: "3", integrationInstanceId: "11", environment: 2, expectedVersion: 4, title: "New title",
                             description: "New description", memoryType: FEEDBACK, content: "New content"
                         }) { id }
                     }
@@ -200,19 +201,21 @@ class EmbeddedAiAutoMemoryGraphQlControllerIntTest {
     @Test
     void testDeleteReturnsTrue() {
         graphQlTester
-            .document("mutation { deleteEmbeddedAiAutoMemory(id: \"3\", environment: 2) }")
+            .document(
+                "mutation { deleteEmbeddedAiAutoMemory(id: \"3\", integrationInstanceId: \"11\", environment: 2) }")
             .execute()
             .path("deleteEmbeddedAiAutoMemory")
             .entity(Boolean.class)
             .isEqualTo(true);
 
-        verify(embeddedAiAutoMemoryFacade).deleteEmbeddedAiAutoMemory(Environment.PRODUCTION, 3L);
+        verify(embeddedAiAutoMemoryFacade).deleteEmbeddedAiAutoMemory(Environment.PRODUCTION, 11L, 3L);
     }
 
     @Test
     void testUnknownEnvironmentIsABadRequest() {
         graphQlTester
-            .document("mutation { deleteEmbeddedAiAutoMemory(id: \"3\", environment: 9) }")
+            .document(
+                "mutation { deleteEmbeddedAiAutoMemory(id: \"3\", integrationInstanceId: \"11\", environment: 9) }")
             .execute()
             .errors()
             .satisfy(errors -> assertThat(errors)
@@ -221,16 +224,19 @@ class EmbeddedAiAutoMemoryGraphQlControllerIntTest {
     }
 
     @Test
-    void testMissingMemoryIsABadRequest() {
+    void testMissingMemoryIsNotFound() {
         when(embeddedAiAutoMemoryFacade.updateEmbeddedAiAutoMemory(
-            eq(Environment.PRODUCTION), anyLong(), anyLong(), eq(new AiAutoMemoryPatch("x", null, null, null))))
-                .thenThrow(new IllegalArgumentException("Embedded AI memory 3 not found"));
+            eq(Environment.PRODUCTION), anyLong(), anyLong(), anyLong(),
+            eq(new AiAutoMemoryPatch("x", null, null, null))))
+                .thenThrow(new AiAutoMemoryNotFoundException("Memory not found"));
 
         graphQlTester
             .document(
                 """
                     mutation {
-                        updateEmbeddedAiAutoMemory(input: {id: "3", environment: 2, expectedVersion: 4, title: "x"}) {
+                        updateEmbeddedAiAutoMemory(
+                            input: {id: "3", integrationInstanceId: "11", environment: 2, expectedVersion: 4, title: "x"}
+                        ) {
                             id
                         }
                     }
@@ -240,8 +246,8 @@ class EmbeddedAiAutoMemoryGraphQlControllerIntTest {
             .satisfy(errors -> assertThat(errors)
                 .singleElement()
                 .satisfies(error -> {
-                    assertThat(error.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
-                    assertThat(error.getMessage()).isEqualTo("Embedded AI memory 3 not found");
+                    assertThat(error.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
+                    assertThat(error.getMessage()).isEqualTo("Memory not found");
                 }));
     }
 

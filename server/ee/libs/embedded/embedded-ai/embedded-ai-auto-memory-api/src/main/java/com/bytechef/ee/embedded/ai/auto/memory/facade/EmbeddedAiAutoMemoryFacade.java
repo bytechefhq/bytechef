@@ -25,7 +25,7 @@ import org.jspecify.annotations.Nullable;
  */
 public interface EmbeddedAiAutoMemoryFacade {
 
-    void deleteEmbeddedAiAutoMemory(Environment environment, long id);
+    void deleteEmbeddedAiAutoMemory(Environment environment, long integrationInstanceId, long id);
 
     List<EmbeddedAiAutoMemory> getEmbeddedAiAutoMemories(
         Environment environment, @Nullable Long connectedUserId, @Nullable AiAutoMemoryType memoryType);
@@ -33,5 +33,5 @@ public interface EmbeddedAiAutoMemoryFacade {
     List<EmbeddedAiAutoMemoryConnectedUser> getEmbeddedAiAutoMemoryConnectedUsers(Environment environment);
 
     EmbeddedAiAutoMemory updateEmbeddedAiAutoMemory(
-        Environment environment, long id, long expectedVersion, AiAutoMemoryPatch patch);
+        Environment environment, long integrationInstanceId, long id, long expectedVersion, AiAutoMemoryPatch patch);
 }

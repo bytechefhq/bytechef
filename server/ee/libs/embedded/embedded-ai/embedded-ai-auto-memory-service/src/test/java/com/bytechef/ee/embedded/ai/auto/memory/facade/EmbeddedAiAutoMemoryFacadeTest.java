@@ -28,6 +28,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryNotFoundException;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryOwner;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPatch;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalType;
@@ -52,6 +53,10 @@ class EmbeddedAiAutoMemoryFacadeTest {
     private static final long INTEGRATION_ID = 400L;
     private static final long OTHER_CONNECTED_USER_ID = 201L;
     private static final long OTHER_INSTANCE_ID = 101L;
+
+    private static final AiAutoMemoryOwner INSTANCE_OWNER = new AiAutoMemoryOwner(
+        Workspace.DEFAULT_WORKSPACE_ID, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, INSTANCE_ID,
+        Environment.DEVELOPMENT);
 
     private final AiAutoMemoryService aiAutoMemoryService = mock(AiAutoMemoryService.class);
     private final ConnectedUserService connectedUserService = mock(ConnectedUserService.class);
@@ -165,62 +170,51 @@ class EmbeddedAiAutoMemoryFacadeTest {
     }
 
     @Test
-    void testUpdateCallsUpdateByIdWithTheRowOwner() {
+    void testUpdateAddressesTheIntegrationInstanceOwnerWithoutListingTheWorkspace() {
         AiAutoMemory aiAutoMemory = memory(
             3L, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, INSTANCE_ID, Environment.DEVELOPMENT);
         AiAutoMemoryPatch aiAutoMemoryPatch = new AiAutoMemoryPatch("New title", null, null, null);
 
-        when(aiAutoMemoryService.listAllOwners(Workspace.DEFAULT_WORKSPACE_ID, Environment.DEVELOPMENT, null))
-            .thenReturn(List.of(aiAutoMemory));
-        when(aiAutoMemoryService.updateById(aiAutoMemory.getOwner(), 3L, 7L, aiAutoMemoryPatch))
+        when(aiAutoMemoryService.updateById(INSTANCE_OWNER, 3L, 7L, aiAutoMemoryPatch))
             .thenReturn(aiAutoMemory);
 
         EmbeddedAiAutoMemory embeddedAiAutoMemory = embeddedAiAutoMemoryFacade.updateEmbeddedAiAutoMemory(
-            Environment.DEVELOPMENT, 3L, 7L, aiAutoMemoryPatch);
+            Environment.DEVELOPMENT, INSTANCE_ID, 3L, 7L, aiAutoMemoryPatch);
 
         assertThat(embeddedAiAutoMemory.connectedUserId()).isEqualTo(CONNECTED_USER_ID);
 
-        verify(aiAutoMemoryService).updateById(aiAutoMemory.getOwner(), 3L, 7L, aiAutoMemoryPatch);
+        verify(aiAutoMemoryService).updateById(INSTANCE_OWNER, 3L, 7L, aiAutoMemoryPatch);
+        verify(aiAutoMemoryService, never()).listAllOwners(anyLong(), any(), any());
     }
 
     @Test
-    void testUpdateRejectsAMemoryThatIsNotIntegrationInstanceOwned() {
-        when(aiAutoMemoryService.listAllOwners(Workspace.DEFAULT_WORKSPACE_ID, Environment.DEVELOPMENT, null))
-            .thenReturn(List.of(memory(3L, AiAutoMemoryPrincipalType.USER, 5L, Environment.DEVELOPMENT)));
-
+    void testUpdatePropagatesAMemoryTheOwnerDoesNotHold() {
         AiAutoMemoryPatch aiAutoMemoryPatch = new AiAutoMemoryPatch("New title", null, null, null);
 
-        assertThatExceptionOfType(IllegalArgumentException.class)
+        when(aiAutoMemoryService.updateById(INSTANCE_OWNER, 3L, 7L, aiAutoMemoryPatch))
+            .thenThrow(new AiAutoMemoryNotFoundException("Memory not found"));
+
+        assertThatExceptionOfType(AiAutoMemoryNotFoundException.class)
             .isThrownBy(() -> embeddedAiAutoMemoryFacade.updateEmbeddedAiAutoMemory(
-                Environment.DEVELOPMENT, 3L, 7L, aiAutoMemoryPatch))
-            .withMessageContaining("not found");
-
-        verify(aiAutoMemoryService, never()).updateById(any(), anyLong(), anyLong(), any());
+                Environment.DEVELOPMENT, INSTANCE_ID, 3L, 7L, aiAutoMemoryPatch));
     }
 
     @Test
-    void testDeleteCallsDeleteByIdWithTheRowOwner() {
-        AiAutoMemory aiAutoMemory = memory(
-            3L, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, INSTANCE_ID, Environment.DEVELOPMENT);
+    void testDeleteAddressesTheIntegrationInstanceOwnerWithoutListingTheWorkspace() {
+        embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(Environment.DEVELOPMENT, INSTANCE_ID, 3L);
 
-        when(aiAutoMemoryService.listAllOwners(Workspace.DEFAULT_WORKSPACE_ID, Environment.DEVELOPMENT, null))
-            .thenReturn(List.of(aiAutoMemory));
-
-        embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(Environment.DEVELOPMENT, 3L);
-
-        verify(aiAutoMemoryService).deleteById(aiAutoMemory.getOwner(), 3L);
+        verify(aiAutoMemoryService).deleteById(INSTANCE_OWNER, 3L);
+        verify(aiAutoMemoryService, never()).listAllOwners(anyLong(), any(), any());
     }
 
     @Test
-    void testDeleteRejectsAMemoryOfAnotherEnvironment() {
-        when(aiAutoMemoryService.listAllOwners(Workspace.DEFAULT_WORKSPACE_ID, Environment.PRODUCTION, null))
-            .thenReturn(List.of());
+    void testDeletePropagatesAMemoryTheOwnerDoesNotHold() {
+        when(aiAutoMemoryService.deleteById(INSTANCE_OWNER, 3L))
+            .thenThrow(new AiAutoMemoryNotFoundException("Memory not found"));
 
-        assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(Environment.PRODUCTION, 3L))
-            .withMessageContaining("not found");
-
-        verify(aiAutoMemoryService, never()).deleteById(any(), anyLong());
+        assertThatExceptionOfType(AiAutoMemoryNotFoundException.class)
+            .isThrownBy(
+                () -> embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(Environment.DEVELOPMENT, INSTANCE_ID, 3L));
     }
 
     private static ConnectedUser connectedUser(long id, String name, String email, String externalId) {

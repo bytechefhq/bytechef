@@ -58,13 +58,16 @@ extend type Query {
 
 extend type Mutation {
     """
-    Partial update of an integration instance's memory. Fails with BAD_REQUEST when the memory does not exist in the
-    environment, and with CONFLICT when it changed since expectedVersion. Admin only.
+    Partial update of an integration instance's memory. Fails with NOT_FOUND when the instance holds no such memory in
+    the environment, and with CONFLICT when it changed since expectedVersion. Admin only.
     """
     updateEmbeddedAiAutoMemory(input: UpdateEmbeddedAiAutoMemoryInput!): EmbeddedAiAutoMemory!
 
-    "Deletes an integration instance's memory. Fails with BAD_REQUEST when it does not exist in the environment. Admin only."
-    deleteEmbeddedAiAutoMemory(id: ID!, environment: Int!): Boolean!
+    """
+    Deletes an integration instance's memory. Fails with NOT_FOUND when the instance holds no such memory in the
+    environment. Admin only.
+    """
+    deleteEmbeddedAiAutoMemory(id: ID!, integrationInstanceId: ID!, environment: Int!): Boolean!
 }
 
 """
@@ -73,6 +76,8 @@ content is rejected.
 """
 input UpdateEmbeddedAiAutoMemoryInput {
     id: ID!
+    "The integration instance that holds the memory: the memory's integrationInstanceId."
+    integrationInstanceId: ID!
     environment: Int!
     expectedVersion: Long!
     title: String

@@ -19,6 +19,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryOwner;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPatch;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalType;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryService;
@@ -76,13 +77,13 @@ public class EmbeddedAiAutoMemoryFacadeImpl implements EmbeddedAiAutoMemoryFacad
     @Override
     @Audited(event = AI_AUTO_MEMORY_DELETED, data = {
         @AuditData(key = "aiAutoMemoryId", value = "#id"),
-        @AuditData(key = "environment", value = "#environment")
+        @AuditData(key = "environment", value = "#environment"),
+        @AuditData(key = "principalType", value = "'INTEGRATION_INSTANCE'"),
+        @AuditData(key = "principalId", value = "#integrationInstanceId")
     })
     @PreAuthorize("isTenantAdmin()")
-    public void deleteEmbeddedAiAutoMemory(Environment environment, long id) {
-        AiAutoMemory aiAutoMemory = getIntegrationInstanceMemory(environment, id);
-
-        aiAutoMemoryService.deleteById(aiAutoMemory.getOwner(), id);
+    public void deleteEmbeddedAiAutoMemory(Environment environment, long integrationInstanceId, long id) {
+        aiAutoMemoryService.deleteById(toIntegrationInstanceOwner(environment, integrationInstanceId), id);
     }
 
     @Override
@@ -132,26 +133,31 @@ public class EmbeddedAiAutoMemoryFacadeImpl implements EmbeddedAiAutoMemoryFacad
     @Override
     @Audited(event = AI_AUTO_MEMORY_UPDATED, data = {
         @AuditData(key = "aiAutoMemoryId", value = "#id"),
-        @AuditData(key = "environment", value = "#environment")
+        @AuditData(key = "environment", value = "#environment"),
+        @AuditData(key = "principalType", value = "'INTEGRATION_INSTANCE'"),
+        @AuditData(key = "principalId", value = "#integrationInstanceId")
     })
     @PreAuthorize("isTenantAdmin()")
     public EmbeddedAiAutoMemory updateEmbeddedAiAutoMemory(
-        Environment environment, long id, long expectedVersion, AiAutoMemoryPatch patch) {
-
-        AiAutoMemory aiAutoMemory = getIntegrationInstanceMemory(environment, id);
+        Environment environment, long integrationInstanceId, long id, long expectedVersion,
+        AiAutoMemoryPatch patch) {
 
         AiAutoMemory updatedAiAutoMemory = aiAutoMemoryService.updateById(
-            aiAutoMemory.getOwner(), id, expectedVersion, patch);
+            toIntegrationInstanceOwner(environment, integrationInstanceId), id, expectedVersion, patch);
 
-        return toEmbeddedAiAutoMemories(List.of(updatedAiAutoMemory)).getFirst();
+        List<EmbeddedAiAutoMemory> embeddedAiAutoMemories = toEmbeddedAiAutoMemories(List.of(updatedAiAutoMemory));
+
+        return embeddedAiAutoMemories.getFirst();
     }
 
-    private AiAutoMemory getIntegrationInstanceMemory(Environment environment, long id) {
-        return listIntegrationInstanceMemories(environment, null)
-            .stream()
-            .filter(aiAutoMemory -> Objects.equals(aiAutoMemory.getId(), id))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Embedded AI memory %d not found".formatted(id)));
+    /**
+     * The service resolves a memory only within this exact owner, so a row of another principal type, another instance
+     * or another environment is not found.
+     */
+    private static AiAutoMemoryOwner toIntegrationInstanceOwner(Environment environment, long integrationInstanceId) {
+        return new AiAutoMemoryOwner(
+            Workspace.DEFAULT_WORKSPACE_ID, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, integrationInstanceId,
+            environment);
     }
 
     private List<AiAutoMemory> listIntegrationInstanceMemories(

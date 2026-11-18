@@ -35,6 +35,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -84,9 +85,9 @@ class EmbeddedAiAutoMemoryFacadeMethodSecurityTest {
                 Environment.DEVELOPMENT));
         assertThatExceptionOfType(AccessDeniedException.class)
             .isThrownBy(() -> embeddedAiAutoMemoryFacade.updateEmbeddedAiAutoMemory(
-                Environment.DEVELOPMENT, 1L, 1L, PATCH));
+                Environment.DEVELOPMENT, 1L, 1L, 1L, PATCH));
         assertThatExceptionOfType(AccessDeniedException.class)
-            .isThrownBy(() -> embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(Environment.DEVELOPMENT, 1L));
+            .isThrownBy(() -> embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(Environment.DEVELOPMENT, 1L, 1L));
     }
 
     @Test
@@ -101,9 +102,9 @@ class EmbeddedAiAutoMemoryFacadeMethodSecurityTest {
                 Environment.DEVELOPMENT));
         assertThatExceptionOfType(AccessDeniedException.class)
             .isThrownBy(() -> embeddedAiAutoMemoryFacade.updateEmbeddedAiAutoMemory(
-                Environment.DEVELOPMENT, 1L, 1L, PATCH));
+                Environment.DEVELOPMENT, 1L, 1L, 1L, PATCH));
         assertThatExceptionOfType(AccessDeniedException.class)
-            .isThrownBy(() -> embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(Environment.DEVELOPMENT, 1L));
+            .isThrownBy(() -> embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(Environment.DEVELOPMENT, 1L, 1L));
     }
 
     @Test
@@ -117,14 +118,15 @@ class EmbeddedAiAutoMemoryFacadeMethodSecurityTest {
     }
 
     private static void authenticate(String... authorities) {
-        SecurityContextHolder.getContext()
-            .setAuthentication(
-                new UsernamePasswordAuthenticationToken(
-                    "user", "n/a",
-                    List.of(authorities)
-                        .stream()
-                        .map(SimpleGrantedAuthority::new)
-                        .toList()));
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(
+            new UsernamePasswordAuthenticationToken(
+                "user", "n/a",
+                List.of(authorities)
+                    .stream()
+                    .map(SimpleGrantedAuthority::new)
+                    .toList()));
     }
 
     @Configuration
