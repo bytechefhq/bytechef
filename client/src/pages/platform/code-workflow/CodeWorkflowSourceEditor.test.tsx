@@ -1,4 +1,8 @@
 import useCodeWorkflowHeaderStore from '@/pages/platform/code-workflow/stores/useCodeWorkflowHeaderStore';
+import {
+    getCompletionContext,
+    unregisterCompletionContext,
+} from '@/shared/components/monaco/completion/completionContextRegistry';
 import {CodeWorkflowLanguage} from '@/shared/middleware/graphql';
 import {fireEvent, render, resetAll, screen, waitFor} from '@/shared/util/test-utils';
 import {afterEach, describe, expect, it, vi} from 'vitest';
@@ -9,27 +13,75 @@ vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
     default: ({
         defaultLanguage,
         onChange,
+        onMount,
         value,
     }: {
         defaultLanguage: string;
         onChange: (value: string | undefined) => void;
+        onMount: (editor: {getModel: () => unknown}) => void;
         value: string;
     }) => (
-        <textarea
-            data-language={defaultLanguage}
-            data-testid="monaco-editor-mock"
-            onChange={(event) => onChange(event.target.value)}
-            value={value}
-        />
+        <div>
+            <textarea
+                data-language={defaultLanguage}
+                data-testid="monaco-editor-mock"
+                onChange={(event) => onChange(event.target.value)}
+                value={value}
+            />
+
+            <button
+                onClick={() => onMount({getModel: () => ({uri: {toString: () => 'inmemory://test'}})})}
+                type="button"
+            >
+                Mount
+            </button>
+        </div>
     ),
 }));
 
+vi.mock('@/shared/components/monaco/completion/useComponentCatalog', () => ({
+    useComponentCatalog: () => ({components: [], getConnectionDefinition: vi.fn(), getDefinition: vi.fn()}),
+}));
+
 afterEach(() => {
+    unregisterCompletionContext('inmemory://test');
     resetAll();
     vi.clearAllMocks();
 });
 
 describe('CodeWorkflowSourceEditor', () => {
+    it('registers a code workflow completion context', async () => {
+        render(
+            <CodeWorkflowSourceEditor
+                isLoading={false}
+                isSaving={false}
+                language={CodeWorkflowLanguage.Python}
+                onSave={vi.fn()}
+                source=""
+            />
+        );
+
+        fireEvent.click(await screen.findByRole('button', {name: 'Mount'}));
+
+        expect(getCompletionContext('inmemory://test')).toMatchObject({kind: 'codeWorkflow', language: 'python'});
+    });
+
+    it('registers no completion context for a Java code workflow', async () => {
+        render(
+            <CodeWorkflowSourceEditor
+                isLoading={false}
+                isSaving={false}
+                language={CodeWorkflowLanguage.Java}
+                onSave={vi.fn()}
+                source=""
+            />
+        );
+
+        fireEvent.click(await screen.findByRole('button', {name: 'Mount'}));
+
+        expect(getCompletionContext('inmemory://test')).toBeUndefined();
+    });
+
     it('renders the Monaco editor with the given source for the given language', async () => {
         render(
             <CodeWorkflowSourceEditor

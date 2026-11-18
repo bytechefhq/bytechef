@@ -4,13 +4,18 @@ import PageLoader from '@/components/PageLoader';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useCodeWorkflowHeaderStore from '@/pages/platform/code-workflow/stores/useCodeWorkflowHeaderStore';
 import MonacoEditorWrapper from '@/shared/components/MonacoEditorWrapper';
+import {CompletionContextType, ScriptLanguageType} from '@/shared/components/monaco/completion/completionTypes';
+import {useCompletionContext} from '@/shared/components/monaco/completion/useCompletionContext';
+import {useComponentCatalog} from '@/shared/components/monaco/completion/useComponentCatalog';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {CodeWorkflowLanguage} from '@/shared/middleware/graphql';
 import getCodeWorkflowLanguageLabel from '@/shared/util/codeWorkflowLanguage-utils';
 import {Settings2Icon} from 'lucide-react';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {useShallow} from 'zustand/shallow';
+
+import type {editor} from 'monaco-editor';
 
 const MONACO_LANGUAGE_BY_CODE_WORKFLOW_LANGUAGE: Record<CodeWorkflowLanguage, string> = {
     [CodeWorkflowLanguage.Java]: 'java',
@@ -19,7 +24,10 @@ const MONACO_LANGUAGE_BY_CODE_WORKFLOW_LANGUAGE: Record<CodeWorkflowLanguage, st
     [CodeWorkflowLanguage.Ruby]: 'ruby',
 };
 
+const SCRIPT_MONACO_LANGUAGES = ['javascript', 'python', 'ruby'];
+
 export interface CodeWorkflowSourceEditorProps {
+    embedded?: boolean;
     error?: unknown;
     headerless?: boolean;
     isLoading: boolean;
@@ -90,6 +98,7 @@ const CodeWorkflowSourceEditorHeader = ({
 );
 
 const CodeWorkflowSourceEditor = ({
+    embedded,
     error,
     headerless,
     isLoading,
@@ -101,6 +110,7 @@ const CodeWorkflowSourceEditor = ({
     testConfigurationDisabled,
 }: CodeWorkflowSourceEditorProps) => {
     const [isSourceDirty, setIsSourceDirty] = useState(false);
+    const [model, setModel] = useState<editor.ITextModel>();
 
     const latestSourceRef = useRef(source ?? '');
 
@@ -112,6 +122,18 @@ const CodeWorkflowSourceEditor = ({
     );
 
     const monacoLanguage = MONACO_LANGUAGE_BY_CODE_WORKFLOW_LANGUAGE[language as CodeWorkflowLanguage];
+
+    const components = useComponentCatalog({embedded});
+
+    const completionContext = useMemo<CompletionContextType | undefined>(
+        () =>
+            monacoLanguage && SCRIPT_MONACO_LANGUAGES.includes(monacoLanguage)
+                ? {components, kind: 'codeWorkflow', language: monacoLanguage as ScriptLanguageType}
+                : undefined,
+        [components, monacoLanguage]
+    );
+
+    useCompletionContext(model, completionContext);
 
     const handleSave = () => {
         onSave(latestSourceRef.current)
@@ -174,7 +196,7 @@ const CodeWorkflowSourceEditor = ({
                                 <MonacoEditorWrapper
                                     defaultLanguage={monacoLanguage}
                                     onChange={handleSourceChange}
-                                    onMount={() => {}}
+                                    onMount={(mountedEditor) => setModel(mountedEditor.getModel() ?? undefined)}
                                     options={{
                                         automaticLayout: true,
                                         folding: true,
