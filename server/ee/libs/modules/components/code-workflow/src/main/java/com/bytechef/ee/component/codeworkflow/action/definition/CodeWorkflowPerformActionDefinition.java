@@ -43,11 +43,12 @@ public class CodeWorkflowPerformActionDefinition extends AbstractActionDefinitio
 
     protected Object perform(
         Parameters inputParameters, Map<String, ? extends ComponentConnection> connectionParameters,
-        Parameters extensions, ActionContext actionContext) {
+        Parameters extensions, ActionContext actionContext) throws Exception {
 
         return codeWorkflowTaskExecutor.executePerform(
             inputParameters.getRequiredString("codeWorkflowContainerUuid"),
             inputParameters.getRequiredString("workflowName"), inputParameters.getRequiredString("taskName"),
-            inputParameters.getRequired(MetadataConstants.TYPE, PlatformType.class));
+            inputParameters.getRequired(MetadataConstants.TYPE, PlatformType.class), inputParameters,
+            connectionParameters, actionContext);
     }
 }

@@ -81,7 +81,7 @@ class AutomationProjectApiControllerIntTest {
 
         AutomationProjectDTO projectDTO = new AutomationProjectDTO(
             PROJECT_ID, "Onboarding Project", "New user onboarding automations", null, List.of(), true, 1, 1,
-            List.of(workflowDTO), null, true, 0, null);
+            List.of(workflowDTO), null, false, true, 0, null);
 
         when(automationProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(List.of(projectDTO));
@@ -128,8 +128,8 @@ class AutomationProjectApiControllerIntTest {
             null);
 
         AutomationProjectDTO projectDTO = new AutomationProjectDTO(
-            PROJECT_ID, "Email Project", null, null, List.of(), true, 1, 1, List.of(workflowDTO), null, true, 0,
-            null);
+            PROJECT_ID, "Email Project", null, null, List.of(), true, 1, 1, List.of(workflowDTO), null, false, true,
+            0, null);
 
         when(automationProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(List.of(projectDTO));
@@ -171,7 +171,8 @@ class AutomationProjectApiControllerIntTest {
             List.of(slackComponent, gmailComponent), List.of(), null);
 
         AutomationProjectDTO projectDTO = new AutomationProjectDTO(
-            PROJECT_ID, "Slack Project", null, null, List.of(), true, 1, 1, List.of(workflowDTO), null, true, 0, null);
+            PROJECT_ID, "Slack Project", null, null, List.of(), true, 1, 1, List.of(workflowDTO), null, false, true,
+            0, null);
 
         when(automationProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(List.of(projectDTO));
@@ -219,7 +220,7 @@ class AutomationProjectApiControllerIntTest {
     void testGetFrontendProjectsUnpublishedProjectHasEmptyWorkflows() {
         AutomationProjectDTO unpublishedProjectDTO = new AutomationProjectDTO(
             PROJECT_ID + 1, "Draft Project", "A project with no published version", null, List.of(), false, 1, null,
-            List.of(), null, true, 0, null);
+            List.of(), null, false, true, 0, null);
 
         when(automationProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(List.of(unpublishedProjectDTO));
@@ -247,11 +248,11 @@ class AutomationProjectApiControllerIntTest {
     void testGetFrontendProjectsLeavesOutProjectsHiddenFromTheHub() {
         AutomationProjectDTO visibleProjectDTO = new AutomationProjectDTO(
             PROJECT_ID, "Visible Project", "Shown in the hub", null, List.of(), true, 1, 1, List.of(), null,
-            true, 0, null);
+            false, true, 0, null);
 
         AutomationProjectDTO hiddenProjectDTO = new AutomationProjectDTO(
             PROJECT_ID + 1, "Hidden Project", "Not shown in the hub", null, List.of(), true, 1, 1, List.of(), null,
-            false, 0, null);
+            false, false, 0, null);
 
         when(automationProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(List.of(visibleProjectDTO, hiddenProjectDTO));
@@ -279,11 +280,11 @@ class AutomationProjectApiControllerIntTest {
     void testGetProjectsLeavesOutProjectsHiddenFromTheHub() {
         AutomationProjectDTO visibleProjectDTO = new AutomationProjectDTO(
             PROJECT_ID, "Visible Project", "Shown in the hub", null, List.of(), true, 1, 1, List.of(), null,
-            true, 0, null);
+            false, true, 0, null);
 
         AutomationProjectDTO hiddenProjectDTO = new AutomationProjectDTO(
             PROJECT_ID + 1, "Hidden Project", "Not shown in the hub", null, List.of(), true, 1, 1, List.of(), null,
-            false, 0, null);
+            false, false, 0, null);
 
         when(automationProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(List.of(visibleProjectDTO, hiddenProjectDTO));
@@ -382,7 +383,7 @@ class AutomationProjectApiControllerIntTest {
             null);
 
         AutomationProjectDTO projectDTO = new AutomationProjectDTO(
-            PROJECT_ID, "Email Project", null, null, List.of(), true, 1, 1, List.of(workflowDTO), null,
+            PROJECT_ID, "Email Project", null, null, List.of(), true, 1, 1, List.of(workflowDTO), null, false,
             automationHubVisible, 0, null);
 
         when(automationProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))

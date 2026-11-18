@@ -5951,6 +5951,11 @@ public class ApplicationProperties {
     public static class Workflow {
 
         /**
+         * Code workflow configuration
+         */
+        private CodeWorkflow codeWorkflow = new CodeWorkflow();
+
+        /**
          * Workflow execution configuration
          */
         private Execution execution = new Execution();
@@ -5970,6 +5975,10 @@ public class ApplicationProperties {
          */
         private TestOutput testOutput = new TestOutput();
 
+        public CodeWorkflow getCodeWorkflow() {
+            return codeWorkflow;
+        }
+
         public Execution getExecution() {
             return execution;
         }
@@ -5984,6 +5993,10 @@ public class ApplicationProperties {
 
         public TestOutput getTestOutput() {
             return testOutput;
+        }
+
+        public void setCodeWorkflow(CodeWorkflow codeWorkflow) {
+            this.codeWorkflow = codeWorkflow;
         }
 
         public void setExecution(Execution execution) {
@@ -6018,6 +6031,25 @@ public class ApplicationProperties {
 
             public void setMaxSampleItems(int maxSampleItems) {
                 this.maxSampleItems = maxSampleItems;
+            }
+        }
+
+        /**
+         * Code workflow configuration.
+         */
+        public static class CodeWorkflow {
+
+            /**
+             * Whether uploading of Java (jar) code workflows is enabled
+             */
+            private boolean javaEnabled;
+
+            public boolean isJavaEnabled() {
+                return javaEnabled;
+            }
+
+            public void setJavaEnabled(boolean javaEnabled) {
+                this.javaEnabled = javaEnabled;
             }
         }
 

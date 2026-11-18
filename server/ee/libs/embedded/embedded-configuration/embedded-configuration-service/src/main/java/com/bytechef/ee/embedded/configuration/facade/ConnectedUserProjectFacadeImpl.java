@@ -48,6 +48,7 @@ import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.exception.AutomationProjectConfigurationErrorType;
+import com.bytechef.ee.embedded.configuration.exception.CodeWorkflowNotCopyableException;
 import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
@@ -238,6 +239,10 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         }
 
         AutomationProjectDTO releasedProject = releasedProjectOptional.get();
+
+        if (releasedProject.codeWorkflowProject()) {
+            throw new CodeWorkflowNotCopyableException(workflowUuid);
+        }
 
         ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
             externalUserId, environment);

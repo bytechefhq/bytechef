@@ -34,7 +34,7 @@ public interface WorkflowDefinition {
 
     Optional<List<? extends Output>> getOutputs();
 
-    Optional<List<? extends TaskDefinition>> getTasks();
+    Optional<List<? extends WorkflowTaskDefinition>> getTasks();
 
     Optional<List<? extends TriggerDefinition>> getTriggers();
 }

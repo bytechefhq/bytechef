@@ -15,5 +15,8 @@ package com.bytechef.ee.component.codeworkflow.constant;
 public class CodeWorkflowConstants {
 
     public static final String CODE_WORKFLOW = "codeWorkflow";
+
+    public static final String INPUT = "input";
+
     public static final String PERFORM = "perform";
 }
