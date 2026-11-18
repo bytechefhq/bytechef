@@ -32,7 +32,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
-import java.util.function.Function;
+import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
 import org.graalvm.polyglot.proxy.ProxyExecutable;
 import org.graalvm.polyglot.proxy.ProxyObject;
@@ -67,63 +67,112 @@ class ProjectHandlerPolyglotEngine {
         });
     }
 
-    @SuppressWarnings("unchecked")
     private static Object executePerform(
-        String workflowName, String taskName, String languageId, String script, TaskContext taskContext) {
+        String workflowName, String taskName, String languageId, String script, Map<String, ?> input,
+        Map<String, ?> connection, TaskContext taskContext) {
 
         return PolyglotSandbox.call(languageId, polyglotContext -> {
             Value value = polyglotContext.eval(languageId, script);
 
-            List<Map<String, Object>> workflows = getWorkflows(value);
+            Value workflow = findWorkflow(value, workflowName);
 
-            List<Map<String, Object>> tasks = (List<Map<String, Object>>) workflows.stream()
-                .filter(workflow -> workflowName.equals(workflow.get("name")))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Workflow name=%s not found".formatted(workflowName)))
-                .get("tasks");
+            if (workflow == null) {
+                throw new IllegalArgumentException("Workflow name=%s not found".formatted(workflowName));
+            }
 
-            Map<String, Object> task = findTask(tasks, taskName);
+            Value performFunction = findPerformFunction(getValue(workflow, "tasks"), taskName);
 
-            if (task == null) {
+            if (performFunction == null) {
                 throw new IllegalArgumentException("Task name=%s not found".formatted(taskName));
             }
 
-            Function<Object[], Object> perform = (Function<Object[], Object>) task.get("perform");
+            Object guestInput = PolyglotValues.copyToGuestValue(input, languageId);
+            ProxyObject guestContext = toGuestContext(taskContext, languageId);
 
-            Object result = perform.apply(new Object[] {
-                toGuestContext(taskContext, languageId)
-            });
+            Value result;
 
-            return PolyglotValues.copyFromPolyglotContext(result);
+            if (getRequiredPerformParameterCount(polyglotContext, languageId, performFunction) >= 3) {
+                Object guestConnection = PolyglotValues.copyToGuestMemberAndHashMap(connection, languageId);
+
+                result = performFunction.execute(guestInput, guestConnection, guestContext);
+            } else {
+                result = performFunction.execute(guestInput, guestContext);
+            }
+
+            return PolyglotValues.copyFromPolyglotContext(PolyglotValues.copyToJavaValue(result));
         });
     }
 
-    @SuppressWarnings("unchecked")
-    private static Map<String, Object> findTask(List<?> tasks, String taskName) {
-        for (Object entry : tasks) {
-            Map<String, Object> task = (Map<String, Object>) entry;
+    private static int getRequiredPerformParameterCount(
+        Context polyglotContext, String languageId, Value performFunction) {
 
-            if (taskName.equals(task.get("name")) && task.get("perform") != null) {
-                return task;
+        String parameterCountFunctionSource = switch (languageId) {
+            case "js" -> "(performFunction) => performFunction.length";
+            case "python" -> "lambda perform_function: perform_function.__code__.co_argcount - " +
+                "len(perform_function.__defaults__ or ())";
+            default -> null;
+        };
+
+        if (parameterCountFunctionSource == null) {
+            return 2;
+        }
+
+        Value parameterCountFunction = polyglotContext.eval(languageId, parameterCountFunctionSource);
+
+        Value parameterCount = parameterCountFunction.execute(performFunction);
+
+        return parameterCount.fitsInInt() ? parameterCount.asInt() : 2;
+    }
+
+    private static Value findWorkflow(Value value, String workflowName) {
+        Value workflows = getValue(value, "workflows");
+
+        if (workflows == null || !workflows.hasArrayElements()) {
+            return null;
+        }
+
+        for (long index = 0; index < workflows.getArraySize(); index++) {
+            Value workflow = workflows.getArrayElement(index);
+
+            if (workflowName.equals(getMember(workflow, "name"))) {
+                return workflow;
+            }
+        }
+
+        return null;
+    }
+
+    private static Value findPerformFunction(Value tasks, String taskName) {
+        if (tasks == null || !tasks.hasArrayElements()) {
+            return null;
+        }
+
+        for (long index = 0; index < tasks.getArraySize(); index++) {
+            Value task = tasks.getArrayElement(index);
+
+            Value performFunction = getValue(task, "perform");
+
+            if (taskName.equals(getMember(task, "name")) && performFunction != null && !performFunction.isNull()) {
+                return performFunction;
             }
 
-            if (task.get("tasks") instanceof List<?> nestedTasks) {
-                Map<String, Object> nestedTask = findTask(nestedTasks, taskName);
+            Value nestedPerformFunction = findPerformFunction(getValue(task, "tasks"), taskName);
 
-                if (nestedTask != null) {
-                    return nestedTask;
-                }
+            if (nestedPerformFunction != null) {
+                return nestedPerformFunction;
             }
 
-            if (task.get("branches") instanceof List<?> branches) {
-                for (Object branch : branches) {
-                    if (branch instanceof List<?> branchTasks) {
-                        Map<String, Object> branchTask = findTask(branchTasks, taskName);
+            Value branches = getValue(task, "branches");
 
-                        if (branchTask != null) {
-                            return branchTask;
-                        }
-                    }
+            if (branches == null || !branches.hasArrayElements()) {
+                continue;
+            }
+
+            for (long branchIndex = 0; branchIndex < branches.getArraySize(); branchIndex++) {
+                Value branchPerformFunction = findPerformFunction(branches.getArrayElement(branchIndex), taskName);
+
+                if (branchPerformFunction != null) {
+                    return branchPerformFunction;
                 }
             }
         }
@@ -132,14 +181,7 @@ class ProjectHandlerPolyglotEngine {
     }
 
     private static ProxyObject toGuestContext(TaskContext taskContext, String languageId) {
-        ComponentActionInvoker componentActionInvoker =
-            (componentName, actionName, input, connectionName, clusterElements) -> {
-                if (taskContext == null) {
-                    throw new IllegalStateException("A TaskContext is not available");
-                }
-
-                return taskContext.component(componentName, actionName, input, connectionName, clusterElements);
-            };
+        ComponentActionInvoker componentActionInvoker = taskContext::component;
 
         ComponentCatalog componentCatalog = new ComponentCatalog() {
 
@@ -157,44 +199,9 @@ class ProjectHandlerPolyglotEngine {
         return ProxyObject.fromMap(
             Map.of(
                 "component", new ComponentProxyObject(languageId, componentActionInvoker, componentCatalog),
-                "input", (ProxyExecutable) arguments -> {
-                    if (taskContext == null) {
-                        throw new IllegalStateException("A TaskContext is not available");
-                    }
-
-                    if (arguments.length == 0) {
-                        return PolyglotValues.copyToGuestValue(taskContext.input(), languageId);
-                    }
-
-                    return PolyglotValues.copyToGuestValue(taskContext.input(arguments[0].asString()), languageId);
-                },
-                "parameters", (ProxyExecutable) arguments -> {
-                    if (taskContext == null) {
-                        throw new IllegalStateException("A TaskContext is not available");
-                    }
-
-                    return PolyglotValues.copyToGuestValue(taskContext.parameters(), languageId);
-                },
-                "connection", (ProxyExecutable) arguments -> {
-                    if (taskContext == null) {
-                        throw new IllegalStateException("A TaskContext is not available");
-                    }
-
-                    try {
-                        return PolyglotValues.copyToGuestValue(
-                            taskContext.connection(arguments[0].asString()), languageId);
-                    } catch (RuntimeException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new IllegalStateException(e);
-                    }
-                },
                 "log", (ProxyExecutable) arguments -> {
-                    if (taskContext == null) {
-                        throw new IllegalStateException("A TaskContext is not available");
-                    }
-
-                    taskContext.log(TaskContext.LogLevel.of(arguments[0].asString()), arguments[1].asString());
+                    taskContext.log(
+                        TaskContext.LogLevel.of(arguments[0].asString()), PolyglotValues.toLogMessage(arguments[1]));
 
                     return null;
                 }));
@@ -345,14 +352,9 @@ class ProjectHandlerPolyglotEngine {
 
         addName(names, name);
 
-        Object parameters = task.get("parameters");
-
         return new PolyglotTaskDefinition(
             workflowName, name, (String) task.get("label"), (String) task.get("description"),
-            toConnectionRequirements(task.get("connections")),
-            parameters instanceof Map<?, ?> parameterMap
-                ? (Map<String, ?>) PolyglotValues.copyFromPolyglotContext(parameterMap) : null,
-            languageId, script);
+            toConnectionRequirements(task.get("connections")), languageId, script);
     }
 
     private static void addName(Set<String> names, String name) {
@@ -465,7 +467,7 @@ class ProjectHandlerPolyglotEngine {
     @SuppressFBWarnings("EI")
     private record PolyglotTaskDefinition(
         String workflowName, String name, String label, String description,
-        List<ConnectionRequirement> connections, Map<String, ?> parameters, String languageId, String script)
+        List<ConnectionRequirement> connections, String languageId, String script)
         implements TaskDefinition {
 
         @Override
@@ -489,24 +491,9 @@ class ProjectHandlerPolyglotEngine {
         }
 
         @Override
-        public Optional<Map<String, ?>> getParameters() {
-            return Optional.ofNullable(parameters);
-        }
-
-        @Override
         public PerformFunction getPerform() {
-            return new PerformFunction() {
-
-                @Override
-                public Object apply() {
-                    return executePerform(workflowName, name, languageId, script, null);
-                }
-
-                @Override
-                public Object apply(TaskContext taskContext) {
-                    return executePerform(workflowName, name, languageId, script, taskContext);
-                }
-            };
+            return (input, connection, taskContext) -> executePerform(
+                workflowName, name, languageId, script, input, connection, taskContext);
         }
     }
 
@@ -561,7 +548,7 @@ class ProjectHandlerPolyglotEngine {
                 new PolyglotInput(
                     (String) input.get("name"), (String) input.get("label"),
                     input.get("type") == null ? "STRING" : String.valueOf(input.get("type")),
-                    Boolean.TRUE.equals(required)));
+                    Boolean.TRUE.equals(required), toComponentInputReference(input)));
         }
 
         return inputDefinitions;
@@ -586,8 +573,35 @@ class ProjectHandlerPolyglotEngine {
         return outputDefinitions;
     }
 
+    private static Input.ComponentInputReference toComponentInputReference(Map<?, ?> input) {
+        Object componentName = input.get("componentName");
+        Object componentVersion = input.get("componentVersion");
+        Object groupName = input.get("groupName");
+
+        if (componentName == null && componentVersion == null && groupName == null) {
+            return null;
+        }
+
+        if (!(componentName instanceof String) || !(componentVersion instanceof Number number) ||
+            !(groupName instanceof String)) {
+
+            throw new IllegalArgumentException(
+                ("Input %s must set componentName, componentVersion and groupName together to use a component " +
+                    "input").formatted(input.get("name")));
+        }
+
+        return new Input.ComponentInputReference((String) componentName, number.intValue(), (String) groupName);
+    }
+
     @SuppressFBWarnings("EI")
-    private record PolyglotInput(String name, String label, String type, boolean required) implements Input {
+    private record PolyglotInput(
+        String name, String label, String type, boolean required, Input.ComponentInputReference componentInput)
+        implements Input {
+
+        @Override
+        public Optional<ComponentInputReference> getComponentInput() {
+            return Optional.ofNullable(componentInput);
+        }
 
         @Override
         public String getLabel() {

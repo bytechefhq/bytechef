@@ -26,6 +26,7 @@ import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowC
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.domain.WorkflowInput;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import com.bytechef.workflow.definition.WorkflowDefinition;
@@ -305,7 +306,7 @@ class CodeWorkflowContainerFacadeTest {
                         .connections(
                             WorkflowDsl.connection("slack", "slack-prod"),
                             WorkflowDsl.connection("httpClient", 2, "billing-api"))
-                        .perform(() -> "x")));
+                        .perform((input, context) -> "x")));
 
         codeWorkflowContainerFacade.update(
             codeWorkflowContainer, "v2", workflowDefinitions, "content".getBytes(), PlatformType.AUTOMATION);
@@ -365,8 +366,7 @@ class CodeWorkflowContainerFacadeTest {
         List<WorkflowDefinition> workflowDefinitions = List.of(
             WorkflowDsl.workflow("wf-a")
                 .tasks(WorkflowDsl.task("my-task")
-                    .parameters(Map.of("retries", 3))
-                    .perform(() -> "x")));
+                    .perform((input, context) -> "x")));
 
         codeWorkflowContainerFacade.update(
             codeWorkflowContainer, "v2", workflowDefinitions, "content".getBytes(), PlatformType.AUTOMATION);
@@ -382,9 +382,9 @@ class CodeWorkflowContainerFacadeTest {
 
         Map<String, Object> parameters = (Map<String, Object>) workflowTask.getParameters();
 
+        assertThat(parameters).containsOnlyKeys("codeWorkflowContainerUuid", "workflowName", "taskName", "input",
+            "type");
         assertThat(parameters).containsEntry("input", "=#root");
-
-        assertThat(parameters).containsEntry("retries", 3);
     }
 
     @Test
@@ -414,17 +414,17 @@ class CodeWorkflowContainerFacadeTest {
                     WorkflowDsl.parallel("enrich")
                         .tasks(
                             WorkflowDsl.task("customer")
-                                .perform(() -> "c"),
+                                .perform((input, context) -> "c"),
                             WorkflowDsl.task("inventory")
-                                .perform(() -> "i")),
+                                .perform((input, context) -> "i")),
                     WorkflowDsl.forkJoin("notify")
                         .branches(
                             WorkflowDsl.branch(
                                 WorkflowDsl.task("slack")
-                                    .perform(() -> "s")),
+                                    .perform((input, context) -> "s")),
                             WorkflowDsl.branch(
                                 WorkflowDsl.task("email")
-                                    .perform(() -> "e")))));
+                                    .perform((input, context) -> "e")))));
 
         codeWorkflowContainerFacade.update(
             codeWorkflowContainer, "v2", workflowDefinitions, "content".getBytes(), PlatformType.AUTOMATION);
@@ -451,7 +451,7 @@ class CodeWorkflowContainerFacadeTest {
         assertThat((Map<String, Object>) parallelTasks.getFirst()
             .get("parameters")).containsEntry("taskName", "customer")
                 .containsEntry("input", "=#root")
-                .containsEntry("concurrentTaskNames", List.of("inventory"));
+                .doesNotContainKey("concurrentTaskNames");
 
         WorkflowTask forkJoinTask = workflowTasks.get(1);
 
@@ -466,7 +466,7 @@ class CodeWorkflowContainerFacadeTest {
 
         assertThat((Map<String, Object>) branches.getFirst()
             .getFirst()
-            .get("parameters")).containsEntry("concurrentTaskNames", List.of("email"));
+            .get("parameters")).containsEntry("taskName", "slack");
     }
 
     @Test
@@ -495,6 +495,7 @@ class CodeWorkflowContainerFacadeTest {
                 .inputs(
                     WorkflowDsl.input("orderId")
                         .label("Order ID")
+                        .type("STRING")
                         .required(true))
                 .outputs(
                     WorkflowDsl.output("customer")
@@ -504,7 +505,7 @@ class CodeWorkflowContainerFacadeTest {
                         .parameters(Map.of("unit", "DAY")))
                 .tasks(
                     WorkflowDsl.task("fetch-customer")
-                        .perform(() -> "c")));
+                        .perform((input, context) -> "c")));
 
         codeWorkflowContainerFacade.update(
             codeWorkflowContainer, "v2", workflowDefinitions, "content".getBytes(), PlatformType.AUTOMATION);
@@ -520,6 +521,7 @@ class CodeWorkflowContainerFacadeTest {
 
         assertThat(input.name()).isEqualTo("orderId");
         assertThat(input.required()).isTrue();
+        assertThat(input.type()).isEqualTo("string");
 
         assertThat(parsedWorkflow.getOutputs()
             .getFirst()
@@ -529,6 +531,55 @@ class CodeWorkflowContainerFacadeTest {
             .get("triggers")).getFirst();
 
         assertThat(trigger).containsEntry("type", "schedule/v1/interval");
+    }
+
+    @Test
+    void testUpdateEmitsTheComponentInputAnInputReferences() {
+        UUID containerUuid = UUID.randomUUID();
+        UUID workflowAId = UUID.randomUUID();
+
+        CodeWorkflowContainer codeWorkflowContainer = new CodeWorkflowContainer(containerUuid);
+
+        codeWorkflowContainer.addCodeWorkflow(workflowAId, "wf-a");
+        codeWorkflowContainer.setLanguage(Language.JAVASCRIPT);
+        codeWorkflowContainer.setName("container");
+        codeWorkflowContainer.setExternalVersion("v1");
+
+        Workflow existingWorkflow = mock(Workflow.class);
+
+        when(existingWorkflow.getVersion()).thenReturn(3);
+        when(workflowService.getWorkflow(workflowAId.toString())).thenReturn(existingWorkflow);
+        when(codeWorkflowFileStorage.storeCodeWorkflowFile(anyString(), any()))
+            .thenReturn(new FileEntry("container.js", "file://container.js"));
+        when(codeWorkflowContainerService.update(codeWorkflowContainer)).thenReturn(codeWorkflowContainer);
+
+        List<WorkflowDefinition> workflowDefinitions = List.of(
+            WorkflowDsl.workflow("wf-a")
+                .inputs(
+                    WorkflowDsl.input("channel")
+                        .label("Slack Channel")
+                        .component("slack", 1, "channel")
+                        .required(true),
+                    WorkflowDsl.input("note"))
+                .tasks(
+                    WorkflowDsl.task("post")
+                        .perform((input, context) -> "c")));
+
+        codeWorkflowContainerFacade.update(
+            codeWorkflowContainer, "v2", workflowDefinitions, "content".getBytes(), PlatformType.AUTOMATION);
+
+        ArgumentCaptor<String> definitionCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(workflowService).update(eq(workflowAId.toString()), definitionCaptor.capture(), eq(3));
+
+        List<WorkflowInput> workflowInputs = WorkflowInput.of(
+            new Workflow(definitionCaptor.getValue(), Workflow.Format.JSON));
+
+        assertThat(workflowInputs.getFirst()
+            .getComponentInputReference())
+                .isEqualTo(new WorkflowInput.ComponentInputReference("slack", 1, "channel"));
+        assertThat(workflowInputs.get(1)
+            .getComponentInputReference()).isNull();
     }
 
     private static WorkflowDefinition workflowDefinition(String name) {
