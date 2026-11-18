@@ -17,12 +17,17 @@ const workflowComponentDefinitions = {
     slack: {icon: '<svg />', name: 'slack', title: 'Slack'},
 };
 
-const renderRow = (workflow: Parameters<typeof WorkflowTriggerAndComponentsRow>[0]['workflow'], fitToWidth?: boolean) =>
+const renderRow = (
+    workflow: Parameters<typeof WorkflowTriggerAndComponentsRow>[0]['workflow'],
+    fitToWidth?: boolean,
+    truncateTriggerLabel?: boolean
+) =>
     render(
         <TooltipProvider>
             <WorkflowTriggerAndComponentsRow
                 filteredComponentNames={['googleMail', 'slack', 'openAi']}
                 fitToWidth={fitToWidth}
+                truncateTriggerLabel={truncateTriggerLabel}
                 workflow={workflow}
                 workflowComponentDefinitions={workflowComponentDefinitions}
                 workflowTaskDispatcherDefinitions={{}}
@@ -145,6 +150,28 @@ describe('WorkflowTriggerAndComponentsRow', () => {
 
         expect(tooltip).toHaveTextContent('New Email');
         expect(tooltip).toHaveTextContent('Runs when a new email arrives');
+    });
+
+    it('truncates a long trigger label and shows it whole on hover when only the label may shrink', async () => {
+        renderRow(
+            {
+                triggers: [{label: 'Auto Respond with HTTP 200 Status', type: 'webhook/v1/autoRespondWithHTTP200'}],
+                workflowTriggerComponentNames: ['webhook'],
+            },
+            false,
+            true
+        );
+
+        const label = screen.getByText('Auto Respond with HTTP 200 Status');
+
+        expect(label).toHaveClass('truncate');
+        expect(label.closest('.min-w-0')).not.toBeNull();
+
+        await userEvent.hover(label);
+
+        const tooltip = await screen.findByRole('tooltip');
+
+        expect(tooltip).toHaveTextContent('Auto Respond with HTTP 200 Status');
     });
 
     it('keeps the trigger label whole when the row does not fit to its width', () => {

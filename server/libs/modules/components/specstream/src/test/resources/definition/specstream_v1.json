@@ -2047,7 +2047,7 @@
       "controlType": "SELECT",
       "defaultValue": null,
       "description": "If true, returns image results instead of web results. Always uses the Fast search tier.",
-      "displayCondition": null,
+      "displayCondition": "preferPost == true",
       "exampleValue": true,
       "expressionEnabled": true,
       "hidden": false,
@@ -2144,6 +2144,30 @@
       "regex": null,
       "required": false,
       "type": "STRING"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Send request using http POST method. Parameter names and values are encoded in JSON and loaded into requests body. Using POST allows caller more reliable response to parameters like Image Search.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Use http POST",
+      "metadata": { },
+      "name": "preferPost",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
     } ],
     "resumePerform": null,
     "title": "Web Search",
@@ -5735,7 +5759,7 @@
       "controlType": "SELECT",
       "defaultValue": null,
       "description": "If true, returns image results instead of web results. Always uses the Fast search tier.",
-      "displayCondition": null,
+      "displayCondition": "preferPost == true",
       "exampleValue": true,
       "expressionEnabled": true,
       "hidden": false,
@@ -5832,6 +5856,30 @@
       "regex": null,
       "required": false,
       "type": "STRING"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "Send request using http POST method. Parameter names and values are encoded in JSON and loaded into requests body. Using POST allows caller more reliable response to parameters like Image Search.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Use http POST",
+      "metadata": { },
+      "name": "preferPost",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
     } ],
     "title": "Web Search",
     "type": {
