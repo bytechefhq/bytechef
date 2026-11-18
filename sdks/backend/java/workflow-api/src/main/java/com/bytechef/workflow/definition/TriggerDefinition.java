@@ -16,7 +16,7 @@
 
 package com.bytechef.workflow.definition;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -27,5 +27,5 @@ public interface TriggerDefinition {
 
     String getName();
 
-    List<? extends Parameter> getParameters();
+    Map<String, ?> getParameters();
 }

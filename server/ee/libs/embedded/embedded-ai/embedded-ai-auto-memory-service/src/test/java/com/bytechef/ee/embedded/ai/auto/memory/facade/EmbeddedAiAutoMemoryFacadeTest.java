@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.ai.auto.memory.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -107,7 +108,7 @@ class EmbeddedAiAutoMemoryFacadeTest {
                 connectedUser(OTHER_CONNECTED_USER_ID, "Ben", "ben@acme.com", "ben-1")));
         when(integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(any()))
             .thenReturn(List.of(integrationInstanceConfiguration()));
-        when(integrationService.getIntegrations(any())).thenReturn(List.of(integration()));
+        when(integrationService.getIntegrations(anyList())).thenReturn(List.of(integration()));
         when(projectOwnershipService.getOwnedProjectDeploymentIds(any(), eq(ProjectDeploymentOwner.EMBEDDED)))
             .thenAnswer(invocation -> {
                 Collection<Long> projectDeploymentIds = invocation.getArgument(0);

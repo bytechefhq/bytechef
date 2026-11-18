@@ -1,0 +1,15 @@
+enum CodeWorkflowLanguage {
+    JAVA
+    JAVASCRIPT
+    PYTHON
+    RUBY
+}
+
+extend type Query {
+    codeWorkflowSource(projectId: ID!): String!
+}
+
+extend type Mutation {
+    updateCodeWorkflowSource(projectId: ID!, content: String!): Boolean!
+    createCodeWorkflow(workspaceId: ID!, name: String!, language: CodeWorkflowLanguage!, description: String, categoryId: ID, tags: [String!]): ID!
+}

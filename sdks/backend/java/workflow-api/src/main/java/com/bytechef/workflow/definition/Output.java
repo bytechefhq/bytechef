@@ -20,4 +20,10 @@ package com.bytechef.workflow.definition;
  * @author Ivica Cardic
  */
 public interface Output {
+
+    String getName();
+
+    String getTask();
+
+    Object getValue();
 }
