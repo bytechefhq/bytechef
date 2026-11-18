@@ -7,7 +7,8 @@ import {useEffect, useRef} from 'react';
 import {useForm} from 'react-hook-form';
 import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {useGetComponentDefinitionQueryMock} = vi.hoisted(() => ({
+const {codeWorkflowMock, useGetComponentDefinitionQueryMock} = vi.hoisted(() => ({
+    codeWorkflowMock: {value: false},
     useGetComponentDefinitionQueryMock: vi.fn(),
 }));
 
@@ -18,6 +19,7 @@ vi.mock('@/shared/queries/platform/componentDefinitions.queries', () => ({
 
 vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () => ({
     useWorkflowEditor: () => ({
+        codeWorkflow: codeWorkflowMock.value,
         useGetComponentDefinitionsQuery: () => ({
             data: [
                 {inputsCount: 1, name: 'googleSheets', version: 1},
@@ -198,6 +200,8 @@ describe('WorkflowInputsEditDialog', () => {
     });
 
     beforeEach(() => {
+        codeWorkflowMock.value = false;
+
         saveWorkflowInputMock.mockClear();
         useGetComponentDefinitionQueryMock.mockReturnValue({
             data: {
@@ -468,6 +472,29 @@ describe('WorkflowInputsEditDialog', () => {
             groupName: 'channel',
         });
         expect(savedInput.testValue).not.toBe('C123');
+    });
+
+    it('should lock the declaration but not the test value for a code workflow', async () => {
+        codeWorkflowMock.value = true;
+
+        render(
+            <EditHarness
+                defaultValues={{
+                    label: 'Channel',
+                    name: 'channel',
+                    required: false,
+                    testValue: '#alerts',
+                    type: 'string',
+                }}
+            />
+        );
+
+        expect(await screen.findByPlaceholderText('Input label')).toHaveAttribute('readonly');
+        expect(screen.getByLabelText('Test Value')).not.toHaveAttribute('readonly');
+
+        for (const combobox of screen.getAllByRole('combobox')) {
+            expect(combobox).toBeDisabled();
+        }
     });
 
     it('should keep the existing test value when an input is opened for editing', async () => {

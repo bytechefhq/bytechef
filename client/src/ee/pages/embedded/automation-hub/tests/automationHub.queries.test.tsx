@@ -8,8 +8,8 @@ import {useGetComponentConnectionsQuery} from '../queries/automationHub.queries'
 
 const {getFrontendConnectionsMock} = vi.hoisted(() => ({getFrontendConnectionsMock: vi.fn()}));
 
-vi.mock('@/ee/shared/middleware/embedded/public', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('@/ee/shared/middleware/embedded/public')>();
+vi.mock('@bytechef/embedded-api', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@bytechef/embedded-api')>();
 
     return {
         ...actual,

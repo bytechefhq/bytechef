@@ -1,5 +1,5 @@
 import {useAutomationHubStore} from '@/ee/pages/embedded/automation-hub/stores/useAutomationHubStore';
-import {ConnectedUserProjectWorkflow} from '@/ee/shared/middleware/embedded/public';
+import {ConnectedUserProjectWorkflow} from '@bytechef/embedded-api';
 import {useShallow} from 'zustand/react/shallow';
 
 export interface BuilderAccessI {

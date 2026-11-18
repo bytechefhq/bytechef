@@ -1,4 +1,8 @@
-import {resolveBackingWorkflowNodeName, resolveComponentInputGroup} from '@/shared/components/InputConfigurationList';
+import {
+    convertInputToProperty,
+    resolveBackingWorkflowNodeName,
+    resolveComponentInputGroup,
+} from '@/shared/components/InputConfigurationList';
 import {ComponentConnection} from '@/shared/middleware/automation/configuration';
 import {
     ComponentDefinition,
@@ -94,5 +98,19 @@ describe('resolveBackingWorkflowNodeName', () => {
         expect(resolveBackingWorkflowNodeName(undefined, componentConnections, [10, 20])).toBeUndefined();
         expect(resolveBackingWorkflowNodeName('hubspot', [], [10])).toBeUndefined();
         expect(resolveBackingWorkflowNodeName('hubspot', undefined, [10])).toBeUndefined();
+    });
+});
+
+describe('convertInputToProperty', () => {
+    it('maps input types regardless of their case', () => {
+        const uppercaseProperty = convertInputToProperty({name: 'orderId', type: 'STRING'} as WorkflowInput);
+
+        expect(uppercaseProperty.controlType).toBe(ControlType.Text);
+        expect(uppercaseProperty.type).toBe(PropertyType.String);
+
+        const lowercaseProperty = convertInputToProperty({name: 'enabled', type: 'boolean'} as WorkflowInput);
+
+        expect(lowercaseProperty.controlType).toBe(ControlType.Select);
+        expect(lowercaseProperty.type).toBe(PropertyType.Boolean);
     });
 });
