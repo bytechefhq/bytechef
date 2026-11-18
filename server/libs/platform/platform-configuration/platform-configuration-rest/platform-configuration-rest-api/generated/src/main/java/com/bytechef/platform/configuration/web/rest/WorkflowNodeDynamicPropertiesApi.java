@@ -5,7 +5,7 @@
  */
 package com.bytechef.platform.configuration.web.rest;
 
-import com.bytechef.platform.configuration.web.rest.model.ComponentOperationDynamicPropertiesRequestModel;
+import com.bytechef.platform.configuration.web.rest.model.ComponentOperationPropertyRequestModel;
 import org.springframework.lang.Nullable;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-23T16:46:42.503002+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-23T16:47:06.280758+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "workflow-node-dynamic-properties", description = "The Platform Workflow Node Dynamic Properties Internal API")
 public interface WorkflowNodeDynamicPropertiesApi {
@@ -106,7 +106,7 @@ public interface WorkflowNodeDynamicPropertiesApi {
      * @param workflowNodeName The name of a workflow&#39;s task or trigger (E.g. script_1) (required)
      * @param propertyName The name of a property. (required)
      * @param environmentId The id of an environment. (required)
-     * @param componentOperationDynamicPropertiesRequestModel  (required)
+     * @param componentOperationPropertyRequestModel  (required)
      * @return The list of dynamic properties. (status code 200)
      */
     @Operation(
@@ -131,7 +131,7 @@ public interface WorkflowNodeDynamicPropertiesApi {
         @Parameter(name = "workflowNodeName", description = "The name of a workflow's task or trigger (E.g. script_1)", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
         @Parameter(name = "propertyName", description = "The name of a property.", required = true, in = ParameterIn.PATH) @PathVariable("propertyName") String propertyName,
         @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId,
-        @Parameter(name = "ComponentOperationDynamicPropertiesRequestModel", description = "", required = true) @Valid @RequestBody ComponentOperationDynamicPropertiesRequestModel componentOperationDynamicPropertiesRequestModel
+        @Parameter(name = "ComponentOperationPropertyRequestModel", description = "", required = true) @Valid @RequestBody ComponentOperationPropertyRequestModel componentOperationPropertyRequestModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
