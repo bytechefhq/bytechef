@@ -20,10 +20,10 @@ billing:
     product-growth-id: prod_UQl6ZIubWx3VS4
     meter-event-name: tenant_task_executions
     webhook-secret:
-    success-url: ${bytechef.public-url}/automation/settings/billing?checkout=success
-    cancel-url: ${bytechef.public-url}/automation/settings/billing
+    success-url: ${bytechef.public-url}/settings/billing?checkout=success
+    cancel-url: ${bytechef.public-url}/settings/billing
     product-job-executions-package-id: prod_VWDpTTcwJTsej8
-    job-executions-package-success-url: ${bytechef.public-url}/automation/settings/billing?package=success
+    job-executions-package-success-url: ${bytechef.public-url}/settings/billing?package=success
 
 docs:
   changelog-url: https://github.com/bytechefhq/bytechef/releases
