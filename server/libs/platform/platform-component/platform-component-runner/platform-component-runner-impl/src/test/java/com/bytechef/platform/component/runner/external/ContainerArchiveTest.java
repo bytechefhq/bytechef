@@ -31,7 +31,9 @@ import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -589,5 +591,24 @@ class ContainerArchiveTest {
         }
 
         return names;
+    }
+
+    static Map<String, String> entryContents(InputStream inputStream) throws IOException {
+        Map<String, String> contents = new HashMap<>();
+
+        try (TarArchiveInputStream tarArchiveInputStream = new TarArchiveInputStream(inputStream)) {
+            TarArchiveEntry entry = tarArchiveInputStream.getNextEntry();
+
+            while (entry != null) {
+                if (!entry.isDirectory()) {
+                    contents.put(
+                        entry.getName(), new String(tarArchiveInputStream.readAllBytes(), StandardCharsets.UTF_8));
+                }
+
+                entry = tarArchiveInputStream.getNextEntry();
+            }
+        }
+
+        return contents;
     }
 }
