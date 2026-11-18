@@ -1250,6 +1250,7 @@ export type AutomationSearchQuery = { automationSearch: Array<
 
 export type DeleteEmbeddedAiAutoMemoryMutationVariables = Exact<{
   id: string | number;
+  integrationInstanceId: string | number;
   environment: number;
 }>;
 
@@ -7280,8 +7281,12 @@ export const useAutomationSearchQuery = <
     )};
 
 export const DeleteEmbeddedAiAutoMemoryDocument = new TypedDocumentString(`
-    mutation deleteEmbeddedAiAutoMemory($id: ID!, $environment: Int!) {
-  deleteEmbeddedAiAutoMemory(id: $id, environment: $environment)
+    mutation deleteEmbeddedAiAutoMemory($id: ID!, $integrationInstanceId: ID!, $environment: Int!) {
+  deleteEmbeddedAiAutoMemory(
+    id: $id
+    integrationInstanceId: $integrationInstanceId
+    environment: $environment
+  )
 }
     `);
 

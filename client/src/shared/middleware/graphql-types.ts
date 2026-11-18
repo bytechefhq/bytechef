@@ -2121,7 +2121,10 @@ export type Mutation = {
   deleteConnectedUserProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   deleteCustomComponent: Scalars['Boolean']['output'];
   deleteDataTableRow: Scalars['Boolean']['output'];
-  /** Deletes an integration instance's memory. Fails with BAD_REQUEST when it does not exist in the environment. Admin only. */
+  /**
+   * Deletes an integration instance's memory. Fails with NOT_FOUND when the instance holds no such memory in the
+   * environment. Admin only.
+   */
   deleteEmbeddedAiAutoMemory: Scalars['Boolean']['output'];
   deleteEmbeddedMcpComponent?: Maybe<Scalars['Boolean']['output']>;
   deleteEmbeddedMcpServer?: Maybe<Scalars['Boolean']['output']>;
@@ -2229,8 +2232,8 @@ export type Mutation = {
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
   /**
-   * Partial update of an integration instance's memory. Fails with BAD_REQUEST when the memory does not exist in the
-   * environment, and with CONFLICT when it changed since expectedVersion. Admin only.
+   * Partial update of an integration instance's memory. Fails with NOT_FOUND when the instance holds no such memory in
+   * the environment, and with CONFLICT when it changed since expectedVersion. Admin only.
    */
   updateEmbeddedAiAutoMemory: EmbeddedAiAutoMemory;
   updateEmbeddedMcpComponent?: Maybe<McpComponent>;
@@ -2582,6 +2585,7 @@ export type MutationDeleteDataTableRowArgs = {
 export type MutationDeleteEmbeddedAiAutoMemoryArgs = {
   environment: Scalars['Int']['input'];
   id: Scalars['ID']['input'];
+  integrationInstanceId: Scalars['ID']['input'];
 };
 
 
@@ -5179,6 +5183,8 @@ export type UpdateEmbeddedAiAutoMemoryInput = {
   environment: Scalars['Int']['input'];
   expectedVersion: Scalars['Long']['input'];
   id: Scalars['ID']['input'];
+  /** The integration instance that holds the memory: the memory's integrationInstanceId. */
+  integrationInstanceId: Scalars['ID']['input'];
   memoryType?: InputMaybe<AiAutoMemoryType>;
   title?: InputMaybe<Scalars['String']['input']>;
 };
