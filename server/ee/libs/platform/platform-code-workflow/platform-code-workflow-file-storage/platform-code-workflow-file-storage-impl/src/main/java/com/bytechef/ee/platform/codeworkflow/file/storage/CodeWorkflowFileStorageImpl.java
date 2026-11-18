@@ -39,6 +39,16 @@ public class CodeWorkflowFileStorageImpl implements CodeWorkflowFileStorage {
     }
 
     @Override
+    public byte[] readCodeWorkflowFileBytes(FileEntry fileEntry) {
+        return fileStorageService.readFileToBytes(CODE_WORKFLOWS_DIR, fileEntry);
+    }
+
+    @Override
+    public String readCodeWorkflowFileContent(FileEntry fileEntry) {
+        return fileStorageService.readFileToString(CODE_WORKFLOWS_DIR, fileEntry);
+    }
+
+    @Override
     public FileEntry storeCodeWorkflowFile(String filename, byte[] bytes) {
         return fileStorageService.storeFileContent(CODE_WORKFLOWS_DIR, filename, bytes);
     }
