@@ -1,5 +1,5 @@
 
-# ComponentOperationDynamicPropertiesRequest
+# ComponentOperationPropertyRequest
 
 
 ## Properties
@@ -19,7 +19,7 @@ Name | Type
 ## Example
 
 ```typescript
-import type { ComponentOperationDynamicPropertiesRequest } from ''
+import type { ComponentOperationPropertyRequest } from ''
 
 // TODO: Update the object below with actual values
 const example = {
@@ -32,7 +32,7 @@ const example = {
   "operationName": null,
   "operationType": null,
   "parameters": null,
-} satisfies ComponentOperationDynamicPropertiesRequest
+} satisfies ComponentOperationPropertyRequest
 
 console.log(example)
 
@@ -41,7 +41,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as ComponentOperationDynamicPropertiesRequest
+const exampleParsed = JSON.parse(exampleJSON) as ComponentOperationPropertyRequest
 console.log(exampleParsed)
 ```
 

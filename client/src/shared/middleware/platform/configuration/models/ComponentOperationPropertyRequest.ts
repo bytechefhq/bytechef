@@ -16,61 +16,43 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface ComponentOperationDynamicPropertiesRequest
+ * @interface ComponentOperationPropertyRequest
  */
-export interface ComponentOperationDynamicPropertiesRequest {
+export interface ComponentOperationPropertyRequest {
     /**
      * The type of a cluster element of the workflow node that declares the connection.
-     * @type {string}
-     * @memberof ComponentOperationDynamicPropertiesRequest
      */
     clusterElementType?: string;
     /**
      * The name of a cluster element of the workflow node that declares the connection.
-     * @type {string}
-     * @memberof ComponentOperationDynamicPropertiesRequest
      */
     clusterElementWorkflowNodeName?: string;
     /**
      * The name of a component.
-     * @type {string}
-     * @memberof ComponentOperationDynamicPropertiesRequest
      */
     componentName: string;
     /**
      * The version of a component.
-     * @type {number}
-     * @memberof ComponentOperationDynamicPropertiesRequest
      */
     componentVersion: number;
     /**
      * The key of a component connection declared on the workflow node.
-     * @type {string}
-     * @memberof ComponentOperationDynamicPropertiesRequest
      */
     connectionKey?: string;
     /**
      * The list of dependency paths.
-     * @type {Array<string>}
-     * @memberof ComponentOperationDynamicPropertiesRequest
      */
     lookupDependsOnPaths?: Array<string>;
     /**
      * The name of a component action or trigger.
-     * @type {string}
-     * @memberof ComponentOperationDynamicPropertiesRequest
      */
     operationName: string;
     /**
      * The type of a component operation.
-     * @type {ComponentOperationDynamicPropertiesRequestOperationTypeEnum}
-     * @memberof ComponentOperationDynamicPropertiesRequest
      */
-    operationType: ComponentOperationDynamicPropertiesRequestOperationTypeEnum;
+    operationType: ComponentOperationPropertyRequestOperationTypeEnum;
     /**
      * The known parameter values of the operation.
-     * @type {{ [key: string]: any; }}
-     * @memberof ComponentOperationDynamicPropertiesRequest
      */
     parameters?: { [key: string]: any; };
 }
@@ -79,17 +61,17 @@ export interface ComponentOperationDynamicPropertiesRequest {
 /**
  * @export
  */
-export const ComponentOperationDynamicPropertiesRequestOperationTypeEnum = {
+export const ComponentOperationPropertyRequestOperationTypeEnum = {
     Action: 'ACTION',
-    Trigger: 'TRIGGER'
+    Trigger: 'TRIGGER',
 } as const;
-export type ComponentOperationDynamicPropertiesRequestOperationTypeEnum = typeof ComponentOperationDynamicPropertiesRequestOperationTypeEnum[keyof typeof ComponentOperationDynamicPropertiesRequestOperationTypeEnum];
+export type ComponentOperationPropertyRequestOperationTypeEnum = typeof ComponentOperationPropertyRequestOperationTypeEnum[keyof typeof ComponentOperationPropertyRequestOperationTypeEnum];
 
 
 /**
- * Check if a given object implements the ComponentOperationDynamicPropertiesRequest interface.
+ * Check if a given object implements the ComponentOperationPropertyRequest interface.
  */
-export function instanceOfComponentOperationDynamicPropertiesRequest(value: object): value is ComponentOperationDynamicPropertiesRequest {
+export function instanceOfComponentOperationPropertyRequest(value: object): value is ComponentOperationPropertyRequest {
     if (!('componentName' in value) || value['componentName'] === undefined) return false;
     if (!('componentVersion' in value) || value['componentVersion'] === undefined) return false;
     if (!('operationName' in value) || value['operationName'] === undefined) return false;
@@ -97,11 +79,11 @@ export function instanceOfComponentOperationDynamicPropertiesRequest(value: obje
     return true;
 }
 
-export function ComponentOperationDynamicPropertiesRequestFromJSON(json: any): ComponentOperationDynamicPropertiesRequest {
-    return ComponentOperationDynamicPropertiesRequestFromJSONTyped(json, false);
+export function ComponentOperationPropertyRequestFromJSON(json: any): ComponentOperationPropertyRequest {
+    return ComponentOperationPropertyRequestFromJSONTyped(json, false);
 }
 
-export function ComponentOperationDynamicPropertiesRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): ComponentOperationDynamicPropertiesRequest {
+export function ComponentOperationPropertyRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): ComponentOperationPropertyRequest {
     if (json == null) {
         return json;
     }
@@ -119,11 +101,11 @@ export function ComponentOperationDynamicPropertiesRequestFromJSONTyped(json: an
     };
 }
 
-export function ComponentOperationDynamicPropertiesRequestToJSON(json: any): ComponentOperationDynamicPropertiesRequest {
-    return ComponentOperationDynamicPropertiesRequestToJSONTyped(json, false);
+export function ComponentOperationPropertyRequestToJSON(json: any): ComponentOperationPropertyRequest {
+    return ComponentOperationPropertyRequestToJSONTyped(json, false);
 }
 
-export function ComponentOperationDynamicPropertiesRequestToJSONTyped(value?: ComponentOperationDynamicPropertiesRequest | null, ignoreDiscriminator: boolean = false): any {
+export function ComponentOperationPropertyRequestToJSONTyped(value?: ComponentOperationPropertyRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
