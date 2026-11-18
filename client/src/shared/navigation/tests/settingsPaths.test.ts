@@ -30,3 +30,11 @@ describe('getOrganizationSettingsRedirectPath', () => {
         expect(getOrganizationSettingsRedirectPath('/automation/settings/users-extra', '')).toBeUndefined();
     });
 });
+
+describe('getOrganizationSettingsRedirectPath with a fragment', () => {
+    it('keeps the query and the fragment of an old Organization page', () => {
+        expect(
+            getOrganizationSettingsRedirectPath('/automation/settings/notifications', '?id=4', '#body-template')
+        ).toBe('/settings/notifications?id=4#body-template');
+    });
+});

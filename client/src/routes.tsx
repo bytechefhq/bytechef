@@ -31,12 +31,12 @@ import Settings from '@/shared/layout/Settings';
 import SettingsLayout from '@/shared/layout/SettingsLayout';
 import {ProjectApi} from '@/shared/middleware/automation/configuration';
 import {EnvironmentApi} from '@/shared/middleware/platform/configuration';
+import OrganizationSettingsRedirect from '@/shared/navigation/OrganizationSettingsRedirect';
 import {
     AI_SKILLS_SETTINGS_PATH,
     MEMORIES_SETTINGS_PATH,
     ORGANIZATION_SETTINGS_PAGES,
     ORGANIZATION_SETTINGS_PATH,
-    getOrganizationSettingsRedirectPath,
 } from '@/shared/navigation/settingsPaths';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {EnvironmentKeys} from '@/shared/queries/platform/environments.queries';
@@ -45,7 +45,7 @@ import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import redirectOutsideDevelopmentEnvironment from '@/shared/util/redirectOutsideDevelopmentEnvironment';
 import {QueryClient} from '@tanstack/react-query';
 import {Suspense, lazy} from 'react';
-import {LoaderFunctionArgs, createBrowserRouter, redirect} from 'react-router-dom';
+import {createBrowserRouter, redirect} from 'react-router-dom';
 
 const App = lazy(() => import('@/App'));
 const AccountProfile = lazy(() => import('@/pages/account/settings/AccountProfile'));
@@ -424,14 +424,7 @@ const automationMemoriesRoute = {
 };
 
 const organizationSettingsRedirectRoutes = ORGANIZATION_SETTINGS_PAGES.map((organizationSettingsPage) => ({
-    loader: ({request}: LoaderFunctionArgs) => {
-        const url = new URL(request.url);
-
-        return redirect(
-            getOrganizationSettingsRedirectPath(url.pathname, url.search) ??
-                `${ORGANIZATION_SETTINGS_PATH}/${organizationSettingsPage}`
-        );
-    },
+    element: <OrganizationSettingsRedirect />,
     path: `${organizationSettingsPage}/*`,
 }));
 
