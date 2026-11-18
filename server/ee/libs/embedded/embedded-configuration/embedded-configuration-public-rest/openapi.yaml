@@ -2299,6 +2299,8 @@ paths:
           multipart/form-data:
             schema:
               type: "object"
+              required:
+                - "projectFile"
               properties:
                 projectFile:
                   description: "The file of a code-native automation project."
@@ -2350,6 +2352,8 @@ paths:
           multipart/form-data:
             schema:
               type: "object"
+              required:
+                - "integrationFile"
               properties:
                 integrationFile:
                   description: "The file of a code-native integration."
