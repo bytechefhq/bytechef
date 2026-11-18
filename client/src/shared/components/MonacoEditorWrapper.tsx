@@ -15,6 +15,7 @@ interface MonacoEditorProps {
     onMount: (editor: StandaloneCodeEditorType) => void;
     onValidate?: (markers: editor.IMarkerData[]) => void;
     options?: EditorOptionsType;
+    path?: string;
     value?: string;
 }
 

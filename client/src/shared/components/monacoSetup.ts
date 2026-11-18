@@ -1,5 +1,6 @@
 import {registerCompletionProviders} from '@/shared/components/monaco/completion/registerCompletionProviders';
 import {configureJavaScriptDefaults} from '@/shared/components/monaco/configureJavaScriptDefaults';
+import {configureJsonSchemaCompletion} from '@/shared/components/monaco/jsonSchemaCompletion';
 import {defineMonacoDarkTheme} from '@/shared/util/monacoTheme-utils';
 import {type Monaco, loader} from '@monaco-editor/react';
 import EditorWorker from 'monaco-editor/editor/editor.worker.js?worker';
@@ -42,6 +43,8 @@ export async function ensureMonacoConfigured(): Promise<void> {
     loader.config({monaco});
 
     configureJavaScriptDefaults(monaco);
+
+    configureJsonSchemaCompletion(monaco);
 
     defineMonacoDarkTheme(monaco, false);
 
