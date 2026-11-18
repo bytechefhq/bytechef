@@ -145,7 +145,6 @@ const embeddedNavigation: NavigationType[] = [
         icon: Settings2Icon,
         name: 'Integration Configurations',
     },
-    {href: '/embedded/app-events', icon: ZapIcon, name: 'App Events'},
     {
         href: '/embedded/automations',
         icon: Workflow,
@@ -156,6 +155,7 @@ const embeddedNavigation: NavigationType[] = [
         icon: SlidersHorizontalIcon,
         name: 'Automation Configurations',
     },
+    {href: '/embedded/app-events', icon: ZapIcon, name: 'App Events'},
     {href: '/embedded/mcp-servers', icon: ServerIcon, name: 'MCP Servers'},
     {
         href: '/embedded/connected-users',
