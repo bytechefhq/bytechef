@@ -1,17 +1,12 @@
-import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import ConnectedUserConnectionCredentialsDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserConnectionCredentialsDialog';
+import ConnectedUserConnectionDialogs from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserConnectionDialogs';
 import ConnectedUserCredentialStatus from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserCredentialStatus';
-import ConnectedUserIntegrationCredentialsDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserIntegrationCredentialsDialog';
 import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
 import {getConnectedUserConnectionPermissions} from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connectedUserConnectionPermissions';
 import {CONNECTION_ORIGIN_BADGES} from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connectionOriginBadges';
 import {Connection, ConnectionOriginEnum} from '@/ee/shared/middleware/embedded/configuration';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
-import {useDeleteConnectedUserConnectionMutation} from '@/ee/shared/mutations/embedded/connections.mutations';
-import {ConnectionKeys} from '@/ee/shared/queries/embedded/connections.queries';
-import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
@@ -35,19 +30,6 @@ const ConnectedUserSheetPanelConnectionListItem = ({
 }: ConnectedUserSheetPanelConnectionListItemProps) => {
     const [showCredentialsDialog, setShowCredentialsDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-
-    const queryClient = useQueryClient();
-
-    const deleteConnectedUserConnectionMutation = useDeleteConnectedUserConnectionMutation(connectedUserId, {
-        onError: () => setShowDeleteDialog(false),
-        onSuccess: () => {
-            void queryClient.invalidateQueries({
-                queryKey: ConnectionKeys.connections,
-            });
-
-            setShowDeleteDialog(false);
-        },
-    });
 
     const originBadge = connection.origin && CONNECTION_ORIGIN_BADGES[connection.origin];
 
@@ -142,31 +124,16 @@ const ConnectedUserSheetPanelConnectionListItem = ({
                 )}
             </div>
 
-            {deletable && (
-                <AlertDialog
-                    description={`This action cannot be undone. This will permanently delete the connection ${connection.name}.`}
-                    isPending={deleteConnectedUserConnectionMutation.isPending}
-                    onCancel={() => setShowDeleteDialog(false)}
-                    onConfirm={() => deleteConnectedUserConnectionMutation.mutate(connection.id!)}
-                    open={showDeleteDialog}
-                />
-            )}
-
-            {showCredentialsDialog && provisionedIntegrationInstance && (
-                <ConnectedUserIntegrationCredentialsDialog
-                    connectedUserId={connectedUserId}
-                    integrationInstance={provisionedIntegrationInstance}
-                    onClose={() => setShowCredentialsDialog(false)}
-                />
-            )}
-
-            {showCredentialsDialog && !provisionedIntegrationInstance && (
-                <ConnectedUserConnectionCredentialsDialog
-                    connectedUserId={connectedUserId}
-                    connection={connection}
-                    onClose={() => setShowCredentialsDialog(false)}
-                />
-            )}
+            <ConnectedUserConnectionDialogs
+                connectedUserId={connectedUserId}
+                connection={connection}
+                deletable={deletable}
+                onCredentialsDialogClose={() => setShowCredentialsDialog(false)}
+                onDeleteDialogClose={() => setShowDeleteDialog(false)}
+                provisionedIntegrationInstance={provisionedIntegrationInstance}
+                showCredentialsDialog={showCredentialsDialog}
+                showDeleteDialog={showDeleteDialog}
+            />
         </li>
     );
 };
