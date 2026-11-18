@@ -40,6 +40,27 @@ public final class ToolNameUtils {
     private ToolNameUtils() {
     }
 
+    public static String getDefaultToolName(String componentName, String clusterElementName) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(componentName.toUpperCase(Locale.ROOT));
+        sb.append("_");
+        sb.append(Character.toUpperCase(clusterElementName.charAt(0)));
+
+        for (int i = 1; i < clusterElementName.length(); i++) {
+            char character = clusterElementName.charAt(i);
+
+            if (Character.isUpperCase(character)) {
+                sb.append('_')
+                    .append(character);
+            } else {
+                sb.append(Character.toUpperCase(character));
+            }
+        }
+
+        return sb.toString();
+    }
+
     public static @Nullable String getCustomToolName(@Nullable Map<String, ?> parameters) {
         if (parameters == null || !(parameters.get(ToolConstants.TOOL_NAME) instanceof String name)) {
             return null;

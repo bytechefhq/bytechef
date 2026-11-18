@@ -43,6 +43,7 @@ import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.Property;
+import com.bytechef.platform.component.domain.ValueProperty;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -350,6 +351,16 @@ class ClusterElementDefinitionServiceTest {
         ClusterElementDefinition result = getToolClusterElementDefinition(List.of());
 
         assertEquals(List.of("toolName", "toolDescription"), getPropertyNames(result));
+    }
+
+    @Test
+    void testTheToolNamePlaceholderShowsTheDefaultNameOfThisTool() {
+        ClusterElementDefinition result = getToolClusterElementDefinition(List.of());
+
+        ValueProperty<?> toolNameProperty = (ValueProperty<?>) result.getProperties()
+            .getFirst();
+
+        assertEquals("Defaults to TESTCOMPONENT_POST", toolNameProperty.getPlaceholder());
     }
 
     @Test

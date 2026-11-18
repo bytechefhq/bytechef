@@ -28,6 +28,16 @@ import org.junit.jupiter.api.Test;
 class ToolNameUtilsTest {
 
     @Test
+    void testGetDefaultToolNameJoinsTheUpperCasedComponentAndElementNames() {
+        assertEquals("ACME_GET_ORDER", ToolNameUtils.getDefaultToolName("acme", "getOrder"));
+    }
+
+    @Test
+    void testGetDefaultToolNameKeepsASingleWordElementName() {
+        assertEquals("SLACK_POST", ToolNameUtils.getDefaultToolName("slack", "post"));
+    }
+
+    @Test
     void testGetWorkflowToolNameFallsBackToTheWorkflowLabel() {
         assertEquals("SEND_EMAIL", ToolNameUtils.getWorkflowToolName(Map.of(), "Send Email"));
     }
