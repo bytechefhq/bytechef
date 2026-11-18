@@ -15,16 +15,16 @@ anything: reference the types with a triple-slash directive and use the global `
     workflows: [
         {
             inputs: [{label: 'Customer ID', name: 'customerId', required: true, type: 'STRING'}],
-            name: 'sync-orders',
-            outputs: [{name: 'orders', task: 'fetch-orders'}],
+            name: 'sync_orders',
+            outputs: [{name: 'orders', task: 'fetch_orders'}],
             tasks: [
                 {
-                    connections: [{componentName: 'httpClient', name: 'orders-api'}],
-                    name: 'fetch-orders',
-                    perform: (context) =>
+                    connections: [{componentName: 'httpClient', name: 'orders_api'}],
+                    name: 'fetch_orders',
+                    perform: (input, connection, context) =>
                         context.component.httpClient.get(
-                            {uri: 'https://api.example.com/customers/' + context.input('customerId') + '/orders'},
-                            'orders-api'
+                            {uri: 'https://api.example.com/customers/' + input.customerId + '/orders'},
+                            'orders_api'
                         ),
                 },
             ],
@@ -33,7 +33,14 @@ anything: reference the types with a triple-slash directive and use the global `
 }) satisfies ByteChef.ProjectDefinition;
 ```
 
-`context` is typed inside `perform` without an annotation. Compile the file with `tsc` and deploy the emitted `.js`
+`perform` takes `(input, context)`, or `(input, connection, context)` when it declares three parameters:
+
+- `input` holds the workflow inputs plus the output of every task that already ran, keyed by name.
+- `connection` maps each connection the task declares, by its `name`, to that connection's parameters.
+- `context` calls component actions (`context.component`) and writes to the execution log (`context.log`).
+
+The three-parameter form is typed inside `perform` without annotations. TypeScript can't infer the two-parameter
+form's types from the union of both forms, so annotate them: `(input: ByteChef.TaskInput, context: ByteChef.TaskContext)`. Compile the file with `tsc` and deploy the emitted `.js`
 file. `satisfies` and the directive leave nothing behind, so the
 output is the plain object literal ByteChef expects. Plain JavaScript files get the same checks through `// @ts-check`
 and a JSDoc `@type {ByteChef.ProjectDefinition}` annotation.
@@ -45,8 +52,9 @@ and a JSDoc `@type {ByteChef.ProjectDefinition}` annotation.
 | `ProjectDefinition` | An automation code project or an embedded catalog code project, identified by `name` |
 | `IntegrationDefinition` | An embedded code integration, identified by `componentName` and `componentVersion` |
 | `WorkflowDefinition` | A workflow: `inputs`, `outputs`, `triggers` and `tasks` |
+| `InputDefinition` | A workflow input; `componentName`, `componentVersion` and `groupName` take its options from a component's declared input, such as Slack's `channel` |
 | `TaskDefinition`, `ParallelTaskDefinition`, `ForkJoinTaskDefinition` | A task, and the two task groups |
-| `TaskContext` | The `context` passed to `perform`: `component`, `connection`, `input`, `log`, `parameters` |
+| `TaskContext`, `TaskInput`, `TaskConnections` | The `context`, `input` and `connection` passed to `perform`; `context` carries `component` and `log` |
 | `ConnectionRequirement`, `ClusterElement` | A task's declared connections, and cluster elements composed at a call site |
 
 See [`examples/`](examples) for a project and an integration.

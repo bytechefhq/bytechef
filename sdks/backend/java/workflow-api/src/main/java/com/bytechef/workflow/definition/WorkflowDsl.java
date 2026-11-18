@@ -183,6 +183,7 @@ public class WorkflowDsl {
 
     public static class ModifiableInput implements Input {
 
+        private ComponentInputReference componentInput;
         private String label;
         private final String name;
         private boolean required;
@@ -190,6 +191,12 @@ public class WorkflowDsl {
 
         private ModifiableInput(String name) {
             this.name = name;
+        }
+
+        public ModifiableInput component(String componentName, int componentVersion, String groupName) {
+            this.componentInput = new ComponentInputReference(componentName, componentVersion, groupName);
+
+            return this;
         }
 
         public ModifiableInput label(String label) {
@@ -208,6 +215,11 @@ public class WorkflowDsl {
             this.type = type;
 
             return this;
+        }
+
+        @Override
+        public Optional<ComponentInputReference> getComponentInput() {
+            return Optional.ofNullable(componentInput);
         }
 
         @Override
@@ -278,7 +290,6 @@ public class WorkflowDsl {
 
         private String label;
         private final String name;
-        private Map<String, ?> parameters;
         private PerformFunction performFunction;
 
         public ModifiableTaskDefinition(String name) {
@@ -303,31 +314,14 @@ public class WorkflowDsl {
             return this;
         }
 
-        public ModifiableTaskDefinition parameters(Map<String, ?> parameters) {
-            this.parameters = Map.copyOf(parameters);
-
-            return this;
-        }
-
         public ModifiableTaskDefinition perform(PerformFunction perform) {
             this.performFunction = perform;
 
             return this;
         }
 
-        public ModifiableTaskDefinition perform(ContextPerformFunction perform) {
-            this.performFunction = new PerformFunction() {
-
-                @Override
-                public Object apply() {
-                    return null;
-                }
-
-                @Override
-                public Object apply(TaskContext context) throws Exception {
-                    return perform.apply(context);
-                }
-            };
+        public ModifiableTaskDefinition perform(InputContextPerformFunction perform) {
+            this.performFunction = (input, connection, context) -> perform.apply(input, context);
 
             return this;
         }
@@ -350,11 +344,6 @@ public class WorkflowDsl {
         @Override
         public String getName() {
             return name;
-        }
-
-        @Override
-        public Optional<Map<String, ?>> getParameters() {
-            return Optional.ofNullable(parameters);
         }
 
         @Override

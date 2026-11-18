@@ -20,7 +20,9 @@ import com.bytechef.workflow.definition.CompositeTaskDefinition;
 import com.bytechef.workflow.definition.ConnectionRequirement;
 import com.bytechef.workflow.definition.Input;
 import com.bytechef.workflow.definition.Output;
+import com.bytechef.workflow.definition.TaskContext;
 import com.bytechef.workflow.definition.TaskDefinition;
+import com.bytechef.workflow.definition.TaskDefinition.PerformFunction;
 import com.bytechef.workflow.definition.WorkflowDefinition;
 import com.bytechef.workflow.definition.WorkflowTaskDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -36,6 +38,7 @@ import java.security.ProtectionDomain;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -45,7 +48,6 @@ import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 import org.graalvm.polyglot.PolyglotException;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -102,7 +104,7 @@ class ProjectHandlerPolyglotEngineTest {
                     tasks: [
                         {
                             name: 'my-task',
-                            perform: (context) => {
+                            perform: (input, context) => {
                                 const result = context.component.mock.doIt({x: 1}, 'conn');
 
                                 return result.y;
@@ -125,7 +127,7 @@ class ProjectHandlerPolyglotEngineTest {
                     "tasks": [
                         {
                             "name": "my-task",
-                            "perform": lambda *args: args[0].component.mock.doIt({"x": 1}, "conn")
+                            "perform": lambda input, context: context.component.mock.doIt({"x": 1}, "conn")
                         }
                     ]
                 }
@@ -133,33 +135,34 @@ class ProjectHandlerPolyglotEngineTest {
         )
         """;
 
-    private static final String SCRIPT_TASK_RUNNER_JAVASCRIPT_SOURCE = """
-        ({
-            name: 'test-project',
-            workflows: [
-                {
-                    name: 'my-workflow',
-                    tasks: [
-                        {
-                            name: 'my-task',
-                            perform: (context) => {
-                                const result = context.component.script.python({
-                                    script: "def perform(input, context):\\n    return {'doubled': input['value'] * 2}\\n",
-                                    input: {value: 21},
-                                    taskRunner: {type: 'process'}
-                                });
+    private static final String SCRIPT_TASK_RUNNER_JAVASCRIPT_SOURCE =
+        """
+            ({
+                name: 'test-project',
+                workflows: [
+                    {
+                        name: 'my-workflow',
+                        tasks: [
+                            {
+                                name: 'my-task',
+                                perform: (input, context) => {
+                                    const result = context.component.script.python({
+                                        script: "def perform(input, context):\\n    return {'doubled': input['value'] * 2}\\n",
+                                        input: {value: 21},
+                                        taskRunner: {type: 'process'}
+                                    });
 
-                                return result.vars.doubled;
+                                    return result.vars.doubled;
+                                }
                             }
-                        }
-                    ]
-                }
-            ]
-        })
-        """;
+                        ]
+                    }
+                ]
+            })
+            """;
 
     private static final String SCRIPT_TASK_RUNNER_PYTHON_SOURCE = """
-        def double(context):
+        def double(input, context):
             result = context.component.script.python({
                 "script": "def perform(input, context):\\n    return {'doubled': input['value'] * 2}\\n",
                 "input": {"value": 21},
@@ -176,8 +179,8 @@ class ProjectHandlerPolyglotEngineTest {
         """;
 
     private static final String DICT_PYTHON_SOURCE = """
-        def greet(context):
-            name = context.input("name")
+        def greet(input, context):
+            name = input["name"]
 
             context.log("info", "Greeting " + name)
 
@@ -199,23 +202,6 @@ class ProjectHandlerPolyglotEngineTest {
         project
         """;
 
-    private static final String CONTEXT_RUBY_SOURCE = """
-        Struct.new(:name, :workflows).new(
-          "test-project",
-          [
-            {
-              "name" => "my-workflow",
-              "tasks" => [
-                {
-                  "name" => "my-task",
-                  "perform" => lambda { |context| context.component.mock.doIt({ "x" => 1 }, "conn") }
-                }
-              ]
-            }
-          ]
-        )
-        """;
-
     private static final String LOG_JAVASCRIPT_SOURCE = """
         ({
             name: 'test-project',
@@ -225,28 +211,11 @@ class ProjectHandlerPolyglotEngineTest {
                     tasks: [
                         {
                             name: 'my-task',
-                            perform: (context) => {
+                            perform: (input, context) => {
                                 context.log('warn', 'log message');
 
                                 return 'logged';
                             }
-                        }
-                    ]
-                }
-            ]
-        })
-        """;
-
-    private static final String ZERO_ARG_JAVASCRIPT_SOURCE = """
-        ({
-            name: 'test-project',
-            workflows: [
-                {
-                    name: 'my-workflow',
-                    tasks: [
-                        {
-                            name: 'my-task',
-                            perform: () => 'legacy'
                         }
                     ]
                 }
@@ -263,7 +232,7 @@ class ProjectHandlerPolyglotEngineTest {
                     tasks: [
                         {
                             name: 'my-task',
-                            perform: (context) => context.component.aiAgent.chat({messages: []}, null, {
+                            perform: (input, context) => context.component.aiAgent.chat({messages: []}, null, {
                                 model: {
                                     type: 'openAi/v1/model',
                                     connection: 'openai-prod',
@@ -287,8 +256,7 @@ class ProjectHandlerPolyglotEngineTest {
 
         RecordingTaskContext taskContext = new RecordingTaskContext("answer");
 
-        taskDefinition.getPerform()
-            .apply(taskContext);
+        perform(taskDefinition, Map.of(), Map.of(), taskContext);
 
         Map<String, ?> clusterElements = taskContext.getClusterElements();
 
@@ -320,8 +288,7 @@ class ProjectHandlerPolyglotEngineTest {
 
         TaskDefinition taskDefinition = loadSingleTask("python", DICT_PYTHON_SOURCE);
 
-        Object result = taskDefinition.getPerform()
-            .apply(new RecordingTaskContext(null, Map.of(), Map.of("name", "Ada")));
+        Object result = perform(taskDefinition, Map.of("name", "Ada"), Map.of(), new RecordingTaskContext(null));
 
         assertEquals("Hello, Ada!", result);
     }
@@ -362,15 +329,13 @@ class ProjectHandlerPolyglotEngineTest {
         assertEquals(3, tasks.size());
         assertEquals(CompositeTaskDefinition.Type.PARALLEL, ((CompositeTaskDefinition) tasks.get(1)).getType());
 
-        RecordingTaskContext taskContext = new RecordingTaskContext(
-            List.of("order-1", "order-2"), Map.of(), Map.of("customerId", "42"));
+        RecordingTaskContext taskContext = new RecordingTaskContext(List.of("order-1", "order-2"));
 
-        Object result = ((TaskDefinition) tasks.getFirst()).getPerform()
-            .apply(taskContext);
+        Object result = perform((TaskDefinition) tasks.getFirst(), Map.of("customerId", "42"), Map.of(), taskContext);
 
         assertEquals("httpClient", taskContext.getComponentName());
         assertEquals("get", taskContext.getActionName());
-        assertEquals("orders-api", taskContext.getConnectionName());
+        assertEquals("orders_api", taskContext.getConnectionName());
         assertEquals(List.of("order-1", "order-2"), result);
     }
 
@@ -389,8 +354,7 @@ class ProjectHandlerPolyglotEngineTest {
 
         RecordingTaskContext taskContext = new RecordingTaskContext(Map.of("y", 2));
 
-        Object result = taskDefinition.getPerform()
-            .apply(taskContext);
+        Object result = perform(taskDefinition, Map.of(), Map.of(), taskContext);
 
         assertEquals("mock", taskContext.getComponentName());
         assertEquals("doIt", taskContext.getActionName());
@@ -408,8 +372,7 @@ class ProjectHandlerPolyglotEngineTest {
 
         RecordingTaskContext taskContext = new RecordingTaskContext("python result");
 
-        Object result = taskDefinition.getPerform()
-            .apply(taskContext);
+        Object result = perform(taskDefinition, Map.of(), Map.of(), taskContext);
 
         assertEquals("mock", taskContext.getComponentName());
         assertEquals("doIt", taskContext.getActionName());
@@ -431,34 +394,13 @@ class ProjectHandlerPolyglotEngineTest {
         assertScriptComponentCallOnTaskRunner(loadSingleTask("python", SCRIPT_TASK_RUNNER_PYTHON_SOURCE));
     }
 
-    @Disabled("RUBY-DISABLED")
-    @Test
-    void testPerformReceivesComponentCapableContextForRuby() throws Exception {
-        TaskDefinition taskDefinition = loadSingleTask("ruby", CONTEXT_RUBY_SOURCE);
-
-        RecordingTaskContext taskContext = new RecordingTaskContext("ruby result");
-
-        Object result = taskDefinition.getPerform()
-            .apply(taskContext);
-
-        assertEquals("mock", taskContext.getComponentName());
-        assertEquals("doIt", taskContext.getActionName());
-        assertEquals("conn", taskContext.getConnectionName());
-
-        Map<String, ?> input = taskContext.getInput();
-
-        assertEquals(1, ((Number) input.get("x")).intValue());
-        assertEquals("ruby result", result);
-    }
-
     @Test
     void testPerformLogDelegatesToTaskContext() throws Exception {
         TaskDefinition taskDefinition = loadSingleTask("js", LOG_JAVASCRIPT_SOURCE);
 
         RecordingTaskContext taskContext = new RecordingTaskContext(null);
 
-        Object result = taskDefinition.getPerform()
-            .apply(taskContext);
+        Object result = perform(taskDefinition, Map.of(), Map.of(), taskContext);
 
         assertEquals("WARN", taskContext.getLogLevel());
         assertEquals("log message", taskContext.getLogMessage());
@@ -466,46 +408,85 @@ class ProjectHandlerPolyglotEngineTest {
     }
 
     @Test
-    void testZeroArgPerformStillRunsWithTaskContext() throws Exception {
-        TaskDefinition taskDefinition = loadSingleTask("js", ZERO_ARG_JAVASCRIPT_SOURCE);
-
-        RecordingTaskContext taskContext = new RecordingTaskContext(null);
-
-        Object result = taskDefinition.getPerform()
-            .apply(taskContext);
-
-        assertEquals("legacy", result);
-    }
-
-    @Test
-    void testPerformReadsConnectionParametersFromContext() throws Exception {
-        String source = """
-            ({
-                name: 'test-project',
-                workflows: [
-                    {
-                        name: 'my-workflow',
-                        tasks: [
-                            {
-                                name: 'my-task',
-                                connections: [{componentName: 'slack', name: 'slack-prod'}],
-                                perform: (context) => context.connection('slack-prod').region
-                            }
-                        ]
-                    }
-                ]
-            })
-            """;
+    void testThreeArgumentPerformReceivesDeclaredConnectionsForJavaScript() throws Exception {
+        String source =
+            """
+                ({
+                    name: 'test-project',
+                    workflows: [
+                        {
+                            name: 'my-workflow',
+                            tasks: [
+                                {
+                                    name: 'my-task',
+                                    connections: [{componentName: 'slack', name: 'slack-prod'}],
+                                    perform: (input, connection, context) => connection['slack-prod'].region + ':' + input.channel
+                                }
+                            ]
+                        }
+                    ]
+                })
+                """;
 
         TaskDefinition taskDefinition = loadSingleTask("js", source);
 
-        RecordingTaskContext taskContext = new RecordingTaskContext(null, Map.of("region", "eu"));
+        Object result =
+            perform(taskDefinition, Map.of("channel", "general"), Map.of("slack-prod", Map.of("region", "eu")),
+                new RecordingTaskContext(null));
 
-        Object result = taskDefinition.getPerform()
-            .apply(taskContext);
+        assertEquals("eu:general", result);
+    }
 
-        assertEquals("slack-prod", taskContext.getConnectionName());
-        assertEquals("eu", result);
+    @Test
+    void testThreeArgumentPerformReceivesDeclaredConnectionsForPython() throws Exception {
+        String source = """
+            def post(input, connection, context):
+                return connection["slack-prod"]["region"] + ":" + input["channel"]
+
+
+            {
+                "name": "test-project",
+                "componentName": "test-component",
+                "componentVersion": 1,
+                "workflows": [{"name": "my-workflow", "tasks": [{"name": "my-task", "perform": post}]}],
+            }
+            """;
+
+        TaskDefinition taskDefinition = loadSingleTask("python", source);
+
+        Object result =
+            perform(taskDefinition, Map.of("channel", "general"), Map.of("slack-prod", Map.of("region", "eu")),
+                new RecordingTaskContext(null));
+
+        assertEquals("eu:general", result);
+    }
+
+    @Test
+    void testTwoArgumentPerformWithAnOptionalThirdParameterReceivesInputAndContextForPython() throws Exception {
+        String source = """
+            def post(input, context, suffix="!"):
+                context.log("info", "posting")
+
+                return input["channel"] + suffix
+
+
+            {
+                "name": "test-project",
+                "componentName": "test-component",
+                "componentVersion": 1,
+                "workflows": [{"name": "my-workflow", "tasks": [{"name": "my-task", "perform": post}]}],
+            }
+            """;
+
+        TaskDefinition taskDefinition = loadSingleTask("python", source);
+
+        RecordingTaskContext taskContext = new RecordingTaskContext(null);
+
+        Object result = perform(taskDefinition, Map.of("channel", "general"),
+            Map.of("slack-prod", Map.of("region", "eu")), taskContext);
+
+        assertEquals("general!", result);
+        assertEquals("posting", taskContext.getLogMessage());
     }
 
     @Test
@@ -519,7 +500,7 @@ class ProjectHandlerPolyglotEngineTest {
                         tasks: [
                             {
                                 name: 'my-task',
-                                perform: (context) => context.log('warning', 'log message')
+                                perform: (input, context) => context.log('warning', 'log message')
                             }
                         ]
                     }
@@ -532,12 +513,11 @@ class ProjectHandlerPolyglotEngineTest {
         RecordingTaskContext taskContext = new RecordingTaskContext(null);
 
         assertThrows(
-            Exception.class, () -> taskDefinition.getPerform()
-                .apply(taskContext));
+            Exception.class, () -> perform(taskDefinition, Map.of(), Map.of(), taskContext));
     }
 
     @Test
-    void testPerformReadsWorkflowInputsAndPriorTaskOutputsFromContext() throws Exception {
+    void testPerformReadsWorkflowInputsAndPriorTaskOutputsFromInput() throws Exception {
         String source = """
             ({
                 name: 'test-project',
@@ -547,8 +527,7 @@ class ProjectHandlerPolyglotEngineTest {
                         tasks: [
                             {
                                 name: 'my-task',
-                                perform: (context) =>
-                                    context.input('my-task1').id + ':' + context.input().input.email
+                                perform: (input, context) => input['my-task1'].id + ':' + input.input.email
                             }
                         ]
                     }
@@ -558,11 +537,9 @@ class ProjectHandlerPolyglotEngineTest {
 
         TaskDefinition taskDefinition = loadSingleTask("js", source);
 
-        RecordingTaskContext taskContext = new RecordingTaskContext(
-            null, Map.of(), Map.of("input", Map.of("email", "a@b.com"), "my-task1", Map.of("id", "3")));
-
-        Object result = taskDefinition.getPerform()
-            .apply(taskContext);
+        Object result = perform(taskDefinition,
+            Map.of("input", Map.of("email", "a@b.com"), "my-task1", Map.of("id", "3")), Map.of(),
+            new RecordingTaskContext(null));
 
         assertEquals("3:a@b.com", result);
     }
@@ -626,7 +603,7 @@ class ProjectHandlerPolyglotEngineTest {
                                 "connections": [
                                     {"componentName": "slack", "name": "slack-prod"}
                                 ],
-                                "perform": lambda context: "x"
+                                "perform": lambda input, context: "x"
                             }
                         ]
                     }
@@ -696,10 +673,36 @@ class ProjectHandlerPolyglotEngineTest {
 
     @Test
     void testLoadWithoutConnectionsKeepsGetConnectionsEmpty() {
-        TaskDefinition taskDefinition = loadSingleTask("js", ZERO_ARG_JAVASCRIPT_SOURCE);
+        TaskDefinition taskDefinition = loadSingleTask("js", LOG_JAVASCRIPT_SOURCE);
 
         assertTrue(taskDefinition.getConnections()
             .isEmpty());
+    }
+
+    @Test
+    void testLoadParsesAnInputThatReferencesAComponentInput() {
+        String source = """
+            ({
+                name: 'test-project',
+                workflows: [
+                    {
+                        name: 'my-workflow',
+                        inputs: [{name: 'channel', componentName: 'slack', componentVersion: 1, groupName: 'channel'}],
+                        tasks: [{name: 'post', perform: () => 'c'}]
+                    }
+                ]
+            })
+            """;
+
+        Input input = ProjectHandlerPolyglotEngine.load("js", source)
+            .getDefinition()
+            .getWorkflows()
+            .getFirst()
+            .getInputs()
+            .orElseThrow()
+            .getFirst();
+
+        assertEquals(Optional.of(new Input.ComponentInputReference("slack", 1, "channel")), input.getComponentInput());
     }
 
     @Test
@@ -847,7 +850,7 @@ class ProjectHandlerPolyglotEngineTest {
                             {
                                 name: 'notify',
                                 type: 'forkJoin',
-                                branches: [[{name: 'slack', perform: (context) => 'posted'}]]
+                                branches: [[{name: 'slack', perform: (input, context) => 'posted'}]]
                             }
                         ]
                     }
@@ -861,8 +864,7 @@ class ProjectHandlerPolyglotEngineTest {
             .getFirst()
             .getFirst();
 
-        assertEquals("posted", nestedTask.getPerform()
-            .apply(new RecordingTaskContext(null)));
+        assertEquals("posted", perform(nestedTask, Map.of(), Map.of(), new RecordingTaskContext(null)));
     }
 
     @Test
@@ -916,8 +918,7 @@ class ProjectHandlerPolyglotEngineTest {
         RecordingTaskContext taskContext = new RecordingTaskContext(
             Map.of("exitCode", 0, "vars", Map.of("doubled", 42)));
 
-        Object result = taskDefinition.getPerform()
-            .apply(taskContext);
+        Object result = perform(taskDefinition, Map.of(), Map.of(), taskContext);
 
         assertEquals("script", taskContext.getComponentName());
         assertEquals("python", taskContext.getActionName());
@@ -998,5 +999,14 @@ class ProjectHandlerPolyglotEngineTest {
             })
             .distinct()
             .collect(Collectors.joining(File.pathSeparator));
+    }
+
+    private static Object perform(
+        TaskDefinition taskDefinition, Map<String, ?> input, Map<String, ?> connection, TaskContext context)
+        throws Exception {
+
+        PerformFunction performFunction = taskDefinition.getPerform();
+
+        return performFunction.apply(input, connection, context);
     }
 }
