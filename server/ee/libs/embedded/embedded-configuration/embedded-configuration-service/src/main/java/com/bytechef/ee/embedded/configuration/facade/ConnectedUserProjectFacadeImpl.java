@@ -70,6 +70,7 @@ import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowInput;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTriggerDTO;
@@ -1320,7 +1321,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         return inputs.stream()
             .filter(input -> !internalOnlyInputNames.contains(input.name()))
             .map(input -> new ConnectedUserWorkflowTemplateDTO.Input(
-                input.name(), input.label(), input.type(), input.required()))
+                input.name(), input.label(), input.type(), input.required(),
+                new WorkflowInput(input).getComponentInputReference()))
             .toList();
     }
 
