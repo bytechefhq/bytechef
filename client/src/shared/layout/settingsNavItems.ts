@@ -28,8 +28,13 @@ const automationSectionNavItems: SettingsNavItemI[] = [
         title: 'API Keys',
     },
     {
-        href: MEMORIES_SETTINGS_PATH,
-        title: 'Memories',
+        items: [
+            {
+                href: MEMORIES_SETTINGS_PATH,
+                title: 'Memories',
+            },
+        ],
+        title: 'AI',
     },
 ];
 
@@ -43,8 +48,13 @@ const embeddedSectionNavItems: SettingsNavItemI[] = [
         title: 'API Keys',
     },
     {
-        href: EMBEDDED_MEMORIES_SETTINGS_PATH,
-        title: 'Memories',
+        items: [
+            {
+                href: EMBEDDED_MEMORIES_SETTINGS_PATH,
+                title: 'Memories',
+            },
+        ],
+        title: 'AI',
     },
 ];
 

@@ -9,12 +9,18 @@ const flattenHrefs = (navItems: SettingsNavItemI[]): string[] =>
 
 const findAiGroup = (navItems: SettingsNavItemI[]) => navItems.find((navItem) => navItem.title === 'AI');
 
-describe('getSettingsNavItems', () => {
-    it('lists Memories under the Automation current workspace, not under the AI group', () => {
-        const navItems = getSettingsNavItems(PlatformType.AUTOMATION);
+const splitAtOrganization = (navItems: SettingsNavItemI[]) => {
+    const organizationIndex = navItems.findIndex((navItem) => navItem.title === 'Organization');
 
-        expect(flattenHrefs(navItems)).toContain('/automation/settings/ai/memories');
-        expect(findAiGroup(navItems)?.items?.map((item) => item.title)).toEqual(['Providers', 'Skills']);
+    return {organization: navItems.slice(organizationIndex), section: navItems.slice(0, organizationIndex)};
+};
+
+describe('getSettingsNavItems', () => {
+    it('lists Memories under an AI group of the Automation current workspace, not under the Organization AI group', () => {
+        const {organization, section} = splitAtOrganization(getSettingsNavItems(PlatformType.AUTOMATION));
+
+        expect(findAiGroup(section)?.items).toEqual([{href: '/automation/settings/ai/memories', title: 'Memories'}]);
+        expect(findAiGroup(organization)?.items?.map((item) => item.title)).toEqual(['Providers', 'Skills']);
     });
 
     it('lists the Embedded Memories page in Embedded, and not the Automation one', () => {
@@ -22,6 +28,13 @@ describe('getSettingsNavItems', () => {
 
         expect(hrefs).toContain('/embedded/settings/ai/memories');
         expect(hrefs).not.toContain('/automation/settings/ai/memories');
+    });
+
+    it('lists the Embedded Memories page under an AI group of the Embedded section', () => {
+        const {organization, section} = splitAtOrganization(getSettingsNavItems(PlatformType.EMBEDDED));
+
+        expect(findAiGroup(section)?.items).toEqual([{href: '/embedded/settings/ai/memories', title: 'Memories'}]);
+        expect(findAiGroup(organization)?.items?.map((item) => item.title)).toEqual(['Providers', 'Skills']);
     });
 
     it('lists no Embedded Memories page in Automation', () => {
