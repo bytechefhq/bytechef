@@ -37,6 +37,15 @@ describe('ConnectionListItemLayout', () => {
         expect(screen.getByText('dialog slot')).toBeInTheDocument();
     });
 
+    it('renders the extra badges before the status badge', () => {
+        renderLayout({active: true, badges: <span>Shared</span>, credentialStatus: 'VALID'});
+
+        const sharedBadge = screen.getByText('Shared');
+        const statusBadge = screen.getByText('Active');
+
+        expect(sharedBadge.compareDocumentPosition(statusBadge) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+
     it('shows Active for a valid active connection', () => {
         renderLayout({active: true, credentialStatus: 'VALID'});
 
@@ -72,6 +81,24 @@ describe('ConnectionListItemLayout', () => {
         renderLayout({createdDate: new Date(2026, 10, 9, 18, 0, 0)});
 
         expect(screen.getByText(/Created at/)).toBeInTheDocument();
+    });
+
+    it('renders the tag row only when a tag list is given', () => {
+        const {unmount} = renderLayout();
+
+        expect(screen.getByTestId('connection-list-item-tags')).toHaveTextContent('tag list');
+
+        unmount();
+
+        renderLayout({tagList: undefined});
+
+        expect(screen.queryByTestId('connection-list-item-tags')).not.toBeInTheDocument();
+    });
+
+    it('renders no menu when onEditClick is not given', () => {
+        renderLayout({menuItems: undefined, onEditClick: undefined});
+
+        expect(screen.queryByRole('button')).not.toBeInTheDocument();
     });
 
     it('opens the menu with the given items and calls onEditClick', async () => {
