@@ -1,32 +1,38 @@
 
-# ComponentActionDynamicPropertiesRequest
+# ComponentOperationDynamicPropertiesRequest
 
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`actionName` | string
+`clusterElementType` | string
+`clusterElementWorkflowNodeName` | string
 `componentName` | string
 `componentVersion` | number
 `connectionKey` | string
 `lookupDependsOnPaths` | Array&lt;string&gt;
+`operationName` | string
+`operationType` | string
 `parameters` | { [key: string]: any; }
 
 ## Example
 
 ```typescript
-import type { ComponentActionDynamicPropertiesRequest } from ''
+import type { ComponentOperationDynamicPropertiesRequest } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "actionName": null,
+  "clusterElementType": null,
+  "clusterElementWorkflowNodeName": null,
   "componentName": null,
   "componentVersion": null,
   "connectionKey": null,
   "lookupDependsOnPaths": null,
+  "operationName": null,
+  "operationType": null,
   "parameters": null,
-} satisfies ComponentActionDynamicPropertiesRequest
+} satisfies ComponentOperationDynamicPropertiesRequest
 
 console.log(example)
 
@@ -35,7 +41,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as ComponentActionDynamicPropertiesRequest
+const exampleParsed = JSON.parse(exampleJSON) as ComponentOperationDynamicPropertiesRequest
 console.log(exampleParsed)
 ```
 
