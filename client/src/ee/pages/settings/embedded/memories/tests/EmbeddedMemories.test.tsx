@@ -44,6 +44,7 @@ const mockUseUpdateMutation = vi.mocked(useUpdateEmbeddedAiAutoMemoryMutation);
 type GraphQlMemoryType = EmbeddedAiAutoMemoriesQuery['embeddedAiAutoMemories'][number];
 
 const makeGraphQlMemory = (overrides: Partial<GraphQlMemoryType> = {}): GraphQlMemoryType => ({
+    automation: null,
     connectedUser: {email: 'ada@example.com', externalId: 'ext-ada', id: '21', name: 'Ada'},
     content: 'Customer is on the **Pro** plan.',
     createdAt: Date.parse('2026-04-01T00:00:00Z'),
@@ -51,9 +52,10 @@ const makeGraphQlMemory = (overrides: Partial<GraphQlMemoryType> = {}): GraphQlM
     environmentId: 2,
     id: '3',
     integration: {componentName: 'memoryDemo', id: '31', name: 'Memory Demo'},
-    integrationInstanceId: 11,
     memoryType: 'USER' as GraphQlMemoryType['memoryType'],
     name: 'customer_plan',
+    principalId: 11,
+    principalType: 'INTEGRATION_INSTANCE' as GraphQlMemoryType['principalType'],
     title: 'Plan',
     updatedAt: Date.parse('2026-04-10T00:00:00Z'),
     version: 4,
@@ -66,6 +68,18 @@ const connectedUsersData: EmbeddedAiAutoMemoryConnectedUsersQuery = {
         {email: null, externalId: 'ext-bob', id: '22', memoryCount: 2, name: null},
     ],
 };
+
+const makeAutomationMemory = (overrides: Partial<GraphQlMemoryType> = {}): GraphQlMemoryType =>
+    makeGraphQlMemory({
+        automation: {id: '51', name: 'Lead Notes'},
+        id: '5',
+        integration: null,
+        name: 'contact_preference',
+        principalId: 41,
+        principalType: 'PROJECT_DEPLOYMENT' as GraphQlMemoryType['principalType'],
+        title: 'Contact preference',
+        ...overrides,
+    });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const makeQueryResult = (data: unknown): any => ({
@@ -136,7 +150,37 @@ describe('EmbeddedMemories', () => {
         expect(within(row).getByText('Ada')).toBeInTheDocument();
         expect(within(row).getByText('ext-ada')).toBeInTheDocument();
         expect(within(row).getByText('Memory Demo')).toBeInTheDocument();
+        expect(within(row).getByText('Integration')).toBeInTheDocument();
         expect(within(row).getByText('User')).toBeInTheDocument();
+    });
+
+    it('titles the source column Source', () => {
+        renderPage();
+
+        expect(screen.getByRole('columnheader', {name: 'Source'})).toBeInTheDocument();
+    });
+
+    it('lists an automation memory with the automation the connected user enabled', () => {
+        mockMemories([makeAutomationMemory()]);
+
+        renderPage();
+
+        const row = screen.getByText('Contact preference').closest('tr')!;
+
+        expect(within(row).getByText('Ada')).toBeInTheDocument();
+        expect(within(row).getByText('Lead Notes')).toBeInTheDocument();
+        expect(within(row).getByText('Automation')).toBeInTheDocument();
+    });
+
+    it("names the connected user's own workflows when an automation memory has no automation", () => {
+        mockMemories([makeAutomationMemory({automation: null})]);
+
+        renderPage();
+
+        const row = screen.getByText('Contact preference').closest('tr')!;
+
+        expect(within(row).getByText('Custom workflows')).toBeInTheDocument();
+        expect(within(row).getByText('Automation')).toBeInTheDocument();
     });
 
     it('shows the external id once for a connected user without a name or email', () => {
@@ -259,8 +303,9 @@ describe('EmbeddedMemories', () => {
                     environment: 2,
                     expectedVersion: 4,
                     id: '3',
-                    integrationInstanceId: '11',
                     memoryType: undefined,
+                    principalId: '11',
+                    principalType: 'INTEGRATION_INSTANCE',
                     title: 'Subscription plan',
                 },
             },
@@ -278,7 +323,24 @@ describe('EmbeddedMemories', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Delete permanently'}));
 
         expect(deleteMutate).toHaveBeenCalledWith(
-            {environment: 2, id: '3', integrationInstanceId: '11'},
+            {environment: 2, id: '3', principalId: '11', principalType: 'INTEGRATION_INSTANCE'},
+            expect.anything()
+        );
+    });
+
+    it('deletes an automation memory through its deployment owner', async () => {
+        mockMemories([makeAutomationMemory()]);
+
+        renderPage();
+
+        await openRowMenu('Contact preference');
+
+        await userEvent.click(await screen.findByRole('menuitem', {name: /delete/i}));
+
+        await userEvent.click(screen.getByRole('button', {name: 'Delete permanently'}));
+
+        expect(deleteMutate).toHaveBeenCalledWith(
+            {environment: 2, id: '5', principalId: '41', principalType: 'PROJECT_DEPLOYMENT'},
             expect.anything()
         );
     });

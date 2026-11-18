@@ -8,9 +8,11 @@ import {
 import {
     AiAutoMemoryDetailI,
     AiAutoMemoryI,
+    AiAutoMemoryPrincipalTypeType,
     AiAutoMemoryTypeType,
 } from '@/pages/automation/ai/memories/hooks/useAiAutoMemories';
 import {
+    AiAutoMemoryPrincipalType,
     AiAutoMemoryType,
     EmbeddedAiAutoMemoriesQuery,
     EmbeddedAiAutoMemoryConnectedUsersQuery,
@@ -21,7 +23,7 @@ import {
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 
-/** Integration-instance memories all live in the default workspace. */
+/** Embedded memories all live in the default workspace: integration instances and Embedded projects alike. */
 export const EMBEDDED_MEMORY_WORKSPACE_ID = 1049;
 
 export interface EmbeddedAiAutoMemoryConnectedUserRefI {
@@ -37,7 +39,17 @@ export interface EmbeddedAiAutoMemoryIntegrationI {
     name: string | null;
 }
 
+export interface EmbeddedAiAutoMemoryAutomationI {
+    id: number;
+    name: string | null;
+}
+
+/**
+ * An integration instance's memory carries its integration. A project deployment's memory carries the automation the
+ * connected user enabled, or no automation when it belongs to the connected user's own workflows.
+ */
 export interface EmbeddedAiAutoMemoryI extends AiAutoMemoryDetailI {
+    automation: EmbeddedAiAutoMemoryAutomationI | null;
     connectedUser: EmbeddedAiAutoMemoryConnectedUserRefI | null;
     integration: EmbeddedAiAutoMemoryIntegrationI | null;
 }
@@ -54,6 +66,12 @@ function toTimestamp(value: unknown): string {
 
 function toEmbeddedMemory(memory: GraphQlEmbeddedMemoryType): EmbeddedAiAutoMemoryI {
     return {
+        automation: memory.automation
+            ? {
+                  id: Number(memory.automation.id),
+                  name: memory.automation.name ?? null,
+              }
+            : null,
         connectedUser: memory.connectedUser
             ? {
                   email: memory.connectedUser.email ?? null,
@@ -76,8 +94,8 @@ function toEmbeddedMemory(memory: GraphQlEmbeddedMemoryType): EmbeddedAiAutoMemo
             : null,
         memoryType: memory.memoryType as AiAutoMemoryTypeType,
         name: memory.name,
-        principalId: Number(memory.integrationInstanceId),
-        principalType: 'INTEGRATION_INSTANCE',
+        principalId: Number(memory.principalId),
+        principalType: memory.principalType as AiAutoMemoryPrincipalTypeType,
         title: memory.title,
         updatedAt: toTimestamp(memory.updatedAt),
         version: Number(memory.version),
@@ -160,7 +178,8 @@ function useEmbeddedDeleteMemory(): MemoryMutationResultI<MemoryDeleteRequestI> 
                 {
                     environment: environmentId,
                     id: String(memory.id),
-                    integrationInstanceId: String(memory.principalId),
+                    principalId: String(memory.principalId),
+                    principalType: memory.principalType as AiAutoMemoryPrincipalType,
                 },
                 options
             ),
@@ -195,8 +214,9 @@ function useEmbeddedUpdateMemory(): MemoryMutationResultI<MemoryUpdateRequestI> 
                         environment: environmentId,
                         expectedVersion,
                         id: String(memory.id),
-                        integrationInstanceId: String(memory.principalId),
                         memoryType: patch.memoryType as AiAutoMemoryType | undefined,
+                        principalId: String(memory.principalId),
+                        principalType: memory.principalType as AiAutoMemoryPrincipalType,
                         title: patch.title,
                     },
                 },

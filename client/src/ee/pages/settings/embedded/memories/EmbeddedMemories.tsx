@@ -38,6 +38,18 @@ interface EmbeddedMemoryCellsPropsI {
     memory: EmbeddedAiAutoMemoryI;
 }
 
+const EmbeddedMemorySourceName = ({memory}: EmbeddedMemoryCellsPropsI) => {
+    if (memory.principalType === 'PROJECT_DEPLOYMENT') {
+        return <span className="text-sm">{memory.automation?.name || 'Custom workflows'}</span>;
+    }
+
+    if (memory.integration) {
+        return <span className="text-sm">{memory.integration.name || memory.integration.componentName}</span>;
+    }
+
+    return <span className="text-sm text-muted-foreground">Deleted integration</span>;
+};
+
 const EmbeddedMemoryCells = ({memory}: EmbeddedMemoryCellsPropsI) => (
     <>
         <td className="px-4 py-2">
@@ -54,12 +66,14 @@ const EmbeddedMemoryCells = ({memory}: EmbeddedMemoryCellsPropsI) => (
             )}
         </td>
 
-        <td className="px-4 py-2 text-sm">
-            {memory.integration ? (
-                memory.integration.name || memory.integration.componentName
-            ) : (
-                <span className="text-muted-foreground">Deleted integration</span>
-            )}
+        <td className="px-4 py-2">
+            <div className="flex flex-col">
+                <EmbeddedMemorySourceName memory={memory} />
+
+                <span className="text-xs text-muted-foreground">
+                    {memory.principalType === 'PROJECT_DEPLOYMENT' ? 'Automation' : 'Integration'}
+                </span>
+            </div>
         </td>
     </>
 );
@@ -151,9 +165,9 @@ const EmbeddedMemories = () => {
     return (
         <MemoryDialogDataContext.Provider value={EMBEDDED_MEMORY_DIALOG_DATA}>
             <MemoriesPageLayout
-                columnTitles={['Connected User', 'Integration']}
-                description="Facts integration agents stored for each connected user."
-                emptyStateDescription="Integration agents that use the Auto Memory tool store what they learn about each connected user here. You can inspect, edit or delete each memory."
+                columnTitles={['Connected User', 'Source']}
+                description="Facts integration and automation agents stored for each connected user."
+                emptyStateDescription="Integration and automation agents that use the Auto Memory tool store what they learn about each connected user here. You can inspect, edit or delete each memory."
                 filterGroups={filterGroups}
                 filterLoadError={
                     isConnectedUsersError
