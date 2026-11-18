@@ -29,6 +29,35 @@ picks its channel from Slack's own `channel` input.
 - **Embedded code integration** - an integration built on the Gmail component, so its Gmail calls need no declared
   connection. See [Code Integrations](/platform/embedded/build/code-integrations).
 
+### Checking and deploying a code workflow sample
+
+Every sample's README has the full steps. In short:
+
+| Sample | Local check | File to deploy | Deploy endpoint | API key |
+|---|---|---|---|---|
+| Automation project, JavaScript | `npm run check` | `src/sample_code_project.js` | `POST /api/automation/v1/projects/deploy?workspaceId=<id>` | Workspace API key |
+| Automation project, Python | `python3 scripts/check.py src/sample_code_project.py name=Ada` | `src/sample_code_project.py` | same | same |
+| Automation project, Java | `./gradlew build` | `build/libs/sample-code-project-java-1.0.0.jar` | same | same |
+| Catalog code project, JavaScript | `npm run check` | `src/sample_catalog_code_project.js` | `POST /api/embedded/v1/automation-project-code-workflows/deploy` | Embedded API key |
+| Catalog code project, Python | `python3 scripts/check.py src/sample_catalog_code_project.py` | `src/sample_catalog_code_project.py` | same | same |
+| Catalog code project, Java | `./gradlew build` | `build/libs/sample-catalog-code-project-java-1.0.0.jar` | same | same |
+| Code integration, JavaScript | `npm run check` | `src/sample_code_integration.js` | `POST /api/embedded/v1/integration-code-workflows/deploy` | Embedded API key |
+| Code integration, Python | `python3 scripts/check.py src/sample_code_integration.py` | `src/sample_code_integration.py` | same | same |
+| Code integration, Java | `./gradlew build` | `build/libs/sample-code-integration-java-1.0.0.jar` | same | same |
+
+The JavaScript and Python checks evaluate the file the way the server does and run each task once against a stub
+context; they need only Node.js or Python 3.9 or later and install nothing. The Java samples need JDK 25 and compile
+against the ByteChef SDK jars in their `libs/` folder. The file part is `projectFile` on the two project endpoints and
+`integrationFile` on the integration endpoint, and every endpoint takes the environment from the `X-ENVIRONMENT`
+header (`PRODUCTION` when absent). You can also upload the file from the UI: **Import Code Project** on Automation →
+Projects or Embedded → Automations, and **Import Code Integration** on Embedded → Integrations. These menu items,
+like code workflows themselves, are Enterprise Edition only.
+
+The JavaScript samples also carry a TypeScript version checked with `npm run check:ts`, and the Python samples a
+`mypy --strict` type check. Both need the `@bytechef/workflow-api` or `bytechef-workflow-api` type package, which is
+not published yet; see [Typed authoring](/platform/automation/build/workflows/code-workflows#typed-authoring) for
+installing it from the ByteChef repository.
+
 ## Custom components
 
 Your own component, uploaded and used like a built-in one - see
