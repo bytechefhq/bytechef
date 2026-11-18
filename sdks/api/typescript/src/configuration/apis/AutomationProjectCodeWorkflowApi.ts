@@ -38,6 +38,10 @@ export interface DeployAutomationProjectCodeWorkflowRequest {
      * The file of a code-native automation project.
      */
     projectFile?: Blob;
+    /**
+     * Whether to also point the configuration of the request environment at the newly published version.
+     */
+    release?: boolean;
 }
 
 /**
@@ -83,6 +87,10 @@ export class AutomationProjectCodeWorkflowApi extends runtime.BaseAPI {
 
         if (requestParameters['projectFile'] != null) {
             formParams.append('projectFile', requestParameters['projectFile'] as any);
+        }
+
+        if (requestParameters['release'] != null) {
+            formParams.append('release', requestParameters['release'] as any);
         }
 
 
