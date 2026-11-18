@@ -35,6 +35,7 @@ export interface MergedWorkflowType {
     inputs?: WorkflowInputType[];
     enabled?: boolean;
     label?: string;
+    staticWebhookUrl?: string;
     workflowUuid: string;
 }
 
@@ -67,6 +68,7 @@ export interface McpIntegrationInstanceToolType {
 export interface IntegrationInstanceWorkflowType {
     enabled?: boolean;
     inputs?: Record<string, unknown>;
+    staticWebhookUrl?: string;
     workflowUuid: string;
 }
 

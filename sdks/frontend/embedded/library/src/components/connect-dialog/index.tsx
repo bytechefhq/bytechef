@@ -189,6 +189,7 @@ export default function useConnectDialog({
                           };
                       })
                     : [],
+                staticWebhookUrl: instanceWorkflow?.staticWebhookUrl,
             } as MergedWorkflowType;
         });
     }, [integration, currentIntegrationInstanceId, enabledOverrides, inputOverrides]);
@@ -454,9 +455,23 @@ export default function useConnectDialog({
                 }));
 
                 console.error('Failed to toggle workflow:', error);
+
+                return;
+            }
+
+            if (!pressed) {
+                return;
+            }
+
+            try {
+                const integrationData: IntegrationType = await fetch(`/api/embedded/v1/integrations/${integrationId}`);
+
+                setIntegration(integrationData);
+            } catch (error) {
+                console.error('Enabled the workflow but failed to reload the integration:', error);
             }
         },
-        [fetch, currentIntegrationInstanceId]
+        [fetch, currentIntegrationInstanceId, integrationId]
     );
 
     const handleMcpToolToggle = useCallback(

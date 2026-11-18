@@ -274,7 +274,7 @@ const DialogWorkflowsContainer = ({
 
             <ul className={styles.workflowsList}>
                 {mergedWorkflows.map((mergedWorkflow) => {
-                    const {enabled = false, inputs, workflowUuid, label} = mergedWorkflow;
+                    const {enabled = false, inputs, label, staticWebhookUrl, workflowUuid} = mergedWorkflow;
 
                     return (
                         <li key={workflowUuid}>
@@ -287,6 +287,8 @@ const DialogWorkflowsContainer = ({
                                     onPressedChange={(pressed) => handleWorkflowToggle(workflowUuid, pressed)}
                                 />
                             </div>
+
+                            {enabled && staticWebhookUrl && <WorkflowWebhookUrl webhookUrl={staticWebhookUrl} />}
 
                             {enabled && (
                                 <div className={styles.workflowInputsContainer}>
@@ -320,6 +322,44 @@ const DialogWorkflowsContainer = ({
                     );
                 })}
             </ul>
+        </div>
+    );
+};
+
+const WorkflowWebhookUrl = ({webhookUrl}: {webhookUrl: string}) => {
+    const [copied, setCopied] = useState(false);
+
+    const copiedTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+    const handleCopyClick = async () => {
+        try {
+            await navigator.clipboard.writeText(webhookUrl);
+        } catch (error) {
+            console.error('Failed to copy the webhook URL:', error);
+
+            return;
+        }
+
+        setCopied(true);
+
+        clearTimeout(copiedTimeoutRef.current);
+
+        copiedTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
+    };
+
+    useEffect(() => () => clearTimeout(copiedTimeoutRef.current), []);
+
+    return (
+        <div className={styles.workflowWebhookUrlContainer}>
+            <span>WEBHOOK URL</span>
+
+            <div>
+                <code title={webhookUrl}>{webhookUrl}</code>
+
+                <button className={styles.buttonSecondary} onClick={handleCopyClick} type="button">
+                    {copied ? 'Copied' : 'Copy'}
+                </button>
+            </div>
         </div>
     );
 };
