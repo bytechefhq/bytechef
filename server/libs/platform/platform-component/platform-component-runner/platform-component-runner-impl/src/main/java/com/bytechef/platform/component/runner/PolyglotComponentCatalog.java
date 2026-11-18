@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.script.engine;
+package com.bytechef.platform.component.runner;
 
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.polyglot.ComponentCatalog;
@@ -27,12 +27,12 @@ import org.springframework.context.ApplicationContext;
 /**
  * @author Ivica Cardic
  */
-class ScriptComponentCatalog implements ComponentCatalog {
+class PolyglotComponentCatalog implements ComponentCatalog {
 
     private final ApplicationContext applicationContext;
     private final Map<String, ComponentDefinition> componentDefinitionMap = new ConcurrentHashMap<>();
 
-    ScriptComponentCatalog(ApplicationContext applicationContext) {
+    PolyglotComponentCatalog(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 

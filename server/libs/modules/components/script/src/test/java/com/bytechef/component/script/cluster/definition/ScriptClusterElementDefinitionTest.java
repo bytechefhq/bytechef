@@ -29,9 +29,10 @@ import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.script.cluster.datastream.definition.ScriptClusterElementDefinition;
-import com.bytechef.component.script.engine.PolyglotEngine;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.datastream.ItemProcessor;
+import com.bytechef.platform.component.polyglot.ScriptSandboxMode;
+import com.bytechef.platform.component.runner.PolyglotEngine;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -78,15 +79,18 @@ class ScriptClusterElementDefinitionTest {
         Map<String, Object> item = Map.of("name", "John", "age", 30);
         Map<String, Object> expectedResult = Map.of("name", "John Doe", "age", 31);
 
-        when(polyglotEngine.execute(eq("js"), any(Parameters.class), eq(null), any(ClusterElementContextAware.class)))
-            .thenReturn(expectedResult);
+        when(polyglotEngine.execute(
+            eq(ScriptSandboxMode.STRICT), eq(null), eq("js"), any(Parameters.class), eq(null),
+            any(ClusterElementContextAware.class)))
+                .thenReturn(expectedResult);
 
         Map<String, Object> result = scriptClusterElementDefinition.process(
             item, inputParameters, connectionParameters, context);
 
         assertThat(result).isEqualTo(expectedResult);
 
-        verify(polyglotEngine).execute(eq("js"), any(Parameters.class), eq(null),
+        verify(polyglotEngine).execute(
+            eq(ScriptSandboxMode.STRICT), eq(null), eq("js"), any(Parameters.class), eq(null),
             any(ClusterElementContextAware.class));
     }
 
@@ -97,7 +101,8 @@ class ScriptClusterElementDefinitionTest {
 
         ArgumentCaptor<Parameters> parametersCaptor = ArgumentCaptor.forClass(Parameters.class);
 
-        when(polyglotEngine.execute(eq("js"), parametersCaptor.capture(), eq(null),
+        when(polyglotEngine.execute(
+            eq(ScriptSandboxMode.STRICT), eq(null), eq("js"), parametersCaptor.capture(), eq(null),
             any(ClusterElementContextAware.class)))
                 .thenReturn(expectedResult);
 
@@ -112,8 +117,10 @@ class ScriptClusterElementDefinitionTest {
     void testProcessReturnsNullWhenEngineReturnsNull() {
         Map<String, Object> item = Map.of("data", "test");
 
-        when(polyglotEngine.execute(eq("js"), any(Parameters.class), eq(null), any(ClusterElementContextAware.class)))
-            .thenReturn(null);
+        when(polyglotEngine.execute(
+            eq(ScriptSandboxMode.STRICT), eq(null), eq("js"), any(Parameters.class), eq(null),
+            any(ClusterElementContextAware.class)))
+                .thenReturn(null);
 
         Map<String, Object> result = scriptClusterElementDefinition.process(
             item, inputParameters, connectionParameters, context);
@@ -126,8 +133,10 @@ class ScriptClusterElementDefinitionTest {
         Map<String, Object> item = Map.of();
         Map<String, Object> expectedResult = Map.of("processed", true);
 
-        when(polyglotEngine.execute(eq("js"), any(Parameters.class), eq(null), any(ClusterElementContextAware.class)))
-            .thenReturn(expectedResult);
+        when(polyglotEngine.execute(
+            eq(ScriptSandboxMode.STRICT), eq(null), eq("js"), any(Parameters.class), eq(null),
+            any(ClusterElementContextAware.class)))
+                .thenReturn(expectedResult);
 
         Map<String, Object> result = scriptClusterElementDefinition.process(
             item, inputParameters, connectionParameters, context);
