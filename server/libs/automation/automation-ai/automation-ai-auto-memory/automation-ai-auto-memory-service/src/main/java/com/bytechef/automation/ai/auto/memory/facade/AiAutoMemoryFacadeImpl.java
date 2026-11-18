@@ -16,7 +16,6 @@
 
 package com.bytechef.automation.ai.auto.memory.facade;
 
-import com.bytechef.automation.ai.auto.memory.audit.AiAutoMemoryAuditEvents;
 import com.bytechef.automation.ai.auto.memory.domain.AiAutoMemoryPrincipal;
 import com.bytechef.automation.ai.auto.memory.domain.AiAutoMemoryPrincipalKey;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
@@ -26,6 +25,7 @@ import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryAuditEvents;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryNotFoundException;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryOwner;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPatch;

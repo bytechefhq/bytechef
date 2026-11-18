@@ -15,7 +15,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.automation.ai.auto.memory.audit.AiAutoMemoryAuditEvents;
 import com.bytechef.automation.ai.auto.memory.domain.AiAutoMemoryPrincipalKey;
 import com.bytechef.automation.ai.auto.memory.facade.AiAutoMemoryFacade;
 import com.bytechef.automation.ai.auto.memory.facade.AiAutoMemoryFacadeImpl;
@@ -28,6 +27,7 @@ import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryAuditEvents;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryNotFoundException;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryOwner;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPatch;
