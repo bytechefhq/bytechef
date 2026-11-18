@@ -8,6 +8,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import AutomationsView from '../views/AutomationsView';
 
 const {
+    copyToClipboardMock,
     createBlankMutateMock,
     deleteAutomationMutateMock,
     deprovisionMutateMock,
@@ -16,10 +17,12 @@ const {
     setEnabledMutateMock,
     setMcpEnabledMutateMock,
     toastErrorMock,
+    toastMock,
     updateInputsMutateAsyncMock,
     useGetAutomationsQueryMock,
     useGetTemplateProjectsQueryMock,
 } = vi.hoisted(() => ({
+    copyToClipboardMock: vi.fn(),
     createBlankMutateMock: vi.fn(),
     deleteAutomationMutateMock: vi.fn(),
     deprovisionMutateMock: vi.fn(),
@@ -28,6 +31,7 @@ const {
     setEnabledMutateMock: vi.fn(),
     setMcpEnabledMutateMock: vi.fn(),
     toastErrorMock: vi.fn(),
+    toastMock: vi.fn(),
     updateInputsMutateAsyncMock: vi.fn(),
     useGetAutomationsQueryMock: vi.fn(),
     useGetTemplateProjectsQueryMock: vi.fn(),
@@ -95,8 +99,14 @@ vi.mock('@tanstack/react-query', async () => {
 });
 
 vi.mock('sonner', () => ({
-    toast: {error: toastErrorMock},
+    toast: Object.assign(toastMock, {error: toastErrorMock}),
 }));
+
+vi.mock('@uidotdev/usehooks', async () => {
+    const actual = await vi.importActual<typeof import('@uidotdev/usehooks')>('@uidotdev/usehooks');
+
+    return {...actual, useCopyToClipboard: () => [null, copyToClipboardMock]};
+});
 
 vi.mock('react-inlinesvg', () => ({
     default: ({src}: {src: string}) => <img alt="component icon" src={src} />,
@@ -203,6 +213,8 @@ describe('AutomationsView', () => {
         setEnabledMutateMock.mockReset();
         setMcpEnabledMutateMock.mockReset();
         toastErrorMock.mockReset();
+        toastMock.mockReset();
+        copyToClipboardMock.mockReset();
         useGetAutomationsQueryMock.mockReset();
         useGetTemplateProjectsQueryMock.mockReset();
 
@@ -390,6 +402,38 @@ describe('AutomationsView', () => {
             await user.click(screen.getByRole('button', {name: 'Remove'}));
 
             expect(deleteAutomationMutateMock).toHaveBeenCalledWith('blank-uuid');
+        });
+
+        it('copies the webhook URL of an automation that starts with a static webhook trigger', async () => {
+            const user = userEvent.setup();
+
+            useGetAutomationsQueryMock.mockReturnValue({
+                data: [{...blankAutomation, staticWebhookUrl: 'https://bytechef.example.com/webhooks/abc'}],
+                error: null,
+                isLoading: false,
+            });
+
+            renderView();
+
+            await user.click(
+                within(templateCard('Weekly digest')).getByRole('button', {name: 'Weekly digest actions'})
+            );
+            await user.click(screen.getByRole('menuitem', {name: /copy webhook url/i}));
+
+            expect(copyToClipboardMock).toHaveBeenCalledWith('https://bytechef.example.com/webhooks/abc');
+            expect(toastMock).toHaveBeenCalledWith('Webhook URL copied to clipboard');
+        });
+
+        it('offers no Copy webhook URL on an automation without a webhook URL', async () => {
+            const user = userEvent.setup();
+
+            renderView();
+
+            await user.click(
+                within(templateCard('Weekly digest')).getByRole('button', {name: 'Weekly digest actions'})
+            );
+
+            expect(screen.queryByRole('menuitem', {name: /copy webhook url/i})).not.toBeInTheDocument();
         });
 
         it('marks a dangling reference as needing attention, disables its toggle and offers only Remove', async () => {
