@@ -45,6 +45,8 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -205,9 +207,8 @@ public class CustomActionUtils {
                 Http.responseType(ResponseType.JSON)
                     .responseType(getResponseType(inputParameters))
                     .filename(inputParameters.getString(RESPONSE_FILENAME)))
-            .headers(MapUtils.toMap(headers, Map.Entry::getKey, entry -> List.of((String) entry.getValue())))
-            .queryParameters(
-                MapUtils.toMap(queryParameters, Map.Entry::getKey, entry -> List.of((String) entry.getValue())))
+            .headers(toValueLists(headers))
+            .queryParameters(toValueLists(queryParameters))
             .body(
                 getBody(MapUtils.get(inputParameters, BODY_CONTENT_TYPE, BodyContentType.class, null), inputParameters))
             .execute();
@@ -237,6 +238,32 @@ public class CustomActionUtils {
         }
 
         return body;
+    }
+
+    static Map<String, List<String>> toValueLists(Map<String, ?> parameters) {
+        Map<String, List<String>> valueLists = new LinkedHashMap<>();
+
+        for (Map.Entry<String, ?> entry : parameters.entrySet()) {
+            Object value = entry.getValue();
+
+            if (value instanceof List<?> list) {
+                List<String> values = new ArrayList<>();
+
+                for (Object item : list) {
+                    if (item != null) {
+                        values.add(String.valueOf(item));
+                    }
+                }
+
+                if (!values.isEmpty()) {
+                    valueLists.put(entry.getKey(), values);
+                }
+            } else if (value != null) {
+                valueLists.put(entry.getKey(), List.of(String.valueOf(value)));
+            }
+        }
+
+        return valueLists;
     }
 
     private static ResponseType getResponseType(Parameters inputParameters) {
