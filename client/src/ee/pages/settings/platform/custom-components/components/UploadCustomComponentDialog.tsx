@@ -23,10 +23,15 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
     const {
         acceptedExtensions,
         canSubmit,
+        dragging,
         formatFileSize,
+        handleDragLeave,
+        handleDragOver,
+        handleDrop,
         handleFileChange,
         handleOpenChange,
         handleSubmit,
+        javaEnabled,
         open,
         removeFile,
         selectedFiles,
@@ -34,10 +39,9 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
         uploading,
     } = useUploadCustomComponentDialog();
 
-    const acceptedExtensionsLabel = acceptedExtensions
-        .split(',')
-        .map((extension) => extension.replace('.', '').toUpperCase())
-        .join(', ');
+    const acceptedFilesDescription = javaEnabled
+        ? 'Accepts .jar, .js and .py files: a Java component built into a JAR, or a JavaScript or Python source file that defines the component.'
+        : 'Accepts .js and .py files: a JavaScript or Python source file that defines the component.';
 
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>
@@ -62,11 +66,17 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
                                         'flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-stroke-neutral-tertiary p-6',
                                         uploading
                                             ? 'cursor-not-allowed opacity-50'
-                                            : 'cursor-pointer hover:bg-surface-neutral-primary-hover'
+                                            : 'cursor-pointer hover:bg-surface-neutral-primary-hover',
+                                        dragging && 'border-stroke-brand-primary bg-surface-neutral-primary-hover'
                                     )}
+                                    data-testid="component-file-drop-zone"
                                     onClick={() =>
                                         !uploading && document.getElementById('component-file-upload')?.click()
                                     }
+                                    onDragEnter={handleDragOver}
+                                    onDragLeave={handleDragLeave}
+                                    onDragOver={handleDragOver}
+                                    onDrop={handleDrop}
                                     onKeyDown={handleActivationKeyDown}
                                     role="button"
                                     tabIndex={0}
@@ -78,7 +88,7 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
                                     </p>
 
                                     <p className="mt-1 text-xs text-content-neutral-tertiary">
-                                        {acceptedExtensionsLabel} files
+                                        {acceptedFilesDescription}
                                     </p>
 
                                     <input
