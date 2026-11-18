@@ -121,6 +121,7 @@ const Automations = () => {
         void queryClient.invalidateQueries({queryKey: ['automationProjectCategories']});
         void queryClient.invalidateQueries({queryKey: ['automationProjectTags']});
         void queryClient.invalidateQueries({queryKey: ['automationProjects']});
+        void queryClient.invalidateQueries({queryKey: ['automationProjectCodeWorkflowSource']});
     };
 
     const openWorkflowEditor = (workflowUuid: string) => {
@@ -446,7 +447,7 @@ const Automations = () => {
             {showImportCodeWorkflowDialog && (
                 <ImportCodeWorkflowDialog
                     deployUrl="/api/embedded/internal/automation/projects/deploy"
-                    description="Upload a built code project. If a project with the same name exists, it is redeployed and every connected user referencing it gets the new version. Unpublished edits made in the editor are replaced."
+                    description="Upload a built code project. If a project with the same name exists, it is redeployed as a new published version; connected users get it once an environment configuration points at it. Unpublished edits made in the editor are replaced."
                     fileFieldName="projectFile"
                     onClose={() => setShowImportCodeWorkflowDialog(false)}
                     onImported={invalidateProjects}
