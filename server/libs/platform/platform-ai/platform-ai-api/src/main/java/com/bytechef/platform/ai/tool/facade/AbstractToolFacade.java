@@ -279,25 +279,7 @@ public abstract class AbstractToolFacade {
             return toolName;
         }
 
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(componentName.toUpperCase());
-        sb.append("_");
-
-        sb.append(Character.toUpperCase(clusterElementName.charAt(0)));
-
-        for (int i = 1; i < clusterElementName.length(); i++) {
-            char c = clusterElementName.charAt(i);
-
-            if (Character.isUpperCase(c)) {
-                sb.append('_')
-                    .append(c);
-            } else {
-                sb.append(Character.toUpperCase(c));
-            }
-        }
-
-        return sb.toString();
+        return ToolNameUtils.getDefaultToolName(componentName, clusterElementName);
     }
 
     protected Object resolveParameterValue(Object value, Map<String, Object> request) {

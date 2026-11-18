@@ -41,6 +41,7 @@ import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.constant.ToolConstants;
+import com.bytechef.platform.ai.tool.util.ToolNameUtils;
 import com.bytechef.platform.ai.tool.util.ToolPropertyUtils;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
@@ -79,8 +80,6 @@ import org.springframework.stereotype.Service;
  */
 @Service("clusterElementDefinitionService")
 public class ClusterElementDefinitionServiceImpl implements ClusterElementDefinitionService {
-
-    private static final Property TOOL_NAME_PROPERTY = ToolPropertyUtils.toolNameProperty("SLACK_SEND_MESSAGE");
 
     private static final Property TOOL_DESCRIPTION_PROPERTY = ToolPropertyUtils.toolDescriptionProperty("tool");
 
@@ -457,7 +456,10 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         List<Property> additionalProperties = new ArrayList<>();
 
         if (!propertyNames.contains(ToolConstants.TOOL_NAME)) {
-            additionalProperties.add(TOOL_NAME_PROPERTY);
+            additionalProperties.add(
+                ToolPropertyUtils.toolNameProperty(
+                    ToolNameUtils.getDefaultToolName(
+                        clusterElementDefinition.getComponentName(), clusterElementDefinition.getName())));
         }
 
         if (!propertyNames.contains(ToolConstants.TOOL_DESCRIPTION)) {
