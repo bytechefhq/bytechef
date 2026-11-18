@@ -1562,6 +1562,12 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
         publishAndPinProject(automationProjectId);
 
+        AutomationProjectDTO automationProject = automationProjectFacade.getProject(automationProjectId);
+
+        automationProjectConfigurationService.create(
+            automationProjectId, Environment.DEVELOPMENT.ordinal(), Environment.DEVELOPMENT.name(), null,
+            automationProject.lastPublishedVersion(), true, true);
+
         ConnectedUser productionConnectedUser = createConnectedUser(Environment.PRODUCTION);
         ConnectedUser developmentConnectedUser = createConnectedUser(Environment.DEVELOPMENT);
 
