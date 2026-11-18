@@ -305,7 +305,7 @@ describe('ConnectDialog', () => {
 
             expect(within(workflowItem).getByText(webhookUrl)).toBeInTheDocument();
 
-            fireEvent.click(within(workflowItem).getByRole('button', {name: 'Copy'}));
+            fireEvent.click(within(workflowItem).getByRole('button', {name: 'Copy webhook URL'}));
 
             expect(writeTextMock).toHaveBeenCalledWith(webhookUrl);
             expect(await within(workflowItem).findByRole('button', {name: 'Copied'})).toBeInTheDocument();

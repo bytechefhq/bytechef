@@ -1,4 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
+import CheckIcon from './assets/check.svg';
+import CopyIcon from './assets/copy.svg';
 import XIcon from './assets/x.svg';
 import SquareArrowOutUpRightIcon from './assets/square-arrow-out-up-right.svg';
 import styles from '../shared/dialog.module.css';
@@ -356,8 +358,14 @@ const WorkflowWebhookUrl = ({webhookUrl}: {webhookUrl: string}) => {
             <div>
                 <code title={webhookUrl}>{webhookUrl}</code>
 
-                <button className={styles.buttonSecondary} onClick={handleCopyClick} type="button">
-                    {copied ? 'Copied' : 'Copy'}
+                <button
+                    aria-label={copied ? 'Copied' : 'Copy webhook URL'}
+                    className={styles.copyButton}
+                    onClick={handleCopyClick}
+                    title={copied ? 'Copied' : 'Copy webhook URL'}
+                    type="button"
+                >
+                    <img alt="" src={copied ? CheckIcon : CopyIcon} />
                 </button>
             </div>
         </div>
