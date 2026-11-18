@@ -231,6 +231,10 @@ class ConnectedUserProjectFacadeIntTest {
          "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
         """;
 
+    private static final String NEW_WORKFLOW_DEFINITION = """
+        {"label":"New Workflow","description":"","inputs":[],"triggers":[],"tasks":[]}
+        """;
+
     @Autowired
     private AutomationProjectConfigurationService automationProjectConfigurationService;
 
@@ -477,6 +481,31 @@ class ConnectedUserProjectFacadeIntTest {
             .singleElement()
             .extracting(ConnectedUserProjectWorkflowDTO::lastExecutionDate)
             .isEqualTo(endDate);
+    }
+
+    @Test
+    void testGenerateNamesAWorkflowStillCalledNewWorkflowFromThePrompt() {
+        String workflowUuid = connectedUserProjectFacade.createProjectWorkflow(
+            externalUserId, NEW_WORKFLOW_DEFINITION, Environment.PRODUCTION);
+
+        connectedUserProjectFacade.updateProjectWorkflow(
+            externalUserId, workflowUuid, "Post a standup reminder to #general every weekday at 9am", null,
+            Environment.PRODUCTION, true);
+
+        assertThat(getLastWorkflowLabel(workflowUuid))
+            .isEqualTo("Post a standup reminder to #general every weekday at 9am");
+    }
+
+    @Test
+    void testGenerateKeepsTheNameOfARenamedWorkflow() {
+        String workflowUuid = connectedUserProjectFacade.createProjectWorkflow(
+            externalUserId, NEW_WORKFLOW_DEFINITION.replace("New Workflow", "Standup"), Environment.PRODUCTION);
+
+        connectedUserProjectFacade.updateProjectWorkflow(
+            externalUserId, workflowUuid, "Post a standup reminder to #general every weekday at 9am", null,
+            Environment.PRODUCTION, true);
+
+        assertThat(getLastWorkflowLabel(workflowUuid)).isEqualTo("Standup");
     }
 
     @Test
@@ -1403,6 +1432,12 @@ class ConnectedUserProjectFacadeIntTest {
             integrationInstanceConfiguration);
 
         integrationInstanceConfigurationService.updateEnabled(integrationInstanceConfiguration.getId(), enabled);
+    }
+
+    private String getLastWorkflowLabel(String workflowUuid) {
+        Workflow workflow = workflowService.getWorkflow(projectWorkflowService.getLastWorkflowId(workflowUuid));
+
+        return workflow.getLabel();
     }
 
     private String createPublishedCopy(String copyExternalUserId, String definition) {
