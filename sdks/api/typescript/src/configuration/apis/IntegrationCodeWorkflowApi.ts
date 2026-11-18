@@ -21,6 +21,10 @@ import {
 
 export interface DeployIntegrationCodeWorkflowRequest {
     /**
+     * The file of a code-native integration.
+     */
+    integrationFile: Blob;
+    /**
      * The environment.
      */
     xEnvironment?: Environment;
@@ -28,10 +32,6 @@ export interface DeployIntegrationCodeWorkflowRequest {
      * Whether to make the published integration live in the environment: create and enable its instance configuration when it has none there, otherwise move the existing one to the published version and enable it.
      */
     enable?: boolean;
-    /**
-     * The file of a code-native integration.
-     */
-    integrationFile?: Blob;
 }
 
 /**
@@ -43,6 +43,13 @@ export class IntegrationCodeWorkflowApi extends runtime.BaseAPI {
      * Creates request options for deployIntegrationCodeWorkflow without sending the request
      */
     async deployIntegrationCodeWorkflowRequestOpts(requestParameters: DeployIntegrationCodeWorkflowRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['integrationFile'] == null) {
+            throw new runtime.RequiredError(
+                'integrationFile',
+                'Required parameter "integrationFile" was null or undefined when calling deployIntegrationCodeWorkflow().'
+            );
+        }
+
         const queryParameters: any = {};
 
         if (requestParameters['enable'] != null) {
@@ -110,7 +117,7 @@ export class IntegrationCodeWorkflowApi extends runtime.BaseAPI {
      * Deploy a code based integration. Unlike the connected-user-scoped endpoints on this API, this operation is authenticated as the API key\'s own ByteChef user and does not fabricate a connected-user identity.
      * Deploy a code based integration
      */
-    async deployIntegrationCodeWorkflow(requestParameters: DeployIntegrationCodeWorkflowRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+    async deployIntegrationCodeWorkflow(requestParameters: DeployIntegrationCodeWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deployIntegrationCodeWorkflowRaw(requestParameters, initOverrides);
     }
 

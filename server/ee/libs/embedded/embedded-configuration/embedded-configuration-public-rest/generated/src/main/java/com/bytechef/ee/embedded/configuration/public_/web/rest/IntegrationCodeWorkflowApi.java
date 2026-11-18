@@ -48,9 +48,9 @@ public interface IntegrationCodeWorkflowApi {
      * POST /integration-code-workflows/deploy : Deploy a code based integration
      * Deploy a code based integration. Unlike the connected-user-scoped endpoints on this API, this operation is authenticated as the API key&#39;s own ByteChef user and does not fabricate a connected-user identity.
      *
+     * @param integrationFile The file of a code-native integration. (required)
      * @param xEnvironment The environment. (optional)
      * @param enable Whether to make the published integration live in the environment: create and enable its instance configuration when it has none there, otherwise move the existing one to the published version and enable it. (optional, default to false)
-     * @param integrationFile The file of a code-native integration. (optional)
      * @return Successful operation. (status code 204)
      *         or Access token is missing or invalid (status code 401)
      */
@@ -73,9 +73,9 @@ public interface IntegrationCodeWorkflowApi {
         consumes = { "multipart/form-data" }
     )
     default ResponseEntity<Void> deployIntegrationCodeWorkflow(
+        @Parameter(name = "integrationFile", description = "The file of a code-native integration.", required = true) @RequestPart(value = "integrationFile", required = true) MultipartFile integrationFile,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment,
-        @Parameter(name = "enable", description = "Whether to make the published integration live in the environment: create and enable its instance configuration when it has none there, otherwise move the existing one to the published version and enable it.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "enable", required = false, defaultValue = "false") Boolean enable,
-        @Parameter(name = "integrationFile", description = "The file of a code-native integration.") @RequestPart(value = "integrationFile", required = false) MultipartFile integrationFile
+        @Parameter(name = "enable", description = "Whether to make the published integration live in the environment: create and enable its instance configuration when it has none there, otherwise move the existing one to the published version and enable it.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "enable", required = false, defaultValue = "false") Boolean enable
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
