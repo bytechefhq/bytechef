@@ -80,7 +80,7 @@ public class RemoteOAuth2Apps {
             return currentSnapshot.apps();
         }
 
-        if (currentSnapshot.fetchedAt() != null) {
+        if (currentSnapshot.fetchedAt() != null || currentSnapshot.failedAt() != null) {
             if (!lock.tryLock()) {
                 return currentSnapshot.apps();
             }
@@ -103,7 +103,14 @@ public class RemoteOAuth2Apps {
 
     private OAuthAppProxyClient resolveClient() {
         if (!clientResolved) {
-            oAuthAppProxyClient = oAuthAppProxyClientProvider.getIfAvailable();
+            try {
+                oAuthAppProxyClient = oAuthAppProxyClientProvider.getIfAvailable();
+            } catch (RuntimeException exception) {
+                warn(exception, clock.instant());
+
+                return null;
+            }
+
             clientResolved = true;
         }
 
