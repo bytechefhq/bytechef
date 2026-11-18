@@ -38,6 +38,7 @@ import com.bytechef.platform.component.domain.ValueProperty;
 import com.bytechef.platform.configuration.domain.WorkflowInput;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -120,8 +121,27 @@ public interface ConnectedUserIntegrationMapper {
             target = "inputs",
             expression = "java(mapInputs(integrationInstanceConfigurationWorkflowDTO))")
         @Mapping(target = "label", source = "workflow.label")
+        @Mapping(target = "staticWebhookTrigger", ignore = true)
         IntegrationWorkflowModel map(
             IntegrationInstanceConfigurationWorkflowDTO integrationInstanceConfigurationWorkflowDTO);
+
+        @AfterMapping
+        default void setStaticWebhookTriggers(
+            ConnectedUserIntegrationDTO connectedUserIntegrationDTO, @MappingTarget IntegrationModel integrationModel) {
+
+            List<IntegrationWorkflowModel> integrationWorkflowModels = integrationModel.getWorkflows();
+
+            if (integrationWorkflowModels == null) {
+                return;
+            }
+
+            Set<String> staticWebhookWorkflowUuids = connectedUserIntegrationDTO.staticWebhookWorkflowUuids();
+
+            for (IntegrationWorkflowModel integrationWorkflowModel : integrationWorkflowModels) {
+                integrationWorkflowModel.setStaticWebhookTrigger(
+                    staticWebhookWorkflowUuids.contains(integrationWorkflowModel.getWorkflowUuid()));
+            }
+        }
 
         McpToolModel map(ConnectedUserIntegrationDTO.McpToolInfo mcpToolInfo);
 
@@ -142,6 +162,7 @@ public interface ConnectedUserIntegrationMapper {
         @Mapping(target = "description", source = "description")
         @Mapping(target = "inputs", source = "inputs")
         @Mapping(target = "label", source = "label")
+        @Mapping(target = "staticWebhookTrigger", ignore = true)
         @Mapping(target = "workflowUuid", source = "workflowUuid")
         IntegrationWorkflowModel map(ConnectedUserIntegrationDTO.McpWorkflowInfo mcpWorkflowInfo);
 

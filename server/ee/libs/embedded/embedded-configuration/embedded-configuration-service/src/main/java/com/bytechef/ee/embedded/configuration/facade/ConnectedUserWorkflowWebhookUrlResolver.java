@@ -22,6 +22,7 @@ import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,7 @@ class ConnectedUserWorkflowWebhookUrlResolver {
 
     private static final Logger log = LoggerFactory.getLogger(ConnectedUserWorkflowWebhookUrlResolver.class);
 
-    private static final String REQUEST_COMPONENT_NAME = "request";
+    private static final Set<String> EMBEDDED_API_TRIGGER_COMPONENT_NAMES = Set.of("appEvent", "request");
 
     private final ProjectWorkflowService projectWorkflowService;
     private final TriggerDefinitionService triggerDefinitionService;
@@ -95,6 +96,20 @@ class ConnectedUserWorkflowWebhookUrlResolver {
         return resolve(PlatformType.EMBEDDED, integrationInstanceId, workflowUuid, workflow);
     }
 
+    boolean hasStaticWebhookTrigger(@Nullable Workflow workflow) {
+        if (workflow == null) {
+            return false;
+        }
+
+        for (WorkflowTrigger workflowTrigger : WorkflowTrigger.ofEnabled(workflow)) {
+            if (isStaticWebhookTrigger(WorkflowNodeType.ofType(workflowTrigger.getType()))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     @Nullable
     private String resolve(PlatformType platformType, long id, String workflowUuid, Workflow workflow) {
         for (WorkflowTrigger workflowTrigger : WorkflowTrigger.ofEnabled(workflow)) {
@@ -118,9 +133,7 @@ class ConnectedUserWorkflowWebhookUrlResolver {
             return false;
         }
 
-        // The request component's triggers are static webhooks for the engine, but connected users start them through
-        // the embedded public API with their own token, not through the shared webhook url
-        if (Objects.equals(workflowNodeType.name(), REQUEST_COMPONENT_NAME)) {
+        if (EMBEDDED_API_TRIGGER_COMPONENT_NAMES.contains(workflowNodeType.name())) {
             return false;
         }
 

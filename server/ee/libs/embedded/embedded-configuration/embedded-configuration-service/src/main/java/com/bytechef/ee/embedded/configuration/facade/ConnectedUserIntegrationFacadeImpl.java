@@ -356,9 +356,12 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             oAuth2AuthorizationParameters,
             oAuth2Service.getRedirectUri());
 
-        return connectedUserIntegrationDTO.withMcp(
+        connectedUserIntegrationDTO = connectedUserIntegrationDTO.withMcp(
             getMcpTools(Objects.requireNonNull(integrationDTO.id()), integrationDTO.componentName()), mcpWorkflows,
             attachInstanceMcpData(connectedUserIntegrationDTO.integrationInstances(), connectedUser));
+
+        return connectedUserIntegrationDTO.withStaticWebhookWorkflowUuids(
+            getStaticWebhookWorkflowUuids(filteredConfiguration));
     }
 
     @Override
@@ -872,9 +875,12 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             connections, filteredConfiguration, integrationInstances, integrationInstanceWorkflows,
             integrationInstanceConfigurationsById);
 
-        return connectedUserIntegrationDTO.withMcp(
+        connectedUserIntegrationDTO = connectedUserIntegrationDTO.withMcp(
             getMcpTools(Objects.requireNonNull(integrationDTO.id()), integrationDTO.componentName()), mcpWorkflows,
             attachInstanceMcpData(connectedUserIntegrationDTO.integrationInstances(), connectedUser));
+
+        return connectedUserIntegrationDTO.withStaticWebhookWorkflowUuids(
+            getStaticWebhookWorkflowUuids(filteredConfiguration));
     }
 
     private ConnectedUserIntegrationDTO.@Nullable ConnectionConfig getConnectionConfig(
@@ -1084,6 +1090,18 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
                 getMcpInstanceWorkflows(integrationInstance.integrationInstance(), connectedUser),
                 integrationInstance.integrationInstanceConfiguration(), integrationInstance.connectionConfig()))
             .toList();
+    }
+
+    private Set<String> getStaticWebhookWorkflowUuids(
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
+
+        return integrationInstanceConfigurationDTO.integrationInstanceConfigurationWorkflows()
+            .stream()
+            .filter(integrationInstanceConfigurationWorkflowDTO -> connectedUserWorkflowWebhookUrlResolver
+                .hasStaticWebhookTrigger(integrationInstanceConfigurationWorkflowDTO.workflow()))
+            .map(IntegrationInstanceConfigurationWorkflowDTO::workflowUuid)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
     }
 
     private List<ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstanceWorkflow> getWorkflowsWithStaticWebhookUrl(
