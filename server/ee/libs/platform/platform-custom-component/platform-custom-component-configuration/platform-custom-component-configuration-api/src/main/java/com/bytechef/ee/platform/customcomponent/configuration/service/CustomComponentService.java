@@ -30,5 +30,11 @@ public interface CustomComponentService {
 
     List<CustomComponent> getCustomComponents();
 
+    Optional<CustomComponent> fetchDraftCustomComponent(String name);
+
+    Optional<CustomComponent> fetchLatestCustomComponent(String name);
+
+    CustomComponent publishCustomComponent(long id);
+
     CustomComponent update(CustomComponent customComponent);
 }
