@@ -81,7 +81,7 @@ const AutomationProjectWorkflowListItem = ({
 
     return (
         <li
-            className="group/row flex cursor-pointer items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
+            className="group/row flex cursor-pointer items-center justify-between rounded-md py-1 pl-3 hover:bg-surface-neutral-primary-hover"
             onClick={handleWorkflowListItemClick}
             role="presentation"
         >
