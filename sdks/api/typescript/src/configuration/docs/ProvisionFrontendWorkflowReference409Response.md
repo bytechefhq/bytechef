@@ -8,7 +8,6 @@ Name | Type
 ------------ | -------------
 `missingConnectionComponentName` | string
 `providedComponentName` | string
-`providedInputName` | string
 
 ## Example
 
@@ -19,7 +18,6 @@ import type { ProvisionFrontendWorkflowReference409Response } from ''
 const example = {
   "missingConnectionComponentName": null,
   "providedComponentName": null,
-  "providedInputName": null,
 } satisfies ProvisionFrontendWorkflowReference409Response
 
 console.log(example)

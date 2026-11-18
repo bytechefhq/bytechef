@@ -26,6 +26,7 @@ Name | Type
 `attentionReason` | string
 `mcpEnabled` | boolean
 `toolOnly` | boolean
+`staticWebhookUrl` | string
 
 ## Example
 
@@ -53,6 +54,7 @@ const example = {
   "attentionReason": null,
   "mcpEnabled": null,
   "toolOnly": null,
+  "staticWebhookUrl": null,
 } satisfies ConnectedUserProjectWorkflow
 
 console.log(example)

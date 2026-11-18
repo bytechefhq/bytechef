@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProvidedValueLockedError", description = "Returned when a request sets the connection of a component that the configuration provides for every connected user.")
 @JsonTypeName("ProvidedValueLockedError")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-20T20:08:50.901089+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-20T21:37:42.770599+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class ProvidedValueLockedErrorModel implements ProvisionFrontendWorkflowReference409ResponseModel {
 
   private @Nullable String providedComponentName;
