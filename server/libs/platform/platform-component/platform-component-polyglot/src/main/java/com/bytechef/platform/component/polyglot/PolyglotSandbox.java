@@ -37,6 +37,7 @@ import org.graalvm.polyglot.Engine;
 import org.graalvm.polyglot.EnvironmentAccess;
 import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.PolyglotAccess;
+import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.SandboxPolicy;
 import org.graalvm.polyglot.io.IOAccess;
 import org.jspecify.annotations.Nullable;
@@ -60,6 +61,8 @@ public final class PolyglotSandbox {
 
     private static final Object GUEST_EXECUTOR_LOCK = new Object();
 
+    private static final Object HEAP_MEMORY_LIMIT_PROBE_LOCK = new Object();
+
     private static final ScheduledExecutorService WATCHDOG_SCHEDULER = newWatchdogScheduler();
 
     private static final ExecutorService WATCHDOG_CLOSE_EXECUTOR = Executors.newCachedThreadPool(
@@ -70,6 +73,9 @@ public final class PolyglotSandbox {
     @Nullable
     private static volatile PolyglotGuestExecutor guestExecutor;
 
+    @Nullable
+    private static volatile Boolean heapMemoryLimitSupported;
+
     private PolyglotSandbox() {
     }
 
@@ -77,6 +83,8 @@ public final class PolyglotSandbox {
         settings = polyglotSandboxSettings;
 
         ENGINES.clear();
+
+        heapMemoryLimitSupported = null;
 
         synchronized (GUEST_EXECUTOR_LOCK) {
             PolyglotGuestExecutor previousGuestExecutor = guestExecutor;
@@ -122,14 +130,24 @@ public final class PolyglotSandbox {
             }
 
             ScheduledFuture<?> watchdogFuture = WATCHDOG_SCHEDULER.schedule(
-                () -> WATCHDOG_CLOSE_EXECUTOR.execute(() -> context.close(true)), timeout.toMillis(),
-                TimeUnit.MILLISECONDS);
+                () -> submitWatchdogClose(context), timeout.toMillis(), TimeUnit.MILLISECONDS);
 
             try {
                 return guestFunction.apply(context);
             } finally {
                 watchdogFuture.cancel(false);
             }
+        }
+    }
+
+    private static void submitWatchdogClose(Context context) {
+        try {
+            WATCHDOG_CLOSE_EXECUTOR.execute(() -> context.close(true));
+        } catch (RuntimeException | Error exception) {
+            log.error(
+                "Could not schedule the guest execution's timeout close; the execution is no longer bounded by its " +
+                    "wall-clock timeout",
+                exception);
         }
     }
 
@@ -142,8 +160,10 @@ public final class PolyglotSandbox {
 
         boolean constrained = isConstrained(currentSettings, mode, permittedLanguages);
 
+        Engine engine = getEngine(constrained, mode, permittedLanguages);
+
         Context.Builder builder = Context.newBuilder(permittedLanguages)
-            .engine(getEngine(constrained, permittedLanguages))
+            .engine(engine)
             .allowHostAccess(constrained ? CONSTRAINED_HOST_ACCESS : HostAccess.NONE)
             .allowHostClassLoading(false)
             .allowHostClassLookup(className -> false)
@@ -155,7 +175,7 @@ public final class PolyglotSandbox {
             .allowPolyglotAccess(PolyglotAccess.NONE);
 
         if (constrained) {
-            applySandboxPolicy(builder, currentSettings);
+            applySandboxPolicy(builder, currentSettings, engine, permittedLanguages);
         }
 
         return builder.build();
@@ -163,12 +183,17 @@ public final class PolyglotSandbox {
 
     private static Context newTrustedContext(String... permittedLanguages) {
         return Context.newBuilder(permittedLanguages)
-            .engine(getEngine(false, permittedLanguages))
+            .engine(getEngine(false, ScriptSandboxMode.TRUSTED, permittedLanguages))
             .allowAllAccess(true)
+            .in(new ByteArrayInputStream(new byte[0]))
+            .out(newGuestOutputStream(false))
+            .err(newGuestOutputStream(true))
             .build();
     }
 
-    private static void applySandboxPolicy(Context.Builder builder, PolyglotSandboxSettings currentSettings) {
+    private static void applySandboxPolicy(
+        Context.Builder builder, PolyglotSandboxSettings currentSettings, Engine engine, String... permittedLanguages) {
+
         builder.sandbox(SandboxPolicy.CONSTRAINED)
             .in(new ByteArrayInputStream(new byte[0]))
             .out(newGuestOutputStream(false))
@@ -182,8 +207,55 @@ public final class PolyglotSandbox {
 
         Long maxHeapMemory = currentSettings.maxHeapMemory();
 
-        if (maxHeapMemory != null) {
+        if (maxHeapMemory != null && isHeapMemoryLimitSupported(engine, permittedLanguages)) {
             builder.option("sandbox.MaxHeapMemory", maxHeapMemory + "B");
+        }
+    }
+
+    static boolean isHeapMemoryLimitSupported(String languageId) {
+        return isHeapMemoryLimitSupported(getEngine(true, ScriptSandboxMode.STRICT, languageId), languageId);
+    }
+
+    private static boolean isHeapMemoryLimitSupported(Engine engine, String... permittedLanguages) {
+        Boolean supported = heapMemoryLimitSupported;
+
+        if (supported != null) {
+            return supported;
+        }
+
+        synchronized (HEAP_MEMORY_LIMIT_PROBE_LOCK) {
+            supported = heapMemoryLimitSupported;
+
+            if (supported == null) {
+                supported = probeHeapMemoryLimit(engine, permittedLanguages);
+
+                heapMemoryLimitSupported = supported;
+            }
+
+            return supported;
+        }
+    }
+
+    private static boolean probeHeapMemoryLimit(Engine engine, String... permittedLanguages) {
+        Context.Builder builder = Context.newBuilder(permittedLanguages)
+            .engine(engine)
+            .allowHostAccess(CONSTRAINED_HOST_ACCESS)
+            .sandbox(SandboxPolicy.CONSTRAINED)
+            .in(new ByteArrayInputStream(new byte[0]))
+            .out(OutputStream.nullOutputStream())
+            .err(OutputStream.nullOutputStream())
+            .option("sandbox.MaxHeapMemory", PolyglotSandboxSettings.DEFAULT_MAX_HEAP_MEMORY + "B");
+
+        try (Context _ = builder.build()) {
+            return true;
+        } catch (PolyglotException | IllegalArgumentException exception) {
+            log.warn(
+                "The polyglot sandbox heap memory limit (sandbox.MaxHeapMemory) cannot be applied on this JVM " +
+                    "(java.vm.version={}): {} Scripts run without a heap memory limit; the CPU time limit still " +
+                    "applies. Run on a GraalVM JDK {} or newer to enforce it.",
+                System.getProperty("java.vm.version"), exception.getMessage(), engine.getVersion());
+
+            return false;
         }
     }
 
@@ -243,17 +315,17 @@ public final class PolyglotSandbox {
         return true;
     }
 
-    private static Engine getEngine(boolean constrained, String... permittedLanguages) {
+    private static Engine getEngine(boolean constrained, ScriptSandboxMode mode, String... permittedLanguages) {
         return ENGINES.computeIfAbsent(
-            toEngineKey(constrained, permittedLanguages), key -> newEngine(constrained, permittedLanguages));
+            toEngineKey(constrained, mode, permittedLanguages), key -> newEngine(constrained, permittedLanguages));
     }
 
-    private static String toEngineKey(boolean constrained, String... permittedLanguages) {
+    private static String toEngineKey(boolean constrained, ScriptSandboxMode mode, String... permittedLanguages) {
         List<String> sortedLanguages = Arrays.stream(permittedLanguages)
             .sorted()
             .toList();
 
-        return constrained + ":" + String.join(",", sortedLanguages);
+        return constrained + ":" + mode + ":" + String.join(",", sortedLanguages);
     }
 
     private static Engine newEngine(boolean constrained, String... permittedLanguages) {
