@@ -19,6 +19,7 @@ package com.bytechef.platform.configuration.dto;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +30,8 @@ import java.util.Objects;
  * @author Ivica Cardic
  */
 public final class WorkflowTaskDTO {
+
+    private static final String CODE_WORKFLOW_COMPONENT_NAME = "codeWorkflow";
 
     private final List<ComponentConnection> connections;
     private final ClusterElementMap clusterElements;
@@ -97,6 +100,19 @@ public final class WorkflowTaskDTO {
 
     public List<ComponentConnection> getConnections() {
         return connections;
+    }
+
+    public List<String> getComponentNames() {
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
+
+        if (!Objects.equals(workflowNodeType.name(), CODE_WORKFLOW_COMPONENT_NAME)) {
+            return List.of(workflowNodeType.name());
+        }
+
+        return connections.stream()
+            .map(ComponentConnection::componentName)
+            .distinct()
+            .toList();
     }
 
     public String getDescription() {
