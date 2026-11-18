@@ -311,6 +311,24 @@ describe('ConnectDialog', () => {
             expect(await within(workflowItem).findByRole('button', {name: 'Copied'})).toBeInTheDocument();
         });
 
+        it('explains the webhook URL in a tooltip', () => {
+            render(
+                <ConnectDialog
+                    {...editConnectionProps}
+                    mergedWorkflows={[
+                        {
+                            ...editConnectionProps.mergedWorkflows[0],
+                            staticWebhookUrl: 'https://bytechef.example.com/webhooks/abc',
+                        },
+                    ]}
+                />
+            );
+
+            expect(screen.getByRole('button', {name: 'About the webhook URL'})).toHaveAccessibleDescription(
+                /start this workflow/
+            );
+        });
+
         it('hides the webhook URL of a disabled workflow', () => {
             const webhookUrl = 'https://bytechef.example.com/webhooks/abc';
 
