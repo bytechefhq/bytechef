@@ -1,5 +1,5 @@
 import ConnectedUserSheetPanelWorkflowExecutionList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelWorkflowExecutionList';
-import {render, screen, userEvent} from '@/shared/util/test-utils';
+import {render, screen, userEvent, within} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
@@ -56,6 +56,12 @@ describe('ConnectedUserSheetPanelWorkflowExecutionList', () => {
             expect.objectContaining({connectedUserId: 7, pageNumber: 0})
         );
         expect(screen.getByRole('status', {name: 'Loading workflow executions'})).toBeInTheDocument();
+
+        expect(
+            within(screen.getByRole('status'))
+                .getAllByRole('columnheader')
+                .map((columnHeader) => columnHeader.textContent)
+        ).toEqual(['Status', 'Workflow', 'Source', 'Version', 'Duration', 'Execution date', 'Actions']);
         expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
     });
 

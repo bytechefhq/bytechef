@@ -54,7 +54,7 @@ const ConnectedUserSheetPanelConnectionList = ({
     );
 
     if (isLoading) {
-        return <ConnectedUserSheetPanelListSkeleton label="Loading connections" />;
+        return <ConnectedUserSheetPanelListSkeleton label="Loading connections" variant="connection" />;
     }
 
     if (isError) {

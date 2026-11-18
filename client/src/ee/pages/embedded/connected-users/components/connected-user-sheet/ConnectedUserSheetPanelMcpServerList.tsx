@@ -30,7 +30,7 @@ const ConnectedUserSheetPanelMcpServerList = ({
     });
 
     if (isLoading) {
-        return <ConnectedUserSheetPanelListSkeleton label="Loading MCP servers" />;
+        return <ConnectedUserSheetPanelListSkeleton label="Loading MCP servers" variant="mcpServer" />;
     }
 
     const mcpServers = data?.connectedUserMcpServers ?? [];
