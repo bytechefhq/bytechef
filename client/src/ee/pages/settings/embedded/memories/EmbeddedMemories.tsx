@@ -114,7 +114,9 @@ const EmbeddedMemoriesTableRow = ({memory, onDelete, onEdit, onView}: EmbeddedMe
                     <div className="flex flex-col">
                         <span className="text-sm">{getConnectedUserLabel(memory.connectedUser)}</span>
 
-                        <span className="text-xs text-muted-foreground">{memory.connectedUser.externalId}</span>
+                        {getConnectedUserLabel(memory.connectedUser) !== memory.connectedUser.externalId && (
+                            <span className="text-xs text-muted-foreground">{memory.connectedUser.externalId}</span>
+                        )}
                     </div>
                 ) : (
                     <span className="text-sm text-muted-foreground">Deleted connected user</span>
