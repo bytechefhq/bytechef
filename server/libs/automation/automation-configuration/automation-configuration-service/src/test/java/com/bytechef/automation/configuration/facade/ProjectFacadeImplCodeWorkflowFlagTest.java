@@ -33,7 +33,9 @@ import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupp
 import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier.CodeWorkflowInfo;
 import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier.CodeWorkflowSource;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectVersionWorkflowChangeService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
 import com.bytechef.automation.configuration.util.ComponentDefinitionHelper;
@@ -100,7 +102,9 @@ class ProjectFacadeImplCodeWorkflowFlagTest {
         projectFacade = new ProjectFacadeImpl(
             applicationProperties, mock(CategoryService.class), componentDefinitionHelper, preBuiltTemplateService,
             projectCodeWorkflowInfoSupplierProvider, projectWorkflowService, mock(ProjectDeploymentService.class),
-            projectService, mock(ProjectDeploymentFacade.class), mock(ProjectWorkflowFacade.class),
+            mock(ProjectOwnershipService.class), projectService, mock(ProjectVersionWorkflowChangeService.class),
+            mock(ProjectDeploymentFacade.class),
+            mock(ProjectWorkflowFacade.class),
             mock(SharedTemplateFileStorage.class), mock(SharedTemplateService.class), tagService,
             mock(WorkflowService.class), mock(WorkflowTestConfigurationService.class),
             mock(WorkflowNodeTestOutputService.class), List.of());
@@ -167,6 +171,58 @@ class ProjectFacadeImplCodeWorkflowFlagTest {
 
             return byteArrayOutputStream.toByteArray();
         }
+    }
+
+    @Test
+    @MockitoSettings(strictness = Strictness.LENIENT)
+    void testRestoreProjectVersionRestoresACodeProjectsSourceInsteadOfCopyingWorkflows() {
+        ProjectCodeWorkflowInfoSupplier supplier = mock(ProjectCodeWorkflowInfoSupplier.class);
+
+        when(projectCodeWorkflowInfoSupplierProvider.getIfAvailable()).thenReturn(supplier);
+        when(supplier.fetchCodeWorkflowInfo(PROJECT_ID)).thenReturn(Optional.of(new CodeWorkflowInfo("JAVASCRIPT")));
+
+        projectFacade.restoreProjectVersion(PROJECT_ID, 1);
+
+        verify(supplier).restoreCodeWorkflowSource(PROJECT_ID, 1);
+        verify(projectWorkflowService, never()).getProjectWorkflows(anyLong(), anyInt());
+    }
+
+    @Test
+    @MockitoSettings(strictness = Strictness.LENIENT)
+    void testUpdateProjectRewritesACodeProjectsSourceWhenTheNameChanges() {
+        ProjectCodeWorkflowInfoSupplier supplier = mock(ProjectCodeWorkflowInfoSupplier.class);
+
+        when(project.getName()).thenReturn("old-name");
+        when(projectCodeWorkflowInfoSupplierProvider.getIfAvailable()).thenReturn(supplier);
+        when(supplier.fetchCodeWorkflowInfo(PROJECT_ID)).thenReturn(Optional.of(new CodeWorkflowInfo("JAVASCRIPT")));
+
+        ProjectDTO projectDTO = ProjectDTO.builder()
+            .id(PROJECT_ID)
+            .name("new-name")
+            .build();
+
+        projectFacade.updateProject(projectDTO);
+
+        verify(supplier).renameCodeWorkflowSource(PROJECT_ID);
+    }
+
+    @Test
+    @MockitoSettings(strictness = Strictness.LENIENT)
+    void testUpdateProjectLeavesACodeProjectsSourceAloneWhenTheNameIsUnchanged() {
+        ProjectCodeWorkflowInfoSupplier supplier = mock(ProjectCodeWorkflowInfoSupplier.class);
+
+        when(project.getName()).thenReturn("same-name");
+        when(projectCodeWorkflowInfoSupplierProvider.getIfAvailable()).thenReturn(supplier);
+        when(supplier.fetchCodeWorkflowInfo(PROJECT_ID)).thenReturn(Optional.of(new CodeWorkflowInfo("JAVASCRIPT")));
+
+        ProjectDTO projectDTO = ProjectDTO.builder()
+            .id(PROJECT_ID)
+            .name("same-name")
+            .build();
+
+        projectFacade.updateProject(projectDTO);
+
+        verify(supplier, never()).renameCodeWorkflowSource(anyLong());
     }
 
     @Test

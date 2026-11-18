@@ -13,11 +13,12 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.project.ProjectHandler;
@@ -73,9 +74,11 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade {
 
-    private static final String EMBEDDED_AUTOMATION_MARKER = SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX;
+    private static final Set<ProjectOwner> EMBEDDED_PROJECT_OWNERS =
+        Set.of(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT);
 
     private final CacheManager cacheManager;
+    private final ProjectOwnershipService projectOwnershipService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final ProjectFacade projectFacade;
@@ -101,9 +104,11 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         ProjectCodeWorkflowDraftService projectCodeWorkflowDraftService, TagService tagService,
         ProjectDeploymentFacade projectDeploymentFacade, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService) {
+        ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService,
+        ProjectOwnershipService projectOwnershipService) {
 
         this.cacheManager = cacheManager;
+        this.projectOwnershipService = projectOwnershipService;
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
         this.projectFacade = projectFacade;
@@ -178,9 +183,12 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
             return List.of();
         }
 
+        Set<Long> embeddedProjectIds = projectOwnershipService.getOwnedProjectIds(
+            projectIds, EMBEDDED_PROJECT_OWNERS);
+
         return projectService.getProjects(projectIds)
             .stream()
-            .filter(project -> !isEmbeddedBridgeProject(project))
+            .filter(project -> !embeddedProjectIds.contains(project.getId()))
             .toList();
     }
 
@@ -247,10 +255,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         }
 
         if (!Objects.equals(projectDefinition.getName(), project.getName())) {
-            throw new ConfigurationException(
-                "Renaming a code workflow by editing its source is not supported (expected name '"
-                    + project.getName() + "')",
-                CodeWorkflowErrorType.CODE_WORKFLOW_NAME_MISMATCH);
+            project = renameProject(project, projectDefinition.getName());
         }
 
         projectCodeWorkflowDraftService.saveDraft(project, projectDefinition, bytes, language);
@@ -266,6 +271,66 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
 
         Project project = projectService.getProject(projectId);
 
+        saveDraftWithProjectName(project, language, content);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public void renameCodeWorkflowSource(long projectId) {
+        Project project = projectService.getProject(projectId);
+
+        CodeWorkflowContainer codeWorkflowContainer = getCodeWorkflowContainer(projectId);
+
+        Language language = codeWorkflowContainer.getLanguage();
+
+        if (language == Language.JAVA) {
+            throw new ConfigurationException(
+                "A Java code workflow takes its name from its JAR; change the name in the project definition and " +
+                    "upload the JAR again",
+                CodeWorkflowErrorType.CODE_WORKFLOW_NAME_MISMATCH);
+        }
+
+        String content = codeWorkflowFileStorage.readCodeWorkflowFileContent(codeWorkflowContainer.getWorkflows());
+
+        saveDraftWithProjectName(project, language, content);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public void restoreCodeWorkflowSource(long projectId, int projectVersion) {
+        Project project = projectService.getProject(projectId);
+
+        Optional<ProjectCodeWorkflow> projectCodeWorkflowOptional =
+            projectCodeWorkflowService.fetchPublishedProjectCodeWorkflow(projectId, projectVersion + 1);
+
+        if (projectCodeWorkflowOptional.isEmpty()) {
+            throw new ConfigurationException(
+                "Project version " + projectVersion + " has no code workflow source to restore",
+                CodeWorkflowErrorType.SOURCE_LOAD_FAILED);
+        }
+
+        ProjectCodeWorkflow projectCodeWorkflow = projectCodeWorkflowOptional.get();
+
+        CodeWorkflowContainer codeWorkflowContainer = codeWorkflowContainerService.getCodeWorkflowContainer(
+            projectCodeWorkflow.getCodeWorkflowContainerId());
+
+        Language language = codeWorkflowContainer.getLanguage();
+
+        if (language == Language.JAVA) {
+            byte[] bytes = readCodeWorkflowFileBytes(codeWorkflowContainer);
+
+            projectCodeWorkflowDraftService.saveDraft(
+                project, readProjectDefinition(language, bytes), bytes, language);
+
+            return;
+        }
+
+        String content = codeWorkflowFileStorage.readCodeWorkflowFileContent(codeWorkflowContainer.getWorkflows());
+
+        saveDraftWithProjectName(project, language, content);
+    }
+
+    private void saveDraftWithProjectName(Project project, Language language, String content) {
         String projectName = project.getName();
 
         validateName(projectName);
@@ -275,9 +340,9 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         ProjectDefinition projectDefinition = readProjectDefinition(language, bytes);
 
         if (!Objects.equals(projectDefinition.getName(), projectName)) {
-            content = rewriteDeclaredName(content, projectDefinition.getName(), projectName);
+            String renamedContent = rewriteDeclaredName(content, projectDefinition.getName(), projectName);
 
-            bytes = content.getBytes(StandardCharsets.UTF_8);
+            bytes = renamedContent.getBytes(StandardCharsets.UTF_8);
 
             projectDefinition = readProjectDefinition(language, bytes);
 
@@ -290,6 +355,10 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         }
 
         projectCodeWorkflowDraftService.saveDraft(project, projectDefinition, bytes, language);
+    }
+
+    private byte[] readCodeWorkflowFileBytes(CodeWorkflowContainer codeWorkflowContainer) {
+        return codeWorkflowFileStorage.readCodeWorkflowFileBytes(codeWorkflowContainer.getWorkflows());
     }
 
     private PublishedProject publish(long workspaceId, byte[] bytes, Language language) {
@@ -320,6 +389,25 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         int projectVersion = deployInto(project, projectDefinition, bytes, language);
 
         return new PublishedProject(project, projectVersion);
+    }
+
+    private Project renameProject(Project project, String name) {
+        validateName(name);
+
+        Long projectId = project.getId();
+
+        boolean nameTaken = projectService.fetchProject(name, project.getWorkspaceId())
+            .filter(existingProject -> !Objects.equals(existingProject.getId(), projectId))
+            .isPresent();
+
+        if (nameTaken) {
+            throw new ConfigurationException(
+                "A project named '" + name + "' already exists", CodeWorkflowErrorType.CODE_WORKFLOW_ALREADY_EXISTS);
+        }
+
+        project.setName(name);
+
+        return projectService.update(project);
     }
 
     private static void validateName(String name) {
@@ -495,10 +583,11 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         return codeWorkflowContainerService.getCodeWorkflowContainer(projectCodeWorkflow.getCodeWorkflowContainerId());
     }
 
-    private static boolean isEmbeddedBridgeProject(Project project) {
-        String name = project.getName();
+    private boolean isEmbeddedBridgeProject(Project project) {
+        Set<Long> embeddedProjectIds = projectOwnershipService.getOwnedProjectIds(
+            List.of(project.getId()), EMBEDDED_PROJECT_OWNERS);
 
-        return name != null && name.startsWith(EMBEDDED_AUTOMATION_MARKER);
+        return !embeddedProjectIds.isEmpty();
     }
 
     private Project createProject(long workspaceId, ProjectDefinition projectDefinition) {

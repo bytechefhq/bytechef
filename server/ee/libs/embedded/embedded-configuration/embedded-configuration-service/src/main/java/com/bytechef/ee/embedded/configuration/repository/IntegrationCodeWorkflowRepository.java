@@ -30,6 +30,8 @@ public interface IntegrationCodeWorkflowRepository extends ListCrudRepository<In
     @Query("DELETE FROM integration_code_workflow WHERE integration_id = :integrationId")
     void deleteByIntegrationId(@Param("integrationId") long integrationId);
 
+    List<IntegrationCodeWorkflow> findAllByIntegrationId(long integrationId);
+
     @Query("SELECT DISTINCT integration_id FROM integration_code_workflow")
     List<Long> findDistinctIntegrationIds();
 
