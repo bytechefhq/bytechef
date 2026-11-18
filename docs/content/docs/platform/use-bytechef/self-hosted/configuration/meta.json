@@ -7,6 +7,7 @@
     "message-brokers",
     "node-roles",
     "file-storage",
-    "plan-limits"
+    "plan-limits",
+    "script-sandbox"
   ]
 }
