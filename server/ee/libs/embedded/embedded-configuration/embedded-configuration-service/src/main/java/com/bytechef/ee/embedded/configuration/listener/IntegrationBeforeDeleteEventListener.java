@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.listener;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.service.IntegrationCodeWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.relational.core.mapping.event.AbstractRelationalEventListener;
 import org.springframework.data.relational.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.relational.core.mapping.event.Identifier;
@@ -26,6 +27,7 @@ public class IntegrationBeforeDeleteEventListener extends AbstractRelationalEven
 
     private final IntegrationCodeWorkflowService integrationCodeWorkflowService;
 
+    @SuppressFBWarnings("EI")
     public IntegrationBeforeDeleteEventListener(IntegrationCodeWorkflowService integrationCodeWorkflowService) {
         this.integrationCodeWorkflowService = integrationCodeWorkflowService;
     }
