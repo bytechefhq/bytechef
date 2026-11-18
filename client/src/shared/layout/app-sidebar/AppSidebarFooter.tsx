@@ -20,6 +20,7 @@ import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatfor
 import {AUTHORITIES, DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
+import {resolvePlatformMode} from '@/shared/navigation/platformMode';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -74,6 +75,10 @@ export function AppSidebarFooter() {
     const {pathname} = useLocation();
 
     const navigate = useNavigate();
+
+    const platformMode = resolvePlatformMode(pathname, currentType);
+
+    const platformBasePath = platformMode === PlatformType.AUTOMATION ? '/automation' : '/embedded';
 
     const queryClient = useQueryClient();
 
@@ -167,7 +172,7 @@ export function AppSidebarFooter() {
                 <DropdownMenuSeparator />
 
                 <div className="space-y-1">
-                    {currentType === PlatformType.AUTOMATION && (
+                    {platformMode === PlatformType.AUTOMATION && (
                         <DropdownMenuItem
                             className="cursor-pointer font-semibold"
                             onClick={() => navigate('/automation/approval-tasks')}
@@ -182,9 +187,7 @@ export function AppSidebarFooter() {
 
                     <DropdownMenuItem
                         className="cursor-pointer font-semibold"
-                        onClick={() =>
-                            navigate(`${pathname.startsWith('/automation') ? '/automation' : '/embedded'}/settings`)
-                        }
+                        onClick={() => navigate(`${platformBasePath}/settings`)}
                     >
                         <div className="flex items-center space-x-1">
                             <SettingsIcon className="size-5" />
@@ -195,9 +198,7 @@ export function AppSidebarFooter() {
 
                     <DropdownMenuItem
                         className="cursor-pointer font-semibold"
-                        onClick={() =>
-                            navigate(`${pathname.startsWith('/automation') ? '/automation' : '/embedded'}/account`)
-                        }
+                        onClick={() => navigate(`${platformBasePath}/account`)}
                     >
                         <div className="flex items-center space-x-1">
                             <UserRoundCogIcon className="size-5" />

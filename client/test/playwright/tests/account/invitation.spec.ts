@@ -66,7 +66,7 @@ test.describe('Invitations', () => {
 
         await login(page, TEST_USER.email, TEST_USER.password);
 
-        await page.goto('/automation/settings/users');
+        await page.goto('/settings/users');
 
         await page.getByRole('button', {name: 'Invite User'}).click();
 

@@ -91,7 +91,7 @@ export class NotificationsPage {
     }
 
     async goto(): Promise<void> {
-        await this.page.goto('/automation/settings/notifications');
+        await this.page.goto('/settings/notifications');
 
         await expect(this.newNotificationButton).toBeVisible({timeout: 30000});
     }

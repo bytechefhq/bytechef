@@ -158,6 +158,87 @@ describe('AppSidebarFooter', () => {
         expect(screen.queryByText('Approval Tasks')).not.toBeInTheDocument();
     });
 
+    it('opens the Automation settings from an Organization settings page after coming from Automation', async () => {
+        const user = userEvent.setup();
+
+        render(
+            <MemoryRouter initialEntries={['/settings/users']}>
+                <Routes>
+                    <Route element={<AppSidebarFooter />} path="/settings/users" />
+
+                    <Route element={<div>Automation settings page</div>} path="/automation/settings" />
+
+                    <Route element={<div>Embedded settings page</div>} path="/embedded/settings" />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        await user.click(screen.getByRole('button', {name: 'User menu'}));
+        await user.click(screen.getByText('Settings'));
+
+        expect(await screen.findByText('Automation settings page')).toBeInTheDocument();
+    });
+
+    it('opens the Automation account from an Organization settings page after coming from Automation', async () => {
+        const user = userEvent.setup();
+
+        render(
+            <MemoryRouter initialEntries={['/settings/users']}>
+                <Routes>
+                    <Route element={<AppSidebarFooter />} path="/settings/users" />
+
+                    <Route element={<div>Automation account page</div>} path="/automation/account" />
+
+                    <Route element={<div>Embedded account page</div>} path="/embedded/account" />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        await user.click(screen.getByRole('button', {name: 'User menu'}));
+        await user.click(screen.getByText('Your account'));
+
+        expect(await screen.findByText('Automation account page')).toBeInTheDocument();
+    });
+
+    it('opens the Embedded settings from an Organization settings page after coming from Embedded', async () => {
+        hoisted.currentType = 1;
+
+        const user = userEvent.setup();
+
+        render(
+            <MemoryRouter initialEntries={['/settings/users']}>
+                <Routes>
+                    <Route element={<AppSidebarFooter />} path="/settings/users" />
+
+                    <Route element={<div>Automation settings page</div>} path="/automation/settings" />
+
+                    <Route element={<div>Embedded settings page</div>} path="/embedded/settings" />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        await user.click(screen.getByRole('button', {name: 'User menu'}));
+        await user.click(screen.getByText('Settings'));
+
+        expect(await screen.findByText('Embedded settings page')).toBeInTheDocument();
+    });
+
+    it('offers Approval Tasks on an Organization settings page when no mode is remembered', async () => {
+        hoisted.currentType = undefined as unknown as number;
+
+        const user = userEvent.setup();
+
+        render(
+            <MemoryRouter initialEntries={['/settings/users']}>
+                <AppSidebarFooter />
+            </MemoryRouter>
+        );
+
+        await user.click(screen.getByRole('button', {name: 'User menu'}));
+
+        expect(screen.getByText('Approval Tasks')).toBeInTheDocument();
+    });
+
     it('opens the Help & Feedback links in a new tab', async () => {
         const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
         const user = userEvent.setup();
