@@ -40,6 +40,10 @@ export interface IntegrationWorkflow {
      */
     label?: string;
     /**
+     * If the workflow starts with a static webhook trigger. Its webhook URL is available once the workflow is enabled.
+     */
+    staticWebhookTrigger?: boolean;
+    /**
      * The reference code of a workflow.
      */
     workflowUuid?: string;
@@ -65,6 +69,7 @@ export function IntegrationWorkflowFromJSONTyped(json: any, ignoreDiscriminator:
         'description': json['description'] == null ? undefined : json['description'],
         'inputs': json['inputs'] == null ? undefined : ((json['inputs'] as Array<any>).map(InputFromJSON)),
         'label': json['label'] == null ? undefined : json['label'],
+        'staticWebhookTrigger': json['staticWebhookTrigger'] == null ? undefined : json['staticWebhookTrigger'],
         'workflowUuid': json['workflowUuid'] == null ? undefined : json['workflowUuid'],
     };
 }
@@ -83,6 +88,7 @@ export function IntegrationWorkflowToJSONTyped(value?: IntegrationWorkflow | nul
         'description': value['description'],
         'inputs': value['inputs'] == null ? undefined : ((value['inputs'] as Array<any>).map(InputToJSON)),
         'label': value['label'],
+        'staticWebhookTrigger': value['staticWebhookTrigger'],
         'workflowUuid': value['workflowUuid'],
     };
 }
