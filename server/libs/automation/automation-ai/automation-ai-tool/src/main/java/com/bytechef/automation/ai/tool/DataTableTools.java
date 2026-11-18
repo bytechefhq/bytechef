@@ -106,7 +106,7 @@ public class DataTableTools {
 
         boolean exists = workspaceDataTableFacade.listTables(resolvedWorkspaceId, environmentId)
             .stream()
-            .anyMatch(dataTableInfo -> tableName.equalsIgnoreCase(dataTableInfo.baseName()));
+            .anyMatch(dataTableInfo -> tableName.equalsIgnoreCase(dataTableInfo.name()));
 
         if (exists) {
             throw new ExecutionException(
@@ -122,7 +122,7 @@ public class DataTableTools {
 
         return workspaceDataTableFacade.listTables(resolvedWorkspaceId, environmentId)
             .stream()
-            .filter(dataTableInfo -> tableName.equalsIgnoreCase(dataTableInfo.baseName()))
+            .filter(dataTableInfo -> tableName.equalsIgnoreCase(dataTableInfo.name()))
             .findFirst()
             .map(DataTableTools::toDataTableSummary)
             .orElseThrow(() -> new ExecutionException(
@@ -157,7 +157,7 @@ public class DataTableTools {
 
     private static DataTableSummary toDataTableSummary(DataTableInfo dataTableInfo) {
         return new DataTableSummary(
-            dataTableInfo.baseName(), dataTableInfo.description(), dataTableInfo.columns()
+            dataTableInfo.name(), dataTableInfo.description(), dataTableInfo.columns()
                 .stream()
                 .map(columnSpec -> new DataTableColumn(columnSpec.name(), columnSpec.type()
                     .name()))

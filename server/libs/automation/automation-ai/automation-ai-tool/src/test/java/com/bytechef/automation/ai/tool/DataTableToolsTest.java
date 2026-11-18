@@ -129,7 +129,7 @@ class DataTableToolsTest {
 
     private static DataTableInfo invoices() {
         return new DataTableInfo(
-            1L, "Invoices", "Invoice attachments",
+            1L, "Invoices", WORKSPACE_ID, "Invoice attachments",
             List.of(new ColumnSpec("subject", ColumnType.STRING), new ColumnSpec("amount", ColumnType.NUMBER)),
             Instant.EPOCH);
     }

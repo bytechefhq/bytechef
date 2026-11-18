@@ -230,7 +230,7 @@ public class ProjectTools {
                     .description(
                         trimmedDescription == null || trimmedDescription.isEmpty() ? null : trimmedDescription)
                     .name(name)
-                    .tags(getTags(tagIds))
+                    .tags(getTags(tagIds, resolvedWorkspaceId))
                     .workspaceId(resolvedWorkspaceId)
                     .build());
 
@@ -279,7 +279,7 @@ public class ProjectTools {
                     .id(existingProjectDTO.id())
                     .name(trimmedName == null || trimmedName.isEmpty() ? existingProjectDTO.name() : trimmedName)
                     .projectVersions(existingProjectDTO.projectVersions())
-                    .tags(tagIds == null ? existingProjectDTO.tags() : getTags(tagIds))
+                    .tags(tagIds == null ? existingProjectDTO.tags() : getTags(tagIds, workspaceId))
                     .version(existingProjectDTO.version())
                     .workspaceId(workspaceId)
                     .build());
@@ -393,12 +393,12 @@ public class ProjectTools {
             .orElseThrow(() -> new IllegalArgumentException("Category " + categoryId + " not found"));
     }
 
-    private List<Tag> getTags(@Nullable List<Long> tagIds) {
+    private List<Tag> getTags(@Nullable List<Long> tagIds, long workspaceId) {
         if (tagIds == null || tagIds.isEmpty()) {
             return List.of();
         }
 
-        List<Tag> tags = projectTagFacade.getProjectTags()
+        List<Tag> tags = projectTagFacade.getProjectTags(workspaceId)
             .stream()
             .filter(tag -> tagIds.contains(tag.getId()))
             .toList();

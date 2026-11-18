@@ -421,7 +421,7 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
 
     @Test
     void theDynamicOutputOfASavedWorkflowWithoutTestOutputReceivesTheWorkflowId() {
-        ActionDefinition httpClientActionDefinition = actionDefinition(ComponentDsl.string("uri"));
+        ActionDefinition httpClientActionDefinition = actionDefinition("get", ComponentDsl.string("uri"));
 
         when(actionDefinitionService.getActionDefinition("httpClient", 1, "get"))
             .thenReturn(httpClientActionDefinition);
