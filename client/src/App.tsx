@@ -233,16 +233,16 @@ function App() {
     const ff_2396 = useFeatureFlagsStore()('ff-2396');
 
     const isAdmin = !!account?.authorities?.includes(AUTHORITIES.ADMIN);
-    const isAutomationPath = location.pathname.includes('/automation/');
-    const isEmbeddedPath = location.pathname.startsWith('/embedded/');
+    const isAutomationMode = platformMode === PlatformType.AUTOMATION;
+    const isEmbeddedMode = platformMode === PlatformType.EMBEDDED;
 
     const embeddedGettingStartedCompleted = useEmbeddedGettingStartedCompleted(
-        currentEnvironmentId === DEVELOPMENT_ENVIRONMENT && isEmbeddedPath && isAdmin && edition === EditionType.EE
+        currentEnvironmentId === DEVELOPMENT_ENVIRONMENT && isEmbeddedMode && isAdmin && edition === EditionType.EE
     );
 
     const automationGettingStartedCompleted = useAutomationGettingStartedCompleted({
         enabled:
-            isAutomationPath &&
+            isAutomationMode &&
             canEditWorkspace &&
             currentEnvironmentId === DEVELOPMENT_ENVIRONMENT &&
             currentWorkspaceId !== undefined,
