@@ -41,10 +41,11 @@ export const getConnectedUserConnectionsQuery = (connectedUserId: number) => (re
         staleTime: DEFINITION_STALE_TIME,
     });
 
-export const useGetAllConnectedUserConnectionsQuery = (connectedUserId: number) =>
+export const useGetAllConnectedUserConnectionsQuery = (connectedUserId: number, enabled?: boolean) =>
     useQuery<Connection[], Error>({
         queryKey: ConnectionKeys.allConnectedUserConnections(connectedUserId),
         queryFn: () => new ConnectionApi().getAllConnectedUserConnections({connectedUserId}),
+        enabled: enabled === undefined ? true : enabled,
     });
 
 export const useGetConnectionsQuery = (filters: GetConnectionsRequest, enabled?: boolean) =>
