@@ -16,6 +16,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.JobContextAware;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.polyglot.ComponentActionInvoker;
 import com.bytechef.platform.component.service.ActionDefinitionService;
@@ -102,9 +103,23 @@ public class CodeWorkflowTaskContext implements TaskContext, ComponentActionInvo
 
         Map<String, ?> extensions = composeExtensions(clusterElements, connections);
 
+        ActionContext invokedActionContext = toInvokedActionContext(
+            componentDefinition.getName(), componentDefinition.getVersion(), actionName, componentConnection);
+
         return actionDefinitionService.executePerformForPolyglot(
             componentDefinition.getName(), componentDefinition.getVersion(), actionName, input, componentConnection,
-            connections, extensions, environmentId, actionContext);
+            connections, extensions, environmentId, invokedActionContext);
+    }
+
+    private ActionContext toInvokedActionContext(
+        String componentName, int componentVersion, String actionName,
+        @Nullable ComponentConnection componentConnection) {
+
+        if (actionContext instanceof JobContextAware jobContextAware) {
+            return jobContextAware.toActionContext(componentName, componentVersion, actionName, componentConnection);
+        }
+
+        return actionContext;
     }
 
     @Override

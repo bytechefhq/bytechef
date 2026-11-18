@@ -20,12 +20,14 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextConsumer;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.JobContextAware;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -78,6 +80,29 @@ class CodeWorkflowTaskContextTest {
     }
 
     @Test
+    void testComponentPerformsWithTheActionContextOfTheInvokedComponentAndItsConnection() throws Exception {
+        ActionContext taskActionContext =
+            mock(ActionContext.class, withSettings().extraInterfaces(JobContextAware.class));
+        ActionContext invokedActionContext = mock(ActionContext.class);
+        ComponentConnection componentConnection = new ComponentConnection("component1", 1, 1L, Map.of(), null);
+
+        Map<String, ComponentConnection> componentConnections = Map.of("component1", componentConnection);
+
+        CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
+            taskActionContext, actionDefinitionService, componentConnections, componentDefinitionService);
+
+        when(componentDefinitionService.getComponentDefinition("component1", null)).thenReturn(componentDefinition);
+        when(((JobContextAware) taskActionContext).toActionContext("component1", 0, "action1", componentConnection))
+            .thenReturn(invokedActionContext);
+
+        taskContext.component("component1", "action1", Map.of(), null);
+
+        verify(actionDefinitionService).executePerformForPolyglot(
+            eq("component1"), eq(0), eq("action1"), eq(Map.of()), eq(componentConnection), eq(componentConnections),
+            eq(Map.of()), isNull(), eq(invokedActionContext));
+    }
+
+    @Test
     void testComponentForwardsEnvironmentIdFromActionContextAware() throws Exception {
         ActionContextAware actionContextAware = mock(ActionContextAware.class);
 
@@ -85,7 +110,11 @@ class CodeWorkflowTaskContextTest {
 
         ComponentConnection componentConnection = new ComponentConnection("component1", 1, 2L, Map.of(), null);
 
+        ActionContext invokedActionContext = mock(ActionContext.class);
+
         when(componentDefinitionService.getComponentDefinition("component1", null)).thenReturn(componentDefinition);
+        when(actionContextAware.toActionContext("component1", 0, "action1", componentConnection))
+            .thenReturn(invokedActionContext);
 
         CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
             actionContextAware, actionDefinitionService, Map.of("connection1", componentConnection),
@@ -95,7 +124,7 @@ class CodeWorkflowTaskContextTest {
 
         verify(actionDefinitionService).executePerformForPolyglot(
             eq("component1"), eq(0), eq("action1"), eq(Map.of()), eq(componentConnection), any(), any(), eq(7L),
-            eq(actionContextAware));
+            eq(invokedActionContext));
     }
 
     @Test
