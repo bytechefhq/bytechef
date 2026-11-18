@@ -31,6 +31,10 @@ export interface IntegrationInstanceWorkflow {
      * The reference code of a workflow.
      */
     workflowUuid?: string;
+    /**
+     * The url that starts the workflow for this integration instance when it begins with a static webhook trigger, for example Webhook. Null when the workflow starts with another trigger.
+     */
+    staticWebhookUrl?: string;
 }
 
 /**
@@ -53,6 +57,7 @@ export function IntegrationInstanceWorkflowFromJSONTyped(json: any, ignoreDiscri
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
         'inputs': json['inputs'] == null ? undefined : json['inputs'],
         'workflowUuid': json['workflowUuid'] == null ? undefined : json['workflowUuid'],
+        'staticWebhookUrl': json['staticWebhookUrl'] == null ? undefined : json['staticWebhookUrl'],
     };
 }
 
@@ -70,6 +75,7 @@ export function IntegrationInstanceWorkflowToJSONTyped(value?: IntegrationInstan
         'enabled': value['enabled'],
         'inputs': value['inputs'],
         'workflowUuid': value['workflowUuid'],
+        'staticWebhookUrl': value['staticWebhookUrl'],
     };
 }
 
