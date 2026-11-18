@@ -1,30 +1,23 @@
 
-# OAuth2
+# AutomationProjectCodeWorkflowDeployResult
 
+The result of deploying an automation code workflow into the embedded catalog.
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`authorizationUrl` | string
-`extraQueryParameters` | { [key: string]: string; }
-`clientId` | string
-`redirectUri` | string
-`scopes` | { [key: string]: string; }
+`warnings` | Array&lt;string&gt;
 
 ## Example
 
 ```typescript
-import type { OAuth2 } from ''
+import type { AutomationProjectCodeWorkflowDeployResult } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "authorizationUrl": null,
-  "extraQueryParameters": null,
-  "clientId": null,
-  "redirectUri": null,
-  "scopes": null,
-} satisfies OAuth2
+  "warnings": null,
+} satisfies AutomationProjectCodeWorkflowDeployResult
 
 console.log(example)
 
@@ -33,7 +26,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as OAuth2
+const exampleParsed = JSON.parse(exampleJSON) as AutomationProjectCodeWorkflowDeployResult
 console.log(exampleParsed)
 ```
 
