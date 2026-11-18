@@ -29,11 +29,13 @@ const AutomationEditorWorkflowsListItem = ({
             editedTimeAgo={editedTimeAgo}
             label={workflow.label}
             menu={
-                <AutomationEditorWorkflowsListItemDropdownMenu
-                    currentWorkflowId={currentWorkflowId}
-                    project={project}
-                    workflow={workflow}
-                />
+                !project.codeWorkflowProject && (
+                    <AutomationEditorWorkflowsListItemDropdownMenu
+                        currentWorkflowId={currentWorkflowId}
+                        project={project}
+                        workflow={workflow}
+                    />
+                )
             }
             onClick={() => onWorkflowClick(workflow.workflowUuid)}
         />
