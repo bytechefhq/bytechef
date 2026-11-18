@@ -139,6 +139,16 @@ describe('EmbeddedMemories', () => {
         expect(within(row).getByText('User')).toBeInTheDocument();
     });
 
+    it('shows the external id once for a connected user without a name or email', () => {
+        mockMemories([makeGraphQlMemory({connectedUser: {email: null, externalId: 'ext-bob', id: '22', name: null}})]);
+
+        renderPage();
+
+        const row = screen.getByText('Plan').closest('tr')!;
+
+        expect(within(row).getAllByText('ext-bob')).toHaveLength(1);
+    });
+
     it('marks a memory whose connected user and integration were deleted', () => {
         mockMemories([makeGraphQlMemory({connectedUser: null, integration: null})]);
 
