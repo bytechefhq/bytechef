@@ -61,6 +61,17 @@ class ProjectDeploymentFacadeChatWorkflowTest {
             + "\"type\":\"webhook/v1/autoRespondWithHTTPOK\"},{\"name\":\"chat_1\","
             + "\"type\":\"chat/v1/newChatMessage\"}],\"tasks\":[]}";
 
+    private static final String DISABLED_CHAT_BEFORE_HOSTED_CHAT_WORKFLOW_DEFINITION =
+        "{\"label\":\"Disabled first\",\"triggers\":[{\"name\":\"trigger_1\","
+            + "\"type\":\"chat/v1/newChatRequest\",\"disabled\":true},{\"name\":\"trigger_2\","
+            + "\"type\":\"webhook/v1/autoRespondingWithHTTP200\"},{\"name\":\"trigger_3\","
+            + "\"type\":\"chat/v1/newChatRequest\",\"parameters\":{\"mode\":1}}],\"tasks\":[]}";
+
+    private static final String ONLY_DISABLED_CHAT_WORKFLOW_DEFINITION =
+        "{\"label\":\"Disabled only\",\"triggers\":[{\"name\":\"trigger_1\","
+            + "\"type\":\"chat/v1/newChatRequest\",\"disabled\":true},{\"name\":\"trigger_2\","
+            + "\"type\":\"webhook/v1/autoRespondingWithHTTP200\"}],\"tasks\":[]}";
+
     private static final String NON_CHAT_WORKFLOW_DEFINITION =
         "{\"label\":\"Webhook\",\"triggers\":[{\"name\":\"trigger_1\",\"type\":\"webhook/v1/autoRespondWithHTTPOK\"}],"
             + "\"tasks\":[]}";
@@ -231,6 +242,39 @@ class ProjectDeploymentFacadeChatWorkflowTest {
                 .workflowExecutionId());
 
         assertThat(workflowExecutionId.getTriggerName()).isEqualTo("chat_1");
+    }
+
+    @Test
+    void testListingTakesTheExecutionIdOfTheEnabledHostedChatTrigger() {
+        stubOneChatWorkflow();
+
+        Mockito.when(workflowService.getWorkflows(ArgumentMatchers.anyList()))
+            .thenReturn(
+                List.of(
+                    new Workflow(
+                        WORKFLOW_ID, DISABLED_CHAT_BEFORE_HOSTED_CHAT_WORKFLOW_DEFINITION, Workflow.Format.JSON)));
+
+        List<ChatWorkflow> chatWorkflows = createProjectDeploymentFacade()
+            .getWorkspaceChatWorkflows(WORKSPACE_ID, null);
+
+        assertThat(chatWorkflows).hasSize(1);
+
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(
+            chatWorkflows.getFirst()
+                .workflowExecutionId());
+
+        assertThat(workflowExecutionId.getTriggerName()).isEqualTo("trigger_3");
+    }
+
+    @Test
+    void testListingSkipsAWorkflowWithOnlyADisabledChatTrigger() {
+        stubOneChatWorkflow();
+
+        Mockito.when(workflowService.getWorkflows(ArgumentMatchers.anyList()))
+            .thenReturn(
+                List.of(new Workflow(WORKFLOW_ID, ONLY_DISABLED_CHAT_WORKFLOW_DEFINITION, Workflow.Format.JSON)));
+
+        assertThat(createProjectDeploymentFacade().getWorkspaceChatWorkflows(WORKSPACE_ID, null)).isEmpty();
     }
 
     private StubbedChatWorkflow stubOneChatWorkflow() {
