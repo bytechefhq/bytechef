@@ -26,6 +26,7 @@ import java.util.Optional;
  */
 public enum ExternalLanguage {
 
+    BASH("bash"),
     JAVASCRIPT("javascript", "js"),
     PYTHON("python"),
     SHELL("shell");

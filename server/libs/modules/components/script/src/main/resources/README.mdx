@@ -66,6 +66,21 @@ function perform(input, context) {
 <iframe src="https://www.guidejar.com/embed/6ec7275a-fbd9-4bd9-b97b-1c1a460acd9a?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0">
 </iframe></div>
 
+### Reading Connection Parameters
+
+Declare `perform` with a `connection` argument between `input` and `context` to read the parameters of the connections defined in the **Connections** panel at the bottom right of the Script editor, keyed by the connection name, the same way `input` holds the input parameters:
+
+```javascript
+function perform(input, connection, context) {
+    const token = connection['googleMaps'].api_token;
+
+    return null;
+}
+```
+
+Declare `connection` as a plain, required parameter. ByteChef counts the required parameters of `perform` to decide whether to pass it, so a JavaScript default value on `connection` makes the script receive `perform(input, context)` instead. Scripts that declare `perform(input, context)`, with or without further optional parameters, keep working unchanged.
+
+Datastream item processors, AI skill scripts and scripts run by the Process, Docker, Kubernetes or AWS Batch runner receive an empty `connection`. A Script tool's return value is sent to the AI model, so don't return connection parameters from a tool.
 
 ### Task Runners
 
@@ -125,6 +140,12 @@ The Process and Docker runners can only start an interpreter for JavaScript, Pyt
 That check is deliberately not enforced earlier, in the editor: the **Task Runner** select is built from what each enabled runner declares it can do, not from what languages it can run, so an action written in a GraalVM-only language still lists Process and Docker as choices alongside GraalVM.
 
 In the current build this only matters for JavaScript and Python, the two languages this component ships — both resolve externally. The Ruby, Java and R actions exist in the codebase but are not registered on this component for reasons unrelated to task runners; the mismatch above becomes reachable once they are.
+
+### The Bash Action
+
+The **Bash** action runs its script with `bash`, so it needs the Process, Docker, Kubernetes or AWS Batch runner; GraalVM cannot run it. Each **Input** value is exported as `INPUT_<name>`, a string as it is and any other value as JSON. A name that is not a valid shell variable name is not exported, but every value is also in the JSON file named by `BYTECHEF_INPUT_FILE`. Writing a JSON object to `$BYTECHEF_OUTPUT_DIR/output.json` returns it in `vars`.
+
+Under Docker, Kubernetes and AWS Batch the default image is `ubuntu:24.04`. It has `bash` but not `jq`, `python3` or `curl`, so a script that needs them, including one that reads `BYTECHEF_INPUT_FILE` or `BYTECHEF_CONNECTIONS_FILE` with `jq`, must set the runner's **Image** to one that ships them. The Process runner uses whatever the host has on its `PATH`.
 
 ### Inheriting The Host Environment
 

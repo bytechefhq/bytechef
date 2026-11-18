@@ -206,12 +206,12 @@ public final class ActionDefinition {
             "name='" + name + '\'' +
             ", componentName='" + componentName + '\'' +
             ", componentVersion=" + componentVersion +
+            ", deprecated=" + deprecated +
             ", title='" + title + '\'' +
             ", description='" + description + '\'' +
             ", properties=" + properties +
             ", resumePerformFunctionDefined=" + resumePerformFunctionDefined +
             ", batch=" + batch +
-            ", deprecated=" + deprecated +
             ", outputDefined=" + outputDefined +
             ", outputFunctionDefined=" + outputFunctionDefined +
             ", outputResponse=" + outputResponse +

@@ -61,6 +61,7 @@ public class ProcessTaskRunner implements TaskRunner {
     private static final Duration DRAIN_GRACE = Duration.ofSeconds(5);
 
     private static final Map<ExternalLanguage, String> DEFAULT_INTERPRETERS = Map.of(
+        ExternalLanguage.BASH, "bash",
         ExternalLanguage.JAVASCRIPT, "node",
         ExternalLanguage.PYTHON, "python3",
         ExternalLanguage.SHELL, "/bin/sh");
