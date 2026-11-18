@@ -1161,6 +1161,8 @@ export type CustomComponent = {
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   name: Scalars['String']['output'];
+  publishedDate?: Maybe<Scalars['Long']['output']>;
+  status?: Maybe<CustomComponentStatus>;
   title?: Maybe<Scalars['String']['output']>;
   version?: Maybe<Scalars['Int']['output']>;
 };
@@ -1183,6 +1185,11 @@ export enum CustomComponentLanguage {
   Javascript = 'JAVASCRIPT',
   Python = 'PYTHON',
   Ruby = 'RUBY'
+}
+
+export enum CustomComponentStatus {
+  Draft = 'DRAFT',
+  Published = 'PUBLISHED'
 }
 
 export type CustomComponentTriggerDefinition = {
@@ -2130,6 +2137,7 @@ export type Mutation = {
   createAutomationProjectConfiguration: Scalars['ID']['output'];
   createAutomationProjectWorkflow: Scalars['ID']['output'];
   createCodeWorkflow: Scalars['ID']['output'];
+  createCustomComponent: CustomComponent;
   createDataTable: Scalars['Boolean']['output'];
   createEmbeddedMcpComponent?: Maybe<McpComponent>;
   createEmbeddedMcpServer?: Maybe<McpServer>;
@@ -2228,6 +2236,7 @@ export type Mutation = {
   provisionConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
   provisionConnectedUserProjectWorkflows?: Maybe<Scalars['Boolean']['output']>;
   publishAutomationProject: Scalars['Boolean']['output'];
+  publishCustomComponent: CustomComponent;
   removeDataTableColumn: Scalars['Boolean']['output'];
   removeFileInSkill: AiSkill;
   renameDataTable: Scalars['Boolean']['output'];
@@ -2282,6 +2291,7 @@ export type Mutation = {
    * Succeeding means the values were stored, not that they work.
    */
   updateConnectionCredentials: Scalars['Boolean']['output'];
+  updateCustomComponentSource: CustomComponent;
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
   /**
@@ -2474,6 +2484,12 @@ export type MutationCreateCodeWorkflowArgs = {
   name: Scalars['String']['input'];
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
   workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateCustomComponentArgs = {
+  language: CustomComponentLanguage;
+  name: Scalars['String']['input'];
 };
 
 
@@ -2962,6 +2978,11 @@ export type MutationPublishAutomationProjectArgs = {
 };
 
 
+export type MutationPublishCustomComponentArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationRemoveDataTableColumnArgs = {
   input: RemoveColumnInput;
 };
@@ -3246,6 +3267,12 @@ export type MutationUpdateCodeWorkflowSourceArgs = {
 
 export type MutationUpdateConnectionCredentialsArgs = {
   input: UpdateConnectionCredentialsInput;
+};
+
+
+export type MutationUpdateCustomComponentSourceArgs = {
+  content: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
@@ -3872,6 +3899,7 @@ export type Query = {
   connectionDefinitions: Array<ConnectionDefinition>;
   customComponent?: Maybe<CustomComponent>;
   customComponentDefinition?: Maybe<CustomComponentDefinition>;
+  customComponentSource: Scalars['String']['output'];
   customComponents: Array<CustomComponent>;
   dataTableLinkOptions: Array<DataTableLinkOption>;
   dataTableRows: Array<DataTableRow>;
@@ -4454,6 +4482,11 @@ export type QueryCustomComponentArgs = {
 
 
 export type QueryCustomComponentDefinitionArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryCustomComponentSourceArgs = {
   id: Scalars['ID']['input'];
 };
 
