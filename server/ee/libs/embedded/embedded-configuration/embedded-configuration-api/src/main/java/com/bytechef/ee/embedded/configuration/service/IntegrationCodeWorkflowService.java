@@ -22,6 +22,8 @@ public interface IntegrationCodeWorkflowService {
 
     IntegrationCodeWorkflow create(CodeWorkflowContainer codeWorkflowContainer, Integration integration);
 
+    void deleteIntegrationCodeWorkflows(long integrationId);
+
     Optional<IntegrationCodeWorkflow> fetchIntegrationCodeWorkflow(long integrationId);
 
     List<Long> getCodeWorkflowIntegrationIds();

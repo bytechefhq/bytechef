@@ -11,6 +11,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationCodeWorkflow;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -24,6 +25,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 @ConditionalOnEEVersion
 public interface IntegrationCodeWorkflowRepository extends ListCrudRepository<IntegrationCodeWorkflow, Long> {
+
+    @Modifying
+    @Query("DELETE FROM integration_code_workflow WHERE integration_id = :integrationId")
+    void deleteByIntegrationId(@Param("integrationId") long integrationId);
 
     @Query("SELECT DISTINCT integration_id FROM integration_code_workflow")
     List<Long> findDistinctIntegrationIds();
