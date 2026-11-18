@@ -20,7 +20,7 @@ import { mapValues } from '../runtime.js';
  */
 export interface EnableConnectedUserWorkflowResponse {
     /**
-     * Why the workflow stays paused: TURNED_OFF_BY_ADMINISTRATOR, UPDATE_PENDING, MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input> or INVALID_WORKFLOW:<errorCount>. Null when nothing blocks it.
+     * Why the workflow stays paused: TURNED_OFF_BY_ADMINISTRATOR, UPDATE_PENDING, MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input>, INVALID_WORKFLOW:<errorCount> or AWAITING_CONFIGURATION (the administrator has not finished the configuration yet). Null when nothing blocks it.
      */
     attentionReason?: string;
     /**

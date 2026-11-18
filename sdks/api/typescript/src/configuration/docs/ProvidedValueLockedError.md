@@ -1,14 +1,13 @@
 
 # ProvidedValueLockedError
 
-Returned when a request sets the connection of a component, or the value of an input, that the configuration provides for every connected user. Exactly one of the properties is present.
+Returned when a request sets the connection of a component that the configuration provides for every connected user.
 
 ## Properties
 
 Name | Type
 ------------ | -------------
 `providedComponentName` | string
-`providedInputName` | string
 
 ## Example
 
@@ -18,7 +17,6 @@ import type { ProvidedValueLockedError } from ''
 // TODO: Update the object below with actual values
 const example = {
   "providedComponentName": null,
-  "providedInputName": null,
 } satisfies ProvidedValueLockedError
 
 console.log(example)

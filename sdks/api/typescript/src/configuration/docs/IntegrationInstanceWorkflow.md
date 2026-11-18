@@ -10,6 +10,7 @@ Name | Type
 `enabled` | boolean
 `inputs` | { [key: string]: any; }
 `workflowUuid` | string
+`staticWebhookUrl` | string
 
 ## Example
 
@@ -21,6 +22,7 @@ const example = {
   "enabled": null,
   "inputs": null,
   "workflowUuid": null,
+  "staticWebhookUrl": null,
 } satisfies IntegrationInstanceWorkflow
 
 console.log(example)
