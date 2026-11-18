@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.ai.auto.memory.audit;
+package com.bytechef.platform.ai.auto.memory;
 
 /**
  * @author Ivica Cardic

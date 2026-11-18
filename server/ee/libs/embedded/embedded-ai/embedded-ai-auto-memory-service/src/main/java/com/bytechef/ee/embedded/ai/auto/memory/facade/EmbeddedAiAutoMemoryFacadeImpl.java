@@ -19,6 +19,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryAuditEvents;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryOwner;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPatch;
 import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalType;
@@ -52,9 +53,6 @@ import org.springframework.stereotype.Service;
 @ConditionalOnEEVersion
 public class EmbeddedAiAutoMemoryFacadeImpl implements EmbeddedAiAutoMemoryFacade {
 
-    private static final String AI_AUTO_MEMORY_DELETED = "AI_AUTO_MEMORY_DELETED";
-    private static final String AI_AUTO_MEMORY_UPDATED = "AI_AUTO_MEMORY_UPDATED";
-
     private final AiAutoMemoryService aiAutoMemoryService;
     private final ConnectedUserService connectedUserService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
@@ -75,7 +73,7 @@ public class EmbeddedAiAutoMemoryFacadeImpl implements EmbeddedAiAutoMemoryFacad
     }
 
     @Override
-    @Audited(event = AI_AUTO_MEMORY_DELETED, data = {
+    @Audited(event = AiAutoMemoryAuditEvents.AI_AUTO_MEMORY_DELETED, data = {
         @AuditData(key = "aiAutoMemoryId", value = "#id"),
         @AuditData(key = "environment", value = "#environment"),
         @AuditData(key = "principalType", value = "'INTEGRATION_INSTANCE'"),
@@ -131,7 +129,7 @@ public class EmbeddedAiAutoMemoryFacadeImpl implements EmbeddedAiAutoMemoryFacad
     }
 
     @Override
-    @Audited(event = AI_AUTO_MEMORY_UPDATED, data = {
+    @Audited(event = AiAutoMemoryAuditEvents.AI_AUTO_MEMORY_UPDATED, data = {
         @AuditData(key = "aiAutoMemoryId", value = "#id"),
         @AuditData(key = "environment", value = "#environment"),
         @AuditData(key = "principalType", value = "'INTEGRATION_INSTANCE'"),
