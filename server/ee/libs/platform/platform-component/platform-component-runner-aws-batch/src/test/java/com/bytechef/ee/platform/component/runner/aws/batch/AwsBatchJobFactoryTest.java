@@ -117,6 +117,17 @@ class AwsBatchJobFactoryTest {
     }
 
     @Test
+    void testConnectionVariablesReachOnlyTheMainContainer() throws Exception {
+        Map<String, TaskContainerProperties> containers = containers(
+            definition(Map.of(), Map.of("BYTECHEF_CONNECTION_SLACK_TOKEN", "xoxb-123456")));
+
+        assertThat(environment(containers.get("main"))).containsEntry("BYTECHEF_CONNECTION_SLACK_TOKEN", "xoxb-123456");
+        assertThat(environment(containers.get("bytechef-init"))).doesNotContainKey("BYTECHEF_CONNECTION_SLACK_TOKEN");
+        assertThat(environment(containers.get("bytechef-output")))
+            .doesNotContainKey("BYTECHEF_CONNECTION_SLACK_TOKEN");
+    }
+
+    @Test
     void testMainRunsTheInterpreterWithStderrRedirectedInTheAuthorsImage() throws Exception {
         TaskContainerProperties main = containers(definition(Map.of())).get("main");
 
@@ -179,6 +190,12 @@ class AwsBatchJobFactoryTest {
     }
 
     private static RegisterJobDefinitionRequest definition(Map<String, ?> overrides) throws Exception {
+        return definition(overrides, Map.of());
+    }
+
+    private static RegisterJobDefinitionRequest definition(
+        Map<String, ?> overrides, Map<String, String> extraEnvironment) throws Exception {
+
         Map<String, Object> parameters = new HashMap<>(
             Map.of(
                 "jobQueue", "bytechef", "bucket", "bytechef-staging", "executionRoleArn",
@@ -188,9 +205,13 @@ class AwsBatchJobFactoryTest {
 
         AwsBatchRunnerSettings settings = AwsBatchRunnerSettings.of("python", ParametersFactory.create(parameters));
 
+        Map<String, String> environment = new HashMap<>(
+            Map.of("HOME", "/bytechef/work", "BYTECHEF_INPUT_FILE", "/bytechef/work/input.json"));
+
+        environment.putAll(extraEnvironment);
+
         RemoteJobSpec spec = new RemoteJobSpec(
-            KEY, "python", "script.py", List.of("python3"),
-            Map.of("HOME", "/bytechef/work", "BYTECHEF_INPUT_FILE", "/bytechef/work/input.json"), "/bytechef/work",
+            KEY, "python", "script.py", List.of("python3"), environment, "/bytechef/work",
             RemotePullPolicy.IF_NOT_PRESENT, ParametersFactory.create(parameters));
 
         URL inputUrl = URI.create("https://bucket.s3.amazonaws.com/in?sig=1")
