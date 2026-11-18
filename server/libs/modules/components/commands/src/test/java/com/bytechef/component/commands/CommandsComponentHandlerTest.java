@@ -79,8 +79,7 @@ class CommandsComponentHandlerTest {
 
     @Test
     void testEveryActionOffersOnlyTheCommandCapableTaskRunners() {
-        List<ActionDefinition> actionDefinitions = componentDefinition.getActions()
-            .orElseThrow();
+        List<ActionDefinition> actionDefinitions = componentDefinition.getActions();
 
         assertThat(actionDefinitions).hasSize(3);
 
@@ -88,7 +87,6 @@ class CommandsComponentHandlerTest {
             StringProperty typeProperty = findTaskRunnerTypeProperty(actionDefinition);
 
             List<String> optionValues = typeProperty.getOptions()
-                .orElseThrow()
                 .stream()
                 .map(Option::getValue)
                 .toList();
@@ -101,15 +99,13 @@ class CommandsComponentHandlerTest {
 
     @Test
     void testEveryActionOffersTheDockerRunnerProperties() {
-        List<ActionDefinition> actionDefinitions = componentDefinition.getActions()
-            .orElseThrow();
+        List<ActionDefinition> actionDefinitions = componentDefinition.getActions();
 
         for (ActionDefinition actionDefinition : actionDefinitions) {
             ObjectProperty taskRunnerProperty = findTaskRunnerProperty(actionDefinition);
 
             Map<String, Optional<String>> displayConditions = displayConditionsByName(
-                taskRunnerProperty.getProperties()
-                    .orElseThrow());
+                taskRunnerProperty.getProperties());
 
             assertThat(displayConditions).containsKeys(
                 CPU, ENTRYPOINT, EXTRA_HOSTS, IMAGE, MEMORY, NETWORK_MODE, PULL_POLICY, USER, PRIVILEGED, CREDENTIALS,
@@ -119,13 +115,11 @@ class CommandsComponentHandlerTest {
 
     @Test
     void testEveryRunnerContributedPropertyCarriesADisplayCondition() {
-        List<ActionDefinition> actionDefinitions = componentDefinition.getActions()
-            .orElseThrow();
+        List<ActionDefinition> actionDefinitions = componentDefinition.getActions();
 
         for (ActionDefinition actionDefinition : actionDefinitions) {
             Map<String, Optional<String>> displayConditions = displayConditionsByName(
-                actionDefinition.getProperties()
-                    .orElseThrow());
+                actionDefinition.getProperties());
 
             ALWAYS_VISIBLE_PROPERTY_NAMES.forEach(displayConditions::remove);
 
@@ -136,8 +130,7 @@ class CommandsComponentHandlerTest {
             ObjectProperty taskRunnerProperty = findTaskRunnerProperty(actionDefinition);
 
             Map<String, Optional<String>> runnerDisplayConditions = displayConditionsByName(
-                taskRunnerProperty.getProperties()
-                    .orElseThrow());
+                taskRunnerProperty.getProperties());
 
             runnerDisplayConditions.remove(TYPE);
 
@@ -160,7 +153,6 @@ class CommandsComponentHandlerTest {
         ObjectProperty taskRunnerProperty = findTaskRunnerProperty(actionDefinition);
 
         return taskRunnerProperty.getProperties()
-            .orElseThrow()
             .stream()
             .filter(property -> TYPE.equals(property.getName()))
             .map(StringProperty.class::cast)
@@ -169,8 +161,7 @@ class CommandsComponentHandlerTest {
     }
 
     private static ObjectProperty findTaskRunnerProperty(ActionDefinition actionDefinition) {
-        List<? extends Property> properties = actionDefinition.getProperties()
-            .orElseThrow();
+        List<? extends Property> properties = actionDefinition.getProperties();
 
         return properties.stream()
             .filter(property -> TASK_RUNNER.equals(property.getName()))
@@ -197,7 +188,7 @@ class CommandsComponentHandlerTest {
         script.setRunners(Map.of(DOCKER, enabledRunner(), GRAALVM, enabledRunner(), PROCESS, enabledRunner()));
 
         return new TaskRunnerRegistryImpl(
-            List.of(new GraalVmTaskRunner(null, applicationProperties), new ProcessTaskRunner()),
+            List.of(new GraalVmTaskRunner(null, applicationProperties), new ProcessTaskRunner(applicationProperties)),
             List.of(new DockerTaskRunnerBackend()), applicationProperties);
     }
 
