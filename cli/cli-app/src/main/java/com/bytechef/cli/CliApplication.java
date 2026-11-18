@@ -44,7 +44,53 @@ public class CliApplication {
             DefaultCommandParser commandParser = new DefaultCommandParser(commandRegistry);
             NonInteractiveShellRunner runner = new NonInteractiveShellRunner(commandParser, commandRegistry);
 
-            runner.run(applicationArguments.getSourceArgs());
+            runner.run(quoteArguments(applicationArguments.getSourceArgs()));
         };
+    }
+
+    static String[] quoteArguments(String... arguments) {
+        String[] quotedArguments = new String[arguments.length];
+
+        for (int index = 0; index < arguments.length; index++) {
+            quotedArguments[index] = quoteArgument(arguments[index]);
+        }
+
+        return quotedArguments;
+    }
+
+    private static String quoteArgument(String argument) {
+        if (argument.startsWith("-")) {
+            int equalsIndex = argument.indexOf('=');
+
+            if (equalsIndex > 0) {
+                String value = argument.substring(equalsIndex + 1);
+
+                return needsQuotes(value) ? argument.substring(0, equalsIndex + 1) + quote(value) : argument;
+            }
+        }
+
+        return needsQuotes(argument) ? quote(argument) : argument;
+    }
+
+    private static boolean needsQuotes(String value) {
+        if (value.isEmpty()) {
+            return true;
+        }
+
+        for (int index = 0; index < value.length(); index++) {
+            if (Character.isWhitespace(value.charAt(index))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static String quote(String value) {
+        String escapedValue = value.replace("\\", "\\\\");
+
+        escapedValue = escapedValue.replace("\"", "\\\"");
+
+        return "\"" + escapedValue + "\"";
     }
 }
