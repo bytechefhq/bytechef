@@ -8,9 +8,9 @@ import exportAgent from '@/pages/automation/agents/utils/agentImportExport';
 import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAgentQueries';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
-import PublishPopover from '@/pages/automation/project/components/project-header/components/PublishPopover';
 import SettingsMenu from '@/pages/automation/project/components/project-header/components/settings-menu/SettingsMenu';
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
+import PublishPopover from '@/shared/components/PublishPopover';
 import Header from '@/shared/layout/Header';
 import {Project, ProjectDeployment, ProjectStatus} from '@/shared/middleware/automation/configuration';
 import {useAiAgentVersionsQuery} from '@/shared/middleware/graphql';
@@ -149,7 +149,7 @@ const AgentDetailHeader = ({
                         <ButtonGroup>
                             <PublishPopover
                                 isPending={publishProjectMutation.isPending}
-                                onPublishProjectSubmit={handlePublishSubmit}
+                                onPublishSubmit={handlePublishSubmit}
                                 title="Publish Project"
                                 tooltip="Publishes every workflow and agent in this project."
                             />
