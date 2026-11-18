@@ -395,6 +395,13 @@ platform-coordinator sweep, acting only on approval suspends. There are no appro
 
 Never add notification logic under `server/libs/atlas/`. See `.agents/hitl-approvals.md`.
 
+### Project versioning and audit dates
+
+A project's dates behave like a directory's: its `lastModifiedDate` follows changes to its list of workflows (add,
+delete, rename), not edits inside a workflow. Create, update, duplicate, delete, publish and restore follow numbered
+rules (PV-1...). Before changing any of these paths, read `.agents/project-versioning.md`: it lists each rule, the
+decisions behind it and the test that enforces it.
+
 ### Spring Boot Project Conventions
 
 - **Integration Test Naming**: All integration test classes must end with "IntTest" suffix (e.g., `WorkflowFacadeIntTest.java`)
