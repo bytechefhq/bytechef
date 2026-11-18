@@ -23,7 +23,6 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.project.definition.ProjectDefinition;
 import com.bytechef.config.ApplicationProperties;
@@ -52,6 +51,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -67,7 +67,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 class AutomationProjectCodeWorkflowFacadeTest {
 
     @Mock
-    private AutomationProjectConfigurationAdminFacade automationProjectConfigurationAdminFacade;
+    private AutomationProjectConfigurationFacade automationProjectConfigurationFacade;
 
     @Mock
     private AutomationProjectFacade automationProjectFacade;
@@ -214,13 +214,37 @@ class AutomationProjectCodeWorkflowFacadeTest {
     }
 
     @Test
-    void testUpdateCodeWorkflowSourceRejectsARename() {
+    void testUpdateCodeWorkflowSourceWithANewNameRenamesTheProject() {
         stubCatalogCodeProject(7L, "orders", Language.JAVASCRIPT);
 
-        assertErrorKey(
-            () -> facade().updateCodeWorkflowSource(7L, jsSource("renamed")),
-            CodeWorkflowErrorType.CODE_WORKFLOW_NAME_MISMATCH);
+        when(automationProjectFacade.fetchProjectIdByName("renamed")).thenReturn(Optional.empty());
+        when(projectService.update(any(Project.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
+        facade().updateCodeWorkflowSource(7L, jsSource("renamed"));
+
+        ArgumentCaptor<Project> projectCaptor = ArgumentCaptor.forClass(Project.class);
+
+        verify(projectService).update(projectCaptor.capture());
+
+        Project renamedProject = projectCaptor.getValue();
+
+        assertThat(renamedProject.getName()).isEqualTo("renamed");
+
+        verify(projectCodeWorkflowDraftService)
+            .saveDraft(eq(renamedProject), any(ProjectDefinition.class), any(), eq(Language.JAVASCRIPT));
+    }
+
+    @Test
+    void testUpdateCodeWorkflowSourceRejectsTheNameOfAnotherCatalogProject() {
+        stubCatalogCodeProject(7L, "orders", Language.JAVASCRIPT);
+
+        when(automationProjectFacade.fetchProjectIdByName("invoices")).thenReturn(Optional.of(8L));
+
+        assertErrorKey(
+            () -> facade().updateCodeWorkflowSource(7L, jsSource("invoices")),
+            CodeWorkflowErrorType.CODE_WORKFLOW_ALREADY_EXISTS);
+
+        verify(projectService, never()).update(any(Project.class));
         verify(projectCodeWorkflowDraftService, never()).saveDraft(any(), any(), any(), any());
     }
 
@@ -313,7 +337,7 @@ class AutomationProjectCodeWorkflowFacadeTest {
         Project project = new Project();
 
         project.setId(projectId);
-        project.setName(SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX + displayName);
+        project.setName(displayName);
         project.setProjectVersions(List.of(new ProjectVersion(draftVersion)));
 
         lenient().when(projectService.getProject(projectId))
@@ -351,7 +375,7 @@ class AutomationProjectCodeWorkflowFacadeTest {
 
     private AutomationProjectCodeWorkflowFacadeImpl facade() {
         return new AutomationProjectCodeWorkflowFacadeImpl(
-            new ApplicationProperties(), automationProjectConfigurationAdminFacade,
+            new ApplicationProperties(), automationProjectConfigurationFacade,
             automationProjectFacade, mock(CacheManager.class),
             codeWorkflowContainerService, codeWorkflowFileStorage, projectCodeWorkflowDraftService,
             projectCodeWorkflowService, projectService);

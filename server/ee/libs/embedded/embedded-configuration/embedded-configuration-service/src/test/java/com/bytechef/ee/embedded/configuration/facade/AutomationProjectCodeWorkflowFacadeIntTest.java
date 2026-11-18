@@ -112,7 +112,7 @@ class AutomationProjectCodeWorkflowFacadeIntTest {
     private AutomationProjectCodeWorkflowFacade automationProjectCodeWorkflowFacade;
 
     @Autowired
-    private AutomationProjectConfigurationAdminFacade automationProjectConfigurationAdminFacade;
+    private AutomationProjectConfigurationFacade automationProjectConfigurationFacade;
 
     @Autowired
     private AutomationProjectFacade automationProjectFacade;
@@ -145,7 +145,7 @@ class AutomationProjectCodeWorkflowFacadeIntTest {
 
         int firstVersion = getLastPublishedVersion(projectId);
 
-        automationProjectConfigurationAdminFacade.createConfiguration(
+        automationProjectConfigurationFacade.createConfiguration(
             projectId, Environment.PRODUCTION.ordinal(), Environment.PRODUCTION.name(), null, firstVersion,
             false, false);
 
@@ -172,7 +172,7 @@ class AutomationProjectCodeWorkflowFacadeIntTest {
 
         int firstVersion = getLastPublishedVersion(projectId);
 
-        automationProjectConfigurationAdminFacade.createConfiguration(
+        automationProjectConfigurationFacade.createConfiguration(
             projectId, Environment.PRODUCTION.ordinal(), Environment.PRODUCTION.name(), null, firstVersion,
             true, true);
 
@@ -191,7 +191,7 @@ class AutomationProjectCodeWorkflowFacadeIntTest {
         automationProjectCodeWorkflowFacade.save(
             codeProject(name), Language.JAVASCRIPT, Environment.PRODUCTION, false);
 
-        assertThat(automationProjectConfigurationAdminFacade.getConfigurations(projectId)).isEmpty();
+        assertThat(automationProjectConfigurationFacade.getConfigurations(projectId)).isEmpty();
     }
 
     private long createDeployedProject(String name) {
@@ -204,7 +204,7 @@ class AutomationProjectCodeWorkflowFacadeIntTest {
 
     private AutomationProjectConfigurationDTO getConfiguration(long projectId) {
         List<AutomationProjectConfigurationDTO> configurations =
-            automationProjectConfigurationAdminFacade.getConfigurations(projectId);
+            automationProjectConfigurationFacade.getConfigurations(projectId);
 
         assertThat(configurations).hasSize(1);
 

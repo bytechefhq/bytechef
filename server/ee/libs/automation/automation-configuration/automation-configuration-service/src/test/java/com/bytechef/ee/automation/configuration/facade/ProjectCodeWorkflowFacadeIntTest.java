@@ -11,16 +11,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,6 +42,7 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
@@ -60,6 +62,8 @@ import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowCo
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
@@ -88,8 +92,8 @@ import com.bytechef.workflow.definition.WorkflowDefinition;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
@@ -98,11 +102,11 @@ import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.MockedStatic;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
+import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -131,7 +135,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     ConnectionLifecycleFacade.class, ConnectionService.class, EnvironmentService.class, Evaluator.class,
     JobFacade.class, JobService.class, PreBuiltTemplateService.class, PrincipalJobFacade.class,
     PrincipalJobService.class, ProjectCodeWorkflowService.class, ProjectDeploymentService.class,
-    ProjectDeploymentWorkflowService.class, ProjectFacade.class, ProjectService.class, ProjectWorkflowService.class,
+    ProjectDeploymentWorkflowService.class, ProjectFacade.class, ProjectOwnershipService.class, ProjectService.class,
+    ProjectWorkflowService.class,
     SharedTemplateFileStorage.class, SharedTemplateService.class, TagService.class, TriggerDefinitionService.class,
     TriggerExecutionService.class, TriggerLifecycleFacade.class, WorkflowCacheManager.class, WorkflowFacade.class,
     WorkflowNodeTestOutputService.class, WorkflowService.class, WorkflowTestConfigurationService.class,
@@ -161,7 +166,7 @@ class ProjectCodeWorkflowFacadeIntTest {
     private CodeWorkflowContainerService codeWorkflowContainerService;
 
     @Autowired
-    private CodeWorkflowContainerFacade codeWorkflowContainerFacade;
+    private CodeWorkflowFileStorage codeWorkflowFileStorage;
 
     @Autowired
     private PermissionService permissionService;
@@ -193,7 +198,9 @@ class ProjectCodeWorkflowFacadeIntTest {
     @BeforeEach
     void beforeEach() {
         reset(
-            codeWorkflowContainerFacade, codeWorkflowContainerService, componentConnectionFacade, environmentService,
+            codeWorkflowContainerFacade, codeWorkflowContainerService, codeWorkflowFileStorage,
+            componentConnectionFacade,
+            environmentService,
             permissionService, projectCodeWorkflowService, projectDeploymentService, projectDeploymentWorkflowService,
             projectFacade, projectService, projectWorkflowService, workflowService);
 
@@ -262,15 +269,15 @@ class ProjectCodeWorkflowFacadeIntTest {
         ProjectHandler projectHandler = mock(ProjectHandler.class);
 
         when(projectHandler.getDefinition()).thenReturn(projectDefinition);
-        when(codeWorkflowContainerFacade.create(any(), any(), any(), any(), any(), any()))
-            .thenReturn(mock(CodeWorkflowContainer.class));
+        when(codeWorkflowContainerFacade.create(any(), any(), any(), any(), any(), any(), any()))
+            .thenAnswer(invocation -> reconcile(invocation.getArgument(2), invocation.getArgument(6)));
 
         try (MockedStatic<ProjectHandlerLoader> projectHandlerLoader = mockStatic(ProjectHandlerLoader.class)) {
             projectHandlerLoader
                 .when(() -> ProjectHandlerLoader.loadProjectHandler(any(), any(), any(), any()))
                 .thenReturn(projectHandler);
 
-            projectCodeWorkflowFacade.save(WORKSPACE_ID, new byte[0], Language.JAVA);
+            projectCodeWorkflowFacade.save(WORKSPACE_ID, new byte[0], Language.JAVASCRIPT);
         }
     }
 
@@ -443,7 +450,7 @@ class ProjectCodeWorkflowFacadeIntTest {
 
         Project project = publishedProject(1);
 
-        when(projectService.fetchProject(PROJECT_NAME)).thenReturn(Optional.of(project));
+        when(projectService.fetchProject(PROJECT_NAME, WORKSPACE_ID)).thenReturn(Optional.of(project));
         when(projectService.update(any(Project.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         UUID keptWorkflowUuid = UUID.randomUUID();
@@ -483,6 +490,102 @@ class ProjectCodeWorkflowFacadeIntTest {
 
         verify(projectFacade).publishProject(PROJECT_ID, null, false);
         verify(projectService, never()).publishProject(anyLong(), any(), anyBoolean());
+    }
+
+    @Test
+    void testRestoreCodeWorkflowSourceIsAdminOnly() {
+        assertThatThrownBy(() -> projectCodeWorkflowFacade.restoreCodeWorkflowSource(PROJECT_ID, 1))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testRestoreCodeWorkflowSourceDraftsThePublishedVersionsSourceUnderTheCurrentProjectName() {
+        authenticate(AuthorityConstants.ADMIN);
+
+        Project project = publishedProject(2);
+
+        when(projectService.getProject(PROJECT_ID)).thenReturn(project);
+
+        stubCodeWorkflowSourceContainer(Language.JAVASCRIPT, projectSource("old-name", "restored_workflow"));
+        stubReconcilingCodeWorkflowContainer();
+
+        projectCodeWorkflowFacade.restoreCodeWorkflowSource(PROJECT_ID, 1);
+
+        verify(projectCodeWorkflowService).fetchPublishedProjectCodeWorkflow(PROJECT_ID, 2);
+        verify(codeWorkflowContainerFacade).create(
+            eq(PROJECT_NAME), any(), argThat(workflowDefinitions -> workflowDefinitions.size() == 1),
+            eq(Language.JAVASCRIPT), argThat(bytes -> declaresProjectName(bytes, PROJECT_NAME)),
+            eq(PlatformType.AUTOMATION), any());
+        verify(projectWorkflowService).addWorkflow(PROJECT_ID, 3, "new-restored_workflow");
+    }
+
+    @Test
+    void testRenameCodeWorkflowSourceRewritesTheDeclaredNameInTheDraft() {
+        authenticate(AuthorityConstants.ADMIN);
+
+        Project project = publishedProject(1);
+
+        when(projectService.getProject(PROJECT_ID)).thenReturn(project);
+
+        stubCodeWorkflowSourceContainer(Language.JAVASCRIPT, projectSource("old-name", "my_workflow"));
+        stubReconcilingCodeWorkflowContainer();
+
+        projectCodeWorkflowFacade.renameCodeWorkflowSource(PROJECT_ID);
+
+        verify(codeWorkflowContainerFacade).create(
+            eq(PROJECT_NAME), any(), any(), eq(Language.JAVASCRIPT),
+            argThat(bytes -> declaresProjectName(bytes, PROJECT_NAME)), eq(PlatformType.AUTOMATION), any());
+    }
+
+    @Test
+    void testRenameCodeWorkflowSourceRejectsAJavaCodeWorkflow() {
+        authenticate(AuthorityConstants.ADMIN);
+
+        when(projectService.getProject(PROJECT_ID)).thenReturn(publishedProject(1));
+
+        stubCodeWorkflowSourceContainer(Language.JAVA, "");
+
+        assertThatThrownBy(() -> projectCodeWorkflowFacade.renameCodeWorkflowSource(PROJECT_ID))
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("takes its name from its JAR");
+
+        verify(codeWorkflowContainerFacade, never()).create(
+            any(), any(), any(), any(), any(), any(), any());
+    }
+
+    private void stubCodeWorkflowSourceContainer(Language language, String source) {
+        ProjectCodeWorkflow projectCodeWorkflow = mock(ProjectCodeWorkflow.class);
+
+        when(projectCodeWorkflow.getCodeWorkflowContainerId()).thenReturn(7L);
+        when(projectCodeWorkflow.getProjectVersion()).thenReturn(1);
+
+        FileEntry fileEntry = mock(FileEntry.class);
+
+        CodeWorkflowContainer codeWorkflowContainer = mock(CodeWorkflowContainer.class);
+
+        when(codeWorkflowContainer.getLanguage()).thenReturn(language);
+        when(codeWorkflowContainer.getWorkflowNameIds()).thenReturn(Map.of());
+        when(codeWorkflowContainer.getWorkflows()).thenReturn(fileEntry);
+
+        when(projectCodeWorkflowService.fetchProjectCodeWorkflow(PROJECT_ID))
+            .thenReturn(Optional.of(projectCodeWorkflow));
+        when(projectCodeWorkflowService.getProjectCodeWorkflow(PROJECT_ID)).thenReturn(projectCodeWorkflow);
+        when(projectCodeWorkflowService.fetchPublishedProjectCodeWorkflow(PROJECT_ID, 2))
+            .thenReturn(Optional.of(projectCodeWorkflow));
+        when(codeWorkflowContainerService.getCodeWorkflowContainer(7L)).thenReturn(codeWorkflowContainer);
+        when(codeWorkflowFileStorage.readCodeWorkflowFileContent(fileEntry)).thenReturn(source);
+    }
+
+    private static String projectSource(String projectName, String workflowName) {
+        return "({name: \"" + projectName + "\", version: \"1\", workflows: [{name: \"" + workflowName
+            + "\", label: \"" + workflowName + "\", tasks: [{name: \"my_task\", label: \"My Task\", "
+            + "perform: function(input, context) { return \"hello\"; }}]}]})";
+    }
+
+    private static boolean declaresProjectName(byte[] bytes, String projectName) {
+        String source = new String(bytes, StandardCharsets.UTF_8);
+
+        return source.startsWith("({name: \"" + projectName + "\"");
     }
 
     private ProjectDeployment existingProjectDeployment() {
@@ -633,7 +736,7 @@ class ProjectCodeWorkflowFacadeIntTest {
 
         project.publish(null);
 
-        when(projectService.fetchProject(PROJECT_NAME)).thenReturn(Optional.of(project));
+        when(projectService.fetchProject(PROJECT_NAME, WORKSPACE_ID)).thenReturn(Optional.of(project));
         when(projectService.update(any(Project.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(projectService.getProject(PROJECT_ID)).thenAnswer(invocation -> publishedProject(2));
 
