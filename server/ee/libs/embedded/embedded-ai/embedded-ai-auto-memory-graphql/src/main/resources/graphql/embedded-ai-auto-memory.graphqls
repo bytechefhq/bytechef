@@ -1,0 +1,82 @@
+"A memory an Embedded integration's agent saved for one connected user's integration instance."
+type EmbeddedAiAutoMemory {
+    id: ID!
+    name: String!
+    title: String!
+    description: String
+    memoryType: AiAutoMemoryType!
+    content: String!
+    "The Environment ordinal the memory belongs to."
+    environmentId: Long!
+    "Changes on every write. Send it back as UpdateEmbeddedAiAutoMemoryInput.expectedVersion."
+    version: Long!
+    createdAt: Long
+    updatedAt: Long
+    integrationInstanceId: Long!
+    "Null when the instance's connected user was deleted while its memories remain."
+    connectedUser: EmbeddedAiAutoMemoryConnectedUserRef
+    "Null when the instance's integration was deleted while its memories remain."
+    integration: EmbeddedAiAutoMemoryIntegration
+}
+
+type EmbeddedAiAutoMemoryConnectedUserRef {
+    id: ID!
+    name: String
+    email: String
+    externalId: String!
+}
+
+type EmbeddedAiAutoMemoryIntegration {
+    id: ID!
+    name: String
+    componentName: String
+}
+
+"A connected user holding at least one memory in the environment, for the Connected User filter."
+type EmbeddedAiAutoMemoryConnectedUser {
+    id: ID!
+    name: String
+    email: String
+    externalId: String!
+    memoryCount: Int!
+}
+
+extend type Query {
+    """
+    Lists the memories of every Embedded integration instance in the environment (the Environment ordinal: 0
+    DEVELOPMENT, 1 STAGING, 2 PRODUCTION). connectedUserId and memoryType narrow the list. Admin only.
+    """
+    embeddedAiAutoMemories(
+        environment: Int!,
+        connectedUserId: ID,
+        memoryType: AiAutoMemoryType
+    ): [EmbeddedAiAutoMemory!]!
+
+    "The connected users holding at least one memory in the environment. Admin only."
+    embeddedAiAutoMemoryConnectedUsers(environment: Int!): [EmbeddedAiAutoMemoryConnectedUser!]!
+}
+
+extend type Mutation {
+    """
+    Partial update of an integration instance's memory. Fails with BAD_REQUEST when the memory does not exist in the
+    environment, and with CONFLICT when it changed since expectedVersion. Admin only.
+    """
+    updateEmbeddedAiAutoMemory(input: UpdateEmbeddedAiAutoMemoryInput!): EmbeddedAiAutoMemory!
+
+    "Deletes an integration instance's memory. Fails with BAD_REQUEST when it does not exist in the environment. Admin only."
+    deleteEmbeddedAiAutoMemory(id: ID!, environment: Int!): Boolean!
+}
+
+"""
+A partial update. An omitted field keeps the stored value; a blank description clears it, while a blank title or
+content is rejected.
+"""
+input UpdateEmbeddedAiAutoMemoryInput {
+    id: ID!
+    environment: Int!
+    expectedVersion: Long!
+    title: String
+    description: String
+    memoryType: AiAutoMemoryType
+    content: String
+}

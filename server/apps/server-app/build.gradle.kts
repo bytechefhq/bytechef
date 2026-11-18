@@ -312,6 +312,8 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-execution:embedded-execution-service"))
     implementation(project(":server:ee:libs:embedded:embedded-getting-started:embedded-getting-started-graphql"))
     implementation(project(":server:ee:libs:embedded:embedded-getting-started:embedded-getting-started-service"))
+    implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-auto-memory-graphql"))
+    implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-auto-memory-service"))
     implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-graphql"))
     implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-service"))
     implementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-rest"))

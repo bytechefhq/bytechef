@@ -650,6 +650,7 @@ include("server:ee:libs:core:tenant:tenant-remote-client")
 include("server:ee:libs:core:tenant:tenant-remote-rest")
 
 include("server:ee:libs:embedded:embedded-ai:embedded-ai-auto-memory-api")
+include("server:ee:libs:embedded:embedded-ai:embedded-ai-auto-memory-graphql")
 include("server:ee:libs:embedded:embedded-ai:embedded-ai-auto-memory-service")
 include("server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-api")
 include("server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-graphql")
