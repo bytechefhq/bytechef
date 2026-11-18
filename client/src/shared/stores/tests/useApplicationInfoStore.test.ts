@@ -23,6 +23,12 @@ describe('applicationInfoStore', () => {
             expect(ai.knowledgeBase.enabled).toBe(false);
         });
 
+        it('defaults custom component Java uploads to enabled before getApplicationInfo resolves', () => {
+            const {component} = applicationInfoStore.getState();
+
+            expect(component.customComponent.javaEnabled).toBe(true);
+        });
+
         it('starts without docs URLs before getApplicationInfo resolves', () => {
             expect(applicationInfoStore.getInitialState().docs).toEqual({
                 changelogUrl: undefined,
