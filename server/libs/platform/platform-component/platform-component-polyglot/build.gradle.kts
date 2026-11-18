@@ -7,6 +7,7 @@ dependencies {
     implementation("org.springframework:spring-core")
     implementation("org.springframework:spring-context")
     implementation("org.springframework.boot:spring-boot")
+    implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
 
     testImplementation(rootProject.libs.org.graalvm.polyglot.js)
