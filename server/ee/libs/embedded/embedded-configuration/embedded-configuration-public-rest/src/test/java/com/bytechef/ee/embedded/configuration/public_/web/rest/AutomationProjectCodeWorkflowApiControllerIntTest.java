@@ -202,6 +202,21 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
             .doesNotExist();
     }
 
+    @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
+    void testDeployRejectsAMissingProjectFile() {
+        webTestClient
+            .post()
+            .uri("/v1/automation-project-code-workflows/deploy")
+            .contentType(MediaType.MULTIPART_FORM_DATA)
+            .bodyValue(new MultipartBodyBuilder().build())
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
+
+        verify(automationProjectCodeWorkflowFacade, never()).save(any(), any(), any(), anyBoolean());
+    }
+
     static WebTestClient.ResponseSpec deploy(WebTestClient webTestClient, String uri, String bearerToken) {
         return deploy(webTestClient, uri, bearerToken, null);
     }
@@ -341,13 +356,24 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
             verify(automationProjectCodeWorkflowFacade, never()).save(any(), any(), any(), anyBoolean());
         }
 
+        @Test
+        void testAutomationApiKeyIsRejected() {
+            stubApiKey(PlatformType.AUTOMATION);
+
+            deploy(webTestClient, DEPLOY_PATH, SECRET_KEY)
+                .expectStatus()
+                .isUnauthorized();
+
+            verify(automationProjectCodeWorkflowFacade, never()).save(any(), any(), any(), anyBoolean());
+        }
+
         private void stubApiKey(PlatformType type) {
             ApiKey apiKey = new ApiKey();
 
             apiKey.setType(type);
             apiKey.setUserId(7L);
 
-            when(apiKeyService.getApiKey(anyString(), anyLong())).thenReturn(apiKey);
+            when(apiKeyService.fetchApiKey(anyString(), anyLong())).thenReturn(Optional.of(apiKey));
         }
 
         @EnableWebSecurity
