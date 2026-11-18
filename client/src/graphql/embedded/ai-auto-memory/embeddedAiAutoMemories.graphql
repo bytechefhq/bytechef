@@ -1,0 +1,26 @@
+query embeddedAiAutoMemories($environment: Int!, $connectedUserId: ID, $memoryType: AiAutoMemoryType) {
+    embeddedAiAutoMemories(environment: $environment, connectedUserId: $connectedUserId, memoryType: $memoryType) {
+        id
+        name
+        title
+        description
+        memoryType
+        content
+        environmentId
+        version
+        createdAt
+        updatedAt
+        integrationInstanceId
+        connectedUser {
+            id
+            name
+            email
+            externalId
+        }
+        integration {
+            id
+            name
+            componentName
+        }
+    }
+}

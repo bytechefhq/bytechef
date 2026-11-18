@@ -1,0 +1,9 @@
+query embeddedAiAutoMemoryConnectedUsers($environment: Int!) {
+    embeddedAiAutoMemoryConnectedUsers(environment: $environment) {
+        id
+        name
+        email
+        externalId
+        memoryCount
+    }
+}
