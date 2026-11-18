@@ -142,6 +142,21 @@ class IntegrationCodeWorkflowApiControllerIntTest {
         verify(integrationCodeWorkflowFacade, never()).save(any(), any(), any(), anyBoolean());
     }
 
+    @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
+    void testDeployRejectsAMissingIntegrationFile() {
+        webTestClient
+            .post()
+            .uri("/v1/integration-code-workflows/deploy")
+            .contentType(MediaType.MULTIPART_FORM_DATA)
+            .bodyValue(new MultipartBodyBuilder().build())
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
+
+        verify(integrationCodeWorkflowFacade, never()).save(any(), any(), any(), anyBoolean());
+    }
+
     private WebTestClient.ResponseSpec deploy(String uri, String bearerToken) {
         return deploy(uri, bearerToken, null);
     }
@@ -232,13 +247,24 @@ class IntegrationCodeWorkflowApiControllerIntTest {
             verify(integrationCodeWorkflowFacade, never()).save(any(), any(), any(), anyBoolean());
         }
 
+        @Test
+        void testAutomationApiKeyIsRejected() {
+            stubApiKey(PlatformType.AUTOMATION);
+
+            deploy(DEPLOY_PATH, SECRET_KEY)
+                .expectStatus()
+                .isUnauthorized();
+
+            verify(integrationCodeWorkflowFacade, never()).save(any(), any(), any(), anyBoolean());
+        }
+
         private void stubApiKey(PlatformType type) {
             ApiKey apiKey = new ApiKey();
 
             apiKey.setType(type);
             apiKey.setUserId(7L);
 
-            when(apiKeyService.getApiKey(anyString(), anyLong())).thenReturn(apiKey);
+            when(apiKeyService.fetchApiKey(anyString(), anyLong())).thenReturn(Optional.of(apiKey));
         }
 
         @EnableWebSecurity

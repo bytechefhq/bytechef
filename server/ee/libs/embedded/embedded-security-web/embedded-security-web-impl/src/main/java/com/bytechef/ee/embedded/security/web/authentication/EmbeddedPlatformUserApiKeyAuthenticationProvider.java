@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.security.web.authentication;
 
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -48,29 +49,27 @@ public class EmbeddedPlatformUserApiKeyAuthenticationProvider implements Authent
         EmbeddedPlatformUserApiKeyAuthenticationToken embeddedPlatformUserApiKeyAuthenticationToken =
             (EmbeddedPlatformUserApiKeyAuthenticationToken) authentication;
 
-        ApiKey apiKey;
+        ApiKey apiKey = apiKeyService
+            .fetchApiKey(embeddedPlatformUserApiKeyAuthenticationToken.getSecretKey(),
+                embeddedPlatformUserApiKeyAuthenticationToken.getEnvironmentId())
+            .orElseThrow(() -> new BadCredentialsException("Unknown API secret key"));
 
-        try {
-            apiKey = apiKeyService.getApiKey(
-                embeddedPlatformUserApiKeyAuthenticationToken.getSecretKey(),
-                embeddedPlatformUserApiKeyAuthenticationToken.getEnvironmentId());
-        } catch (IllegalArgumentException e) {
-            throw new BadCredentialsException("Unknown API secret key", e);
+        if (apiKey.getType() != PlatformType.EMBEDDED) {
+            throw new BadCredentialsException("Embedded API key required");
         }
 
-        if (apiKey.getType() == null) {
-            throw new BadCredentialsException("API key required");
+        Long userId = apiKey.getUserId();
+
+        if (userId == null) {
+            throw new BadCredentialsException("API key has no owner");
         }
 
-        org.springframework.security.core.userdetails.User user = userService.fetchUser(apiKey.getUserId())
-            .map(curUser -> createSpringSecurityUser(
-                embeddedPlatformUserApiKeyAuthenticationToken.getSecretKey(), curUser))
-            .orElseThrow(() -> new UsernameNotFoundException(
-                "User with token " + embeddedPlatformUserApiKeyAuthenticationToken.getSecretKey()
-                    + " was not found in the database"));
+        org.springframework.security.core.userdetails.User user = userService.fetchUser(userId)
+            .map(this::createSpringSecurityUser)
+            .orElseThrow(() -> new UsernameNotFoundException("User " + userId + " was not found in the database"));
 
         return new EmbeddedPlatformUserApiKeyAuthenticationToken(
-            embeddedPlatformUserApiKeyAuthenticationToken.getEnvironmentId(), user);
+            embeddedPlatformUserApiKeyAuthenticationToken.getEnvironmentId(), user, apiKey.getId());
     }
 
     @Override
@@ -78,9 +77,9 @@ public class EmbeddedPlatformUserApiKeyAuthenticationProvider implements Authent
         return authentication.equals(EmbeddedPlatformUserApiKeyAuthenticationToken.class);
     }
 
-    private org.springframework.security.core.userdetails.User createSpringSecurityUser(String secretKey, User user) {
+    private org.springframework.security.core.userdetails.User createSpringSecurityUser(User user) {
         if (!user.isActivated()) {
-            throw new UserNotActivatedException("User " + secretKey + " was not activated");
+            throw new UserNotActivatedException("User " + user.getLogin() + " was not activated");
         }
 
         List<SimpleGrantedAuthority> grantedAuthorities = user.getAuthorityIds()
