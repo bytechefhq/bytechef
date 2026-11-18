@@ -5,6 +5,7 @@ import ConnectedUserConnectionCredentialsDialog from '@/ee/pages/embedded/connec
 import ConnectedUserCredentialStatus from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserCredentialStatus';
 import ConnectedUserIntegrationCredentialsDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserIntegrationCredentialsDialog';
 import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
+import {getConnectedUserConnectionPermissions} from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connectedUserConnectionPermissions';
 import {CONNECTION_ORIGIN_BADGES} from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connectionOriginBadges';
 import {Connection, ConnectionOriginEnum} from '@/ee/shared/middleware/embedded/configuration';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
@@ -50,13 +51,10 @@ const ConnectedUserSheetPanelConnectionListItem = ({
 
     const originBadge = connection.origin && CONNECTION_ORIGIN_BADGES[connection.origin];
 
-    const provisioned = connection.origin === ConnectionOriginEnum.Provisioned;
-
-    const shared = connection.origin === ConnectionOriginEnum.Internal;
-
-    const credentialsEditable = provisioned || !!provisionedIntegrationInstance;
-
-    const deletable = connection.id != null && (provisioned || connection.origin === ConnectionOriginEnum.SelfServe);
+    const {credentialsEditable, deletable, shared} = getConnectedUserConnectionPermissions(
+        connection,
+        provisionedIntegrationInstance
+    );
 
     const hasActions = credentialsEditable || shared || deletable;
 
