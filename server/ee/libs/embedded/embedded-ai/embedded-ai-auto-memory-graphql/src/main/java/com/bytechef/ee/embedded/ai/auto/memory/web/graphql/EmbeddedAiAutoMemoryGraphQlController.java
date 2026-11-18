@@ -23,6 +23,7 @@ import graphql.ErrorClassification;
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
 import graphql.schema.DataFetchingEnvironment;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -74,12 +75,15 @@ public class EmbeddedAiAutoMemoryGraphQlController {
             input.title(), input.description(), input.memoryType(), input.content());
 
         return embeddedAiAutoMemoryFacade.updateEmbeddedAiAutoMemory(
-            toEnvironment(input.environment()), input.id(), input.expectedVersion(), patch);
+            toEnvironment(input.environment()), input.integrationInstanceId(), input.id(), input.expectedVersion(),
+            patch);
     }
 
     @MutationMapping
-    public boolean deleteEmbeddedAiAutoMemory(@Argument long id, @Argument int environment) {
-        embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(toEnvironment(environment), id);
+    public boolean deleteEmbeddedAiAutoMemory(
+        @Argument long id, @Argument long integrationInstanceId, @Argument int environment) {
+
+        embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(toEnvironment(environment), integrationInstanceId, id);
 
         return true;
     }
@@ -239,8 +243,9 @@ public class EmbeddedAiAutoMemoryGraphQlController {
             return null;
         }
 
-        return localDateTime.toInstant(ZoneOffset.UTC)
-            .toEpochMilli();
+        Instant instant = localDateTime.toInstant(ZoneOffset.UTC);
+
+        return instant.toEpochMilli();
     }
 
     public record ConnectedUserRef(long id, @Nullable String name, @Nullable String email,
@@ -251,7 +256,8 @@ public class EmbeddedAiAutoMemoryGraphQlController {
     }
 
     public record UpdateEmbeddedAiAutoMemoryInput(
-        long id, int environment, long expectedVersion, @Nullable String title, @Nullable String description,
+        long id, long integrationInstanceId, int environment, long expectedVersion, @Nullable String title,
+        @Nullable String description,
         @Nullable AiAutoMemoryType memoryType, @Nullable String content) {
     }
 }
