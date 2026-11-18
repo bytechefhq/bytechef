@@ -10,7 +10,8 @@ query embeddedAiAutoMemories($environment: Int!, $connectedUserId: ID, $memoryTy
         version
         createdAt
         updatedAt
-        integrationInstanceId
+        principalType
+        principalId
         connectedUser {
             id
             name
@@ -21,6 +22,10 @@ query embeddedAiAutoMemories($environment: Int!, $connectedUserId: ID, $memoryTy
             id
             name
             componentName
+        }
+        automation {
+            id
+            name
         }
     }
 }
