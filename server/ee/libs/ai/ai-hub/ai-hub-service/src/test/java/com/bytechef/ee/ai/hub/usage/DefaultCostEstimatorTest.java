@@ -9,6 +9,7 @@ package com.bytechef.ee.ai.hub.usage;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.config.ApplicationProperties;
 import java.math.BigDecimal;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,13 +26,19 @@ class DefaultCostEstimatorTest {
 
     @BeforeEach
     void beforeEach() {
-        CostEstimationProperties costEstimationProperties = new CostEstimationProperties();
+        ApplicationProperties applicationProperties = new ApplicationProperties();
 
-        Map<String, BigDecimal> toolRates = costEstimationProperties.getToolRates();
+        ApplicationProperties.Ai ai = applicationProperties.getAi();
+
+        ApplicationProperties.Ai.Hub hub = ai.getHub();
+
+        ApplicationProperties.Ai.Hub.CostEstimation costEstimation = hub.getCostEstimation();
+
+        Map<String, BigDecimal> toolRates = costEstimation.getToolRates();
 
         toolRates.put("firecrawl_scrape", new BigDecimal("0.0015"));
 
-        defaultCostEstimator = new DefaultCostEstimator(costEstimationProperties);
+        defaultCostEstimator = new DefaultCostEstimator(applicationProperties);
     }
 
     @Test

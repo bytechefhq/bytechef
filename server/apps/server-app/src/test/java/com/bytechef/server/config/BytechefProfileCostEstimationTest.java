@@ -18,7 +18,7 @@ package com.bytechef.server.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.ee.ai.hub.usage.CostEstimationProperties;
+import com.bytechef.config.ApplicationProperties;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
@@ -47,11 +47,11 @@ class BytechefProfileCostEstimationTest {
 
         propertySources.forEach(mutablePropertySources::addLast);
 
-        CostEstimationProperties costEstimationProperties = Binder.get(standardEnvironment)
-            .bind("bytechef.ai-hub.cost-estimation", CostEstimationProperties.class)
-            .orElseThrow(() -> new AssertionError("bytechef.ai-hub.cost-estimation is not set"));
+        ApplicationProperties.Ai.Hub.CostEstimation costEstimation = Binder.get(standardEnvironment)
+            .bind("bytechef.ai.hub.cost-estimation", ApplicationProperties.Ai.Hub.CostEstimation.class)
+            .orElseThrow(() -> new AssertionError("bytechef.ai.hub.cost-estimation is not set"));
 
-        Map<String, BigDecimal> toolRates = costEstimationProperties.getToolRates();
+        Map<String, BigDecimal> toolRates = costEstimation.getToolRates();
 
         assertThat(toolRates).containsKeys(
             "brave_search", "firecrawl_scrape", "firecrawl_search", "openai_image", "pptx_generate");

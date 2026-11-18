@@ -18,11 +18,13 @@ package com.bytechef.config;
 
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -1385,14 +1387,36 @@ public class ApplicationProperties {
 
         public static class Hub {
 
+            private CostEstimation costEstimation = new CostEstimation();
             private boolean enabled;
+
+            public CostEstimation getCostEstimation() {
+                return costEstimation;
+            }
 
             public boolean isEnabled() {
                 return enabled;
             }
 
+            public void setCostEstimation(CostEstimation costEstimation) {
+                this.costEstimation = costEstimation;
+            }
+
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
+            }
+
+            public static class CostEstimation {
+
+                private Map<String, BigDecimal> toolRates = new LinkedHashMap<>();
+
+                public Map<String, BigDecimal> getToolRates() {
+                    return toolRates;
+                }
+
+                public void setToolRates(Map<String, BigDecimal> toolRates) {
+                    this.toolRates = toolRates;
+                }
             }
         }
 
