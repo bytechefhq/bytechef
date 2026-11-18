@@ -10,6 +10,7 @@ Name | Type
 `description` | string
 `inputs` | [Array&lt;Input&gt;](Input.md)
 `label` | string
+`staticWebhookTrigger` | boolean
 `workflowUuid` | string
 
 ## Example
@@ -22,6 +23,7 @@ const example = {
   "description": null,
   "inputs": null,
   "label": null,
+  "staticWebhookTrigger": null,
   "workflowUuid": null,
 } satisfies IntegrationWorkflow
 
