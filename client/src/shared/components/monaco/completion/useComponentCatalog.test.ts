@@ -6,6 +6,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {useComponentCatalog} from './useComponentCatalog';
 
 const {
+    fetcherMock,
     getComponentActionDefinitionMock,
     getComponentConnectionDefinitionMock,
     getComponentDefinitionMock,
@@ -13,6 +14,7 @@ const {
     getComponentTriggerDefinitionMock,
     getEmbeddedComponentDefinitionsMock,
 } = vi.hoisted(() => ({
+    fetcherMock: vi.fn(),
     getComponentActionDefinitionMock: vi.fn(),
     getComponentConnectionDefinitionMock: vi.fn(),
     getComponentDefinitionMock: vi.fn(),
@@ -31,6 +33,10 @@ vi.mock('@/shared/middleware/automation/configuration', () => ({
     ComponentDefinitionApi: class {
         getComponentDefinitions = getComponentDefinitionsMock;
     },
+}));
+
+vi.mock('@/shared/middleware/graphqlFetcher', () => ({
+    fetcher: (document: unknown, variables: unknown) => () => fetcherMock(variables),
 }));
 
 vi.mock('@/shared/middleware/platform/configuration', () => ({
@@ -100,6 +106,25 @@ describe('useComponentCatalog', () => {
             componentName: 'slack',
             componentVersion: 2,
             triggerName: 'newMessage',
+        });
+    });
+
+    it('evaluates display conditions for the resolved component version', async () => {
+        fetcherMock.mockResolvedValue({componentPropertyDisplayConditions: {"method == 'POST'": true}});
+
+        const {result} = renderHook(() => useComponentCatalog(), {wrapper});
+
+        await waitFor(() => expect(result.current.components).toHaveLength(1));
+
+        expect(
+            await result.current.getDisplayConditions('slack', undefined, 'sendMessage', 'action', {method: 'POST'})
+        ).toEqual({"method == 'POST'": true});
+        expect(fetcherMock).toHaveBeenCalledWith({
+            componentName: 'slack',
+            componentVersion: 1,
+            operationName: 'sendMessage',
+            operationType: 'ACTION',
+            parameters: {method: 'POST'},
         });
     });
 

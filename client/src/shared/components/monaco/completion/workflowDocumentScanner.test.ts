@@ -265,3 +265,24 @@ describe('scanWorkflowDocument key slots', () => {
         expect(scanWorkflowDocument(source, source.length, 'yaml')?.keySlot).toBeUndefined();
     });
 });
+
+describe('scanWorkflowDocument parameter values', () => {
+    it('reads the literal values, keys and node name of a JSON task', () => {
+        const source =
+            '{"tasks": [{"name": "rows", "type": "a/v1/b", "parameters": {"id": "x", "count": 2, "on": true, "expr": "${t.a}", "nested": {"k": 1}, "": 1}}]}';
+        const position = scanWorkflowDocument(source, source.indexOf('"": 1') + 1, 'json');
+
+        expect(position?.literalValuesOf(['tasks', '0', 'parameters'])).toEqual({count: 2, id: 'x', on: true});
+        expect(position?.keysOf(['tasks', '0', 'parameters'])).toEqual(['id', 'count', 'on', 'expr', 'nested']);
+        expect(position?.nameOf(['tasks', '0'])).toBe('rows');
+    });
+
+    it('coerces plain YAML scalars but keeps quoted ones as strings', () => {
+        const source =
+            'tasks:\n  - name: rows\n    type: a/v1/b\n    parameters:\n      count: 2\n      code: "2"\n      on: false\n      empty:\n      ';
+        const position = scanWorkflowDocument(source, source.length, 'yaml');
+
+        expect(position?.literalValuesOf(['tasks', '0', 'parameters'])).toEqual({code: '2', count: 2, on: false});
+        expect(position?.nameOf(['tasks', '0'])).toBe('rows');
+    });
+});

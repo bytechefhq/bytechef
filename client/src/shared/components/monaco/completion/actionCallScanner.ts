@@ -5,7 +5,11 @@ export type ActionCallKeySlotType = {
     existingKeys: string[];
     prefix: string;
     propertyPath: string[];
+    rootKeys: string[];
+    rootValues: Record<string, unknown>;
 };
+
+type LiteralType = {value: unknown};
 
 type FrameType = {
     calleeText?: string;
@@ -13,6 +17,9 @@ type FrameType = {
     firstArgumentOfCall: boolean;
     keyForValue?: string;
     keys: string[];
+    literalValue?: LiteralType;
+    literals: Record<string, unknown>;
+    segmentKey?: string;
     segmentStart: number;
     tokenCount: number;
     tokenValue?: string;
@@ -22,6 +29,13 @@ const IDENTIFIER_START = /[A-Za-z_$]/;
 const IDENTIFIER_PART = /[\w$]/;
 const KEY_PREFIX = /^\s*([A-Za-z_$][\w$]*)?$/;
 const TRAILING_MEMBER_CHAIN = /[\w$.[\]'"]+$/;
+const NUMBER_LITERAL = /^-?\d+(\.\d+)?/;
+
+const LITERAL_IDENTIFIERS: Record<ScriptLanguageType, Record<string, unknown>> = {
+    javascript: {false: false, null: null, true: true},
+    python: {False: false, None: null, True: true},
+    ruby: {false: false, nil: null, true: true},
+};
 
 function readString(text: string, start: number): {end: number; terminated: boolean; value: string} {
     const quote = text[start];
@@ -87,19 +101,43 @@ function previousSignificantCharacter(text: string, index: number): string {
     return cursor >= 0 ? text[cursor] : '';
 }
 
-function recordToken(frame: FrameType | undefined, value?: string): void {
+function recordToken(frame: FrameType | undefined, value?: string, literal?: LiteralType): void {
     if (frame?.character === '{') {
         frame.tokenCount++;
         frame.tokenValue = value;
+        frame.literalValue = frame.tokenCount === 3 ? literal : undefined;
     }
 }
 
 function recordKey(frame: FrameType): void {
-    if (frame.tokenCount === 1 && frame.tokenValue !== undefined && !frame.keys.includes(frame.tokenValue)) {
-        frame.keys.push(frame.tokenValue);
+    if (frame.tokenCount === 1 && frame.tokenValue !== undefined) {
+        frame.segmentKey = frame.tokenValue;
+
+        if (!frame.keys.includes(frame.tokenValue)) {
+            frame.keys.push(frame.tokenValue);
+        }
     }
 
     frame.tokenCount = 2;
+}
+
+function closeSegment(frame: FrameType): void {
+    if (frame.segmentKey !== undefined && frame.tokenCount === 3 && frame.literalValue) {
+        frame.literals[frame.segmentKey] = frame.literalValue.value;
+    }
+
+    frame.literalValue = undefined;
+    frame.segmentKey = undefined;
+    frame.tokenCount = 0;
+    frame.tokenValue = undefined;
+}
+
+function isInterpolated(value: string, quote: string, language: ScriptLanguageType): boolean {
+    if (language === 'javascript') {
+        return quote === '`' && value.includes('${');
+    }
+
+    return language === 'ruby' && quote === '"' && value.includes('#{');
 }
 
 export function findActionCallKeySlot(
@@ -133,7 +171,11 @@ export function findActionCallKeySlot(
                 break;
             }
 
-            recordToken(top, string.value);
+            recordToken(
+                top,
+                string.value,
+                isInterpolated(string.value, character, language) ? undefined : {value: string.value}
+            );
 
             position = string.end;
 
@@ -147,9 +189,29 @@ export function findActionCallKeySlot(
                 end++;
             }
 
-            recordToken(top, text.slice(position, end));
+            const identifier = text.slice(position, end);
+            const literalIdentifiers = LITERAL_IDENTIFIERS[language];
+
+            recordToken(
+                top,
+                identifier,
+                Object.hasOwn(literalIdentifiers, identifier) ? {value: literalIdentifiers[identifier]} : undefined
+            );
 
             position = end;
+
+            continue;
+        }
+
+        const numberMatch =
+            /[\d-]/.test(character) && !IDENTIFIER_PART.test(text[position - 1] ?? '')
+                ? NUMBER_LITERAL.exec(text.slice(position))
+                : null;
+
+        if (numberMatch) {
+            recordToken(top, undefined, {value: Number(numberMatch[0])});
+
+            position += numberMatch[0].length;
 
             continue;
         }
@@ -173,6 +235,7 @@ export function findActionCallKeySlot(
                     character === '{' && top?.character === '(' && previous === '(' && top.tokenCount === 0,
                 keyForValue: keyForValue ?? (top?.character === '[' ? '0' : undefined),
                 keys: [],
+                literals: {},
                 segmentStart: position + 1,
                 tokenCount: 0,
             });
@@ -183,7 +246,11 @@ export function findActionCallKeySlot(
         }
 
         if (character === ')' || character === ']' || character === '}') {
-            frames.pop();
+            const closedFrame = frames.pop();
+
+            if (closedFrame?.character === '{') {
+                closeSegment(closedFrame);
+            }
 
             position++;
 
@@ -191,9 +258,9 @@ export function findActionCallKeySlot(
         }
 
         if (top?.character === '{' && character === ',') {
+            closeSegment(top);
+
             top.segmentStart = position + 1;
-            top.tokenCount = 0;
-            top.tokenValue = undefined;
 
             position++;
 
@@ -261,6 +328,8 @@ export function findActionCallKeySlot(
                 existingKeys: objectFrame.keys,
                 prefix,
                 propertyPath,
+                rootKeys: frame.keys,
+                rootValues: frame.literals,
             };
         }
 
