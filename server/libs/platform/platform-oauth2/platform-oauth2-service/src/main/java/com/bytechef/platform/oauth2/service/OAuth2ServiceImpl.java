@@ -22,8 +22,10 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Oauth2;
 import com.bytechef.config.ApplicationProperties.Oauth2.OAuth2App;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -34,9 +36,11 @@ import org.springframework.stereotype.Service;
 public class OAuth2ServiceImpl implements OAuth2Service {
 
     private final Oauth2 oauth2;
+    private final RemoteOAuth2Apps remoteOAuth2Apps;
 
-    public OAuth2ServiceImpl(ApplicationProperties applicationProperties) {
+    public OAuth2ServiceImpl(ApplicationProperties applicationProperties, RemoteOAuth2Apps remoteOAuth2Apps) {
         this.oauth2 = applicationProperties.getOauth2();
+        this.remoteOAuth2Apps = remoteOAuth2Apps;
     }
 
     @Override
@@ -44,7 +48,7 @@ public class OAuth2ServiceImpl implements OAuth2Service {
         Map<String, Object> newParameters = new HashMap<>(parameters);
 
         if (StringUtils.isBlank(MapUtils.getString(parameters, Authorization.CLIENT_ID))) {
-            Map<String, OAuth2App> oAuth2AppMap = oauth2.getPredefinedApps();
+            Map<String, OAuth2App> oAuth2AppMap = getEffectiveApps();
 
             if (oAuth2AppMap.containsKey(componentName)) {
                 OAuth2App oAuth2App = oAuth2AppMap.get(componentName);
@@ -66,9 +70,28 @@ public class OAuth2ServiceImpl implements OAuth2Service {
 
     @Override
     public List<String> getPredefinedApps() {
-        return oauth2.getPredefinedApps()
-            .keySet()
-            .stream()
-            .toList();
+        Map<String, OAuth2App> yamlApps = oauth2.getPredefinedApps();
+
+        Set<String> names = new LinkedHashSet<>(yamlApps.keySet());
+
+        Map<String, OAuth2App> remoteApps = remoteOAuth2Apps.getOAuth2Apps();
+
+        names.addAll(
+            remoteApps.keySet()
+                .stream()
+                .sorted()
+                .toList());
+
+        return List.copyOf(names);
+    }
+
+    private Map<String, OAuth2App> getEffectiveApps() {
+        Map<String, OAuth2App> remoteApps = remoteOAuth2Apps.getOAuth2Apps();
+
+        Map<String, OAuth2App> apps = new HashMap<>(remoteApps);
+
+        apps.putAll(oauth2.getPredefinedApps());
+
+        return apps;
     }
 }
