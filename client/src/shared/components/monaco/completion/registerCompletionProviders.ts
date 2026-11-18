@@ -1,10 +1,11 @@
 import {getCompletionContext} from './completionContextRegistry';
 import {type CompletionItemDraftType, getScriptCompletions} from './scriptCompletions';
+import {getShellCompletions} from './shellCompletions';
 import {getWorkflowDefinitionCompletions} from './workflowDefinitionCompletions';
 
 import type {languages} from 'monaco-editor';
 
-export const COMPLETION_LANGUAGES = ['javascript', 'python', 'ruby', 'json', 'yaml'] as const;
+export const COMPLETION_LANGUAGES = ['javascript', 'python', 'ruby', 'shell', 'json', 'yaml'] as const;
 
 type MonacoType = typeof import('monaco-editor');
 
@@ -44,10 +45,15 @@ export function buildCompletionProvider(monaco: MonacoType): languages.Completio
                 const source = model.getValue();
                 const cursorOffset = model.getOffsetAt(position);
 
-                const drafts =
-                    context.kind === 'workflowDefinition'
-                        ? await getWorkflowDefinitionCompletions({context, cursorOffset, source})
-                        : await getScriptCompletions({context, cursorOffset, source});
+                let drafts: CompletionItemDraftType[];
+
+                if (context.kind === 'workflowDefinition') {
+                    drafts = await getWorkflowDefinitionCompletions({context, cursorOffset, source});
+                } else if (context.kind === 'shell') {
+                    drafts = getShellCompletions({context, cursorOffset, source});
+                } else {
+                    drafts = await getScriptCompletions({context, cursorOffset, source});
+                }
 
                 const linePrefix = model.getLineContent(position.lineNumber).slice(0, position.column - 1);
                 const identifierLength = IDENTIFIER_BEFORE_CURSOR.exec(linePrefix)?.[0].length ?? 0;
