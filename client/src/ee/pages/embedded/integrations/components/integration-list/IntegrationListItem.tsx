@@ -215,7 +215,7 @@ const IntegrationListItem = ({
 
                 <div className="flex flex-1 items-center py-3 group-data-[state='open']/integration:border-none">
                     <div className="flex-1">
-                        <div className="flex min-h-6 items-center justify-between">
+                        <div className="flex items-center justify-between">
                             <div className="relative flex items-center gap-2">
                                 {hasWorkflows ? (
                                     <Link
@@ -264,7 +264,7 @@ const IntegrationListItem = ({
                             </div>
                         </div>
 
-                        <div className="relative mt-2 min-h-6 sm:flex sm:items-center sm:justify-between">
+                        <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center gap-2">
                                 <CollapsibleTrigger className="group mr-2 flex items-center text-xs font-semibold text-muted-foreground">
                                     <span className="mr-1">
@@ -304,8 +304,8 @@ const IntegrationListItem = ({
 
                     <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
                         {integration.lastIntegrationVersion && (
-                            <div className="flex flex-col items-end gap-y-2">
-                                <div className="flex min-h-6 items-center">
+                            <div className="flex flex-col items-end gap-y-4">
+                                <div className="flex items-center">
                                     {integration.lastPublishedDate && integration.lastIntegrationVersion ? (
                                         <Badge
                                             className="flex space-x-1 border-transparent"
@@ -331,7 +331,7 @@ const IntegrationListItem = ({
 
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <div className="flex min-h-6 items-center text-sm text-content-neutral-secondary sm:mt-0">
+                                        <div className="flex items-center text-sm text-content-neutral-secondary sm:mt-0">
                                             {integration.lastPublishedDate ? (
                                                 <span className="text-xs">
                                                     {`Published at ${integration.lastPublishedDate?.toLocaleDateString()} ${integration.lastPublishedDate?.toLocaleTimeString()}`}
