@@ -37,6 +37,7 @@ export interface ConnectedUserWorkflowType {
     inputValues?: Record<string, unknown>;
     kind?: 'COPY' | 'REFERENCE';
     mcpEnabled?: boolean | null;
+    staticWebhookUrl?: string;
     toolOnly?: boolean | null;
 }
 
