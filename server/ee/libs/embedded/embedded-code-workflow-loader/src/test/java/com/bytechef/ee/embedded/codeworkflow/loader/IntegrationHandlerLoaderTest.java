@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.codeworkflow.loader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.embedded.integration.IntegrationHandler;
@@ -115,6 +116,34 @@ class IntegrationHandlerLoaderTest {
         }
         """;
 
+    private static final String LAZY_HELPER_JAVA_SOURCE = """
+        import com.bytechef.embedded.integration.IntegrationHandler;
+        import com.bytechef.embedded.integration.definition.IntegrationDefinition;
+        import com.bytechef.embedded.integration.definition.IntegrationDsl;
+        import com.bytechef.workflow.definition.WorkflowDsl;
+
+        public class LazyHelperIntegrationHandler implements IntegrationHandler {
+
+            @Override
+            public IntegrationDefinition getDefinition() {
+                return IntegrationDsl.integration("lazy-component", 1)
+                    .version("1.0.0")
+                    .workflows(
+                        WorkflowDsl.workflow("lazy-workflow")
+                            .tasks(
+                                WorkflowDsl.task("lazy-task")
+                                    .perform((input, context) -> LazyHelper.greet("ByteChef"))));
+            }
+        }
+
+        class LazyHelper {
+
+            static String greet(String name) {
+                return "Hello " + name;
+            }
+        }
+        """;
+
     @TempDir
     private Path tempDir;
 
@@ -206,6 +235,46 @@ class IntegrationHandlerLoaderTest {
         TaskDefinition taskDefinition = (TaskDefinition) tasks.getFirst();
 
         assertEquals("hello from java", perform(taskDefinition, Map.of(), Map.of(), new RecordingTaskContext(null)));
+    }
+
+    @Test
+    void testLoadIntegrationHandlerKeepsJarReadableForClassesFirstUsedAtPerform() throws Exception {
+        Path jarPath = buildFixtureJar(tempDir, LAZY_HELPER_JAVA_SOURCE, "LazyHelperIntegrationHandler");
+
+        IntegrationHandler integrationHandler = IntegrationHandlerLoader.loadIntegrationHandler(
+            toUrl(jarPath), Language.JAVA, "lazy-helper-cache-key", new ConcurrentMapCacheManager());
+
+        assertEquals("Hello ByteChef", performFirstTask(integrationHandler));
+    }
+
+    @Test
+    void testLoadIntegrationHandlerTwiceReturnsCachedHandlerThatStillPerforms() throws Exception {
+        Path jarPath = buildFixtureJar(tempDir, LAZY_HELPER_JAVA_SOURCE, "LazyHelperIntegrationHandler");
+        ConcurrentMapCacheManager cacheManager = new ConcurrentMapCacheManager();
+
+        IntegrationHandler firstIntegrationHandler = IntegrationHandlerLoader.loadIntegrationHandler(
+            toUrl(jarPath), Language.JAVA, "lazy-helper-cache-key", cacheManager);
+        IntegrationHandler secondIntegrationHandler = IntegrationHandlerLoader.loadIntegrationHandler(
+            toUrl(jarPath), Language.JAVA, "lazy-helper-cache-key", cacheManager);
+
+        assertSame(firstIntegrationHandler, secondIntegrationHandler);
+        assertEquals("Hello ByteChef", performFirstTask(secondIntegrationHandler));
+    }
+
+    private static Object performFirstTask(IntegrationHandler integrationHandler) throws Exception {
+        IntegrationDefinition integrationDefinition = integrationHandler.getDefinition();
+
+        List<WorkflowDefinition> workflows = integrationDefinition.getWorkflows()
+            .orElseThrow();
+
+        WorkflowDefinition workflowDefinition = workflows.getFirst();
+
+        List<? extends WorkflowTaskDefinition> tasks = workflowDefinition.getTasks()
+            .orElseThrow();
+
+        TaskDefinition taskDefinition = (TaskDefinition) tasks.getFirst();
+
+        return perform(taskDefinition, Map.of(), Map.of(), new RecordingTaskContext(null));
     }
 
     private static Path buildFixtureJar(Path directory, String source, String className) throws IOException {

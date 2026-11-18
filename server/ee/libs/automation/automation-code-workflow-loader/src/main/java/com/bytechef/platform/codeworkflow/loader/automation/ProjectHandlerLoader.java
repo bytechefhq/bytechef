@@ -10,7 +10,6 @@ package com.bytechef.platform.codeworkflow.loader.automation;
 import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.platform.component.polyglot.AbstractHandlerLoader;
-import java.io.IOException;
 import java.net.URL;
 import org.springframework.cache.CacheManager;
 
@@ -32,11 +31,10 @@ public class ProjectHandlerLoader extends AbstractHandlerLoader<ProjectHandler> 
     }
 
     @Override
-    protected ProjectHandler loadJavaHandler(URL url, String cacheKey, CacheManager cacheManager) throws IOException {
-        try (ProjectHandlerClassLoader projectHandlerClassLoader =
-            ProjectHandlerClassLoader.of(url, cacheKey, cacheManager)) {
-            return projectHandlerClassLoader.loadHandler();
-        }
+    protected ProjectHandler loadJavaHandler(URL url, String cacheKey, CacheManager cacheManager) {
+        ProjectHandlerClassLoader projectHandlerClassLoader = ProjectHandlerClassLoader.of(url, cacheKey, cacheManager);
+
+        return projectHandlerClassLoader.loadHandler();
     }
 
     @Override
