@@ -29,13 +29,13 @@ public class SpecStreamConstants {
     public static final String NEWS_SEARCH = "news";
     public static final String NUMBER_OF_SOURCES = "num";
     public static final String PAGE_URLS = "urls";
-    public static final String PREFER_POST_OVER_GET = "preferPost";
     public static final String RESULT_PAGE = "page";
     public static final String RETURN_PAGE_PASSAGES = "passages";
     public static final String SAFE_SEARCH_LEVEL = "safe";
     public static final String SEARCH_QUERY = "q";
     public static final String SEARCH_TIER = "speed";
     public static final String TEXT_FORMAT = "format";
+    public static final String USE_HTTP_POST = "useHttpPost";
 
     private SpecStreamConstants() {
     }

@@ -31,17 +31,22 @@ import static com.bytechef.component.specstream.constant.SpecStreamConstants.IMA
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.LANGUAGE_CODE;
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.NEWS_SEARCH;
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.NUMBER_OF_SOURCES;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.PREFER_POST_OVER_GET;
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.RESULT_PAGE;
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.RETURN_PAGE_PASSAGES;
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.SAFE_SEARCH_LEVEL;
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.SEARCH_QUERY;
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.SEARCH_TIER;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.USE_HTTP_POST;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Tarek Etman
@@ -117,9 +122,9 @@ public class SpecStreamWebSearchAction {
                 .label("Image Search")
                 .exampleValue(true)
                 .description(
-                    "If true, returns image results instead of web results. Always uses the Fast search tier.")
+                    "If true, returns image results instead of web results. Always uses the Fast search tier and " +
+                        "HTTP POST.")
                 .advancedOption(true)
-                .displayCondition(PREFER_POST_OVER_GET + " == true")
                 .required(false),
             string(COUNTRY_CODE)
                 .label("Country Code")
@@ -149,12 +154,13 @@ public class SpecStreamWebSearchAction {
                     option("Strict", "strict"))
                 .advancedOption(true)
                 .required(false),
-            bool(PREFER_POST_OVER_GET)
-                .label("Use http POST")
+            bool(USE_HTTP_POST)
+                .label("Send as HTTP POST")
+                .exampleValue(true)
                 .description(
-                    "Send request using http POST method. Parameter names and values are encoded in JSON and loaded " +
-                        "into requests body. Using POST allows caller more reliable response to parameters like " +
-                        "Image Search.")
+                    "If true, sends the request as HTTP POST with the parameters in a JSON body. If false, sends " +
+                        "the request as HTTP GET with the parameters in the URL query. Image Search always uses " +
+                        "HTTP POST.")
                 .advancedOption(true)
                 .required(false))
         .output(
@@ -215,46 +221,56 @@ public class SpecStreamWebSearchAction {
         .help("", "https://docs.bytechef.io/reference/components/specstream_v1#web-search")
         .perform(SpecStreamWebSearchAction::perform);
 
+    private static final String WEB_SEARCH_PATH = "/web-search";
+
     private SpecStreamWebSearchAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        boolean preferPostMethod = inputParameters.getBoolean(PREFER_POST_OVER_GET, false);
+        boolean useHttpPost = inputParameters.getBoolean(USE_HTTP_POST, false) ||
+            inputParameters.getBoolean(IMAGE_SEARCH, false);
 
-        Context.Http.Executor executor;
+        Object[] searchParameters = getSearchParameters(inputParameters, useHttpPost);
 
-        if (preferPostMethod) {
+        Executor executor;
+
+        if (useHttpPost) {
             executor = context
-                .http(http -> http.post("/web-search"))
-                .body(Context.Http.Body.of(SEARCH_QUERY, inputParameters.getRequiredString(SEARCH_QUERY),
-                    SEARCH_TIER, inputParameters.getString(SEARCH_TIER),
-                    NUMBER_OF_SOURCES, inputParameters.getInteger(NUMBER_OF_SOURCES),
-                    RESULT_PAGE, inputParameters.getInteger(RESULT_PAGE),
-                    RETURN_PAGE_PASSAGES, inputParameters.getBoolean(RETURN_PAGE_PASSAGES),
-                    NEWS_SEARCH, inputParameters.getBoolean(NEWS_SEARCH),
-                    IMAGE_SEARCH, inputParameters.getBoolean(IMAGE_SEARCH),
-                    COUNTRY_CODE, inputParameters.getString(COUNTRY_CODE),
-                    LANGUAGE_CODE, inputParameters.getString(LANGUAGE_CODE),
-                    SAFE_SEARCH_LEVEL, inputParameters.getString(SAFE_SEARCH_LEVEL)));
+                .http(http -> http.post(WEB_SEARCH_PATH))
+                .body(Body.of(searchParameters));
         } else {
             executor = context
-                .http(http -> http.get("/web-search"))
-                .queryParameters(
-                    SEARCH_QUERY, inputParameters.getRequiredString(SEARCH_QUERY),
-                    SEARCH_TIER, inputParameters.getString(SEARCH_TIER),
-                    NUMBER_OF_SOURCES, inputParameters.getInteger(NUMBER_OF_SOURCES),
-                    RESULT_PAGE, inputParameters.getInteger(RESULT_PAGE),
-                    RETURN_PAGE_PASSAGES, inputParameters.getBoolean(RETURN_PAGE_PASSAGES),
-                    NEWS_SEARCH, inputParameters.getBoolean(NEWS_SEARCH),
-                    IMAGE_SEARCH, inputParameters.getBoolean(IMAGE_SEARCH),
-                    COUNTRY_CODE, inputParameters.getString(COUNTRY_CODE),
-                    LANGUAGE_CODE, inputParameters.getString(LANGUAGE_CODE),
-                    SAFE_SEARCH_LEVEL, inputParameters.getString(SAFE_SEARCH_LEVEL));
+                .http(http -> http.get(WEB_SEARCH_PATH))
+                .queryParameters(searchParameters);
         }
 
         return executor
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody();
+    }
+
+    /**
+     * SpecStream declares the images parameter only in the HTTP POST body, so it is left out of an HTTP GET query.
+     */
+    private static Object[] getSearchParameters(Parameters inputParameters, boolean useHttpPost) {
+        List<Object> searchParameters = new ArrayList<>(
+            Arrays.asList(
+                SEARCH_QUERY, inputParameters.getRequiredString(SEARCH_QUERY),
+                SEARCH_TIER, inputParameters.getString(SEARCH_TIER),
+                NUMBER_OF_SOURCES, inputParameters.getInteger(NUMBER_OF_SOURCES),
+                RESULT_PAGE, inputParameters.getInteger(RESULT_PAGE),
+                RETURN_PAGE_PASSAGES, inputParameters.getBoolean(RETURN_PAGE_PASSAGES),
+                NEWS_SEARCH, inputParameters.getBoolean(NEWS_SEARCH),
+                COUNTRY_CODE, inputParameters.getString(COUNTRY_CODE),
+                LANGUAGE_CODE, inputParameters.getString(LANGUAGE_CODE),
+                SAFE_SEARCH_LEVEL, inputParameters.getString(SAFE_SEARCH_LEVEL)));
+
+        if (useHttpPost) {
+            searchParameters.add(IMAGE_SEARCH);
+            searchParameters.add(inputParameters.getBoolean(IMAGE_SEARCH));
+        }
+
+        return searchParameters.toArray();
     }
 }

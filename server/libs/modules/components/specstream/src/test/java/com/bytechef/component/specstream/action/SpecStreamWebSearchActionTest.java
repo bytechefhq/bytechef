@@ -22,12 +22,12 @@ import static com.bytechef.component.specstream.constant.SpecStreamConstants.IMA
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.LANGUAGE_CODE;
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.NEWS_SEARCH;
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.NUMBER_OF_SOURCES;
-import static com.bytechef.component.specstream.constant.SpecStreamConstants.PREFER_POST_OVER_GET;
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.RESULT_PAGE;
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.RETURN_PAGE_PASSAGES;
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.SAFE_SEARCH_LEVEL;
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.SEARCH_QUERY;
 import static com.bytechef.component.specstream.constant.SpecStreamConstants.SEARCH_TIER;
+import static com.bytechef.component.specstream.constant.SpecStreamConstants.USE_HTTP_POST;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -101,7 +101,6 @@ class SpecStreamWebSearchActionTest {
             RESULT_PAGE, null,
             RETURN_PAGE_PASSAGES, null,
             NEWS_SEARCH, null,
-            IMAGE_SEARCH, null,
             COUNTRY_CODE, null,
             LANGUAGE_CODE, null,
             SAFE_SEARCH_LEVEL, null
@@ -118,7 +117,7 @@ class SpecStreamWebSearchActionTest {
 
         Parameters mockedPostParameters = MockParametersFactory.create(
             Map.of(
-                SEARCH_QUERY, "Stripe logo", SEARCH_TIER, "fast", IMAGE_SEARCH, true, PREFER_POST_OVER_GET, true));
+                SEARCH_QUERY, "Stripe logo", SEARCH_TIER, "fast", IMAGE_SEARCH, true, USE_HTTP_POST, true));
 
         Map<String, Object> expectedBody = Map.of("data", Map.of("kind", "images", "query", "Stripe logo"));
 
@@ -149,5 +148,32 @@ class SpecStreamWebSearchActionTest {
             SEARCH_QUERY, "Stripe logo", SEARCH_TIER, "fast", IMAGE_SEARCH, true);
 
         assertEquals(expectedContent, body.getContent());
+    }
+
+    @Test
+    void testPerformWithImageSearchUsesPost(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+
+        Parameters mockedImageSearchParameters = MockParametersFactory.create(
+            Map.of(SEARCH_QUERY, "Stripe logo", IMAGE_SEARCH, true, USE_HTTP_POST, false));
+
+        Map<String, Object> expectedBody = Map.of("data", Map.of("images", true, "query", "Stripe logo"));
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody())
+            .thenReturn(expectedBody);
+
+        Object result = SpecStreamWebSearchAction.perform(
+            mockedImageSearchParameters, mockedConnectionParameters, mockedContext);
+
+        assertEquals(expectedBody, result);
+        assertEquals("/web-search", stringArgumentCaptor.getValue());
+
+        Body body = bodyArgumentCaptor.getValue();
+
+        assertEquals(Map.of(SEARCH_QUERY, "Stripe logo", IMAGE_SEARCH, true), body.getContent());
     }
 }
