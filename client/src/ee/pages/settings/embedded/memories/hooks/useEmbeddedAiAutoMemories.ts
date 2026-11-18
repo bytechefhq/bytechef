@@ -156,7 +156,14 @@ function useEmbeddedDeleteMemory(): MemoryMutationResultI<MemoryDeleteRequestI> 
     return {
         isPending: deleteMemoryMutation.isPending,
         mutate: ({environmentId, memory}, options) =>
-            deleteMemoryMutation.mutate({environment: environmentId, id: String(memory.id)}, options),
+            deleteMemoryMutation.mutate(
+                {
+                    environment: environmentId,
+                    id: String(memory.id),
+                    integrationInstanceId: String(memory.principalId),
+                },
+                options
+            ),
     };
 }
 
@@ -188,6 +195,7 @@ function useEmbeddedUpdateMemory(): MemoryMutationResultI<MemoryUpdateRequestI> 
                         environment: environmentId,
                         expectedVersion,
                         id: String(memory.id),
+                        integrationInstanceId: String(memory.principalId),
                         memoryType: patch.memoryType as AiAutoMemoryType | undefined,
                         title: patch.title,
                     },
@@ -198,8 +206,8 @@ function useEmbeddedUpdateMemory(): MemoryMutationResultI<MemoryUpdateRequestI> 
 }
 
 /**
- * The list query already carries each memory's content, so the detail is the row the dialog was opened with, and a
- * reload re-reads it from the refreshed list.
+ * The list query already carries each memory's content, so the detail is the row the dialog was opened with. Reload
+ * returns the row as the list currently holds it; the list itself refreshes after every write and on window focus.
  */
 export const EMBEDDED_MEMORY_DIALOG_DATA: MemoryDialogDataI = {
     useDeleteMemory: useEmbeddedDeleteMemory,

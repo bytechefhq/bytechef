@@ -212,6 +212,7 @@ describe('EmbeddedMemories', () => {
                     environment: 2,
                     expectedVersion: 4,
                     id: '3',
+                    integrationInstanceId: '11',
                     memoryType: undefined,
                     title: 'Subscription plan',
                 },
@@ -229,7 +230,10 @@ describe('EmbeddedMemories', () => {
 
         await userEvent.click(screen.getByRole('button', {name: 'Delete permanently'}));
 
-        expect(deleteMutate).toHaveBeenCalledWith({environment: 2, id: '3'}, expect.anything());
+        expect(deleteMutate).toHaveBeenCalledWith(
+            {environment: 2, id: '3', integrationInstanceId: '11'},
+            expect.anything()
+        );
     });
 
     it('shows the empty state when no integration agent has saved a memory', () => {
