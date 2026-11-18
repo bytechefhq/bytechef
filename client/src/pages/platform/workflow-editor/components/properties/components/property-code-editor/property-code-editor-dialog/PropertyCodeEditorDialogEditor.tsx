@@ -5,7 +5,7 @@ import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {CompletionContextType, ScriptLanguageType} from '@/shared/components/monaco/completion/completionTypes';
 import {useCompletionContext} from '@/shared/components/monaco/completion/useCompletionContext';
 import {useComponentCatalog} from '@/shared/components/monaco/completion/useComponentCatalog';
-import {useDynamicPropertiesLoader} from '@/shared/components/monaco/completion/useDynamicPropertiesLoader';
+import {useOperationPropertyLoaders} from '@/shared/components/monaco/completion/useOperationPropertyLoaders';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {Suspense, lazy, useMemo, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
@@ -49,7 +49,7 @@ const PropertyCodeEditorDialogEditor = ({
     );
 
     const components = useComponentCatalog();
-    const loadDynamicProperties = useDynamicPropertiesLoader(workflowId, currentEnvironmentId);
+    const operationPropertyLoaders = useOperationPropertyLoaders(workflowId, currentEnvironmentId);
 
     const clusterElementNode = useMemo(
         () =>
@@ -73,7 +73,7 @@ const PropertyCodeEditorDialogEditor = ({
             input: inputParameters ?? scriptInput,
             kind: 'script',
             language: scriptLanguage as ScriptLanguageType,
-            loadDynamicProperties,
+            ...operationPropertyLoaders,
             workflowNodeName: clusterElementNode ? rootClusterElementNodeName : workflowNodeName,
         };
     }, [
@@ -82,7 +82,7 @@ const PropertyCodeEditorDialogEditor = ({
         components,
         inputParameters,
         language,
-        loadDynamicProperties,
+        operationPropertyLoaders,
         rootClusterElementNodeName,
         scriptInput,
         workflowNodeName,

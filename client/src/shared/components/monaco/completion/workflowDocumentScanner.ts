@@ -12,6 +12,8 @@ export type WorkflowDocumentPositionType = {
     literalValuesOf: (containerPath: string[]) => Record<string, unknown>;
     nameOf: (nodePath: string[]) => string | undefined;
     path: string[];
+    stringQuote?: string;
+    stringStart?: number;
     stringValueBeforeCursor?: string;
     typeOf: (nodePath: string[]) => string | undefined;
 };
@@ -1011,7 +1013,14 @@ export function scanWorkflowDocument(
     };
 
     if (hit) {
+        result.stringStart = hit.start;
         result.stringValueBeforeCursor = hit.before(cursor);
+
+        const quote = format === 'json' ? '"' : source[hit.start - 1];
+
+        if (quote === '"' || quote === "'") {
+            result.stringQuote = quote;
+        }
     } else {
         if (scannedKeySlot) {
             const {containerPath, name, prefix} = scannedKeySlot;

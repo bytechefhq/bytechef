@@ -1,7 +1,12 @@
-import {type ActionCallKeySlotType, findActionCallKeySlot} from './actionCallScanner';
+import {
+    type ActionCallKeySlotType,
+    type ActionCallValueSlotType,
+    findActionCallKeySlot,
+    findActionCallValueSlot,
+} from './actionCallScanner';
 import {parseMemberPath} from './memberPath';
 import {findEnclosingFunctionName, findPerformScope} from './performScanner';
-import {getPropertyCompletionItems} from './propertyCompletions';
+import {getPropertyCompletionItems, getPropertyValueItems} from './propertyCompletions';
 import {buildActionCallSnippet, buildFunctionSnippet} from './snippets';
 import {
     type EnclosingTaskType,
@@ -11,12 +16,16 @@ import {
     findTaskByPerformName,
 } from './sourceScanner';
 
+import type {Option, Property} from '@/shared/middleware/platform/configuration';
+
 import type {
     CodeWorkflowCompletionContextI,
     ConnectionDeclarationType,
     CustomComponentCompletionContextI,
+    OperationPropertyRequestType,
     PerformScopeType,
     ScriptCompletionContextI,
+    ScriptLanguageType,
 } from './completionTypes';
 
 export type CompletionItemDraftType = {
@@ -27,6 +36,7 @@ export type CompletionItemDraftType = {
     insertText: string;
     kind: 'function' | 'module' | 'method' | 'property' | 'value' | 'variable';
     label: string;
+    replaceLength?: number;
     retrigger?: boolean;
     sortText?: string;
 };
@@ -251,17 +261,30 @@ function bareRootItems(scope: PerformScopeType): CompletionItemDraftType[] {
         .map((name) => ({insertAsSnippet: false, insertText: name, kind: 'variable', label: name}));
 }
 
-async function actionPropertyItems(
+type PropertyLoaderType<T> = (
+    propertyName: string,
+    lookupDependsOnPaths: string[],
+    parameters: Record<string, unknown>
+) => Promise<T[]>;
+
+type ActionCallTargetType = {
+    loadDisplayConditions: (parameters: Record<string, unknown>) => Promise<Record<string, boolean>>;
+    loadDynamicProperties?: PropertyLoaderType<Property>;
+    loadOptions?: PropertyLoaderType<Option>;
+    properties: Property[];
+};
+
+async function resolveActionCall(
     request: ScriptCompletionRequestI,
-    keySlot: ActionCallKeySlotType
-): Promise<CompletionItemDraftType[] | undefined> {
+    calleeText: string
+): Promise<ActionCallTargetType | undefined> {
     const {context, cursorOffset, source} = request;
 
     if (context.kind === 'customComponent') {
         return undefined;
     }
 
-    const calleePath = parseMemberPath(keySlot.calleeText);
+    const calleePath = parseMemberPath(calleeText);
 
     if (!calleePath || calleePath.segments.length !== 3 || calleePath.segments[0] !== 'component') {
         return undefined;
@@ -285,34 +308,101 @@ async function actionPropertyItems(
         actionName,
         'action'
     );
-    const {loadDynamicProperties} = context;
+    const {loadDynamicProperties, loadOptions} = context;
     const workflowNodeName = context.kind === 'script' ? context.workflowNodeName : findTask(request)?.name;
     const clusterElementNode = context.kind === 'script' ? context.clusterElementNode : undefined;
 
-    return getPropertyCompletionItems({
-        existingKeys: keySlot.existingKeys,
+    const toOperationRequest =
+        workflowNodeName && declaredVersion !== undefined
+            ? (
+                  propertyName: string,
+                  lookupDependsOnPaths: string[],
+                  parameters: Record<string, unknown>
+              ): OperationPropertyRequestType => ({
+                  clusterElementNode,
+                  componentName,
+                  componentVersion: declaredVersion,
+                  connectionKey: declaredConnection?.name,
+                  lookupDependsOnPaths,
+                  operationKind: 'action',
+                  operationName: actionName,
+                  parameters,
+                  propertyName,
+                  workflowNodeName,
+              })
+            : undefined;
+
+    return {
         loadDisplayConditions: (parameters) =>
             context.components.getDisplayConditions(componentName, declaredVersion, actionName, 'action', parameters),
         loadDynamicProperties:
-            loadDynamicProperties && workflowNodeName && declaredVersion !== undefined
-                ? (propertyName, lookupDependsOnPaths, parameters) =>
-                      loadDynamicProperties({
-                          clusterElementNode,
-                          componentName,
-                          componentVersion: declaredVersion,
-                          connectionKey: declaredConnection?.name,
-                          lookupDependsOnPaths,
-                          operationKind: 'action',
-                          operationName: actionName,
-                          parameters,
-                          propertyName,
-                          workflowNodeName,
-                      })
+            loadDynamicProperties && toOperationRequest
+                ? (...requestArguments) => loadDynamicProperties(toOperationRequest(...requestArguments))
                 : undefined,
+        loadOptions:
+            loadOptions && toOperationRequest
+                ? (...requestArguments) => loadOptions(toOperationRequest(...requestArguments))
+                : undefined,
+        properties,
+    };
+}
+
+async function actionPropertyItems(
+    request: ScriptCompletionRequestI,
+    keySlot: ActionCallKeySlotType
+): Promise<CompletionItemDraftType[] | undefined> {
+    const target = await resolveActionCall(request, keySlot.calleeText);
+
+    if (!target) {
+        return undefined;
+    }
+
+    return getPropertyCompletionItems({
+        ...target,
+        existingKeys: keySlot.existingKeys,
         parameters: keySlot.rootValues,
         presentKeys: keySlot.rootKeys,
-        properties,
         propertyPath: keySlot.propertyPath,
+    });
+}
+
+function escapeQuoted(value: string, quote: string): string {
+    return value.replaceAll('\\', '\\\\').replaceAll(quote, `\\${quote}`);
+}
+
+function scriptValueText(value: unknown, language: ScriptLanguageType, quote?: string): string | undefined {
+    if (quote) {
+        return typeof value === 'string' ? escapeQuoted(value, quote) : undefined;
+    }
+
+    if (typeof value === 'string') {
+        return `'${escapeQuoted(value, "'")}'`;
+    }
+
+    if (typeof value === 'boolean' && language === 'python') {
+        return value ? 'True' : 'False';
+    }
+
+    return String(value);
+}
+
+async function actionValueItems(
+    request: ScriptCompletionRequestI,
+    valueSlot: ActionCallValueSlotType
+): Promise<CompletionItemDraftType[] | undefined> {
+    const target = await resolveActionCall(request, valueSlot.calleeText);
+
+    if (!target) {
+        return undefined;
+    }
+
+    return getPropertyValueItems({
+        ...target,
+        parameters: valueSlot.rootValues,
+        presentKeys: valueSlot.rootKeys,
+        propertyPath: valueSlot.propertyPath,
+        replaceLength: valueSlot.prefix.length,
+        toInsertText: (value) => scriptValueText(value, request.context.language, valueSlot.quote),
     });
 }
 
@@ -325,6 +415,16 @@ export async function getScriptCompletions(request: ScriptCompletionRequestI): P
 
         if (propertyItems) {
             return propertyItems;
+        }
+    }
+
+    const valueSlot = findActionCallValueSlot(source, cursorOffset, context.language);
+
+    if (valueSlot) {
+        const valueItems = await actionValueItems(request, valueSlot);
+
+        if (valueItems) {
+            return valueItems;
         }
     }
     const path = parseMemberPath(source.slice(0, cursorOffset));

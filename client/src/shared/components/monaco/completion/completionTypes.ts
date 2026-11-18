@@ -3,6 +3,7 @@ import type {
     ComponentDefinition,
     ComponentDefinitionBasic,
     ConnectionDefinition,
+    Option,
     Property,
     WorkflowNodeOutput,
 } from '@/shared/middleware/platform/configuration';
@@ -44,7 +45,7 @@ export type ClusterElementNodeType = {
     clusterElementWorkflowNodeName: string;
 };
 
-export type DynamicPropertiesRequestType = {
+export type OperationPropertyRequestType = {
     clusterElementNode?: ClusterElementNodeType;
     componentName: string;
     componentVersion: number;
@@ -57,7 +58,14 @@ export type DynamicPropertiesRequestType = {
     workflowNodeName: string;
 };
 
-export type DynamicPropertiesLoaderType = (request: DynamicPropertiesRequestType) => Promise<Property[]>;
+export type DynamicPropertiesLoaderType = (request: OperationPropertyRequestType) => Promise<Property[]>;
+
+export type OptionsLoaderType = (request: OperationPropertyRequestType) => Promise<Option[]>;
+
+export type OperationPropertyLoadersType = {
+    loadDynamicProperties?: DynamicPropertiesLoaderType;
+    loadOptions?: OptionsLoaderType;
+};
 
 export interface ScriptCompletionContextI {
     clusterElementNode?: ClusterElementNodeType;
@@ -67,6 +75,7 @@ export interface ScriptCompletionContextI {
     kind: 'script';
     language: ScriptLanguageType;
     loadDynamicProperties?: DynamicPropertiesLoaderType;
+    loadOptions?: OptionsLoaderType;
     workflowNodeName?: string;
 }
 
@@ -80,6 +89,7 @@ export interface CodeWorkflowCompletionContextI {
     kind: 'codeWorkflow';
     language: ScriptLanguageType;
     loadDynamicProperties?: DynamicPropertiesLoaderType;
+    loadOptions?: OptionsLoaderType;
 }
 
 export interface WorkflowDefinitionCompletionContextI {
@@ -89,6 +99,7 @@ export interface WorkflowDefinitionCompletionContextI {
     getNodeOutputs: () => Promise<WorkflowNodeOutput[]>;
     kind: 'workflowDefinition';
     loadDynamicProperties?: DynamicPropertiesLoaderType;
+    loadOptions?: OptionsLoaderType;
 }
 
 export type CompletionContextType =

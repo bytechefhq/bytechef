@@ -9,6 +9,27 @@ export type ActionCallKeySlotType = {
     rootValues: Record<string, unknown>;
 };
 
+export type ActionCallValueSlotType = {
+    calleeText: string;
+    prefix: string;
+    propertyPath: string[];
+    quote?: string;
+    rootKeys: string[];
+    rootValues: Record<string, unknown>;
+};
+
+type ScanResultType = {
+    frames: FrameType[];
+    openString?: {start: number; value: string};
+    text: string;
+};
+
+type FirstArgumentLocationType = {
+    calleeText: string;
+    propertyPath: string[];
+    rootFrame: FrameType;
+};
+
 type LiteralType = {value: unknown};
 
 type FrameType = {
@@ -23,11 +44,13 @@ type FrameType = {
     segmentStart: number;
     tokenCount: number;
     tokenValue?: string;
+    valueStart?: number;
 };
 
 const IDENTIFIER_START = /[A-Za-z_$]/;
 const IDENTIFIER_PART = /[\w$]/;
 const KEY_PREFIX = /^\s*([A-Za-z_$][\w$]*)?$/;
+const VALUE_PREFIX = /^\s*([\w.-]*)$/;
 const TRAILING_MEMBER_CHAIN = /[\w$.[\]'"]+$/;
 const NUMBER_LITERAL = /^-?\d+(\.\d+)?/;
 
@@ -130,6 +153,7 @@ function closeSegment(frame: FrameType): void {
     frame.segmentKey = undefined;
     frame.tokenCount = 0;
     frame.tokenValue = undefined;
+    frame.valueStart = undefined;
 }
 
 function isInterpolated(value: string, quote: string, language: ScriptLanguageType): boolean {
@@ -140,11 +164,7 @@ function isInterpolated(value: string, quote: string, language: ScriptLanguageTy
     return language === 'ruby' && quote === '"' && value.includes('#{');
 }
 
-export function findActionCallKeySlot(
-    source: string,
-    cursorOffset: number,
-    language: ScriptLanguageType
-): ActionCallKeySlotType | undefined {
+function scanActionCall(source: string, cursorOffset: number, language: ScriptLanguageType): ScanResultType {
     const text = source.slice(0, cursorOffset);
     const frames: FrameType[] = [];
 
@@ -276,13 +296,15 @@ export function findActionCallKeySlot(
         }
 
         if (top?.character === '{' && (character === ':' || (character === '=' && text[position + 1] === '>'))) {
+            position += character === '=' ? 2 : 1;
+
             if (top.tokenCount === 1) {
                 recordKey(top);
+
+                top.valueStart = position;
             } else {
                 recordToken(top);
             }
-
-            position += character === '=' ? 2 : 1;
 
             continue;
         }
@@ -294,6 +316,39 @@ export function findActionCallKeySlot(
         position++;
     }
 
+    return {frames, openString, text};
+}
+
+function locateFirstArgument(frames: FrameType[]): FirstArgumentLocationType | undefined {
+    const propertyPath: string[] = [];
+
+    let index = frames.length - 1;
+
+    while (index > 0) {
+        const frame = frames[index];
+
+        if (frame.character === '{' && frame.firstArgumentOfCall) {
+            return {calleeText: frames[index - 1].calleeText ?? '', propertyPath, rootFrame: frame};
+        }
+
+        if (frame.keyForValue === undefined) {
+            return undefined;
+        }
+
+        propertyPath.unshift(frame.keyForValue);
+
+        index--;
+    }
+
+    return undefined;
+}
+
+export function findActionCallKeySlot(
+    source: string,
+    cursorOffset: number,
+    language: ScriptLanguageType
+): ActionCallKeySlotType | undefined {
+    const {frames, openString, text} = scanActionCall(source, cursorOffset, language);
     const objectFrame = frames[frames.length - 1];
 
     if (objectFrame?.character !== '{') {
@@ -313,34 +368,57 @@ export function findActionCallKeySlot(
         return undefined;
     }
 
-    const propertyPath: string[] = [];
+    const location = locateFirstArgument(frames);
 
-    let index = frames.length - 1;
-
-    while (index > 0) {
-        const frame = frames[index];
-
-        if (frame.character === '{' && frame.firstArgumentOfCall) {
-            const callFrame = frames[index - 1];
-
-            return {
-                calleeText: callFrame.calleeText ?? '',
-                existingKeys: objectFrame.keys,
-                prefix,
-                propertyPath,
-                rootKeys: frame.keys,
-                rootValues: frame.literals,
-            };
-        }
-
-        if (frame.keyForValue === undefined) {
-            return undefined;
-        }
-
-        propertyPath.unshift(frame.keyForValue);
-
-        index--;
+    if (!location) {
+        return undefined;
     }
 
-    return undefined;
+    return {
+        calleeText: location.calleeText,
+        existingKeys: objectFrame.keys,
+        prefix,
+        propertyPath: location.propertyPath,
+        rootKeys: location.rootFrame.keys,
+        rootValues: location.rootFrame.literals,
+    };
+}
+
+export function findActionCallValueSlot(
+    source: string,
+    cursorOffset: number,
+    language: ScriptLanguageType
+): ActionCallValueSlotType | undefined {
+    const {frames, openString, text} = scanActionCall(source, cursorOffset, language);
+    const objectFrame = frames[frames.length - 1];
+
+    if (
+        objectFrame?.character !== '{' ||
+        objectFrame.segmentKey === undefined ||
+        objectFrame.valueStart === undefined
+    ) {
+        return undefined;
+    }
+
+    const valueText = text.slice(objectFrame.valueStart, openString ? openString.start : text.length);
+    const prefixMatch = openString ? /^\s*$/.exec(valueText) : VALUE_PREFIX.exec(valueText);
+
+    if (!prefixMatch) {
+        return undefined;
+    }
+
+    const location = locateFirstArgument(frames);
+
+    if (!location) {
+        return undefined;
+    }
+
+    return {
+        calleeText: location.calleeText,
+        prefix: openString ? text.slice(openString.start + 1) : (prefixMatch[1] ?? ''),
+        propertyPath: [...location.propertyPath, objectFrame.segmentKey],
+        ...(openString && {quote: text[openString.start]}),
+        rootKeys: location.rootFrame.keys,
+        rootValues: location.rootFrame.literals,
+    };
 }
