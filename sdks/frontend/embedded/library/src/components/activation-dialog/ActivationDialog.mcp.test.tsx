@@ -138,7 +138,7 @@ describe('ActivationDialog Available to AI agents switch', () => {
 
         renderDialog();
 
-        expect(await screen.findByRole('button', {name: 'Save'})).toBeInTheDocument();
+        expect(await screen.findByRole('button', {name: 'Done'})).toBeInTheDocument();
         expect(screen.queryByRole('switch', {name: 'Available to AI agents'})).not.toBeInTheDocument();
     });
 
@@ -173,7 +173,7 @@ describe('ActivationDialog Available to AI agents switch', () => {
         expect(calls.some((call) => call.url.endsWith('/wf-plain/enable'))).toBe(false);
     });
 
-    it('toolOnlyReferenceSavesWithoutOwnEnable', async () => {
+    it('toolOnlyReferenceClosesWithoutOwnEnable', async () => {
         const onClose = vi.fn();
 
         userWorkflows = [{automationUuid: 'wf-plain', kind: 'REFERENCE', mcpEnabled: true, toolOnly: true}];
@@ -190,7 +190,7 @@ describe('ActivationDialog Available to AI agents switch', () => {
 
         expect(await screen.findByRole('switch', {name: 'Available to AI agents'})).toBeChecked();
 
-        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Done'}));
 
         await waitFor(() => expect(onClose).toHaveBeenCalled());
 

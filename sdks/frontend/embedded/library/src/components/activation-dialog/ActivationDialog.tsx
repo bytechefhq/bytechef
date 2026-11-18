@@ -644,6 +644,8 @@ const ActivationBody = ({
         [fetch, loadAiAgentsWorkflow, template.id]
     );
 
+    const nothingToEdit = !!existingReference && state.requiredComponents.length === 0 && !hasEditableInputs(inputs);
+
     const backShown =
         state.step !== 'connect' &&
         state.step !== 'done' &&
@@ -815,11 +817,13 @@ const ActivationBody = ({
                         {providedRows}
 
                         <p className={styles.notice}>
-                            {existingReference
-                                ? 'Save to keep your changes. Saving does not switch this automation on or off.'
-                                : toolOnly
-                                  ? 'Everything is ready. Activate to save your settings.'
-                                  : 'Everything is ready. Activate to switch this automation on.'}
+                            {nothingToEdit
+                                ? 'This automation has nothing to set up.'
+                                : existingReference
+                                  ? 'Save to keep your changes. Saving does not switch this automation on or off.'
+                                  : toolOnly
+                                    ? 'Everything is ready. Activate to save your settings.'
+                                    : 'Everything is ready. Activate to switch this automation on.'}
                         </p>
                     </div>
                 )}
@@ -864,7 +868,11 @@ const ActivationBody = ({
                                 </button>
                             )}
 
-                            {state.step === 'activate' ? (
+                            {state.step === 'activate' && nothingToEdit ? (
+                                <button className={dialogStyles.buttonPrimary} onClick={onClose} type="button">
+                                    Done
+                                </button>
+                            ) : state.step === 'activate' ? (
                                 <button
                                     className={dialogStyles.buttonPrimary}
                                     disabled={busy}
