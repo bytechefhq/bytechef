@@ -9,8 +9,10 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.mapper;
 
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.mapper.config.EmbeddedConfigurationPublicMapperSpringConfig;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentInputReferenceModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectedUserProjectWorkflowModel;
 import com.bytechef.ee.embedded.configuration.util.ToolOnlyWorkflowUtils;
+import com.bytechef.platform.configuration.domain.WorkflowInput;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
@@ -43,4 +45,8 @@ public interface ConnectUserProjectWorkflowMapper
         target = "toolOnly",
         expression = "java(ToolOnlyWorkflowUtils.isToolOnly(connectedUserProjectWorkflowDTO.workflow()))")
     ConnectedUserProjectWorkflowModel convert(ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflowDTO);
+
+    @Mapping(target = "group", ignore = true)
+    ComponentInputReferenceModel toComponentInputReferenceModel(
+        WorkflowInput.ComponentInputReference componentInputReference);
 }

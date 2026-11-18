@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.dto;
 
+import com.bytechef.platform.configuration.domain.WorkflowInput;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -104,6 +105,12 @@ public record ConnectedUserWorkflowTemplateDTO(
         }
     }
 
-    public record Input(String name, String label, String type, boolean required) {
+    public record Input(
+        String name, String label, String type, boolean required,
+        WorkflowInput.@Nullable ComponentInputReference componentReference) {
+
+        public Input(String name, String label, String type, boolean required) {
+            this(name, label, type, required, null);
+        }
     }
 }
