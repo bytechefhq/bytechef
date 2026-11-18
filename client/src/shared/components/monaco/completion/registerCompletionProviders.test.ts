@@ -1,7 +1,11 @@
 import {describe, expect, it, vi} from 'vitest';
 
 import {registerCompletionContext} from './completionContextRegistry';
-import {buildCompletionProvider, registerCompletionProviders} from './registerCompletionProviders';
+import {
+    buildCompletionProvider,
+    buildJavaScriptCompletionProvider,
+    registerCompletionProviders,
+} from './registerCompletionProviders';
 
 import type {EvaluatorFunctionDefinition} from '@/shared/middleware/graphql';
 import type {
@@ -12,12 +16,28 @@ import type {
 } from '@/shared/middleware/platform/configuration';
 
 const registerCompletionItemProvider = vi.fn(() => ({dispose: vi.fn()}));
+const setModeConfiguration = vi.fn();
+const getCompletionsAtPosition = vi.fn();
 
 const fakeMonaco = {
+    Range: class {
+        constructor(
+            public startLineNumber: number,
+            public startColumn: number,
+            public endLineNumber: number,
+            public endColumn: number
+        ) {}
+    },
     languages: {
         CompletionItemInsertTextRule: {InsertAsSnippet: 4},
         CompletionItemKind: {Function: 1, Method: 0, Module: 8, Property: 9, Value: 12, Variable: 4},
+        CompletionItemTag: {Deprecated: 1},
+        CompletionTriggerKind: {Invoke: 0, TriggerCharacter: 1},
         registerCompletionItemProvider,
+    },
+    typescript: {
+        getJavaScriptWorker: async () => async () => ({getCompletionsAtPosition}),
+        javascriptDefaults: {modeConfiguration: {completionItems: true, hovers: true}, setModeConfiguration},
     },
 } as unknown as typeof import('monaco-editor');
 
@@ -35,6 +55,88 @@ describe('registerCompletionProviders', () => {
             'json',
             'yaml',
         ]);
+        expect(setModeConfiguration).toHaveBeenCalledWith({completionItems: false, hovers: true});
+    });
+});
+
+describe('buildJavaScriptCompletionProvider', () => {
+    const uri = 'inmemory://javascript-script';
+    const head = 'function perform(input, connection, context) {\n';
+
+    registerCompletionContext(uri, {
+        components: {
+            components: [{name: 'googleMaps', title: 'Google Maps', version: 1} as ComponentDefinitionBasic],
+            getConnectionDefinition: vi.fn(),
+            getDefinition: vi.fn(),
+            getDisplayConditions: vi.fn(async () => ({})),
+            getOperationProperties: vi.fn(async () => [{name: 'latitude', type: 'NUMBER'}] as unknown as Property[]),
+        },
+        connections: [],
+        input: {},
+        kind: 'script',
+        language: 'javascript',
+    });
+
+    const javaScriptModel = (value: string) => ({
+        getLineContent: () => value.split('\n').at(-1) ?? '',
+        getOffsetAt: () => value.length,
+        getValue: () => value,
+        getWordUntilPosition: () => ({endColumn: 1, startColumn: 1}),
+        isDisposed: () => false,
+        uri: {toString: () => uri},
+    });
+
+    const provide = (value: string, completionContext: object) =>
+        buildJavaScriptCompletionProvider(fakeMonaco).provideCompletionItems(
+            javaScriptModel(value) as never,
+            {column: 1, lineNumber: 1} as never,
+            completionContext as never,
+            {} as never
+        );
+
+    getCompletionsAtPosition.mockResolvedValue({
+        entries: [{kind: 'var', name: 'AbortController', sortText: '15'}],
+    });
+
+    it('offers only the action property keys inside the parameters of an action call', async () => {
+        const result = await provide(`${head}context.component.googleMaps.getAddress({`, {
+            triggerCharacter: '{',
+            triggerKind: 1,
+        });
+
+        expect(result?.suggestions.map((suggestion) => suggestion.label)).toEqual(['latitude']);
+    });
+
+    it('drops the language service items when invoked explicitly in a property key position', async () => {
+        const result = await provide(`${head}context.component.googleMaps.getAddress({lat`, {triggerKind: 0});
+
+        expect(result?.suggestions.map((suggestion) => suggestion.label)).toEqual(['latitude']);
+    });
+
+    it('keeps the language service items in ordinary code', async () => {
+        const result = await provide(`${head}const controller = new Abo`, {triggerKind: 0});
+
+        expect(result?.suggestions.map((suggestion) => suggestion.label)).toEqual(['AbortController']);
+    });
+
+    it('does not ask the language service on a trigger character it does not handle', async () => {
+        getCompletionsAtPosition.mockClear();
+
+        const result = await provide(`${head}const text = '`, {triggerCharacter: "'", triggerKind: 1});
+
+        expect(result?.suggestions).toEqual([]);
+        expect(getCompletionsAtPosition).not.toHaveBeenCalled();
+    });
+
+    it('returns the language service items for an editor without a ByteChef context', async () => {
+        const result = await buildJavaScriptCompletionProvider(fakeMonaco).provideCompletionItems(
+            {...javaScriptModel('Abo'), uri: {toString: () => 'inmemory://plain'}} as never,
+            {column: 4, lineNumber: 1} as never,
+            {triggerKind: 0} as never,
+            {} as never
+        );
+
+        expect(result?.suggestions.map((suggestion) => suggestion.label)).toEqual(['AbortController']);
     });
 });
 

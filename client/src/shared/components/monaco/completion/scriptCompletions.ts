@@ -415,7 +415,18 @@ async function actionValueItems(
     });
 }
 
+export interface ScriptCompletionResultI {
+    exclusive: boolean;
+    items: CompletionItemDraftType[];
+}
+
 export async function getScriptCompletions(request: ScriptCompletionRequestI): Promise<CompletionItemDraftType[]> {
+    const result = await getScriptCompletionResult(request);
+
+    return result.items;
+}
+
+export async function getScriptCompletionResult(request: ScriptCompletionRequestI): Promise<ScriptCompletionResultI> {
     const {context, cursorOffset, source} = request;
     const keySlot = findActionCallKeySlot(source, cursorOffset, context.language);
 
@@ -423,7 +434,7 @@ export async function getScriptCompletions(request: ScriptCompletionRequestI): P
         const propertyItems = await actionPropertyItems(request, keySlot);
 
         if (propertyItems) {
-            return propertyItems;
+            return {exclusive: propertyItems.length > 0, items: propertyItems};
         }
     }
 
@@ -433,18 +444,22 @@ export async function getScriptCompletions(request: ScriptCompletionRequestI): P
         const valueItems = await actionValueItems(request, valueSlot);
 
         if (valueItems) {
-            return valueItems;
+            return {exclusive: false, items: valueItems};
         }
     }
+
     const path = parseMemberPath(source.slice(0, cursorOffset));
 
     if (!path || !isMemberPathPosition(request, path)) {
-        return [];
+        return {exclusive: false, items: []};
     }
 
     const items = await memberPathItems(request, path);
 
-    return path.quote ? items.map((item) => toBracketItem(item, path)) : items;
+    return {
+        exclusive: path.segments.length > 0 && items.length > 0,
+        items: path.quote ? items.map((item) => toBracketItem(item, path)) : items,
+    };
 }
 
 function isMemberPathPosition(request: ScriptCompletionRequestI, path: MemberPathType): boolean {

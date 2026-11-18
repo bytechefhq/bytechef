@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
 
-import {getScriptCompletions} from './scriptCompletions';
+import {getScriptCompletionResult, getScriptCompletions} from './scriptCompletions';
 
 import type {
     ComponentDefinition,
@@ -661,5 +661,37 @@ describe('getScriptCompletions connection choice', () => {
         await getScriptCompletions({context: contextWith(loadOptions), cursorOffset: source.length, source});
 
         expect(loadOptions).toHaveBeenCalledWith(expect.objectContaining({connectionKey: undefined}));
+    });
+});
+
+describe('getScriptCompletionResult', () => {
+    const context: ScriptCompletionContextI = {
+        components: catalog,
+        connections: [{componentName: 'googleMaps', componentVersion: 1, name: 'gm'}],
+        input: {order: {id: 1}},
+        kind: 'script',
+        language: 'javascript',
+    };
+    const head = 'function perform(input, connection, context) {\n';
+    const resultAt = (source: string) => getScriptCompletionResult({context, cursorOffset: source.length, source});
+
+    it('claims the position alone for the property keys of an action call', async () => {
+        const result = await resultAt(`${head}context.component.googleMaps.getAddress({latitude: 1, `);
+
+        expect(result).toMatchObject({exclusive: true});
+        expect(result.items.map((item) => item.label)).toEqual(['longitude', 'options']);
+    });
+
+    it('claims the position alone for members of context and input', async () => {
+        expect(await resultAt(`${head}context.`)).toMatchObject({exclusive: true});
+        expect(await resultAt(`${head}input.`)).toMatchObject({exclusive: true});
+    });
+
+    it('shares a bare identifier position with the language service', async () => {
+        expect(await resultAt(`${head}inp`)).toEqual({exclusive: false, items: []});
+    });
+
+    it('does not claim a member path it has nothing for', async () => {
+        expect(await resultAt(`${head}JSON.`)).toEqual({exclusive: false, items: []});
     });
 });
