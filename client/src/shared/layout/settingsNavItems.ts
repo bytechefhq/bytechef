@@ -4,6 +4,7 @@ import {
     AI_SKILLS_SETTINGS_PATH,
     API_CONNECTORS_SETTINGS_PATH,
     BILLING_SETTINGS_PATH,
+    EMBEDDED_MEMORIES_SETTINGS_PATH,
     MEMORIES_SETTINGS_PATH,
     ORGANIZATION_SETTINGS_PATH,
 } from '@/shared/navigation/settingsPaths';
@@ -40,6 +41,10 @@ const embeddedSectionNavItems: SettingsNavItemI[] = [
     {
         href: `${EMBEDDED_SETTINGS_PATH}/api-keys`,
         title: 'API Keys',
+    },
+    {
+        href: EMBEDDED_MEMORIES_SETTINGS_PATH,
+        title: 'Memories',
     },
 ];
 

@@ -1,9 +1,9 @@
 import Button from '@/components/Button/Button';
 import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogMain} from '@/components/Dialog';
-import {AiAutoMemoryPrincipalType} from '@/shared/middleware/graphql';
 import {toast} from 'sonner';
 
-import {AiAutoMemoryI, useDeleteAiAutoMemoryMutation} from '../hooks/useAiAutoMemories';
+import {AiAutoMemoryI} from '../hooks/useAiAutoMemories';
+import {useMemoryDialogData} from './memoryDialogData';
 
 interface MemoryDeleteDialogProps {
     environmentId: number;
@@ -14,7 +14,9 @@ interface MemoryDeleteDialogProps {
 }
 
 const MemoryDeleteDialog = ({environmentId, memory, onClose, open, workspaceId}: MemoryDeleteDialogProps) => {
-    const deleteMemoryMutation = useDeleteAiAutoMemoryMutation();
+    const {useDeleteMemory} = useMemoryDialogData();
+
+    const deleteMemoryMutation = useDeleteMemory();
 
     const handleDelete = () => {
         if (!memory) {
@@ -22,15 +24,7 @@ const MemoryDeleteDialog = ({environmentId, memory, onClose, open, workspaceId}:
         }
 
         deleteMemoryMutation.mutate(
-            {
-                environment: environmentId,
-                id: String(memory.id),
-                principal: {
-                    principalId: memory.principalId,
-                    principalType: memory.principalType as AiAutoMemoryPrincipalType,
-                },
-                workspaceId: String(workspaceId),
-            },
+            {environmentId, memory, workspaceId},
             {
                 onSuccess: () => {
                     toast.success(`Memory "${memory.title}" deleted`);

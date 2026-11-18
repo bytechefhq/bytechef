@@ -4,7 +4,6 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
-import {AiAutoMemoryPrincipalType, AiAutoMemoryType} from '@/shared/middleware/graphql';
 import {TriangleAlertIcon} from 'lucide-react';
 import {useCallback, useEffect, useState} from 'react';
 import {toast} from 'sonner';
@@ -16,9 +15,8 @@ import {
     AiAutoMemoryI,
     AiAutoMemoryPatchI,
     AiAutoMemoryTypeType,
-    useAiAutoMemoryDetailQuery,
-    useUpdateAiAutoMemoryMutation,
 } from '../hooks/useAiAutoMemories';
+import {useMemoryDialogData} from './memoryDialogData';
 
 function toSingleLine(value: string): string {
     return value.replace(/[\r\n]+/g, ' ');
@@ -39,9 +37,11 @@ const MemoryEditDialog = ({environmentId, memory, onClose, open, workspaceId}: M
     const [memoryType, setMemoryType] = useState<AiAutoMemoryTypeType>('USER');
     const [title, setTitle] = useState('');
 
-    const {data: memoryDetail, refetch: refetchMemoryDetail} = useAiAutoMemoryDetailQuery(memory, workspaceId, open);
+    const {useMemoryDetail, useUpdateMemory} = useMemoryDialogData();
 
-    const updateMemoryMutation = useUpdateAiAutoMemoryMutation();
+    const {data: memoryDetail, refetch: refetchMemoryDetail} = useMemoryDetail(memory, workspaceId, open);
+
+    const updateMemoryMutation = useUpdateMemory();
 
     const changedSinceLoaded =
         memory !== null && baseMemory !== null && memory.id === baseMemory.id && memory.version !== baseMemory.version;
@@ -86,22 +86,7 @@ const MemoryEditDialog = ({environmentId, memory, onClose, open, workspaceId}: M
         }
 
         updateMemoryMutation.mutate(
-            {
-                input: {
-                    content: patch.content,
-                    description: patch.description,
-                    environment: environmentId,
-                    expectedVersion: baseMemory.version,
-                    id: String(baseMemory.id),
-                    memoryType: patch.memoryType as AiAutoMemoryType | undefined,
-                    principal: {
-                        principalId: baseMemory.principalId,
-                        principalType: baseMemory.principalType as AiAutoMemoryPrincipalType,
-                    },
-                    title: patch.title,
-                    workspaceId: String(workspaceId),
-                },
-            },
+            {environmentId, expectedVersion: baseMemory.version, memory: baseMemory, patch, workspaceId},
             {
                 onSuccess: () => {
                     toast.success('Memory updated');

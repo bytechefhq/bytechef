@@ -98,6 +98,7 @@ const ApiConnectorImportPage = lazy(
 );
 const ApiConnectorAiPage = lazy(() => import('@/ee/pages/settings/platform/api-connectors/pages/ApiConnectorAiPage'));
 const EmbeddedApiKeys = lazy(() => import('@/ee/pages/settings/embedded/api-keys/ApiKeys'));
+const EmbeddedMemories = lazy(() => import('@/ee/pages/settings/embedded/memories/EmbeddedMemories'));
 const AppEvents = lazy(() => import('@/ee/pages/embedded/app-events/AppEvents'));
 const AutomationGettingStarted = lazy(() => import('@/pages/automation/getting-started/AutomationGettingStarted'));
 const EmbeddedGettingStarted = lazy(() => import('@/ee/pages/embedded/getting-started/EmbeddedGettingStarted'));
@@ -1131,7 +1132,15 @@ export const getRouter = (queryClient: QueryClient) =>
                                             path: 'api-keys',
                                         },
                                         {
-                                            loader: () => redirect(MEMORIES_SETTINGS_PATH),
+                                            element: (
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                                    <EEVersion>
+                                                        <LazyLoadWrapper>
+                                                            <EmbeddedMemories />
+                                                        </LazyLoadWrapper>
+                                                    </EEVersion>
+                                                </PrivateRoute>
+                                            ),
                                             path: 'ai/memories',
                                         },
                                         ...organizationSettingsRedirectRoutes,

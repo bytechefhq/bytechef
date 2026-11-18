@@ -4,7 +4,8 @@ import {format} from 'date-fns';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
-import {AiAutoMemoryI, getAiAutoMemoryTypeLabel, useAiAutoMemoryDetailQuery} from '../hooks/useAiAutoMemories';
+import {AiAutoMemoryI, getAiAutoMemoryTypeLabel} from '../hooks/useAiAutoMemories';
+import {useMemoryDialogData} from './memoryDialogData';
 
 interface MemoryDetailDialogProps {
     memory: AiAutoMemoryI | null;
@@ -27,7 +28,9 @@ function formatTimestamp(value: string): string {
 }
 
 const MemoryDetailDialog = ({memory, onClose, open, workspaceId}: MemoryDetailDialogProps) => {
-    const {data: memoryDetail, isPending} = useAiAutoMemoryDetailQuery(memory, workspaceId, open);
+    const {useMemoryDetail} = useMemoryDialogData();
+
+    const {data: memoryDetail, isPending} = useMemoryDetail(memory, workspaceId, open);
 
     return (
         <Dialog onOpenChange={(nextOpen) => !nextOpen && onClose()} open={open}>
