@@ -11,9 +11,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,6 +39,7 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
+import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowFacade;
 import com.bytechef.ee.automation.configuration.repository.ProjectCodeWorkflowRepository;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowDraftService;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowDraftServiceImpl;
@@ -89,6 +92,9 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowInput;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
+import com.bytechef.platform.configuration.dto.WorkflowChangeType;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
@@ -136,8 +142,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -235,6 +241,9 @@ class AutomationProjectFacadeIntTest {
     private IntegrationService integrationService;
 
     @Autowired
+    private ProjectCodeWorkflowFacade projectCodeWorkflowFacade;
+
+    @Autowired
     private ProjectCodeWorkflowService projectCodeWorkflowService;
 
     @Autowired
@@ -329,6 +338,57 @@ class AutomationProjectFacadeIntTest {
             assertThat(publishedProject.getLastProjectVersion()).isEqualTo(draftVersion + 1);
         } finally {
             reset(projectCodeWorkflowService);
+        }
+    }
+
+    @Test
+    void testRestoringAVersionOfACodeProjectRestoresItsSource() {
+        long projectId = automationProjectFacade.createProject("CodeProject", "", null, List.of(), null);
+
+        automationProjectFacade.createProjectWorkflow(projectId, null, null);
+        automationProjectFacade.publishProject(projectId);
+
+        when(projectCodeWorkflowService.fetchProjectCodeWorkflow(projectId))
+            .thenReturn(Optional.of(mock(ProjectCodeWorkflow.class)));
+
+        try {
+            automationProjectFacade.restoreProjectVersion(projectId, 1);
+
+            verify(projectCodeWorkflowFacade).restoreCodeWorkflowSource(projectId, 1);
+        } finally {
+            reset(projectCodeWorkflowFacade, projectCodeWorkflowService);
+        }
+    }
+
+    @Test
+    void testRenamingACodeProjectRewritesItsSource() {
+        long projectId = automationProjectFacade.createProject("CodeProject", "", null, List.of(), null);
+
+        when(projectCodeWorkflowService.fetchProjectCodeWorkflow(projectId))
+            .thenReturn(Optional.of(mock(ProjectCodeWorkflow.class)));
+
+        try {
+            automationProjectFacade.updateProject(projectId, "RenamedCodeProject", "", null, List.of(), null);
+
+            verify(projectCodeWorkflowFacade).renameCodeWorkflowSource(projectId);
+        } finally {
+            reset(projectCodeWorkflowFacade, projectCodeWorkflowService);
+        }
+    }
+
+    @Test
+    void testUpdatingACodeProjectWithoutRenamingItLeavesItsSourceAlone() {
+        long projectId = automationProjectFacade.createProject("CodeProject", "", null, List.of(), null);
+
+        when(projectCodeWorkflowService.fetchProjectCodeWorkflow(projectId))
+            .thenReturn(Optional.of(mock(ProjectCodeWorkflow.class)));
+
+        try {
+            automationProjectFacade.updateProject(projectId, "CodeProject", "changed", null, List.of(), null);
+
+            verify(projectCodeWorkflowFacade, never()).renameCodeWorkflowSource(anyLong());
+        } finally {
+            reset(projectCodeWorkflowFacade, projectCodeWorkflowService);
         }
     }
 
@@ -1664,7 +1724,7 @@ class AutomationProjectFacadeIntTest {
         ActionDefinitionFacade.class, ApiKeyFacade.class, ApiKeyService.class, AuthorityService.class,
         ClusterElementDefinitionService.class, TriggerDefinitionFacade.class,
         ComponentConnectionFacade.class,
-        ComponentDefinitionService.class, ConnectedUserService.class, ConnectionDefinitionService.class,
+        ComponentDefinitionService.class, ConnectionDefinitionService.class,
         ConnectionFacade.class, ConnectionLifecycleFacade.class, ConnectionService.class,
         EmbeddedPermissionEvaluator.class, EnvironmentService.class,
         GitHubProxyClient.class, JobFacade.class, JobService.class, McpComponentService.class,
@@ -1679,7 +1739,9 @@ class AutomationProjectFacadeIntTest {
         TriggerLifecycleFacade.class, UserService.class, WorkflowCacheManager.class,
         WorkflowNodeParameterFacade.class, WorkflowNodeTestOutputService.class,
         WorkflowTestConfigurationFacade.class, WorkflowTestConfigurationService.class,
-        WorkspaceConnectionFacade.class, WorkspaceFacade.class
+        WorkspaceConnectionFacade.class, WorkspaceFacade.class, McpAutomationRowFacade.class,
+        McpIntegrationInstanceRowFacade.class,
+        McpIntegrationInstanceWorkflowService.class
     })
     class CodeProjectLifecycle {
 
@@ -1961,7 +2023,9 @@ class AutomationProjectFacadeIntTest {
         }
 
         @Configuration
-        @Import(AutomationProjectFacadeIntTestConfiguration.class)
+        @Import({
+            AutomationProjectFacadeIntTestConfiguration.class, ConnectedUserServiceConfiguration.class
+        })
         static class CodeProjectLifecycleConfiguration {
 
             @Bean
@@ -2023,6 +2087,11 @@ class AutomationProjectFacadeIntTest {
         @Override
         public URL getCodeWorkflowFileURL(FileEntry fileEntry) {
             throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public byte[] readCodeWorkflowFileBytes(FileEntry fileEntry) {
+            return contentsByUrl.get(fileEntry.getUrl());
         }
 
         @Override

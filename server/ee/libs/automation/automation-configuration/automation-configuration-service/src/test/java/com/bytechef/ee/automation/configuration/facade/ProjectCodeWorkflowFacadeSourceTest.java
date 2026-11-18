@@ -23,8 +23,10 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.config.ApplicationProperties;
@@ -47,6 +49,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.cache.CacheManager;
@@ -57,6 +60,8 @@ import org.springframework.cache.CacheManager;
  * @author Ivica Cardic
  */
 class ProjectCodeWorkflowFacadeSourceTest {
+
+    private final ProjectOwnershipService projectOwnershipService = mock(ProjectOwnershipService.class);
 
     @Test
     void testGetCodeWorkflowSourceReturnsSourceForNonJavaLanguage() {
@@ -255,7 +260,11 @@ class ProjectCodeWorkflowFacadeSourceTest {
         Project project = new Project();
 
         project.setId(1L);
-        project.setName("__EMBEDDED_AUTOMATION__catalog-project");
+        project.setName("catalog-project");
+
+        when(projectOwnershipService.getOwnedProjectIds(List.of(1L),
+            Set.of(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT)))
+                .thenReturn(Set.of(1L));
 
         ProjectService projectService = mock(ProjectService.class);
 
@@ -278,7 +287,63 @@ class ProjectCodeWorkflowFacadeSourceTest {
     }
 
     @Test
-    void testUpdateCodeWorkflowSourceWithDifferentNameThrowsCodeWorkflowNameMismatch() {
+    void testUpdateCodeWorkflowSourceWithDifferentNameRenamesTheProject() {
+        ProjectCodeWorkflow projectCodeWorkflow = mock(ProjectCodeWorkflow.class);
+
+        when(projectCodeWorkflow.getCodeWorkflowContainerId()).thenReturn(5L);
+        when(projectCodeWorkflow.getProjectVersion()).thenReturn(1);
+
+        CodeWorkflowContainer existingCodeWorkflowContainer = mock(CodeWorkflowContainer.class);
+
+        when(existingCodeWorkflowContainer.getLanguage()).thenReturn(Language.JAVASCRIPT);
+
+        ProjectCodeWorkflowService projectCodeWorkflowService = mock(ProjectCodeWorkflowService.class);
+
+        when(projectCodeWorkflowService.getProjectCodeWorkflow(1L)).thenReturn(projectCodeWorkflow);
+        when(projectCodeWorkflowService.fetchProjectCodeWorkflow(1L)).thenReturn(Optional.of(projectCodeWorkflow));
+
+        CodeWorkflowContainerService codeWorkflowContainerService = mock(CodeWorkflowContainerService.class);
+
+        when(codeWorkflowContainerService.getCodeWorkflowContainer(5L)).thenReturn(existingCodeWorkflowContainer);
+
+        ProjectService projectService = mock(ProjectService.class);
+
+        when(projectService.getProject(1L)).thenReturn(codeProject());
+        when(projectService.fetchProject("my-renamed-project", 7L)).thenReturn(Optional.empty());
+        when(projectService.update(any(Project.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        CodeWorkflowContainerFacade codeWorkflowContainerFacade = mock(CodeWorkflowContainerFacade.class);
+
+        when(codeWorkflowContainerFacade.update(
+            eq(existingCodeWorkflowContainer), any(), any(), any(), eq(PlatformType.AUTOMATION)))
+                .thenReturn(new CodeWorkflowReconciliation(mock(CodeWorkflowContainer.class), Map.of(), Map.of()));
+
+        ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = newFacade(
+            projectService, mock(ProjectWorkflowService.class), codeWorkflowContainerFacade,
+            projectCodeWorkflowService, codeWorkflowContainerService, mock(CodeWorkflowFileStorage.class),
+            mock(WorkflowService.class));
+
+        projectCodeWorkflowFacade.updateCodeWorkflowSource(1L, jsScript("my-renamed-project"));
+
+        ArgumentCaptor<Project> projectCaptor = ArgumentCaptor.forClass(Project.class);
+
+        verify(projectService).update(projectCaptor.capture());
+
+        Project renamedProject = projectCaptor.getValue();
+
+        assertThat(renamedProject.getName()).isEqualTo("my-renamed-project");
+
+        ArgumentCaptor<byte[]> bytesCaptor = ArgumentCaptor.forClass(byte[].class);
+
+        verify(codeWorkflowContainerFacade).update(
+            eq(existingCodeWorkflowContainer), eq("1"), any(), bytesCaptor.capture(), eq(PlatformType.AUTOMATION));
+
+        assertThat(new String(bytesCaptor.getValue(), StandardCharsets.UTF_8))
+            .isEqualTo(jsScript("my-renamed-project"));
+    }
+
+    @Test
+    void testUpdateCodeWorkflowSourceWithTheNameOfAnotherProjectIsRejected() {
         ProjectCodeWorkflow projectCodeWorkflow = mock(ProjectCodeWorkflow.class);
 
         when(projectCodeWorkflow.getCodeWorkflowContainerId()).thenReturn(5L);
@@ -295,14 +360,15 @@ class ProjectCodeWorkflowFacadeSourceTest {
 
         when(codeWorkflowContainerService.getCodeWorkflowContainer(5L)).thenReturn(existingCodeWorkflowContainer);
 
-        Project project = new Project();
+        Project otherProject = new Project();
 
-        project.setId(1L);
-        project.setName("my-code-project");
+        otherProject.setId(2L);
+        otherProject.setName("another-project");
 
         ProjectService projectService = mock(ProjectService.class);
 
-        when(projectService.getProject(1L)).thenReturn(project);
+        when(projectService.getProject(1L)).thenReturn(codeProject());
+        when(projectService.fetchProject("another-project", 7L)).thenReturn(Optional.of(otherProject));
 
         CodeWorkflowContainerFacade codeWorkflowContainerFacade = mock(CodeWorkflowContainerFacade.class);
 
@@ -312,11 +378,12 @@ class ProjectCodeWorkflowFacadeSourceTest {
             mock(WorkflowService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.updateCodeWorkflowSource(
-            1L, jsScript("a-completely-different-name")))
+            1L, jsScript("another-project")))
                 .isInstanceOf(ConfigurationException.class)
                 .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
-                .isEqualTo(CodeWorkflowErrorType.CODE_WORKFLOW_NAME_MISMATCH.getErrorKey());
+                .isEqualTo(CodeWorkflowErrorType.CODE_WORKFLOW_ALREADY_EXISTS.getErrorKey());
 
+        verify(projectService, never()).update(any(Project.class));
         verifyNoInteractions(codeWorkflowContainerFacade);
     }
 
@@ -393,7 +460,7 @@ class ProjectCodeWorkflowFacadeSourceTest {
             + "perform: function() { return \"hello\"; }}]}]})";
     }
 
-    private static ProjectCodeWorkflowFacadeImpl newFacade(
+    private ProjectCodeWorkflowFacadeImpl newFacade(
         ProjectService projectService, ProjectWorkflowService projectWorkflowService,
         CodeWorkflowContainerFacade codeWorkflowContainerFacade,
         ProjectCodeWorkflowService projectCodeWorkflowService,
@@ -409,7 +476,7 @@ class ProjectCodeWorkflowFacadeSourceTest {
                 projectWorkflowService, workflowService, List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class));
+            mock(WorkflowService.class), projectOwnershipService);
     }
 
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {
@@ -423,5 +490,15 @@ class ProjectCodeWorkflowFacadeSourceTest {
         when(applicationProperties.getWorkflow()).thenReturn(workflow);
 
         return applicationProperties;
+    }
+
+    private static Project codeProject() {
+        Project project = new Project();
+
+        project.setId(1L);
+        project.setName("my-code-project");
+        project.setWorkspaceId(7L);
+
+        return project;
     }
 }
