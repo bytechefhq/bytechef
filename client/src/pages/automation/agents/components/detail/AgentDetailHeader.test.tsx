@@ -16,18 +16,14 @@ vi.mock('@/pages/automation/project-deployments/components/project-deployment-di
     default: () => null,
 }));
 vi.mock('@/pages/automation/project/components/ProjectVersionHistorySheet', () => ({default: () => null}));
-vi.mock('@/pages/automation/project/components/project-header/components/PublishPopover', () => ({
+vi.mock('@/shared/components/PublishPopover', () => ({
     default: ({
-        onPublishProjectSubmit,
+        onPublishSubmit,
         title,
     }: {
-        onPublishProjectSubmit: ({description, onSuccess}: {description?: string; onSuccess: () => void}) => void;
+        onPublishSubmit: ({description, onSuccess}: {description?: string; onSuccess: () => void}) => void;
         title: string;
-    }) => (
-        <button onClick={() => onPublishProjectSubmit({description: 'First release', onSuccess: () => {}})}>
-            {title}
-        </button>
-    ),
+    }) => <button onClick={() => onPublishSubmit({description: 'First release', onSuccess: () => {}})}>{title}</button>,
 }));
 
 const mockSettingsMenu = vi.fn();

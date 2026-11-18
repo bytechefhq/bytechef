@@ -654,7 +654,8 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
 
             if (draftProjectWorkflow == null) {
                 projectWorkflowService.addWorkflow(
-                    projectId, draftProjectVersion, duplicatedWorkflow.getId(), publishedProjectWorkflow.getUuid());
+                    projectId, draftProjectVersion, duplicatedWorkflow.getId(), publishedProjectWorkflow.getUuid(),
+                    publishedProjectWorkflow.getType());
 
                 continue;
             }

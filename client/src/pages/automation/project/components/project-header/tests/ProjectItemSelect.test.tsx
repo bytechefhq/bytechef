@@ -74,7 +74,7 @@ it('lists the Workflows and Agents groups scoped to the current project', async 
     expect(screen.queryByText('Other Project Bot')).not.toBeInTheDocument();
 });
 
-it('shows a workflow icon and an agent icon next to each group item', async () => {
+it('shows an agent icon next to agent items and no icon next to workflow items', async () => {
     renderProjectItemSelect();
 
     await userEvent.click(screen.getByLabelText('Project item select'));
@@ -84,11 +84,7 @@ it('shows a workflow icon and an agent icon next to each group item', async () =
     const workflowItem = within(menu).getByText('Workflow 1').closest('[role="menuitemradio"]') as HTMLElement;
     const agentItem = within(menu).getByText('Support Bot').closest('[role="menuitemradio"]') as HTMLElement;
 
-    expect(within(workflowItem).getByText('Workflow 1').previousElementSibling).toHaveClass(
-        'lucide-workflow',
-        'size-4',
-        'shrink-0'
-    );
+    expect(workflowItem.querySelector('.lucide-workflow')).toBeNull();
     expect(within(agentItem).getByText('Support Bot').previousElementSibling).toHaveClass(
         'lucide-bot',
         'size-4',
