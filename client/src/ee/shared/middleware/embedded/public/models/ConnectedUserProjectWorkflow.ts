@@ -110,6 +110,10 @@ export interface ConnectedUserProjectWorkflow {
      * True when the workflow can only be started as an MCP tool, because its only enabled trigger is the workflow call trigger.
      */
     toolOnly?: boolean;
+    /**
+     * The url that starts the workflow when it begins with a static webhook trigger, for example Webhook. Null when the workflow is not deployed or starts with another trigger.
+     */
+    staticWebhookUrl?: string;
 }
 
 
@@ -159,6 +163,7 @@ export function ConnectedUserProjectWorkflowFromJSONTyped(json: any, ignoreDiscr
         'attentionReason': json['attentionReason'] == null ? undefined : json['attentionReason'],
         'mcpEnabled': json['mcpEnabled'] == null ? undefined : json['mcpEnabled'],
         'toolOnly': json['toolOnly'] == null ? undefined : json['toolOnly'],
+        'staticWebhookUrl': json['staticWebhookUrl'] == null ? undefined : json['staticWebhookUrl'],
     };
 }
 
@@ -192,6 +197,7 @@ export function ConnectedUserProjectWorkflowToJSONTyped(value?: ConnectedUserPro
         'attentionReason': value['attentionReason'],
         'mcpEnabled': value['mcpEnabled'],
         'toolOnly': value['toolOnly'],
+        'staticWebhookUrl': value['staticWebhookUrl'],
     };
 }
 
