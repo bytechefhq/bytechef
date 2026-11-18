@@ -30,17 +30,25 @@ import java.util.concurrent.ConcurrentHashMap;
  * can corrupt sub-task definitions with wrong values when expressions partially resolve against the current context.
  *
  * <p>
- * A second, unrelated case is a parameter whose value is not an expression at all but merely looks like one - the
- * {@code commands} component's command lines, where POSIX parameter expansion ({@code ${VAR}}, {@code ${VAR:-default}},
- * {@code ${#a[@]}}) is character-for-character the evaluator's own accessor syntax. Left evaluated, a line as
- * unremarkable as {@code echo ${GREETING:-hi}} fails the task with {@code Invalid expression}, naming neither the
- * component nor the property, because a shell default is not a valid accessor.
+ * A second, unrelated case is a parameter whose value is not an expression at all but merely looks like one. Two
+ * components carry one. The {@code commands} component's command lines use POSIX parameter expansion ({@code ${VAR}},
+ * {@code ${VAR:-default}}, {@code ${#a[@]}}), which is character-for-character the evaluator's own accessor syntax; the
+ * {@code script} component's source carries the same collision in another language, because a JavaScript template
+ * literal is written {@code `Hi ${name}`}. Left evaluated, a line as unremarkable as {@code echo ${GREETING:-hi}}, or a
+ * script as unremarkable as {@code return `Total: ${a + b}`}, fails the task with {@code Invalid expression}, naming
+ * neither the component nor the property, because neither a shell default nor a JavaScript sum is a valid accessor.
  *
  * <p>
- * The bare form {@code echo ${HOME}} is worse than that rather than better: it <em>is</em> a valid accessor, so it
- * passes validation and is evaluated against the workflow context. It survives untouched only for as long as that
- * context happens to carry no {@code HOME} key - the day one does, the line is silently rewritten before the shell ever
- * sees it.
+ * The bare forms {@code echo ${HOME}} and {@code `Hi ${name}`} are worse than that rather than better: each <em>is</em>
+ * a valid accessor, so it passes validation and is evaluated against the workflow context. It survives untouched only
+ * for as long as that context happens to carry no {@code HOME} or {@code name} key - the day one does, the source is
+ * silently rewritten before the shell or the interpreter ever sees it.
+ *
+ * <p>
+ * The two cases differ in what deferral means. For a dispatcher it means <em>evaluated later</em>, when the selected
+ * branch is dispatched. For a command line or a script body it means <em>never evaluated</em> - the raw string travels
+ * to the worker and is handed to the shell or the interpreter verbatim, which is the whole point. The mechanism is
+ * identical; only the intent differs.
  *
  * <p>
  * Component prefixes are seeded by this class itself, as plain string literals, rather than registered from the
@@ -62,6 +70,7 @@ public final class DeferredEvaluationParameterKeys {
 
     static {
         register("commands/", "commands");
+        register("script/", "script");
     }
 
     private DeferredEvaluationParameterKeys() {

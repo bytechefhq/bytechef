@@ -79,4 +79,13 @@ class DeferredEvaluationParameterKeysTest {
 
         assertEquals(Set.of("commands"), DeferredEvaluationParameterKeys.forTaskType("commands/v1"));
     }
+
+    @Test
+    void testScriptIsSeededWithoutLoadingTheScriptComponent() {
+        assertThrows(
+            ClassNotFoundException.class,
+            () -> Class.forName("com.bytechef.component.script.ScriptComponentHandler"));
+
+        assertEquals(Set.of("script"), DeferredEvaluationParameterKeys.forTaskType("script/v1"));
+    }
 }

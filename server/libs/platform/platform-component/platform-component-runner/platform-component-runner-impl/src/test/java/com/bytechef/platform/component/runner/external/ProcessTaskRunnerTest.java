@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.config.ApplicationProperties;
+import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.runner.TaskRunnerRequest;
 import com.bytechef.platform.component.runner.TaskRunnerResult;
@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -66,7 +65,7 @@ class ProcessTaskRunnerTest {
     private static final Set<String> NON_DISCRIMINATING_NAMES = Set.of(
         "HOME", "IFS", "OPTIND", "PATH", "PPID", "PS1", "PS2", "PS4", "PWD", "OLDPWD", "SHLVL", "_");
 
-    private final ProcessTaskRunner processTaskRunner = new ProcessTaskRunner(new ApplicationProperties());
+    private final ProcessTaskRunner processTaskRunner = new ProcessTaskRunner();
 
     @Test
     void testGetTypeIsProcess() {
@@ -408,15 +407,12 @@ class ProcessTaskRunnerTest {
 
         assumeTrue(hostHome != null && !hostHome.isBlank());
 
-        ProcessTaskRunner enabledTaskRunner = new ProcessTaskRunner(
-            applicationProperties(Map.of("inherit-environment-enabled", "true")));
-
         TaskRunnerRequest request = new TaskRunnerRequest(
             "shell", null, List.of("echo \"[$HOME]\""), Map.of(), Map.of(), Map.of(), List.of(),
             ParametersFactory.create(Map.of()), ParametersFactory.create(Map.of("inheritEnvironment", true)),
             Duration.ofSeconds(30), Map.of(), mock(ActionContext.class));
 
-        assertThat(enabledTaskRunner.run(request)
+        assertThat(processTaskRunner.run(request)
             .stdout()).contains("[" + hostHome + "]");
     }
 
@@ -444,33 +440,15 @@ class ProcessTaskRunnerTest {
     }
 
     @Test
-    void testValidateRejectsInheritEnvironmentWhenTheOperatorHasNotEnabledIt() {
-        assertThatThrownBy(() -> processTaskRunner.validate(inheritEnvironmentRequest()))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("bytechef.script.runners.process.properties.inherit-environment-enabled");
-    }
+    void testInheritEnvironmentIsAlwaysOfferedAndOffByDefault() {
+        ValueProperty<?> property = processTaskRunner.getProperties()
+            .stream()
+            .filter(candidate -> "inheritEnvironment".equals(candidate.getName()))
+            .findFirst()
+            .orElseThrow();
 
-    @Test
-    void testValidateAcceptsInheritEnvironmentWhenTheOperatorEnabledIt() {
-        ProcessTaskRunner enabledTaskRunner = new ProcessTaskRunner(
-            applicationProperties(Map.of("inherit-environment-enabled", "true")));
-
-        enabledTaskRunner.validate(inheritEnvironmentRequest());
-    }
-
-    @Test
-    void testInheritEnvironmentIsHiddenWhenTheOperatorHasNotEnabledIt() {
-        assertThat(processTaskRunner.getProperties())
-            .noneMatch(property -> "inheritEnvironment".equals(property.getName()));
-    }
-
-    @Test
-    void testInheritEnvironmentIsOfferedWhenTheOperatorEnabledIt() {
-        ProcessTaskRunner enabledTaskRunner = new ProcessTaskRunner(
-            applicationProperties(Map.of("inherit-environment-enabled", "true")));
-
-        assertThat(enabledTaskRunner.getProperties())
-            .anyMatch(property -> "inheritEnvironment".equals(property.getName()));
+        assertThat(property.getDefaultValue()).get()
+            .isEqualTo(false);
     }
 
     @Test
@@ -486,25 +464,6 @@ class ProcessTaskRunnerTest {
                 .isNotSameAs(
                     processTaskRunner.getProperties()
                         .getFirst());
-    }
-
-    private static ApplicationProperties applicationProperties(Map<String, String> runnerProperties) {
-        ApplicationProperties.Script.Runner runner = new ApplicationProperties.Script.Runner();
-
-        runner.setEnabled(true);
-        runner.setProperties(runnerProperties);
-
-        ApplicationProperties applicationProperties = new ApplicationProperties();
-
-        ApplicationProperties.Script script = applicationProperties.getScript();
-
-        Map<String, ApplicationProperties.Script.Runner> runners = new HashMap<>();
-
-        runners.put("process", runner);
-
-        script.setRunners(runners);
-
-        return applicationProperties;
     }
 
     private static void awaitMarkerProcesses(String marker) throws InterruptedException {
@@ -556,13 +515,6 @@ class ProcessTaskRunnerTest {
             .map(Map.Entry::getKey)
             .sorted()
             .findFirst();
-    }
-
-    private static TaskRunnerRequest inheritEnvironmentRequest() {
-        return new TaskRunnerRequest(
-            "shell", null, List.of("echo hi"), Map.of(), Map.of(), Map.of(), List.of(),
-            ParametersFactory.create(Map.of()), ParametersFactory.create(Map.of("inheritEnvironment", true)),
-            Duration.ofSeconds(5), Map.of(), mock(ActionContext.class));
     }
 
     private static boolean isExecutable(String path) {
