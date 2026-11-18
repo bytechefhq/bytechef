@@ -3,6 +3,7 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-coordinator:platform-workflow-coordinator-api"))
 
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))
@@ -21,11 +22,11 @@ dependencies {
     testImplementation(project(":server:libs:core:encryption:encryption-api"))
     testImplementation(project(":server:libs:core:encryption:encryption-impl"))
     testImplementation(project(":server:libs:platform:platform-category:platform-category-service"))
-    testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
 
     testImplementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-service"))
+    testImplementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-service"))
 }
