@@ -79,6 +79,11 @@ const GROUP_META: Record<
     navTitle: 'Workflow Catalog',
     description: 'List the catalog projects available to connected users.',
   },
+  'embedded-configuration-mcp-automation-workflow': {
+    title: 'Embedded MCP Workflows',
+    navTitle: 'MCP Workflows',
+    description: "Turn a connected user's workflow on or off as a tool for AI agents.",
+  },
   // One entry per tag in the automation spec -- see SPLIT_BY_TAG. The keys are `automation-<tag>`.
   'embedded-webhook-app-event-trigger': {
     title: 'Embedded App Events',
@@ -158,6 +163,11 @@ const GROUP_META: Record<
     title: 'Embedded Workflow Catalog (Frontend)',
     navTitle: 'Workflow Catalog',
     description: "List the catalog projects available to the signed-in connected user.",
+  },
+  'embedded-configuration-mcp-automation-workflow-frontend': {
+    title: 'Embedded MCP Workflows (Frontend)',
+    navTitle: 'MCP Workflows',
+    description: "Turn the signed-in user's workflow on or off as a tool for AI agents.",
   },
   'embedded-webhook-app-event-trigger-frontend': {
     title: 'Embedded App Events (Frontend)',
