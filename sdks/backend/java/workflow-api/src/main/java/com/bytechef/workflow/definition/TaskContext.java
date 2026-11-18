@@ -25,8 +25,13 @@ import java.util.Map;
 public interface TaskContext {
 
     /**
-     * Calls an action without naming a connection. In an integration code workflow it runs on the integration's own
-     * connection when the action belongs to the integration's component.
+     * Calls a component action without naming a connection.
+     *
+     * @param componentName the component name
+     * @param actionName    the action name
+     * @param input         the action input
+     * @return the action output
+     * @throws Exception when the action fails
      */
     default Object component(String componentName, String actionName, Map<String, ?> input) throws Exception {
         return component(componentName, actionName, input, null);
@@ -41,14 +46,6 @@ public interface TaskContext {
     Object component(
         String componentName, String actionName, Map<String, ?> input, String connectionName,
         Map<String, ?> clusterElements) throws Exception;
-
-    Map<String, ?> input();
-
-    Object input(String name);
-
-    Map<String, ?> parameters();
-
-    Map<String, ?> connection(String connectionName) throws Exception;
 
     void log(LogLevel level, String message);
 

@@ -16,10 +16,22 @@
 
 package com.bytechef.workflow.definition;
 
+import java.util.Objects;
+import java.util.Optional;
+
 /**
  * @author Ivica Cardic
  */
 public interface Input {
+
+    /**
+     * Returns the component input this input takes its options from.
+     *
+     * @return the component input reference, or empty when the input has none
+     */
+    default Optional<ComponentInputReference> getComponentInput() {
+        return Optional.empty();
+    }
 
     String getLabel();
 
@@ -28,4 +40,12 @@ public interface Input {
     boolean isRequired();
 
     String getType();
+
+    record ComponentInputReference(String componentName, int componentVersion, String groupName) {
+
+        public ComponentInputReference {
+            Objects.requireNonNull(componentName, "componentName");
+            Objects.requireNonNull(groupName, "groupName");
+        }
+    }
 }

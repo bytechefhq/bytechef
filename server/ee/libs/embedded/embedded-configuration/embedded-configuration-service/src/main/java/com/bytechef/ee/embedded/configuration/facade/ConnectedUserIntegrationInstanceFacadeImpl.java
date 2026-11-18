@@ -10,10 +10,12 @@ package com.bytechef.ee.embedded.configuration.facade;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
@@ -23,6 +25,8 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -52,8 +56,10 @@ public class ConnectedUserIntegrationInstanceFacadeImpl implements ConnectedUser
 
     private final ComponentDefinitionFacade componentDefinitionFacade;
     private final ConnectedUserService connectedUserService;
+    private final ConnectionService connectionService;
     private final EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
+    private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationInstanceFacade integrationInstanceFacade;
     private final IntegrationService integrationService;
@@ -62,15 +68,18 @@ public class ConnectedUserIntegrationInstanceFacadeImpl implements ConnectedUser
     @SuppressFBWarnings("EI")
     public ConnectedUserIntegrationInstanceFacadeImpl(
         ComponentDefinitionFacade componentDefinitionFacade, ConnectedUserService connectedUserService,
-        EmbeddedPermissionEvaluator embeddedPermissionEvaluator,
+        ConnectionService connectionService, EmbeddedPermissionEvaluator embeddedPermissionEvaluator,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
+        IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService, IntegrationInstanceFacade integrationInstanceFacade,
         IntegrationService integrationService, IntegrationWorkflowService integrationWorkflowService) {
 
         this.componentDefinitionFacade = componentDefinitionFacade;
         this.connectedUserService = connectedUserService;
+        this.connectionService = connectionService;
         this.embeddedPermissionEvaluator = embeddedPermissionEvaluator;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
+        this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationInstanceFacade = integrationInstanceFacade;
         this.integrationService = integrationService;
@@ -98,9 +107,46 @@ public class ConnectedUserIntegrationInstanceFacadeImpl implements ConnectedUser
             return List.of();
         }
 
+        Optional<Long> connectionId = findComponentConnectionId(integrationInstance, componentName);
+
+        if (connectionId.isEmpty()) {
+            return List.of();
+        }
+
         return componentDefinitionFacade.executeWorkflowInputOptions(
             componentName, componentVersion, groupName, propertyName, lookupDependsOnValues,
-            List.copyOf(lookupDependsOnValues.keySet()), searchText, integrationInstance.getConnectionId());
+            List.copyOf(lookupDependsOnValues.keySet()), searchText, connectionId.get());
+    }
+
+    private Optional<Long> findComponentConnectionId(IntegrationInstance integrationInstance, String componentName) {
+        long integrationInstanceId = Objects.requireNonNull(integrationInstance.getId());
+
+        Integration integration = integrationService.getIntegrationInstanceIntegration(integrationInstanceId);
+
+        if (Objects.equals(integration.getComponentName(), componentName)) {
+            return Optional.of(integrationInstance.getConnectionId());
+        }
+
+        List<Long> configuredConnectionIds = integrationInstanceConfigurationWorkflowService
+            .getIntegrationInstanceConfigurationWorkflows(integrationInstance.getIntegrationInstanceConfigurationId())
+            .stream()
+            .flatMap(integrationInstanceConfigurationWorkflow -> integrationInstanceConfigurationWorkflow
+                .getConnections()
+                .stream())
+            .map(IntegrationInstanceConfigurationWorkflowConnection::getConnectionId)
+            .filter(Objects::nonNull)
+            .distinct()
+            .toList();
+
+        if (configuredConnectionIds.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return connectionService.getConnections(configuredConnectionIds)
+            .stream()
+            .filter(connection -> Objects.equals(connection.getComponentName(), componentName))
+            .map(Connection::getId)
+            .findFirst();
     }
 
     @Override

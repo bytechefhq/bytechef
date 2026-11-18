@@ -1,6 +1,6 @@
 /**
  * Type definitions for ByteChef script code workflows: the object a JavaScript code workflow file evaluates to, and
- * the context ByteChef passes to each task's `perform`.
+ * the arguments ByteChef passes to each task's `perform`.
  */
 
 export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'TRACE' | 'DEBUG' | 'INFO' | 'WARN' | 'ERROR';
@@ -45,25 +45,40 @@ export interface TaskContext {
     /** `context.component.<componentName>.<actionName>(input, connectionName, clusterElements)`. */
     component: Record<string, Record<string, ComponentAction>>;
 
-    /** A declared connection's parameters, credentials included. */
-    connection(connectionName: string): Record<string, unknown>;
-
-    /** The workflow inputs plus the output of every task that already ran, keyed by name. */
-    input(): Record<string, unknown>;
-
-    /** One workflow input or task output. Fails on an unknown name. */
-    input(name: string): unknown;
-
     /** Writes to the task's execution log. */
     log(level: LogLevel, message: string): void;
-
-    /** The task's declared parameters, with any `${...}` already evaluated. */
-    parameters(): Record<string, unknown>;
 }
 
 /**
- * A connection a task uses. `name` is what `perform` passes as `connectionName`. `componentVersion` defaults to the
- * component's latest version at save time.
+ * The `input` ByteChef passes to `perform`: the workflow inputs plus the output of every task that already ran, keyed
+ * by name.
+ */
+export type TaskInput = Record<string, any>;
+
+/**
+ * The `connection` ByteChef passes to a three-parameter `perform`: each connection the task declares, keyed by its
+ * name, mapped to that connection's parameters, credentials included.
+ */
+export type TaskConnections = Record<string, Record<string, any>>;
+
+/**
+ * `perform(input, context)`. TypeScript does not infer this form's parameter types from `TaskDefinition`: annotate
+ * them with `TaskInput` and `TaskContext`.
+ */
+export type InputContextPerformFunction = (input: TaskInput, context: TaskContext) => unknown;
+
+/**
+ * `perform(input, connection, context)`, chosen when `perform` declares three parameters.
+ */
+export type InputConnectionContextPerformFunction = (
+    input: TaskInput,
+    connection: TaskConnections,
+    context: TaskContext,
+) => unknown;
+
+/**
+ * A connection a task uses. `name` keys its parameters in `perform`'s `connection` and is the `connectionName` a
+ * component call passes. `componentVersion` defaults to the component's latest version at save time.
  */
 export interface ConnectionRequirement {
     componentName: string;
@@ -83,10 +98,7 @@ export interface TaskDefinition {
     label?: string;
     name: string;
 
-    /** Read back with `context.parameters()`. A value may be a `${...}` expression. */
-    parameters?: Record<string, unknown>;
-
-    perform: (context: TaskContext) => unknown;
+    perform: InputContextPerformFunction | InputConnectionContextPerformFunction;
 }
 
 /**
@@ -119,9 +131,13 @@ export type WorkflowTask = TaskDefinition | ParallelTaskDefinition | ForkJoinTas
 export type InputType = 'BOOLEAN' | 'DATE' | 'DATE_TIME' | 'FIELD_MAPPING' | 'INTEGER' | 'NUMBER' | 'STRING' | 'TIME';
 
 /**
- * A workflow input. At run time it arrives in `context.input()` under its own name.
+ * A workflow input. At run time it arrives in `perform`'s `input` under its own name.
  */
 export interface InputDefinition {
+    /** With `componentVersion` and `groupName`, the component input this input takes its options from. */
+    componentName?: string;
+    componentVersion?: number;
+    groupName?: string;
     label?: string;
     name: string;
     required?: boolean;
@@ -168,12 +184,14 @@ export interface ProjectDefinition {
 }
 
 /**
- * An embedded code integration, identified by `componentName` and `componentVersion`.
+ * An embedded code integration, identified by `componentName` and `componentVersion`. `name` is its display name; it
+ * defaults to `componentName`.
  */
 export interface IntegrationDefinition {
     componentName: string;
     componentVersion: number;
     description?: string;
+    name?: string;
     version?: string;
     workflows?: WorkflowDefinition[];
 }
@@ -189,6 +207,8 @@ declare global {
         type ComponentAction = import('./index.js').ComponentAction;
         type ConnectionRequirement = import('./index.js').ConnectionRequirement;
         type ForkJoinTaskDefinition = import('./index.js').ForkJoinTaskDefinition;
+        type InputConnectionContextPerformFunction = import('./index.js').InputConnectionContextPerformFunction;
+        type InputContextPerformFunction = import('./index.js').InputContextPerformFunction;
         type InputDefinition = import('./index.js').InputDefinition;
         type InputType = import('./index.js').InputType;
         type IntegrationDefinition = import('./index.js').IntegrationDefinition;
@@ -196,8 +216,10 @@ declare global {
         type OutputDefinition = import('./index.js').OutputDefinition;
         type ParallelTaskDefinition = import('./index.js').ParallelTaskDefinition;
         type ProjectDefinition = import('./index.js').ProjectDefinition;
+        type TaskConnections = import('./index.js').TaskConnections;
         type TaskContext = import('./index.js').TaskContext;
         type TaskDefinition = import('./index.js').TaskDefinition;
+        type TaskInput = import('./index.js').TaskInput;
         type TriggerDefinition = import('./index.js').TriggerDefinition;
         type WorkflowDefinition = import('./index.js').WorkflowDefinition;
         type WorkflowTask = import('./index.js').WorkflowTask;

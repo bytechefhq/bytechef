@@ -31,6 +31,7 @@ import com.bytechef.workflow.definition.WorkflowTaskDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalInt;
@@ -236,8 +237,7 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
             } else {
                 arrayNode.add(
                     toTaskNode(
-                        codeWorkflowContainerUuid, workflowDefinition, (TaskDefinition) taskDefinition, type,
-                        List.of()));
+                        codeWorkflowContainerUuid, workflowDefinition, (TaskDefinition) taskDefinition, type));
             }
         }
 
@@ -260,16 +260,8 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
 
             ArrayNode tasksNode = objectMapper.createArrayNode();
 
-            List<String> groupTaskNames = compositeTaskDefinition.getTasks()
-                .stream()
-                .map(TaskDefinition::getName)
-                .toList();
-
             for (TaskDefinition taskDefinition : compositeTaskDefinition.getTasks()) {
-                tasksNode.add(
-                    toTaskNode(
-                        codeWorkflowContainerUuid, workflowDefinition, taskDefinition, type,
-                        without(groupTaskNames, taskDefinition.getName())));
+                tasksNode.add(toTaskNode(codeWorkflowContainerUuid, workflowDefinition, taskDefinition, type));
             }
 
             parametersNode.set("tasks", tasksNode);
@@ -278,27 +270,11 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
 
             ArrayNode branchesNode = objectMapper.createArrayNode();
 
-            List<String> groupTaskNames = compositeTaskDefinition.getBranches()
-                .stream()
-                .flatMap(List::stream)
-                .map(TaskDefinition::getName)
-                .toList();
-
             for (List<? extends TaskDefinition> branch : compositeTaskDefinition.getBranches()) {
                 ArrayNode branchNode = objectMapper.createArrayNode();
 
-                List<String> branchTaskNames = branch.stream()
-                    .map(TaskDefinition::getName)
-                    .toList();
-
-                List<String> concurrentTaskNames = groupTaskNames.stream()
-                    .filter(taskName -> !branchTaskNames.contains(taskName))
-                    .toList();
-
                 for (TaskDefinition taskDefinition : branch) {
-                    branchNode.add(
-                        toTaskNode(
-                            codeWorkflowContainerUuid, workflowDefinition, taskDefinition, type, concurrentTaskNames));
+                    branchNode.add(toTaskNode(codeWorkflowContainerUuid, workflowDefinition, taskDefinition, type));
                 }
 
                 branchesNode.add(branchNode);
@@ -312,15 +288,9 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
         return taskNode;
     }
 
-    private static List<String> without(List<String> names, String name) {
-        return names.stream()
-            .filter(curName -> !curName.equals(name))
-            .toList();
-    }
-
     private ObjectNode toTaskNode(
         String codeWorkflowContainerUuid, WorkflowDefinition workflowDefinition, TaskDefinition taskDefinition,
-        PlatformType type, List<String> concurrentTaskNames) {
+        PlatformType type) {
 
         ObjectNode taskNode = objectMapper.createObjectNode()
             .put("description", OptionalUtils.orElse(taskDefinition.getDescription(), null))
@@ -332,26 +302,12 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
             taskDefinition.getConnections(),
             connections -> taskNode.set(WorkflowExtConstants.CONNECTIONS, toConnectionsNode(connections)));
 
-        ObjectNode parametersNode = objectMapper.createObjectNode();
-
-        OptionalUtils.ifPresent(
-            taskDefinition.getParameters(),
-            parameters -> parametersNode.setAll((ObjectNode) objectMapper.valueToTree(parameters)));
-
-        parametersNode
+        ObjectNode parametersNode = objectMapper.createObjectNode()
             .put("codeWorkflowContainerUuid", codeWorkflowContainerUuid)
             .put("workflowName", workflowDefinition.getName())
             .put("taskName", taskDefinition.getName())
             .put("input", "=#root")
             .put("type", type.ordinal());
-
-        if (!concurrentTaskNames.isEmpty()) {
-            ArrayNode concurrentTaskNamesNode = objectMapper.createArrayNode();
-
-            concurrentTaskNames.forEach(concurrentTaskNamesNode::add);
-
-            parametersNode.set("concurrentTaskNames", concurrentTaskNamesNode);
-        }
 
         taskNode.set("parameters", parametersNode);
 
@@ -390,18 +346,29 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
         return componentDefinition.getVersion();
     }
 
+    private static String toWorkflowInputType(String type) {
+        return type.toLowerCase(Locale.ROOT);
+    }
+
     private ArrayNode toInputsNode(List<? extends Input> inputs) {
         ArrayNode inputsNode = objectMapper.createArrayNode();
 
         for (Input input : inputs) {
             ObjectNode inputNode = objectMapper.createObjectNode()
                 .put("name", input.getName())
-                .put("type", input.getType())
+                .put("type", toWorkflowInputType(input.getType()))
                 .put("required", input.isRequired());
 
             if (input.getLabel() != null) {
                 inputNode.put("label", input.getLabel());
             }
+
+            OptionalUtils.ifPresent(
+                input.getComponentInput(),
+                componentInput -> inputNode
+                    .put(WorkflowExtConstants.COMPONENT_NAME, componentInput.componentName())
+                    .put(WorkflowExtConstants.COMPONENT_VERSION, componentInput.componentVersion())
+                    .put(WorkflowExtConstants.GROUP_NAME, componentInput.groupName()));
 
             inputsNode.add(inputNode);
         }

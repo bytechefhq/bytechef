@@ -18,15 +18,11 @@ import com.bytechef.workflow.definition.WorkflowTaskDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 
 /**
- * Adds the integration's own connection to every code task of an integration code workflow that does not declare one,
- * so a task can call the integration's component without declaring the connection and without naming it.
- *
  * @version ee
  *
  * @author Ivica Cardic
@@ -141,11 +137,6 @@ final class IntegrationImplicitConnections {
         @Override
         public String getName() {
             return taskDefinition.getName();
-        }
-
-        @Override
-        public Optional<Map<String, ?>> getParameters() {
-            return taskDefinition.getParameters();
         }
 
         @Override
