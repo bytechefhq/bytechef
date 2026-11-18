@@ -27,7 +27,7 @@ export const MEMORIES_SETTINGS_PATH = '/automation/settings/ai/memories';
 
 const SECTION_SETTINGS_PATH_PATTERN = /^\/(automation|embedded)\/settings\/(.+)$/;
 
-export function getOrganizationSettingsRedirectPath(pathname: string, search: string): string | undefined {
+export function getOrganizationSettingsRedirectPath(pathname: string, search: string, hash = ''): string | undefined {
     const match = SECTION_SETTINGS_PATH_PATTERN.exec(pathname);
 
     if (!match) {
@@ -44,5 +44,5 @@ export function getOrganizationSettingsRedirectPath(pathname: string, search: st
         return undefined;
     }
 
-    return `${ORGANIZATION_SETTINGS_PATH}/${settingsPagePath}${search}`;
+    return `${ORGANIZATION_SETTINGS_PATH}/${settingsPagePath}${search}${hash}`;
 }
