@@ -156,7 +156,7 @@ const ProjectDeploymentWorkflowListItem = ({
     };
 
     return (
-        <li className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
+        <li className="flex items-center justify-between gap-x-4 rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
             <div className="relative flex min-w-0 flex-1 items-center">
                 <div className="flex w-full max-w-80 min-w-0 shrink flex-col gap-1 sm:w-80 sm:shrink-0">
                     <div className="flex min-w-0 items-center gap-2">
