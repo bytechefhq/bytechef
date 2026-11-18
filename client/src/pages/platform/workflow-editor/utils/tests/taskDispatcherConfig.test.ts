@@ -271,6 +271,7 @@ describe('TASK_DISPATCHER_CONFIG', () => {
                 )
             ).toEqual({
                 branch: 'branchData',
+                callAiAgent: 'callAiAgentData',
                 condition: 'conditionData',
                 each: 'eachData',
                 'fork-join': 'forkJoinData',
