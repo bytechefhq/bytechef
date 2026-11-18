@@ -1,17 +1,17 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Platform Custom Component Public API"
+  title: "The Platform Custom Component Internal API"
   version: "1"
 servers:
-  - url: "/api/platform/v1"
+  - url: "/api/platform/internal"
 tags:
   - name: "custom-component"
-    description: "The Platform Custom Component Public API"
+    description: "The Platform Custom Component Internal API"
 paths:
   /custom-components/deploy:
     post:
-      description: "Deploy a new custom component."
+      description: "Deploy a new custom component from the admin console. Session/cookie authenticated, unlike the bearer-token-only /api/platform/v1/custom-components/deploy endpoint."
       summary: "Deploy a new custom component"
       tags:
         - "custom-component"

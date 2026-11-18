@@ -3,7 +3,7 @@ plugins {
 }
 
 val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
-    apiPackage.set("com.bytechef.ee.platform.customcomponent.configuration.public_.web.rest")
+    apiPackage.set("com.bytechef.ee.platform.customcomponent.configuration.web.rest")
     configOptions.set(
         mapOf(
             "interfaceOnly" to "true",
@@ -14,28 +14,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     generatorName.set("spring")
     inputSpec.set( "$projectDir/openapi.yaml")
     modelNameSuffix.set("Model")
-    modelPackage.set("com.bytechef.ee.platform.customcomponent.configuration.public_.web.rest.model")
-    outputDir.set("$projectDir/generated")
-    schemaMappings.set(
-        mapOf(
-            "Page" to "org.springframework.data.domain.Page",
-        )
-    )
-}
-
-val generateInternalOpenAPISpring by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
-    apiPackage.set("com.bytechef.ee.platform.customcomponent.configuration.internal.web.rest")
-    configOptions.set(
-        mapOf(
-            "interfaceOnly" to "true",
-            "useSpringBoot3" to "true",
-            "useTags" to "true"
-        )
-    )
-    generatorName.set("spring")
-    inputSpec.set( "$projectDir/openapi-internal.yaml")
-    modelNameSuffix.set("Model")
-    modelPackage.set("com.bytechef.ee.platform.customcomponent.configuration.internal.web.rest.model")
+    modelPackage.set("com.bytechef.ee.platform.customcomponent.configuration.web.rest.model")
     outputDir.set("$projectDir/generated")
     schemaMappings.set(
         mapOf(
@@ -54,7 +33,7 @@ sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
 //}
 
 tasks.register("generateOpenAPI") {
-    dependsOn(generateOpenAPISpring, generateInternalOpenAPISpring/*, generateOpenAPITypeScriptFetch*/)
+    dependsOn(generateOpenAPISpring/*, generateOpenAPITypeScriptFetch*/)
 }
 
 dependencies {
