@@ -78,11 +78,11 @@ Name: webSearch
 | page | Result Page | INTEGER | Page of the ranked source list to return, from 1 to 10. Each page has Number of Sources results (10 if empty). Only page 1 contains the answer and the rows. | false |
 | passages | Return Page Passages | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, returns text passages from the top source pages that match the query. Adds up to about 1 second. Do not use together with News Search. | false |
 | news | News Search | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, returns news items, newest first, instead of web results. Always uses the Fast search tier. Do not use together with Return Page Passages. | false |
-| images | Image Search | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, returns image results instead of web results. Always uses the Fast search tier. | false |
+| images | Image Search | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, returns image results instead of web results. Always uses the Fast search tier and HTTP POST. | false |
 | country | Country Code | STRING | Two-letter ISO 3166-1 code of the country that the results are for. SpecStream sends it to each search engine that can use a country code. | false |
 | language | Language Code | STRING | Two-letter ISO 639-1 code of the result language. SpecStream sends it to each search engine that can use a language code. | false |
 | safe | Safe Search Level | STRING <details> <summary> Options </summary> <span>off</span>, <span>moderate</span>, <span>strict</span> </details> | Filter level for explicit content. SpecStream sends it to each search engine that can use a level. If empty, each search engine uses its own default level. | false |
-| preferPost | Use http POST | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Send request using http POST method. Parameter names and values are encoded in JSON and loaded into requests body. Using POST allows caller more reliable response to parameters like Image Search. | false |
+| useHttpPost | Send as HTTP POST | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, sends the request as HTTP POST with the parameters in a JSON body. If false, sends the request as HTTP GET with the parameters in the URL query. Image Search always uses HTTP POST. | false |
 
 #### Example JSON Structure
 ```json
@@ -100,7 +100,7 @@ Name: webSearch
     "country" : "",
     "language" : "",
     "safe" : "",
-    "preferPost" : false
+    "useHttpPost" : false
   },
   "type" : "specstream/v1/webSearch"
 }
