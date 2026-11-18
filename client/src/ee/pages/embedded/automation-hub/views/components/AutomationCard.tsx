@@ -13,8 +13,10 @@ import AutomationStatusButton from '@/ee/pages/embedded/automation-hub/views/com
 import AutomationVersion from '@/ee/pages/embedded/automation-hub/views/components/AutomationVersion';
 import ComponentIconStack from '@/ee/pages/embedded/automation-hub/views/components/ComponentIconStack';
 import {ConnectedUserProjectWorkflow} from '@/ee/shared/middleware/embedded/public';
+import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {toast} from 'sonner';
 import {twMerge} from 'tailwind-merge';
 
 interface AutomationCardProps {
@@ -38,12 +40,16 @@ const AutomationCard = ({
 
     const builderAccess = useBuilderAccess();
 
+    const [, copyToClipboard] = useCopyToClipboard();
+
     const navigate = useNavigate();
 
     const inputs = automation.inputs ?? [];
     const hasEditableInputs = inputs.some((input) => !input.provided);
 
     const label = automation.label || 'Untitled automation';
+
+    const {staticWebhookUrl} = automation;
 
     const attentionDescription = describeAttentionReason(automation.attentionReason);
     const needsAttention = automation.dangling || !!attentionDescription;
@@ -72,6 +78,12 @@ const AutomationCard = ({
                 onMissingInput: hasEditableInputs ? () => setInputsDialogOpen(true) : undefined,
             });
         }
+    };
+
+    const handleCopyWebhookUrl = async (webhookUrl: string) => {
+        await copyToClipboard(webhookUrl);
+
+        toast('Webhook URL copied to clipboard');
     };
 
     const handleMcpEnabledChange = async (enabled: boolean) => {
@@ -111,6 +123,7 @@ const AutomationCard = ({
                 <CardAction className="row-span-1 self-center">
                     <AutomationCardMenu
                         label={label}
+                        onCopyWebhookUrl={staticWebhookUrl ? () => handleCopyWebhookUrl(staticWebhookUrl) : undefined}
                         onCustomize={
                             automation.kind === 'COPY' && canOpenInBuilder(automation, builderAccess)
                                 ? () => navigate(`/embedded/hub/builder/${automation.workflowUuid}`)
