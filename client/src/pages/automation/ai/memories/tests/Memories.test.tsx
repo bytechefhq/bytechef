@@ -516,7 +516,7 @@ describe('Memories page', () => {
 
         wrap(<Memories />);
 
-        expect(screen.queryByRole('button', {name: /^Project Deployment\/Integration Instance:/})).toBeNull();
+        expect(screen.queryByRole('button', {name: /^Project Deployment:/})).toBeNull();
 
         const lastCall = mockUseMemoriesQuery.mock.lastCall;
 
@@ -583,7 +583,7 @@ describe('Memories page', () => {
         await pickFilterOption('My memories');
         await pickFilterOption('Feedback');
 
-        expect(screen.getByText('Project Deployment/Integration Instance: My memories')).toBeInTheDocument();
+        expect(screen.getByText('Project Deployment: My memories')).toBeInTheDocument();
         expect(screen.getByText('Type: Feedback')).toBeInTheDocument();
 
         const lastCall = mockUseMemoriesQuery.mock.lastCall;
@@ -631,15 +631,13 @@ describe('Memories page', () => {
 
         await pickFilterOption('Support triage deployment');
 
-        expect(
-            screen.getByText('Project Deployment/Integration Instance: Support triage deployment')
-        ).toBeInTheDocument();
+        expect(screen.getByText('Project Deployment: Support triage deployment')).toBeInTheDocument();
 
         mockUsePrincipalsQuery.mockReturnValue(makeQueryResult({data: [userPrincipal]}));
 
         rerender(withProviders(<Memories />));
 
-        expect(screen.queryByText(/^Project Deployment\/Integration Instance:/)).toBeNull();
+        expect(screen.queryByText(/^Project Deployment:/)).toBeNull();
         expect(screen.queryByRole('button', {name: 'Clear all'})).toBeNull();
         expect(mockUseMemoriesQuery.mock.lastCall?.[3]).toBeUndefined();
         expect(mockUseMemoriesQuery.mock.lastCall?.[4]).toBeUndefined();
