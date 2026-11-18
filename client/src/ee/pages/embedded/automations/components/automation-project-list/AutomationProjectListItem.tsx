@@ -28,12 +28,12 @@ import {
     DownloadIcon,
     EditIcon,
     EllipsisVerticalIcon,
-    LinkIcon,
     PlusIcon,
     SendIcon,
     Settings2Icon,
     Trash2Icon,
     UploadIcon,
+    UsersIcon,
     WorkflowIcon,
 } from 'lucide-react';
 import {MouseEvent, useCallback, useMemo, useRef, useState} from 'react';
@@ -41,7 +41,7 @@ import {toast} from 'sonner';
 import {twMerge} from 'tailwind-merge';
 
 import isEditableCodeLanguage from '../../utils/isEditableCodeLanguage';
-import CodeWorkflowReferencesDialog from '../CodeWorkflowReferencesDialog';
+import AutomationProjectUsageSheet from '../AutomationProjectUsageSheet';
 
 type AutomationProjectType = AutomationProjectsQuery['automationProjects'][number];
 type EmbeddedTagType = AutomationProjectTagsQuery['automationProjectTags'][number];
@@ -72,7 +72,7 @@ const AutomationProjectListItem = ({
     tags,
 }: AutomationProjectListItemProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [showReferencesDialog, setShowReferencesDialog] = useState(false);
+    const [showUsageSheet, setShowUsageSheet] = useState(false);
 
     const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
@@ -239,10 +239,6 @@ const AutomationProjectListItem = ({
                     <div className="flex items-center justify-between gap-x-6 sm:justify-end [&>:last-child]:-ml-3">
                         <div className="flex items-center gap-x-3 sm:min-w-52 sm:flex-col sm:items-end sm:gap-x-0 sm:gap-y-4">
                             <div className="flex items-center space-x-2">
-                                {project.codeWorkflowProject && (
-                                    <Badge label="Reference" styleType="secondary-outline" />
-                                )}
-
                                 {project.published && !project.unpublishedChanges ? (
                                     <Badge
                                         className="flex space-x-1 border-transparent"
@@ -328,25 +324,22 @@ const AutomationProjectListItem = ({
                                         }
                                     />
 
-                                    {project.codeWorkflowProject && (
-                                        <>
-                                            {isEditableCodeLanguage(project.codeWorkflowLanguage) && (
-                                                <DropdownMenuItem
-                                                    aria-label="Edit Source"
-                                                    icon={<CodeIcon />}
-                                                    label="Edit Source"
-                                                    onClick={() => onEditProjectSource(project.id)}
-                                                />
-                                            )}
-
+                                    {project.codeWorkflowProject &&
+                                        isEditableCodeLanguage(project.codeWorkflowLanguage) && (
                                             <DropdownMenuItem
-                                                aria-label="View References"
-                                                icon={<LinkIcon />}
-                                                label="View References"
-                                                onClick={() => setShowReferencesDialog(true)}
+                                                aria-label="Edit Source"
+                                                icon={<CodeIcon />}
+                                                label="Edit Source"
+                                                onClick={() => onEditProjectSource(project.id)}
                                             />
-                                        </>
-                                    )}
+                                        )}
+
+                                    <DropdownMenuItem
+                                        aria-label="Usage"
+                                        icon={<UsersIcon />}
+                                        label="Usage"
+                                        onClick={() => setShowUsageSheet(true)}
+                                    />
                                 </DropdownMenuGroup>
 
                                 <DropdownMenuSeparator />
@@ -430,9 +423,10 @@ const AutomationProjectListItem = ({
                 open={showDeleteDialog}
             />
 
-            {showReferencesDialog && (
-                <CodeWorkflowReferencesDialog
-                    onClose={() => setShowReferencesDialog(false)}
+            {showUsageSheet && (
+                <AutomationProjectUsageSheet
+                    codeWorkflowProject={project.codeWorkflowProject}
+                    onClose={() => setShowUsageSheet(false)}
                     projectName={project.name}
                     workflowTemplates={project.workflowTemplates}
                 />

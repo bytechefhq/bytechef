@@ -1,0 +1,13 @@
+query connectedUserCatalogWorkflowCopies($automationUuids: [ID!]!, $environmentId: ID!) {
+    connectedUserCatalogWorkflowCopies(
+        automationUuids: $automationUuids
+        environmentId: $environmentId
+    ) {
+        copiedFromWorkflowUuid
+        workflowUuid
+        externalUserId
+        connectedUserName
+        connectedUserEmail
+        enabled
+    }
+}
