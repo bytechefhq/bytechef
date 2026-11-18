@@ -1,38 +1,20 @@
-import Badge from '@/components/Badge/Badge';
-import Button from '@/components/Button/Button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/DropdownMenu/DropdownMenu';
-import EmptyList from '@/components/EmptyList';
-import EmptyState from '@/components/EmptyState/EmptyState';
-import PageLoader from '@/components/PageLoader';
-import {Input} from '@/components/ui/input';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {MEMORIES_DOCUMENTATION_URL} from '@/pages/settings/settingsDocumentationUrls';
-import FilterBadges from '@/shared/components/filters/FilterBadges';
-import FilterMenu, {type FilterGroupI, hasActiveFilters} from '@/shared/components/filters/FilterMenu';
+import {type FilterGroupI} from '@/shared/components/filters/FilterMenu';
 import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
-import Header from '@/shared/layout/Header';
-import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {formatDistanceToNow} from 'date-fns';
-import {BrainIcon, EllipsisVerticalIcon, PencilIcon, SearchIcon, Trash2Icon, TriangleAlertIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 
+import MemoriesPageLayout from './components/MemoriesPageLayout';
+import MemoriesTableRow from './components/MemoriesTableRow';
+import {filterMemoriesBySearchTerm, findMemory} from './components/memoriesTableUtils';
 import MemoryDeleteDialog from './dialogs/MemoryDeleteDialog';
 import MemoryDetailDialog from './dialogs/MemoryDetailDialog';
 import MemoryEditDialog from './dialogs/MemoryEditDialog';
 import {
     AI_AUTO_MEMORY_TYPES,
     AI_AUTO_MEMORY_TYPE_META,
-    AiAutoMemoryI,
     AiAutoMemoryPrincipalI,
     AiAutoMemoryTypeType,
-    getAiAutoMemoryTypeLabel,
     useAiAutoMemoriesQuery,
     useAiAutoMemoryPrincipalsQuery,
 } from './hooks/useAiAutoMemories';
@@ -45,14 +27,6 @@ function principalKey(principal: AiAutoMemoryPrincipalI): string {
     return `${principal.principalType}:${principal.principalId}`;
 }
 
-function findMemory(memories: AiAutoMemoryI[] | undefined, memoryId: number | null): AiAutoMemoryI | null {
-    if (memoryId === null) {
-        return null;
-    }
-
-    return memories?.find((memory) => memory.id === memoryId) || null;
-}
-
 const FILTER_ITEMS: {label: string; value: FilterValueType}[] = [
     {label: 'All', value: 'ALL'},
     ...AI_AUTO_MEMORY_TYPES.map((memoryType) => ({
@@ -60,116 +34,6 @@ const FILTER_ITEMS: {label: string; value: FilterValueType}[] = [
         value: memoryType,
     })),
 ];
-
-function formatRelative(value: string): string {
-    try {
-        return formatDistanceToNow(new Date(value), {addSuffix: true});
-    } catch (formatError) {
-        console.warn('Memories: formatRelative failed', {
-            message: formatError instanceof Error ? formatError.message : String(formatError),
-            value,
-        });
-
-        return '';
-    }
-}
-
-interface MemoriesTableRowPropsI {
-    memory: AiAutoMemoryI;
-    mutable: boolean;
-    onDelete: (memory: AiAutoMemoryI) => void;
-    onEdit: (memory: AiAutoMemoryI) => void;
-    onView: (memory: AiAutoMemoryI) => void;
-}
-
-const MemoriesTableRow = ({memory, mutable, onDelete, onEdit, onView}: MemoriesTableRowPropsI) => {
-    const relativeTime = useMemo(() => formatRelative(memory.updatedAt), [memory.updatedAt]);
-
-    return (
-        <tr
-            className="cursor-pointer border-b last:border-0 hover:bg-muted/40 focus-visible:bg-muted/40 focus-visible:outline-none"
-            onClick={() => onView(memory)}
-            onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-
-                    onView(memory);
-                }
-            }}
-            tabIndex={0}
-        >
-            <td className="px-4 py-2">
-                <div className="flex flex-col">
-                    <span className="text-sm font-medium">{memory.title}</span>
-
-                    <span className="text-xs text-muted-foreground">{memory.name}</span>
-                </div>
-            </td>
-
-            <td className="px-4 py-2">
-                <Badge label={getAiAutoMemoryTypeLabel(memory.memoryType)} styleType="secondary-outline" />
-            </td>
-
-            <td className="max-w-sm px-4 py-2 text-sm text-muted-foreground">
-                <span className="line-clamp-2">{memory.description || ''}</span>
-            </td>
-
-            <td className="px-4 py-2 text-sm text-muted-foreground">{relativeTime}</td>
-
-            <td className="w-px px-4 py-2 text-right">
-                {mutable && (
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild onClick={(event) => event.stopPropagation()}>
-                            <Button
-                                aria-label={`More actions for ${memory.title}`}
-                                icon={<EllipsisVerticalIcon />}
-                                size="icon"
-                                variant="ghost"
-                            />
-                        </DropdownMenuTrigger>
-
-                        <DropdownMenuContent align="end" onClick={(event) => event.stopPropagation()}>
-                            <DropdownMenuItem icon={<PencilIcon />} label="Edit" onClick={() => onEdit(memory)} />
-
-                            <DropdownMenuSeparator />
-
-                            <DropdownMenuItem
-                                icon={<Trash2Icon />}
-                                label="Delete"
-                                onClick={() => onDelete(memory)}
-                                variant="destructive"
-                            />
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                )}
-            </td>
-        </tr>
-    );
-};
-
-const MemoriesEmptyState = () => (
-    <EmptyState
-        description="AI agents that use the Auto Memory tool store what is worth keeping here, such as user preferences and project decisions. You can inspect, edit or delete each memory."
-        docsLink={{href: MEMORIES_DOCUMENTATION_URL, label: 'How memories work'}}
-        icon={<BrainIcon />}
-        title="No memories yet"
-    />
-);
-
-interface MemoriesErrorStatePropsI {
-    message: string;
-    onRetry: () => void;
-}
-
-const MemoriesErrorState = ({message, onRetry}: MemoriesErrorStatePropsI) => (
-    <EmptyList
-        button={<Button label="Retry" onClick={onRetry} variant="outline" />}
-        className="mx-auto max-w-2xl px-6"
-        icon={<TriangleAlertIcon className="size-24 text-stroke-neutral-tertiary" />}
-        message={message}
-        title="Could not load memories"
-    />
-);
 
 const Memories = () => {
     const [activeFilter, setActiveFilter] = useState<FilterValueType>('ALL');
@@ -240,160 +104,55 @@ const Memories = () => {
         return groups;
     }, [activeFilter, principals, selectedPrincipal]);
 
-    const filteredMemories = useMemo(() => {
-        if (!memories) {
-            return [];
-        }
-
-        const lowerSearch = searchTerm.trim().toLowerCase();
-
-        if (!lowerSearch) {
-            return memories;
-        }
-
-        return memories.filter((memory) => {
-            const title = memory.title.toLowerCase();
-            const description = (memory.description ?? '').toLowerCase();
-
-            return title.includes(lowerSearch) || description.includes(lowerSearch);
-        });
-    }, [memories, searchTerm]);
+    const filteredMemories = useMemo(() => filterMemoriesBySearchTerm(memories, searchTerm), [memories, searchTerm]);
 
     const deleteTarget = useMemo(() => findMemory(memories, deleteTargetId), [deleteTargetId, memories]);
     const editTarget = useMemo(() => findMemory(memories, editTargetId), [editTargetId, memories]);
     const viewTarget = useMemo(() => findMemory(memories, viewTargetId), [memories, viewTargetId]);
 
-    const filtersActive = hasActiveFilters(filterGroups);
-
-    const totalCount = memories?.length ?? 0;
-
     const showLoadError = isMemoriesError && memories === undefined;
 
     return (
-        <LayoutContainer
-            header={
-                <Header
-                    centerTitle
-                    description="Facts the agent has stored while working in this workspace."
-                    position="main"
-                    right={
-                        <div className="flex items-center gap-2">
-                            <div className="relative w-64">
-                                <SearchIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-
-                                <Input
-                                    className="pl-9"
-                                    onChange={(event) => setSearchTerm(event.target.value)}
-                                    placeholder="Search by title or description..."
-                                    value={searchTerm}
-                                />
-                            </div>
-
-                            <FilterMenu groups={filterGroups} title="Filter Memories" />
-                        </div>
-                    }
-                    title="AI Memories"
-                />
+        <MemoriesPageLayout
+            columnTitles={['Description']}
+            description="Facts the agent has stored while working in this workspace."
+            emptyStateDescription="AI agents that use the Auto Memory tool store what is worth keeping here, such as user preferences and project decisions. You can inspect, edit or delete each memory."
+            filterGroups={filterGroups}
+            filterLoadError={
+                isPrincipalsError
+                    ? {
+                          message: 'Could not load memory owners, so the Project Deployment filter is unavailable.',
+                          onRetry: () => refetchPrincipals(),
+                      }
+                    : undefined
             }
-            leftSidebarOpen={false}
+            isLoading={isLoading}
+            loadError={
+                showLoadError
+                    ? {
+                          message: memoriesError?.message || 'The memories could not be loaded.',
+                          onRetry: () => refetchMemories(),
+                      }
+                    : undefined
+            }
+            onSearchTermChange={setSearchTerm}
+            rows={filteredMemories.map((memory) => (
+                <MemoriesTableRow
+                    key={memory.id}
+                    memory={memory}
+                    mutable={memory.principalType === 'USER' || isAdmin}
+                    onDelete={(target) => setDeleteTargetId(target.id)}
+                    onEdit={(target) => setEditTargetId(target.id)}
+                    onView={(target) => setViewTargetId(target.id)}
+                >
+                    <td className="max-w-sm px-4 py-2 text-sm text-muted-foreground">
+                        <span className="line-clamp-2">{memory.description || ''}</span>
+                    </td>
+                </MemoriesTableRow>
+            ))}
+            searchTerm={searchTerm}
+            totalCount={memories?.length ?? 0}
         >
-            <PageLoader className="min-h-full" loading={isLoading}>
-                <div className="flex w-full flex-col p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
-                    {filtersActive && (
-                        <div className="flex flex-wrap items-center gap-2 pb-4">
-                            <FilterBadges groups={filterGroups} />
-                        </div>
-                    )}
-
-                    {isPrincipalsError && (
-                        <div
-                            className="mb-4 flex items-center gap-3 rounded-md border px-4 py-2 text-sm text-muted-foreground"
-                            role="alert"
-                        >
-                            <TriangleAlertIcon className="size-4 shrink-0" />
-
-                            <span className="flex-1">
-                                Could not load memory owners, so the Project Deployment filter is unavailable.
-                            </span>
-
-                            <Button label="Retry" onClick={() => refetchPrincipals()} size="sm" variant="outline" />
-                        </div>
-                    )}
-
-                    {showLoadError && (
-                        <div className="flex flex-1 items-center justify-center">
-                            <MemoriesErrorState
-                                message={memoriesError?.message || 'The memories could not be loaded.'}
-                                onRetry={() => refetchMemories()}
-                            />
-                        </div>
-                    )}
-
-                    {!showLoadError && totalCount === 0 && filtersActive && (
-                        <p className="p-8 text-center text-sm text-muted-foreground">
-                            No memories match the selected filters.
-                        </p>
-                    )}
-
-                    {!showLoadError && totalCount === 0 && !filtersActive && (
-                        <div className="flex flex-1 items-center justify-center">
-                            <MemoriesEmptyState />
-                        </div>
-                    )}
-
-                    {!showLoadError && totalCount > 0 && (
-                        <div className="flex w-full flex-1 flex-col gap-4">
-                            {filteredMemories.length === 0 ? (
-                                <p className="p-8 text-center text-sm text-muted-foreground">
-                                    No memories match your search.
-                                </p>
-                            ) : (
-                                <div className="overflow-x-auto rounded-md border">
-                                    <table className="w-full">
-                                        <thead>
-                                            <tr className="border-b bg-muted/50 text-left">
-                                                <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                                                    Title
-                                                </th>
-
-                                                <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                                                    Type
-                                                </th>
-
-                                                <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                                                    Description
-                                                </th>
-
-                                                <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                                                    Updated
-                                                </th>
-
-                                                <th className="w-px px-4 py-2 text-right text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                                                    Actions
-                                                </th>
-                                            </tr>
-                                        </thead>
-
-                                        <tbody>
-                                            {filteredMemories.map((memory) => (
-                                                <MemoriesTableRow
-                                                    key={memory.id}
-                                                    memory={memory}
-                                                    mutable={memory.principalType === 'USER' || isAdmin}
-                                                    onDelete={(target) => setDeleteTargetId(target.id)}
-                                                    onEdit={(target) => setEditTargetId(target.id)}
-                                                    onView={(target) => setViewTargetId(target.id)}
-                                                />
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-            </PageLoader>
-
             <MemoryDetailDialog
                 memory={viewTarget}
                 onClose={() => setViewTargetId(null)}
@@ -416,7 +175,7 @@ const Memories = () => {
                 open={deleteTarget !== null}
                 workspaceId={currentWorkspaceId}
             />
-        </LayoutContainer>
+        </MemoriesPageLayout>
     );
 };
 
