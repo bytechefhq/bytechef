@@ -286,6 +286,46 @@ describe('ConnectDialog', () => {
             expect(screen.getByText('INPUTS')).toBeInTheDocument();
             expect(screen.getByLabelText('Input 1')).toBeInTheDocument();
         });
+
+        it('shows and copies the webhook URL of an enabled workflow', async () => {
+            const writeTextMock = vi.fn().mockResolvedValue(undefined);
+
+            Object.assign(navigator, {clipboard: {writeText: writeTextMock}});
+
+            const webhookUrl = 'https://bytechef.example.com/webhooks/abc';
+
+            render(
+                <ConnectDialog
+                    {...editConnectionProps}
+                    mergedWorkflows={[{...editConnectionProps.mergedWorkflows[0], staticWebhookUrl: webhookUrl}]}
+                />
+            );
+
+            const workflowItem = screen.getByText('Test Workflow').closest('li') as HTMLElement;
+
+            expect(within(workflowItem).getByText(webhookUrl)).toBeInTheDocument();
+
+            fireEvent.click(within(workflowItem).getByRole('button', {name: 'Copy'}));
+
+            expect(writeTextMock).toHaveBeenCalledWith(webhookUrl);
+            expect(await within(workflowItem).findByRole('button', {name: 'Copied'})).toBeInTheDocument();
+        });
+
+        it('hides the webhook URL of a disabled workflow', () => {
+            const webhookUrl = 'https://bytechef.example.com/webhooks/abc';
+
+            render(
+                <ConnectDialog
+                    {...editConnectionProps}
+                    mergedWorkflows={[
+                        {...editConnectionProps.mergedWorkflows[0], enabled: false, staticWebhookUrl: webhookUrl},
+                    ]}
+                />
+            );
+
+            expect(screen.queryByText('WEBHOOK URL')).not.toBeInTheDocument();
+            expect(screen.queryByText(webhookUrl)).not.toBeInTheDocument();
+        });
     });
 
     describe('Form Validation UI Tests', () => {

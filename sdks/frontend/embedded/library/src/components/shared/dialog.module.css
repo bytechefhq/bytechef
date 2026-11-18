@@ -440,6 +440,39 @@
     margin: 0;
 }
 
+.workflowWebhookUrlContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    min-inline-size: 0;
+}
+
+.workflowWebhookUrlContainer > span {
+    font-size: 0.875rem;
+    color: var(--dialog-text-muted);
+    font-weight: bold;
+}
+
+.workflowWebhookUrlContainer > div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.workflowWebhookUrlContainer code {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.75rem;
+    padding: 0.375rem 0.5rem;
+    border-radius: 0.375rem;
+    background-color: var(--dialog-hover);
+}
+
 /* Toggle component */
 .toggleCheckbox {
     height: 0;

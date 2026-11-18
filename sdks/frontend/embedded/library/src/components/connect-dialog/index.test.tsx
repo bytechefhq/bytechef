@@ -582,6 +582,85 @@ describe('useConnectDialog - Navigation', () => {
             expect.objectContaining({method: 'DELETE'})
         );
     });
+
+    it('reloads the integration after enabling a workflow so its webhook URL shows', async () => {
+        const webhookUrl = 'https://bytechef.example.com/webhooks/abc';
+
+        let workflowEnabled = false;
+
+        const fetchMock = vi.fn().mockImplementation(async (url: string, init?: RequestInit) => {
+            if (url.endsWith('/enable')) {
+                workflowEnabled = init?.method === 'POST';
+            }
+
+            return {
+                ok: true,
+                headers: {
+                    get: (name: string) => (name === 'content-length' ? '2' : null),
+                },
+                json: vi.fn().mockResolvedValue({
+                    workflows: [
+                        {
+                            label: 'Test Workflow',
+                            workflowUuid: 'workflow-123',
+                        },
+                    ],
+                    integrationInstances: [
+                        {
+                            id: 123,
+                            enabled: true,
+                            credentialStatus: 'VALID',
+                            workflows: workflowEnabled
+                                ? [{enabled: true, staticWebhookUrl: webhookUrl, workflowUuid: 'workflow-123'}]
+                                : [],
+                        },
+                    ],
+                }),
+            };
+        });
+
+        global.fetch = fetchMock as unknown as typeof global.fetch;
+
+        const renderMock = vi.fn();
+
+        vi.mocked(createRoot).mockReturnValue({
+            render: renderMock,
+            unmount: vi.fn(),
+        });
+
+        const {result} = renderHook(() =>
+            useConnectDialog({
+                ...defaultConnectDialogProps,
+                integrationInstanceId: '123',
+            })
+        );
+
+        await act(async () => result.current.openDialog());
+
+        const getLastProps = () => renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
+
+        expect(getLastProps().mergedWorkflows[0].staticWebhookUrl).toBeUndefined();
+
+        fetchMock.mockClear();
+
+        await act(async () => {
+            await getLastProps().handleWorkflowToggle('workflow-123', true);
+        });
+
+        expect(fetchMock).toHaveBeenLastCalledWith(
+            expect.stringMatching(/\/api\/embedded\/v1\/integrations\/1234$/),
+            expect.anything()
+        );
+        expect(getLastProps().mergedWorkflows[0].staticWebhookUrl).toBe(webhookUrl);
+
+        fetchMock.mockClear();
+
+        await act(async () => {
+            await getLastProps().handleWorkflowToggle('workflow-123', false);
+        });
+
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
 });
 
 describe('useConnectDialog - group-member persistence', () => {
