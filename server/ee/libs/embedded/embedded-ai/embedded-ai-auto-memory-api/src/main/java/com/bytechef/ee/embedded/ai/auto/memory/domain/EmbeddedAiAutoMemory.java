@@ -12,8 +12,10 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
 
 /**
- * A memory owned by an integration instance, with the connected user and integration of that instance. The connected
- * user and integration fields are null when the instance, its connected user or its integration no longer exists.
+ * A memory owned by an integration instance or by an Embedded-owned project deployment, with its connected user and
+ * source. An integration instance's memory carries its integration; a deployment's memory carries the automation the
+ * connected user enabled, or no automation when the deployment holds the connected user's own workflows. The connected
+ * user and source fields are null when the owner, its connected user or its integration no longer exists.
  *
  * @version ee
  *
@@ -23,5 +25,6 @@ import org.jspecify.annotations.Nullable;
 public record EmbeddedAiAutoMemory(
     AiAutoMemory memory, @Nullable Long connectedUserId, @Nullable String connectedUserName,
     @Nullable String connectedUserEmail, @Nullable String connectedUserExternalId, @Nullable Long integrationId,
-    @Nullable String integrationName, @Nullable String integrationComponentName) {
+    @Nullable String integrationName, @Nullable String integrationComponentName, @Nullable Long automationId,
+    @Nullable String automationName) {
 }

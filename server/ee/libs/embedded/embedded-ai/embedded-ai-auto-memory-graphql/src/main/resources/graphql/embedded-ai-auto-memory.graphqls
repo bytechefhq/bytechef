@@ -1,4 +1,7 @@
-"A memory an Embedded integration's agent saved for one connected user's integration instance."
+"""
+A memory an Embedded agent saved for one connected user: in an integration instance (principalType
+INTEGRATION_INSTANCE) or in an automation deployment (principalType PROJECT_DEPLOYMENT).
+"""
 type EmbeddedAiAutoMemory {
     id: ID!
     name: String!
@@ -12,11 +15,19 @@ type EmbeddedAiAutoMemory {
     version: Long!
     createdAt: Long
     updatedAt: Long
-    integrationInstanceId: Long!
-    "Null when the instance's connected user was deleted while its memories remain."
+    "INTEGRATION_INSTANCE or PROJECT_DEPLOYMENT. Send it back with principalId to update or delete the memory."
+    principalType: AiAutoMemoryPrincipalType!
+    "The integration instance or project deployment that holds the memory."
+    principalId: Long!
+    "Null when the owner's connected user was deleted while its memories remain."
     connectedUser: EmbeddedAiAutoMemoryConnectedUserRef
-    "Null when the instance's integration was deleted while its memories remain."
+    "An integration instance's integration. Null for an automation memory, or when the integration was deleted."
     integration: EmbeddedAiAutoMemoryIntegration
+    """
+    The automation the connected user enabled, for an automation memory. Null for an integration memory, and for a
+    memory of the connected user's own workflows, which run in their own deployment.
+    """
+    automation: EmbeddedAiAutoMemoryAutomation
 }
 
 type EmbeddedAiAutoMemoryConnectedUserRef {
@@ -32,6 +43,11 @@ type EmbeddedAiAutoMemoryIntegration {
     componentName: String
 }
 
+type EmbeddedAiAutoMemoryAutomation {
+    id: ID!
+    name: String
+}
+
 "A connected user holding at least one memory in the environment, for the Connected User filter."
 type EmbeddedAiAutoMemoryConnectedUser {
     id: ID!
@@ -43,7 +59,7 @@ type EmbeddedAiAutoMemoryConnectedUser {
 
 extend type Query {
     """
-    Lists the memories of every Embedded integration instance in the environment (the Environment ordinal: 0
+    Lists the memories of every Embedded integration instance and automation deployment in the environment (the Environment ordinal: 0
     DEVELOPMENT, 1 STAGING, 2 PRODUCTION). connectedUserId and memoryType narrow the list. Admin only.
     """
     embeddedAiAutoMemories(
@@ -58,16 +74,21 @@ extend type Query {
 
 extend type Mutation {
     """
-    Partial update of an integration instance's memory. Fails with NOT_FOUND when the instance holds no such memory in
-    the environment, and with CONFLICT when it changed since expectedVersion. Admin only.
+    Partial update of an Embedded memory. Fails with NOT_FOUND when the owner holds no such memory in the environment
+    or is not an Embedded owner, and with CONFLICT when it changed since expectedVersion. Admin only.
     """
     updateEmbeddedAiAutoMemory(input: UpdateEmbeddedAiAutoMemoryInput!): EmbeddedAiAutoMemory!
 
     """
-    Deletes an integration instance's memory. Fails with NOT_FOUND when the instance holds no such memory in the
-    environment. Admin only.
+    Deletes an Embedded memory. Fails with NOT_FOUND when the owner holds no such memory in the environment or is not
+    an Embedded owner. Admin only.
     """
-    deleteEmbeddedAiAutoMemory(id: ID!, integrationInstanceId: ID!, environment: Int!): Boolean!
+    deleteEmbeddedAiAutoMemory(
+        id: ID!,
+        principalType: AiAutoMemoryPrincipalType!,
+        principalId: ID!,
+        environment: Int!
+    ): Boolean!
 }
 
 """
@@ -76,8 +97,10 @@ content is rejected.
 """
 input UpdateEmbeddedAiAutoMemoryInput {
     id: ID!
-    "The integration instance that holds the memory: the memory's integrationInstanceId."
-    integrationInstanceId: ID!
+    "The memory's principalType."
+    principalType: AiAutoMemoryPrincipalType!
+    "The memory's principalId."
+    principalId: ID!
     environment: Int!
     expectedVersion: Long!
     title: String
