@@ -56,8 +56,7 @@ type ContextType = ScriptCompletionRequestI['context'];
 
 const SCRIPT_CONTEXT_MEMBERS = ['component'];
 const CUSTOM_COMPONENT_CONTEXT_MEMBERS = ['http', 'log'];
-const CODE_WORKFLOW_CONTEXT_MEMBERS = ['component', 'connection', 'input', 'log', 'parameters'];
-const ZERO_ARGUMENT_CONTEXT_MEMBERS = new Set(['input', 'parameters']);
+const CODE_WORKFLOW_CONTEXT_MEMBERS = ['component', 'log'];
 const OPEN_BRACKET_BEFORE = /\[\s*$/;
 
 function propertyItem(name: string): CompletionItemDraftType {
@@ -68,9 +67,13 @@ function propertyItems(names: string[]): CompletionItemDraftType[] {
     return names.map(propertyItem);
 }
 
+function runsInExternalTaskRunner(context: ContextType): boolean {
+    return context.kind === 'script' && Boolean(context.externalTaskRunner);
+}
+
 function contextMembers(context: ContextType): string[] {
     if (context.kind === 'script') {
-        return SCRIPT_CONTEXT_MEMBERS;
+        return context.externalTaskRunner ? [] : SCRIPT_CONTEXT_MEMBERS;
     }
 
     return context.kind === 'customComponent' ? CUSTOM_COMPONENT_CONTEXT_MEMBERS : CODE_WORKFLOW_CONTEXT_MEMBERS;
@@ -82,12 +85,7 @@ function contextMemberItems(context: ContextType): CompletionItemDraftType[] {
             return {insertAsSnippet: false, insertText: member, kind: 'module', label: member};
         }
 
-        const insertText =
-            context.kind === 'codeWorkflow' && ZERO_ARGUMENT_CONTEXT_MEMBERS.has(member)
-                ? `${member}()$0`
-                : buildFunctionSnippet(member);
-
-        return {insertAsSnippet: true, insertText, kind: 'method', label: member};
+        return {insertAsSnippet: true, insertText: buildFunctionSnippet(member), kind: 'method', label: member};
     });
 }
 
@@ -196,6 +194,14 @@ function inputItems(
         return isPlainObject(value) ? propertyItems(Object.keys(value)) : [];
     }
 
+    if (context.kind === 'codeWorkflow') {
+        const task = findTask(request);
+
+        return segments.length === 1
+            ? propertyItems([...(task?.inputNames ?? []), ...(task?.earlierTaskNames ?? [])])
+            : [];
+    }
+
     if (context.kind === 'customComponent' && segments.length === 1 && scope.inputName) {
         const action = findEnclosingAction(source, cursorOffset, context.language);
 
@@ -210,12 +216,13 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 }
 
 async function connectionPropertyItems(
-    context: ScriptCompletionContextI,
+    request: ScriptCompletionRequestI,
     connectionName: string
 ): Promise<CompletionItemDraftType[]> {
-    const declaration = context.connections.find((connection) => connection.name === connectionName);
+    const {context} = request;
+    const declaration = declaredConnections(request).find((connection) => connection.name === connectionName);
 
-    if (!declaration) {
+    if (!declaration || context.kind === 'customComponent') {
         return [];
     }
 
@@ -249,16 +256,12 @@ async function connectionItems(
     const {context, source} = request;
 
     if (segments.length === 1) {
-        if (context.kind === 'script') {
-            return propertyItems(context.connections.map((connection) => connection.name));
-        }
-
         return context.kind === 'customComponent'
             ? propertyItems(findComponentConnectionPropertyNames(source, context.language))
-            : [];
+            : propertyItems(declaredConnections(request).map((connection) => connection.name));
     }
 
-    return segments.length === 2 && context.kind === 'script' ? connectionPropertyItems(context, segments[0]) : [];
+    return segments.length === 2 ? connectionPropertyItems(request, segments[0]) : [];
 }
 
 function bareRootItems(scope: PerformScopeType): CompletionItemDraftType[] {
@@ -286,7 +289,7 @@ function resolveComponentCallee(
 ): {actionName: string; componentName: string} | undefined {
     const {context, cursorOffset, source} = request;
 
-    if (context.kind === 'customComponent') {
+    if (context.kind === 'customComponent' || runsInExternalTaskRunner(context)) {
         return undefined;
     }
 
@@ -542,7 +545,7 @@ async function memberPathItems(
     path: MemberPathType
 ): Promise<CompletionItemDraftType[]> {
     const {context, cursorOffset, source} = request;
-    const {callSegments, root, segments} = path;
+    const {root, segments} = path;
     const scope = findPerformScope(source, cursorOffset, context.language, segments.length > 0 ? root : undefined);
 
     if (!scope) {
@@ -558,18 +561,12 @@ async function memberPathItems(
             return contextMemberItems(context);
         }
 
-        if (segments[0] === 'component') {
+        if (segments[0] === 'component' && !runsInExternalTaskRunner(context)) {
             if (segments.length === 2) {
                 return componentItems(request);
             }
 
             return segments.length === 3 ? actionItems(request, segments[1]) : [];
-        }
-
-        if (segments.length === 2 && segments[0] === 'input' && callSegments[0] && context.kind === 'codeWorkflow') {
-            const task = findTask(request);
-
-            return propertyItems([...(task?.inputNames ?? []), ...(task?.earlierTaskNames ?? [])]);
         }
 
         return [];

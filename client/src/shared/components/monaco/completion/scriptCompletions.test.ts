@@ -62,6 +62,40 @@ describe('getScriptCompletions for a script', () => {
         expect(items.map((item) => item.label)).toEqual(['component']);
     });
 
+    describe('in an external task runner', () => {
+        const externalContext: ScriptCompletionContextI = {...context, externalTaskRunner: true};
+
+        const complete = (source: string) =>
+            getScriptCompletions({context: externalContext, cursorOffset: source.length, source});
+
+        it('offers nothing on context, which only GraalVM provides', async () => {
+            expect(await complete(base + 'context.')).toEqual([]);
+            expect(await complete(base + 'context.component.')).toEqual([]);
+            expect(await complete(base + 'context.component.googleMaps.')).toEqual([]);
+        });
+
+        it('offers no action properties or connection names on a component action call', async () => {
+            expect(await complete(base + 'context.component.googleMaps.getAddress({lat')).toEqual([]);
+            expect(await complete(base + "context.component.googleMaps.getAddress({}, '")).toEqual([]);
+        });
+
+        it('still offers the declared connections and their parameters', async () => {
+            const connectionItems = await complete(base + 'connection.');
+
+            expect(connectionItems.map((item) => item.label)).toEqual(['gm']);
+
+            const parameterItems = await complete(base + 'connection.gm.');
+
+            expect(parameterItems.map((item) => item.label)).toEqual(['apiKey', 'region']);
+        });
+
+        it('still offers the input', async () => {
+            const inputItems = await complete(base + 'input.');
+
+            expect(inputItems.map((item) => item.label)).toEqual(['order', 'total']);
+        });
+    });
+
     it('sorts connected components first and marks them', async () => {
         const source = base + 'context.component.';
         const items = await getScriptCompletions({context, cursorOffset: source.length, source});
@@ -281,29 +315,36 @@ describe('getScriptCompletions for a custom component', () => {
 
 describe('getScriptCompletions for a code workflow', () => {
     const context: CodeWorkflowCompletionContextI = {components: catalog, kind: 'codeWorkflow', language: 'javascript'};
-    const source =
-        '({workflows: [{name: "w", inputs: [{name: "orderId"}], tasks: [{name: "fetch", perform: (context) => 1}, {name: "n", connections: [{componentName: "aiAgent", name: "agent"}], perform: function (context) {\ncontext.';
+    const head =
+        '({workflows: [{name: "w", inputs: [{name: "orderId"}], tasks: [{name: "fetch", perform: (input, context) => 1}, {name: "n", connections: [{componentName: "aiAgent", componentVersion: 1, name: "agent"}], perform: function (input, connection, context) {\n';
+    const source = head + 'context.';
 
-    it('offers the five runtime members', async () => {
-        expect(
-            (await getScriptCompletions({context, cursorOffset: source.length, source})).map((item) => item.label)
-        ).toEqual(['component', 'connection', 'input', 'log', 'parameters']);
+    const labels = async (completionSource: string) =>
+        (await getScriptCompletions({context, cursorOffset: completionSource.length, source: completionSource})).map(
+            (item) => item.label
+        );
+
+    it('offers only the component and log members on context', async () => {
+        expect(await labels(source)).toEqual(['component', 'log']);
     });
 
-    it('places the caret after the parentheses of zero-argument members and inside connection', async () => {
+    it('places the caret inside the parentheses of log', async () => {
         expect(
             (await getScriptCompletions({context, cursorOffset: source.length, source})).map((item) => item.insertText)
-        ).toEqual(['component', 'connection($1)', 'input()$0', 'log($1)', 'parameters()$0']);
+        ).toEqual(['component', 'log($1)']);
     });
 
-    it('offers inputs and earlier tasks under context.input()', async () => {
-        const inputSource = source + 'input().';
+    it('offers the workflow inputs and earlier tasks under input', async () => {
+        expect(await labels(head + 'input.')).toEqual(['orderId', 'fetch']);
+    });
 
-        expect(
-            (await getScriptCompletions({context, cursorOffset: inputSource.length, source: inputSource})).map(
-                (item) => item.label
-            )
-        ).toEqual(['orderId', 'fetch']);
+    it('offers the task connections under connection', async () => {
+        expect(await labels(head + 'connection.')).toEqual(['agent']);
+    });
+
+    it('offers a declared connection parameters under its name', async () => {
+        expect(await labels(head + 'connection.agent.')).toEqual(['apiKey', 'region']);
+        expect(catalog.getConnectionDefinition).toHaveBeenCalledWith('aiAgent', 1);
     });
 
     it('adds the cluster elements stop for an action that accepts them', async () => {
@@ -317,7 +358,7 @@ describe('getScriptCompletions for a code workflow', () => {
 
     it('resolves a Python task through its named function', async () => {
         const pythonContext: CodeWorkflowCompletionContextI = {...context, language: 'python'};
-        const pythonSource = 'def greet(context):\n    context.input().';
+        const pythonSource = 'def greet(input, context):\n    input.';
         const fullSource =
             pythonSource +
             '\n\nproject = {"workflows": [{"name": "w", "inputs": [{"name": "name"}], "tasks": [{"name": "greet", "perform": greet}]}]}';
@@ -335,7 +376,7 @@ describe('getScriptCompletions for a code workflow', () => {
 
     it('completes a Python task input read by subscript', async () => {
         const pythonContext: CodeWorkflowCompletionContextI = {...context, language: 'python'};
-        const pythonSource = 'def greet(context):\n    context.input()["na';
+        const pythonSource = 'def greet(input, context):\n    input["na';
         const fullSource =
             pythonSource +
             '"]\n\nproject = {"workflows": [{"name": "w", "inputs": [{"name": "name"}], "tasks": [{"name": "greet", "perform": greet}]}]}';

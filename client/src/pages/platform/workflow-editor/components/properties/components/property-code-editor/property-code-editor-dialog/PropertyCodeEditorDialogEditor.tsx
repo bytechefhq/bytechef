@@ -1,4 +1,5 @@
 import {usePropertyCodeEditorDialogStore} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/stores/usePropertyCodeEditorDialogStore';
+import {isExternalTaskRunner} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/utils/isExternalTaskRunner';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
@@ -38,13 +39,15 @@ const PropertyCodeEditorDialogEditor = ({
             }))
         );
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const {clusterElementType, currentNodeEnv, currentNodeName} = useWorkflowNodeDetailsPanelStore(
-        useShallow((state) => ({
-            clusterElementType: state.currentNode?.clusterElementType,
-            currentNodeEnv: state.currentNode?.parameters?.env,
-            currentNodeName: state.currentNode?.name,
-        }))
-    );
+    const {clusterElementType, currentNodeEnv, currentNodeName, currentNodeTaskRunner} =
+        useWorkflowNodeDetailsPanelStore(
+            useShallow((state) => ({
+                clusterElementType: state.currentNode?.clusterElementType,
+                currentNodeEnv: state.currentNode?.parameters?.env,
+                currentNodeName: state.currentNode?.name,
+                currentNodeTaskRunner: state.currentNode?.parameters?.taskRunner,
+            }))
+        );
     const rootClusterElementNodeName = useWorkflowEditorStore(
         (state) => state.rootClusterElementNodeData?.workflowNodeName
     );
@@ -80,6 +83,7 @@ const PropertyCodeEditorDialogEditor = ({
             clusterElementNode,
             components,
             connections: componentConnections,
+            externalTaskRunner: isExternalTaskRunner(scriptLanguage, {taskRunner: currentNodeTaskRunner}),
             input: inputParameters ?? scriptInput,
             kind: 'script',
             language: scriptLanguage as ScriptLanguageType,
@@ -91,6 +95,7 @@ const PropertyCodeEditorDialogEditor = ({
         componentConnections,
         components,
         currentNodeEnv,
+        currentNodeTaskRunner,
         inputParameters,
         language,
         operationPropertyLoaders,

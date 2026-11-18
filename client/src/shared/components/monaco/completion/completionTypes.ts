@@ -71,6 +71,7 @@ export interface ScriptCompletionContextI {
     clusterElementNode?: ClusterElementNodeType;
     components: ComponentCatalogType;
     connections: ConnectionDeclarationType[];
+    externalTaskRunner?: boolean;
     input: Record<string, unknown>;
     kind: 'script';
     language: ScriptLanguageType;

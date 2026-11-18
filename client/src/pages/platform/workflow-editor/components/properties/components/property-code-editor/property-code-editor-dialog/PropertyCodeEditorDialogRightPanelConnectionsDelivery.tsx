@@ -1,25 +1,12 @@
+import {isExternalTaskRunner} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/utils/isExternalTaskRunner';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {TriangleAlertIcon} from 'lucide-react';
 import {useMemo} from 'react';
 
-const GRAALVM_TASK_RUNNER_TYPE = 'graalvm';
-
 interface PropertyCodeEditorDialogRightPanelConnectionsDeliveryProps {
     language: string;
 }
-
-const getTaskRunnerType = (parameters: Record<string, unknown> | undefined): string | undefined => {
-    const taskRunner = parameters?.taskRunner;
-
-    if (!taskRunner || typeof taskRunner !== 'object') {
-        return undefined;
-    }
-
-    const {type} = taskRunner as {type?: unknown};
-
-    return typeof type === 'string' ? type : undefined;
-};
 
 const PropertyCodeEditorDialogRightPanelConnectionsDelivery = ({
     language,
@@ -29,15 +16,10 @@ const PropertyCodeEditorDialogRightPanelConnectionsDelivery = ({
 
     const shellScript = language.toLowerCase() === 'shell';
 
-    const externalTaskRunner = useMemo(() => {
-        if (shellScript) {
-            return true;
-        }
-
-        const taskRunnerType = getTaskRunnerType(currentNodeParameters);
-
-        return taskRunnerType !== undefined && taskRunnerType !== GRAALVM_TASK_RUNNER_TYPE;
-    }, [currentNodeParameters, shellScript]);
+    const externalTaskRunner = useMemo(
+        () => isExternalTaskRunner(language, currentNodeParameters),
+        [currentNodeParameters, language]
+    );
 
     if (!externalTaskRunner) {
         return null;

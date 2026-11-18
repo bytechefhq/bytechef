@@ -194,6 +194,42 @@ describe('PropertyCodeEditorDialogEditor', () => {
             });
         });
 
+        it('marks a script in a non-GraalVM task runner as external', async () => {
+            useWorkflowNodeDetailsPanelStore.setState({
+                currentNode: {
+                    componentName: 'script',
+                    label: 'JavaScript',
+                    name: 'script_1',
+                    parameters: {taskRunner: {type: 'docker'}},
+                    workflowNodeName: 'script_1',
+                },
+            } as unknown as Parameters<typeof useWorkflowNodeDetailsPanelStore.setState>[0]);
+
+            render(<PropertyCodeEditorDialogEditor language="javascript" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toMatchObject({externalTaskRunner: true, kind: 'script'});
+        });
+
+        it('does not mark a script in the GraalVM task runner as external', async () => {
+            useWorkflowNodeDetailsPanelStore.setState({
+                currentNode: {
+                    componentName: 'script',
+                    label: 'JavaScript',
+                    name: 'script_1',
+                    parameters: {taskRunner: {type: 'graalvm'}},
+                    workflowNodeName: 'script_1',
+                },
+            } as unknown as Parameters<typeof useWorkflowNodeDetailsPanelStore.setState>[0]);
+
+            render(<PropertyCodeEditorDialogEditor language="javascript" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toMatchObject({externalTaskRunner: false, kind: 'script'});
+        });
+
         it('prefers the edited input parameters over the stored script input', async () => {
             hoisted.storeState.inputParameters = {edited: true};
             hoisted.storeState.scriptInput = {order: 1};
