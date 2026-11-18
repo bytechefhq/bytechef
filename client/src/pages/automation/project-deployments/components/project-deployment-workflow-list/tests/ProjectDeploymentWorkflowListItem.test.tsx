@@ -133,6 +133,7 @@ describe('ProjectDeploymentWorkflowListItem', () => {
         expect(rowPropsMock).toHaveBeenLastCalledWith(
             expect.objectContaining({
                 className: 'hidden sm:flex',
+                truncateTriggerLabel: true,
                 workflow,
                 workflowComponentDefinitions: {},
                 workflowTaskDispatcherDefinitions: {},
