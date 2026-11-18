@@ -17,8 +17,10 @@
 package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.Project;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
@@ -47,4 +49,25 @@ public interface ProjectRepository
             WHERE project_workflow.workflow_id = :workflowId
         """)
     Optional<Project> findByWorkflowId(@Param("workflowId") String workflowId);
+
+    /**
+     * Sets the created and last modified dates directly, bypassing auditing, which stamps its own clock read on save.
+     */
+    @Modifying
+    @Query("UPDATE project SET created_date = :createdDate, last_modified_date = :lastModifiedDate WHERE id = :id")
+    void updateDates(
+        @Param("id") long id, @Param("createdDate") Instant createdDate,
+        @Param("lastModifiedDate") Instant lastModifiedDate);
+
+    /**
+     * Sets the last modified fields directly, bypassing auditing, which stamps its own clock read on save.
+     */
+    @Modifying
+    @Query("""
+            UPDATE project SET last_modified_by = :lastModifiedBy, last_modified_date = :lastModifiedDate
+            WHERE id = :id
+        """)
+    void updateLastModified(
+        @Param("id") long id, @Param("lastModifiedBy") String lastModifiedBy,
+        @Param("lastModifiedDate") Instant lastModifiedDate);
 }

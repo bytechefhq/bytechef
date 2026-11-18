@@ -26,7 +26,9 @@ import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -216,6 +218,13 @@ public class ProjectServiceImpl implements ProjectService {
 
         projectRepository.save(project);
 
+        ProjectVersion publishedProjectVersion = project.fetchProjectVersion(newVersion - 1)
+            .orElseThrow();
+
+        Instant publishedDate = publishedProjectVersion.getPublishedDate();
+
+        projectRepository.updateDates(id, publishedDate, publishedDate);
+
         return newVersion;
     }
 
@@ -226,6 +235,19 @@ public class ProjectServiceImpl implements ProjectService {
         project.removeProjectVersion(projectVersion);
 
         projectRepository.save(project);
+    }
+
+    @Override
+    public void restoreProjectVersionDates(long id, int projectVersion) {
+        Project project = getProject(id);
+
+        Instant lastModifiedDate = getPublishedProjectVersion(id, projectVersion).getPublishedDate();
+
+        Instant createdDate = project.fetchProjectVersion(projectVersion - 1)
+            .map(ProjectVersion::getPublishedDate)
+            .orElse(lastModifiedDate);
+
+        projectRepository.updateDates(id, createdDate, lastModifiedDate);
     }
 
     @Override
@@ -254,4 +276,16 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepository.save(curProject);
     }
 
+    @Override
+    public void updateLastModified(long id, String lastModifiedBy, Instant lastModifiedDate) {
+        projectRepository.updateLastModified(id, lastModifiedBy, lastModifiedDate);
+    }
+
+    @Override
+    public void updateLastModified(long id) {
+        String currentUserLogin = SecurityUtils.fetchCurrentUserLogin()
+            .orElse("system");
+
+        projectRepository.updateLastModified(id, currentUserLogin, Instant.now());
+    }
 }

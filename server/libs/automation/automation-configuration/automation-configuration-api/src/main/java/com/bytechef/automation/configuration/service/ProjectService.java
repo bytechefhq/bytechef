@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -71,8 +72,26 @@ public interface ProjectService {
 
     void removeProjectVersion(long id, int projectVersion);
 
+    /**
+     * Sets the project's created and last modified dates to the ones the draft had when the given published version
+     * was the draft: created at the publish of the previous version (or at its own publish for version 1), last
+     * modified at its own publish.
+     */
+    void restoreProjectVersionDates(long id, int projectVersion);
+
     Project update(long id, List<Long> tagIds);
 
     Project update(Project project);
+
+    /**
+     * Sets the project's last modified fields to the given values, as a directory's modification time follows a change
+     * to its list of files.
+     */
+    void updateLastModified(long id, String lastModifiedBy, Instant lastModifiedDate);
+
+    /**
+     * Sets the project's last modified fields to the current user and time.
+     */
+    void updateLastModified(long id);
 
 }

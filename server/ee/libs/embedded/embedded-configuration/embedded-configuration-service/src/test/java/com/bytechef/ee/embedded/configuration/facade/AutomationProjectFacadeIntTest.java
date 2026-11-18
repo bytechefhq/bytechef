@@ -16,11 +16,13 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
@@ -99,6 +101,7 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -650,6 +653,48 @@ class AutomationProjectFacadeIntTest {
 
         assertThat(getDraftTemplate(projectId).label()).isEqualTo("Renamed");
         assertThat(getPublishedTemplate(projectId).label()).isEqualTo("Original");
+    }
+
+    @Test
+    void testUpdateProjectWorkflowRenameSetsProjectLastModifiedDateToTheWorkflowLastModifiedDate() {
+        long projectId = automationProjectFacade.createProject("RenameDates", "", null, List.of(), null);
+
+        String workflowUuid = automationProjectFacade.createProjectWorkflow(
+            projectId, "{\"label\":\"Original\",\"tasks\":[]}", null);
+
+        automationProjectFacade.updateProjectWorkflow(workflowUuid, "Renamed", "");
+
+        Workflow renamedWorkflow = workflowService.getWorkflow(getDraftTemplate(projectId).workflowId());
+
+        assertThat(renamedWorkflow.getLastModifiedDate()).isAfter(renamedWorkflow.getCreatedDate());
+        assertThat(projectService.getProject(projectId)
+            .getLastModifiedDate()).isEqualTo(renamedWorkflow.getLastModifiedDate());
+    }
+
+    @Test
+    void testRestoreProjectVersionSetsProjectDatesFromThePublishDates() {
+        long projectId = automationProjectFacade.createProject("RestoreDates", "", null, List.of(), null);
+
+        automationProjectFacade.createProjectWorkflow(projectId, null, null);
+
+        automationProjectFacade.publishProject(projectId);
+        automationProjectFacade.publishProject(projectId);
+
+        Project project = projectService.getProject(projectId);
+
+        Instant firstPublishedDate = project.fetchProjectVersion(1)
+            .map(ProjectVersion::getPublishedDate)
+            .orElseThrow();
+        Instant secondPublishedDate = project.fetchProjectVersion(2)
+            .map(ProjectVersion::getPublishedDate)
+            .orElseThrow();
+
+        automationProjectFacade.restoreProjectVersion(projectId, 2);
+
+        project = projectService.getProject(projectId);
+
+        assertThat(project.getCreatedDate()).isEqualTo(firstPublishedDate);
+        assertThat(project.getLastModifiedDate()).isEqualTo(secondPublishedDate);
     }
 
     @Test

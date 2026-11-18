@@ -106,6 +106,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @ProjectIntTestConfigurationSharedMocks
 public class ProjectFacadeIntTest {
 
+    private static final Instant EARLIER_DATE = Instant.parse("2026-01-02T03:04:05Z");
+
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -1218,6 +1220,158 @@ public class ProjectFacadeIntTest {
     }
 
     @Test
+    public void testCreateProjectStartsAtDraftVersionOneWithEqualDates() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        Project project = getProject(projectDTO.id());
+
+        assertThat(project.getProjectVersions()).singleElement()
+            .satisfies(projectVersion -> {
+                assertThat(projectVersion.getVersion()).isEqualTo(1);
+                assertThat(projectVersion.getStatus()).isEqualTo(ProjectVersion.Status.DRAFT);
+            });
+        assertThat(project.getLastModifiedDate()).isEqualTo(project.getCreatedDate());
+    }
+
+    @Test
+    public void testAddWorkflowSetsProjectLastModifiedDateToTheWorkflowCreatedDate() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        backdateProjectLastModifiedDate(projectDTO.id());
+
+        Workflow workflow = getWorkflow(projectFacadeInstanceHelper.addTestWorkflow(projectDTO));
+
+        assertThat(workflow.getLastModifiedDate()).isEqualTo(workflow.getCreatedDate());
+        assertThat(getProject(projectDTO.id()).getLastModifiedDate()).isEqualTo(workflow.getCreatedDate());
+    }
+
+    @Test
+    public void testEditWorkflowContentKeepsProjectLastModifiedDate() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        Workflow workflow = getWorkflow(projectFacadeInstanceHelper.addTestWorkflow(projectDTO));
+
+        backdateProjectLastModifiedDate(projectDTO.id());
+
+        projectWorkflowFacade.updateWorkflow(
+            workflow.getId(), "{\"label\": \"Test Workflow\", \"description\": \"Changed\", \"tasks\": []}",
+            workflow.getVersion());
+
+        assertThat(getProject(projectDTO.id()).getLastModifiedDate()).isEqualTo(EARLIER_DATE);
+    }
+
+    @Test
+    public void testRenameWorkflowSetsProjectLastModifiedDateToTheWorkflowLastModifiedDate() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        Workflow workflow = getWorkflow(projectFacadeInstanceHelper.addTestWorkflow(projectDTO));
+
+        backdateProjectLastModifiedDate(projectDTO.id());
+
+        projectWorkflowFacade.updateWorkflow(
+            workflow.getId(), "{\"label\": \"Renamed Workflow\", \"description\": \"Test Description\", \"tasks\": []}",
+            workflow.getVersion());
+
+        Workflow renamedWorkflow = workflowRepository.findById(workflow.getId())
+            .orElseThrow();
+
+        assertThat(renamedWorkflow.getLastModifiedDate()).isAfter(renamedWorkflow.getCreatedDate());
+        assertThat(getProject(projectDTO.id()).getLastModifiedDate())
+            .isEqualTo(renamedWorkflow.getLastModifiedDate());
+    }
+
+    @Test
+    public void testDuplicateWorkflowSetsProjectLastModifiedDateToTheCopyCreatedDate() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        Workflow workflow = getWorkflow(projectFacadeInstanceHelper.addTestWorkflow(projectDTO));
+
+        backdateProjectLastModifiedDate(projectDTO.id());
+
+        String duplicatedWorkflowId = projectWorkflowFacade.duplicateWorkflow(projectDTO.id(), workflow.getId());
+
+        Workflow duplicatedWorkflow = workflowRepository.findById(duplicatedWorkflowId)
+            .orElseThrow();
+
+        assertThat(getProject(projectDTO.id()).getLastModifiedDate()).isEqualTo(duplicatedWorkflow.getCreatedDate());
+    }
+
+    @Test
+    public void testDeleteWorkflowMovesProjectLastModifiedDate() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        Workflow workflow = getWorkflow(projectFacadeInstanceHelper.addTestWorkflow(projectDTO));
+
+        backdateProjectLastModifiedDate(projectDTO.id());
+
+        projectWorkflowFacade.deleteWorkflow(workflow.getId());
+
+        assertThat(getProject(projectDTO.id()).getLastModifiedDate()).isAfter(EARLIER_DATE);
+    }
+
+    @Test
+    public void testUpdateProjectMovesProjectLastModifiedDate() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        backdateProjectLastModifiedDate(projectDTO.id());
+
+        projectFacade.updateProject(
+            ProjectDTO.builder()
+                .id(projectDTO.id())
+                .name("Renamed Project")
+                .version(projectDTO.version())
+                .workspaceId(workspace.getId())
+                .build());
+
+        assertThat(getProject(projectDTO.id()).getLastModifiedDate()).isAfter(EARLIER_DATE);
+    }
+
+    @Test
+    public void testPublishProjectSetsProjectDatesToThePublishedDate() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
+
+        projectFacade.publishProject(projectDTO.id(), "first", false);
+
+        Project project = getProject(projectDTO.id());
+
+        Instant publishedDate = getPublishedDate(project, 1);
+
+        assertThat(project.getCreatedDate()).isEqualTo(publishedDate);
+        assertThat(project.getLastModifiedDate()).isEqualTo(publishedDate);
+    }
+
+    @Test
+    public void testRestoreProjectVersionSetsProjectDatesFromThePublishDates() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
+
+        projectFacade.publishProject(projectDTO.id(), "first", false);
+        projectFacade.publishProject(projectDTO.id(), "second", false);
+
+        Project project = getProject(projectDTO.id());
+
+        Instant firstPublishedDate = getPublishedDate(project, 1);
+        Instant secondPublishedDate = getPublishedDate(project, 2);
+
+        projectFacade.restoreProjectVersion(projectDTO.id(), 2);
+
+        project = getProject(projectDTO.id());
+
+        assertThat(project.getCreatedDate()).isEqualTo(firstPublishedDate);
+        assertThat(project.getLastModifiedDate()).isEqualTo(secondPublishedDate);
+
+        projectFacade.restoreProjectVersion(projectDTO.id(), 1);
+
+        project = getProject(projectDTO.id());
+
+        assertThat(project.getCreatedDate()).isEqualTo(firstPublishedDate);
+        assertThat(project.getLastModifiedDate()).isEqualTo(firstPublishedDate);
+    }
+
+    @Test
     public void testRestoreProjectVersion() {
         ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
 
@@ -1340,6 +1494,26 @@ public class ProjectFacadeIntTest {
 
         assertThat(projectDTO.tags()).hasSize(1);
         assertThat(projectDTO.name()).isEqualTo("Updated Name");
+    }
+
+    private void backdateProjectLastModifiedDate(long projectId) {
+        projectRepository.updateLastModified(projectId, "earlier@localhost.com", EARLIER_DATE);
+    }
+
+    private Project getProject(long projectId) {
+        return projectRepository.findById(projectId)
+            .orElseThrow();
+    }
+
+    private static Instant getPublishedDate(Project project, int version) {
+        return project.fetchProjectVersion(version)
+            .map(ProjectVersion::getPublishedDate)
+            .orElseThrow();
+    }
+
+    private Workflow getWorkflow(ProjectWorkflowDTO projectWorkflowDTO) {
+        return workflowRepository.findById(projectWorkflowDTO.getId())
+            .orElseThrow();
     }
 
     @Nested

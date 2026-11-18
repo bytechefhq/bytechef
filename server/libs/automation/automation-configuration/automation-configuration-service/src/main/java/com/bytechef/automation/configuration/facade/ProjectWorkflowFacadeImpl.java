@@ -166,7 +166,12 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
         Workflow workflow = workflowService.create(definition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
-        return projectWorkflowService.addWorkflow(projectId, project.getLastProjectVersion(), workflow.getId());
+        ProjectWorkflow projectWorkflow = projectWorkflowService.addWorkflow(
+            projectId, project.getLastProjectVersion(), workflow.getId());
+
+        projectService.updateLastModified(projectId, workflow.getCreatedBy(), workflow.getCreatedDate());
+
+        return projectWorkflow;
     }
 
     @Override
@@ -222,6 +227,8 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         workflowTestConfigurationService.delete(workflowId);
 
         workflowService.delete(workflowId);
+
+        projectService.updateLastModified(Validate.notNull(project.getId(), "id"));
     }
 
     @Override
@@ -245,6 +252,8 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
             sourceWorkflow.getSourceType());
 
         projectWorkflowService.addWorkflow(projectId, project.getLastProjectVersion(), workflow.getId());
+
+        projectService.updateLastModified(projectId, workflow.getCreatedBy(), workflow.getCreatedDate());
 
         workflowTestConfigurationService.copyWorkflowTestConfigurations(workflowId, workflow.getId());
 
@@ -579,6 +588,9 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
             projectWorkflowService.addWorkflow(
                 projectId, draftProjectVersion, duplicatedWorkflow.getId(), publishedProjectWorkflow.getUuid());
 
+            projectService.updateLastModified(
+                projectId, duplicatedWorkflow.getCreatedBy(), duplicatedWorkflow.getCreatedDate());
+
             return;
         }
 
@@ -592,7 +604,21 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
     @Override
     public ProjectWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
+        Workflow currentWorkflow = workflowService.getWorkflow(workflowId);
+
+        String currentLabel = currentWorkflow.getLabel();
+
         workflowFacade.update(workflowId, definition, version);
+
+        Workflow updatedWorkflow = workflowService.getWorkflow(workflowId);
+
+        if (!Objects.equals(currentLabel, updatedWorkflow.getLabel())) {
+            Project project = projectService.getWorkflowProject(workflowId);
+
+            projectService.updateLastModified(
+                Validate.notNull(project.getId(), "id"), updatedWorkflow.getLastModifiedBy(),
+                updatedWorkflow.getLastModifiedDate());
+        }
 
         for (String cacheName : WorkflowNodeOutputFacade.WORKFLOW_CACHE_NAMES) {
             for (Environment environment : environmentService.getEnvironments()) {

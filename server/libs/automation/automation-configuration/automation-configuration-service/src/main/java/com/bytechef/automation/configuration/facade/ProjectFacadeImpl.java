@@ -595,6 +595,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         for (ProjectWorkflow draftProjectWorkflow : draftProjectWorkflowMap.values()) {
             deleteProjectWorkflow(draftProjectWorkflow);
         }
+        projectService.restoreProjectVersionDates(id, projectVersion);
     }
 
     @Override

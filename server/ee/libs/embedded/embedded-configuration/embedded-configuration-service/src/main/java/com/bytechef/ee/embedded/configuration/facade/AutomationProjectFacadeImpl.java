@@ -596,6 +596,8 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
 
             deleteDraftWorkflow(draftProjectWorkflow.getWorkflowId());
         }
+
+        projectService.restoreProjectVersionDates(projectId, projectVersion);
     }
 
     @Override
@@ -637,11 +639,19 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
 
         Map<String, Object> definitionMap = JsonUtils.read(workflow.getDefinition(), new TypeReference<>() {});
 
+        String currentLabel = workflow.getLabel();
+
         definitionMap.put("label", label);
         definitionMap.put("description", description == null ? "" : description);
 
-        workflowService.update(
+        Workflow updatedWorkflow = workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
+
+        if (!Objects.equals(currentLabel, updatedWorkflow.getLabel())) {
+            projectService.updateLastModified(
+                projectWorkflow.getProjectId(), updatedWorkflow.getLastModifiedBy(),
+                updatedWorkflow.getLastModifiedDate());
+        }
     }
 
     @Override

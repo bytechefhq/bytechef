@@ -15,6 +15,7 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -160,12 +161,27 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
+    public void restoreProjectVersionDates(long id, int projectVersion) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Project update(long id, List<Long> tagIds) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Project update(Project project) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void updateLastModified(long id, String lastModifiedBy, Instant lastModifiedDate) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void updateLastModified(long id) {
         throw new UnsupportedOperationException();
     }
 
