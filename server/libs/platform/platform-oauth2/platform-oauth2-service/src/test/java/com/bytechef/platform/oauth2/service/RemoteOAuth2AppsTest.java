@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -161,20 +162,10 @@ class RemoteOAuth2AppsTest {
     void testStaleCopyIsServedWhileRefreshIsInFlight() throws InterruptedException {
         CountDownLatch fetchStarted = new CountDownLatch(1);
         CountDownLatch releaseFetch = new CountDownLatch(1);
-        AtomicReference<Map<String, OAuth2App>> refreshingResult = new AtomicReference<>();
 
         when(oAuthAppProxyClient.getOAuthApps())
             .thenReturn(Map.of("a", new OAuthApp("id", "secret")))
-            .thenAnswer(
-                invocation -> {
-                    fetchStarted.countDown();
-
-                    if (!releaseFetch.await(30, TimeUnit.SECONDS)) {
-                        throw new IllegalStateException("not released");
-                    }
-
-                    return Map.of("b", new OAuthApp("id2", "secret2"));
-                });
+            .thenAnswer(blockingFetch(fetchStarted, releaseFetch, Map.of("b", new OAuthApp("id2", "secret2"))));
 
         RemoteOAuth2Apps remoteOAuth2Apps = new RemoteOAuth2Apps(objectProvider, clock);
 
@@ -182,27 +173,86 @@ class RemoteOAuth2AppsTest {
 
         clock.advanceSeconds(301);
 
-        Thread refreshingThread = new Thread(() -> refreshingResult.set(remoteOAuth2Apps.getOAuth2Apps()));
+        assertConcurrentCallerNotBlocked(remoteOAuth2Apps, fetchStarted, releaseFetch, "a", "b");
+    }
 
-        refreshingThread.start();
+    @Test
+    void testEmptyCopyIsServedWhileRetryIsInFlightAfterFailure() throws InterruptedException {
+        CountDownLatch fetchStarted = new CountDownLatch(1);
+        CountDownLatch releaseFetch = new CountDownLatch(1);
 
-        assertThat(fetchStarted.await(10, TimeUnit.SECONDS)).isTrue();
+        when(oAuthAppProxyClient.getOAuthApps())
+            .thenThrow(unauthorized())
+            .thenAnswer(blockingFetch(fetchStarted, releaseFetch, Map.of("b", new OAuthApp("id2", "secret2"))));
 
+        RemoteOAuth2Apps remoteOAuth2Apps = new RemoteOAuth2Apps(objectProvider, clock);
+
+        remoteOAuth2Apps.getOAuth2Apps();
+
+        clock.advanceSeconds(61);
+
+        assertConcurrentCallerNotBlocked(remoteOAuth2Apps, fetchStarted, releaseFetch, null, "b");
+    }
+
+    @Test
+    void testProviderFailureIsTreatedAsDisabledForThatCall() {
+        when(objectProvider.getIfAvailable()).thenThrow(new IllegalStateException("boom"))
+            .thenReturn(oAuthAppProxyClient);
+        when(oAuthAppProxyClient.getOAuthApps()).thenReturn(Map.of("a", new OAuthApp("id", "secret")));
+
+        RemoteOAuth2Apps remoteOAuth2Apps = new RemoteOAuth2Apps(objectProvider, clock);
+
+        assertThat(remoteOAuth2Apps.getOAuth2Apps()).isEmpty();
+        assertThat(remoteOAuth2Apps.getOAuth2Apps()).containsOnlyKeys("a");
+    }
+
+    private static Answer<Map<String, OAuthApp>> blockingFetch(
+        CountDownLatch fetchStarted, CountDownLatch releaseFetch, Map<String, OAuthApp> result) {
+
+        return invocation -> {
+            fetchStarted.countDown();
+
+            if (!releaseFetch.await(30, TimeUnit.SECONDS)) {
+                throw new IllegalStateException("not released");
+            }
+
+            return result;
+        };
+    }
+
+    private static void assertConcurrentCallerNotBlocked(
+        RemoteOAuth2Apps remoteOAuth2Apps, CountDownLatch fetchStarted, CountDownLatch releaseFetch,
+        String expectedConcurrentKey, String expectedRefreshedKey) throws InterruptedException {
+
+        AtomicReference<Map<String, OAuth2App>> refreshingResult = new AtomicReference<>();
         AtomicReference<Map<String, OAuth2App>> concurrentResult = new AtomicReference<>();
+
+        Thread refreshingThread = new Thread(() -> refreshingResult.set(remoteOAuth2Apps.getOAuth2Apps()));
         Thread concurrentThread = new Thread(() -> concurrentResult.set(remoteOAuth2Apps.getOAuth2Apps()));
 
-        concurrentThread.start();
-        concurrentThread.join(5000);
+        try {
+            refreshingThread.start();
 
-        assertThat(concurrentThread.isAlive()).isFalse();
-        assertThat(concurrentResult.get()).containsOnlyKeys("a");
+            assertThat(fetchStarted.await(10, TimeUnit.SECONDS)).isTrue();
 
-        releaseFetch.countDown();
+            concurrentThread.start();
+            concurrentThread.join(5000);
+
+            assertThat(concurrentThread.isAlive()).isFalse();
+
+            if (expectedConcurrentKey == null) {
+                assertThat(concurrentResult.get()).isEmpty();
+            } else {
+                assertThat(concurrentResult.get()).containsOnlyKeys(expectedConcurrentKey);
+            }
+        } finally {
+            releaseFetch.countDown();
+        }
 
         refreshingThread.join(10000);
 
         assertThat(refreshingThread.isAlive()).isFalse();
-        assertThat(refreshingResult.get()).containsOnlyKeys("b");
+        assertThat(refreshingResult.get()).containsOnlyKeys(expectedRefreshedKey);
     }
 
     private static HttpClientErrorException unauthorized() {
