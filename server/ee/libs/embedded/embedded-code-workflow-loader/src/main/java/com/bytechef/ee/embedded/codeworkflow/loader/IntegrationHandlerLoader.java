@@ -31,7 +31,6 @@ public class IntegrationHandlerLoader {
     @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     public static IntegrationHandler loadIntegrationHandler(
         URL url, Language language, String cacheKey, CacheManager cacheManager) {
-
         try {
             return switch (language) {
                 case JAVA -> loadJavaIntegrationHandler(url, cacheKey, cacheManager);
@@ -44,14 +43,11 @@ public class IntegrationHandlerLoader {
         }
     }
 
-    private static IntegrationHandler loadJavaIntegrationHandler(URL url, String cacheKey, CacheManager cacheManager)
-        throws IOException {
+    private static IntegrationHandler loadJavaIntegrationHandler(URL url, String cacheKey, CacheManager cacheManager) {
+        IntegrationHandlerClassLoader integrationHandlerClassLoader =
+            IntegrationHandlerClassLoader.of(url, cacheKey, cacheManager);
 
-        try (IntegrationHandlerClassLoader integrationHandlerClassLoader = IntegrationHandlerClassLoader.of(
-            url, cacheKey, cacheManager)) {
-
-            return integrationHandlerClassLoader.loadIntegrationHandler();
-        }
+        return integrationHandlerClassLoader.loadIntegrationHandler();
     }
 
     private static String getLanguageId(Language language) {

@@ -35,7 +35,6 @@ public class ProjectHandlerLoader {
     @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     public static ProjectHandler loadProjectHandler(
         URL url, Language language, String cacheKey, CacheManager cacheManager) {
-
         try {
             return switch (language) {
                 case JAVA -> loadJavaProjectHandler(url, cacheKey, cacheManager);
@@ -48,14 +47,10 @@ public class ProjectHandlerLoader {
         }
     }
 
-    private static ProjectHandler loadJavaProjectHandler(URL url, String cacheKey, CacheManager cacheManager)
-        throws IOException {
+    private static ProjectHandler loadJavaProjectHandler(URL url, String cacheKey, CacheManager cacheManager) {
+        ProjectHandlerClassLoader projectHandlerClassLoader = ProjectHandlerClassLoader.of(url, cacheKey, cacheManager);
 
-        try (ProjectHandlerClassLoader projectHandlerClassLoader = ProjectHandlerClassLoader.of(
-            url, cacheKey, cacheManager)) {
-
-            return projectHandlerClassLoader.loadWorkflowHandler();
-        }
+        return projectHandlerClassLoader.loadWorkflowHandler();
     }
 
     private static String getLanguageId(Language language) {

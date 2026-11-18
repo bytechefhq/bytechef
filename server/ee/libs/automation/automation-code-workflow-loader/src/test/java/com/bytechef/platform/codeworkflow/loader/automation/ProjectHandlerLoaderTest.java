@@ -8,6 +8,7 @@
 package com.bytechef.platform.codeworkflow.loader.automation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.automation.project.definition.ProjectDefinition;
@@ -94,6 +95,34 @@ class ProjectHandlerLoaderTest {
                                 WorkflowDsl.task("loader-task")
                                     .perform((input, context) -> context.component(
                                         "mock", "doIt", Map.of("x", 1), "conn"))));
+            }
+        }
+        """;
+
+    private static final String LAZY_HELPER_JAVA_SOURCE = """
+        import com.bytechef.automation.project.ProjectHandler;
+        import com.bytechef.automation.project.definition.ProjectDefinition;
+        import com.bytechef.automation.project.definition.ProjectDsl;
+        import com.bytechef.workflow.definition.WorkflowDsl;
+
+        public class LazyHelperProjectHandler implements ProjectHandler {
+
+            @Override
+            public ProjectDefinition getDefinition() {
+                return ProjectDsl.project("lazy-helper-project")
+                    .version("1.0.0")
+                    .workflows(
+                        WorkflowDsl.workflow("lazy-workflow")
+                            .tasks(
+                                WorkflowDsl.task("lazy-task")
+                                    .perform((input, context) -> LazyHelper.greet("ByteChef"))));
+            }
+        }
+
+        class LazyHelper {
+
+            static String greet(String name) {
+                return "Hello " + name;
             }
         }
         """;
@@ -185,6 +214,47 @@ class ProjectHandlerLoaderTest {
         TaskDefinition taskDefinition = (TaskDefinition) tasks.getFirst();
 
         assertEquals("hello from java", perform(taskDefinition, Map.of(), Map.of(), new RecordingTaskContext(null)));
+    }
+
+    @Test
+    void testLoadProjectHandlerKeepsJarReadableForClassesFirstUsedAtPerform() throws Exception {
+        Path jarPath = ProjectHandlerPolyglotEngineTest.buildFixtureJar(
+            tempDir, LAZY_HELPER_JAVA_SOURCE, "LazyHelperProjectHandler");
+
+        ProjectHandler projectHandler = ProjectHandlerLoader.loadProjectHandler(
+            toUrl(jarPath), Language.JAVA, "lazy-helper-cache-key", new ConcurrentMapCacheManager());
+
+        assertEquals("Hello ByteChef", performFirstTask(projectHandler));
+    }
+
+    @Test
+    void testLoadProjectHandlerTwiceReturnsCachedHandlerThatStillPerforms() throws Exception {
+        Path jarPath = ProjectHandlerPolyglotEngineTest.buildFixtureJar(
+            tempDir, LAZY_HELPER_JAVA_SOURCE, "LazyHelperProjectHandler");
+        ConcurrentMapCacheManager cacheManager = new ConcurrentMapCacheManager();
+
+        ProjectHandler firstProjectHandler = ProjectHandlerLoader.loadProjectHandler(
+            toUrl(jarPath), Language.JAVA, "lazy-helper-cache-key", cacheManager);
+        ProjectHandler secondProjectHandler = ProjectHandlerLoader.loadProjectHandler(
+            toUrl(jarPath), Language.JAVA, "lazy-helper-cache-key", cacheManager);
+
+        assertSame(firstProjectHandler, secondProjectHandler);
+        assertEquals("Hello ByteChef", performFirstTask(secondProjectHandler));
+    }
+
+    private static Object performFirstTask(ProjectHandler projectHandler) throws Exception {
+        ProjectDefinition projectDefinition = projectHandler.getDefinition();
+
+        List<WorkflowDefinition> workflows = projectDefinition.getWorkflows();
+
+        WorkflowDefinition workflowDefinition = workflows.getFirst();
+
+        List<? extends WorkflowTaskDefinition> tasks = workflowDefinition.getTasks()
+            .orElseThrow();
+
+        TaskDefinition taskDefinition = (TaskDefinition) tasks.getFirst();
+
+        return perform(taskDefinition, Map.of(), Map.of(), new RecordingTaskContext(null));
     }
 
     private static URL toUrl(Path path) throws MalformedURLException {
