@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 
 const ProjectTabButtons = ({
+    codeWorkflow = false,
     importN8nWorkflowDisabled,
     onDeleteProjectClick,
     onDuplicateProjectClick,
@@ -33,6 +34,7 @@ const ProjectTabButtons = ({
     projectGitConfigurationEnabled,
     projectId,
 }: {
+    codeWorkflow?: boolean;
     importN8nWorkflowDisabled: boolean;
     onDeleteProjectClick: () => void;
     onDuplicateProjectClick: () => void;
@@ -56,11 +58,13 @@ const ProjectTabButtons = ({
         <>
             <DropdownMenuItem icon={<EditIcon />} label="Edit" onSelect={onShowEditProjectDialogClick} />
 
-            <DropdownMenuItem icon={<CopyIcon />} label="Duplicate" onSelect={onDuplicateProjectClick} />
+            {!codeWorkflow && (
+                <DropdownMenuItem icon={<CopyIcon />} label="Duplicate" onSelect={onDuplicateProjectClick} />
+            )}
 
             <DropdownMenuItem icon={<Share2Icon />} label="Share" onSelect={onShareProject} />
 
-            {templatesSubmissionForm && (
+            {!codeWorkflow && templatesSubmissionForm && (
                 <DropdownMenuItem
                     icon={<Share2Icon />}
                     label="Share with Community"
@@ -74,38 +78,42 @@ const ProjectTabButtons = ({
                 onSelect={() => (window.location.href = `/api/automation/internal/projects/${projectId}/export`)}
             />
 
+            {!codeWorkflow && (
+                <>
+                    <DropdownMenuSeparator />
+
+                    <DropdownMenuItem icon={<PlusIcon />} label="New Workflow" onSelect={onNewWorkflowClick} />
+
+                    <DropdownMenuItem
+                        icon={<LayoutTemplateIcon />}
+                        label="Workflow from Template"
+                        onSelect={onNewWorkflowFromTemplateClick}
+                    />
+
+                    <DropdownMenuItem icon={<UploadIcon />} label="Import Workflow" onSelect={onImportWorkflowClick} />
+
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <span className="block">
+                                <DropdownMenuItem
+                                    disabled={importN8nWorkflowDisabled}
+                                    icon={<UploadIcon />}
+                                    label="Import n8n Workflow"
+                                    onSelect={onImportN8nWorkflowClick}
+                                />
+                            </span>
+                        </TooltipTrigger>
+
+                        {importN8nWorkflowDisabled && (
+                            <TooltipContent>Enable an AI provider to import n8n workflows.</TooltipContent>
+                        )}
+                    </Tooltip>
+                </>
+            )}
+
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem icon={<PlusIcon />} label="New Workflow" onSelect={onNewWorkflowClick} />
-
-            <DropdownMenuItem
-                icon={<LayoutTemplateIcon />}
-                label="Workflow from Template"
-                onSelect={onNewWorkflowFromTemplateClick}
-            />
-
-            <DropdownMenuItem icon={<UploadIcon />} label="Import Workflow" onSelect={onImportWorkflowClick} />
-
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <span className="block">
-                        <DropdownMenuItem
-                            disabled={importN8nWorkflowDisabled}
-                            icon={<UploadIcon />}
-                            label="Import n8n Workflow"
-                            onSelect={onImportN8nWorkflowClick}
-                        />
-                    </span>
-                </TooltipTrigger>
-
-                {importN8nWorkflowDisabled && (
-                    <TooltipContent>Enable an AI provider to import n8n workflows.</TooltipContent>
-                )}
-            </Tooltip>
-
-            <DropdownMenuSeparator />
-
-            {ff_1039 && (
+            {ff_1039 && !codeWorkflow && (
                 <EEVersion hidden={true}>
                     <DropdownMenuItem
                         disabled={!projectGitConfigurationEnabled}
