@@ -88,14 +88,15 @@ component: a Script JavaScript or Python task can set its runner's **Mode** to `
 | Script item processors for [data streams](/platform/automation/build/workflows/data-streams) | JavaScript, Python | Strict |
 | Scripts bundled in an AI skill and run by the agent's skills tool | JavaScript, Python | Strict |
 | [Code workflow](/platform/automation/build/workflows/code-workflows) and code integration tasks | JavaScript, Python | Strict |
+| [Custom components](/platform/settings/components/custom-components) | JavaScript, Python | Strict |
 
 The CPU and heap limits are applied to JavaScript and Python only. Any other guest language still gets the denials in
 the table above, but runs without the resource limits.
 
 [Code workflows](/platform/automation/build/workflows/code-workflows) and code integrations written in JavaScript or
-Python run each task in a strict sandbox context, so the denials and the limits on this page apply to them.
-[Custom components](/platform/settings/components/custom-components) load through their own GraalVM contexts. They do
-not use the script sandbox, and the settings on this page do not apply to them.
+Python run each task in a strict sandbox context, and so do JavaScript and Python
+[custom components](/platform/settings/components/custom-components), so the denials and the limits on this page apply
+to them. A Java custom component runs in the server's own JVM, outside the sandbox.
 
 ## Configuration
 
@@ -238,8 +239,8 @@ logging:
 - **Run on GraalVM.** If the heap-limit warning appears in your log, the server is running on a JVM that cannot enforce
   `sandbox.MaxHeapMemory`.
 - **Watch the `[guest]` lines.** A script that logs heavily logs on every run, and that volume lands in your server log.
-- **Know what is not covered.** Custom components run outside this sandbox, so review them as you would any code you
-  deploy.
+- **Know what is not covered.** Java custom components run outside this sandbox, so review them as you would any code
+  you deploy.
 
 ## Related
 
