@@ -4,6 +4,7 @@ import ConnectedUserIntegrationCredentialsDialog from '@/ee/pages/embedded/conne
 import {Connection} from '@/ee/shared/middleware/embedded/configuration';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
 import {useDeleteConnectedUserConnectionMutation} from '@/ee/shared/mutations/embedded/connections.mutations';
+import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {ConnectionKeys} from '@/ee/shared/queries/embedded/connections.queries';
 import {useQueryClient} from '@tanstack/react-query';
 
@@ -35,6 +36,9 @@ const ConnectedUserConnectionDialogs = ({
         onSuccess: () => {
             void queryClient.invalidateQueries({
                 queryKey: ConnectionKeys.connections,
+            });
+            void queryClient.invalidateQueries({
+                queryKey: ConnectedUserKeys.connectedUser(connectedUserId),
             });
 
             onDeleteDialogClose();

@@ -6,7 +6,13 @@ import {afterEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
     deleteConnectedUserConnectionMutate: vi.fn(),
+    invalidateQueries: vi.fn(),
     useDeleteConnectedUserConnectionMutation: vi.fn(),
+}));
+
+vi.mock('@tanstack/react-query', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@tanstack/react-query')>()),
+    useQueryClient: () => ({invalidateQueries: hoisted.invalidateQueries}),
 }));
 
 vi.mock('@/ee/shared/mutations/embedded/connections.mutations', () => ({
@@ -79,6 +85,20 @@ describe('ConnectedUserConnectionDialogs', () => {
 
         expect(hoisted.useDeleteConnectedUserConnectionMutation).toHaveBeenCalledWith(42, expect.any(Object));
         expect(hoisted.deleteConnectedUserConnectionMutate).toHaveBeenCalledWith(9);
+    });
+
+    it("refreshes the connections and the connected user's record after a deletion", () => {
+        const onDeleteDialogClose = vi.fn();
+
+        hoisted.useDeleteConnectedUserConnectionMutation.mockReturnValue({isPending: false, mutate: vi.fn()});
+
+        renderDialogs({deletable: true, onDeleteDialogClose, showDeleteDialog: true});
+
+        hoisted.useDeleteConnectedUserConnectionMutation.mock.calls[0][1].onSuccess();
+
+        expect(hoisted.invalidateQueries).toHaveBeenCalledWith({queryKey: ['embedded_connections']});
+        expect(hoisted.invalidateQueries).toHaveBeenCalledWith({queryKey: ['connectedUsers', 42]});
+        expect(onDeleteDialogClose).toHaveBeenCalled();
     });
 
     it('closes the delete dialog when the deletion fails', () => {
