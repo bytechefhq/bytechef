@@ -8,9 +8,11 @@
 package com.bytechef.ee.embedded.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowCopyDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Set;
@@ -28,16 +30,30 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnEEVersion
 public class ConnectedUserWorkflowReferenceGraphQlController {
     private final ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
+    private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserWorkflowReferenceGraphQlController(
-        ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade) {
+        ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade,
+        EnvironmentService environmentService) {
+
         this.connectedUserWorkflowReferenceFacade = connectedUserWorkflowReferenceFacade;
+        this.environmentService = environmentService;
+    }
+
+    @QueryMapping
+    public List<ConnectedUserWorkflowCopyDTO> connectedUserCatalogWorkflowCopies(
+        @Argument List<String> automationUuids, @Argument Long environmentId) {
+
+        return connectedUserWorkflowReferenceFacade.getCopies(
+            Set.copyOf(automationUuids), environmentService.getEnvironment(environmentId));
     }
 
     @QueryMapping
     public List<ConnectedUserWorkflowReferenceDTO> connectedUserCodeWorkflowReferences(
-        @Argument List<String> automationUuids) {
-        return connectedUserWorkflowReferenceFacade.getReferences(Set.copyOf(automationUuids));
+        @Argument List<String> automationUuids, @Argument Long environmentId) {
+
+        return connectedUserWorkflowReferenceFacade.getReferences(
+            Set.copyOf(automationUuids), environmentService.getEnvironment(environmentId));
     }
 }
