@@ -348,6 +348,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-rest"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-service"))
     implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-handler"))
+    implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-public-rest"))
     implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-rest"))
     implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-graphql"))
     implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-service"))

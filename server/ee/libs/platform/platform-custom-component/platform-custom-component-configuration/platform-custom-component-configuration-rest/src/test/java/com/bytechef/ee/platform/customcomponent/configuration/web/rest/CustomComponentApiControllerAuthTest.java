@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.platform.customcomponent.configuration.internal.web.rest;
+package com.bytechef.ee.platform.customcomponent.configuration.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,14 +25,14 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author Ivica Cardic
  */
-class CustomComponentInternalApiControllerAuthTest {
+class CustomComponentApiControllerAuthTest {
 
     private static final Pattern EMBEDDED_INTERNAL_PATH_SHAPE =
         Pattern.compile("^/api/(?:automation|embedded|platform)/internal/.+");
 
     @Test
     void testControllerIsMountedOnPlatformInternalBasePath() {
-        RequestMapping requestMapping = CustomComponentInternalApiController.class.getAnnotation(
+        RequestMapping requestMapping = CustomComponentApiController.class.getAnnotation(
             RequestMapping.class);
 
         assertThat(requestMapping).isNotNull();
@@ -44,7 +44,7 @@ class CustomComponentInternalApiControllerAuthTest {
         String platformApiKeyPathPattern = readPlatformApiKeyPathPattern();
 
         String resolvedPath =
-            "/api/platform/internal" + CustomComponentInternalApi.PATH_DEPLOY_CUSTOM_COMPONENT_INTERNAL;
+            "/api/platform/internal" + CustomComponentApi.PATH_DEPLOY_CUSTOM_COMPONENT;
 
         assertThat(resolvedPath).doesNotMatch(platformApiKeyPathPattern);
     }
@@ -61,7 +61,7 @@ class CustomComponentInternalApiControllerAuthTest {
     @Test
     void testInternalDeployPathFallsThroughEmbeddedApiKeyMatcherWithoutAuthorizationHeader() {
         String resolvedPath =
-            "/api/platform/internal" + CustomComponentInternalApi.PATH_DEPLOY_CUSTOM_COMPONENT_INTERNAL;
+            "/api/platform/internal" + CustomComponentApi.PATH_DEPLOY_CUSTOM_COMPONENT;
 
         assertThat(EMBEDDED_INTERNAL_PATH_SHAPE.matcher(resolvedPath)
             .matches()).isTrue();
@@ -86,8 +86,8 @@ class CustomComponentInternalApiControllerAuthTest {
 
     @Test
     void testDeployRoutesToTheAdminGatedFacadeSaveMethod() throws Exception {
-        Method method = CustomComponentInternalApiController.class.getDeclaredMethod(
-            "deployCustomComponentInternal", MultipartFile.class);
+        Method method = CustomComponentApiController.class.getDeclaredMethod(
+            "deployCustomComponent", MultipartFile.class);
 
         assertThat(method).isNotNull();
 
