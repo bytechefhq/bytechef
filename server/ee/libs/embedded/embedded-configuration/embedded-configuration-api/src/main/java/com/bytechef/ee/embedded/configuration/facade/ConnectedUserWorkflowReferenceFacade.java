@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowCopyDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceValuesDTO;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -59,7 +60,11 @@ public interface ConnectedUserWorkflowReferenceFacade {
      */
     ConnectedUserWorkflowReferenceValuesDTO getReferenceValues(long referenceId);
 
+    List<ConnectedUserWorkflowCopyDTO> getCopies(Set<String> automationUuids, Environment environment);
+
     List<ConnectedUserWorkflowReferenceDTO> getReferences(Set<String> automationUuids);
+
+    List<ConnectedUserWorkflowReferenceDTO> getReferences(Set<String> automationUuids, Environment environment);
 
     void updateReferenceInputs(
         String externalUserId, String automationUuid, Map<String, ?> inputs, Environment environment);

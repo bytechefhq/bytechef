@@ -55,6 +55,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowSer
 import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowCopyDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.ee.embedded.configuration.exception.AutomationTemplateNotVisibleException;
@@ -221,6 +222,9 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Autowired
     private ConnectedUserConnectionService connectedUserConnectionService;
+
+    @Autowired
+    private ConnectedUserProjectFacade connectedUserProjectFacade;
 
     @MockitoSpyBean
     private ConnectedUserProjectService connectedUserProjectService;
@@ -1547,6 +1551,64 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
         verify(connectedUserProjectService, times(1)).getConnectedUserProjects(anyList());
         verify(connectedUserService, times(1)).getConnectedUsers(anyList());
+    }
+
+    @Test
+    void testGetCopiesListsOnlyTheCopiesOfConnectedUsersInTheEnvironment() {
+        long automationProjectId = createAutomationProject("Copies");
+
+        String copiedWorkflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
+        String referencedWorkflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationProjectId);
+
+        ConnectedUser productionConnectedUser = createConnectedUser(Environment.PRODUCTION);
+        ConnectedUser developmentConnectedUser = createConnectedUser(Environment.DEVELOPMENT);
+
+        givenOwnedConnection(productionConnectedUser);
+        givenOwnedConnection(developmentConnectedUser);
+
+        String productionCopyUuid = connectedUserProjectFacade.copyWorkflowTemplate(
+            productionConnectedUser.getExternalId(), copiedWorkflowUuid, Environment.PRODUCTION);
+        String developmentCopyUuid = connectedUserProjectFacade.copyWorkflowTemplate(
+            developmentConnectedUser.getExternalId(), copiedWorkflowUuid, Environment.DEVELOPMENT);
+
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            productionConnectedUser.getExternalId(), referencedWorkflowUuid, Environment.PRODUCTION);
+
+        Set<String> workflowUuids = Set.of(copiedWorkflowUuid, referencedWorkflowUuid);
+
+        assertThat(connectedUserWorkflowReferenceFacade.getCopies(workflowUuids, Environment.PRODUCTION))
+            .extracting(
+                ConnectedUserWorkflowCopyDTO::copiedFromWorkflowUuid, ConnectedUserWorkflowCopyDTO::workflowUuid,
+                ConnectedUserWorkflowCopyDTO::externalUserId, ConnectedUserWorkflowCopyDTO::enabled)
+            .containsExactly(
+                tuple(copiedWorkflowUuid, productionCopyUuid, productionConnectedUser.getExternalId(), false));
+        assertThat(connectedUserWorkflowReferenceFacade.getCopies(workflowUuids, Environment.DEVELOPMENT))
+            .extracting(ConnectedUserWorkflowCopyDTO::workflowUuid, ConnectedUserWorkflowCopyDTO::externalUserId)
+            .containsExactly(tuple(developmentCopyUuid, developmentConnectedUser.getExternalId()));
+    }
+
+    @Test
+    void testGetReferencesListsOnlyTheReferencesOfConnectedUsersInTheEnvironment() {
+        long automationProjectId = createAutomationProject("Environment References");
+
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationProjectId);
+
+        ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
+
+        givenOwnedConnection(connectedUser);
+
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+
+        assertThat(connectedUserWorkflowReferenceFacade.getReferences(Set.of(workflowUuid), Environment.PRODUCTION))
+            .extracting(ConnectedUserWorkflowReferenceDTO::externalUserId)
+            .containsExactly(connectedUser.getExternalId());
+        assertThat(connectedUserWorkflowReferenceFacade.getReferences(Set.of(workflowUuid), Environment.DEVELOPMENT))
+            .isEmpty();
     }
 
     private long givenAdministratorConnection() {

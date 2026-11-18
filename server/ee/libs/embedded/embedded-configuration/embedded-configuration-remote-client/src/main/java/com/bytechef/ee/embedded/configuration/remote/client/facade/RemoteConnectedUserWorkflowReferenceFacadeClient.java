@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.remote.client.facade;
 
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowCopyDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceValuesDTO;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
@@ -74,7 +75,19 @@ public class RemoteConnectedUserWorkflowReferenceFacadeClient implements Connect
     }
 
     @Override
+    public List<ConnectedUserWorkflowCopyDTO> getCopies(Set<String> automationUuids, Environment environment) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<ConnectedUserWorkflowReferenceDTO> getReferences(Set<String> automationUuids) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ConnectedUserWorkflowReferenceDTO> getReferences(
+        Set<String> automationUuids, Environment environment) {
+
         throw new UnsupportedOperationException();
     }
 
