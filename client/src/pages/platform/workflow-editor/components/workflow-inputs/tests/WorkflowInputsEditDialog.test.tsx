@@ -10,6 +10,7 @@ import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 const {useGetComponentDefinitionQueryMock, workflowEditorState} = vi.hoisted(() => ({
     useGetComponentDefinitionQueryMock: vi.fn(),
     workflowEditorState: {
+        codeWorkflow: false,
         componentDefinitions: [] as Array<{inputsCount: number; name: string; version: number}>,
     },
 }));
@@ -21,6 +22,7 @@ vi.mock('@/shared/queries/platform/componentDefinitions.queries', () => ({
 
 vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () => ({
     useWorkflowEditor: () => ({
+        codeWorkflow: workflowEditorState.codeWorkflow,
         useGetComponentDefinitionsQuery: () => ({data: workflowEditorState.componentDefinitions}),
     }),
 }));
@@ -196,6 +198,7 @@ describe('WorkflowInputsEditDialog', () => {
     });
 
     beforeEach(() => {
+        workflowEditorState.codeWorkflow = false;
         workflowEditorState.componentDefinitions = [
             {inputsCount: 1, name: 'googleSheets', version: 1},
             {inputsCount: 1, name: 'slack', version: 2},
@@ -487,6 +490,29 @@ describe('WorkflowInputsEditDialog', () => {
             groupName: 'channel',
         });
         expect(savedInput.testValue).not.toBe('C123');
+    });
+
+    it('should lock the declaration but not the test value for a code workflow', async () => {
+        workflowEditorState.codeWorkflow = true;
+
+        render(
+            <EditHarness
+                defaultValues={{
+                    label: 'Channel',
+                    name: 'channel',
+                    required: false,
+                    testValue: '#alerts',
+                    type: 'string',
+                }}
+            />
+        );
+
+        expect(await screen.findByPlaceholderText('Input label')).toHaveAttribute('readonly');
+        expect(screen.getByLabelText('Test Value')).not.toHaveAttribute('readonly');
+
+        for (const combobox of screen.getAllByRole('combobox')) {
+            expect(combobox).toBeDisabled();
+        }
     });
 
     it('should keep the existing test value when an input is opened for editing', async () => {

@@ -55,7 +55,9 @@ const WorkflowInputsEditDialog = ({
     saveWorkflowInput,
     workflow,
 }: WorkflowInputsEditDialogProps) => {
-    const {useGetComponentDefinitionsQuery} = useWorkflowEditor();
+    const {codeWorkflow, useGetComponentDefinitionsQuery} = useWorkflowEditor();
+
+    const declarationReadOnly = codeWorkflow === true;
 
     const selectedType = useWatch({control: form.control, name: 'type'});
     const selectedComponentName = useWatch({control: form.control, name: 'componentReference.componentName'});
@@ -167,9 +169,11 @@ const WorkflowInputsEditDialog = ({
                 <DialogMain>
                     <DialogHeader
                         description={
-                            currentInputIndex === -1
-                                ? 'Add a new workflow input definition.'
-                                : 'Edit the workflow input definition.'
+                            declarationReadOnly
+                                ? "Declared in the workflow's source — only the test value can be changed here."
+                                : currentInputIndex === -1
+                                  ? 'Add a new workflow input definition.'
+                                  : 'Edit the workflow input definition.'
                         }
                         title={`${currentInputIndex === -1 ? 'Create a new' : 'Edit'} Input`}
                     />
@@ -189,6 +193,7 @@ const WorkflowInputsEditDialog = ({
 
                                             <FormControl>
                                                 <Select
+                                                    disabled={declarationReadOnly}
                                                     onValueChange={(value) => {
                                                         if (value !== field.value && value !== 'component') {
                                                             form.setValue('testValue', '');
@@ -248,6 +253,7 @@ const WorkflowInputsEditDialog = ({
 
                                                     <FormControl>
                                                         <Select
+                                                            disabled={declarationReadOnly}
                                                             onValueChange={(value) =>
                                                                 handleComponentChange(value, field.onChange)
                                                             }
@@ -297,7 +303,7 @@ const WorkflowInputsEditDialog = ({
 
                                                     <FormControl>
                                                         <Select
-                                                            disabled={!selectedComponentName}
+                                                            disabled={declarationReadOnly || !selectedComponentName}
                                                             onValueChange={handlePropertyOrGroupChange}
                                                             value={field.value ? `group:${field.value}` : ''}
                                                         >
@@ -340,7 +346,7 @@ const WorkflowInputsEditDialog = ({
                                                 <Input
                                                     {...field}
                                                     placeholder="Input name (will be used as a dynamic value key)"
-                                                    readOnly={currentInputIndex !== -1}
+                                                    readOnly={currentInputIndex !== -1 || declarationReadOnly}
                                                     ref={nameInputRef}
                                                 />
                                             </FormControl>
@@ -365,7 +371,11 @@ const WorkflowInputsEditDialog = ({
                                             </FormLabel>
 
                                             <FormControl>
-                                                <Input {...field} placeholder="Input label" />
+                                                <Input
+                                                    {...field}
+                                                    placeholder="Input label"
+                                                    readOnly={declarationReadOnly}
+                                                />
                                             </FormControl>
 
                                             <FormMessage />
@@ -383,6 +393,7 @@ const WorkflowInputsEditDialog = ({
 
                                             <FormControl>
                                                 <Select
+                                                    disabled={declarationReadOnly}
                                                     onValueChange={(value) => field.onChange(value === 'true')}
                                                     value={String(field.value ?? false)}
                                                 >
@@ -413,6 +424,7 @@ const WorkflowInputsEditDialog = ({
 
                                                 <FormControl>
                                                     <Select
+                                                        disabled={declarationReadOnly}
                                                         onValueChange={(value) => field.onChange(value === 'true')}
                                                         value={String(field.value ?? false)}
                                                     >

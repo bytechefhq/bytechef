@@ -1,4 +1,4 @@
-import {IntegrationApi, IntegrationBasic} from '@/ee/shared/middleware/embedded/public';
+import {IntegrationApi, IntegrationBasic} from '@bytechef/embedded-api';
 import {useQuery} from '@tanstack/react-query';
 
 export const IntegrationMarketplaceKeys = {
