@@ -640,7 +640,7 @@ Outbound webhook calls: job status and task started webhooks, notification webho
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED` | Enable uploading of Java (jar) code workflows. When disabled, Java code workflow uploads are rejected while other languages (JavaScript, Python) and previously uploaded Java code workflows continue to work. Coming soon: this setting is not available yet | `true` |
+| `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED` | Enable uploading of Java (jar) code workflows. When disabled, Java code workflow uploads are rejected while other languages (JavaScript, Python) and previously uploaded Java code workflows continue to work. | `true` |
 | `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_LOADER` | Loader used to run Java code workflows (`CLASS_LOADER`, `ESPRESSO`). `ESPRESSO` executes Java code workflows inside a sandboxed GraalVM Espresso guest JVM instead of an in-process classloader. Coming soon: this setting is not available yet | `CLASS_LOADER` |
 
 ### Output Storage
