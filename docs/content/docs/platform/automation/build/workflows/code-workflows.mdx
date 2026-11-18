@@ -1,7 +1,6 @@
 ---
 title: Code Workflows
 description: Define a whole workflow in code - the Java, JavaScript and Python contracts, the task context, typed authoring, editing in ByteChef and deploying through the API.
-comingSoon: true
 ee: true
 ---
 
@@ -44,13 +43,45 @@ turn off Java uploads; see [Restricting Java code workflows](#restricting-java-c
 ## Sample projects
 
 Every combination has a sample repository with a working project, a local check that evaluates the file the way the
-server does, and deploy instructions. [Sample Repositories](/platform/sample-repositories) lists every ByteChef sample.
+server does, and deploy instructions. Start from one of them: clone it, run its check, and deploy the file it names.
+[Sample Repositories](/platform/sample-repositories) lists every ByteChef sample.
 
 | | Java | JavaScript | Python |
 |---|---|---|---|
 | Automation project | [java](https://github.com/bytechefhq/bytechef-automation-sample-code-workflow-java) | [javascript](https://github.com/bytechefhq/bytechef-automation-sample-code-workflow-javascript) | [python](https://github.com/bytechefhq/bytechef-automation-sample-code-workflow-python) |
 | Embedded catalog project | [java](https://github.com/bytechefhq/bytechef-embedded-automation-sample-code-workflow-java) | [javascript](https://github.com/bytechefhq/bytechef-embedded-automation-sample-code-workflow-javascript) | [python](https://github.com/bytechefhq/bytechef-embedded-automation-sample-code-workflow-python) |
 | Embedded code integration | [java](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-java) | [javascript](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-javascript) | [python](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-python) |
+
+The three automation project samples define the same project, named "Sample Code Project JavaScript", "Sample Code
+Project Python" or "Sample Code Project Java", with four workflows:
+
+- `sampleWorkflow1` takes a required `name` input and returns `Hello, <name>!` as its `greeting` output.
+- `summarizeNewEmail` starts with the Gmail **New Email** polling trigger (`googleMail/v1/newEmailPolling`) and returns a
+  one-line summary of each new email.
+- `fetchRecentEmails` takes an optional `from` input and calls the Gmail **Search Email** action through a declared
+  `gmail` connection.
+- `notifySlackOnNewEmail` posts each new email to Slack through a declared `slack` connection. Its `channel` input takes
+  its options from Slack's own `channel` input.
+
+To check a sample locally and find the file to deploy:
+
+| Sample | Local check | File to deploy |
+|---|---|---|
+| JavaScript | `npm run check` | `src/sample_code_project.js` |
+| Python | `python3 scripts/check.py src/sample_code_project.py name=Ada` | `src/sample_code_project.py` |
+| Java | `./gradlew build` (JDK 25) | `build/libs/sample-code-project-java-1.0.0.jar` |
+
+The JavaScript and Python checks evaluate the file the way the server does, check its shape and run each task once
+against a stub context that stands in for Gmail. They need only Node.js or Python 3.9 or later; there is nothing to
+install. Deploy the file from Automation → **Projects** (see [Creating and editing in ByteChef](#creating-and-editing-in-bytechef))
+or through the [deploy endpoint](#deploying-through-the-api):
+
+```bash
+curl -X POST "$BYTECHEF_URL/api/automation/v1/projects/deploy?workspaceId=1" \
+  -H "Authorization: Bearer $BYTECHEF_API_KEY" \
+  -H "X-ENVIRONMENT: DEVELOPMENT" \
+  -F "projectFile=@src/sample_code_project.js"
+```
 
 ---
 
@@ -75,8 +106,8 @@ ByteChef re-evaluates the file for every task run, so top-level code should only
 | `description` | string | No | |
 | `workflows` | list of workflows | No | |
 
-A [code integration](/platform/embedded/build/code-integrations) replaces `name` with `componentName` (string) and
-`componentVersion` (integer), both required.
+A [code integration](/platform/embedded/build/code-integrations) is identified by `componentName` (string) and
+`componentVersion` (integer), both required, and takes an optional `name` as its display name.
 
 ### Workflow
 
@@ -95,32 +126,35 @@ A [code integration](/platform/embedded/build/code-integrations) replaces `name`
 | Member | Type | Required | |
 |---|---|---|---|
 | `name` | string | Yes | Unique across the workflow, nesting included: the engine keys the task's output by it. |
-| `perform` | function | Yes | Called with a [context](#the-task-context) when the task runs. Its return value is the task's output. |
+| `perform` | function | Yes | Called with `(input, context)` or `(input, connection, context)` when the task runs; see [The task context](#the-task-context). Its return value is the task's output. |
 | `label` | string | No | |
 | `description` | string | No | |
-| `parameters` | map | No | See [Task parameters](#task-parameters). |
 | `connections` | list or map | No | See [Declaring connections](#declaring-connections). |
 
 ### A complete example
 
-A project with one workflow that takes a `name` input, runs one task and returns its result as the `greeting` output:
+The `sampleWorkflow1` workflow of the [automation project samples](#sample-projects), with the project's other three
+workflows left out. It takes a `name` input, runs one task and returns its result as the `greeting` output:
 
 ```javascript tab="JavaScript"
 ({
-    name: "Sample Code Project",
+    name: "Sample Code Project JavaScript",
     version: "1",
+    description: "Sample code project description.",
     workflows: [
         {
             name: "sampleWorkflow1",
             label: "Sample workflow 1",
+            description: "Greets the name it is given.",
             inputs: [{name: "name", label: "Name", type: "STRING", required: true}],
             outputs: [{name: "greeting", task: "greet"}],
             tasks: [
                 {
                     name: "greet",
                     label: "Greet",
-                    perform: function (context) {
-                        const name = context.input("name");
+                    description: "Builds a greeting from the name input.",
+                    perform: function (input, context) {
+                        const name = input.name;
 
                         context.log("info", "Greeting " + name);
 
@@ -134,24 +168,39 @@ A project with one workflow that takes a `name` input, runs one task and returns
 ```
 
 ```python tab="Python"
-def greet(context):
-    name = context.input("name")
+from typing import TYPE_CHECKING, Any, Dict
 
-    context.log("info", "Greeting " + name)
-
-    return "Hello, " + name + "!"
+if TYPE_CHECKING:
+    from bytechef_workflow_api import ProjectDefinition, TaskContext
 
 
-project = {
-    "name": "Sample Code Project",
+def greet(input: Dict[str, Any], context: "TaskContext") -> str:
+    name = input["name"]
+
+    context.log("info", f"Greeting {name}")
+
+    return f"Hello, {name}!"
+
+
+project: "ProjectDefinition" = {
+    "name": "Sample Code Project Python",
     "version": "1",
+    "description": "Sample code project description.",
     "workflows": [
         {
             "name": "sampleWorkflow1",
             "label": "Sample workflow 1",
+            "description": "Greets the name it is given.",
             "inputs": [{"name": "name", "label": "Name", "type": "STRING", "required": True}],
             "outputs": [{"name": "greeting", "task": "greet"}],
-            "tasks": [{"name": "greet", "label": "Greet", "perform": greet}],
+            "tasks": [
+                {
+                    "name": "greet",
+                    "label": "Greet",
+                    "description": "Builds a greeting from the name input.",
+                    "perform": greet,
+                }
+            ],
         }
     ],
 }
@@ -160,62 +209,84 @@ project
 ```
 
 ```java tab="Java"
+@AutoService(ProjectHandler.class)
 public class SampleProjectHandler implements ProjectHandler {
+
+    private static final ProjectDefinition PROJECT_DEFINITION = project("Sample Code Project Java")
+        .description("Sample code project description.")
+        .workflows(SampleWorkflow1.WORKFLOW_DEFINITION);
 
     @Override
     public ProjectDefinition getDefinition() {
-        return ProjectDsl.project("Sample Code Project")
-            .version("1")
-            .workflows(
-                WorkflowDsl.workflow("sampleWorkflow1")
-                    .label("Sample workflow 1")
-                    .inputs(WorkflowDsl.input("name").label("Name").required(true))
-                    .outputs(WorkflowDsl.output("greeting").task("greet"))
-                    .tasks(
-                        WorkflowDsl.task("greet")
-                            .label("Greet")
-                            .perform(context -> {
-                                Object name = context.input("name");
+        return PROJECT_DEFINITION;
+    }
+}
 
-                                context.log(TaskContext.LogLevel.INFO, "Greeting " + name);
+public class SampleWorkflow1 {
 
-                                return "Hello, " + name + "!";
-                            })));
+    public static final ModifiableWorkflowDefinition WORKFLOW_DEFINITION = workflow("sampleWorkflow1")
+        .label("Sample workflow 1")
+        .description("Greets the name it is given.")
+        .inputs(
+            input("name")
+                .label("Name")
+                .type("STRING")
+                .required(true))
+        .outputs(
+            output("greeting")
+                .task("greet"))
+        .tasks(
+            task("greet")
+                .label("Greet")
+                .description("Builds a greeting from the name input.")
+                .perform(SampleWorkflow1::greet));
+
+    private static Object greet(Map<String, ?> input, TaskContext context) {
+        Object name = input.get("name");
+
+        context.log(TaskContext.LogLevel.INFO, "Greeting " + name);
+
+        return "Hello, " + name + "!";
     }
 }
 ```
 
+The Python file imports the [type definitions](#typed-authoring) only under `TYPE_CHECKING`, so the server, which skips
+that block, never needs them. The Java classes use static imports from `ProjectDsl` and `WorkflowDsl`; see the
+[Java sample](https://github.com/bytechefhq/bytechef-automation-sample-code-workflow-java) for the full sources.
+
 ## The task context
 
-`perform` receives a `context`:
+`perform` takes `(input, context)`, or `(input, connection, context)` when it declares three required parameters - the
+same model as the [Script component](/reference/components/script_v1). ByteChef counts the parameters a JavaScript
+function declares (`perform.length`) and the parameters without a default a Python function declares; a Java task picks
+the form through the lambda it passes.
 
+- `input` holds the workflow's inputs plus the output of every task that already ran, keyed by name. A workflow input
+  and a task output sit side by side at the top level, each under its own name - including names a `${...}` reference
+  could never reach, like `my-task-1`, which you read as `input["my-task-1"]`. The snapshot is taken when the task is
+  dispatched, so it does not change while the task runs, and a task that has not run yet is simply absent from it.
+- `connection` maps each connection the task [declares](#declaring-connections), by its declared name, to that
+  connection's parameters, for when you build a request yourself rather than through a component action: a region,
+  tenant or account id, a base URL. The map carries the connection's credentials too, so treat it as sensitive. Only
+  the three-parameter form receives it.
 - `context.component.<componentName>.<actionName>(input, connectionName, clusterElements)` invokes any built-in
   component action. `input` is the action's input parameters; `connectionName` (optional) names one of the task's
   [declared connections](#declaring-connections). A name with no wired connection, on an action that requires one,
   fails with an error naming the connection. `clusterElements` (optional) wires an action that reads cluster
   elements - an AI agent's chat above all; see [Calling an AI agent](#calling-an-ai-agent).
-- `context.connection(connectionName)` returns a declared connection's parameters, for when you build a request
-  yourself rather than through a component action: a region, tenant or account id, a base URL. The map carries the
-  connection's credentials too, so treat it as sensitive.
-- `context.input()` returns the workflow's inputs plus the output of every task that already ran, keyed by name.
-  `context.input(name)` reads one entry and fails on an unknown name, so a typo surfaces where it happens rather than
-  as a `null` further down; use `context.input()[name]` when absence is a legitimate outcome. A workflow input and a
-  task output sit side by side at the top level, each under its own name - including names a `${...}` reference
-  could never reach, like `my-task-1`. The snapshot is taken when the task is dispatched, so it does not change while
-  the task runs, and a task that has not run yet is simply absent from it.
-- `context.parameters()` returns the task's own declared parameters, with any `${...}` in them already evaluated.
-  It is separate from `input()`: one is the task's configuration, the other is the run's data.
 - `context.log(level, message)` writes to the task's execution log. A script names the level as a string (`"trace"`,
   `"debug"`, `"info"`, `"warn"`, `"error"`, case-insensitive), and anything else fails rather than being logged at a
   level you did not ask for. Java tasks pass the `TaskContext.LogLevel` enum.
 
 ```javascript tab="JavaScript"
-perform: function (context) {
-    const customerId = context.input().customerId;
-    const previous = context.input("fetch-customer");
+perform: function (input, connection, context) {
+    const previous = input["fetch_customer"];
+    const accountId = connection["my_connection"].accountId;
 
     const response = context.component.httpClient.get(
-        {uri: "https://api.example.com/customers/" + customerId + "/items"}, "my-connection");
+        {uri: "https://api.example.com/accounts/" + accountId + "/customers/" + input.customerId + "/items"},
+        "my_connection");
 
     context.log("info", "fetched " + response.body.length + " items for " + previous.name);
 
@@ -224,12 +295,13 @@ perform: function (context) {
 ```
 
 ```python tab="Python"
-def fetch_items(context):
-    customer_id = context.input()["customerId"]
-    previous = context.input("fetch-customer")
+def fetch_items(input, connection, context):
+    previous = input["fetch_customer"]
+    account_id = connection["my_connection"]["accountId"]
 
     response = context.component.httpClient.get(
-        {"uri": "https://api.example.com/customers/" + customer_id + "/items"}, "my-connection")
+        {"uri": "https://api.example.com/accounts/" + account_id + "/customers/" + input["customerId"] + "/items"},
+        "my_connection")
 
     context.log("info", "fetched " + str(len(response["body"])) + " items for " + previous["name"])
 
@@ -237,18 +309,22 @@ def fetch_items(context):
 ```
 
 ```java tab="Java"
-WorkflowDsl.task("fetch-items")
-    .perform(context -> {
+WorkflowDsl.task("fetch_items")
+    .perform((input, connection, context) -> {
+        Map<String, ?> myConnection = (Map<String, ?>) connection.get("my_connection");
+
         context.log(TaskContext.LogLevel.INFO, "fetching items");
 
         return context.component(
             "httpClient", "get",
-            Map.of("uri", "https://api.example.com/customers/" + context.input("customerId") + "/items"),
-            "my-connection");
+            Map.of(
+                "uri", "https://api.example.com/accounts/" + myConnection.get("accountId") + "/customers/" +
+                    input.get("customerId") + "/items"),
+            "my_connection");
     });
 ```
 
-A `perform` that takes no arguments keeps working on every path - the context is simply not passed to it.
+A task that reads no connection parameters declares two: `perform(input, context)`.
 
 ## Inputs, outputs and triggers
 
@@ -258,7 +334,7 @@ A workflow can declare what it accepts, what it returns, and what starts it:
 {
     name: "orders",
     inputs: [{name: "orderId", label: "Order ID", type: "STRING", required: true}],
-    outputs: [{name: "customer", task: "fetch-customer"}, {name: "ok", value: true}],
+    outputs: [{name: "customer", task: "fetch_customer"}, {name: "ok", value: true}],
     triggers: [{name: "daily", type: "schedule/v1/interval", parameters: {interval: 1, unit: "DAY"}}],
     tasks: [ /* ... */ ]
 }
@@ -268,7 +344,7 @@ A workflow can declare what it accepts, what it returns, and what starts it:
 {
     "name": "orders",
     "inputs": [{"name": "orderId", "label": "Order ID", "type": "STRING", "required": True}],
-    "outputs": [{"name": "customer", "task": "fetch-customer"}, {"name": "ok", "value": True}],
+    "outputs": [{"name": "customer", "task": "fetch_customer"}, {"name": "ok", "value": True}],
     "triggers": [{"name": "daily", "type": "schedule/v1/interval", "parameters": {"interval": 1, "unit": "DAY"}}],
     "tasks": [ ... ],
 }
@@ -277,13 +353,13 @@ A workflow can declare what it accepts, what it returns, and what starts it:
 ```java tab="Java"
 WorkflowDsl.workflow("orders")
     .inputs(input("orderId").label("Order ID").required(true))
-    .outputs(output("customer").task("fetch-customer"))
+    .outputs(output("customer").task("fetch_customer"))
     .triggers(trigger("daily", "schedule/v1/interval").parameters(Map.of("interval", 1, "unit", "DAY")))
 ```
 
 **Inputs** are what test configuration prompts for and what a caller passes. An input has a `name`, an optional
 `label`, a `type` (`STRING` by default; also `BOOLEAN`, `DATE`, `DATE_TIME`, `INTEGER`, `NUMBER`, `TIME` and, in
-embedded, `FIELD_MAPPING`) and `required`. At run time each arrives in `context.input()` under its own name, in the
+embedded, `FIELD_MAPPING`) and `required`. At run time each arrives in `perform`'s `input` under its own name, in the
 same namespace as the task outputs - so an input and a task cannot share a name.
 
 An input can also take its options from an input a component declares, so whoever fills it in picks from a list
@@ -336,44 +412,44 @@ tasks all at once, and a `forkJoin` group runs each branch concurrently while th
 
 ```javascript tab="JavaScript"
 tasks: [
-    {name: "fetch-order", perform: (context) => /* ... */},
+    {name: "fetch_order", perform: (input, context) => /* ... */},
     {
         name: "enrich",
         type: "parallel",
         tasks: [
-            {name: "fetch-customer", perform: (context) => /* ... */},
-            {name: "fetch-inventory", perform: (context) => /* ... */}
+            {name: "fetch_customer", perform: (input, context) => /* ... */},
+            {name: "fetch_inventory", perform: (input, context) => /* ... */}
         ]
     },
     {
         name: "notify",
         type: "forkJoin",
         branches: [
-            [{name: "post-slack", perform: /* ... */}, {name: "record-slack", perform: /* ... */}],
-            [{name: "send-email", perform: /* ... */}]
+            [{name: "post_slack", perform: /* ... */}, {name: "record_slack", perform: /* ... */}],
+            [{name: "send_email", perform: /* ... */}]
         ]
     },
-    {name: "summarize", perform: (context) => context.input("fetch-customer")}
+    {name: "summarize", perform: (input, context) => input["fetch_customer"]}
 ]
 ```
 
 ```python tab="Python"
 "tasks": [
-    {"name": "fetch-order", "perform": fetch_order},
+    {"name": "fetch_order", "perform": fetch_order},
     {
         "name": "enrich",
         "type": "parallel",
         "tasks": [
-            {"name": "fetch-customer", "perform": fetch_customer},
-            {"name": "fetch-inventory", "perform": fetch_inventory},
+            {"name": "fetch_customer", "perform": fetch_customer},
+            {"name": "fetch_inventory", "perform": fetch_inventory},
         ],
     },
     {
         "name": "notify",
         "type": "forkJoin",
         "branches": [
-            [{"name": "post-slack", "perform": post_slack}, {"name": "record-slack", "perform": record_slack}],
-            [{"name": "send-email", "perform": send_email}],
+            [{"name": "post_slack", "perform": post_slack}, {"name": "record_slack", "perform": record_slack}],
+            [{"name": "send_email", "perform": send_email}],
         ],
     },
     {"name": "summarize", "perform": summarize},
@@ -383,20 +459,20 @@ tasks: [
 ```java tab="Java"
 WorkflowDsl.workflow("orders")
     .tasks(
-        task("fetch-order").perform(context -> /* ... */),
+        task("fetch_order").perform((input, context) -> /* ... */),
         parallel("enrich")
             .tasks(
-                task("fetch-customer").perform(context -> /* ... */),
-                task("fetch-inventory").perform(context -> /* ... */)),
+                task("fetch_customer").perform((input, context) -> /* ... */),
+                task("fetch_inventory").perform((input, context) -> /* ... */)),
         forkJoin("notify")
             .branches(
-                branch(task("post-slack").perform(/* ... */), task("record-slack").perform(/* ... */)),
-                branch(task("send-email").perform(/* ... */))),
-        task("summarize").perform(context -> context.input("fetch-customer")));
+                branch(task("post_slack").perform(/* ... */), task("record_slack").perform(/* ... */)),
+                branch(task("send_email").perform(/* ... */))),
+        task("summarize").perform((input, context) -> input.get("fetch_customer")));
 ```
 
 **A parallel group's tasks cannot read each other.** They start together, so a sibling has not produced anything yet
-and `context.input(siblingName)` fails with an error saying so. Whatever they need must come from before the group; a
+and its name is absent from `input`. Whatever they need must come from before the group; a
 task after the group reads all of their outputs normally. Tasks within one fork/join branch do run in sequence, so
 they can read each other.
 
@@ -407,24 +483,6 @@ must be unique across the whole workflow, nesting included, and a group cannot c
 Concurrency has to come from these groups rather than from threads inside a `perform` - script tasks run in a strict
 sandbox with thread creation off, and work a task spawns itself would be invisible to the engine.
 
-## Task parameters
-
-A task can declare parameters of its own, which ride on the task node and are evaluated against the job context
-before the task runs - so a value may be a `${...}` expression:
-
-```javascript tab="JavaScript"
-{name: "my-task", parameters: {retries: 3, region: "${region}"}, perform: (context) => /* ... */}
-```
-
-```python tab="Python"
-{"name": "my-task", "parameters": {"retries": 3, "region": "${region}"}, "perform": my_task}
-```
-
-Read them back with `context.parameters()` - deliberately *not* through `context.input()`, so a parameter is never
-mistaken for a task's output. A literal in the perform is simpler when the value never changes; parameters earn their
-keep when the value comes from the workflow definition rather than the code, which also makes it visible to the
-editor and the API.
-
 ## Declaring connections
 
 A task declares the connections its perform uses, making the requirement readable from the generated workflow
@@ -432,44 +490,46 @@ definition and validated at save and deploy time (a declared name with no matchi
 
 ```javascript tab="JavaScript"
 {
-    name: "my-task",
+    name: "my_task",
     connections: [
-        {componentName: "httpClient", name: "billing-api"},
-        {componentName: "slack", componentVersion: 1, name: "slack-prod"}
+        {componentName: "httpClient", name: "billing_api"},
+        {componentName: "slack", componentVersion: 1, name: "slack_prod"}
     ],
-    perform: function (context) { /* ... */ }
+    perform: function (input, connection, context) { /* ... */ }
 }
 ```
 
 ```python tab="Python"
 {
-    "name": "my-task",
+    "name": "my_task",
     "connections": [
-        {"componentName": "httpClient", "name": "billing-api"},
-        {"componentName": "slack", "componentVersion": 1, "name": "slack-prod"},
+        {"componentName": "httpClient", "name": "billing_api"},
+        {"componentName": "slack", "componentVersion": 1, "name": "slack_prod"},
     ],
     "perform": my_task,
 }
 ```
 
 ```java tab="Java"
-WorkflowDsl.task("my-task")
+WorkflowDsl.task("my_task")
     .connections(
-        connection("httpClient", "billing-api"),
-        connection("slack", 1, "slack-prod"))
-    .perform(context -> /* ... */);
+        connection("httpClient", "billing_api"),
+        connection("slack", 1, "slack_prod"))
+    .perform((input, connection, context) -> /* ... */);
 ```
 
 A map keyed by connection name is accepted too, if you prefer it:
 
 ```javascript
 connections: {
-    "billing-api": {componentName: "httpClient"},
-    "slack-prod": {componentName: "slack", componentVersion: 1}
+    "billing_api": {componentName: "httpClient"},
+    "slack_prod": {componentName: "slack", componentVersion: 1}
 }
 ```
 
-The declared `name` is the same value the perform passes as `connectionName`. Declaring a connection makes it appear
+The declared `name` is the same value the perform passes as `connectionName`, and the key under which a
+three-parameter perform finds the connection's parameters in `connection`, for example `connection["billing_api"]`.
+Declaring a connection makes it appear
 wherever the platform asks you to wire connections - the **Test Configuration** dialog in the editor and the
 deployment's connection step - so each environment picks its own credentials, exactly like a visual workflow's nodes.
 A `connectionName` that was never declared and wired cannot resolve, so the call fails at run time.
@@ -488,20 +548,20 @@ so it composes them as a third argument to the call:
 
 ```javascript
 {
-    name: "ask-agents",
+    name: "ask_agents",
     connections: [
-        {componentName: "openAi", name: "openai-prod"},
-        {componentName: "anthropic", name: "anthropic-prod"},
-        {componentName: "slack", name: "slack-prod"}
+        {componentName: "openAi", name: "openai_prod"},
+        {componentName: "anthropic", name: "anthropic_prod"},
+        {componentName: "slack", name: "slack_prod"}
     ],
-    perform: function (context) {
+    perform: function (input, context) {
         const draft = context.component.aiAgent.chat({messages: [{role: "user", content: "Draft a reply"}]}, null, {
-            model: {type: "openAi/v1/model", connection: "openai-prod", parameters: {model: "gpt-4o"}},
-            tools: [{type: "slack/v1/sendMessage", connection: "slack-prod", name: "post_to_slack"}]
+            model: {type: "openAi/v1/model", connection: "openai_prod", parameters: {model: "gpt-4o"}},
+            tools: [{type: "slack/v1/sendMessage", connection: "slack_prod", name: "post_to_slack"}]
         });
 
         return context.component.aiAgent.chat({messages: [{role: "user", content: "Review: " + draft}]}, null, {
-            model: {type: "anthropic/v1/model", connection: "anthropic-prod",
+            model: {type: "anthropic/v1/model", connection: "anthropic_prod",
                     parameters: {model: "claude-sonnet-5"}}
         });
     }
@@ -530,20 +590,20 @@ platform's generated `SLACK_SendMessage`.
 Java tasks compose the same thing through the SDK, which builds the identical structure:
 
 ```java
-WorkflowDsl.task("ask-agent")
-    .connections(connection("openAi", "openai-prod"), connection("slack", "slack-prod"))
-    .perform(context -> context.component(
+WorkflowDsl.task("ask_agent")
+    .connections(connection("openAi", "openai_prod"), connection("slack", "slack_prod"))
+    .perform((input, context) -> context.component(
         "aiAgent", "chat", Map.of("messages", messages), null,
         clusterElements()
             .element(
                 "model",
                 clusterElement("openAi/v1/model")
-                    .connection("openai-prod")
+                    .connection("openai_prod")
                     .parameter("model", "gpt-4o"))
             .elements(
                 "tools",
                 clusterElement("slack/v1/sendMessage")
-                    .connection("slack-prod")
+                    .connection("slack_prod")
                     .name("post_to_slack"))));
 ```
 
@@ -560,8 +620,9 @@ there fails with an error saying so.
 
 ## Running a step on a task runner
 
-A code workflow's tasks run inside ByteChef, in the same sandbox as a [script](#scripting-languages): no native
-libraries, no filesystem, and a CPU and memory budget. When one step needs more - pandas or numpy, an npm package, or
+A JavaScript or Python code workflow's tasks run inside ByteChef, in the same sandbox as a
+[script](#scripting-languages): no native libraries, no filesystem, and a [CPU time and memory limit](#limits). When
+one step needs more - pandas or numpy, an npm package, or
 a long computation that shouldn't hold a worker - hand just that step to the **Script component** and run it on a
 **task runner**: a local process or a Docker container. The task around it stays where it is and keeps calling
 components and reading connections as usual.
@@ -569,10 +630,10 @@ components and reading connections as usual.
 ```javascript tab="JavaScript"
 {
     name: "summarize",
-    perform: function (context) {
+    perform: function (input, context) {
         const result = context.component.script.python({
             script: "import pandas as pd\n\ndef perform(input, context):\n    frame = pd.DataFrame(input['rows'])\n    return frame.describe().to_dict()\n",
-            input: {rows: context.input("fetchRows")},
+            input: {rows: input.fetchRows},
             taskRunner: {type: "docker", image: "registry.example.com/python-pandas:3.12"}
         });
 
@@ -591,10 +652,10 @@ def perform(input, context):
 """
 
 
-def summarize(context):
+def summarize(input, context):
     result = context.component.script.python({
         "script": SUMMARIZE,
-        "input": {"rows": context.input("fetchRows")},
+        "input": {"rows": input["fetchRows"]},
         "taskRunner": {"type": "docker", "image": "registry.example.com/python-pandas:3.12"},
     })
 
@@ -618,10 +679,10 @@ It is never handed to the script.
 {
     name: "summarize",
     connections: [{name: "taskRunner", componentName: "kubernetes", componentVersion: 1}],
-    perform: function (context) {
+    perform: function (input, context) {
         return context.component.script.python({
             script: "...",
-            input: {rows: context.input("fetchRows")},
+            input: {rows: input.fetchRows},
             taskRunner: {type: "kubernetes", image: "registry.example.com/python-pandas:3.12"}
         }).vars;
     }
@@ -633,8 +694,8 @@ returned, alongside `exitCode`, `stdout`, `stderr` and `outputFiles`. On `graalv
 
 Things to know:
 
-- **The script on the runner can't call back.** `context.component`, `context.connection` and the other context
-  members throw "is not available under the … runner" there. Fetch data and call components in the task, pass what the
+- **The script on the runner can't call back.** `context.component` and every other context member
+  throw "is not available under the … runner" there. Fetch data and call components in the task, pass what the
   script needs in `input`, and act on its result in the task.
 - **The task's connections go with it.** With `bytechef.script.inject-connections` on (as in the shipped
   configuration), every connection the task declares except `taskRunner` is written to a `connections.json` file
@@ -661,14 +722,36 @@ Things to know:
 - **A runner costs start-up time.** A container start adds noticeably more latency than an in-process call, so keep
   runner steps for work that needs them.
 
+[Task Runners](/platform/automation/build/workflows/task-runners) covers setting the runners up.
+
 ## Typed authoring
 
 The script contract has type definitions for TypeScript and Python, so an editor or a type checker catches a missing
-`name`, a misspelled `perform` or an unknown input type before you deploy, and types the `context` inside every
+`name`, a misspelled `perform` or an unknown input type before you deploy, and types the arguments of every
 `perform`. Both packages carry types only: ByteChef evaluates the file as a plain script, so nothing they add
 survives to runtime. Both describe projects (`ProjectDefinition`) and code integrations (`IntegrationDefinition`).
 
-**TypeScript** - install [`@bytechef/workflow-api`](https://github.com/bytechefhq/bytechef/tree/master/sdks/backend/typescript/workflow-api)
+<Callout type="warn" title="Install the type packages from source">
+    `@bytechef/workflow-api` and `bytechef-workflow-api` are not published to npm or PyPI yet, so installing them by
+    name fails, and so do the samples' `npm install`, `npm run check:ts` and `pip install -r requirements-dev.txt`
+    steps. Their sources live in the ByteChef repository, under
+    [`sdks/backend/typescript/workflow-api`](https://github.com/bytechefhq/bytechef/tree/master/sdks/backend/typescript/workflow-api)
+    and [`sdks/backend/python/workflow-api`](https://github.com/bytechefhq/bytechef/tree/master/sdks/backend/python/workflow-api).
+    Until they are published, install them from a ByteChef checkout, as below. The samples' plain `npm run check`
+    and `python3 scripts/check.py` checks need neither package.
+</Callout>
+
+```bash
+# TypeScript: build the package, then add it to your project as a dev dependency
+npm --prefix <bytechef>/sdks/backend/typescript/workflow-api install
+npm --prefix <bytechef>/sdks/backend/typescript/workflow-api run build
+npm install --save-dev <bytechef>/sdks/backend/typescript/workflow-api
+
+# Python
+pip install <bytechef>/sdks/backend/python/workflow-api mypy
+```
+
+**TypeScript** - add [`@bytechef/workflow-api`](https://github.com/bytechefhq/bytechef/tree/master/sdks/backend/typescript/workflow-api)
 as a dev dependency, reference it with a triple-slash directive and check the project with `satisfies`. A code
 workflow file can't `import` anything, so the types live in the global `ByteChef` namespace:
 
@@ -680,17 +763,17 @@ workflow file can't `import` anything, so the types live in the global `ByteChef
     version: "1.0.0",
     workflows: [
         {
-            name: "sync-orders",
+            name: "sync_orders",
             inputs: [{name: "customerId", label: "Customer ID", type: "STRING", required: true}],
-            outputs: [{name: "orders", task: "fetch-orders"}],
+            outputs: [{name: "orders", task: "fetch_orders"}],
             tasks: [
                 {
-                    name: "fetch-orders",
-                    connections: [{componentName: "httpClient", name: "orders-api"}],
-                    perform: (context) =>
+                    name: "fetch_orders",
+                    connections: [{componentName: "httpClient", name: "orders_api"}],
+                    perform: (input, connection, context) =>
                         context.component.httpClient.get(
-                            {uri: "https://api.example.com/customers/" + context.input("customerId") + "/orders"},
-                            "orders-api")
+                            {uri: "https://api.example.com/customers/" + input.customerId + "/orders"},
+                            "orders_api")
                 }
             ]
         }
@@ -699,23 +782,32 @@ workflow file can't `import` anything, so the types live in the global `ByteChef
 ```
 
 Compile the file with `tsc` and deploy the emitted `.js` file. `satisfies` and the directive leave nothing behind, so
-the output is the plain object expression ByteChef expects. Plain JavaScript files get the same checks through
-`// @ts-check` and a JSDoc `@type {ByteChef.ProjectDefinition}` annotation.
+the output is the plain object expression ByteChef expects. Don't `import` or `export` anything in the `.ts` file:
+either one turns it into a module, and the output stops being a bare expression. Plain JavaScript files get the same
+checks through `// @ts-check` and a JSDoc `@type {ByteChef.ProjectDefinition}` annotation.
+
+A three-parameter `perform` is typed without annotations. TypeScript can't infer a two-parameter `perform` from the
+union of both forms, so annotate its parameters: `(input: ByteChef.TaskInput, context: ByteChef.TaskContext) => ...`.
+
+Each JavaScript sample carries a TypeScript version of its project next to the `.js` file, for example
+`src/sample_code_project.ts` in the automation sample. `npm run check:ts` compiles it to `dist/` and runs the same check
+on the output; deploy the `.js` file from `dist/`. The TypeScript project has a name of its own ("Sample Code Project
+TypeScript"), so deploying it creates a second project next to the JavaScript one.
 
 **Python** - install [`bytechef-workflow-api`](https://github.com/bytechefhq/bytechef/tree/master/sdks/backend/python/workflow-api)
 where your type checker runs (mypy, Pyright) and import it under `TYPE_CHECKING`, since the ByteChef runtime can't
-import it:
+import it. Standard-library imports are fine in a code workflow; nothing else is available on the server:
 
 ```python
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Dict
 
 if TYPE_CHECKING:
     from bytechef_workflow_api import ProjectDefinition, TaskContext
 
 
-def fetch_orders(context: "TaskContext") -> Any:
+def fetch_orders(input: Dict[str, Any], context: "TaskContext") -> Any:
     return context.component.httpClient.get(
-        {"uri": "https://api.example.com/customers/" + context.input("customerId") + "/orders"}, "orders-api"
+        {"uri": "https://api.example.com/customers/" + input["customerId"] + "/orders"}, "orders_api"
     )
 
 
@@ -724,13 +816,13 @@ project: "ProjectDefinition" = {
     "version": "1.0.0",
     "workflows": [
         {
-            "name": "sync-orders",
+            "name": "sync_orders",
             "inputs": [{"name": "customerId", "label": "Customer ID", "type": "STRING", "required": True}],
-            "outputs": [{"name": "orders", "task": "fetch-orders"}],
+            "outputs": [{"name": "orders", "task": "fetch_orders"}],
             "tasks": [
                 {
-                    "name": "fetch-orders",
-                    "connections": [{"componentName": "httpClient", "name": "orders-api"}],
+                    "name": "fetch_orders",
+                    "connections": [{"componentName": "httpClient", "name": "orders_api"}],
                     "perform": fetch_orders,
                 }
             ],
@@ -742,7 +834,7 @@ project
 ```
 
 The types follow the definition as a `dict`; a `SimpleNamespace` definition loads too, but a type checker can't check
-it.
+it. The Python samples are annotated this way; type check one with `mypy --strict src scripts`.
 
 ## The Java contract
 
@@ -750,8 +842,9 @@ A Java code workflow is a jar containing a `ProjectHandler` implementation, disc
 `ServiceLoader` mechanism - so the jar must carry a `META-INF/services/com.bytechef.automation.project.ProjectHandler`
 entry naming your class, whether you write that file yourself or generate it (Google's `@AutoService` is the usual
 way). The handler returns a `ProjectDefinition`, which the `ProjectDsl` and `WorkflowDsl` builders assemble - see
-[A complete example](#a-complete-example). A task's `perform` takes the SDK's `TaskContext`, the Java side of
-[the task context](#the-task-context); a `perform` that takes no arguments still works.
+[A complete example](#a-complete-example). A task's `perform` is a lambda taking `(input, context)` or
+`(input, connection, context)`: `input` and `connection` are `Map<String, ?>`, and `context` is the SDK's
+`TaskContext`, the Java side of [the task context](#the-task-context), with `component(...)` and `log(...)`.
 
 `ProjectHandler`, `ProjectDefinition`, `WorkflowDsl` and `TaskContext` come from the ByteChef backend SDK
 (`sdks/backend/java/automation/project-api` and `sdks/backend/java/workflow-api`) - compile the jar against those and
@@ -766,18 +859,30 @@ same library without colliding.
 ## Creating and editing in ByteChef
 
 JavaScript and Python code workflows can be created and edited directly in ByteChef, without a separate build and
-upload step. On the **Projects** page, the arrow next to **New Project** opens a menu with **New Code Workflow** and
-**Import Code Project**:
+upload step. On an Enterprise Edition deployment, the arrow next to **New Project** on Automation → **Projects** opens a
+menu with **New Project**, **From Template**, **Import Project**, **New Code Project** and **Import Code Project**. The
+Community Edition menu has no code project items:
 
-- **New Code Workflow** asks for a name, a language (JavaScript or Python), a description, a category and tags, then
-  creates the project as a draft from a starter source and opens it in the code editor.
-- **Import Code Project** uploads a file - a `.jar`, `.js` or `.py` - and publishes it, exactly like the
-  [deploy endpoint](#deploying-through-the-api).
+- **New Code Project** opens a dialog that asks for a **Language** (JavaScript or Python), a **Project Name**, and an
+  optional **Description**, **Category** and **Tags**. ByteChef creates the project as a draft from a starter source and
+  opens it in the code editor. The name must not already be used in the workspace and must not contain quotes,
+  backslashes or line breaks.
+- **Import Code Project** uploads a `.js`, `.py` or `.jar` file and publishes it, like the
+  [deploy endpoint](#deploying-through-the-api) without `enable`: existing deployments stay on the version they run.
+  The dialog offers `.jar` only while [Java uploads](#restricting-java-code-workflows) are allowed.
+
+A code project's row shows a language badge, and its workflow rows list the components its tasks declare connections
+to. The actions that change a project's workflow structure, such as **New Workflow**, are hidden for a code project:
+its workflows come from the source.
 
 A code project opens a **source editor** in place of the visual canvas. Saves are checked before they are stored -
-source that fails to load is rejected with the loader's error and the draft stays as it was - and they are
-**name-locked**: the `name` declared in the code must stay the project's name, so renaming through the source is not
-supported.
+source that fails to load is rejected with the loader's error and the draft stays as it was. The `name` declared in
+the code and the project's name stay in sync: change the `name` in the source and saving renames the project, unless
+another project already uses that name; rename the project and the `name` in the draft source is rewritten to match. A
+Java code workflow takes its name from its JAR, so rename it there and upload the JAR again.
+
+Restoring a version from the project's version history restores that version's source into the draft, under the
+project's current name.
 
 Editor saves update the project's **draft** only: deployments keep running the last published version until you
 publish from the project header, exactly like visual workflows. Iterating on a draft is safe - a workflow keeps its
@@ -797,22 +902,23 @@ POST /api/automation/v1/projects/deploy
 
 A `multipart/form-data` request:
 
-| Part | |
+| Parameter | |
 |---|---|
-| `projectFile` (file part) | The `.jar`, `.js` or `.py` file. The file name's extension picks the language. |
-| `workspaceId` | Required. The workspace the project belongs to. |
+| `projectFile` (file part) | Required. The `.jar`, `.js` or `.py` file. The file name's extension picks the language. |
+| `workspaceId` | Required. The workspace the project belongs to. Send it as a query parameter or as a form field. |
 | `enable` (query parameter) | Optional, `false` by default. See below. |
+| `X-ENVIRONMENT` (header) | Optional. `DEVELOPMENT`, `STAGING` or `PRODUCTION` (case-insensitive); `PRODUCTION` when absent. |
 
 It is part of the public [Projects API](/openapi/automation-project-code-workflow). Authenticate with
 `Authorization: Bearer <API key>`, using a workspace API key (Settings → Current Workspace → **API Keys**) that
-belongs to an administrator - deploying requires the admin role. The key is looked up in the environment named by the
-`X-Environment` header (`DEVELOPMENT`, `STAGING` or `PRODUCTION`; `PRODUCTION` when the header is absent), so send
-the environment the key was created in. A successful deploy returns `204 No Content`.
+belongs to an administrator - deploying requires the admin role. Only an automation workspace key is accepted: an
+Embedded API key is rejected. The key is looked up in the environment named by the `X-ENVIRONMENT` header, so send the
+environment the key was created in; the same header picks the environment `enable` acts on.
 
 ```bash
 curl -X POST "$BYTECHEF_URL/api/automation/v1/projects/deploy?workspaceId=1&enable=true" \
   -H "Authorization: Bearer $BYTECHEF_API_KEY" \
-  -H "X-Environment: DEVELOPMENT" \
+  -H "X-ENVIRONMENT: DEVELOPMENT" \
   -F "projectFile=@src/sample_code_project.py"
 ```
 
@@ -820,11 +926,31 @@ What the endpoint does:
 
 - **It saves *and* publishes.** The upload is saved as the project's draft and published in the same call, so the
   deployed version becomes the published one. An upload replaces any unpublished editor changes.
-- **It upserts by name.** The project is matched on the `name` in the definition. The first deploy creates the
-  project; every deploy after that publishes a new version of it, and each workflow keeps its identity by name.
+- **It upserts by name.** The project is matched on the `name` in the definition within the workspace. The first
+  deploy creates the project; every deploy after that publishes a new version of it, and each workflow keeps its
+  identity by name.
+- **Without `enable`, deployments don't move.** Existing deployments keep running the version they are on until you
+  move them in the UI.
 - **`enable=true` makes it live in the request's environment.** When the project has no deployment there, ByteChef
-  creates and enables one; otherwise it moves the existing deployment to the published version and enables it.
-  Without `enable`, existing deployments keep running the version they are on.
+  creates one at the published version and enables it; otherwise it moves the existing deployment to the published
+  version and enables it if it was disabled.
+
+With `enable=true`, a workflow that can't run without configuration is added to the deployment but left **disabled**:
+one that declares a required input, or whose trigger or tasks need a connection. Every other workflow is enabled,
+and so is the deployment. Open the deployment, set the input values and pick the connections for those workflows,
+then enable them. On a move to a new version this applies to workflows the version adds; workflows that were already
+deployed keep their enabled state, their input values and their connections. In the
+[automation samples](#sample-projects), `sampleWorkflow1` (required `name` input) and the three Gmail workflows
+(Gmail trigger or connection, plus Slack for `notifySlackOnNewEmail`) all wait for configuration this way.
+
+Responses:
+
+| Status | When |
+|---|---|
+| `204 No Content` | The project was saved and published, and enabled when `enable=true`. |
+| `400 Bad Request` | The file is missing or fails to load, its language is unsupported or Java uploads are disabled, or a required parameter is missing. The body names the reason. |
+| `401 Unauthorized` | The API key is unknown in that environment, is not a workspace API key, or `X-ENVIRONMENT` is not a valid environment. |
+| `403 Forbidden` | The key's user is not an administrator. |
 
 A second endpoint, `POST /api/automation/v1/projects/{id}/git/pull`, pulls a project from its configured Git
 repository instead of taking an upload.
@@ -896,15 +1022,22 @@ with the workflow.
 
 ### Limits
 
-Script steps execute in the [script sandbox](/platform/use-bytechef/self-hosted/configuration/script-sandbox):
-no host class access, no filesystem access, no environment access, no subprocess execution, no thread
-creation. Concurrency inside a script is therefore not available - use the workflow's own
-[flow controls](/platform/automation/build/workflows/flow-controls) to parallelize.
+Scripts, and the tasks of a JavaScript or Python code workflow, execute in a GraalVM guest context with no host class
+access, no filesystem access, no environment access, no subprocess execution and no thread creation. Concurrency inside a script is
+therefore not available - use the workflow's own
+[flow controls](/platform/automation/build/workflows/flow-controls), or a code workflow's
+[task groups](#running-tasks-concurrently), to parallelize.
 
-Each JavaScript or Python execution also runs under a CPU time limit (5 minutes by default) and a heap
-limit (512 MB by default), which the operator sets with `bytechef.script.sandbox.*`. A script that goes
-past either fails its task. For unbounded or long-running computation, write a
-[custom component](/platform/settings/components/custom-components) instead.
+The guest context also runs inside a resource **sandbox**, on by default. Each execution gets a CPU time limit (5
+minutes by default) and a heap memory limit (512 MB by default), and the number of guest executions that run at once is
+capped; an execution that passes a limit is stopped and its task fails. Operators tune these under
+`bytechef.script.sandbox` (`max-cpu-time`, `max-heap-memory`, `max-concurrent-executions`, `enabled`); see
+[Script Sandbox](/platform/use-bytechef/self-hosted/configuration/script-sandbox). On a JVM that can't enforce the heap
+limit, the server logs a warning and only the CPU limit applies.
+
+For work the sandbox doesn't allow - native libraries, packages from npm or PyPI, long computations - run the step on a
+[task runner](/platform/automation/build/workflows/task-runners) instead: a local process or a container. See
+[Running a step on a task runner](#running-a-step-on-a-task-runner).
 
 ### Script or custom component?
 
@@ -914,17 +1047,16 @@ past either fails its task. For unbounded or long-running computation, write a
 | The logic is one-off. | The logic needs its own typed schema. |
 | You are iterating. | Others depend on the behavior. |
 
-A common approach is to prototype in a script and move the logic to a custom component when it is
-stable. Each script execution creates a new guest context and evaluates the source again, so a script
-step has a small start-up cost on every run that a custom component, initialized once, does not.
+A common progression: prototype in a script, promote it to a custom component once it stabilizes. Make that call
+for reuse and schema. When a step needs more CPU, memory or packages than the sandbox allows, the answer is a
+[task runner](/platform/automation/build/workflows/task-runners), not a custom component.
+
+---
 
 ## Not yet available
 
-Everything in this section is on the upcoming release track.
-
 ### Copilot
 
-The in-editor [AI Copilot](/platform/automation/build/ai-copilot) panel routes to code-workflow-aware Ask and Build
-assistants whenever a code-backed project or integration is open, on both the automation and embedded surfaces. In
-the [AI Hub](/platform/automation/build/hub), the `buildCodeWorkflow` specialist lists, explains, creates, and
-updates code workflows, and can open one in its right panel.
+The [AI Copilot](/platform/automation/build/ai-copilot) and the [AI Hub](/platform/automation/build/hub) don't know
+about code workflows yet: there is no code-workflow-aware assistant in the code editor and no AI Hub specialist that
+creates or edits a code workflow. Write the source yourself, starting from a [sample](#sample-projects).
