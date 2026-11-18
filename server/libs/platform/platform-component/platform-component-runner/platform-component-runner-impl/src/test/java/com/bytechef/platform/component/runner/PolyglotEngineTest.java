@@ -84,7 +84,22 @@ class PolyglotEngineTest {
     }
 
     @Test
-    void testExecuteJavaScriptWithoutComponentConnections() {
+    void testExecutePythonWithInputAndContext() {
+        Object result = execute("python", "def perform(input, context):\n\treturn input.name");
+
+        assertThat(result).isEqualTo("ByteChef");
+    }
+
+    @Test
+    void testExecutePythonWithInputConnectionAndContext() {
+        Object result = execute(
+            "python", "def perform(input, connection, context):\n\treturn connection[\"my-connection\"][\"token\"]");
+
+        assertThat(result).isEqualTo("secret");
+    }
+
+    @Test
+    void testExecuteWithoutComponentConnections() {
         Parameters inputParameters = ParametersFactory.create(
             Map.of(
                 INPUT, Map.of(),
@@ -97,6 +112,23 @@ class PolyglotEngineTest {
     }
 
     @Test
+    void testExecutePythonReadsInputKeyNamedLikeDictMethodBySubscript() {
+        Object result = execute(
+            "python", "def perform(input, context):\n\treturn input[\"items\"]", Map.of("items", List.of(1, 2)));
+
+        assertThat(result).isEqualTo(List.of(1, 2));
+    }
+
+    @Test
+    void testExecutePythonWithInputContextAndOptionalParameter() {
+        Object result = execute(
+            "python",
+            "def perform(input, context, debug=False):\n\treturn 'context' if debug is False else 'connection'");
+
+        assertThat(result).isEqualTo("context");
+    }
+
+    @Test
     void testExecuteJavaScriptPassesContextAsThirdArgument() {
         Object result = execute(
             "js", "function perform(input, connection, context) {\n\treturn typeof context.component;\n}");
@@ -105,7 +137,7 @@ class PolyglotEngineTest {
     }
 
     @Test
-    void testExecuteJavaScriptWithoutExposedConnectionParameters() {
+    void testExecuteWithoutExposedConnectionParameters() {
         Parameters inputParameters = ParametersFactory.create(
             Map.of(
                 INPUT, Map.of(),
@@ -118,7 +150,7 @@ class PolyglotEngineTest {
     }
 
     @Test
-    void testExecuteJavaScriptWithoutPerformFunction() {
+    void testExecuteWithoutPerformFunction() {
         Parameters inputParameters = ParametersFactory.create(Map.of(INPUT, Map.of(), SCRIPT, "var perform = {};"));
 
         assertThatThrownBy(
@@ -130,7 +162,7 @@ class PolyglotEngineTest {
 
     @Order(Integer.MAX_VALUE)
     @Test
-    void testExecuteJavaScriptNamedConnectionWithoutComponentConnections() {
+    void testExecuteNamedConnectionWithoutComponentConnections() {
         Parameters inputParameters = ParametersFactory.create(
             Map.of(
                 INPUT, Map.of(),
@@ -149,30 +181,6 @@ class PolyglotEngineTest {
         assertThatThrownBy(
             () -> polyglotEngine.execute(ScriptSandboxMode.STRICT, null, "js", inputParameters, null, jobContextAware))
                 .hasMessageContaining("Connection with name missing does not exist");
-    }
-
-    @Test
-    void testExecutePythonWithInputAndContext() {
-        Object result = execute("python", "def perform(input, context):\n\treturn input.name");
-
-        assertThat(result).isEqualTo("ByteChef");
-    }
-
-    @Test
-    void testExecutePythonWithInputConnectionAndContext() {
-        Object result = execute(
-            "python", "def perform(input, connection, context):\n\treturn connection[\"my-connection\"][\"token\"]");
-
-        assertThat(result).isEqualTo("secret");
-    }
-
-    @Test
-    void testExecutePythonWithInputContextAndOptionalParameter() {
-        Object result = execute(
-            "python",
-            "def perform(input, context, debug=False):\n\treturn 'context' if debug is False else 'connection'");
-
-        assertThat(result).isEqualTo("context");
     }
 
     @Test

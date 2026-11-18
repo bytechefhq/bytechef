@@ -13,4 +13,5 @@ dependencies {
     testImplementation("ch.qos.logback:logback-classic")
     testImplementation(rootProject.libs.org.graalvm.polyglot.js)
     testImplementation(rootProject.libs.org.graalvm.polyglot.python)
+    testImplementation(project(":server:libs:test:test-support"))
 }
