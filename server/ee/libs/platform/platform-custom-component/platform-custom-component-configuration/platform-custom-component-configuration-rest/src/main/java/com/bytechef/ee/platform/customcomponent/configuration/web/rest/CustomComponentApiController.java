@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.platform.customcomponent.configuration.internal.web.rest;
+package com.bytechef.ee.platform.customcomponent.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent.Language;
@@ -24,21 +24,21 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author Ivica Cardic
  */
-@RestController("com.bytechef.ee.platform.customcomponent.configuration.internal.web.rest.CustomComponentInternalApiController")
+@RestController("com.bytechef.ee.platform.customcomponent.configuration.web.rest.CustomComponentApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
 @ConditionalOnCoordinator
 @ConditionalOnEEVersion
-public class CustomComponentInternalApiController implements CustomComponentInternalApi {
+public class CustomComponentApiController implements CustomComponentApi {
 
     private final CustomComponentFacade customComponentFacade;
 
     @SuppressFBWarnings("EI")
-    public CustomComponentInternalApiController(CustomComponentFacade customComponentFacade) {
+    public CustomComponentApiController(CustomComponentFacade customComponentFacade) {
         this.customComponentFacade = customComponentFacade;
     }
 
     @Override
-    public ResponseEntity<Void> deployCustomComponentInternal(MultipartFile componentFile) {
+    public ResponseEntity<Void> deployCustomComponent(MultipartFile componentFile) {
         try {
             customComponentFacade.save(
                 componentFile.getBytes(), Language.of(Objects.requireNonNull(componentFile.getOriginalFilename())));
