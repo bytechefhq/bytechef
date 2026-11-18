@@ -29,7 +29,6 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
-import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -136,7 +135,8 @@ class CreateDataTableFromCsvToolCallbackTest {
 
         String csv = "name,note\n\"Doe, John\",\"says \"\"hi\"\"\"\n\"Smith, Jane\",\"line1\nline2\"";
 
-        when(workspaceDataTableFacade.getDataTableId("contacts")).thenReturn(7L);
+        when(workspaceDataTableFacade.createTable(eq("contacts"), any(String.class), any(), anyLong(), anyLong()))
+            .thenReturn(7L);
 
         callback.call(buildInput("contacts", csv), toolContextWithWorkspace());
 
@@ -192,7 +192,8 @@ class CreateDataTableFromCsvToolCallbackTest {
         CreateDataTableFromCsvToolCallback callback =
             new CreateDataTableFromCsvToolCallback(workspaceDataTableFacade);
 
-        when(workspaceDataTableFacade.getDataTableId("typed")).thenReturn(7L);
+        when(workspaceDataTableFacade.createTable(eq("typed"), any(String.class), any(), anyLong(), anyLong()))
+            .thenReturn(7L);
 
         callback.call(
             buildInput("typed", "id,name,score,joined\n1,Alice,9.5,2026-01-15"), toolContextWithWorkspace());
@@ -211,12 +212,11 @@ class CreateDataTableFromCsvToolCallbackTest {
     }
 
     @Test
-    void testDropsMixedCaseTableWhenRowInsertFails() throws Exception {
+    void testDropsTheCreatedTableWhenRowInsertFails() throws Exception {
         WorkspaceDataTableFacade workspaceDataTableFacade = mock(WorkspaceDataTableFacade.class);
 
-        when(workspaceDataTableFacade.listTables(1L, 0L))
-            .thenReturn(List.of(new DataTableInfo(42L, "orders", "", List.of(), null)));
-        when(workspaceDataTableFacade.getDataTableId("Orders")).thenReturn(42L);
+        when(workspaceDataTableFacade.createTable(eq("Orders"), any(String.class), any(), anyLong(), anyLong()))
+            .thenReturn(42L);
         when(workspaceDataTableFacade.insertRow(eq(42L), any(), eq(0L)))
             .thenThrow(new IllegalStateException("insert failed"));
 

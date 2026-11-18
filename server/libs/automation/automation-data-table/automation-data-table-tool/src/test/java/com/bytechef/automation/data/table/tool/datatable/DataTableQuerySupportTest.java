@@ -52,7 +52,7 @@ class DataTableQuerySupportTest {
     @Test
     void testResolveBaseNameReturnsBaseNameOwnedByWorkspace() throws Exception {
         when(workspaceDataTableFacade.listTables(3L, 0L)).thenReturn(
-            List.of(new DataTableInfo(7L, "contacts", null, List.of(), null)));
+            List.of(new DataTableInfo(7L, "contacts", null, null, List.of(), null)));
 
         assertThat(DataTableQuerySupport.resolveBaseName(workspaceDataTableFacade, 7L, 3L, 0L))
             .isEqualTo("contacts");
@@ -61,7 +61,7 @@ class DataTableQuerySupportTest {
     @Test
     void testResolveBaseNameThrowsWhenTableBelongsToAnotherWorkspace() {
         when(workspaceDataTableFacade.listTables(3L, 0L)).thenReturn(
-            List.of(new DataTableInfo(9L, "orders", null, List.of(), null)));
+            List.of(new DataTableInfo(9L, "orders", null, null, List.of(), null)));
 
         assertThatExceptionOfType(DataTableNotFoundException.class)
             .isThrownBy(() -> DataTableQuerySupport.resolveBaseName(workspaceDataTableFacade, 7L, 3L, 0L));

@@ -150,7 +150,7 @@ public class DeleteDataTableRowToolCallback implements ToolCallback {
 
             if (wasDeleted) {
                 recordArtifact(
-                    invocationContext, tableInfo.baseName(), input.dataTableId(), environmentId, priorRow, rowId);
+                    invocationContext, tableInfo.name(), input.dataTableId(), environmentId, priorRow, rowId);
             }
 
             return JsonUtils.write(new DeleteDataTableRowOutput(wasDeleted, rowId));

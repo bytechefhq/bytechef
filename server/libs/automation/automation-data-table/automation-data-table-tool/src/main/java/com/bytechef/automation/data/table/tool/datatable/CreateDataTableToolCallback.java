@@ -134,7 +134,7 @@ public class CreateDataTableToolCallback implements ToolCallback {
             Long dataTableId = workspaceDataTableFacade.listTables(workspaceId, environmentId)
                 .stream()
                 .filter(dataTableInfo -> input.baseName()
-                    .equals(dataTableInfo.baseName()))
+                    .equals(dataTableInfo.name()))
                 .map(dataTableInfo -> dataTableInfo.id())
                 .findFirst()
                 .orElse(null);

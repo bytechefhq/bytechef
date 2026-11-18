@@ -62,7 +62,7 @@ class DataTableToolCallbacksFactoryTest {
     @BeforeEach
     void beforeEach() {
         when(workspaceDataTableFacade.listTables(WORKSPACE_ID, ENVIRONMENT_ID))
-            .thenReturn(List.of(new DataTableInfo(DATA_TABLE_ID, "orders", null, List.of(), Instant.now())));
+            .thenReturn(List.of(new DataTableInfo(DATA_TABLE_ID, "orders", null, null, List.of(), Instant.now())));
     }
 
     @Test

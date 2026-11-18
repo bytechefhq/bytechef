@@ -138,7 +138,7 @@ public class AddDataTableRowToolCallback implements ToolCallback {
 
             DataTableRow inserted = workspaceDataTableFacade.insertRow(dataTableId, values, environmentId);
 
-            recordArtifact(invocationContext, tableInfo.baseName(), inserted.id());
+            recordArtifact(invocationContext, tableInfo.name(), inserted.id());
 
             return JsonUtils.write(new AddDataTableRowOutput(true, inserted.id()));
         } catch (JacksonException exception) {

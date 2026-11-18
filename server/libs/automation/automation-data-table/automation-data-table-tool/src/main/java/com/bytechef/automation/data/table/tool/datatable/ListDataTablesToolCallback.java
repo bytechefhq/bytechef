@@ -98,7 +98,7 @@ public class ListDataTablesToolCallback implements ToolCallback {
                         .map(columnSpec -> new ColumnSummary(columnSpec.name(), columnSpec.type()))
                         .toList();
 
-                    return new DataTableSummary(info.id(), info.baseName(), columnSummaries);
+                    return new DataTableSummary(info.id(), info.name(), columnSummaries);
                 })
                 .toList();
 

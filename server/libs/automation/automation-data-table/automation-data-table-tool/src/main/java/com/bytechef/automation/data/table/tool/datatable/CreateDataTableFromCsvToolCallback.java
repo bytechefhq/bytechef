@@ -130,15 +130,15 @@ public class CreateDataTableFromCsvToolCallback implements ToolCallback {
 
             String description = input.description() == null ? "" : input.description();
 
-            workspaceDataTableFacade.createTable(input.baseName(), description, columnSpecs, workspaceId,
-                environmentId);
+            long dataTableId = workspaceDataTableFacade.createTable(
+                input.baseName(), description, columnSpecs, workspaceId, environmentId);
 
             int inserted;
 
             try {
-                inserted = insertRows(parsed, columnSpecs, input.baseName(), environmentId);
+                inserted = insertRows(parsed, columnSpecs, dataTableId, environmentId);
             } catch (RuntimeException exception) {
-                return dropPartiallyPopulatedTable(input.baseName(), workspaceId, environmentId, exception);
+                return dropPartiallyPopulatedTable(input.baseName(), dataTableId, environmentId, exception);
             }
 
             return JsonUtils.write(new CreateDataTableFromCsvOutput(
@@ -161,9 +161,7 @@ public class CreateDataTableFromCsvToolCallback implements ToolCallback {
     }
 
     private int insertRows(
-        ParsedCsv parsed, List<ColumnSpec> columnSpecs, String baseName, long environmentId) {
-
-        long dataTableId = workspaceDataTableFacade.getDataTableId(baseName);
+        ParsedCsv parsed, List<ColumnSpec> columnSpecs, long dataTableId, long environmentId) {
 
         int inserted = 0;
 
@@ -187,7 +185,7 @@ public class CreateDataTableFromCsvToolCallback implements ToolCallback {
     }
 
     private String dropPartiallyPopulatedTable(
-        String baseName, long workspaceId, long environmentId, RuntimeException exception) {
+        String baseName, long dataTableId, long environmentId, RuntimeException exception) {
 
         Class<? extends RuntimeException> exceptionClass = exception.getClass();
         String failureCause = exceptionClass.getSimpleName();
@@ -195,14 +193,6 @@ public class CreateDataTableFromCsvToolCallback implements ToolCallback {
         log.warn(
             "{}: row insert failed for table '{}'; dropping the partially created table", TOOL_NAME, baseName,
             exception);
-
-        Long dataTableId = resolveDataTableId(baseName, workspaceId, environmentId);
-
-        if (dataTableId == null) {
-            return ToolErrors
-                .toolError("Row insert failed (" + failureCause + ") and the partially created table '" + baseName
-                    + "' could not be located for cleanup; drop it manually before retrying.");
-        }
 
         try {
             workspaceDataTableFacade.dropTable(dataTableId, environmentId);
@@ -216,15 +206,6 @@ public class CreateDataTableFromCsvToolCallback implements ToolCallback {
 
         return ToolErrors.toolError("Row insert failed (" + failureCause + "). The partially created table '" + baseName
             + "' was dropped, so no rows were kept and retrying with corrected data is safe.");
-    }
-
-    private @Nullable Long resolveDataTableId(String baseName, long workspaceId, long environmentId) {
-        return workspaceDataTableFacade.listTables(workspaceId, environmentId)
-            .stream()
-            .filter(dataTableInfo -> baseName.equalsIgnoreCase(dataTableInfo.baseName()))
-            .map(dataTableInfo -> dataTableInfo.id())
-            .findFirst()
-            .orElse(null);
     }
 
     private static List<ColumnSpec> inferColumnSpecs(ParsedCsv parsed) {
@@ -323,6 +304,7 @@ public class CreateDataTableFromCsvToolCallback implements ToolCallback {
                     yield false;
                 }
             }
+            case LINK -> false;
             case STRING -> true;
         };
     }
@@ -353,7 +335,7 @@ public class CreateDataTableFromCsvToolCallback implements ToolCallback {
                 case NUMBER -> Double.parseDouble(trimmed);
                 case DATE -> LocalDate.parse(trimmed);
                 case DATE_TIME -> LocalDateTime.parse(trimmed);
-                case STRING -> raw;
+                case LINK, STRING -> raw;
             };
         } catch (NumberFormatException | DateTimeParseException exception) {
             return raw;

@@ -58,7 +58,7 @@ public final class DataTableQuerySupport {
                 continue;
             }
 
-            String baseName = dataTableInfo.baseName();
+            String baseName = dataTableInfo.name();
 
             if (baseName != null && !baseName.isBlank()) {
                 return baseName;
