@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectedUserProjectWorkflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("ConnectedUserProjectWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-15T19:28:21.317912+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-18T07:20:03.362029+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class ConnectedUserProjectWorkflowModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -109,6 +109,8 @@ public class ConnectedUserProjectWorkflowModel {
   private @Nullable Boolean mcpEnabled;
 
   private @Nullable Boolean toolOnly;
+
+  private @Nullable String staticWebhookUrl;
 
   public ConnectedUserProjectWorkflowModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
@@ -541,6 +543,27 @@ public class ConnectedUserProjectWorkflowModel {
     this.toolOnly = toolOnly;
   }
 
+  public ConnectedUserProjectWorkflowModel staticWebhookUrl(@Nullable String staticWebhookUrl) {
+    this.staticWebhookUrl = staticWebhookUrl;
+    return this;
+  }
+
+  /**
+   * The url that starts the workflow when it begins with a static webhook trigger, for example Webhook. Null when the workflow is not deployed or starts with another trigger.
+   * @return staticWebhookUrl
+   */
+  
+  @Schema(name = "staticWebhookUrl", description = "The url that starts the workflow when it begins with a static webhook trigger, for example Webhook. Null when the workflow is not deployed or starts with another trigger.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("staticWebhookUrl")
+  public @Nullable String getStaticWebhookUrl() {
+    return staticWebhookUrl;
+  }
+
+  @JsonProperty("staticWebhookUrl")
+  public void setStaticWebhookUrl(@Nullable String staticWebhookUrl) {
+    this.staticWebhookUrl = staticWebhookUrl;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -568,12 +591,13 @@ public class ConnectedUserProjectWorkflowModel {
         Objects.equals(this.connections, connectedUserProjectWorkflow.connections) &&
         Objects.equals(this.attentionReason, connectedUserProjectWorkflow.attentionReason) &&
         Objects.equals(this.mcpEnabled, connectedUserProjectWorkflow.mcpEnabled) &&
-        Objects.equals(this.toolOnly, connectedUserProjectWorkflow.toolOnly);
+        Objects.equals(this.toolOnly, connectedUserProjectWorkflow.toolOnly) &&
+        Objects.equals(this.staticWebhookUrl, connectedUserProjectWorkflow.staticWebhookUrl);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdDate, description, definition, lastModifiedDate, enabled, label, workflowUuid, workflowVersion, kind, automationUuid, copiedFromWorkflowUuid, dangling, components, inputs, inputValues, connections, attentionReason, mcpEnabled, toolOnly);
+    return Objects.hash(createdDate, description, definition, lastModifiedDate, enabled, label, workflowUuid, workflowVersion, kind, automationUuid, copiedFromWorkflowUuid, dangling, components, inputs, inputValues, connections, attentionReason, mcpEnabled, toolOnly, staticWebhookUrl);
   }
 
   @Override
@@ -599,6 +623,7 @@ public class ConnectedUserProjectWorkflowModel {
     sb.append("    attentionReason: ").append(toIndentedString(attentionReason)).append("\n");
     sb.append("    mcpEnabled: ").append(toIndentedString(mcpEnabled)).append("\n");
     sb.append("    toolOnly: ").append(toIndentedString(toolOnly)).append("\n");
+    sb.append("    staticWebhookUrl: ").append(toIndentedString(staticWebhookUrl)).append("\n");
     sb.append("}");
     return sb.toString();
   }
