@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.audit.aspect;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,6 +40,7 @@ import java.util.jar.JarOutputStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
@@ -199,7 +201,7 @@ class CustomComponentAuditIntTest {
 
             return new CustomComponentFacadeImpl(
                 applicationProperties, new ConcurrentMapCacheManager(), customComponentService,
-                customComponentFileStorage);
+                customComponentFileStorage, mock(ObjectProvider.class));
         }
     }
 }
