@@ -20,18 +20,18 @@
             properties: [
                 {name: "input", type: "STRING", label: "Input", required: false}
             ],
-            perform: function (inputParameters, connectionParameters, context) {
+            perform: function (input, connection, context) {
                 // context.log("info", "myAction invoked");
                 //
                 // const response = context.http({
                 //     method: "GET",
                 //     url: "https://api.example.com/items",
-                //     headers: {"Authorization": "Bearer " + connectionParameters.accessToken}
+                //     headers: {"Authorization": "Bearer " + connection.accessToken}
                 // });
                 //
                 // return response.body;
 
-                return inputParameters;
+                return input;
             }
         }
     ]
