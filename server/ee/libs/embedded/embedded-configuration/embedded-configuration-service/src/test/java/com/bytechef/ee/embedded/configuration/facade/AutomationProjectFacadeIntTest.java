@@ -1535,7 +1535,7 @@ class AutomationProjectFacadeIntTest {
     @Test
     void testPublishedTemplateInputCarriesItsComponentInputReference() {
         long projectId = automationProjectFacade.createProject(
-            "Slack channel digest", "", null, List.of(), null, null);
+            "Slack channel digest", "", null, List.of(), null);
 
         String workflowUuid = automationProjectFacade.createProjectWorkflow(
             projectId,
