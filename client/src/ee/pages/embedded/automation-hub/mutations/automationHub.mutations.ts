@@ -1,9 +1,5 @@
 import {AutomationHubKeys} from '@/ee/pages/embedded/automation-hub/queries/automationHub.queries';
-import {
-    ConnectedUserProjectWorkflowApi,
-    ConnectionApi,
-    McpAutomationWorkflowApi,
-} from '@/ee/shared/middleware/embedded/public';
+import {ConnectedUserProjectWorkflowApi, ConnectionApi, McpAutomationWorkflowApi} from '@bytechef/embedded-api';
 import {useMutation, useQueryClient} from '@tanstack/react-query';
 
 export const BLANK_DEFINITION = JSON.stringify({description: '', label: 'New automation', tasks: [], triggers: []});

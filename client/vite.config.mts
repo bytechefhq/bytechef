@@ -63,6 +63,7 @@ export default ({mode}) => {
             alias: {
                 '@': path.resolve(__dirname, './src'),
                 '@bytechef/embedded': path.resolve(__dirname, '../sdks/frontend/embedded/library/src/main.ts'),
+                '@bytechef/embedded-api': path.resolve(__dirname, '../sdks/api/typescript/src/configuration/index.ts'),
                 '@dagrejs/dagre': path.resolve(__dirname, 'node_modules/@dagrejs/dagre/dist/dagre.cjs'),
                 'monaco-editor/esm/vs/editor/editor.worker.js': path.resolve(
                     __dirname,

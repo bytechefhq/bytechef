@@ -5,6 +5,7 @@ import {WorkflowInput, WorkflowTestConfiguration} from '@/shared/middleware/plat
 import {EditIcon, Trash2Icon} from 'lucide-react';
 
 interface WorkflowInputsTableProps {
+    codeWorkflow?: boolean;
     internalOnlyVisible?: boolean;
     openDeleteDialog: (index: number) => void;
     openEditDialog: (index?: number) => void;
@@ -13,6 +14,7 @@ interface WorkflowInputsTableProps {
 }
 
 const WorkflowInputsTable = ({
+    codeWorkflow,
     internalOnlyVisible,
     openDeleteDialog,
     openEditDialog,
@@ -69,18 +71,22 @@ const WorkflowInputsTable = ({
 
                         <TableCell className="flex justify-end">
                             <Button
+                                aria-label="Edit input"
                                 icon={<EditIcon />}
                                 onClick={() => openEditDialog(index)}
                                 size="icon"
                                 variant="ghost"
                             />
 
-                            <Button
-                                icon={<Trash2Icon className="text-destructive" />}
-                                onClick={() => openDeleteDialog(index)}
-                                size="icon"
-                                variant="ghost"
-                            />
+                            {!codeWorkflow && (
+                                <Button
+                                    aria-label="Delete input"
+                                    icon={<Trash2Icon className="text-destructive" />}
+                                    onClick={() => openDeleteDialog(index)}
+                                    size="icon"
+                                    variant="ghost"
+                                />
+                            )}
                         </TableCell>
                     </TableRow>
                 );

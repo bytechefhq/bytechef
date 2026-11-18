@@ -87,6 +87,7 @@ const ProjectDialog = ({onClose, onSuccess, project, triggerNode}: ProjectDialog
             queryKey: ProjectCategoryKeys.projectCategories(currentWorkspaceId!),
         });
         void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+        void queryClient.invalidateQueries({queryKey: ['codeWorkflowSource']});
         void queryClient.invalidateQueries({
             queryKey: ProjectTagKeys.projectTags,
         });
