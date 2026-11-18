@@ -1,0 +1,6 @@
+mutation updateEmbeddedAiAutoMemory($input: UpdateEmbeddedAiAutoMemoryInput!) {
+    updateEmbeddedAiAutoMemory(input: $input) {
+        id
+        version
+    }
+}

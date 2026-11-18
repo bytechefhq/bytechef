@@ -1,0 +1,3 @@
+mutation deleteEmbeddedAiAutoMemory($id: ID!, $environment: Int!) {
+    deleteEmbeddedAiAutoMemory(id: $id, environment: $environment)
+}
