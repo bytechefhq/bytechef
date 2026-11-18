@@ -18,6 +18,7 @@ package com.bytechef.platform.component.polyglot;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -25,11 +26,14 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import org.graalvm.polyglot.Value;
+import org.graalvm.polyglot.proxy.ProxyObject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 public class PolyglotValuesTest {
 
     private static final String LANGUAGE_ID = "js";
@@ -47,6 +51,27 @@ public class PolyglotValuesTest {
 
         assertThat(resultMap.get("name")).isEqualTo("ByteChef");
         assertThat(((Number) resultMap.get("count")).intValue()).isEqualTo(3);
+    }
+
+    @Test
+    public void testToLogMessageKeepsAStringAndWritesAnObjectAsJson() {
+        Object messages = PolyglotSandbox.call(LANGUAGE_ID, context -> List.of(
+            PolyglotValues.toLogMessage(context.eval(LANGUAGE_ID, "'task ran'")),
+            PolyglotValues.toLogMessage(context.eval(LANGUAGE_ID, "({status: 200})")),
+            PolyglotValues.toLogMessage(context.eval(LANGUAGE_ID, "[1, 2]")),
+            PolyglotValues.toLogMessage(context.eval(LANGUAGE_ID, "42")),
+            PolyglotValues.toLogMessage(context.eval(LANGUAGE_ID, "null"))));
+
+        assertThat(messages).isEqualTo(List.of("task ran", "{\"status\":200}", "[1,2]", "42", "null"));
+    }
+
+    @Test
+    public void testToLogMessageWritesAHostProxyObjectAsJson() {
+        String message = PolyglotSandbox.call(
+            LANGUAGE_ID, context -> PolyglotValues.toLogMessage(
+                context.asValue(ProxyObject.fromMap(Map.of("status", 200)))));
+
+        assertThat(message).isEqualTo("{\"status\":200}");
     }
 
     @Test
