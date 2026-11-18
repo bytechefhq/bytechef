@@ -1,10 +1,5 @@
 query GetAssetFiles($workspaceId: ID!, $environment: Int, $tagIds: [ID!], $mimeTypePrefix: String) {
-    assetFiles(
-        workspaceId: $workspaceId
-        environment: $environment
-        tagIds: $tagIds
-        mimeTypePrefix: $mimeTypePrefix
-    ) {
+    assetFiles(workspaceId: $workspaceId, environment: $environment, tagIds: $tagIds, mimeTypePrefix: $mimeTypePrefix) {
         createdBy
         createdDate
         description
