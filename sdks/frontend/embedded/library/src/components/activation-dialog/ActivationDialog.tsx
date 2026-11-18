@@ -2,6 +2,7 @@ import {RefObject, useCallback, useEffect, useMemo, useReducer, useRef, useState
 import {ApiResponseError, createApiClient} from '../shared/apiClient';
 import dialogStyles from '../shared/dialog.module.css';
 import DialogPoweredBy from '../shared/DialogPoweredBy';
+import WebhookUrl from '../shared/WebhookUrl';
 import XIcon from '../connect-dialog/assets/x.svg';
 import {
     activationReducer,
@@ -729,6 +730,10 @@ const ActivationBody = ({
                             type="checkbox"
                         />
                     </label>
+                )}
+
+                {aiAgentsWorkflow?.staticWebhookUrl && (
+                    <WebhookUrl subject="automation" webhookUrl={aiAgentsWorkflow.staticWebhookUrl} />
                 )}
 
                 {state.step === 'connect' && (

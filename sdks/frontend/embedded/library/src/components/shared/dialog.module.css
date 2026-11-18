@@ -550,6 +550,11 @@
     transition: opacity 0.15s;
 }
 
+.tooltipStart {
+    left: 0;
+    transform: none;
+}
+
 .tooltipEnd {
     left: auto;
     right: 0;
@@ -557,7 +562,7 @@
 }
 
 .tooltipContainer:hover .tooltip,
-.tooltipContainer:focus-within .tooltip {
+.tooltipContainer:has(:focus-visible) .tooltip {
     opacity: 1;
     visibility: visible;
 }

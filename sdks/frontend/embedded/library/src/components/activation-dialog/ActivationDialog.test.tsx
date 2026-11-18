@@ -460,6 +460,30 @@ describe('ActivationDialog', () => {
             ];
         });
 
+        it('shows the webhook URL of an activated automation that starts with a webhook', async () => {
+            const webhookUrl = 'https://bytechef.example.com/webhooks/abc';
+
+            workflowsResponse = existingSlackReference({staticWebhookUrl: webhookUrl});
+
+            renderDialog();
+
+            expect(await screen.findByText(webhookUrl)).toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'About the webhook URL'})).toHaveAccessibleDescription(
+                /start this automation/
+            );
+            expect(screen.getByRole('button', {name: 'Copy webhook URL'})).toBeInTheDocument();
+        });
+
+        it('shows no webhook URL for an activated automation without one', async () => {
+            workflowsResponse = existingSlackReference();
+
+            renderDialog();
+
+            await screen.findByTestId('connect-row-slack');
+
+            expect(screen.queryByText('WEBHOOK URL')).not.toBeInTheDocument();
+        });
+
         it('opens with the connections and inputs the user chose, and offers Save instead of Activate', async () => {
             workflowsResponse = existingSlackReference();
 
