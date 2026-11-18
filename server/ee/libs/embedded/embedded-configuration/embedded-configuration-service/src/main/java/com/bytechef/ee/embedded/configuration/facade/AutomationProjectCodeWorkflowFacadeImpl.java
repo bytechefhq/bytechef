@@ -9,7 +9,6 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
-import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.automation.project.definition.ProjectDefinition;
@@ -66,9 +65,7 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
 
     private static final Logger log = LoggerFactory.getLogger(AutomationProjectCodeWorkflowFacadeImpl.class);
 
-    private static final String MARKER = SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX;
-
-    private final AutomationProjectConfigurationAdminFacade automationProjectConfigurationAdminFacade;
+    private final AutomationProjectConfigurationFacade automationProjectConfigurationFacade;
     private final AutomationProjectFacade automationProjectFacade;
     private final CacheManager cacheManager;
     private final CodeWorkflowContainerService codeWorkflowContainerService;
@@ -81,14 +78,14 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
     @SuppressFBWarnings("EI")
     public AutomationProjectCodeWorkflowFacadeImpl(
         ApplicationProperties applicationProperties,
-        AutomationProjectConfigurationAdminFacade automationProjectConfigurationAdminFacade,
+        AutomationProjectConfigurationFacade automationProjectConfigurationFacade,
         AutomationProjectFacade automationProjectFacade, CacheManager cacheManager,
         CodeWorkflowContainerService codeWorkflowContainerService,
         CodeWorkflowFileStorage codeWorkflowFileStorage,
         ProjectCodeWorkflowDraftService projectCodeWorkflowDraftService,
         ProjectCodeWorkflowService projectCodeWorkflowService, ProjectService projectService) {
 
-        this.automationProjectConfigurationAdminFacade = automationProjectConfigurationAdminFacade;
+        this.automationProjectConfigurationFacade = automationProjectConfigurationFacade;
         this.automationProjectFacade = automationProjectFacade;
         this.cacheManager = cacheManager;
         this.codeWorkflowContainerService = codeWorkflowContainerService;
@@ -227,8 +224,7 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
 
         Project project = projectService.getProject(automationProjectId);
 
-        String expectedName = project.getName()
-            .substring(MARKER.length());
+        String expectedName = project.getName();
 
         if (!Objects.equals(projectDefinition.getName(), expectedName)) {
             throw new ConfigurationException(
@@ -249,7 +245,7 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
             .getVersion();
 
         Optional<AutomationProjectConfigurationDTO> existingConfigurationOptional =
-            automationProjectConfigurationAdminFacade.getConfigurations(projectId)
+            automationProjectConfigurationFacade.getConfigurations(projectId)
                 .stream()
                 .filter(configuration -> configuration.environmentId() == environment.ordinal())
                 .findFirst();
@@ -257,12 +253,12 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
         if (existingConfigurationOptional.isPresent()) {
             AutomationProjectConfigurationDTO existingConfiguration = existingConfigurationOptional.get();
 
-            automationProjectConfigurationAdminFacade.updateConfiguration(
-                existingConfiguration.id(), projectVersion, existingConfiguration.enabled(),
-                existingConfiguration.automationHubVisible());
+            automationProjectConfigurationFacade.updateConfiguration(
+                existingConfiguration.id(), existingConfiguration.name(), existingConfiguration.permissionExpression(),
+                projectVersion, existingConfiguration.enabled(), existingConfiguration.automationHubVisible());
         } else {
-            automationProjectConfigurationAdminFacade.createConfiguration(
-                projectId, environment.ordinal(), projectVersion, true, true);
+            automationProjectConfigurationFacade.createConfiguration(
+                projectId, environment.ordinal(), environment.name(), null, projectVersion, true, true);
         }
     }
 

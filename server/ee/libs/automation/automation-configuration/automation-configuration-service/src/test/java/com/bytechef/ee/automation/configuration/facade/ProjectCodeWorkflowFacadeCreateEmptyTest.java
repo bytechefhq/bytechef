@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -24,6 +25,7 @@ import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.project.ProjectHandler;
@@ -42,6 +44,11 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.tag.service.TagService;
+import com.bytechef.workflow.definition.TaskContext;
+import com.bytechef.workflow.definition.TaskDefinition;
+import com.bytechef.workflow.definition.TaskDefinition.PerformFunction;
+import com.bytechef.workflow.definition.WorkflowDefinition;
+import com.bytechef.workflow.definition.WorkflowTaskDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,22 +78,15 @@ import org.springframework.cache.CacheManager;
 class ProjectCodeWorkflowFacadeCreateEmptyTest {
 
     @Test
-    void testJavaScriptStarterLoadsThroughLoader() throws IOException {
+    void testJavaScriptStarterLoadsThroughLoader() throws Exception {
         assertStarterLoads(Language.JAVASCRIPT);
     }
 
     @Test
-    void testPythonStarterLoadsThroughLoader() throws IOException {
+    void testPythonStarterLoadsThroughLoader() throws Exception {
         assumePolyglotAvailable("python");
 
         assertStarterLoads(Language.PYTHON);
-    }
-
-    @Test
-    void testRubyStarterLoadsThroughLoader() throws IOException {
-        assumePolyglotAvailable("ruby");
-
-        assertStarterLoads(Language.RUBY);
     }
 
     @Test
@@ -101,7 +101,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
         createdProject.setId(1L);
         createdProject.setName("my-code-project");
 
-        when(projectService.fetchProject("my-code-project")).thenReturn(Optional.empty());
+        when(projectService.fetchProject(eq("my-code-project"), anyLong())).thenReturn(Optional.empty());
         when(projectService.create(any()))
             .thenReturn(createdProject);
 
@@ -124,7 +124,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class));
+            mock(WorkflowService.class), mock(ProjectOwnershipService.class));
 
         Project project = projectCodeWorkflowFacade.createEmptyCodeWorkflow(1L, "my-code-project", Language.JAVASCRIPT);
 
@@ -161,7 +161,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class));
+            mock(WorkflowService.class), mock(ProjectOwnershipService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.createEmptyCodeWorkflow(1L, "my-code-project", language))
             .isInstanceOf(ConfigurationException.class)
@@ -183,7 +183,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
         existingProject.setId(2L);
         existingProject.setName("my-code-project");
 
-        when(projectService.fetchProject("my-code-project"))
+        when(projectService.fetchProject(eq("my-code-project"), anyLong()))
             .thenReturn(Optional.of(existingProject));
 
         ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = new ProjectCodeWorkflowFacadeImpl(
@@ -195,7 +195,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class));
+            mock(WorkflowService.class), mock(ProjectOwnershipService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.createEmptyCodeWorkflow(
             1L, "my-code-project", Language.JAVASCRIPT))
@@ -252,7 +252,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class));
+            mock(WorkflowService.class), mock(ProjectOwnershipService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.createEmptyCodeWorkflow(1L, name, Language.JAVASCRIPT))
             .isInstanceOf(ConfigurationException.class)
@@ -260,10 +260,10 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
             .isEqualTo(CodeWorkflowErrorType.INVALID_CODE_WORKFLOW_NAME.getErrorKey());
 
         verify(projectService, never()).create(any());
-        verify(projectService, never()).fetchProject(any());
+        verify(projectService, never()).fetchProject(anyString(), anyLong());
     }
 
-    private static void assertStarterLoads(Language language) throws IOException {
+    private static void assertStarterLoads(Language language) throws Exception {
         String template = readTemplate(language).replace("__NAME__", "my-code-project");
 
         Path path = Files.createTempFile("code_workflow_starter", "." + language.getExtension());
@@ -284,10 +284,40 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
             assertThat(projectDefinition.getWorkflows()).isNotEmpty();
             assertThat(projectDefinition.getWorkflows()
                 .getFirst()
-                .getName()).isEqualTo("my-workflow");
+                .getName()).isEqualTo("my_workflow");
+
+            List<WorkflowDefinition> workflowDefinitions = projectDefinition.getWorkflows();
+
+            assertThat(performFirstTask(workflowDefinitions.getFirst())).isEqualTo("hello");
         } finally {
             Files.delete(path);
         }
+    }
+
+    private static Object performFirstTask(WorkflowDefinition workflowDefinition) throws Exception {
+        Optional<List<? extends WorkflowTaskDefinition>> tasks = workflowDefinition.getTasks();
+
+        List<? extends WorkflowTaskDefinition> taskDefinitions = tasks.orElseThrow();
+
+        TaskDefinition taskDefinition = (TaskDefinition) taskDefinitions.getFirst();
+
+        PerformFunction performFunction = taskDefinition.getPerform();
+
+        return performFunction.apply(Map.of(), Map.of(), new TaskContext() {
+
+            @Override
+            public Object component(
+                String componentName, String actionName, Map<String, ?> input, String connectionName,
+                Map<String, ?> clusterElements) {
+
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void log(LogLevel level, String message) {
+                throw new UnsupportedOperationException();
+            }
+        });
     }
 
     @BeforeAll
