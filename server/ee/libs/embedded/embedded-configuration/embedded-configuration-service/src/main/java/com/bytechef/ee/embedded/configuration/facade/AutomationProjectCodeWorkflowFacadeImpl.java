@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.project.ProjectHandler;
@@ -18,6 +19,7 @@ import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowDraft
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCodeWorkflowSourceDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCodeWorkflowStateDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.exception.CodeWorkflowErrorType;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
@@ -26,6 +28,7 @@ import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorag
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.workflow.definition.TriggerDefinition;
@@ -65,6 +68,7 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
 
     private static final String MARKER = SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX;
 
+    private final AutomationProjectConfigurationAdminFacade automationProjectConfigurationAdminFacade;
     private final AutomationProjectFacade automationProjectFacade;
     private final CacheManager cacheManager;
     private final CodeWorkflowContainerService codeWorkflowContainerService;
@@ -76,12 +80,15 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
 
     @SuppressFBWarnings("EI")
     public AutomationProjectCodeWorkflowFacadeImpl(
-        ApplicationProperties applicationProperties, AutomationProjectFacade automationProjectFacade,
-        CacheManager cacheManager, CodeWorkflowContainerService codeWorkflowContainerService,
+        ApplicationProperties applicationProperties,
+        AutomationProjectConfigurationAdminFacade automationProjectConfigurationAdminFacade,
+        AutomationProjectFacade automationProjectFacade, CacheManager cacheManager,
+        CodeWorkflowContainerService codeWorkflowContainerService,
         CodeWorkflowFileStorage codeWorkflowFileStorage,
         ProjectCodeWorkflowDraftService projectCodeWorkflowDraftService,
         ProjectCodeWorkflowService projectCodeWorkflowService, ProjectService projectService) {
 
+        this.automationProjectConfigurationAdminFacade = automationProjectConfigurationAdminFacade;
         this.automationProjectFacade = automationProjectFacade;
         this.cacheManager = cacheManager;
         this.codeWorkflowContainerService = codeWorkflowContainerService;
@@ -96,7 +103,7 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
 
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
-    public List<String> save(byte[] bytes, Language language) {
+    public List<String> save(byte[] bytes, Language language, Environment environment, boolean release) {
         if (language == Language.RUBY) {
             throw new ConfigurationException(
                 "Uploading of Ruby code workflows is temporarily disabled",
@@ -122,6 +129,10 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
         projectCodeWorkflowDraftService.saveDraft(project, projectDefinition, bytes, language);
 
         automationProjectFacade.publishProject(projectId);
+
+        if (release) {
+            releaseToEnvironment(projectId, environment);
+        }
 
         List<String> warnings = new ArrayList<>();
 
@@ -227,6 +238,32 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
         }
 
         projectCodeWorkflowDraftService.saveDraft(project, projectDefinition, bytes, language);
+    }
+
+    private void releaseToEnvironment(long projectId, Environment environment) {
+        Project project = projectService.getProject(projectId);
+
+        ProjectVersion lastPublishedProjectVersion = project.getLastPublishedProjectVersion();
+
+        int projectVersion = Objects.requireNonNull(lastPublishedProjectVersion)
+            .getVersion();
+
+        Optional<AutomationProjectConfigurationDTO> existingConfigurationOptional =
+            automationProjectConfigurationAdminFacade.getConfigurations(projectId)
+                .stream()
+                .filter(configuration -> configuration.environmentId() == environment.ordinal())
+                .findFirst();
+
+        if (existingConfigurationOptional.isPresent()) {
+            AutomationProjectConfigurationDTO existingConfiguration = existingConfigurationOptional.get();
+
+            automationProjectConfigurationAdminFacade.updateConfiguration(
+                existingConfiguration.id(), projectVersion, existingConfiguration.enabled(),
+                existingConfiguration.automationHubVisible());
+        } else {
+            automationProjectConfigurationAdminFacade.createConfiguration(
+                projectId, environment.ordinal(), projectVersion, true, true);
+        }
     }
 
     private CodeWorkflowContainer getEditableCodeWorkflowContainer(long automationProjectId) {
