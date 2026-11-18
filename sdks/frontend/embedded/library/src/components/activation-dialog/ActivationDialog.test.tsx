@@ -474,6 +474,23 @@ describe('ActivationDialog', () => {
             expect(screen.getByRole('button', {name: 'Copy webhook URL'})).toBeInTheDocument();
         });
 
+        it('offers Done instead of Save when the activated automation has nothing to set up', async () => {
+            const onClose = vi.fn();
+
+            workflowsResponse = {body: [{automationUuid: 'wf-plain', kind: 'REFERENCE'}], status: 200};
+
+            renderDialog({onClose, workflowTemplateId: 'wf-plain'});
+
+            expect(await screen.findByText('This automation has nothing to set up.')).toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Save'})).not.toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Deactivate'})).toBeInTheDocument();
+
+            await userEvent.click(screen.getByRole('button', {name: 'Done'}));
+
+            expect(onClose).toHaveBeenCalled();
+            expect(calls.filter((call) => call.method !== 'GET')).toHaveLength(0);
+        });
+
         it('shows no webhook URL for an activated automation without one', async () => {
             workflowsResponse = existingSlackReference();
 
