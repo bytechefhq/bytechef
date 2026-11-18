@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceWorkflow", description = "A workflow data for particular integration instance.")
 @JsonTypeName("IntegrationInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-15T19:28:21.317912+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-18T07:20:03.362029+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class IntegrationInstanceWorkflowModel {
 
   private @Nullable Boolean enabled;
@@ -32,6 +32,8 @@ public class IntegrationInstanceWorkflowModel {
   private Map<String, Object> inputs = new HashMap<>();
 
   private @Nullable String workflowUuid;
+
+  private @Nullable String staticWebhookUrl;
 
   public IntegrationInstanceWorkflowModel enabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
@@ -104,6 +106,27 @@ public class IntegrationInstanceWorkflowModel {
     this.workflowUuid = workflowUuid;
   }
 
+  public IntegrationInstanceWorkflowModel staticWebhookUrl(@Nullable String staticWebhookUrl) {
+    this.staticWebhookUrl = staticWebhookUrl;
+    return this;
+  }
+
+  /**
+   * The url that starts the workflow for this integration instance when it begins with a static webhook trigger, for example Webhook. Null when the workflow starts with another trigger.
+   * @return staticWebhookUrl
+   */
+  
+  @Schema(name = "staticWebhookUrl", description = "The url that starts the workflow for this integration instance when it begins with a static webhook trigger, for example Webhook. Null when the workflow starts with another trigger.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("staticWebhookUrl")
+  public @Nullable String getStaticWebhookUrl() {
+    return staticWebhookUrl;
+  }
+
+  @JsonProperty("staticWebhookUrl")
+  public void setStaticWebhookUrl(@Nullable String staticWebhookUrl) {
+    this.staticWebhookUrl = staticWebhookUrl;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -115,12 +138,13 @@ public class IntegrationInstanceWorkflowModel {
     IntegrationInstanceWorkflowModel integrationInstanceWorkflow = (IntegrationInstanceWorkflowModel) o;
     return Objects.equals(this.enabled, integrationInstanceWorkflow.enabled) &&
         Objects.equals(this.inputs, integrationInstanceWorkflow.inputs) &&
-        Objects.equals(this.workflowUuid, integrationInstanceWorkflow.workflowUuid);
+        Objects.equals(this.workflowUuid, integrationInstanceWorkflow.workflowUuid) &&
+        Objects.equals(this.staticWebhookUrl, integrationInstanceWorkflow.staticWebhookUrl);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(enabled, inputs, workflowUuid);
+    return Objects.hash(enabled, inputs, workflowUuid, staticWebhookUrl);
   }
 
   @Override
@@ -130,6 +154,7 @@ public class IntegrationInstanceWorkflowModel {
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("    workflowUuid: ").append(toIndentedString(workflowUuid)).append("\n");
+    sb.append("    staticWebhookUrl: ").append(toIndentedString(staticWebhookUrl)).append("\n");
     sb.append("}");
     return sb.toString();
   }
