@@ -75,7 +75,7 @@ class AggregateDataTableToolCallbackTest {
         WorkspaceDataTableFacade workspaceDataTableFacade = mock(WorkspaceDataTableFacade.class);
 
         when(workspaceDataTableFacade.listTables(workspaceId, 0L)).thenReturn(
-            List.of(new DataTableInfo(dataTableId, "orders", null, List.of(), null)));
+            List.of(new DataTableInfo(dataTableId, "orders", null, null, List.of(), null)));
         when(workspaceDataTableFacade.listRows(eq(dataTableId), anyInt(), eq(0), eq(0L))).thenReturn(List.of(
             new DataTableRow(1L, Map.of("amount", 100.0, "status", "paid")),
             new DataTableRow(2L, Map.of("amount", 200.0, "status", "paid")),
@@ -108,7 +108,7 @@ class AggregateDataTableToolCallbackTest {
         WorkspaceDataTableFacade workspaceDataTableFacade = mock(WorkspaceDataTableFacade.class);
 
         when(workspaceDataTableFacade.listTables(workspaceId, 0L)).thenReturn(
-            List.of(new DataTableInfo(dataTableId, "sales", null, List.of(), null)));
+            List.of(new DataTableInfo(dataTableId, "sales", null, null, List.of(), null)));
         when(workspaceDataTableFacade.listRows(eq(dataTableId), anyInt(), eq(0), eq(0L))).thenReturn(List.of(
             new DataTableRow(1L, Map.of("region", "north", "revenue", 500.0)),
             new DataTableRow(2L, Map.of("region", "south", "revenue", 300.0)),
@@ -162,7 +162,7 @@ class AggregateDataTableToolCallbackTest {
         WorkspaceDataTableFacade workspaceDataTableFacade = mock(WorkspaceDataTableFacade.class);
 
         when(workspaceDataTableFacade.listTables(workspaceId, 0L)).thenReturn(
-            List.of(new DataTableInfo(dataTableId, "bigdata", null, List.of(), null)));
+            List.of(new DataTableInfo(dataTableId, "bigdata", null, null, List.of(), null)));
 
         List<DataTableRow> simulatedFullPage = new ArrayList<>();
 
@@ -198,7 +198,7 @@ class AggregateDataTableToolCallbackTest {
         WorkspaceDataTableFacade workspaceDataTableFacade = mock(WorkspaceDataTableFacade.class);
 
         when(workspaceDataTableFacade.listTables(workspaceId, 0L)).thenReturn(
-            List.of(new DataTableInfo(dataTableId, "huge", null, List.of(), null)));
+            List.of(new DataTableInfo(dataTableId, "huge", null, null, List.of(), null)));
 
         List<DataTableRow> maxRows = new ArrayList<>();
 
@@ -238,7 +238,7 @@ class AggregateDataTableToolCallbackTest {
         WorkspaceDataTableFacade workspaceDataTableFacade = mock(WorkspaceDataTableFacade.class);
 
         when(workspaceDataTableFacade.listTables(workspaceId, 0L)).thenReturn(
-            List.of(new DataTableInfo(dataTableId, "small", null, List.of(), null)));
+            List.of(new DataTableInfo(dataTableId, "small", null, null, List.of(), null)));
         when(workspaceDataTableFacade.listRows(eq(dataTableId), anyInt(), eq(0), eq(0L))).thenReturn(List.of(
             new DataTableRow(1L, Map.of("amount", 10.0)),
             new DataTableRow(2L, Map.of("amount", 20.0))));
@@ -270,7 +270,7 @@ class AggregateDataTableToolCallbackTest {
         WorkspaceDataTableFacade workspaceDataTableFacade = mock(WorkspaceDataTableFacade.class);
 
         when(workspaceDataTableFacade.listTables(workspaceId, 0L)).thenReturn(
-            List.of(new DataTableInfo(dataTableId, "orders", null, List.of(), null)));
+            List.of(new DataTableInfo(dataTableId, "orders", null, null, List.of(), null)));
         when(workspaceDataTableFacade.listRows(eq(dataTableId), anyInt(), eq(0), eq(0L))).thenReturn(List.of(
             new DataTableRow(1L, Map.of("amount", 100.0)),
             new DataTableRow(2L, Map.of("amount", "not-a-number")),

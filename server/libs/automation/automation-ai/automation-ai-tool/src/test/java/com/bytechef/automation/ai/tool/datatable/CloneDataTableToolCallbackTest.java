@@ -51,7 +51,8 @@ class CloneDataTableToolCallbackTest {
     void testCloningAssignsTheCopyToTheWorkspace() {
         givenTheSourceTableIsInTheWorkspace();
 
-        when(workspaceDataTableFacade.getDataTableId("orders_test")).thenReturn(99L);
+        when(workspaceDataTableFacade.duplicateTable(SOURCE_DATA_TABLE_ID, "orders_test", ENVIRONMENT_ID))
+            .thenReturn(99L);
 
         String result = toolCallback.call(cloneInput("orders_test"), toolContext());
 
@@ -88,7 +89,7 @@ class CloneDataTableToolCallbackTest {
     private void givenTheSourceTableIsInTheWorkspace() {
         when(workspaceDataTableFacade.listTables(WORKSPACE_ID, ENVIRONMENT_ID))
             .thenReturn(
-                List.of(new DataTableInfo(SOURCE_DATA_TABLE_ID, "orders", null, List.of(), Instant.now())));
+                List.of(new DataTableInfo(SOURCE_DATA_TABLE_ID, "orders", null, null, List.of(), Instant.now())));
     }
 
     private static String cloneInput(String newBaseName) {

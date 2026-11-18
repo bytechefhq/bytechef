@@ -65,7 +65,7 @@ class ListDataTablesToolCallbackTest {
         List<ColumnSpec> columns = List.of(
             new ColumnSpec("name", ColumnType.STRING),
             new ColumnSpec("age", ColumnType.INTEGER));
-        DataTableInfo dataTableInfo = new DataTableInfo(42L, "contacts", "Contacts table", columns, null);
+        DataTableInfo dataTableInfo = new DataTableInfo(42L, "contacts", null, "Contacts table", columns, null);
 
         when(workspaceDataTableFacade.listTables(workspaceId, 0L)).thenReturn(List.of(dataTableInfo));
 

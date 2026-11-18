@@ -125,13 +125,13 @@ public class CloneDataTableToolCallback implements ToolCallback {
                     "Data table " + input.dataTableId() + " not found in the current workspace.");
             }
 
+            long newId;
+
             try {
-                workspaceDataTableFacade.duplicateTable(dataTableId, input.newBaseName(), environmentId);
+                newId = workspaceDataTableFacade.duplicateTable(dataTableId, input.newBaseName(), environmentId);
             } catch (IllegalArgumentException exception) {
                 return ToolValidationErrors.validationFailure(CloneDataTableToolCallback.class, TOOL_NAME, exception);
             }
-
-            long newId = workspaceDataTableFacade.getDataTableId(input.newBaseName());
 
             return JsonUtils.write(new CloneDataTableOutput(newId, input.newBaseName()));
         } catch (JacksonException exception) {

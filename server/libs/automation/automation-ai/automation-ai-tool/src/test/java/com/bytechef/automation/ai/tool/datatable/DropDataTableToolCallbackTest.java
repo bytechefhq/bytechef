@@ -56,7 +56,7 @@ class DropDataTableToolCallbackTest {
     }
 
     private static DataTableInfo dataTableInfo(long id) {
-        return new DataTableInfo(id, "base_name_" + id, null, List.of(), null);
+        return new DataTableInfo(id, "base_name_" + id, null, null, List.of(), null);
     }
 
     @Test

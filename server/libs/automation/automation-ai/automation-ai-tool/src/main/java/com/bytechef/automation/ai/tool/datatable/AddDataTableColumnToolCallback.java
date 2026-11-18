@@ -163,7 +163,7 @@ public class AddDataTableColumnToolCallback implements ToolCallback {
                 dataTableId, new ColumnSpec(input.columnName(), columnType), environmentId);
 
             recordArtifact(
-                invocationContext, tableInfo.baseName(), input.dataTableId(), input.columnName(), environmentId);
+                invocationContext, tableInfo.name(), input.dataTableId(), input.columnName(), environmentId);
 
             return JsonUtils.write(new AddDataTableColumnOutput(true, input.columnName()));
         } catch (JacksonException exception) {

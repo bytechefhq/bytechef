@@ -158,7 +158,7 @@ public class UpdateDataTableRowToolCallback implements ToolCallback {
             DataTableRow updated = workspaceDataTableFacade.updateRow(dataTableId, rowId, values, environmentId);
 
             recordArtifact(
-                invocationContext, tableInfo.baseName(), dataTableIdString, environmentId, priorRow, updated.id());
+                invocationContext, tableInfo.name(), dataTableIdString, environmentId, priorRow, updated.id());
 
             return JsonUtils.write(new UpdateDataTableRowOutput(true, updated.id()));
         } catch (JacksonException exception) {
