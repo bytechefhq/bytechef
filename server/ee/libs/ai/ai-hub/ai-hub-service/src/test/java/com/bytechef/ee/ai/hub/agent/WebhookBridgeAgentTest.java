@@ -246,7 +246,7 @@ class WebhookBridgeAgentTest {
         givenChat(chat);
 
         when(executor.getWebhookTriggerFlags(any(WorkflowExecutionId.class)))
-            .thenReturn(new WebhookTriggerFlags(false, true, false, false));
+            .thenReturn(new WebhookTriggerFlags(false, true, false, false, false));
         when(executor.executeSync(any(), any(), any())).thenReturn(Map.of("message", "done"));
 
         Logger bridgeLogger = (Logger) LoggerFactory.getLogger(WebhookBridgeAgent.class);
@@ -671,14 +671,14 @@ class WebhookBridgeAgentTest {
         givenChat(newChat(AiHubChatKind.WORKFLOW_CHAT, "Chat"));
 
         when(executor.getWebhookTriggerFlags(any(WorkflowExecutionId.class)))
-            .thenReturn(new WebhookTriggerFlags(false, true, false, false));
+            .thenReturn(new WebhookTriggerFlags(false, true, false, false, false));
     }
 
     private void givenStreamingChat() {
         givenChat(newChat(AiHubChatKind.WORKFLOW_CHAT, "Chat"));
 
         when(executor.getWebhookTriggerFlags(any(WorkflowExecutionId.class)))
-            .thenReturn(new WebhookTriggerFlags(false, true, false, false));
+            .thenReturn(new WebhookTriggerFlags(false, true, false, false, false));
         when(executor.hasStreamingTask(any(WorkflowExecutionId.class))).thenReturn(true);
         when(executor.stream(any(), any(), any())).thenReturn(new CompletableFuture<>());
     }
