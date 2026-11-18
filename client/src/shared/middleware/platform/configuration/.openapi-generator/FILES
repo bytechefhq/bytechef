@@ -29,6 +29,7 @@ docs/ClusterElementDefinition.md
 docs/ClusterElementDefinitionApi.md
 docs/ClusterElementDefinitionBasic.md
 docs/ClusterElementType.md
+docs/ComponentActionDynamicPropertiesRequest.md
 docs/ComponentCategory.md
 docs/ComponentConnection.md
 docs/ComponentDefinition.md
@@ -120,6 +121,7 @@ models/CheckWorkflowNodeTestOutputExists200Response.ts
 models/ClusterElementDefinition.ts
 models/ClusterElementDefinitionBasic.ts
 models/ClusterElementType.ts
+models/ComponentActionDynamicPropertiesRequest.ts
 models/ComponentCategory.ts
 models/ComponentConnection.ts
 models/ComponentDefinition.ts
