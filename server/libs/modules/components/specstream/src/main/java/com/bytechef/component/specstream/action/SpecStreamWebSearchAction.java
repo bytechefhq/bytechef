@@ -225,6 +225,19 @@ public class SpecStreamWebSearchAction {
 
         if (preferPostMethod) {
             executor = context
+                .http(http -> http.post("/web-search"))
+                .body(Context.Http.Body.of(SEARCH_QUERY, inputParameters.getRequiredString(SEARCH_QUERY),
+                    SEARCH_TIER, inputParameters.getString(SEARCH_TIER),
+                    NUMBER_OF_SOURCES, inputParameters.getInteger(NUMBER_OF_SOURCES),
+                    RESULT_PAGE, inputParameters.getInteger(RESULT_PAGE),
+                    RETURN_PAGE_PASSAGES, inputParameters.getBoolean(RETURN_PAGE_PASSAGES),
+                    NEWS_SEARCH, inputParameters.getBoolean(NEWS_SEARCH),
+                    IMAGE_SEARCH, inputParameters.getBoolean(IMAGE_SEARCH),
+                    COUNTRY_CODE, inputParameters.getString(COUNTRY_CODE),
+                    LANGUAGE_CODE, inputParameters.getString(LANGUAGE_CODE),
+                    SAFE_SEARCH_LEVEL, inputParameters.getString(SAFE_SEARCH_LEVEL)));
+        } else {
+            executor = context
                 .http(http -> http.get("/web-search"))
                 .queryParameters(
                     SEARCH_QUERY, inputParameters.getRequiredString(SEARCH_QUERY),
@@ -237,19 +250,6 @@ public class SpecStreamWebSearchAction {
                     COUNTRY_CODE, inputParameters.getString(COUNTRY_CODE),
                     LANGUAGE_CODE, inputParameters.getString(LANGUAGE_CODE),
                     SAFE_SEARCH_LEVEL, inputParameters.getString(SAFE_SEARCH_LEVEL));
-        } else {
-            executor = context
-                .http(http -> http.post("/web-search"))
-                .body(Context.Http.Body.of(SEARCH_QUERY, inputParameters.getRequiredString(SEARCH_QUERY),
-                    SEARCH_TIER, inputParameters.getString(SEARCH_TIER),
-                    NUMBER_OF_SOURCES, inputParameters.getInteger(NUMBER_OF_SOURCES),
-                    RESULT_PAGE, inputParameters.getInteger(RESULT_PAGE),
-                    RETURN_PAGE_PASSAGES, inputParameters.getBoolean(RETURN_PAGE_PASSAGES),
-                    NEWS_SEARCH, inputParameters.getBoolean(NEWS_SEARCH),
-                    IMAGE_SEARCH, inputParameters.getBoolean(IMAGE_SEARCH),
-                    COUNTRY_CODE, inputParameters.getString(COUNTRY_CODE),
-                    LANGUAGE_CODE, inputParameters.getString(LANGUAGE_CODE),
-                    SAFE_SEARCH_LEVEL, inputParameters.getString(SAFE_SEARCH_LEVEL)));
         }
 
         return executor
