@@ -28,8 +28,16 @@ import ErrorPage from '@/shared/error/ErrorPage';
 import LazyLoadWrapper from '@/shared/error/LazyLoadWrapper';
 import PageNotFound from '@/shared/error/PageNotFound';
 import Settings from '@/shared/layout/Settings';
+import SettingsLayout from '@/shared/layout/SettingsLayout';
 import {ProjectApi} from '@/shared/middleware/automation/configuration';
 import {EnvironmentApi} from '@/shared/middleware/platform/configuration';
+import {
+    AI_SKILLS_SETTINGS_PATH,
+    MEMORIES_SETTINGS_PATH,
+    ORGANIZATION_SETTINGS_PAGES,
+    ORGANIZATION_SETTINGS_PATH,
+    getOrganizationSettingsRedirectPath,
+} from '@/shared/navigation/settingsPaths';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {EnvironmentKeys} from '@/shared/queries/platform/environments.queries';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
@@ -37,7 +45,7 @@ import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import redirectOutsideDevelopmentEnvironment from '@/shared/util/redirectOutsideDevelopmentEnvironment';
 import {QueryClient} from '@tanstack/react-query';
 import {Suspense, lazy} from 'react';
-import {createBrowserRouter, redirect} from 'react-router-dom';
+import {LoaderFunctionArgs, createBrowserRouter, redirect} from 'react-router-dom';
 
 const App = lazy(() => import('@/App'));
 const AccountProfile = lazy(() => import('@/pages/account/settings/AccountProfile'));
@@ -213,23 +221,6 @@ const currentWorkspaceSettingsRoutes = {
             path: 'workspace-api-keys',
         },
     ],
-    navItems: [
-        {
-            title: 'Current Workspace',
-        },
-        {
-            href: 'git-configuration',
-            title: 'Git Configuration',
-        },
-        {
-            href: 'workspace-api-keys',
-            title: 'API Keys',
-        },
-    ],
-};
-
-const organizationSettingsNavItem = {
-    title: 'Organization',
 };
 
 // Platform settings routes
@@ -284,16 +275,6 @@ const platformSettingsRoutes = {
                 </PrivateRoute>
             ),
             path: 'ai/skills/:skillId',
-        },
-        {
-            element: (
-                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                    <LazyLoadWrapper>
-                        <AiAutoMemories />
-                    </LazyLoadWrapper>
-                </PrivateRoute>
-            ),
-            path: 'ai/memories',
         },
         {
             element: (
@@ -429,66 +410,30 @@ const platformSettingsRoutes = {
             path: 'audit-events',
         },
     ],
-    navItems: [
-        {
-            href: 'users',
-            title: 'Users',
-        },
-        {
-            href: 'billing',
-            title: 'Billing',
-        },
-        {
-            items: [
-                {
-                    href: 'ai-providers',
-                    title: 'Providers',
-                },
-                {
-                    href: 'ai/skills',
-                    title: 'Skills',
-                },
-                {
-                    href: 'ai/memories',
-                    title: 'Memories',
-                },
-            ],
-            title: 'AI',
-        },
-        {
-            href: 'mcp-server',
-            title: 'MCP Server',
-        },
-        {
-            href: 'custom-components',
-            title: 'Custom Components',
-        },
-        {
-            href: `api-connectors`,
-            title: 'API Connectors',
-        },
-        {
-            href: 'notifications',
-            title: 'Notifications',
-        },
-        {
-            href: 'identity-providers',
-            title: 'Identity Providers',
-        },
-        {
-            href: 'registered-clients',
-            title: 'OAuth2 Clients',
-        },
-        {
-            href: 'admin-api-keys',
-            title: 'Admin API Keys',
-        },
-        {
-            href: 'audit-events',
-            title: 'Audit Events',
-        },
-    ],
 };
+
+const automationMemoriesRoute = {
+    element: (
+        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+            <LazyLoadWrapper>
+                <AiAutoMemories />
+            </LazyLoadWrapper>
+        </PrivateRoute>
+    ),
+    path: 'ai/memories',
+};
+
+const organizationSettingsRedirectRoutes = ORGANIZATION_SETTINGS_PAGES.map((organizationSettingsPage) => ({
+    loader: ({request}: LoaderFunctionArgs) => {
+        const url = new URL(request.url);
+
+        return redirect(
+            getOrganizationSettingsRedirectPath(url.pathname, url.search) ??
+                `${ORGANIZATION_SETTINGS_PATH}/${organizationSettingsPage}`
+        );
+    },
+    path: `${organizationSettingsPage}/*`,
+}));
 
 export const loadEnvironments = async (queryClient: QueryClient) => {
     if (authenticationStore.getState().authenticated) {
@@ -902,36 +847,36 @@ export const getRouter = (queryClient: QueryClient) =>
                                     path: 'approval-tasks',
                                 },
                                 {
-                                    loader: async () => redirect('/automation/settings/ai/skills'),
+                                    loader: async () => redirect(AI_SKILLS_SETTINGS_PATH),
                                     path: 'ai',
                                 },
                                 {
-                                    loader: async () => redirect('/automation/settings/ai/skills'),
+                                    loader: async () => redirect(AI_SKILLS_SETTINGS_PATH),
                                     path: 'ai/skills',
                                 },
                                 {
-                                    loader: async () => redirect('/automation/settings/ai/skills'),
+                                    loader: async () => redirect(AI_SKILLS_SETTINGS_PATH),
                                     path: 'ai/skills/create',
                                 },
                                 {
-                                    loader: async () => redirect('/automation/settings/ai/skills'),
+                                    loader: async () => redirect(AI_SKILLS_SETTINGS_PATH),
                                     path: 'ai/skills/create/write',
                                 },
                                 {
-                                    loader: async () => redirect('/automation/settings/ai/skills'),
+                                    loader: async () => redirect(AI_SKILLS_SETTINGS_PATH),
                                     path: 'ai/skills/create/upload',
                                 },
                                 {
-                                    loader: async () => redirect('/automation/settings/ai/skills'),
+                                    loader: async () => redirect(AI_SKILLS_SETTINGS_PATH),
                                     path: 'ai/skills/create/ai',
                                 },
                                 {
                                     loader: async ({params}) =>
-                                        redirect(`/automation/settings/ai/skills/${params.skillId}`),
+                                        redirect(`${AI_SKILLS_SETTINGS_PATH}/${params.skillId}`),
                                     path: 'ai/skills/:skillId',
                                 },
                                 {
-                                    loader: () => redirect('/automation/settings/ai/memories'),
+                                    loader: () => redirect(MEMORIES_SETTINGS_PATH),
                                     path: 'ai/memories',
                                 },
                                 {
@@ -955,21 +900,10 @@ export const getRouter = (queryClient: QueryClient) =>
                                             path: 'workspaces',
                                         },
                                         ...currentWorkspaceSettingsRoutes.children,
-                                        ...platformSettingsRoutes.children,
+                                        automationMemoriesRoute,
+                                        ...organizationSettingsRedirectRoutes,
                                     ],
-                                    element: (
-                                        <Settings
-                                            sidebarNavItems={[
-                                                ...currentWorkspaceSettingsRoutes.navItems,
-                                                organizationSettingsNavItem,
-                                                {
-                                                    href: '/automation/settings/workspaces',
-                                                    title: 'Workspaces',
-                                                },
-                                                ...platformSettingsRoutes.navItems,
-                                            ]}
-                                        />
-                                    ),
+                                    element: <SettingsLayout />,
                                     path: 'settings',
                                 },
                             ],
@@ -1203,29 +1137,30 @@ export const getRouter = (queryClient: QueryClient) =>
                                             ),
                                             path: 'api-keys',
                                         },
-                                        ...platformSettingsRoutes.children,
+                                        {
+                                            loader: () => redirect(MEMORIES_SETTINGS_PATH),
+                                            path: 'ai/memories',
+                                        },
+                                        ...organizationSettingsRedirectRoutes,
                                     ],
-                                    element: (
-                                        <Settings
-                                            sidebarNavItems={[
-                                                {
-                                                    href: '/embedded/settings/signing-keys',
-                                                    title: 'Signing Keys',
-                                                },
-                                                {
-                                                    href: '/embedded/settings/api-keys',
-                                                    title: 'API Keys',
-                                                },
-                                                organizationSettingsNavItem,
-                                                ...platformSettingsRoutes.navItems,
-                                            ]}
-                                        />
-                                    ),
+                                    element: <SettingsLayout />,
                                     path: 'settings',
                                 },
                             ],
                             errorElement: <ErrorPage />,
                             path: 'embedded',
+                        },
+                        {
+                            children: [
+                                {
+                                    index: true,
+                                    loader: () => redirect(`${ORGANIZATION_SETTINGS_PATH}/users`),
+                                },
+                                ...platformSettingsRoutes.children,
+                            ],
+                            element: <SettingsLayout />,
+                            errorElement: <ErrorPage />,
+                            path: 'settings',
                         },
                     ],
                     path: '/',
