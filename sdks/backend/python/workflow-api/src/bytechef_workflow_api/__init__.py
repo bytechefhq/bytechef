@@ -1,10 +1,10 @@
 """Type definitions for ByteChef script code workflows.
 
 They describe the dict a Python code workflow file evaluates to and the context ByteChef passes to each task's
-``perform``. The ByteChef runtime can't import this package: import it under ``typing.TYPE_CHECKING``.
+``perform(input, context)`` or ``perform(input, connection, context)``. The ByteChef runtime can't import this package: import it under ``typing.TYPE_CHECKING``.
 """
 
-from typing import Any, Callable, Dict, List, Literal, Protocol, TypedDict, Union, overload
+from typing import Any, Callable, Dict, List, Literal, Protocol, TypedDict, Union
 
 __all__ = [
     "ClusterElement",
@@ -60,26 +60,8 @@ class TaskContext(Protocol):
 
     component: Any
 
-    def connection(self, connection_name: str) -> Dict[str, Any]:
-        """A declared connection's parameters, credentials included."""
-        ...
-
-    @overload
-    def input(self) -> Dict[str, Any]:
-        """The workflow inputs plus the output of every task that already ran, keyed by name."""
-        ...
-
-    @overload
-    def input(self, name: str) -> Any:
-        """One workflow input or task output. Fails on an unknown name."""
-        ...
-
     def log(self, level: LogLevel, message: str) -> None:
         """Writes to the task's execution log."""
-        ...
-
-    def parameters(self) -> Dict[str, Any]:
-        """The task's declared parameters, with any ``${...}`` already evaluated."""
         ...
 
 
@@ -89,8 +71,9 @@ class _ConnectionRequirementRequired(TypedDict):
 
 
 class ConnectionRequirement(_ConnectionRequirementRequired, total=False):
-    """A connection a task uses. ``name`` is what ``perform`` passes as the connection name. ``componentVersion``
-    defaults to the component's latest version at save time."""
+    """A connection a task uses. ``name`` is the key of its parameters in ``perform``'s ``connection`` argument and
+    the connection name a component call passes. ``componentVersion`` defaults to the component's latest version at
+    save time."""
 
     componentVersion: int
 
@@ -111,13 +94,15 @@ class _TaskDefinitionRequired(TypedDict):
 
 
 class TaskDefinition(_TaskDefinitionRequired, total=False):
-    """A task: one step of a workflow. ByteChef calls ``perform(context)`` when the task runs, and its return value
-    becomes the task's output. Task names must be unique across the workflow, nesting included."""
+    """A task: one step of a workflow. ByteChef calls ``perform(input, context)`` when the task runs, or
+    ``perform(input, connection, context)`` when ``perform`` takes three required parameters; its return value becomes
+    the task's output. ``input`` holds the workflow inputs plus the output of every task that already ran, keyed by
+    name; ``connection`` maps each declared connection's name to its parameters, credentials included. Task names must
+    be unique across the workflow, nesting included."""
 
     connections: Union[List[ConnectionRequirement], Dict[str, ConnectionSpec]]
     description: str
     label: str
-    parameters: Dict[str, Any]
 
 
 class _ParallelTaskDefinitionRequired(TypedDict):
@@ -155,9 +140,13 @@ class _InputDefinitionRequired(TypedDict):
 
 
 class InputDefinition(_InputDefinitionRequired, total=False):
-    """A workflow input. At run time it arrives in ``context.input()`` under its own name. ``type`` defaults to
-    ``STRING``."""
+    """A workflow input. At run time it arrives in ``perform``'s ``input`` under its own name. ``type`` defaults to
+    ``STRING``; ``componentName``, ``componentVersion`` and ``groupName`` name the component input it takes its
+    options from."""
 
+    componentName: str
+    componentVersion: int
+    groupName: str
     label: str
     required: bool
     type: InputType
@@ -224,8 +213,10 @@ class _IntegrationDefinitionRequired(TypedDict):
 
 
 class IntegrationDefinition(_IntegrationDefinitionRequired, total=False):
-    """An embedded code integration, identified by ``componentName`` and ``componentVersion``."""
+    """An embedded code integration, identified by ``componentName`` and ``componentVersion``. ``name`` is its
+    display name; it defaults to ``componentName``."""
 
     description: str
+    name: str
     version: str
     workflows: List[WorkflowDefinition]

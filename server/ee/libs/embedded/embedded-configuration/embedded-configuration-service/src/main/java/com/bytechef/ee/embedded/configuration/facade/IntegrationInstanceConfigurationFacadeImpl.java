@@ -1428,24 +1428,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     private List<ComponentConnection> getRequiredAdminComponentConnections(Integration integration, String workflowId) {
-        Workflow workflow = workflowService.getWorkflow(workflowId);
-
-        return CollectionUtils.concat(
-            WorkflowTrigger.of(workflow)
-                .stream()
-                .flatMap(workflowTrigger -> CollectionUtils.stream(
-                    componentConnectionFacade.getComponentConnections(workflowTrigger)))
-                .toList(),
-            workflow.getTasks(true)
-                .stream()
-                .flatMap(workflowTask -> CollectionUtils.stream(
-                    componentConnectionFacade.getComponentConnections(workflowTask)))
-                .toList())
-            .stream()
-            .filter(ComponentConnection::required)
-            .filter(componentConnection -> !Objects.equals(
-                componentConnection.componentName(), integration.getComponentName()))
-            .toList();
+        return getRequiredComponentConnections(workflowService.getWorkflow(workflowId), integration);
     }
 
     private IntegrationInstanceConfigurationWorkflow doEnableIntegrationInstanceConfigurationWorkflow(
