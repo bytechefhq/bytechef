@@ -1,0 +1,268 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.embedded.ai.auto.memory.facade;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.ee.embedded.ai.auto.memory.domain.EmbeddedAiAutoMemory;
+import com.bytechef.ee.embedded.ai.auto.memory.domain.EmbeddedAiAutoMemoryConnectedUser;
+import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationService;
+import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryOwner;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPatch;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryPrincipalType;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryService;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryType;
+import com.bytechef.platform.configuration.domain.Environment;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+class EmbeddedAiAutoMemoryFacadeTest {
+
+    private static final long CONFIGURATION_ID = 300L;
+    private static final long CONNECTED_USER_ID = 200L;
+    private static final long INSTANCE_ID = 100L;
+    private static final long INTEGRATION_ID = 400L;
+    private static final long OTHER_CONNECTED_USER_ID = 201L;
+    private static final long OTHER_INSTANCE_ID = 101L;
+
+    private final AiAutoMemoryService aiAutoMemoryService = mock(AiAutoMemoryService.class);
+    private final ConnectedUserService connectedUserService = mock(ConnectedUserService.class);
+    private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService =
+        mock(IntegrationInstanceConfigurationService.class);
+    private final IntegrationInstanceService integrationInstanceService = mock(IntegrationInstanceService.class);
+    private final IntegrationService integrationService = mock(IntegrationService.class);
+
+    private EmbeddedAiAutoMemoryFacade embeddedAiAutoMemoryFacade;
+
+    @BeforeEach
+    void beforeEach() {
+        embeddedAiAutoMemoryFacade = new EmbeddedAiAutoMemoryFacadeImpl(
+            aiAutoMemoryService, connectedUserService, integrationInstanceConfigurationService,
+            integrationInstanceService, integrationService);
+
+        when(integrationInstanceService.getIntegrationInstances(any())).thenReturn(
+            List.of(
+                integrationInstance(INSTANCE_ID, CONNECTED_USER_ID),
+                integrationInstance(OTHER_INSTANCE_ID, OTHER_CONNECTED_USER_ID)));
+        when(connectedUserService.getConnectedUsers(any())).thenReturn(
+            List.of(
+                connectedUser(CONNECTED_USER_ID, "Ana", "ana@acme.com", "ana-1"),
+                connectedUser(OTHER_CONNECTED_USER_ID, "Ben", "ben@acme.com", "ben-1")));
+        when(integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(any()))
+            .thenReturn(List.of(integrationInstanceConfiguration()));
+        when(integrationService.getIntegrations(any())).thenReturn(List.of(integration()));
+    }
+
+    @Test
+    void testGetMemoriesKeepsOnlyIntegrationInstanceRows() {
+        when(aiAutoMemoryService.listAllOwners(Workspace.DEFAULT_WORKSPACE_ID, Environment.DEVELOPMENT, null))
+            .thenReturn(
+                List.of(
+                    memory(1L, AiAutoMemoryPrincipalType.USER, 5L, Environment.DEVELOPMENT),
+                    memory(2L, AiAutoMemoryPrincipalType.PROJECT_DEPLOYMENT, 6L, Environment.DEVELOPMENT),
+                    memory(3L, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, INSTANCE_ID, Environment.DEVELOPMENT)));
+
+        List<EmbeddedAiAutoMemory> embeddedAiAutoMemories = embeddedAiAutoMemoryFacade.getEmbeddedAiAutoMemories(
+            Environment.DEVELOPMENT, null, null);
+
+        assertThat(embeddedAiAutoMemories).hasSize(1);
+
+        EmbeddedAiAutoMemory embeddedAiAutoMemory = embeddedAiAutoMemories.getFirst();
+
+        AiAutoMemory aiAutoMemory = embeddedAiAutoMemory.memory();
+
+        assertThat(aiAutoMemory.getId()).isEqualTo(3L);
+        assertThat(embeddedAiAutoMemory.connectedUserId()).isEqualTo(CONNECTED_USER_ID);
+        assertThat(embeddedAiAutoMemory.connectedUserName()).isEqualTo("Ana");
+        assertThat(embeddedAiAutoMemory.connectedUserEmail()).isEqualTo("ana@acme.com");
+        assertThat(embeddedAiAutoMemory.connectedUserExternalId()).isEqualTo("ana-1");
+        assertThat(embeddedAiAutoMemory.integrationId()).isEqualTo(INTEGRATION_ID);
+        assertThat(embeddedAiAutoMemory.integrationName()).isEqualTo("Memory Demo");
+        assertThat(embeddedAiAutoMemory.integrationComponentName()).isEqualTo("httpClient");
+    }
+
+    @Test
+    void testGetMemoriesFiltersByConnectedUser() {
+        when(aiAutoMemoryService.listAllOwners(
+            Workspace.DEFAULT_WORKSPACE_ID, Environment.DEVELOPMENT, AiAutoMemoryType.USER))
+                .thenReturn(
+                    List.of(
+                        memory(
+                            3L, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, INSTANCE_ID, Environment.DEVELOPMENT),
+                        memory(
+                            4L, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, OTHER_INSTANCE_ID,
+                            Environment.DEVELOPMENT)));
+
+        List<EmbeddedAiAutoMemory> embeddedAiAutoMemories = embeddedAiAutoMemoryFacade.getEmbeddedAiAutoMemories(
+            Environment.DEVELOPMENT, OTHER_CONNECTED_USER_ID, AiAutoMemoryType.USER);
+
+        assertThat(embeddedAiAutoMemories)
+            .extracting(EmbeddedAiAutoMemory::connectedUserId)
+            .containsExactly(OTHER_CONNECTED_USER_ID);
+    }
+
+    @Test
+    void testGetMemoriesListsAnInstanceWhoseConnectedUserIsGone() {
+        when(integrationInstanceService.getIntegrationInstances(any())).thenReturn(List.of());
+        when(aiAutoMemoryService.listAllOwners(Workspace.DEFAULT_WORKSPACE_ID, Environment.DEVELOPMENT, null))
+            .thenReturn(
+                List.of(
+                    memory(3L, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, INSTANCE_ID, Environment.DEVELOPMENT)));
+
+        List<EmbeddedAiAutoMemory> embeddedAiAutoMemories = embeddedAiAutoMemoryFacade.getEmbeddedAiAutoMemories(
+            Environment.DEVELOPMENT, null, null);
+
+        assertThat(embeddedAiAutoMemories).hasSize(1);
+
+        EmbeddedAiAutoMemory embeddedAiAutoMemory = embeddedAiAutoMemories.getFirst();
+
+        assertThat(embeddedAiAutoMemory.connectedUserId()).isNull();
+        assertThat(embeddedAiAutoMemory.integrationName()).isNull();
+    }
+
+    @Test
+    void testGetConnectedUsersCountsMemoriesPerUser() {
+        when(aiAutoMemoryService.listAllOwners(Workspace.DEFAULT_WORKSPACE_ID, Environment.DEVELOPMENT, null))
+            .thenReturn(
+                List.of(
+                    memory(3L, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, INSTANCE_ID, Environment.DEVELOPMENT),
+                    memory(4L, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, INSTANCE_ID, Environment.DEVELOPMENT),
+                    memory(5L, AiAutoMemoryPrincipalType.USER, OTHER_CONNECTED_USER_ID, Environment.DEVELOPMENT)));
+
+        List<EmbeddedAiAutoMemoryConnectedUser> connectedUsers =
+            embeddedAiAutoMemoryFacade.getEmbeddedAiAutoMemoryConnectedUsers(Environment.DEVELOPMENT);
+
+        assertThat(connectedUsers).containsExactly(
+            new EmbeddedAiAutoMemoryConnectedUser(CONNECTED_USER_ID, "Ana", "ana@acme.com", "ana-1", 2));
+    }
+
+    @Test
+    void testUpdateCallsUpdateByIdWithTheRowOwner() {
+        AiAutoMemory aiAutoMemory = memory(
+            3L, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, INSTANCE_ID, Environment.DEVELOPMENT);
+        AiAutoMemoryPatch aiAutoMemoryPatch = new AiAutoMemoryPatch("New title", null, null, null);
+
+        when(aiAutoMemoryService.listAllOwners(Workspace.DEFAULT_WORKSPACE_ID, Environment.DEVELOPMENT, null))
+            .thenReturn(List.of(aiAutoMemory));
+        when(aiAutoMemoryService.updateById(aiAutoMemory.getOwner(), 3L, 7L, aiAutoMemoryPatch))
+            .thenReturn(aiAutoMemory);
+
+        EmbeddedAiAutoMemory embeddedAiAutoMemory = embeddedAiAutoMemoryFacade.updateEmbeddedAiAutoMemory(
+            Environment.DEVELOPMENT, 3L, 7L, aiAutoMemoryPatch);
+
+        assertThat(embeddedAiAutoMemory.connectedUserId()).isEqualTo(CONNECTED_USER_ID);
+
+        verify(aiAutoMemoryService).updateById(aiAutoMemory.getOwner(), 3L, 7L, aiAutoMemoryPatch);
+    }
+
+    @Test
+    void testUpdateRejectsAMemoryThatIsNotIntegrationInstanceOwned() {
+        when(aiAutoMemoryService.listAllOwners(Workspace.DEFAULT_WORKSPACE_ID, Environment.DEVELOPMENT, null))
+            .thenReturn(List.of(memory(3L, AiAutoMemoryPrincipalType.USER, 5L, Environment.DEVELOPMENT)));
+
+        AiAutoMemoryPatch aiAutoMemoryPatch = new AiAutoMemoryPatch("New title", null, null, null);
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> embeddedAiAutoMemoryFacade.updateEmbeddedAiAutoMemory(
+                Environment.DEVELOPMENT, 3L, 7L, aiAutoMemoryPatch))
+            .withMessageContaining("not found");
+
+        verify(aiAutoMemoryService, never()).updateById(any(), anyLong(), anyLong(), any());
+    }
+
+    @Test
+    void testDeleteCallsDeleteByIdWithTheRowOwner() {
+        AiAutoMemory aiAutoMemory = memory(
+            3L, AiAutoMemoryPrincipalType.INTEGRATION_INSTANCE, INSTANCE_ID, Environment.DEVELOPMENT);
+
+        when(aiAutoMemoryService.listAllOwners(Workspace.DEFAULT_WORKSPACE_ID, Environment.DEVELOPMENT, null))
+            .thenReturn(List.of(aiAutoMemory));
+
+        embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(Environment.DEVELOPMENT, 3L);
+
+        verify(aiAutoMemoryService).deleteById(aiAutoMemory.getOwner(), 3L);
+    }
+
+    @Test
+    void testDeleteRejectsAMemoryOfAnotherEnvironment() {
+        when(aiAutoMemoryService.listAllOwners(Workspace.DEFAULT_WORKSPACE_ID, Environment.PRODUCTION, null))
+            .thenReturn(List.of());
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> embeddedAiAutoMemoryFacade.deleteEmbeddedAiAutoMemory(Environment.PRODUCTION, 3L))
+            .withMessageContaining("not found");
+
+        verify(aiAutoMemoryService, never()).deleteById(any(), anyLong());
+    }
+
+    private static ConnectedUser connectedUser(long id, String name, String email, String externalId) {
+        return new ConnectedUser(Map.of(), email, true, externalId, id, name, 0);
+    }
+
+    private static Integration integration() {
+        Integration integration = new Integration();
+
+        integration.setComponentName("httpClient");
+        integration.setId(INTEGRATION_ID);
+        integration.setName("Memory Demo");
+
+        return integration;
+    }
+
+    private static IntegrationInstance integrationInstance(long id, long connectedUserId) {
+        IntegrationInstance integrationInstance = new IntegrationInstance();
+
+        integrationInstance.setConnectedUserId(connectedUserId);
+        integrationInstance.setId(id);
+        integrationInstance.setIntegrationInstanceConfigurationId(CONFIGURATION_ID);
+
+        return integrationInstance;
+    }
+
+    private static IntegrationInstanceConfiguration integrationInstanceConfiguration() {
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
+
+        integrationInstanceConfiguration.setId(CONFIGURATION_ID);
+        integrationInstanceConfiguration.setIntegrationId(INTEGRATION_ID);
+
+        return integrationInstanceConfiguration;
+    }
+
+    private static AiAutoMemory memory(
+        long id, AiAutoMemoryPrincipalType principalType, long principalId, Environment environment) {
+
+        AiAutoMemoryOwner aiAutoMemoryOwner = new AiAutoMemoryOwner(
+            Workspace.DEFAULT_WORKSPACE_ID, principalType, principalId, environment);
+
+        return AiAutoMemory.restore(
+            aiAutoMemoryOwner, id, "note_" + id, "Note " + id, null, AiAutoMemoryType.USER, "content", null, null, 7L);
+    }
+}
