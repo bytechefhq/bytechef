@@ -1,0 +1,18 @@
+# Test-only GraphQL base operations and the shared types the main schema extends or references.
+
+type Query {
+    _placeholder: Boolean
+}
+
+type Mutation {
+    _placeholder: Boolean
+}
+
+scalar Long
+
+enum AiAutoMemoryType {
+    USER
+    FEEDBACK
+    PROJECT
+    REFERENCE
+}
