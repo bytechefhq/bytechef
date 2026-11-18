@@ -21,6 +21,10 @@ import ConfigurationsListButton from '@/ee/pages/embedded/shared/ConfigurationsL
 import ConfigureButton from '@/ee/pages/embedded/shared/ConfigureButton';
 import ProjectSkeleton from '@/pages/automation/project/components/project-header/components/ProjectSkeleton';
 import DeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteProjectAlertDialog';
+import CodeWorkflowHeaderActions, {
+    CodeWorkflowSaveButton,
+} from '@/pages/platform/code-workflow/components/CodeWorkflowHeaderActions';
+import useCodeWorkflowHeaderStore from '@/pages/platform/code-workflow/stores/useCodeWorkflowHeaderStore';
 import WorkflowActionsButton from '@/pages/platform/workflow-editor/components/WorkflowActionsButton';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -91,6 +95,12 @@ const AutomationEditorHeader = ({
         }))
     );
     const workflow = useWorkflowDataStore((state) => state.workflow);
+    const {codeWorkflowDirty, codeWorkflowSaving} = useCodeWorkflowHeaderStore(
+        useShallow((state) => ({
+            codeWorkflowDirty: state.dirty,
+            codeWorkflowSaving: state.saving,
+        }))
+    );
 
     const copilotLayoutShifted = useCopilotLayoutShifted();
 
@@ -168,10 +178,10 @@ const AutomationEditorHeader = ({
         duplicateProjectMutation.mutate(
             {id: project.id},
             {
-                onSuccess: () => {
-                    void queryClient.invalidateQueries({queryKey: ['automationProjects']});
+                onSuccess: async () => {
+                    await navigate('/embedded/automations');
 
-                    void navigate('/embedded/automations');
+                    void queryClient.invalidateQueries({queryKey: ['automationProjects']});
                 },
             }
         );
@@ -280,6 +290,7 @@ const AutomationEditorHeader = ({
                 onSuccess: () => {
                     void queryClient.invalidateQueries({queryKey: ['automationProjects']});
                     void queryClient.invalidateQueries({queryKey: ['automationProjectCategories']});
+                    void queryClient.invalidateQueries({queryKey: ['automationProjectCodeWorkflowSource']});
                     void queryClient.invalidateQueries({queryKey: ['automationProjectTags']});
 
                     setShowProjectEditDialog(false);
@@ -307,10 +318,10 @@ const AutomationEditorHeader = ({
                 onSettled: () => {
                     setShowProjectDeleteAlert(false);
                 },
-                onSuccess: () => {
-                    void queryClient.invalidateQueries({queryKey: ['automationProjects']});
+                onSuccess: async () => {
+                    await navigate('/embedded/automations');
 
-                    void navigate('/embedded/automations');
+                    void queryClient.invalidateQueries({queryKey: ['automationProjects']});
                 },
             }
         );
@@ -351,8 +362,11 @@ const AutomationEditorHeader = ({
             </div>
 
             <div className="flex items-center gap-1">
+                {project.codeWorkflowProject && <CodeWorkflowHeaderActions />}
+
                 <WorkflowActionsButton
                     chatTrigger={chatTrigger ?? false}
+                    leadingAction={project.codeWorkflowProject ? <CodeWorkflowSaveButton /> : undefined}
                     onRunClick={handleRunClick}
                     onStopClick={handleStopClick}
                     runDisabled={runDisabled}
@@ -361,7 +375,11 @@ const AutomationEditorHeader = ({
 
                 <ButtonGroup>
                     <PublishPopover
-                        disabled={!hasUnpublishedChanges}
+                        disabled={
+                            project.codeWorkflowProject
+                                ? codeWorkflowDirty || codeWorkflowSaving || !project.codeWorkflowDraftPublishable
+                                : !hasUnpublishedChanges
+                        }
                         isPending={publishProjectMutationIsPending}
                         onPublishSubmit={handlePublishProjectSubmit}
                         title="Publish Project"

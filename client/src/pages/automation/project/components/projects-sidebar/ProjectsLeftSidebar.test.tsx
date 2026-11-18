@@ -284,6 +284,14 @@ describe('ProjectsLeftSidebar', () => {
         expect(mockUseImportProjectWorkflow).toHaveBeenCalledWith(9);
     });
 
+    it('hides the New Workflow controls for a code workflow project', () => {
+        setupQueries({projects: [{codeWorkflow: true, id: 9}], selectedProjectId: 9});
+
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={9} />);
+
+        expect(screen.queryByText('New Workflow')).not.toBeInTheDocument();
+    });
+
     it('creates workflows in the current project when all projects are listed', async () => {
         setupQueries({selectedProjectId: 0});
 
