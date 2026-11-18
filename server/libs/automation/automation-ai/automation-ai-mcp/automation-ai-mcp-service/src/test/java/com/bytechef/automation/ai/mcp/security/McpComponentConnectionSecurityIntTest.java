@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.ai.mcp.config.McpMethodSecurityTestConfiguration;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfiguration;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.ai.mcp.domain.WorkspaceMcpServer;
@@ -54,7 +55,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -63,9 +63,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  * @author Ivica Cardic
  */
 @SpringBootTest(classes = McpProjectIntTestConfiguration.class)
-@EnableMethodSecurity
 @Import({
-    ClusterElementPropertyFacadeImpl.class, McpComponentConnectionAccess.class, PostgreSQLContainerConfiguration.class
+    ClusterElementPropertyFacadeImpl.class, McpComponentConnectionAccess.class,
+    McpMethodSecurityTestConfiguration.class,
+    PostgreSQLContainerConfiguration.class
 })
 @McpProjectIntTestConfigurationSharedMocks
 class McpComponentConnectionSecurityIntTest {

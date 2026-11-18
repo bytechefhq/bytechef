@@ -29,10 +29,13 @@ import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRowFacade;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacadeIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.listener.AutomationProjectConfigurationUpdatedEventListener;
@@ -119,7 +122,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     ComponentConnectionFacade.class, ComponentDefinitionService.class, ConnectedUserConnectionFacade.class,
     ConnectionDefinitionService.class, ConnectionFacade.class, ConnectionLifecycleFacade.class,
     ConnectionService.class, CopilotWorkflowGenerator.class, EmbeddedPermissionEvaluator.class,
-    EnvironmentService.class, GitHubProxyClient.class, JobFacade.class, JobService.class, McpComponentService.class,
+    EnvironmentService.class, GitHubProxyClient.class, JobFacade.class, JobService.class, McpAutomationRowFacade.class,
+    McpComponentService.class, McpIntegrationInstanceRowFacade.class, McpIntegrationInstanceWorkflowService.class,
     McpIntegrationComponentService.class, McpIntegrationInstanceConfigurationService.class,
     McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceToolService.class,
     McpServerService.class, McpToolService.class, OAuth2ParametersFacade.class, OAuth2Service.class,
