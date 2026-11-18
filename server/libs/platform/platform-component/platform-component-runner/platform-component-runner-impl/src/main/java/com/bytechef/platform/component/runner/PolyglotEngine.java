@@ -84,7 +84,8 @@ public class PolyglotEngine {
                 applicationContext, scriptComponentConnections, jobContextAware, componentCatalog);
 
             ContextProxyObject contextProxyObject = new ContextProxyObject(
-                languageId, componentActionInvoker, componentCatalog);
+                languageId, componentActionInvoker, componentCatalog,
+                (level, message) -> writeLog(jobContextAware, level, message));
 
             Value performFunction = polyglotContext.getBindings(languageId)
                 .getMember("perform");
@@ -125,6 +126,21 @@ public class PolyglotEngine {
         Value parameterCount = polyglotContext.eval(languageId, parameterCountExpression);
 
         return parameterCount.fitsInInt() ? parameterCount.asInt() : 2;
+    }
+
+    private static void writeLog(JobContextAware jobContextAware, String level, String message) {
+        if (jobContextAware instanceof com.bytechef.component.definition.Context context) {
+            context.log(log -> {
+                switch (level) {
+                    case "trace" -> log.trace(message);
+                    case "debug" -> log.debug(message);
+                    case "info" -> log.info(message);
+                    case "warn" -> log.warn(message);
+                    case "error" -> log.error(message);
+                    default -> throw new IllegalArgumentException("Unknown log level '%s'".formatted(level));
+                }
+            });
+        }
     }
 
     private static MapProxyObject copyConnectionsToGuestValue(

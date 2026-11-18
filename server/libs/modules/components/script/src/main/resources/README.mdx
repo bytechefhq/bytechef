@@ -93,6 +93,18 @@ The same `perform(input, connection, context)` receives the connections under th
 
 Datastream item processors and AI skill scripts receive an empty `connection`. A Script tool's return value is sent to the AI model, so don't return connection parameters from a tool.
 
+### Writing to the Execution Log
+
+Call `context.log(level, message)` to write a message to the task's execution log. The level is one of `trace`, `debug`, `info`, `warn` or `error`, in any letter case; any other level fails the script with an error that lists the valid levels. `context.log` is available on the GraalVM runner only.
+
+```javascript
+function perform(input, context) {
+    context.log('info', 'my-task ran');
+
+    return null;
+}
+```
+
 ### Task Runners
 
 Each action runs in the environment its **Task Runner** property selects. The runners an installation offers depend on what the operator enabled with `bytechef.script.runners.<type>.enabled`, so the **Type** list in your editor may be shorter than this table. The [Task Runners](/platform/automation/build/workflows/task-runners) guide documents every runner, property and operator setting in full.
