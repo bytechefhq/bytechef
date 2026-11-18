@@ -18,6 +18,32 @@ const duplicateNameItems = [
 ];
 
 describe('ComboBox', async () => {
+    it('should render items with a group under that group heading, after the ungrouped items', async () => {
+        render(
+            <ComboBox
+                items={[
+                    {label: 'Ungrouped', value: 1},
+                    {group: 'People', label: 'Alice', value: 2},
+                    {group: 'People', label: 'Bob', value: 3},
+                ]}
+                name="Test"
+            />
+        );
+
+        await userEvent.click(screen.getByRole('combobox'));
+
+        const peopleGroup = screen.getByRole('group', {name: 'People'});
+
+        expect(peopleGroup).toHaveTextContent('Alice');
+        expect(peopleGroup).toHaveTextContent('Bob');
+        expect(peopleGroup).not.toHaveTextContent('Ungrouped');
+        expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
+            'Ungrouped',
+            'Alice',
+            'Bob',
+        ]);
+    });
+
     it('should render the input', () => {
         render(<ComboBox disabled={false} items={comboBoxItemsMock} name="Test" value={comboBoxItemsMock[0].value} />);
 
