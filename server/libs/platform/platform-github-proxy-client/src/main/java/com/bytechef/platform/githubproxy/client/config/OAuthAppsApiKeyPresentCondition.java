@@ -18,20 +18,19 @@ package com.bytechef.platform.githubproxy.client.config;
 
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
+import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 /**
- * Matches when {@code github-proxy.oauth-apps-api-key} is set to a non-blank value. The key is read from the
- * environment instead of being pasted into an expression, so any character in it is safe.
- *
  * @author Ivica Cardic
  */
 class OAuthAppsApiKeyPresentCondition implements Condition {
 
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-        String apiKey = context.getEnvironment()
-            .getProperty("github-proxy.oauth-apps-api-key");
+        Environment environment = context.getEnvironment();
+
+        String apiKey = environment.getProperty("github-proxy.oauth-apps-api-key");
 
         return apiKey != null && !apiKey.isBlank();
     }

@@ -20,16 +20,9 @@ import com.bytechef.platform.githubproxy.client.model.OAuthApp;
 import java.util.Map;
 
 /**
- * Client for the bytechef-github-proxy's {@code /oauth-apps} endpoint, which serves the predefined OAuth apps keyed by
- * component name.
- *
  * @author Ivica Cardic
  */
 public interface OAuthAppProxyClient {
 
-    /**
-     * Fetches the predefined OAuth apps keyed by component name. Throws a {@code RestClientException} when the proxy
-     * responds with a non-2xx status.
-     */
     Map<String, OAuthApp> getOAuthApps();
 }

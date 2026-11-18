@@ -35,8 +35,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 
 /**
- * Predefined OAuth2 apps served by the GitHub proxy, cached in memory. The last good copy is kept when a refresh fails.
- *
  * @author Ivica Cardic
  */
 @Component
