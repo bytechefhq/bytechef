@@ -159,7 +159,7 @@ const ProjectDeploymentListItem = ({
                             <div className="flex w-full items-center gap-2">
                                 {projectDeployment.description ? (
                                     <Tooltip>
-                                        <TooltipTrigger>
+                                        <TooltipTrigger asChild>
                                             <span className="text-base font-semibold">{projectDeployment.name}</span>
                                         </TooltipTrigger>
 
