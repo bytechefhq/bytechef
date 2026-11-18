@@ -65,7 +65,7 @@ class GitHubProxyClientConfiguration {
     OAuthAppProxyClient oAuthAppProxyClient(GitHubProxyClientProperties properties) {
         HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(30))
-            .followRedirects(HttpClient.Redirect.NORMAL)
+            .followRedirects(HttpClient.Redirect.NEVER)
             .build();
 
         JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);

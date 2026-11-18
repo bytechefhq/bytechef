@@ -82,6 +82,24 @@ class RestOAuthAppProxyClientTest {
     }
 
     @Test
+    void testGetOAuthAppsReturnsEmptyMapOnEmptyBody() {
+        RestClient.Builder restClientBuilder = RestClient.builder()
+            .baseUrl("http://proxy.test");
+
+        MockRestServiceServer server = MockRestServiceServer.bindTo(restClientBuilder)
+            .build();
+
+        server.expect(requestTo("http://proxy.test/oauth-apps"))
+            .andRespond(withSuccess());
+
+        RestOAuthAppProxyClient client = new RestOAuthAppProxyClient(restClientBuilder.build());
+
+        Map<String, OAuthApp> oAuthApps = client.getOAuthApps();
+
+        assertThat(oAuthApps).isEmpty();
+    }
+
+    @Test
     void testToStringMasksSecret() {
         OAuthApp oAuthApp = new OAuthApp("id", "topSecret");
 
