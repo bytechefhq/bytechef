@@ -188,7 +188,7 @@ const ConnectedUserProjectWorkflowList = ({
                                     label={group.configuration ? 'Toggle configuration' : 'Toggle workflows'}
                                 />
 
-                                <div className="flex flex-1 flex-col items-start justify-center gap-y-2 py-3">
+                                <div className="flex flex-1 flex-col items-start justify-center gap-y-1 py-3">
                                     {group.configuration ? (
                                         <span className="flex min-h-6 items-center gap-x-2 text-base font-semibold">
                                             {group.configuration.configurationName}
@@ -239,7 +239,7 @@ const ConnectedUserProjectWorkflowList = ({
                                         )}
                                     </div>
 
-                                    <div className="flex w-72 shrink-0 flex-col items-end gap-y-2">
+                                    <div className="flex w-72 shrink-0 flex-col items-end gap-y-1">
                                         <div aria-hidden="true" className="min-h-6" />
 
                                         <Tooltip>

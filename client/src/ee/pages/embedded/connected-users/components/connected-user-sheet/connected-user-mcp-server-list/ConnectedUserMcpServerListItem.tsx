@@ -95,7 +95,7 @@ const ConnectedUserMcpServerListItem = ({
                     <ListItemExpandButton disabled={!hasItems} label="Toggle MCP server" />
 
                     <CollapsibleTrigger className="flex-1 py-3" disabled={!hasItems}>
-                        <div className="flex flex-col items-start justify-center gap-y-2">
+                        <div className="flex flex-col items-start justify-center gap-y-1">
                             <div
                                 className={twMerge(
                                     'flex min-h-6 items-center text-base font-semibold',
@@ -140,7 +140,7 @@ const ConnectedUserMcpServerListItem = ({
                     </CollapsibleTrigger>
 
                     <div className="flex items-center gap-x-2">
-                        <div className="flex w-72 flex-col items-end gap-y-2">
+                        <div className="flex w-72 flex-col items-end gap-y-1">
                             <div className="relative flex min-h-6 items-center">
                                 {enableConnectedUserMcpServerMutation.isPending && (
                                     <LoadingIcon className="absolute top-[3px] left-[-15px]" />

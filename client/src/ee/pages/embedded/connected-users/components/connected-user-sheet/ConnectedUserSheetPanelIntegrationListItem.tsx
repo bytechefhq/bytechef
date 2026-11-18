@@ -191,7 +191,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                                 />
                             )}
 
-                            <div className="flex flex-col items-start justify-center gap-y-2">
+                            <div className="flex flex-col items-start justify-center gap-y-1">
                                 <div
                                     className={twMerge(
                                         'flex min-h-6 items-baseline gap-x-2 text-base font-semibold',
@@ -250,7 +250,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                             </div>
 
                             <div className="flex w-72 items-center justify-end gap-x-2">
-                                <div className="flex flex-col items-end gap-y-2">
+                                <div className="flex flex-col items-end gap-y-1">
                                     <div className="flex min-h-6 items-center">
                                         <div className="relative flex items-center">
                                             {enableIntegrationInstanceMutation.isPending && (
