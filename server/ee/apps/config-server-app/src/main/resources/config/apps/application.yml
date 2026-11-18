@@ -367,6 +367,9 @@ bytechef:
     runners:
       graalvm:
         enabled: true
+    # Gives script and commands tasks on the process, docker, kubernetes and aws-batch runners the parameters of the
+    # connections they declare, in the JSON file BYTECHEF_CONNECTIONS_FILE names, masked in the captured output.
+    inject-connections: true
     sandbox:
       enabled: true
       max-concurrent-executions: 16
