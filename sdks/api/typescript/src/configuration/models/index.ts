@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './AuthorizationType.js';
+export * from './AutomationComponentInputOptionsRequest.js';
 export * from './AutomationProject.js';
 export * from './AutomationProjectCodeWorkflow.js';
 export * from './AutomationProjectCodeWorkflowDeployResult.js';
@@ -48,7 +49,6 @@ export * from './ProvisionWorkflowReferenceRequest.js';
 export * from './PublishFrontendProjectWorkflowRequest.js';
 export * from './ReauthorizeConnectionRequest.js';
 export * from './UpdateFrontendIntegrationInstanceWorkflowRequest.js';
-export * from './UpdateFrontendProjectWorkflowInputs409Response.js';
 export * from './UpdateFrontendWorkflowConfigurationConnectionRequest.js';
 export * from './UpdateWorkflowInputsRequest.js';
 export * from './Workflow.js';

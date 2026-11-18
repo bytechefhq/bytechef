@@ -14,7 +14,7 @@
 
 import { mapValues } from '../runtime.js';
 /**
- * Returned when a request sets the connection of a component, or the value of an input, that the configuration provides for every connected user. Exactly one of the properties is present.
+ * Returned when a request sets the connection of a component that the configuration provides for every connected user.
  * @export
  * @interface ProvidedValueLockedError
  */
@@ -23,10 +23,6 @@ export interface ProvidedValueLockedError {
      * The name of the component whose connection the configuration provides.
      */
     providedComponentName?: string;
-    /**
-     * The name of the input whose value the configuration provides.
-     */
-    providedInputName?: string;
 }
 
 /**
@@ -47,7 +43,6 @@ export function ProvidedValueLockedErrorFromJSONTyped(json: any, ignoreDiscrimin
     return {
         
         'providedComponentName': json['providedComponentName'] == null ? undefined : json['providedComponentName'],
-        'providedInputName': json['providedInputName'] == null ? undefined : json['providedInputName'],
     };
 }
 
@@ -63,7 +58,6 @@ export function ProvidedValueLockedErrorToJSONTyped(value?: ProvidedValueLockedE
     return {
         
         'providedComponentName': value['providedComponentName'],
-        'providedInputName': value['providedInputName'],
     };
 }
 

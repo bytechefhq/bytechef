@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AutomationProject", description = "An automation workflow automation project.")
 @JsonTypeName("AutomationProject")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-15T19:28:21.317912+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-20T21:37:42.770599+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class AutomationProjectModel {
 
   private @Nullable Long id;

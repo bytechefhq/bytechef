@@ -10,6 +10,7 @@ apis/IntegrationInstanceWorkflowApi.ts
 apis/McpAutomationWorkflowApi.ts
 apis/index.ts
 docs/AuthorizationType.md
+docs/AutomationComponentInputOptionsRequest.md
 docs/AutomationProject.md
 docs/AutomationProjectApi.md
 docs/AutomationProjectCodeWorkflow.md
@@ -67,12 +68,12 @@ docs/ProvisionWorkflowReferenceRequest.md
 docs/PublishFrontendProjectWorkflowRequest.md
 docs/ReauthorizeConnectionRequest.md
 docs/UpdateFrontendIntegrationInstanceWorkflowRequest.md
-docs/UpdateFrontendProjectWorkflowInputs409Response.md
 docs/UpdateFrontendWorkflowConfigurationConnectionRequest.md
 docs/UpdateWorkflowInputsRequest.md
 docs/Workflow.md
 index.ts
 models/AuthorizationType.ts
+models/AutomationComponentInputOptionsRequest.ts
 models/AutomationProject.ts
 models/AutomationProjectCodeWorkflow.ts
 models/AutomationProjectCodeWorkflowDeployResult.ts
@@ -120,7 +121,6 @@ models/ProvisionWorkflowReferenceRequest.ts
 models/PublishFrontendProjectWorkflowRequest.ts
 models/ReauthorizeConnectionRequest.ts
 models/UpdateFrontendIntegrationInstanceWorkflowRequest.ts
-models/UpdateFrontendProjectWorkflowInputs409Response.ts
 models/UpdateFrontendWorkflowConfigurationConnectionRequest.ts
 models/UpdateWorkflowInputsRequest.ts
 models/Workflow.ts

@@ -11,7 +11,7 @@ Name | Type
 `label` | string
 `type` | string
 `required` | boolean
-`provided` | boolean
+`componentReference` | [ComponentInputReference](ComponentInputReference.md)
 
 ## Example
 
@@ -24,7 +24,7 @@ const example = {
   "label": null,
   "type": null,
   "required": null,
-  "provided": null,
+  "componentReference": null,
 } satisfies AutomationProjectWorkflowInput
 
 console.log(example)
