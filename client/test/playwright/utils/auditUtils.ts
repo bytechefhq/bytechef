@@ -1,6 +1,6 @@
 import {APIResponse, Page, expect} from '@playwright/test';
 
-export const AUDIT_EVENTS_ROUTE = '/automation/settings/audit-events';
+export const AUDIT_EVENTS_ROUTE = '/settings/audit-events';
 
 export const NON_ADMIN_USER = {
     email: 'user@localhost.com',
