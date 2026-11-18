@@ -29,6 +29,7 @@ interface WorkflowTriggerAndComponentsRowProps {
     filteredComponentNames?: string[];
     fitToWidth?: boolean;
     maxIcons?: number;
+    truncateTriggerLabel?: boolean;
     workflow: WorkflowTriggerSourceI;
     workflowComponentDefinitions: Record<string, WorkflowComponentIconDefinitionType | undefined>;
     workflowTaskDispatcherDefinitions: Record<string, WorkflowComponentIconDefinitionType | undefined>;
@@ -39,6 +40,7 @@ const WorkflowTriggerAndComponentsRow = ({
     filteredComponentNames,
     fitToWidth,
     maxIcons,
+    truncateTriggerLabel,
     workflow,
     workflowComponentDefinitions,
     workflowTaskDispatcherDefinitions,
@@ -95,9 +97,11 @@ const WorkflowTriggerAndComponentsRow = ({
 
     const triggerLabel = triggerData?.label || triggerData?.componentName || '';
 
+    const shrinkTriggerLabel = fitToWidth || truncateTriggerLabel;
+
     const triggerBadge = (
-        <div className={fitToWidth ? 'min-w-0' : 'shrink-0'}>
-            {fitToWidth ? (
+        <div className={shrinkTriggerLabel ? 'min-w-0' : 'shrink-0'}>
+            {shrinkTriggerLabel ? (
                 <Badge className="max-w-full" styleType="outline-outline" weight="semibold">
                     <span className="truncate">{triggerLabel}</span>
                 </Badge>
@@ -108,9 +112,9 @@ const WorkflowTriggerAndComponentsRow = ({
     );
 
     return (
-        <div className={twMerge('flex items-center gap-1', fitToWidth && 'min-w-0', className)}>
+        <div className={twMerge('flex items-center gap-1', shrinkTriggerLabel && 'min-w-0', className)}>
             {triggerData && (
-                <div className={twMerge('flex items-center gap-1', fitToWidth ? 'min-w-0' : 'shrink-0')}>
+                <div className={twMerge('flex items-center gap-1', shrinkTriggerLabel ? 'min-w-0' : 'shrink-0')}>
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <div className="flex shrink-0 items-center justify-center rounded-full border border-stroke-neutral-primary bg-surface-neutral-primary p-1">
@@ -130,12 +134,12 @@ const WorkflowTriggerAndComponentsRow = ({
                         <TooltipContent>{triggerData.componentName}</TooltipContent>
                     </Tooltip>
 
-                    {fitToWidth || triggerData.description ? (
+                    {shrinkTriggerLabel || triggerData.description ? (
                         <Tooltip>
                             <TooltipTrigger asChild>{triggerBadge}</TooltipTrigger>
 
                             <TooltipContent className="max-w-xs text-sm" side="right">
-                                {fitToWidth && <div className="font-semibold">{triggerLabel}</div>}
+                                {shrinkTriggerLabel && <div className="font-semibold">{triggerLabel}</div>}
 
                                 {triggerData.description && <div>{triggerData.description}</div>}
                             </TooltipContent>
