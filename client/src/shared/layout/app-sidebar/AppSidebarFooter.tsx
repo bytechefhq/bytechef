@@ -87,12 +87,14 @@ export function AppSidebarFooter() {
         environmentId: currentEnvironmentId,
         isAdmin: !!account?.authorities?.includes(AUTHORITIES.ADMIN),
         pathname,
+        storedPlatformType: currentType,
     });
 
     const showAutomationGettingStartedHelpLink = shouldShowAutomationGettingStartedHelpLink({
         canCreateProject,
         development: currentEnvironmentId === DEVELOPMENT_ENVIRONMENT,
         pathname,
+        storedPlatformType: currentType,
     });
 
     const gettingStartedHelpPath = showEmbeddedGettingStartedHelpLink

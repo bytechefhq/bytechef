@@ -1,3 +1,4 @@
+import {PlatformType} from '@/pages/home/stores/usePlatformTypeStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {EditionType} from '@/shared/stores/useApplicationInfoStore';
 import {describe, expect, it} from 'vitest';
@@ -63,6 +64,30 @@ describe('shouldShowEmbeddedGettingStartedHelpLink', () => {
                 environmentId: DEVELOPMENT_ENVIRONMENT,
                 isAdmin: true,
                 pathname: '/embedded/integrations',
+            })
+        ).toBe(false);
+    });
+
+    it('shows the help link on Organization settings after coming from Embedded', () => {
+        expect(
+            shouldShowEmbeddedGettingStartedHelpLink({
+                edition: EditionType.EE,
+                environmentId: DEVELOPMENT_ENVIRONMENT,
+                isAdmin: true,
+                pathname: '/settings/users',
+                storedPlatformType: PlatformType.EMBEDDED,
+            })
+        ).toBe(true);
+    });
+
+    it('hides the help link on Organization settings after coming from Automation', () => {
+        expect(
+            shouldShowEmbeddedGettingStartedHelpLink({
+                edition: EditionType.EE,
+                environmentId: DEVELOPMENT_ENVIRONMENT,
+                isAdmin: true,
+                pathname: '/settings/users',
+                storedPlatformType: PlatformType.AUTOMATION,
             })
         ).toBe(false);
     });

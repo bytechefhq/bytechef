@@ -1,3 +1,4 @@
+import {PlatformType} from '@/pages/home/stores/usePlatformTypeStore';
 import {describe, expect, it} from 'vitest';
 
 import shouldShowAutomationGettingStartedHelpLink from './shouldShowAutomationGettingStartedHelpLink';
@@ -46,6 +47,28 @@ describe('shouldShowAutomationGettingStartedHelpLink', () => {
                 canCreateProject: true,
                 development: false,
                 pathname: '/automation/deployments',
+            })
+        ).toBe(false);
+    });
+
+    it('shows the help link on Organization settings after coming from Automation', () => {
+        expect(
+            shouldShowAutomationGettingStartedHelpLink({
+                canCreateProject: true,
+                development: true,
+                pathname: '/settings/users',
+                storedPlatformType: PlatformType.AUTOMATION,
+            })
+        ).toBe(true);
+    });
+
+    it('hides the help link on Organization settings after coming from Embedded', () => {
+        expect(
+            shouldShowAutomationGettingStartedHelpLink({
+                canCreateProject: true,
+                development: true,
+                pathname: '/settings/users',
+                storedPlatformType: PlatformType.EMBEDDED,
             })
         ).toBe(false);
     });
