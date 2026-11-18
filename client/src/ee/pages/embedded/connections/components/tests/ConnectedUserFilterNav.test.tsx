@@ -36,7 +36,7 @@ describe('ConnectedUserFilterNav', () => {
     it('searches connected users with the typed text', async () => {
         render(<ConnectedUserFilterNav environmentId={1} onSelect={vi.fn()} />);
 
-        await userEvent.click(screen.getByRole('combobox', {name: 'Connected user'}));
+        await userEvent.click(screen.getByRole('combobox', {name: 'Connected user: Admin connections'}));
         await userEvent.type(screen.getByPlaceholderText('Search...'), 'acme');
 
         await waitFor(
@@ -54,7 +54,7 @@ describe('ConnectedUserFilterNav', () => {
 
         render(<ConnectedUserFilterNav environmentId={1} onSelect={onSelect} />);
 
-        await userEvent.click(screen.getByRole('combobox', {name: 'Connected user'}));
+        await userEvent.click(screen.getByRole('combobox', {name: 'Connected user: Admin connections'}));
         await userEvent.click(screen.getByText('Acme Corp'));
 
         expect(onSelect).toHaveBeenCalledWith(42);
@@ -65,7 +65,7 @@ describe('ConnectedUserFilterNav', () => {
 
         render(<ConnectedUserFilterNav environmentId={1} onSelect={vi.fn()} selectedConnectedUserId={42} />);
 
-        await userEvent.click(screen.getByRole('combobox', {name: 'Connected user'}));
+        await userEvent.click(screen.getByRole('combobox', {name: 'Connected user: Acme Corp'}));
 
         const connectedUsersGroup = screen.getByRole('group', {name: 'Connected Users'});
 
@@ -77,7 +77,7 @@ describe('ConnectedUserFilterNav', () => {
     it('lists a connected user without a name by external id', async () => {
         render(<ConnectedUserFilterNav environmentId={1} onSelect={vi.fn()} />);
 
-        await userEvent.click(screen.getByRole('combobox', {name: 'Connected user'}));
+        await userEvent.click(screen.getByRole('combobox', {name: 'Connected user: Admin connections'}));
 
         expect(screen.getByText('user-without-name')).toBeInTheDocument();
     });
@@ -90,11 +90,11 @@ describe('ConnectedUserFilterNav', () => {
 
         render(<ConnectedUserFilterNav environmentId={1} onSelect={onSelect} selectedConnectedUserId={42} />);
 
-        expect(screen.getByRole('combobox', {name: 'Connected user'})).toHaveTextContent('Acme Corp');
+        expect(screen.getByRole('combobox', {name: 'Connected user: Acme Corp'})).toHaveTextContent('Acme Corp');
 
         expect(screen.queryByRole('button', {name: 'Clear connected user'})).not.toBeInTheDocument();
 
-        await userEvent.click(screen.getByRole('combobox', {name: 'Connected user'}));
+        await userEvent.click(screen.getByRole('combobox', {name: 'Connected user: Acme Corp'}));
         await userEvent.click(screen.getByRole('option', {name: 'Admin connections'}));
 
         expect(onSelect).toHaveBeenCalledWith(undefined);
@@ -103,10 +103,20 @@ describe('ConnectedUserFilterNav', () => {
     it('shows that admin connections are listed when no connected user is selected', async () => {
         render(<ConnectedUserFilterNav environmentId={1} onSelect={vi.fn()} />);
 
-        expect(screen.getByRole('combobox', {name: 'Connected user'})).toHaveTextContent('Admin connections');
+        expect(screen.getByRole('combobox', {name: 'Connected user: Admin connections'})).toHaveTextContent(
+            'Admin connections'
+        );
 
-        await userEvent.click(screen.getByRole('combobox', {name: 'Connected user'}));
+        await userEvent.click(screen.getByRole('combobox', {name: 'Connected user: Admin connections'}));
 
         expect(screen.queryByRole('option', {name: 'Admin connections'})).not.toBeInTheDocument();
+    });
+
+    it('says the selected connected user is loading instead of showing a blank label', () => {
+        hoisted.connectedUsers = [];
+
+        render(<ConnectedUserFilterNav environmentId={1} onSelect={vi.fn()} selectedConnectedUserId={42} />);
+
+        expect(screen.getByRole('combobox', {name: 'Connected user: Loading...'})).toHaveTextContent('Loading...');
     });
 });
