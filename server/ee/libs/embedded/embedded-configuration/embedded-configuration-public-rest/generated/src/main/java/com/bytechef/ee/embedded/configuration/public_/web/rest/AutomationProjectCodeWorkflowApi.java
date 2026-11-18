@@ -50,8 +50,8 @@ public interface AutomationProjectCodeWorkflowApi {
      * POST /automation-project-code-workflows/deploy : Deploy a new automation code workflow into the embedded catalog
      * Deploy a new automation code workflow into the embedded catalog. Unlike the connected-user-scoped endpoints on this API, this operation is authenticated as the API key&#39;s own ByteChef user and does not fabricate a connected-user identity.
      *
+     * @param projectFile The file of a code-native automation project. (required)
      * @param xEnvironment The environment. (optional)
-     * @param projectFile The file of a code-native automation project. (optional)
      * @param release Whether to also point the configuration of the request environment at the newly published version. (optional, default to false)
      * @return Successful operation. (status code 200)
      *         or Access token is missing or invalid (status code 401)
@@ -78,8 +78,8 @@ public interface AutomationProjectCodeWorkflowApi {
         consumes = { "multipart/form-data" }
     )
     default ResponseEntity<AutomationProjectCodeWorkflowDeployResultModel> deployAutomationProjectCodeWorkflow(
+        @Parameter(name = "projectFile", description = "The file of a code-native automation project.", required = true) @RequestPart(value = "projectFile", required = true) MultipartFile projectFile,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment,
-        @Parameter(name = "projectFile", description = "The file of a code-native automation project.") @RequestPart(value = "projectFile", required = false) MultipartFile projectFile,
         @Parameter(name = "release", description = "Whether to also point the configuration of the request environment at the newly published version.") @Valid @RequestParam(value = "release", required = false) Boolean release
     ) {
         getRequest().ifPresent(request -> {
