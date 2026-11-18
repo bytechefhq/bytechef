@@ -1,0 +1,246 @@
+---
+title: Script Sandbox
+description: How ByteChef confines the JavaScript and Python code that workflow authors write, the strict and trusted sandbox modes, the CPU and heap limits, and every setting that controls them.
+---
+
+Workflow authors can write code: a [Script](/reference/components/script_v1) step, a Script tool an
+[AI agent](/platform/automation/build/workflows/ai/agent) calls, a script item processor in a
+[data stream](/platform/automation/build/workflows/data-streams), or a script bundled with an AI skill. ByteChef runs
+that code inside the server process, on the [GraalVM polyglot](https://www.graalvm.org/latest/reference-manual/embed-languages/)
+runtime. The **script sandbox** is the layer between that guest code and the server: it decides what the code can reach
+and how much CPU and memory it may use.
+
+This page is for operators. It explains what the sandbox blocks, which code runs under it, how to configure it, and
+what a workflow author sees when a script hits a limit.
+
+## What the sandbox restricts
+
+Every guest context ByteChef builds for author code starts from the same denials, whether or not the resource limits
+described below are switched on:
+
+| Capability | In the sandbox |
+| --- | --- |
+| Host Java classes | Denied. `Java.type('java.lang.System')` and any other host class lookup fails, and host classes cannot be loaded. |
+| Host objects | Denied. The guest sees only the values ByteChef copies into it (`input`, `connection`, `context`), not Java objects. |
+| File system and network sockets | Denied. The context has no I/O access at all. |
+| Environment variables | Denied. The server's environment, which holds its database password and cloud credentials, is invisible. |
+| Threads | Denied. A script cannot start threads. |
+| Subprocesses | Denied. A script cannot start a process. |
+| Native code | Denied. |
+| Other guest languages | Denied. A JavaScript script cannot evaluate Python, and the reverse. |
+| Standard input | Empty. |
+| Standard output and error | Captured and written to the server log, line by line (see [Guest output](#guest-output)). |
+
+What a script can still do is compute, and call other ByteChef components through `context.component`:
+
+```javascript
+function perform(input, context) {
+    // Allowed: plain computation on the input.
+    const total = input.items.reduce((sum, item) => sum + item.price, 0);
+
+    // Allowed: another component's action, with the connection wired in the script editor.
+    context.component.logger.info({text: `Order total: ${total}`});
+
+    // Denied: host access. This line would fail the task.
+    // const system = Java.type('java.lang.System');
+
+    return {total};
+}
+```
+
+```python
+def perform(input, context):
+    total = sum(item["price"] for item in input["items"])
+
+    # Denied: the guest has no file system. This would fail the task.
+    # open("/etc/passwd").read()
+
+    return {"total": total}
+```
+
+Calls through `context.component` run in the host, outside the guest, so the component's own HTTP calls, file
+handling and credentials work normally. The guest only ever sees the result.
+
+## Strict and trusted modes
+
+The sandbox has two modes.
+
+**Strict** is the mode described above, and the default. For JavaScript and Python it also applies GraalVM's
+`CONSTRAINED` sandbox policy with a CPU time limit and a heap memory limit (see [Limits](#cpu-time-and-heap-memory-limits)).
+
+**Trusted** lifts every restriction. The guest gets full host access: host classes, the file system, the environment,
+threads and processes, the same reach the server process itself has. No CPU or heap limit applies. Instead, a trusted
+execution can be given a wall-clock timeout: when it runs past it, ByteChef closes the context and the execution is
+cancelled. A trusted context runs on its own GraalVM engine, never one shared with strict contexts, and its standard
+output and error go to the same `[guest]` log lines as strict ones.
+
+Trusted mode is never chosen by a script. The calling code in ByteChef picks the mode, and in this release every
+built-in caller uses strict.
+
+### What runs under the sandbox
+
+| Code | Language | Mode |
+| --- | --- | --- |
+| [Script](/reference/components/script_v1) component actions | JavaScript, Python | Strict |
+| Script tools for [AI agents](/platform/automation/build/workflows/ai/agent) | JavaScript, Python | Strict |
+| Script item processors for [data streams](/platform/automation/build/workflows/data-streams) | JavaScript, Python | Strict |
+| Scripts bundled in an AI skill and run by the agent's skills tool | JavaScript, Python | Strict |
+
+The CPU and heap limits are applied to JavaScript and Python only. Any other guest language still gets the denials in
+the table above, but runs without the resource limits.
+
+[Custom components](/platform/settings/components/custom-components) and
+[code workflows](/platform/automation/build/workflows/code-workflows) written in a script language load through their
+own GraalVM contexts. They do not use the script sandbox, and the settings on this page do not apply to them.
+
+## Configuration
+
+All settings sit under `bytechef.script.sandbox`. Each one can also be set as an environment variable: uppercase the
+property path and replace dots and dashes with underscores.
+
+| Property | Environment variable | Default | What it controls |
+| --- | --- | --- | --- |
+| `bytechef.script.sandbox.enabled` | `BYTECHEF_SCRIPT_SANDBOX_ENABLED` | `true` | Applies GraalVM's constrained sandbox policy and the resource limits to strict JavaScript and Python contexts. |
+| `bytechef.script.sandbox.max-cpu-time` | `BYTECHEF_SCRIPT_SANDBOX_MAX_CPU_TIME` | `5m` | The CPU time one strict execution may use. |
+| `bytechef.script.sandbox.max-heap-memory` | `BYTECHEF_SCRIPT_SANDBOX_MAX_HEAP_MEMORY` | `512MB` | The heap one strict execution may allocate. |
+| `bytechef.script.sandbox.max-concurrent-executions` | `BYTECHEF_SCRIPT_SANDBOX_MAX_CONCURRENT_EXECUTIONS` | the larger of `16` and 4 times the number of CPUs | How many strict executions may run at once when they are started from virtual threads. Must be at least `1`. |
+
+Durations use Spring Boot's format (`30s`, `5m`, `PT5M`), and sizes use its data size format (`64MB`, `1GB`).
+
+```yaml
+bytechef:
+  script:
+    sandbox:
+      enabled: true
+      max-cpu-time: 2m
+      max-heap-memory: 256MB
+      max-concurrent-executions: 32
+```
+
+The same settings as environment variables, for example in a Docker Compose file:
+
+```yaml
+services:
+  bytechef:
+    environment:
+      BYTECHEF_SCRIPT_SANDBOX_MAX_CPU_TIME: 2m
+      BYTECHEF_SCRIPT_SANDBOX_MAX_HEAP_MEMORY: 256MB
+      BYTECHEF_SCRIPT_SANDBOX_MAX_CONCURRENT_EXECUTIONS: "32"
+```
+
+The settings are read once, when the server starts. On startup the server logs the active limits:
+
+```text
+Guest polyglot sandbox enabled: maxCpuTime=PT2M, maxHeapMemory=268435456
+```
+
+### Turning the sandbox off
+
+With `bytechef.script.sandbox.enabled=false` the server logs a warning at startup:
+
+```text
+Guest polyglot sandboxing is disabled; scripts run without resource limits
+```
+
+Strict contexts then run without GraalVM's constrained policy and without the CPU and heap limits. The denials in the
+[first table](#what-the-sandbox-restricts) still apply: scripts still cannot reach host classes, files, the environment,
+threads or processes. What is lost is the protection against a script that loops forever or allocates until the server
+runs out of memory. Guest output is also no longer routed to the `[guest]` log lines. Turn the sandbox off only to rule
+it out while debugging, never on a shared installation.
+
+## CPU time and heap memory limits
+
+Both limits apply per execution: each run of a script gets its own context, its own CPU budget and its own heap budget.
+
+### CPU time
+
+`max-cpu-time` becomes GraalVM's `sandbox.MaxCPUTime` option. It counts CPU time the script's thread actually uses,
+not wall-clock time. A script that waits, for example on a slow `context.component` call to an external API, does not
+use up its budget while it waits. A script stuck in a loop does.
+
+### Heap memory
+
+`max-heap-memory` becomes GraalVM's `sandbox.MaxHeapMemory` option, which caps what the guest context allocates. Not
+every JVM can enforce it. The first time a strict context is built, ByteChef checks whether the runtime accepts the
+option. If it does not, ByteChef logs a warning once and runs scripts without a heap limit:
+
+```text
+The polyglot sandbox heap memory limit (sandbox.MaxHeapMemory) cannot be applied on this JVM (java.vm.version=...): ...
+Scripts run without a heap memory limit; the CPU time limit still applies. Run on a GraalVM JDK <engine version> or
+newer to enforce it.
+```
+
+The version in the message is the version of the polyglot engine bundled with the server. The CPU time limit keeps
+working either way. If you see this warning, run ByteChef on a GraalVM JDK of at least that version to get the heap
+limit back.
+
+### Concurrency
+
+GraalVM cannot meter CPU time or heap on a virtual thread. ByteChef's workers run on virtual threads when
+`spring.threads.virtual.enabled` is `true` (as in the shipped configuration), so a strict execution started from a
+virtual thread is handed to a separate pool of platform threads named `polyglot-guest-<n>`. That pool has
+`max-concurrent-executions` threads. When all of them are busy, further executions wait in line until one finishes.
+The calling thread's propagated context, such as the current tenant, is carried across to the guest thread.
+
+Executions started from a platform thread, and executions with the sandbox turned off, run on the calling thread and
+do not count against this pool.
+
+## What workflow authors see
+
+A script that breaks a sandbox rule or limit fails its task. The task's error carries GraalVM's message:
+
+| Cause | What the error says |
+| --- | --- |
+| The script used up its CPU time | The message names the CPU time limit. When the script was moved to a guest thread, it can instead say *Thread was interrupted*. |
+| The script allocated past its heap limit | The message names the heap memory limit. |
+| The script looked up a host class or used a denied capability | GraalVM reports that the access is not allowed. |
+| The script does not define `perform` | *The script must define a function named 'perform'* |
+| A trusted execution ran past its timeout | The execution is reported as cancelled. |
+
+A limit only stops the one execution that hit it. Other scripts, and the server, keep running.
+
+Authors who hit the CPU limit on legitimate work can usually split it: process a list in a
+[Loop](/reference/flow-controls/loop_v1) of smaller script steps, or move the heavy lifting into a component that
+does it natively.
+
+## Guest output
+
+Whatever a script prints, with `console.log` in JavaScript or `print` in Python, does not reach the task result. It
+goes to the server log under the `com.bytechef.platform.component.polyglot.PolyglotSandbox` logger, one line per
+entry, prefixed with `[guest]`: standard output at `INFO`, standard error at `WARN`.
+
+```text
+INFO  c.b.p.c.polyglot.PolyglotSandbox : [guest] processing 42 items
+WARN  c.b.p.c.polyglot.PolyglotSandbox : [guest] item 7 has no price
+```
+
+To keep guest output out of a production log, raise that logger's level:
+
+```yaml
+logging:
+  level:
+    com.bytechef.platform.component.polyglot.PolyglotSandbox: WARN
+```
+
+## Guidance for operators
+
+- **Keep the sandbox on.** The CPU and heap limits are what stop one runaway script from taking down every workflow on
+  the server.
+- **Size the heap for concurrency.** The heap limit is per execution. In the worst case, `max-concurrent-executions`
+  scripts each hold up to `max-heap-memory` at the same moment, so the server's own heap (`-Xmx`) needs room for that
+  on top of everything else. Lower one of the two if the product is larger than you can afford.
+- **Tune the CPU limit to your workloads.** Five minutes of CPU time is generous for data shaping. A lower value fails
+  a stuck script sooner and frees its thread sooner.
+- **Run on GraalVM.** If the heap-limit warning appears in your log, the server is running on a JVM that cannot enforce
+  `sandbox.MaxHeapMemory`.
+- **Watch the `[guest]` lines.** A script that logs heavily logs on every run, and that volume lands in your server log.
+- **Know what is not covered.** Custom components and code workflows run outside this sandbox, so review them as you
+  would any code you deploy.
+
+## Related
+
+- [Script component reference](/reference/components/script_v1)
+- [Code workflows and scripting languages](/platform/automation/build/workflows/code-workflows#scripting-languages)
+- [Environment variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#script-configuration)
+- [GraalVM sandboxing documentation](https://www.graalvm.org/latest/security-guide/sandboxing/)
+- [ByteChef on GitHub](https://github.com/bytechefhq/bytechef)
