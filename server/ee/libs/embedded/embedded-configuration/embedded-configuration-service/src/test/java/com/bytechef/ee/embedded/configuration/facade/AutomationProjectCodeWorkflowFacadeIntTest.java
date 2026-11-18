@@ -19,10 +19,13 @@ import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRowFacade;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -63,7 +66,10 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -95,7 +101,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     GitHubProxyClient.class, JobFacade.class, JobService.class, McpComponentService.class,
     McpIntegrationComponentService.class,
     McpIntegrationInstanceConfigurationService.class, McpIntegrationInstanceConfigurationWorkflowService.class,
-    McpIntegrationInstanceToolService.class, McpServerService.class, McpToolService.class,
+    McpIntegrationInstanceToolService.class, McpAutomationRowFacade.class,
+    McpIntegrationInstanceRowFacade.class, McpIntegrationInstanceWorkflowService.class, McpServerService.class,
+    McpToolService.class,
     OAuth2ParametersFacade.class,
     OAuth2Service.class, PrincipalJobFacade.class, PrincipalJobService.class, ProjectDeploymentFacade.class,
     ProjectDeploymentService.class, ProjectDeploymentWorkflowService.class, ProjectFacade.class,
@@ -161,6 +169,45 @@ class AutomationProjectCodeWorkflowFacadeIntTest {
         assertThat(configuration.projectVersion()).isEqualTo(newVersion);
         assertThat(configuration.enabled()).isFalse();
         assertThat(configuration.automationHubVisible()).isFalse();
+    }
+
+    @Test
+    void testSaveWithReleaseUpdatesEveryConfigurationOfTheEnvironment() {
+        String name = "Release Many " + UUID.randomUUID();
+        long projectId = createDeployedProject(name);
+
+        automationProjectFacade.publishProject(projectId);
+
+        int firstVersion = getLastPublishedVersion(projectId);
+
+        long acmeConfigurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, Environment.PRODUCTION.ordinal(), "Acme", null, firstVersion, true, true);
+        long globexConfigurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, Environment.PRODUCTION.ordinal(), "Globex", null, firstVersion, false, true);
+        long developmentConfigurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, Environment.DEVELOPMENT.ordinal(), "Development", null, firstVersion, true, true);
+
+        automationProjectCodeWorkflowFacade.save(
+            codeProject(name), Language.JAVASCRIPT, Environment.PRODUCTION, true);
+
+        int newVersion = getLastPublishedVersion(projectId);
+
+        assertThat(newVersion).isGreaterThan(firstVersion);
+
+        Map<Long, AutomationProjectConfigurationDTO> configurations =
+            automationProjectConfigurationFacade.getConfigurations(projectId)
+                .stream()
+                .collect(Collectors.toMap(AutomationProjectConfigurationDTO::id, Function.identity()));
+
+        assertThat(configurations).hasSize(3);
+        assertThat(configurations.get(acmeConfigurationId)
+            .projectVersion()).isEqualTo(newVersion);
+        assertThat(configurations.get(globexConfigurationId)
+            .projectVersion()).isEqualTo(newVersion);
+        assertThat(configurations.get(globexConfigurationId)
+            .enabled()).isFalse();
+        assertThat(configurations.get(developmentConfigurationId)
+            .projectVersion()).isEqualTo(firstVersion);
     }
 
     @Test
