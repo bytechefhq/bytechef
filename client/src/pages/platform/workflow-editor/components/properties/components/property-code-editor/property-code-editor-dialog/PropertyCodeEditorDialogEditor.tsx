@@ -65,6 +65,7 @@ const PropertyCodeEditorDialogEditor = ({
 
         if (scriptLanguage === 'shell') {
             return {
+                connections: componentConnections,
                 env: currentNodeEnv && typeof currentNodeEnv === 'object' ? Object.keys(currentNodeEnv) : [],
                 input: inputParameters ?? scriptInput,
                 kind: 'shell',

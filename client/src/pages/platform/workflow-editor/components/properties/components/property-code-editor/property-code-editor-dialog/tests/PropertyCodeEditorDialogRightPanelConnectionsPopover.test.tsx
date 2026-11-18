@@ -1,7 +1,9 @@
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import PropertyCodeEditorDialogRightPanelConnectionsPopover from '../PropertyCodeEditorDialogRightPanelConnectionsPopover';
+import PropertyCodeEditorDialogRightPanelConnectionsPopover, {
+    connectionFormSchema,
+} from '../PropertyCodeEditorDialogRightPanelConnectionsPopover';
 
 const hoisted = vi.hoisted(() => {
     return {
@@ -129,25 +131,24 @@ describe('PropertyCodeEditorDialogRightPanelConnectionsPopover', () => {
             expect(screen.getByTestId('popover-trigger')).toBeInTheDocument();
         });
 
-        it('should render Add Component header', () => {
+        it('should render Add Connection header', () => {
             render(<PropertyCodeEditorDialogRightPanelConnectionsPopover {...defaultProps} />);
 
-            // There are two "Add Component" texts - one in header, one in button
-            expect(screen.getAllByText('Add Component').length).toBeGreaterThanOrEqual(1);
+            expect(screen.getAllByText('Add Connection').length).toBeGreaterThanOrEqual(1);
         });
 
         it('should render name form field', () => {
             render(<PropertyCodeEditorDialogRightPanelConnectionsPopover {...defaultProps} />);
 
             expect(screen.getByTestId('form-field-name')).toBeInTheDocument();
-            expect(screen.getByText('Name')).toBeInTheDocument();
+            expect(screen.getByText('Name', {selector: 'label'})).toHaveTextContent(/^Name\*$/);
         });
 
         it('should render componentName form field', () => {
             render(<PropertyCodeEditorDialogRightPanelConnectionsPopover {...defaultProps} />);
 
             expect(screen.getByTestId('form-field-componentName')).toBeInTheDocument();
-            expect(screen.getByText('Component')).toBeInTheDocument();
+            expect(screen.getByText('Component', {selector: 'label'})).toHaveTextContent(/^Component\*$/);
         });
 
         it('should render Add button', () => {
@@ -193,5 +194,21 @@ describe('PropertyCodeEditorDialogRightPanelConnectionsPopover', () => {
 
             expect(screen.getByTestId('popover-close')).toBeInTheDocument();
         });
+    });
+});
+
+describe('connectionFormSchema', () => {
+    it('requires a component and a name of at least two characters', () => {
+        const valid = {componentName: 'slack', componentVersion: 1, name: 'my'};
+
+        expect(connectionFormSchema.safeParse(valid).success).toBe(true);
+
+        const withoutComponent = connectionFormSchema.safeParse({...valid, componentName: ''});
+
+        expect(withoutComponent.error?.issues.map((issue) => issue.message)).toContain('Component is required.');
+
+        const shortName = connectionFormSchema.safeParse({...valid, name: 'm'});
+
+        expect(shortName.error?.issues.map((issue) => issue.message)).toContain('Name must be at least 2 characters.');
     });
 });

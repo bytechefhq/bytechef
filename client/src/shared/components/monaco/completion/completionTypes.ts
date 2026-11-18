@@ -93,6 +93,7 @@ export interface CodeWorkflowCompletionContextI {
 }
 
 export interface ShellCompletionContextI {
+    connections: ConnectionDeclarationType[];
     env: string[];
     input: Record<string, unknown>;
     kind: 'shell';

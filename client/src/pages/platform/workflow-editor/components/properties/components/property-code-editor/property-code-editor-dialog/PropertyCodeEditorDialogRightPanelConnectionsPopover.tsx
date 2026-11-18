@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import ComboBox from '@/components/ComboBox';
 import {Input} from '@/components/Input/Input';
+import RequiredMark from '@/components/RequiredMark';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Popover, PopoverClose, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
@@ -11,10 +12,12 @@ import {z} from 'zod';
 import usePropertyCodeEditorDialogRightPanelConnectionsPopover from './hooks/usePropertyCodeEditorDialogRightPanelConnectionsPopover';
 
 export const connectionFormSchema = z.object({
-    componentName: z.string(),
+    componentName: z.string().min(1, {
+        message: 'Component is required.',
+    }),
     componentVersion: z.number(),
     name: z.string().min(2, {
-        message: 'Name must be at least 3 characters.',
+        message: 'Name must be at least 2 characters.',
     }),
 });
 
@@ -32,12 +35,12 @@ const PropertyCodeEditorDialogRightPanelConnectionsPopover = ({
     return (
         <Popover onOpenChange={setOpen} open={open}>
             <PopoverTrigger asChild>
-                {triggerNode ? triggerNode : <Button label="Add Component" size="sm" variant="secondary" />}
+                {triggerNode ? triggerNode : <Button label="Add Connection" size="sm" variant="secondary" />}
             </PopoverTrigger>
 
             <PopoverContent align="end" className="min-w-property-code-editor-sheet-connections-sheet-width">
                 <header className="flex items-center justify-between">
-                    <span className="font-medium">Add Component</span>
+                    <span className="font-medium">Add Connection</span>
 
                     <PopoverClose asChild onClick={() => form.reset()}>
                         <XIcon aria-hidden="true" className="size-4 cursor-pointer" />
@@ -58,7 +61,10 @@ const PropertyCodeEditorDialogRightPanelConnectionsPopover = ({
                                 name="name"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Name</FormLabel>
+                                        <FormLabel className="gap-0">
+                                            Name
+                                            <RequiredMark />
+                                        </FormLabel>
 
                                         <FormControl>
                                             <Input {...field} />
@@ -75,7 +81,10 @@ const PropertyCodeEditorDialogRightPanelConnectionsPopover = ({
                                 name="componentName"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Component</FormLabel>
+                                        <FormLabel className="gap-0">
+                                            Component
+                                            <RequiredMark />
+                                        </FormLabel>
 
                                         <FormControl>
                                             {componentDefinitions && (

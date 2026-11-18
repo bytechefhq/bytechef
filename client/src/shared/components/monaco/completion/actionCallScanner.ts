@@ -22,6 +22,13 @@ export type ActionCallValueSlotType = {
     rootValues: Record<string, unknown>;
 };
 
+export type ActionCallConnectionSlotType = {
+    callStart: number;
+    calleeText: string;
+    prefix: string;
+    quote?: string;
+};
+
 type ScanResultType = {
     frames: FrameType[];
     openString?: {start: number; value: string};
@@ -65,6 +72,8 @@ const TRAILING_MEMBER_CHAIN = /[\w$.[\]'"]+$/;
 const NUMBER_LITERAL = /^-?\d+(\.\d+)?/;
 const PYTHON_CONNECTION_KEYWORD = /^\s*connection\s*=\s*(['"])([^'"\\\n]+)\1\s*$/;
 const PYTHON_INPUT_KEYWORD = /[(,]\s*input\s*=\s*$/;
+const PYTHON_CONNECTION_KEYWORD_PREFIX = /^\s*connection\s*=\s*$/;
+const BLANK = /^\s*$/;
 
 const LITERAL_IDENTIFIERS: Record<ScriptLanguageType, Record<string, unknown>> = {
     javascript: {false: false, null: null, true: true},
@@ -377,6 +386,7 @@ function scanActionCall(source: string, cursorOffset: number, language: ScriptLa
 
         if (top?.character === '(' && character === ',') {
             top.tokenCount++;
+            top.segmentStart = position + 1;
 
             position++;
 
@@ -434,6 +444,34 @@ function locateFirstArgument(frames: FrameType[]): FirstArgumentLocationType | u
     }
 
     return undefined;
+}
+
+export function findActionCallConnectionSlot(
+    source: string,
+    cursorOffset: number,
+    language: ScriptLanguageType
+): ActionCallConnectionSlotType | undefined {
+    const {frames, openString, text} = scanActionCall(source, cursorOffset, language);
+    const callFrame = frames[frames.length - 1];
+
+    if (callFrame?.character !== '(' || !callFrame.calleeText) {
+        return undefined;
+    }
+
+    const segment = text.slice(callFrame.segmentStart, openString ? openString.start : text.length);
+    const positional = callFrame.tokenCount === 1 && BLANK.test(segment);
+    const keyword = language === 'python' && PYTHON_CONNECTION_KEYWORD_PREFIX.test(segment);
+
+    if (!positional && !keyword) {
+        return undefined;
+    }
+
+    return {
+        callStart: callFrame.start,
+        calleeText: callFrame.calleeText,
+        prefix: openString ? openString.value : '',
+        ...(openString && {quote: text[openString.start]}),
+    };
 }
 
 export function findActionCallKeySlot(

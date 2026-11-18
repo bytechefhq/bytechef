@@ -1,6 +1,8 @@
 import {
+    type ActionCallConnectionSlotType,
     type ActionCallKeySlotType,
     type ActionCallValueSlotType,
+    findActionCallConnectionSlot,
     findActionCallKeySlot,
     findActionCallValueSlot,
     findConnectionNameArgument,
@@ -278,17 +280,17 @@ type ActionCallTargetType = {
     properties: Property[];
 };
 
-async function resolveActionCall(
+function resolveComponentCallee(
     request: ScriptCompletionRequestI,
-    slot: ActionCallKeySlotType | ActionCallValueSlotType
-): Promise<ActionCallTargetType | undefined> {
+    calleeText: string
+): {actionName: string; componentName: string} | undefined {
     const {context, cursorOffset, source} = request;
 
     if (context.kind === 'customComponent') {
         return undefined;
     }
 
-    const calleePath = parseMemberPath(slot.calleeText);
+    const calleePath = parseMemberPath(calleeText);
 
     if (!calleePath || calleePath.segments.length !== 3 || calleePath.segments[0] !== 'component') {
         return undefined;
@@ -301,6 +303,46 @@ async function resolveActionCall(
     }
 
     const [, componentName, actionName] = calleePath.segments;
+
+    return {actionName, componentName};
+}
+
+function connectionArgumentItems(
+    request: ScriptCompletionRequestI,
+    connectionSlot: ActionCallConnectionSlotType
+): CompletionItemDraftType[] | undefined {
+    const callee = resolveComponentCallee(request, connectionSlot.calleeText);
+
+    if (!callee) {
+        return undefined;
+    }
+
+    const {language} = request.context;
+
+    return declaredConnections(request)
+        .filter((connection) => connection.componentName === callee.componentName)
+        .map((connection) => ({
+            detail: 'connection',
+            insertAsSnippet: false,
+            insertText: scriptValueText(connection.name, language, connectionSlot.quote) ?? connection.name,
+            kind: 'value',
+            label: connection.name,
+            replaceLength: connectionSlot.prefix.length,
+        }));
+}
+
+async function resolveActionCall(
+    request: ScriptCompletionRequestI,
+    slot: ActionCallKeySlotType | ActionCallValueSlotType
+): Promise<ActionCallTargetType | undefined> {
+    const {context, source} = request;
+    const callee = resolveComponentCallee(request, slot.calleeText);
+
+    if (!callee || context.kind === 'customComponent') {
+        return undefined;
+    }
+
+    const {actionName, componentName} = callee;
     const componentConnections = declaredConnections(request).filter(
         (connection) => connection.componentName === componentName
     );
@@ -428,6 +470,16 @@ export async function getScriptCompletions(request: ScriptCompletionRequestI): P
 
 export async function getScriptCompletionResult(request: ScriptCompletionRequestI): Promise<ScriptCompletionResultI> {
     const {context, cursorOffset, source} = request;
+    const connectionSlot = findActionCallConnectionSlot(source, cursorOffset, context.language);
+
+    if (connectionSlot) {
+        const connectionNameItems = connectionArgumentItems(request, connectionSlot);
+
+        if (connectionNameItems) {
+            return {exclusive: connectionNameItems.length > 0, items: connectionNameItems};
+        }
+    }
+
     const keySlot = findActionCallKeySlot(source, cursorOffset, context.language);
 
     if (keySlot) {

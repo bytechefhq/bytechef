@@ -4,6 +4,8 @@ import {registerCompletionContext} from './completionContextRegistry';
 import {
     buildCompletionProvider,
     buildJavaScriptCompletionProvider,
+    buildJsonCompletionProvider,
+    disposeCompletionProviders,
     registerCompletionProviders,
 } from './registerCompletionProviders';
 
@@ -14,9 +16,18 @@ import type {
     Property,
     WorkflowNodeOutput,
 } from '@/shared/middleware/platform/configuration';
+import type {languages} from 'monaco-editor';
 
-const registerCompletionItemProvider = vi.fn(() => ({dispose: vi.fn()}));
+const disposeRegistration = vi.fn();
+const registerCompletionItemProvider = vi.fn(() => ({dispose: disposeRegistration}));
 const setModeConfiguration = vi.fn();
+const setJsonModeConfiguration = vi.fn();
+
+vi.mock('monaco-editor/languages/features/common/lspLanguageFeatures.js', () => ({
+    CompletionAdapter: class {
+        provideCompletionItems = vi.fn();
+    },
+}));
 const getCompletionsAtPosition = vi.fn();
 
 const fakeMonaco = {
@@ -27,6 +38,13 @@ const fakeMonaco = {
             public endLineNumber: number,
             public endColumn: number
         ) {}
+    },
+    json: {
+        getWorker: async () => async () => ({}),
+        jsonDefaults: {
+            modeConfiguration: {completionItems: true, hovers: true},
+            setModeConfiguration: setJsonModeConfiguration,
+        },
     },
     languages: {
         CompletionItemInsertTextRule: {InsertAsSnippet: 4},
@@ -56,6 +74,21 @@ describe('registerCompletionProviders', () => {
             'yaml',
         ]);
         expect(setModeConfiguration).toHaveBeenCalledWith({completionItems: false, hovers: true});
+        expect(setJsonModeConfiguration).toHaveBeenCalledWith({completionItems: false, hovers: true});
+    });
+
+    it('unregisters its providers when disposed, so a hot-reloaded module does not register them twice', () => {
+        registerCompletionProviders(fakeMonaco);
+        registerCompletionItemProvider.mockClear();
+        disposeRegistration.mockClear();
+
+        disposeCompletionProviders();
+
+        expect(disposeRegistration).toHaveBeenCalledTimes(6);
+
+        registerCompletionProviders(fakeMonaco);
+
+        expect(registerCompletionItemProvider).toHaveBeenCalledTimes(6);
     });
 });
 
@@ -181,7 +214,7 @@ describe('buildCompletionProvider', () => {
     });
 
     it('returns shell suggestions for a model registered as a shell script', async () => {
-        registerCompletionContext('inmemory://shell', {env: ['API_TOKEN'], input: {}, kind: 'shell'});
+        registerCompletionContext('inmemory://shell', {connections: [], env: ['API_TOKEN'], input: {}, kind: 'shell'});
 
         const provider = buildCompletionProvider(fakeMonaco);
 
@@ -392,5 +425,57 @@ describe('buildCompletionProvider', () => {
                 range: {endColumn: line.length + 1, startColumn: line.length + 1 - 'application/js'.length},
             });
         });
+    });
+});
+
+describe('buildJsonCompletionProvider', () => {
+    const languageServiceItem = {insertText: 'numberMaxValue', label: 'numberMaxValue'};
+    const languageServiceProvider = {
+        provideCompletionItems: vi.fn(async () => ({suggestions: [languageServiceItem]})),
+    } as unknown as languages.CompletionItemProvider;
+
+    const modelOf = (uri: string, source: string) => ({
+        getLineContent: () => source,
+        getOffsetAt: () => source.length,
+        getValue: () => source,
+        uri: {toString: () => uri},
+    });
+
+    const complete = (uri: string, source: string) =>
+        buildJsonCompletionProvider(fakeMonaco, languageServiceProvider).provideCompletionItems(
+            modelOf(uri, source) as never,
+            {column: source.length + 1, lineNumber: 1} as never,
+            {} as never,
+            {} as never
+        );
+
+    it('leaves the JSON language service out of a workflow definition', async () => {
+        const uri = 'inmemory://workflow-definition-json';
+
+        registerCompletionContext(uri, {
+            components: {
+                components: [],
+                getConnectionDefinition: vi.fn(),
+                getDefinition: vi.fn(),
+                getDisplayConditions: vi.fn(async () => ({})),
+                getOperationProperties: vi.fn(async () => []),
+            },
+            format: 'json',
+            functions: [],
+            getNodeOutputs: vi.fn(async () => []),
+            kind: 'workflowDefinition',
+        });
+
+        const result = await complete(uri, '{"');
+
+        expect(result?.suggestions.map((suggestion) => suggestion.label)).toContain('tasks');
+        expect(result?.suggestions.map((suggestion) => suggestion.label)).not.toContain('numberMaxValue');
+        expect(languageServiceProvider.provideCompletionItems).not.toHaveBeenCalled();
+    });
+
+    it('keeps the JSON language service in other JSON editors', async () => {
+        const result = await complete('file:///bytechef/json-schema/editor.json', '{"');
+
+        expect(result?.suggestions).toEqual([languageServiceItem]);
     });
 });

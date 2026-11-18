@@ -18,11 +18,13 @@ import {useShallow} from 'zustand/react/shallow';
 import {usePropertyCodeEditorDialogStore} from './stores/usePropertyCodeEditorDialogStore';
 
 interface PropertyCodeEditorDialogConnectionsSheetRightPanelProps {
+    language: string;
     workflow: Workflow;
     workflowNodeName: string;
 }
 
 const PropertyCodeEditorDialogRightPanel = ({
+    language,
     workflow,
     workflowNodeName,
 }: PropertyCodeEditorDialogConnectionsSheetRightPanelProps) => {
@@ -137,6 +139,7 @@ const PropertyCodeEditorDialogRightPanel = ({
             <ResizablePanel className="overflow-auto rounded-lg bg-surface-neutral-primary" minSize={120}>
                 <PropertyCodeEditorDialogRightPanelConnections
                     componentConnections={componentConnections}
+                    language={language}
                     workflow={workflow}
                     workflowNodeName={workflowNodeName}
                 />

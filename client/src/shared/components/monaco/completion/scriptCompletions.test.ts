@@ -691,6 +691,35 @@ describe('getScriptCompletionResult', () => {
         expect(await resultAt(`${head}inp`)).toEqual({exclusive: false, items: []});
     });
 
+    it('offers the connections of the called component as its second argument', async () => {
+        const connectionContext: ScriptCompletionContextI = {
+            ...context,
+            connections: [
+                {componentName: 'slack', componentVersion: 1, name: 'slack_work'},
+                {componentName: 'googleMaps', componentVersion: 1, name: 'gm'},
+                {componentName: 'slack', componentVersion: 1, name: "o'brien"},
+            ],
+        };
+        const connectionResultAt = (source: string) =>
+            getScriptCompletionResult({context: connectionContext, cursorOffset: source.length, source});
+
+        const quoted = await connectionResultAt(`${head}context.component.slack.send({text: 'hi'}, 'sl`);
+
+        expect(quoted.exclusive).toBe(true);
+        expect(quoted.items).toEqual([
+            expect.objectContaining({insertText: 'slack_work', label: 'slack_work', replaceLength: 2}),
+            expect.objectContaining({insertText: "o\\'brien", label: "o'brien", replaceLength: 2}),
+        ]);
+
+        const bare = await connectionResultAt(`${head}context.component.slack.send({text: 'hi'}, `);
+
+        expect(bare.items.map((item) => item.insertText)).toEqual(["'slack_work'", "'o\\'brien'"]);
+    });
+
+    it('offers no connections outside a component action call', async () => {
+        expect(await resultAt(`${head}console.log({}, '`)).toEqual({exclusive: false, items: []});
+    });
+
     it('does not claim a member path it has nothing for', async () => {
         expect(await resultAt(`${head}JSON.`)).toEqual({exclusive: false, items: []});
     });

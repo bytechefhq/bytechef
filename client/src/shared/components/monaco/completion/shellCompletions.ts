@@ -1,4 +1,4 @@
-import type {ShellCompletionContextI} from './completionTypes';
+import type {ConnectionDeclarationType, ShellCompletionContextI} from './completionTypes';
 import type {CompletionItemDraftType} from './scriptCompletions';
 
 export interface ShellCompletionRequestI {
@@ -149,6 +149,37 @@ function inputItems(
     }));
 }
 
+function escapeSnippetText(text: string): string {
+    return text.replace(/[\\$}]/g, (character) => `\\${character}`);
+}
+
+function getConnectionFilter(connectionName: string): string {
+    return escapeSnippetText(VARIABLE_NAME.test(connectionName) ? `.${connectionName}` : `.["${connectionName}"]`);
+}
+
+function connectionItems(
+    connections: ConnectionDeclarationType[],
+    typed: string,
+    inDoubleQuotes: boolean
+): CompletionItemDraftType[] {
+    return connections.map((connection) => {
+        const readCommand = `jq -r '${getConnectionFilter(connection.name)}.\${1:parameter}' "\\$BYTECHEF_CONNECTIONS_FILE"`;
+
+        return {
+            detail: `Connection (${connection.componentName})`,
+            documentation:
+                `Reads a parameter of the "${connection.name}" connection from $BYTECHEF_CONNECTIONS_FILE, the JSON ` +
+                "file that holds each connection's parameters by name. Needs jq in the runner image.",
+            filterText: `connection.${connection.name}`,
+            insertAsSnippet: true,
+            insertText: inDoubleQuotes ? `\\$(${readCommand})` : readCommand,
+            kind: 'property',
+            label: `connection.${connection.name}`,
+            replaceLength: typed.length,
+        };
+    });
+}
+
 function writeOutputItem(typed: string): CompletionItemDraftType {
     return {
         detail: 'Return vars',
@@ -189,8 +220,12 @@ export function getShellCompletions({
     const typed = WORD_BEFORE_CURSOR.exec(linePrefix)?.[0] ?? '';
 
     if (inDoubleQuotes) {
-        return inputItems(context, typed, true);
+        return [...inputItems(context, typed, true), ...connectionItems(context.connections, typed, true)];
     }
 
-    return [...inputItems(context, typed, false), writeOutputItem(typed)];
+    return [
+        ...inputItems(context, typed, false),
+        ...connectionItems(context.connections, typed, false),
+        writeOutputItem(typed),
+    ];
 }

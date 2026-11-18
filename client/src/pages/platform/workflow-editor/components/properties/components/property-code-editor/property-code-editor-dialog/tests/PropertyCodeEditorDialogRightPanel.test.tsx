@@ -57,6 +57,7 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
 
 describe('PropertyCodeEditorDialogRightPanel', () => {
     const defaultProps = {
+        language: 'javascript',
         workflow: {
             definition: '{}',
             id: 'workflow-1',

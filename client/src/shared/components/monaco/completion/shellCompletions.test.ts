@@ -5,6 +5,7 @@ import {getShellCompletions} from './shellCompletions';
 import type {ShellCompletionContextI} from './completionTypes';
 
 const context: ShellCompletionContextI = {
+    connections: [],
     env: ['API_TOKEN', 'not-a-name'],
     input: {channel: '#general', "it's": 1, 'max items': 5},
     kind: 'shell',
@@ -97,6 +98,53 @@ describe('getShellCompletions', () => {
 
             expect(items.map((item) => item.label)).toEqual(['input.channel']);
             expect(items[0]).toMatchObject({insertText: '$INPUT_channel', replaceLength: 'input.ch'.length});
+        });
+
+        it('offers to read each connection from the connections file', () => {
+            const items = getShellCompletions({
+                context: {...context, connections: [{componentName: 'slack', componentVersion: 1, name: 'slack'}]},
+                cursorOffset: 'token=conn'.length,
+                source: 'token=conn',
+            });
+
+            const connectionItem = items.find((item) => item.label === 'connection.slack');
+
+            expect(connectionItem).toMatchObject({
+                detail: 'Connection (slack)',
+                insertAsSnippet: true,
+                insertText: `jq -r '.slack.\${1:parameter}' "\\$BYTECHEF_CONNECTIONS_FILE"`,
+                replaceLength: 'conn'.length,
+            });
+        });
+
+        it('wraps the connection read in a command substitution inside double quotes', () => {
+            const source = 'curl -H "Authorization: Bearer conn';
+
+            const items = getShellCompletions({
+                context: {...context, connections: [{componentName: 'slack', componentVersion: 1, name: 'slack'}]},
+                cursorOffset: source.length,
+                source,
+            });
+
+            const connectionItem = items.find((item) => item.label === 'connection.slack');
+
+            expect(connectionItem?.insertText).toBe(
+                `\\$(jq -r '.slack.\${1:parameter}' "\\$BYTECHEF_CONNECTIONS_FILE")`
+            );
+        });
+
+        it('quotes a connection name that is not a jq identifier and escapes it for the snippet', () => {
+            const items = getShellCompletions({
+                context: {...context, connections: [{componentName: 'http', componentVersion: 1, name: 'my-$api'}]},
+                cursorOffset: 0,
+                source: '',
+            });
+
+            const connectionItem = items.find((item) => item.label === 'connection.my-$api');
+
+            expect(connectionItem?.insertText).toBe(
+                `jq -r '.["my-\\$api"].\${1:parameter}' "\\$BYTECHEF_CONNECTIONS_FILE"`
+            );
         });
 
         it('writes output.json under the output directory without extra tools', () => {

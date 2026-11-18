@@ -1,3 +1,5 @@
+import {CompletionAdapter} from 'monaco-editor/languages/features/common/lspLanguageFeatures.js';
+
 import {getCompletionContext} from './completionContextRegistry';
 import {
     getLanguageServiceCompletionItems,
@@ -8,7 +10,7 @@ import {type CompletionItemDraftType, getScriptCompletionResult} from './scriptC
 import {getShellCompletions} from './shellCompletions';
 import {getWorkflowDefinitionCompletions} from './workflowDefinitionCompletions';
 
-import type {Position, editor, languages} from 'monaco-editor';
+import type {IDisposable, Position, editor, languages} from 'monaco-editor';
 
 export const COMPLETION_LANGUAGES = ['javascript', 'python', 'ruby', 'shell', 'json', 'yaml'] as const;
 
@@ -20,7 +22,9 @@ const LANGUAGE_SERVICE_TRIGGER_CHARACTER = '.';
 
 const TRIGGER_CHARACTERS = ['.', '{', '$', "'", '"', '/'];
 
-let completionProvidersRegistered = false;
+const JSON_LANGUAGE_SERVICE_TRIGGER_CHARACTERS = [' ', ':', '"'];
+
+let completionProviderRegistrations: IDisposable[] | undefined;
 
 function toCompletionItemKind(monaco: MonacoType, kind: CompletionItemDraftType['kind']): languages.CompletionItemKind {
     const kinds = monaco.languages.CompletionItemKind;
@@ -163,24 +167,67 @@ export function buildJavaScriptCompletionProvider(monaco: MonacoType): languages
     };
 }
 
+export function disposeCompletionProviders(): void {
+    completionProviderRegistrations?.forEach((registration) => registration.dispose());
+
+    completionProviderRegistrations = undefined;
+}
+
+export function buildJsonCompletionProvider(
+    monaco: MonacoType,
+    languageServiceProvider: languages.CompletionItemProvider
+): languages.CompletionItemProvider {
+    return {
+        async provideCompletionItems(model, position, completionContext, token) {
+            const {suggestions} = await provideByteChefCompletions(monaco, model, position);
+
+            if (getCompletionContext(model.uri.toString())?.kind === 'workflowDefinition') {
+                return {suggestions};
+            }
+
+            try {
+                const languageServiceCompletions = await languageServiceProvider.provideCompletionItems(
+                    model,
+                    position,
+                    completionContext,
+                    token
+                );
+
+                return {suggestions: [...suggestions, ...(languageServiceCompletions?.suggestions ?? [])]};
+            } catch (error) {
+                console.error('JSON language service completion failed', error);
+
+                return {suggestions};
+            }
+        },
+        triggerCharacters: [...new Set([...TRIGGER_CHARACTERS, ...JSON_LANGUAGE_SERVICE_TRIGGER_CHARACTERS])],
+    };
+}
+
 export function registerCompletionProviders(monaco: MonacoType): void {
-    if (completionProvidersRegistered) {
+    if (completionProviderRegistrations) {
         return;
     }
 
-    completionProvidersRegistered = true;
-
     const {javascriptDefaults} = monaco.typescript;
+    const {jsonDefaults} = monaco.json;
 
     javascriptDefaults.setModeConfiguration({...javascriptDefaults.modeConfiguration, completionItems: false});
+    jsonDefaults.setModeConfiguration({...jsonDefaults.modeConfiguration, completionItems: false});
 
+    const jsonLanguageServiceProvider = new CompletionAdapter(
+        async (...uris) => (await monaco.json.getWorker())(...uris),
+        JSON_LANGUAGE_SERVICE_TRIGGER_CHARACTERS
+    );
+    const providers: Partial<Record<(typeof COMPLETION_LANGUAGES)[number], languages.CompletionItemProvider>> = {
+        javascript: buildJavaScriptCompletionProvider(monaco),
+        json: buildJsonCompletionProvider(monaco, jsonLanguageServiceProvider),
+    };
     const provider = buildCompletionProvider(monaco);
-    const javaScriptProvider = buildJavaScriptCompletionProvider(monaco);
 
-    COMPLETION_LANGUAGES.forEach((language) => {
-        monaco.languages.registerCompletionItemProvider(
-            language,
-            language === 'javascript' ? javaScriptProvider : provider
-        );
-    });
+    completionProviderRegistrations = COMPLETION_LANGUAGES.map((language) =>
+        monaco.languages.registerCompletionItemProvider(language, providers[language] ?? provider)
+    );
 }
+
+import.meta.hot?.dispose(disposeCompletionProviders);

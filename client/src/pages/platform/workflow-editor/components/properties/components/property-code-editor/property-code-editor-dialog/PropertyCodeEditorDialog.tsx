@@ -104,6 +104,7 @@ const PropertyCodeEditorDialog = ({
                                             minSize={280}
                                         >
                                             <PropertyCodeEditorDialogRightPanel
+                                                language={language}
                                                 workflow={workflow}
                                                 workflowNodeName={workflowNodeName}
                                             />

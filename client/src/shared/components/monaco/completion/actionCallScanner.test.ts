@@ -1,6 +1,11 @@
 import {describe, expect, it} from 'vitest';
 
-import {findActionCallKeySlot, findActionCallValueSlot, findConnectionNameArgument} from './actionCallScanner';
+import {
+    findActionCallConnectionSlot,
+    findActionCallKeySlot,
+    findActionCallValueSlot,
+    findConnectionNameArgument,
+} from './actionCallScanner';
 
 const at = (source: string, language: 'javascript' | 'python' | 'ruby' = 'javascript') =>
     findActionCallKeySlot(source, source.length, language);
@@ -217,5 +222,35 @@ describe('findConnectionNameArgument', () => {
 
         expect(findConnectionNameArgument(withoutName, withoutName.indexOf('({') + 1, 'javascript')).toBeUndefined();
         expect(findConnectionNameArgument(withVariable, withVariable.indexOf('({') + 1, 'javascript')).toBeUndefined();
+    });
+});
+
+describe('findActionCallConnectionSlot', () => {
+    const connectionSlotAt = (source: string, language: 'javascript' | 'python' | 'ruby' = 'javascript') =>
+        findActionCallConnectionSlot(source, source.length, language);
+
+    it('finds the second argument after an object literal, inside or before its quote', () => {
+        expect(connectionSlotAt("context.component.slack.send({text: '}', blocks: [1, 2]}, 'sla")).toEqual({
+            callStart: 28,
+            calleeText: 'context.component.slack.send',
+            prefix: 'sla',
+            quote: "'",
+        });
+        expect(connectionSlotAt('context.component.slack.send({text: 1}, ')).toMatchObject({prefix: ''});
+        expect(connectionSlotAt('context.component.slack.send({text: 1}, ')?.quote).toBeUndefined();
+    });
+
+    it('finds a Python connection keyword argument', () => {
+        expect(connectionSlotAt("context.component.gmail.send_email(input={}, connection='gm", 'python')).toMatchObject(
+            {calleeText: 'context.component.gmail.send_email', prefix: 'gm', quote: "'"}
+        );
+        expect(connectionSlotAt("context.component.gmail.send_email(connection='", 'javascript')).toBeUndefined();
+    });
+
+    it('ignores the first argument, later arguments and text after the comma', () => {
+        expect(connectionSlotAt("context.component.slack.send('")).toBeUndefined();
+        expect(connectionSlotAt("context.component.slack.send({}, 'slack_work', '")).toBeUndefined();
+        expect(connectionSlotAt('context.component.slack.send({}, name')).toBeUndefined();
+        expect(connectionSlotAt("context.component.slack.send({}, {text: '")).toBeUndefined();
     });
 });

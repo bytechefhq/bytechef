@@ -217,7 +217,8 @@ describe('PropertyCodeEditorDialogEditor', () => {
             expect(getCompletionContext('inmemory://test')).toMatchObject({kind: 'script', language: 'javascript'});
         });
 
-        it('registers a shell completion context with the task environment and input', async () => {
+        it('registers a shell completion context with the task connections, environment and input', async () => {
+            hoisted.storeState.componentConnections = [{componentName: 'slack', componentVersion: 1, name: 'slack'}];
             hoisted.storeState.scriptInput = {channel: '#general'};
 
             useWorkflowNodeDetailsPanelStore.setState({
@@ -235,6 +236,7 @@ describe('PropertyCodeEditorDialogEditor', () => {
             await mountEditor();
 
             expect(getCompletionContext('inmemory://test')).toEqual({
+                connections: [{componentName: 'slack', componentVersion: 1, name: 'slack'}],
                 env: ['API_TOKEN', 'REGION'],
                 input: {channel: '#general'},
                 kind: 'shell',
