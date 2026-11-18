@@ -16,8 +16,14 @@
 
 package com.bytechef.platform.component.polyglot;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import org.graalvm.polyglot.Value;
+import org.graalvm.polyglot.proxy.ProxyArray;
+import org.graalvm.polyglot.proxy.ProxyExecutable;
 import org.graalvm.polyglot.proxy.ProxyObject;
 
 /**
@@ -26,16 +32,23 @@ import org.graalvm.polyglot.proxy.ProxyObject;
  */
 public final class ContextProxyObject implements ProxyObject {
 
+    private static final List<String> CONTEXT_MEMBER_KEYS = List.of("component", "log");
+    private static final List<String> LOG_LEVELS = List.of("trace", "debug", "info", "warn", "error");
+
     private final String languageId;
     private final ComponentActionInvoker componentActionInvoker;
     private final ComponentCatalog componentCatalog;
+    private final ContextLogWriter contextLogWriter;
 
+    @SuppressFBWarnings("EI")
     public ContextProxyObject(
-        String languageId, ComponentActionInvoker componentActionInvoker, ComponentCatalog componentCatalog) {
+        String languageId, ComponentActionInvoker componentActionInvoker, ComponentCatalog componentCatalog,
+        ContextLogWriter contextLogWriter) {
 
         this.languageId = languageId;
         this.componentActionInvoker = componentActionInvoker;
         this.componentCatalog = componentCatalog;
+        this.contextLogWriter = contextLogWriter;
     }
 
     @Override
@@ -44,22 +57,60 @@ public final class ContextProxyObject implements ProxyObject {
             return new ComponentProxyObject(languageId, componentActionInvoker, componentCatalog);
         }
 
+        if (Objects.equals(name, "log")) {
+            return (ProxyExecutable) this::log;
+        }
+
         return null;
     }
 
     @Override
     public Object getMemberKeys() {
-        throw new UnsupportedOperationException();
+        return ProxyArray.fromList(new ArrayList<>(CONTEXT_MEMBER_KEYS));
     }
 
     @Override
     public boolean hasMember(String name) {
-        return Objects.equals(name, "component");
+        return CONTEXT_MEMBER_KEYS.contains(name);
     }
 
     @Override
     public void putMember(String key, Value value) {
         throw new UnsupportedOperationException();
+    }
+
+    private static String toLogLevel(Value levelValue) {
+        String level = levelValue.isString() ? levelValue.asString() : String.valueOf(levelValue);
+
+        String normalizedLevel = level.toLowerCase(Locale.ROOT);
+
+        if (!LOG_LEVELS.contains(normalizedLevel)) {
+            throw new IllegalArgumentException(
+                "Unknown log level '%s', valid levels are: %s".formatted(level, String.join(", ", LOG_LEVELS)));
+        }
+
+        return normalizedLevel;
+    }
+
+    private static String toLogMessage(Value messageValue) {
+        if (messageValue.isString()) {
+            return messageValue.asString();
+        }
+
+        return String.valueOf(messageValue);
+    }
+
+    private Object log(Value... arguments) {
+        if (arguments.length < 2) {
+            throw new IllegalArgumentException("context.log requires a level and a message");
+        }
+
+        String level = toLogLevel(arguments[0]);
+        String message = toLogMessage(arguments[1]);
+
+        contextLogWriter.write(level, message);
+
+        return null;
     }
 
     public String languageId() {
@@ -83,12 +134,13 @@ public final class ContextProxyObject implements ProxyObject {
         var that = (ContextProxyObject) obj;
         return Objects.equals(this.languageId, that.languageId) &&
             Objects.equals(this.componentActionInvoker, that.componentActionInvoker) &&
-            Objects.equals(this.componentCatalog, that.componentCatalog);
+            Objects.equals(this.componentCatalog, that.componentCatalog) &&
+            Objects.equals(this.contextLogWriter, that.contextLogWriter);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(languageId, componentActionInvoker, componentCatalog);
+        return Objects.hash(languageId, componentActionInvoker, componentCatalog, contextLogWriter);
     }
 
     @Override
