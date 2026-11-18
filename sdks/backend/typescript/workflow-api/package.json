@@ -1,0 +1,37 @@
+{
+    "name": "@bytechef/workflow-api",
+    "version": "0.1.0",
+    "description": "TypeScript type definitions for ByteChef script code workflows.",
+    "type": "module",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "check:examples": "npm run build && npm --prefix examples install --no-audit --no-fund && npm --prefix examples run check"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/bytechefhq/bytechef.git",
+        "directory": "sdks/backend/typescript/workflow-api"
+    },
+    "keywords": [
+        "bytechef",
+        "code-workflow",
+        "workflow",
+        "types"
+    ],
+    "devDependencies": {
+        "typescript": "^5.9.3"
+    }
+}

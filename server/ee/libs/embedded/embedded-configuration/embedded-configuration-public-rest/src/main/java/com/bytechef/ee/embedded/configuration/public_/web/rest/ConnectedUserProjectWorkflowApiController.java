@@ -12,6 +12,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.exception.AutomationTemplateNotVisibleException;
+import com.bytechef.ee.embedded.configuration.exception.CodeWorkflowNotCopyableException;
 import com.bytechef.ee.embedded.configuration.exception.ConnectionNotEntitledException;
 import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
@@ -504,6 +505,14 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         MissingConnectionException missingConnectionException) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
             .body(Map.of("missingConnectionComponentName", missingConnectionException.getComponentName()));
+    }
+
+    @ExceptionHandler(CodeWorkflowNotCopyableException.class)
+    public ResponseEntity<Object> handleCodeWorkflowNotCopyableException(
+        CodeWorkflowNotCopyableException codeWorkflowNotCopyableException) {
+
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+            .body(Map.of("reason", "CODE_WORKFLOW_NOT_COPYABLE"));
     }
 
     @ExceptionHandler(ConnectionNotEntitledException.class)
