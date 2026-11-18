@@ -28,8 +28,12 @@ import com.bytechef.platform.githubproxy.client.OAuthAppProxyClient;
 import com.bytechef.platform.githubproxy.client.model.OAuthApp;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
@@ -153,6 +157,54 @@ class RemoteOAuth2AppsTest {
         verify(oAuthAppProxyClient, times(2)).getOAuthApps();
     }
 
+    @Test
+    void testStaleCopyIsServedWhileRefreshIsInFlight() throws InterruptedException {
+        CountDownLatch fetchStarted = new CountDownLatch(1);
+        CountDownLatch releaseFetch = new CountDownLatch(1);
+        AtomicReference<Map<String, OAuth2App>> refreshingResult = new AtomicReference<>();
+
+        when(oAuthAppProxyClient.getOAuthApps())
+            .thenReturn(Map.of("a", new OAuthApp("id", "secret")))
+            .thenAnswer(
+                invocation -> {
+                    fetchStarted.countDown();
+
+                    if (!releaseFetch.await(30, TimeUnit.SECONDS)) {
+                        throw new IllegalStateException("not released");
+                    }
+
+                    return Map.of("b", new OAuthApp("id2", "secret2"));
+                });
+
+        RemoteOAuth2Apps remoteOAuth2Apps = new RemoteOAuth2Apps(objectProvider, clock);
+
+        remoteOAuth2Apps.getOAuth2Apps();
+
+        clock.advanceSeconds(301);
+
+        Thread refreshingThread = new Thread(() -> refreshingResult.set(remoteOAuth2Apps.getOAuth2Apps()));
+
+        refreshingThread.start();
+
+        assertThat(fetchStarted.await(10, TimeUnit.SECONDS)).isTrue();
+
+        AtomicReference<Map<String, OAuth2App>> concurrentResult = new AtomicReference<>();
+        Thread concurrentThread = new Thread(() -> concurrentResult.set(remoteOAuth2Apps.getOAuth2Apps()));
+
+        concurrentThread.start();
+        concurrentThread.join(5000);
+
+        assertThat(concurrentThread.isAlive()).isFalse();
+        assertThat(concurrentResult.get()).containsOnlyKeys("a");
+
+        releaseFetch.countDown();
+
+        refreshingThread.join(10000);
+
+        assertThat(refreshingThread.isAlive()).isFalse();
+        assertThat(refreshingResult.get()).containsOnlyKeys("b");
+    }
+
     private static HttpClientErrorException unauthorized() {
         return HttpClientErrorException.create(
             HttpStatus.UNAUTHORIZED, "Unauthorized", HttpHeaders.EMPTY, new byte[0], null);
@@ -172,7 +224,7 @@ class RemoteOAuth2AppsTest {
         }
 
         @Override
-        public Clock withZone(java.time.ZoneId zone) {
+        public Clock withZone(ZoneId zone) {
             return this;
         }
 

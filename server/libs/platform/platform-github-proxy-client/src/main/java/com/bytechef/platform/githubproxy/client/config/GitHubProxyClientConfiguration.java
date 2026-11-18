@@ -64,7 +64,7 @@ class GitHubProxyClientConfiguration {
     @ConditionalOnExpression("!'${github-proxy.oauth-apps-api-key:}'.isBlank()")
     OAuthAppProxyClient oAuthAppProxyClient(GitHubProxyClientProperties properties) {
         HttpClient httpClient = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(30))
+            .connectTimeout(Duration.ofSeconds(5))
             .followRedirects(HttpClient.Redirect.NEVER)
             .build();
 

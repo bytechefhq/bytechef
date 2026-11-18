@@ -48,10 +48,17 @@ public class OAuth2ServiceImpl implements OAuth2Service {
         Map<String, Object> newParameters = new HashMap<>(parameters);
 
         if (StringUtils.isBlank(MapUtils.getString(parameters, Authorization.CLIENT_ID))) {
-            Map<String, OAuth2App> oAuth2AppMap = getEffectiveApps();
+            Map<String, OAuth2App> yamlApps = oauth2.getPredefinedApps();
 
-            if (oAuth2AppMap.containsKey(componentName)) {
-                OAuth2App oAuth2App = oAuth2AppMap.get(componentName);
+            OAuth2App oAuth2App = yamlApps.get(componentName);
+
+            if (oAuth2App == null) {
+                Map<String, OAuth2App> remoteApps = remoteOAuth2Apps.getOAuth2Apps();
+
+                oAuth2App = remoteApps.get(componentName);
+            }
+
+            if (oAuth2App != null) {
 
                 newParameters.putAll(
                     Map.of(
@@ -83,15 +90,5 @@ public class OAuth2ServiceImpl implements OAuth2Service {
                 .toList());
 
         return List.copyOf(names);
-    }
-
-    private Map<String, OAuth2App> getEffectiveApps() {
-        Map<String, OAuth2App> remoteApps = remoteOAuth2Apps.getOAuth2Apps();
-
-        Map<String, OAuth2App> apps = new HashMap<>(remoteApps);
-
-        apps.putAll(oauth2.getPredefinedApps());
-
-        return apps;
     }
 }
