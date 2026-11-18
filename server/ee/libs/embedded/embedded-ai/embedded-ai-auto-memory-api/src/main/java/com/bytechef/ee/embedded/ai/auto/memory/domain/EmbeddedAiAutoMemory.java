@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.ai.auto.memory.domain;
 
 import com.bytechef.platform.ai.auto.memory.AiAutoMemory;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -18,6 +19,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("EI")
 public record EmbeddedAiAutoMemory(
     AiAutoMemory memory, @Nullable Long connectedUserId, @Nullable String connectedUserName,
     @Nullable String connectedUserEmail, @Nullable String connectedUserExternalId, @Nullable Long integrationId,
