@@ -1,12 +1,13 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import AutomationEditorHeader from '@/ee/pages/embedded/automation/components/automation-editor/AutomationEditorHeader';
 import {useAutomationEditorSidebarStore} from '@/ee/pages/embedded/automation/components/automation-editor/stores/useAutomationEditorSidebarStore';
+import useCodeWorkflowHeaderStore from '@/pages/platform/code-workflow/stores/useCodeWorkflowHeaderStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {act, render, screen, userEvent, waitFor, within} from '@/shared/util/test-utils';
-import {onlineManager} from '@tanstack/react-query';
+import {QueryClient, onlineManager} from '@tanstack/react-query';
 import {MemoryRouter} from 'react-router-dom';
-import {afterEach, beforeEach, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
     configurationDialogProps: vi.fn(),
@@ -387,8 +388,8 @@ it('hides the project Duplicate action for a code project', async () => {
     renderAutomationEditorHeader();
 
     await userEvent.click(screen.getByLabelText('Settings'));
-    await userEvent.click(screen.getByLabelText('Project tab'));
 
+    expect(screen.queryByLabelText('Project tab')).not.toBeInTheDocument();
     expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
     expect(screen.queryByRole('menuitem', {name: 'Duplicate'})).not.toBeInTheDocument();
 });
@@ -554,6 +555,46 @@ it('closes the delete project dialog once the deletion settles', async () => {
     expect(hoisted.navigate).toHaveBeenCalledWith('/embedded/automations');
 });
 
+it('leaves the deleted project before refreshing the automations so its queries are not fetched again', async () => {
+    let resolveNavigation: () => void = () => {};
+
+    hoisted.navigate.mockReturnValue(
+        new Promise<void>((resolve) => {
+            resolveNavigation = resolve;
+        })
+    );
+
+    const invalidateQueriesSpy = vi.spyOn(QueryClient.prototype, 'invalidateQueries');
+
+    renderAutomationEditorHeader();
+
+    await userEvent.click(screen.getByLabelText('Settings'));
+    await userEvent.click(screen.getByLabelText('Project tab'));
+    await userEvent.click(screen.getByRole('menuitem', {name: 'Delete'}));
+    await userEvent.click(await screen.findByRole('button', {name: 'Confirm Project Deletion'}));
+
+    const [, mutationOptions] = hoisted.deleteProjectMutation.mutate.mock.calls[0];
+
+    let deletion: Promise<void> = Promise.resolve();
+
+    act(() => {
+        deletion = mutationOptions.onSuccess();
+    });
+
+    expect(hoisted.navigate).toHaveBeenCalledWith('/embedded/automations');
+    expect(invalidateQueriesSpy).not.toHaveBeenCalledWith({queryKey: ['automationProjects']});
+
+    await act(async () => {
+        resolveNavigation();
+
+        await deletion;
+    });
+
+    expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['automationProjects']});
+
+    invalidateQueriesSpy.mockRestore();
+});
+
 it('opens the project version history sheet with the restore handler for the current workflow', async () => {
     renderAutomationEditorHeader();
 
@@ -575,4 +616,36 @@ it('opens the project version history sheet with the restore handler for the cur
     await userEvent.click(screen.getByRole('menuitem', {name: 'Project History'}));
 
     expect(hoisted.versionHistorySheetProps).toHaveBeenLastCalledWith(expect.objectContaining({open: true}));
+});
+
+describe('code workflow project', () => {
+    const codeProject = {...mockProject, codeWorkflowDraftPublishable: true, codeWorkflowProject: true};
+
+    beforeEach(() => {
+        hoisted.project.current = codeProject as typeof mockProject;
+
+        useCodeWorkflowHeaderStore.getState().reset();
+    });
+
+    it('enables Publish when the draft is publishable and saved', () => {
+        renderAutomationEditorHeader();
+
+        expect(screen.getByRole('button', {name: 'Publish'})).toBeEnabled();
+    });
+
+    it('disables Publish while the source has unsaved edits', () => {
+        useCodeWorkflowHeaderStore.setState({dirty: true});
+
+        renderAutomationEditorHeader();
+
+        expect(screen.getByRole('button', {name: 'Publish'})).toBeDisabled();
+    });
+
+    it('disables Publish when the draft has no source of its own to publish', () => {
+        hoisted.project.current = {...codeProject, codeWorkflowDraftPublishable: false} as typeof mockProject;
+
+        renderAutomationEditorHeader();
+
+        expect(screen.getByRole('button', {name: 'Publish'})).toBeDisabled();
+    });
 });

@@ -2,12 +2,14 @@ import {DropdownMenuItem, DropdownMenuSeparator} from '@/components/DropdownMenu
 import {EditIcon, HistoryIcon, PlusIcon, Trash2Icon, UploadIcon} from 'lucide-react';
 
 const IntegrationTabButtons = ({
+    codeWorkflow = false,
     onDeleteIntegrationClick,
     onImportWorkflowClick,
     onNewWorkflowClick,
     onShowEditIntegrationDialogClick,
     onShowIntegrationVersionHistorySheet,
 }: {
+    codeWorkflow?: boolean;
     onDeleteIntegrationClick: () => void;
     onImportWorkflowClick: () => void;
     onNewWorkflowClick: () => void;
@@ -17,11 +19,15 @@ const IntegrationTabButtons = ({
     <>
         <DropdownMenuItem icon={<EditIcon />} label="Edit" onSelect={onShowEditIntegrationDialogClick} />
 
-        <DropdownMenuSeparator />
+        {!codeWorkflow && (
+            <>
+                <DropdownMenuSeparator />
 
-        <DropdownMenuItem icon={<PlusIcon />} label="New Workflow" onSelect={onNewWorkflowClick} />
+                <DropdownMenuItem icon={<PlusIcon />} label="New Workflow" onSelect={onNewWorkflowClick} />
 
-        <DropdownMenuItem icon={<UploadIcon />} label="Import Workflow" onSelect={onImportWorkflowClick} />
+                <DropdownMenuItem icon={<UploadIcon />} label="Import Workflow" onSelect={onImportWorkflowClick} />
+            </>
+        )}
 
         <DropdownMenuSeparator />
 

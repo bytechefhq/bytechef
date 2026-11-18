@@ -81,6 +81,17 @@ const SettingsMenu = ({
         }
     };
 
+    const integrationTabButtons = (
+        <IntegrationTabButtons
+            codeWorkflow={integration.codeWorkflow}
+            onDeleteIntegrationClick={() => setShowDeleteIntegrationAlertDialog(true)}
+            onImportWorkflowClick={() => workflowFileInputRef.current?.click()}
+            onNewWorkflowClick={() => setShowCreateWorkflowDialog(true)}
+            onShowEditIntegrationDialogClick={() => setShowEditIntegrationDialog(true)}
+            onShowIntegrationVersionHistorySheet={() => setShowIntegrationVersionHistorySheet(true)}
+        />
+    );
+
     return (
         <>
             <DropdownMenu onOpenChange={setOpenDropdownMenu} open={openDropdownMenu}>
@@ -98,43 +109,41 @@ const SettingsMenu = ({
                 </Tooltip>
 
                 <DropdownMenuContent align="end">
-                    <Tabs aria-label="Settings menu" defaultValue="workflow">
-                        <TabsList className="rounded-none">
-                            <TabsTrigger
-                                aria-label="Workflow tab"
-                                className="w-1/2 px-9 py-1 data-[state=active]:shadow-none"
-                                value="workflow"
-                            >
-                                Workflow
-                            </TabsTrigger>
+                    {integration.codeWorkflow ? (
+                        integrationTabButtons
+                    ) : (
+                        <Tabs aria-label="Settings menu" defaultValue="workflow">
+                            <TabsList className="rounded-none">
+                                <TabsTrigger
+                                    aria-label="Workflow tab"
+                                    className="w-1/2 px-9 py-1 data-[state=active]:shadow-none"
+                                    value="workflow"
+                                >
+                                    Workflow
+                                </TabsTrigger>
 
-                            <TabsTrigger
-                                aria-label="Integration tab"
-                                className="w-1/2 px-9 py-1 data-[state=active]:shadow-none"
-                                value="integration"
-                            >
-                                Integration
-                            </TabsTrigger>
-                        </TabsList>
+                                <TabsTrigger
+                                    aria-label="Integration tab"
+                                    className="w-1/2 px-9 py-1 data-[state=active]:shadow-none"
+                                    value="integration"
+                                >
+                                    Integration
+                                </TabsTrigger>
+                            </TabsList>
 
-                        <TabsContent className="mt-0" value="workflow">
-                            <WorkflowTabButtons
-                                onShowDeleteWorkflowAlertDialog={() => setShowDeleteWorkflowAlertDialog(true)}
-                                onShowEditWorkflowDialog={() => setShowEditWorkflowDialog(true)}
-                                workflowId={workflow.id!}
-                            />
-                        </TabsContent>
+                            <TabsContent className="mt-0" value="workflow">
+                                <WorkflowTabButtons
+                                    onShowDeleteWorkflowAlertDialog={() => setShowDeleteWorkflowAlertDialog(true)}
+                                    onShowEditWorkflowDialog={() => setShowEditWorkflowDialog(true)}
+                                    workflowId={workflow.id!}
+                                />
+                            </TabsContent>
 
-                        <TabsContent className="mt-0" value="integration">
-                            <IntegrationTabButtons
-                                onDeleteIntegrationClick={() => setShowDeleteIntegrationAlertDialog(true)}
-                                onImportWorkflowClick={() => workflowFileInputRef.current?.click()}
-                                onNewWorkflowClick={() => setShowCreateWorkflowDialog(true)}
-                                onShowEditIntegrationDialogClick={() => setShowEditIntegrationDialog(true)}
-                                onShowIntegrationVersionHistorySheet={() => setShowIntegrationVersionHistorySheet(true)}
-                            />
-                        </TabsContent>
-                    </Tabs>
+                            <TabsContent className="mt-0" value="integration">
+                                {integrationTabButtons}
+                            </TabsContent>
+                        </Tabs>
+                    )}
                 </DropdownMenuContent>
             </DropdownMenu>
 
