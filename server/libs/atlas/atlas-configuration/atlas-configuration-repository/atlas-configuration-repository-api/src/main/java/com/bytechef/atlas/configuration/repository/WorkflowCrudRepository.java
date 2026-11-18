@@ -28,9 +28,6 @@ public interface WorkflowCrudRepository extends WorkflowRepository {
 
     Workflow save(Workflow workflow);
 
-    /**
-     * Overwrites the audit fields directly, bypassing auditing, which always stamps the current time on save.
-     */
     void updateAuditFields(
         String id, String createdBy, Instant createdDate, String lastModifiedBy, Instant lastModifiedDate);
 }
