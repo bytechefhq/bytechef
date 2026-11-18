@@ -82,6 +82,7 @@ Name: webSearch
 | country | Country Code | STRING | Two-letter ISO 3166-1 code of the country that the results are for. SpecStream sends it to each search engine that can use a country code. | false |
 | language | Language Code | STRING | Two-letter ISO 639-1 code of the result language. SpecStream sends it to each search engine that can use a language code. | false |
 | safe | Safe Search Level | STRING <details> <summary> Options </summary> <span>off</span>, <span>moderate</span>, <span>strict</span> </details> | Filter level for explicit content. SpecStream sends it to each search engine that can use a level. If empty, each search engine uses its own default level. | false |
+| preferPost | Use http POST | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Send request using http POST method. Parameter names and values are encoded in JSON and loaded into requests body. Using POST allows caller more reliable response to parameters like Image Search. | false |
 
 #### Example JSON Structure
 ```json
@@ -98,7 +99,8 @@ Name: webSearch
     "images" : false,
     "country" : "",
     "language" : "",
-    "safe" : ""
+    "safe" : "",
+    "preferPost" : false
   },
   "type" : "specstream/v1/webSearch"
 }
