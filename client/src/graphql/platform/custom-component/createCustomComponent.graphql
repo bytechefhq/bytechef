@@ -1,0 +1,7 @@
+mutation createCustomComponent($name: String!, $language: CustomComponentLanguage!) {
+    createCustomComponent(name: $name, language: $language) {
+        id
+        name
+        language
+    }
+}
