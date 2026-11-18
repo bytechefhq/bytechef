@@ -23,6 +23,8 @@ export const API_CONNECTORS_SETTINGS_PATH = `${ORGANIZATION_SETTINGS_PATH}/api-c
 
 export const BILLING_SETTINGS_PATH = `${ORGANIZATION_SETTINGS_PATH}/billing`;
 
+export const EMBEDDED_MEMORIES_SETTINGS_PATH = '/embedded/settings/ai/memories';
+
 export const MEMORIES_SETTINGS_PATH = '/automation/settings/ai/memories';
 
 const SECTION_SETTINGS_PATH_PATTERN = /^\/(automation|embedded)\/settings\/(.+)$/;

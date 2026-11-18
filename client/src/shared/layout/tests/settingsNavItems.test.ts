@@ -17,16 +17,27 @@ describe('getSettingsNavItems', () => {
         expect(findAiGroup(navItems)?.items?.map((item) => item.title)).toEqual(['Providers', 'Skills']);
     });
 
-    it('lists no Memories page in Embedded', () => {
+    it('lists the Embedded Memories page in Embedded, and not the Automation one', () => {
         const hrefs = flattenHrefs(getSettingsNavItems(PlatformType.EMBEDDED));
 
-        expect(hrefs.some((href) => href.includes('ai/memories'))).toBe(false);
+        expect(hrefs).toContain('/embedded/settings/ai/memories');
+        expect(hrefs).not.toContain('/automation/settings/ai/memories');
+    });
+
+    it('lists no Embedded Memories page in Automation', () => {
+        const hrefs = flattenHrefs(getSettingsNavItems(PlatformType.AUTOMATION));
+
+        expect(hrefs).not.toContain('/embedded/settings/ai/memories');
     });
 
     it('lists the Embedded section pages first', () => {
         const hrefs = flattenHrefs(getSettingsNavItems(PlatformType.EMBEDDED));
 
-        expect(hrefs.slice(0, 2)).toEqual(['/embedded/settings/signing-keys', '/embedded/settings/api-keys']);
+        expect(hrefs.slice(0, 3)).toEqual([
+            '/embedded/settings/signing-keys',
+            '/embedded/settings/api-keys',
+            '/embedded/settings/ai/memories',
+        ]);
     });
 
     it('links every Organization page under /settings in both modes', () => {
