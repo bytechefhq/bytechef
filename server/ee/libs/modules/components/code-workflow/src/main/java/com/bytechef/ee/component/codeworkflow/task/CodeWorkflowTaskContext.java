@@ -25,7 +25,6 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.workflow.definition.TaskContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,24 +47,17 @@ public class CodeWorkflowTaskContext implements TaskContext, ComponentActionInvo
     private final Map<String, ? extends ComponentConnection> componentConnections;
     private final ComponentDefinitionService componentDefinitionService;
     private final @Nullable Long environmentId;
-    private final Map<String, ?> input;
-    private final List<String> concurrentTaskNames;
-    private final Map<String, ?> parameters;
 
     @SuppressFBWarnings("EI")
     public CodeWorkflowTaskContext(
         ActionContext actionContext, ActionDefinitionService actionDefinitionService,
         Map<String, ? extends ComponentConnection> componentConnections,
-        ComponentDefinitionService componentDefinitionService, Map<String, ?> input,
-        List<String> concurrentTaskNames, Map<String, ?> parameters) {
+        ComponentDefinitionService componentDefinitionService) {
 
         this.actionContext = actionContext;
         this.actionDefinitionService = actionDefinitionService;
         this.componentConnections = componentConnections;
         this.componentDefinitionService = componentDefinitionService;
-        this.input = Collections.unmodifiableMap(new LinkedHashMap<>(input));
-        this.concurrentTaskNames = List.copyOf(concurrentTaskNames);
-        this.parameters = Collections.unmodifiableMap(new LinkedHashMap<>(parameters));
         this.environmentId = actionContext instanceof ActionContextAware actionContextAware
             ? actionContextAware.getEnvironmentId() : null;
     }
@@ -86,13 +78,24 @@ public class CodeWorkflowTaskContext implements TaskContext, ComponentActionInvo
         ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
             componentName, null);
 
-        ComponentConnection componentConnection = resolveComponentConnection(connectionName);
+        boolean unnamedConnection = connectionName == null || connectionName.isBlank();
 
-        if (componentConnection == null && actionDefinitionService.actionDefinesConnection(
-            componentDefinition.getName(), componentDefinition.getVersion(), actionName)) {
+        ComponentConnection componentConnection = unnamedConnection
+            ? componentConnections.get(componentName) : resolveComponentConnection(connectionName);
 
-            throw new IllegalArgumentException(
-                "Connection with name %s does not exist".formatted(connectionName));
+        if (componentConnection == null) {
+            if (unnamedConnection) {
+                if (componentDefinition.isConnectionRequired()) {
+                    throw new IllegalArgumentException(
+                        "No connection is declared for component %s; declare one or pass its name".formatted(
+                            componentName));
+                }
+            } else if (actionDefinitionService.actionDefinesConnection(
+                componentDefinition.getName(), componentDefinition.getVersion(), actionName)) {
+
+                throw new IllegalArgumentException(
+                    "Connection with name %s does not exist".formatted(connectionName));
+            }
         }
 
         Map<String, ComponentConnection> connections = new LinkedHashMap<>(componentConnections);
@@ -102,44 +105,6 @@ public class CodeWorkflowTaskContext implements TaskContext, ComponentActionInvo
         return actionDefinitionService.executePerformForPolyglot(
             componentDefinition.getName(), componentDefinition.getVersion(), actionName, input, componentConnection,
             connections, extensions, environmentId, actionContext);
-    }
-
-    @Override
-    public Map<String, ?> input() {
-        return input;
-    }
-
-    @Override
-    public Object input(String name) {
-        if (!input.containsKey(name)) {
-            if (concurrentTaskNames.contains(name)) {
-                throw new IllegalArgumentException(
-                    ("Task %s runs at the same time as this task, so its output is not available; move it before the "
-                        + "group to read it here").formatted(name));
-            }
-
-            throw new IllegalArgumentException(
-                "No workflow input or task output named %s; available: %s".formatted(name, input.keySet()));
-        }
-
-        return input.get(name);
-    }
-
-    @Override
-    public Map<String, ?> parameters() {
-        return parameters;
-    }
-
-    @Override
-    public Map<String, ?> connection(String connectionName) {
-        ComponentConnection componentConnection = resolveComponentConnection(connectionName);
-
-        if (componentConnection == null) {
-            throw new IllegalArgumentException(
-                "Connection with name %s does not exist".formatted(connectionName));
-        }
-
-        return componentConnection.getParameters();
     }
 
     @Override

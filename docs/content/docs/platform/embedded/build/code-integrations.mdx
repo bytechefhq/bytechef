@@ -31,24 +31,62 @@ project declares `name`.
 
 ```javascript tab="JavaScript"
 ({
-    componentName: "httpClient",
+    componentName: "googleMail",
     componentVersion: 1,
     version: "0.0.1",
-    description: "A sample code integration built on the HTTP Client component.",
+    description: "A sample code integration built on the Gmail component.",
     workflows: [
         {
-            name: "echoMessage",
-            label: "Echo Message",
-            description: "Returns the message it was given, upper-cased.",
-            inputs: [{name: "message", label: "Message", type: "STRING", required: true}],
-            outputs: [{name: "result", task: "shout"}],
+            name: "summarizeNewEmail",
+            label: "Summarize New Email",
+            description: "Runs for every new email in the connected user's inbox and logs who sent it.",
+            // A Gmail trigger on a Gmail integration runs on the connection the connected user created when they
+            // connected the integration - nothing to declare.
+            triggers: [{name: "newEmail", type: "googleMail/v1/newEmailPolling", parameters: {format: "SIMPLE"}}],
+            outputs: [{name: "summary", task: "summarize"}],
             tasks: [
                 {
-                    name: "shout",
-                    label: "Shout",
-                    description: "Upper-cases the message.",
+                    name: "summarize",
+                    label: "Summarize",
+                    description: "Builds a one-line summary of the new email.",
                     perform: function (context) {
-                        return String(context.input("message")).toUpperCase();
+                        const email = context.input("newEmail");
+
+                        const summary = "New email from " + email.from + ": " + email.subject;
+
+                        context.log("info", summary);
+
+                        return summary;
+                    }
+                }
+            ]
+        },
+        {
+            name: "fetchRecentEmails",
+            label: "Fetch Recent Emails",
+            description: "Returns the connected user's most recent emails, optionally only those from one sender.",
+            // awaitWorkflowAndRespond makes a call to the workflow return its outputs.
+            triggers: [{name: "request", type: "request/v1/awaitWorkflowAndRespond"}],
+            outputs: [{name: "emails", task: "fetchEmails"}],
+            tasks: [
+                {
+                    name: "fetchEmails",
+                    label: "Fetch Emails",
+                    description: "Searches the inbox with the Gmail Search Email action.",
+                    // A task names the connections it uses. One on the integration's own component is the
+                    // connected user's integration connection; one on any other component is wired by an
+                    // administrator in the instance configuration.
+                    connections: [{componentName: "googleMail", name: "gmail"}],
+                    perform: function (context) {
+                        const request = context.input()["request"] || {};
+                        const body = request.body || {};
+
+                        const result = context.component.googleMail.searchEmail(
+                            {from: body.from, maxResults: body.maxResults || 10}, "gmail");
+
+                        context.log("info", "Found " + (result.messages || []).length + " emails");
+
+                        return result.messages || [];
                     }
                 }
             ]
@@ -58,26 +96,76 @@ project declares `name`.
 ```
 
 ```python tab="Python"
-def shout(context):
-    return str(context.input("message")).upper()
+def summarize(context):
+    email = context.input("newEmail")
+
+    summary = f"New email from {email['from']}: {email['subject']}"
+
+    context.log("info", summary)
+
+    return summary
+
+
+def fetch_emails(context):
+    request = context.input().get("request") or {}
+    body = request.get("body") or {}
+
+    result = context.component.googleMail.searchEmail(
+        {"from": body.get("from"), "maxResults": body.get("maxResults") or 10}, "gmail"
+    )
+
+    messages = result.get("messages") or []
+
+    context.log("info", f"Found {len(messages)} emails")
+
+    return messages
 
 
 integration = {
-    "componentName": "httpClient",
+    "componentName": "googleMail",
     "componentVersion": 1,
     "version": "0.0.1",
-    "description": "A sample code integration built on the HTTP Client component.",
+    "description": "A sample code integration built on the Gmail component.",
     "workflows": [
         {
-            "name": "echoMessage",
-            "label": "Echo Message",
-            "description": "Returns the message it was given, upper-cased.",
-            "inputs": [{"name": "message", "label": "Message", "type": "STRING", "required": True}],
-            "outputs": [{"name": "result", "task": "shout"}],
-            "tasks": [
-                {"name": "shout", "label": "Shout", "description": "Upper-cases the message.", "perform": shout}
+            "name": "summarizeNewEmail",
+            "label": "Summarize New Email",
+            "description": "Runs for every new email in the connected user's inbox and logs who sent it.",
+            # A Gmail trigger on a Gmail integration runs on the connection the connected user created when they
+            # connected the integration - nothing to declare.
+            "triggers": [
+                {"name": "newEmail", "type": "googleMail/v1/newEmailPolling", "parameters": {"format": "SIMPLE"}}
             ],
-        }
+            "outputs": [{"name": "summary", "task": "summarize"}],
+            "tasks": [
+                {
+                    "name": "summarize",
+                    "label": "Summarize",
+                    "description": "Builds a one-line summary of the new email.",
+                    "perform": summarize,
+                }
+            ],
+        },
+        {
+            "name": "fetchRecentEmails",
+            "label": "Fetch Recent Emails",
+            "description": "Returns the connected user's most recent emails, optionally only those from one sender.",
+            # awaitWorkflowAndRespond makes a call to the workflow return its outputs.
+            "triggers": [{"name": "request", "type": "request/v1/awaitWorkflowAndRespond"}],
+            "outputs": [{"name": "emails", "task": "fetchEmails"}],
+            "tasks": [
+                {
+                    "name": "fetchEmails",
+                    "label": "Fetch Emails",
+                    "description": "Searches the inbox with the Gmail Search Email action.",
+                    # A task names the connections it uses. One on the integration's own component is the
+                    # connected user's integration connection; one on any other component is wired by an
+                    # administrator in the instance configuration.
+                    "connections": [{"componentName": "googleMail", "name": "gmail"}],
+                    "perform": fetch_emails,
+                }
+            ],
+        },
     ],
 }
 
@@ -100,8 +188,22 @@ To type-check a JavaScript or Python integration, use `ByteChef.IntegrationDefin
 | JavaScript | [bytechef-embedded-integration-sample-code-workflow-javascript](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-javascript) |
 | Python | [bytechef-embedded-integration-sample-code-workflow-python](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-python) |
 
-Each sample is the `echoMessage` integration above, with a local check that evaluates the file the way the server does
-and runs its task once.
+Each sample is the Gmail integration above, with a local check that evaluates the file the way the server does and runs
+each task once against a stub that returns a sample email.
+
+## Connections
+
+A Gmail trigger in a Gmail integration runs on the connection the connected user created when they connected the
+integration. A task declares the connections it calls through, by name, and passes that name to
+`context.component.<componentName>.<actionName>(input, connectionName)`:
+
+- A connection on the integration's own component - `googleMail` above - is the connected user's integration
+  connection. ByteChef binds it under the declared name when the task runs; there is nothing to configure.
+- A connection on any other component is chosen by an administrator in the integration's instance configuration, so
+  every connected user's run uses the same one.
+
+See [Declaring connections](/platform/automation/build/workflows/code-workflows#declaring-connections) for the syntax in
+each language.
 
 ## Creating a code integration
 

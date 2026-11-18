@@ -17,6 +17,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -58,8 +59,7 @@ class CodeWorkflowTaskContextTest {
         Map<String, ComponentConnection> componentConnections = Map.of("connection1", componentConnection);
 
         CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
-            actionContext, actionDefinitionService, componentConnections, componentDefinitionService, Map.of(),
-            List.of(), Map.of());
+            actionContext, actionDefinitionService, componentConnections, componentDefinitionService);
 
         when(componentDefinitionService.getComponentDefinition("component1", null)).thenReturn(componentDefinition);
         when(
@@ -89,7 +89,7 @@ class CodeWorkflowTaskContextTest {
 
         CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
             actionContextAware, actionDefinitionService, Map.of("connection1", componentConnection),
-            componentDefinitionService, Map.of(), List.of(), Map.of());
+            componentDefinitionService);
 
         taskContext.component("component1", "action1", Map.of(), "connection1");
 
@@ -104,8 +104,7 @@ class CodeWorkflowTaskContextTest {
         when(actionDefinitionService.actionDefinesConnection("component1", 0, "action1")).thenReturn(true);
 
         CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
-            actionContext, actionDefinitionService, Map.of(), componentDefinitionService, Map.of(), List.of(),
-            Map.of());
+            actionContext, actionDefinitionService, Map.of(), componentDefinitionService);
 
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
@@ -115,13 +114,107 @@ class CodeWorkflowTaskContextTest {
     }
 
     @Test
+    void testComponentWithoutConnectionNameResolvesTheConnectionNamedAfterTheComponent() throws Exception {
+        ComponentConnection componentConnection = new ComponentConnection("component1", 1, 1L, Map.of(), null);
+
+        Map<String, ComponentConnection> componentConnections = Map.of("component1", componentConnection);
+
+        when(componentDefinitionService.getComponentDefinition("component1", null)).thenReturn(componentDefinition);
+        when(actionDefinitionService.actionDefinesConnection("component1", 0, "action1")).thenReturn(true);
+
+        CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
+            actionContext, actionDefinitionService, componentConnections, componentDefinitionService);
+
+        taskContext.component("component1", "action1", Map.of(), null);
+
+        verify(actionDefinitionService).executePerformForPolyglot(
+            "component1", 0, "action1", Map.of(), componentConnection, componentConnections, Map.of(), null,
+            actionContext);
+    }
+
+    @Test
+    void testComponentWithBlankConnectionNameResolvesTheConnectionNamedAfterTheComponent() throws Exception {
+        ComponentConnection componentConnection = new ComponentConnection("component1", 1, 1L, Map.of(), null);
+
+        when(componentDefinitionService.getComponentDefinition("component1", null)).thenReturn(componentDefinition);
+
+        CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
+            actionContext, actionDefinitionService, Map.of("component1", componentConnection),
+            componentDefinitionService);
+
+        taskContext.component("component1", "action1", Map.of(), " ");
+
+        verify(actionDefinitionService).executePerformForPolyglot(
+            eq("component1"), eq(0), eq("action1"), eq(Map.of()), eq(componentConnection), any(), any(), isNull(),
+            eq(actionContext));
+    }
+
+    @Test
+    void testComponentWithoutConnectionNameFailsNamingTheComponentWhenNoneIsDeclaredForIt() {
+        ComponentConnection otherConnection = new ComponentConnection("component2", 1, 1L, Map.of(), null);
+        ComponentDefinition connectionRequiredComponentDefinition = spy(componentDefinition);
+
+        when(connectionRequiredComponentDefinition.isConnectionRequired()).thenReturn(true);
+        when(componentDefinitionService.getComponentDefinition("component1", null))
+            .thenReturn(connectionRequiredComponentDefinition);
+
+        CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
+            actionContext, actionDefinitionService, Map.of("component2", otherConnection),
+            componentDefinitionService);
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class, () -> taskContext.component("component1", "action1", Map.of(), null));
+
+        assertEquals(
+            "No connection is declared for component component1; declare one or pass its name",
+            exception.getMessage());
+    }
+
+    @Test
+    void testComponentWithoutConnectionNameDispatchesWithoutConnectionWhenTheConnectionIsOptional()
+        throws Exception {
+
+        when(componentDefinitionService.getComponentDefinition("component1", null)).thenReturn(componentDefinition);
+        when(actionDefinitionService.actionDefinesConnection("component1", 0, "action1")).thenReturn(true);
+
+        CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
+            actionContext, actionDefinitionService, Map.of(), componentDefinitionService);
+
+        taskContext.component("component1", "action1", Map.of(), null);
+
+        verify(actionDefinitionService).executePerformForPolyglot(
+            eq("component1"), eq(0), eq("action1"), eq(Map.of()), isNull(), any(), any(), isNull(),
+            eq(actionContext));
+    }
+
+    @Test
+    void testComponentWithConnectionNameKeepsTheNamedConnectionOverTheOneNamedAfterTheComponent()
+        throws Exception {
+
+        ComponentConnection componentNamedConnection = new ComponentConnection("component1", 1, 1L, Map.of(), null);
+        ComponentConnection namedConnection = new ComponentConnection("component1", 1, 2L, Map.of(), null);
+
+        when(componentDefinitionService.getComponentDefinition("component1", null)).thenReturn(componentDefinition);
+
+        CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
+            actionContext, actionDefinitionService,
+            Map.of("component1", componentNamedConnection, "connection1", namedConnection),
+            componentDefinitionService);
+
+        taskContext.component("component1", "action1", Map.of(), "connection1");
+
+        verify(actionDefinitionService).executePerformForPolyglot(
+            eq("component1"), eq(0), eq("action1"), eq(Map.of()), eq(namedConnection), any(), any(), isNull(),
+            eq(actionContext));
+    }
+
+    @Test
     void testComponentDispatchesWithoutConnectionWhenComponentDoesNotRequireConnection() throws Exception {
         when(componentDefinitionService.getComponentDefinition("component1", null)).thenReturn(componentDefinition);
         when(actionDefinitionService.actionDefinesConnection("component1", 0, "action1")).thenReturn(false);
 
         CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
-            actionContext, actionDefinitionService, Map.of(), componentDefinitionService, Map.of(), List.of(),
-            Map.of());
+            actionContext, actionDefinitionService, Map.of(), componentDefinitionService);
 
         taskContext.component("component1", "action1", Map.of(), "missingConnection");
 
@@ -140,7 +233,7 @@ class CodeWorkflowTaskContextTest {
 
         CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
             actionContext, actionDefinitionService, Map.of("openai-prod", openAiConnection),
-            componentDefinitionService, Map.of(), List.of(), Map.of());
+            componentDefinitionService);
 
         taskContext.component(
             "aiAgent", "chat", Map.of(), null,
@@ -178,8 +271,8 @@ class CodeWorkflowTaskContextTest {
             .thenReturn(new ComponentDefinition("aiAgent"));
 
         CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
-            actionContext, actionDefinitionService, Map.of("slack-prod", slackConnection), componentDefinitionService,
-            Map.of(), List.of(), Map.of());
+            actionContext, actionDefinitionService, Map.of("slack-prod", slackConnection),
+            componentDefinitionService);
 
         taskContext.component(
             "aiAgent", "chat", Map.of(), null,
@@ -216,7 +309,7 @@ class CodeWorkflowTaskContextTest {
 
         CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
             actionContext, actionDefinitionService, Map.of("openai-prod", openAiConnection),
-            componentDefinitionService, Map.of(), List.of(), Map.of());
+            componentDefinitionService);
 
         taskContext.component(
             "aiAgent", "chat", Map.of(), null,
@@ -246,8 +339,7 @@ class CodeWorkflowTaskContextTest {
             .thenReturn(new ComponentDefinition("aiAgent"));
 
         CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
-            actionContext, actionDefinitionService, Map.of(), componentDefinitionService, Map.of(), List.of(),
-            Map.of());
+            actionContext, actionDefinitionService, Map.of(), componentDefinitionService);
 
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
@@ -264,8 +356,7 @@ class CodeWorkflowTaskContextTest {
             .thenReturn(new ComponentDefinition("aiAgent"));
 
         CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
-            actionContext, actionDefinitionService, Map.of(), componentDefinitionService, Map.of(), List.of(),
-            Map.of());
+            actionContext, actionDefinitionService, Map.of(), componentDefinitionService);
 
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
@@ -276,59 +367,10 @@ class CodeWorkflowTaskContextTest {
     }
 
     @Test
-    void testInputExposesWorkflowInputsAndPriorTaskOutputs() {
-        Map<String, ?> input = Map.of("input", Map.of("email", "a@b.com"), "my-task1", Map.of("id", 3));
-
-        CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
-            actionContext, actionDefinitionService, Map.of(), componentDefinitionService, input, List.of(), Map.of());
-
-        assertEquals(input, taskContext.input());
-        assertEquals(Map.of("id", 3), taskContext.input("my-task1"));
-    }
-
-    @Test
-    void testInputExplainsAConcurrentTaskRatherThanReportingAnUnknownName() {
-        CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
-            actionContext, actionDefinitionService, Map.of(), componentDefinitionService, Map.of("task1", "value"),
-            List.of("sibling"), Map.of());
-
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class, () -> taskContext.input("sibling"));
-
-        assertEquals(
-            "Task sibling runs at the same time as this task, so its output is not available; move it before the " +
-                "group to read it here",
-            exception.getMessage());
-    }
-
-    @Test
-    void testParametersExposeTheTaskOwnDeclaredValues() {
-        CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
-            actionContext, actionDefinitionService, Map.of(), componentDefinitionService, Map.of("task1", "value"),
-            List.of(), Map.of("retries", 3));
-
-        assertEquals(Map.of("retries", 3), taskContext.parameters());
-        assertEquals(Map.of("task1", "value"), taskContext.input());
-    }
-
-    @Test
-    void testInputThrowsForUnknownName() {
-        CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
-            actionContext, actionDefinitionService, Map.of(), componentDefinitionService, Map.of("task1", "value"),
-            List.of(), Map.of());
-
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class, () -> taskContext.input("task2"));
-
-        assertEquals("No workflow input or task output named task2; available: [task1]", exception.getMessage());
-    }
-
-    @Test
     @SuppressWarnings("unchecked")
     void testLogDelegatesToActionContextAtGivenLevel() throws Exception {
         CodeWorkflowTaskContext taskContext = new CodeWorkflowTaskContext(
-            actionContext, actionDefinitionService, Map.of(), componentDefinitionService, Map.of(), List.of(),
-            Map.of());
+            actionContext, actionDefinitionService, Map.of(), componentDefinitionService);
 
         taskContext.log(TaskContext.LogLevel.WARN, "a warning");
 
