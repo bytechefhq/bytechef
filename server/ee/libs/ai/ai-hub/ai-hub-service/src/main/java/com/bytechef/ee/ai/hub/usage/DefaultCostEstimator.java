@@ -7,11 +7,13 @@
 
 package com.bytechef.ee.ai.hub.usage;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
 import com.bytechef.ee.platform.ai.tool.usage.ToolCostEstimator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -29,11 +31,17 @@ public class DefaultCostEstimator implements ToolCostEstimator {
 
     private static final int COST_SCALE = 6;
 
-    private final CostEstimationProperties properties;
+    private final Map<String, BigDecimal> toolRates;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public DefaultCostEstimator(CostEstimationProperties properties) {
-        this.properties = properties;
+    public DefaultCostEstimator(ApplicationProperties applicationProperties) {
+        ApplicationProperties.Ai ai = applicationProperties.getAi();
+
+        ApplicationProperties.Ai.Hub hub = ai.getHub();
+
+        ApplicationProperties.Ai.Hub.CostEstimation costEstimation = hub.getCostEstimation();
+
+        this.toolRates = costEstimation.getToolRates();
     }
 
     @Override
@@ -44,8 +52,7 @@ public class DefaultCostEstimator implements ToolCostEstimator {
             return BigDecimal.ZERO;
         }
 
-        BigDecimal rate = properties.getToolRates()
-            .get(toolName);
+        BigDecimal rate = toolRates.get(toolName);
 
         if (rate == null) {
             log.warn("No tool cost rate configured for tool '{}'; charging 0.0", toolName);
