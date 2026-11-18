@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.polyglot;
 
 import com.bytechef.commons.util.ConvertUtils;
+import com.bytechef.commons.util.JsonUtils;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -77,6 +78,24 @@ public final class PolyglotValues {
         }
 
         return object;
+    }
+
+    public static String toLogMessage(Value value) {
+        if (value == null || value.isNull()) {
+            return "null";
+        }
+
+        if (value.isString()) {
+            return value.asString();
+        }
+
+        Object javaValue = copyToJavaValue(value);
+
+        if (javaValue instanceof Map<?, ?> || javaValue instanceof Collection<?>) {
+            return JsonUtils.write(javaValue);
+        }
+
+        return String.valueOf(javaValue);
     }
 
     public static Object copyToJavaValue(Value value) {
@@ -210,6 +229,32 @@ public final class PolyglotValues {
         } else {
             throw new IllegalArgumentException("Cannot copy value %s to %s type.".formatted(value, languageId));
         }
+    }
+
+    public static Object copyToGuestMemberAndHashMap(Map<String, ?> map, String languageId) {
+        Map<String, Object> proxyMap = new HashMap<>();
+
+        for (Map.Entry<String, ?> entry : map.entrySet()) {
+            Object value = entry.getValue();
+
+            if (value instanceof Map<?, ?> nestedMap) {
+                proxyMap.put(entry.getKey(), copyToGuestMemberAndHashMap(toStringKeyMap(nestedMap), languageId));
+            } else {
+                proxyMap.put(entry.getKey(), copyToGuestValue(value, languageId));
+            }
+        }
+
+        return new MemberAndHashMapProxy(proxyMap);
+    }
+
+    private static Map<String, Object> toStringKeyMap(Map<?, ?> map) {
+        Map<String, Object> stringKeyMap = new HashMap<>();
+
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            stringKeyMap.put((String) entry.getKey(), entry.getValue());
+        }
+
+        return stringKeyMap;
     }
 
     private static Object toGuestMap(Map<String, Object> proxyMap, String languageId) {
