@@ -67,7 +67,7 @@ const ConnectedUserSheetPanelConnectionListItem = ({
                     <ComponentIcon aria-hidden="true" className="size-6 shrink-0 text-content-neutral-secondary" />
                 )}
 
-                <div className="flex flex-col items-start justify-center gap-y-2">
+                <div className="flex flex-col items-start justify-center gap-y-1">
                     <span className="flex min-h-6 items-center text-base font-semibold">{connection.name}</span>
 
                     <div className="flex min-h-6 items-center text-xs font-semibold text-muted-foreground">
@@ -81,7 +81,7 @@ const ConnectedUserSheetPanelConnectionListItem = ({
 
             <div className="flex items-center gap-x-2">
                 <div className="flex shrink-0 items-center justify-end">
-                    <div className="flex flex-col items-end gap-y-2">
+                    <div className="flex flex-col items-end gap-y-1">
                         <div className="flex min-h-6 items-center gap-2">
                             <Tooltip>
                                 <TooltipTrigger asChild>
