@@ -188,6 +188,27 @@ class ProjectWorkflowFacadeIntTest {
     }
 
     @Test
+    void testDuplicateWorkflowLabelsTheCopyBeforeItsFirstSave() {
+        Project project = new Project();
+
+        project.setName("Test Duplicate Label Project");
+        project.setWorkspaceId(workspace.getId());
+        project = projectRepository.save(project);
+
+        ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(
+            project.getId(), "{\"label\":\"Source Workflow\",\"tasks\":[]}");
+
+        String duplicatedWorkflowId = projectWorkflowFacade.duplicateWorkflow(
+            project.getId(), projectWorkflow.getWorkflowId());
+
+        Workflow duplicatedWorkflow = workflowRepository.findById(duplicatedWorkflowId)
+            .orElseThrow();
+
+        assertThat(duplicatedWorkflow.getLabel()).isEqualTo("Source Workflow (2)");
+        assertThat(duplicatedWorkflow.getLastModifiedDate()).isEqualTo(duplicatedWorkflow.getCreatedDate());
+    }
+
+    @Test
     void testExportSharedWorkflow() {
         Project project = new Project();
 

@@ -234,15 +234,15 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     public String duplicateWorkflow(long projectId, String workflowId) {
         Project project = projectService.getWorkflowProject(workflowId);
 
-        Workflow workflow = workflowService.duplicateWorkflow(workflowId);
+        Workflow sourceWorkflow = workflowService.getWorkflow(workflowId);
 
-        Map<String, Object> definitionMap = JsonUtils.read(workflow.getDefinition(), new TypeReference<>() {});
+        Map<String, Object> definitionMap = JsonUtils.read(sourceWorkflow.getDefinition(), new TypeReference<>() {});
 
         definitionMap.put("label", MapUtils.getString(definitionMap, "label", "(2)") + " (2)");
 
-        workflowService.update(
-            Validate.notNull(workflow.getId(), "id"), JsonUtils.writeWithDefaultPrettyPrinter(definitionMap),
-            workflow.getVersion());
+        Workflow workflow = workflowService.create(
+            JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), sourceWorkflow.getFormat(),
+            sourceWorkflow.getSourceType());
 
         projectWorkflowService.addWorkflow(projectId, project.getLastProjectVersion(), workflow.getId());
 
