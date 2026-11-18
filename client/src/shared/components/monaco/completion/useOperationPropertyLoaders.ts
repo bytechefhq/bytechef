@@ -12,6 +12,28 @@ import type {OperationPropertyLoadersType, OperationPropertyRequestType} from '.
 
 const OPERATION_PROPERTY_STALE_TIME = 60000;
 
+function valueAtLookupPath(parameters: Record<string, unknown>, lookupPath: string): unknown {
+    return lookupPath
+        .split('.')
+        .map((segment) => segment.replace(/\[[^\]]*\]$/, ''))
+        .reduce<unknown>(
+            (value, segment) =>
+                typeof value === 'object' && value !== null ? (value as Record<string, unknown>)[segment] : undefined,
+            parameters
+        );
+}
+
+function toQueryKeyParameters({
+    componentOperationPropertyRequest: {lookupDependsOnPaths, parameters, ...componentOperationPropertyRequest},
+    ...requestParameters
+}: ReturnType<typeof toRequestParameters>) {
+    return {
+        ...requestParameters,
+        componentOperationPropertyRequest,
+        lookupDependsOnValues: lookupDependsOnPaths.map((lookupPath) => valueAtLookupPath(parameters, lookupPath)),
+    };
+}
+
 function toRequestParameters(
     {
         clusterElementNode,
@@ -62,7 +84,7 @@ export function useOperationPropertyLoaders(
                     queryKey: [
                         ...WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties,
                         'completion',
-                        requestParameters,
+                        toQueryKeyParameters(requestParameters),
                     ],
                     staleTime: OPERATION_PROPERTY_STALE_TIME,
                 });
@@ -73,7 +95,11 @@ export function useOperationPropertyLoaders(
                 return queryClient.fetchQuery({
                     queryFn: () =>
                         new WorkflowNodeOptionApi().getWorkflowNodeComponentOperationOptions(requestParameters),
-                    queryKey: [...WorkflowNodeOptionKeys.workflowNodeOptions, 'completion', requestParameters],
+                    queryKey: [
+                        ...WorkflowNodeOptionKeys.workflowNodeOptions,
+                        'completion',
+                        toQueryKeyParameters(requestParameters),
+                    ],
                     staleTime: OPERATION_PROPERTY_STALE_TIME,
                 });
             },

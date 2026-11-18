@@ -264,6 +264,19 @@ describe('getScriptCompletions for a custom component', () => {
             ).map((item) => item.label)
         ).toEqual(['token']);
     });
+
+    it('reads a Python component built with SimpleNamespace keyword arguments', async () => {
+        const pythonContext: CustomComponentCompletionContextI = {kind: 'customComponent', language: 'python'};
+        const source =
+            'types.SimpleNamespace(connection=dict(properties=[dict(name="token")]), actions=[types.SimpleNamespace(name="a", properties=[dict(name="q")], perform=lambda input, connection, context: input.)])';
+        const offset = source.indexOf('input.)') + 6;
+
+        expect(
+            (await getScriptCompletions({context: pythonContext, cursorOffset: offset, source})).map(
+                (item) => item.label
+            )
+        ).toEqual(['q']);
+    });
 });
 
 describe('getScriptCompletions for a code workflow', () => {
@@ -277,10 +290,10 @@ describe('getScriptCompletions for a code workflow', () => {
         ).toEqual(['component', 'connection', 'input', 'log', 'parameters']);
     });
 
-    it('places the caret after the parentheses of zero-argument members', async () => {
+    it('places the caret after the parentheses of zero-argument members and inside connection', async () => {
         expect(
             (await getScriptCompletions({context, cursorOffset: source.length, source})).map((item) => item.insertText)
-        ).toEqual(['component', 'connection()$0', 'input()$0', 'log($1)', 'parameters()$0']);
+        ).toEqual(['component', 'connection($1)', 'input()$0', 'log($1)', 'parameters()$0']);
     });
 
     it('offers inputs and earlier tasks under context.input()', async () => {
@@ -473,6 +486,29 @@ describe('getScriptCompletions for runtime action properties', () => {
         );
     });
 
+    it('passes the Python connection keyword argument as the connection key', async () => {
+        const loadDynamicProperties = vi.fn(async () => [{name: 'Email', type: 'STRING'}] as unknown as Property[]);
+        const context: ScriptCompletionContextI = {
+            components: runtimeCatalog,
+            connections: [
+                {componentName: 'airtable', componentVersion: 1, name: 'at'},
+                {componentName: 'airtable', componentVersion: 1, name: 'at_work'},
+            ],
+            input: {},
+            kind: 'script',
+            language: 'python',
+            loadDynamicProperties,
+            workflowNodeName: 'script_1',
+        };
+        const prefix =
+            "def perform(input, connection, context):\n    context.component.airtable.createRecord(connection='at_work', input={'baseId': 'app1', 'fields': {";
+        const source = prefix + '})';
+        const items = await getScriptCompletions({context, cursorOffset: prefix.length, source});
+
+        expect(items.map((item) => item.label)).toEqual(['Email']);
+        expect(loadDynamicProperties).toHaveBeenCalledWith(expect.objectContaining({connectionKey: 'at_work'}));
+    });
+
     it('loads dynamic properties for the enclosing code workflow task and its declared connection', async () => {
         const loadDynamicProperties = vi.fn(async () => [{name: 'Email', type: 'STRING'}] as unknown as Property[]);
         const context: CodeWorkflowCompletionContextI = {
@@ -584,5 +620,46 @@ describe('getScriptCompletions for action property values', () => {
         expect(loadOptions).toHaveBeenCalledWith(
             expect.objectContaining({connectionKey: 'at', propertyName: 'tableId', workflowNodeName: 'script_1'})
         );
+    });
+});
+
+describe('getScriptCompletions connection choice', () => {
+    const optionsCatalog: ComponentCatalogType = {
+        ...catalog,
+        getOperationProperties: vi.fn(
+            async () => [{name: 'channel', optionsDataSource: {}, type: 'STRING'}] as unknown as Property[]
+        ),
+    };
+
+    const contextWith = (loadOptions: ScriptCompletionContextI['loadOptions']): ScriptCompletionContextI => ({
+        components: optionsCatalog,
+        connections: [
+            {componentName: 'slack', componentVersion: 1, name: 'slack_work'},
+            {componentName: 'slack', componentVersion: 1, name: 'slack_personal'},
+        ],
+        input: {},
+        kind: 'script',
+        language: 'javascript',
+        loadOptions,
+        workflowNodeName: 'script_1',
+    });
+
+    it('uses the connection named in the call', async () => {
+        const loadOptions = vi.fn(async () => []);
+        const before = 'function perform(input, connection, context) {\n  context.component.slack.send({channel: ';
+        const source = `${before}}, 'slack_personal')\n}`;
+
+        await getScriptCompletions({context: contextWith(loadOptions), cursorOffset: before.length, source});
+
+        expect(loadOptions).toHaveBeenCalledWith(expect.objectContaining({connectionKey: 'slack_personal'}));
+    });
+
+    it('sends no connection when several match and the call names none', async () => {
+        const loadOptions = vi.fn(async () => []);
+        const source = 'function perform(input, connection, context) {\n  context.component.slack.send({channel: ';
+
+        await getScriptCompletions({context: contextWith(loadOptions), cursorOffset: source.length, source});
+
+        expect(loadOptions).toHaveBeenCalledWith(expect.objectContaining({connectionKey: undefined}));
     });
 });

@@ -269,16 +269,17 @@ describe('parameter key completions', () => {
         ).toEqual([]);
     });
 
-    it('offers nothing for a key outside parameters', async () => {
+    it('offers task keys instead of action properties for a key outside parameters', async () => {
         const source = '{"tasks": [{"type": "httpClient/v1/get", "": 1}]}';
+        const items = await getWorkflowDefinitionCompletions({
+            context: jsonContext,
+            cursorOffset: source.indexOf('"": 1') + 1,
+            source,
+        });
 
-        expect(
-            await getWorkflowDefinitionCompletions({
-                context: jsonContext,
-                cursorOffset: source.indexOf('"": 1') + 1,
-                source,
-            })
-        ).toEqual([]);
+        expect(items.map((item) => item.label)).toContain('parameters');
+        expect(items.map((item) => item.label)).not.toContain('type');
+        expect(items.map((item) => item.label)).not.toContain('uri');
     });
 });
 
@@ -448,5 +449,178 @@ describe('parameter value completions', () => {
         });
 
         expect(items.map((item) => item.label)).toContain('trigger_1');
+    });
+});
+
+describe('bare JSON values and inline scripts', () => {
+    const literalCatalog: ComponentCatalogType = {
+        ...catalog,
+        getOperationProperties: vi.fn(
+            async () =>
+                [
+                    {name: 'count', options: [{value: 1}, {value: 2}], type: 'INTEGER'},
+                    {name: 'enabled', type: 'BOOLEAN'},
+                    {name: 'note', options: [{value: 'a "b"'}], type: 'STRING'},
+                ] as unknown as Property[]
+        ),
+    };
+
+    it('inserts JSON literals for a bare value', async () => {
+        const source = '{"tasks": [{"type": "x/v1/y", "parameters": {"enabled": t, "note": }}]}';
+        const enabled = await getWorkflowDefinitionCompletions({
+            context: {...context, components: literalCatalog, format: 'json'},
+            cursorOffset: source.indexOf(': t') + 3,
+            source,
+        });
+        const note = await getWorkflowDefinitionCompletions({
+            context: {...context, components: literalCatalog, format: 'json'},
+            cursorOffset: source.indexOf('"note": ') + '"note": '.length,
+            source,
+        });
+
+        expect(enabled.map((item) => [item.insertText, item.replaceLength])).toEqual([
+            ['true', 1],
+            ['false', 1],
+        ]);
+        expect(note.map((item) => item.insertText)).toEqual(['"a \\"b\\""']);
+    });
+
+    it('offers the perform parameter names in an inline JavaScript script', async () => {
+        const source =
+            '{"tasks": [{"type": "script/v1/javascript", "parameters": {"script": "function perform(input, connection, context) {\\n con"}}]}';
+        const items = await getWorkflowDefinitionCompletions(request(source, '\\n con'));
+
+        expect(items.map((item) => [item.label, item.replaceLength])).toEqual([
+            ['input', 3],
+            ['connection', 3],
+            ['context', 3],
+        ]);
+    });
+
+    it('replaces only the name typed after an escape sequence in an inline Python script', async () => {
+        const source =
+            '{"tasks": [{"type": "script/v1/python", "parameters": {"script": "def perform(input, connection, context):\\n    inp"}}]}';
+        const items = await getWorkflowDefinitionCompletions(request(source, '    inp'));
+
+        expect(items.find((item) => item.label === 'input')?.replaceLength).toBe(3);
+    });
+
+    it('JSON-escapes values inserted into an inline script', async () => {
+        const source =
+            '{"tasks": [{"name": "s_1", "type": "script/v1/javascript", "connections": [{"componentName": "x", "componentVersion": 1, "name": "xc"}], "parameters": {"script": "function perform(input, connection, context) {\\n context.component.x.y({note: \\""}}]}';
+        const items = await getWorkflowDefinitionCompletions({
+            context: {...context, components: literalCatalog, format: 'json'},
+            cursorOffset: source.indexOf('note: \\"') + 'note: \\"'.length,
+            source,
+        });
+
+        expect(items.map((item) => item.insertText)).toEqual(['a \\\\\\"b\\\\\\"']);
+    });
+
+    it('loads connection options in an inline script with the task name', async () => {
+        const loadOptions = vi.fn(async () => [{value: 'tbl1'}]);
+        const optionsCatalog: ComponentCatalogType = {
+            ...catalog,
+            getOperationProperties: vi.fn(
+                async () => [{name: 'tableId', optionsDataSource: {}, type: 'STRING'}] as unknown as Property[]
+            ),
+        };
+        const source =
+            '{"tasks": [{"name": "s_1", "type": "script/v1/javascript", "connections": [{"componentName": "x", "componentVersion": 1, "name": "xc"}], "parameters": {"script": "function perform(input, connection, context) {\\n context.component.x.y({tableId: "}}]}';
+        const items = await getWorkflowDefinitionCompletions({
+            context: {...context, components: optionsCatalog, format: 'json', loadOptions},
+            cursorOffset: source.indexOf('tableId: ') + 'tableId: '.length,
+            source,
+        });
+
+        expect(items.map((item) => item.insertText)).toEqual(["'tbl1'"]);
+        expect(loadOptions).toHaveBeenCalledWith(
+            expect.objectContaining({connectionKey: 'xc', propertyName: 'tableId', workflowNodeName: 's_1'})
+        );
+    });
+});
+
+describe('review fixes for the workflow definition sheet', () => {
+    const fixCatalog: ComponentCatalogType = {
+        ...catalog,
+        getOperationProperties: vi.fn(
+            async () =>
+                [
+                    {name: 'format', type: 'STRING'},
+                    {displayCondition: "format == 'xml'", name: 'xmlRoot', type: 'STRING'},
+                    {name: 'who', options: [{value: '@channel'}, {value: '.nan'}, {value: 'plain'}], type: 'STRING'},
+                ] as unknown as Property[]
+        ),
+    };
+
+    it('treats an = expression as unknown so it does not hide properties', async () => {
+        const source = '{"tasks": [{"type": "x/v1/y", "parameters": {"format": "=input.fmt", "": 1}}]}';
+        const items = await getWorkflowDefinitionCompletions({
+            context: {...context, components: fixCatalog, format: 'json'},
+            cursorOffset: source.indexOf('"": 1') + 1,
+            source,
+        });
+
+        expect(items.map((item) => item.label)).toEqual(['xmlRoot', 'who']);
+    });
+
+    it('quotes YAML values that would not survive as plain scalars', async () => {
+        const source = 'tasks:\n  - type: x/v1/y\n    parameters:\n      who: ';
+        const items = await getWorkflowDefinitionCompletions({
+            context: {...context, components: fixCatalog, format: 'yaml'},
+            cursorOffset: source.length,
+            source,
+        });
+
+        expect(items.map((item) => item.insertText)).toEqual(['"@channel"', '".nan"', 'plain']);
+    });
+});
+
+describe('workflow structure completions', () => {
+    const at = async (source: string, cursorOffset: number, format: 'json' | 'yaml' = 'json') =>
+        getWorkflowDefinitionCompletions({context: {...context, format}, cursorOffset, source});
+
+    it('offers the root keys in an empty JSON key', async () => {
+        const source = '{"label": "W", "": 1, "tasks": []}';
+        const items = await at(source, source.indexOf('"": 1') + 1);
+
+        expect(items.map((item) => item.label)).toEqual(['description', 'inputs', 'outputs', 'triggers', 'maxRetries']);
+    });
+
+    it('offers the task keys in a YAML task and in a nested pre task', async () => {
+        const yamlSource = 'tasks:\n  - name: t\n    type: httpClient/v1/get\n    para';
+        const yamlItems = await at(yamlSource, yamlSource.length, 'yaml');
+
+        expect(yamlItems.map((item) => item.label)).toContain('parameters');
+        expect(yamlItems.map((item) => item.label)).not.toContain('name');
+
+        const jsonSource = '{"tasks": [{"name": "t", "pre": [{"": 1}]}]}';
+        const jsonItems = await at(jsonSource, jsonSource.indexOf('{"": 1') + 2);
+
+        expect(jsonItems.map((item) => item.label)).toContain('type');
+    });
+
+    it('keeps offering the action properties inside parameters', async () => {
+        const source = '{"tasks": [{"type": "httpClient/v1/get", "parameters": {"": 1}}]}';
+        const items = await at(source, source.indexOf('{"": 1') + 2);
+
+        expect(items.map((item) => item.label)).toContain('uri');
+        expect(items.map((item) => item.label)).not.toContain('maxRetries');
+    });
+
+    it('offers input types in a string and booleans for a bare required value', async () => {
+        const typeSource = '{"inputs": [{"name": "a", "type": "da"}]}';
+        const types = await at(typeSource, typeSource.indexOf('"da"') + 3);
+
+        expect(types.map((item) => item.label)).toContain('date_time');
+        expect(types[0]).toMatchObject({replaceLength: 2});
+
+        const requiredSource = '{"inputs": [{"name": "a", "required": t}]}';
+        const required = await at(requiredSource, requiredSource.indexOf(': t') + 3);
+
+        expect(required.map((item) => [item.insertText, item.replaceLength])).toEqual([
+            ['true', 1],
+            ['false', 1],
+        ]);
     });
 });

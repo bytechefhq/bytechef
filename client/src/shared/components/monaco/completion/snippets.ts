@@ -1,13 +1,13 @@
 import type {ScriptLanguageType} from './completionTypes';
 
+const NULL_LITERALS: Record<ScriptLanguageType, string> = {javascript: 'null', python: 'None', ruby: 'nil'};
+
 export function buildActionCallSnippet(
     actionName: string,
     language: ScriptLanguageType,
     matchingConnectionNames: string[],
     acceptsClusterElements: boolean
 ): string {
-    void language;
-
     const parts = ['{$1}'];
 
     let nextStop = 2;
@@ -20,6 +20,8 @@ export function buildActionCallSnippet(
         parts.push("'$2'");
 
         nextStop = 3;
+    } else if (acceptsClusterElements) {
+        parts.push(NULL_LITERALS[language]);
     }
 
     if (acceptsClusterElements) {

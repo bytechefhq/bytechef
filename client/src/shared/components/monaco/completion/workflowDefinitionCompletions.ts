@@ -5,6 +5,7 @@ import {getPropertyCompletionItems, getPropertyValueItems} from './propertyCompl
 import {type CompletionItemDraftType, getScriptCompletions} from './scriptCompletions';
 import {buildFunctionSnippet} from './snippets';
 import {scanWorkflowDocument} from './workflowDocumentScanner';
+import {getStructureKeyCompletions, getStructureValueCompletions} from './workflowStructureCompletions';
 
 import type {Option, Property} from '@/shared/middleware/platform/configuration';
 import type {PropertyAllType} from '@/shared/types';
@@ -31,6 +32,7 @@ const REFERENCE_NAME_PATTERN = /^[\w-]*/;
 const REFERENCE_BRACKET_PATTERN = /^\[(['"])([\w\s.-]*)(\1\])?/;
 const TRAILING_WORD_PATTERN = /[A-Za-z]\w*$/;
 const OPERATION_TYPE_PATTERN = /^(\w+)\/v(\d+)\/(\w+)$/;
+const IDENTIFIER_BEFORE_CURSOR = /[A-Za-z_$][\w$]*$/;
 
 function isArrayElementType(path: string[]): boolean {
     return (path[0] === 'tasks' || path[0] === 'triggers') && /^\d+$/.test(path[path.length - 2] ?? '');
@@ -57,9 +59,31 @@ async function getInlineScriptCompletions(
         input: Object.fromEntries(position.enclosingTaskInputKeys.map((key) => [key, null])),
         kind: 'script',
         language,
+        loadDynamicProperties: context.loadDynamicProperties,
+        loadOptions: context.loadOptions,
+        workflowNodeName:
+            position.enclosingTaskIndex === undefined
+                ? undefined
+                : position.nameOf(['tasks', String(position.enclosingTaskIndex)]),
     };
 
-    return getScriptCompletions({context: scriptContext, cursorOffset: value.length, source: value});
+    const identifierLength = IDENTIFIER_BEFORE_CURSOR.exec(value)?.[0].length ?? 0;
+    const items = await getScriptCompletions({
+        context: scriptContext,
+        cursorOffset: value.length,
+        inline: true,
+        source: value,
+    });
+
+    return items.map((item) => ({
+        replaceLength: identifierLength,
+        ...item,
+        ...(context.format === 'json' && {insertText: escapeForJsonString(item.insertText, item.insertAsSnippet)}),
+    }));
+}
+
+function escapeForJsonString(text: string, snippet: boolean): string {
+    return snippet ? text.replaceAll('"', '\\"').replaceAll('\n', '\\n') : JSON.stringify(text).slice(1, -1);
 }
 
 function getComponentTypeCompletions(context: WorkflowDefinitionCompletionContextI): CompletionItemDraftType[] {
@@ -335,8 +359,8 @@ async function getParameterKeyCompletions(
     return target ? getPropertyCompletionItems({...target, existingKeys}) : [];
 }
 
-const YAML_PLAIN_STRING = /^[A-Za-z_/.@][\w ./@-]*$/;
-const YAML_RESERVED_PLAIN = /^(true|false|null|~|yes|no|on|off|-?\d+(\.\d+)?)$/i;
+const YAML_PLAIN_STRING = /^[A-Za-z_/.](?:[\w ./@-]*[\w./@-])?$/;
+const YAML_RESERVED_PLAIN = /^(true|false|null|~|yes|no|on|off|-?\d+(\.\d+)?|[-+]?\.(inf|nan))$/i;
 
 function documentValueText(value: unknown, format: 'json' | 'yaml', quote?: string): string | undefined {
     if (format === 'json' || quote === '"') {
@@ -357,12 +381,13 @@ function documentValueText(value: unknown, format: 'json' | 'yaml', quote?: stri
 async function getParameterValueCompletions(
     context: WorkflowDefinitionCompletionContextI,
     position: WorkflowDocumentPositionType,
-    cursorOffset: number
+    path: string[],
+    replaceLength: number,
+    toInsertText: (value: unknown) => string | undefined
 ): Promise<CompletionItemDraftType[]> {
-    const {path, stringQuote, stringStart} = position;
     const key = last(path);
 
-    if (key === undefined || stringStart === undefined) {
+    if (key === undefined) {
         return [];
     }
 
@@ -375,8 +400,8 @@ async function getParameterValueCompletions(
     return getPropertyValueItems({
         ...target,
         propertyPath: [...target.propertyPath, key],
-        replaceLength: cursorOffset - stringStart,
-        toInsertText: (value) => documentValueText(value, context.format, stringQuote),
+        replaceLength,
+        toInsertText,
     });
 }
 
@@ -387,7 +412,24 @@ export async function getWorkflowDefinitionCompletions(
     const position = scanWorkflowDocument(source, cursorOffset, context.format);
 
     if (position?.keySlot) {
-        return getParameterKeyCompletions(context, position);
+        const {containerPath, existingKeys} = position.keySlot;
+
+        return getStructureKeyCompletions(containerPath, existingKeys) ?? getParameterKeyCompletions(context, position);
+    }
+
+    if (position?.bareValue) {
+        const {path, start} = position.bareValue;
+        const structureValueItems = getStructureValueCompletions(path, cursorOffset - start, (value) =>
+            JSON.stringify(value)
+        );
+
+        if (structureValueItems) {
+            return structureValueItems;
+        }
+
+        return getParameterValueCompletions(context, position, path, cursorOffset - start, (option) =>
+            JSON.stringify(option)
+        );
     }
 
     if (!position?.inString) {
@@ -406,14 +448,29 @@ export async function getWorkflowDefinitionCompletions(
         return getInlineScriptCompletions(context, position, value);
     }
 
+    if (position.stringStart !== undefined) {
+        const {stringQuote, stringStart} = position;
+        const structureValueItems = getStructureValueCompletions(path, cursorOffset - stringStart, (option) =>
+            documentValueText(option, context.format, stringQuote)
+        );
+
+        if (structureValueItems) {
+            return structureValueItems;
+        }
+    }
+
     if (key === 'type' && isArrayElementType(path)) {
         return value.includes('/')
             ? getActionTypeCompletions(context, path[0], value)
             : getComponentTypeCompletions(context);
     }
 
-    if (!value.includes('${') && !value.startsWith('=')) {
-        return getParameterValueCompletions(context, position, cursorOffset);
+    if (!value.includes('${') && !value.startsWith('=') && position.stringStart !== undefined) {
+        const {stringQuote} = position;
+
+        return getParameterValueCompletions(context, position, path, cursorOffset - position.stringStart, (option) =>
+            documentValueText(option, context.format, stringQuote)
+        );
     }
 
     return getExpressionCompletions(context, position, value);

@@ -1,6 +1,8 @@
 import type {ScriptLanguageType} from './completionTypes';
 
 export type ActionCallKeySlotType = {
+    argumentStart: number;
+    callStart: number;
     calleeText: string;
     existingKeys: string[];
     prefix: string;
@@ -10,6 +12,8 @@ export type ActionCallKeySlotType = {
 };
 
 export type ActionCallValueSlotType = {
+    argumentStart: number;
+    callStart: number;
     calleeText: string;
     prefix: string;
     propertyPath: string[];
@@ -25,6 +29,7 @@ type ScanResultType = {
 };
 
 type FirstArgumentLocationType = {
+    callStart: number;
     calleeText: string;
     propertyPath: string[];
     rootFrame: FrameType;
@@ -33,8 +38,11 @@ type FirstArgumentLocationType = {
 type LiteralType = {value: unknown};
 
 type FrameType = {
+    arrayItems: unknown[];
+    arrayUnknown: boolean;
     calleeText?: string;
     character: '(' | '[' | '{';
+    elementIndex: number;
     firstArgumentOfCall: boolean;
     keyForValue?: string;
     keys: string[];
@@ -42,6 +50,7 @@ type FrameType = {
     literals: Record<string, unknown>;
     segmentKey?: string;
     segmentStart: number;
+    start: number;
     tokenCount: number;
     tokenValue?: string;
     valueStart?: number;
@@ -51,8 +60,11 @@ const IDENTIFIER_START = /[A-Za-z_$]/;
 const IDENTIFIER_PART = /[\w$]/;
 const KEY_PREFIX = /^\s*([A-Za-z_$][\w$]*)?$/;
 const VALUE_PREFIX = /^\s*([\w.-]*)$/;
+const CONNECTION_NAME_ARGUMENT = /^\s*,\s*(['"])([^'"\\\n]+)\1/;
 const TRAILING_MEMBER_CHAIN = /[\w$.[\]'"]+$/;
 const NUMBER_LITERAL = /^-?\d+(\.\d+)?/;
+const PYTHON_CONNECTION_KEYWORD = /^\s*connection\s*=\s*(['"])([^'"\\\n]+)\1\s*$/;
+const PYTHON_INPUT_KEYWORD = /[(,]\s*input\s*=\s*$/;
 
 const LITERAL_IDENTIFIERS: Record<ScriptLanguageType, Record<string, unknown>> = {
     javascript: {false: false, null: null, true: true},
@@ -129,7 +141,21 @@ function recordToken(frame: FrameType | undefined, value?: string, literal?: Lit
         frame.tokenCount++;
         frame.tokenValue = value;
         frame.literalValue = frame.tokenCount === 3 ? literal : undefined;
+    } else if (frame?.character === '[') {
+        frame.tokenCount++;
+        frame.literalValue = frame.tokenCount === 1 ? literal : undefined;
     }
+}
+
+function closeElement(frame: FrameType): void {
+    if (frame.tokenCount === 1 && frame.literalValue) {
+        frame.arrayItems[frame.elementIndex] = frame.literalValue.value;
+    } else if (frame.tokenCount > 0) {
+        frame.arrayUnknown = true;
+    }
+
+    frame.literalValue = undefined;
+    frame.tokenCount = 0;
 }
 
 function recordKey(frame: FrameType): void {
@@ -154,6 +180,42 @@ function closeSegment(frame: FrameType): void {
     frame.tokenCount = 0;
     frame.tokenValue = undefined;
     frame.valueStart = undefined;
+}
+
+function attachClosedValue(parent: FrameType | undefined, value: unknown): void {
+    if (value === undefined) {
+        return;
+    }
+
+    if (parent?.character === '{' && parent.segmentKey !== undefined && parent.tokenCount === 3) {
+        parent.literalValue = {value};
+    } else if (parent?.character === '[' && parent.tokenCount === 1) {
+        parent.literalValue = {value};
+    }
+}
+
+function nestedRootValues(frames: FrameType[], rootFrame: FrameType): Record<string, unknown> {
+    const rootValues: Record<string, unknown> = {...rootFrame.literals};
+
+    let container: Record<string | number, unknown> = rootValues;
+
+    for (let index = frames.indexOf(rootFrame) + 1; index < frames.length; index++) {
+        const frame = frames[index];
+
+        if (frame.keyForValue === undefined || frame.character === '(') {
+            break;
+        }
+
+        const value: Record<string | number, unknown> =
+            frame.character === '{'
+                ? {...frame.literals}
+                : ([...frame.arrayItems] as unknown as Record<number, unknown>);
+
+        container[frames[index - 1].character === '[' ? Number(frame.keyForValue) : frame.keyForValue] = value;
+        container = value;
+    }
+
+    return rootValues;
 }
 
 function isInterpolated(value: string, quote: string, language: ScriptLanguageType): boolean {
@@ -246,17 +308,24 @@ function scanActionCall(source: string, cursorOffset: number, language: ScriptLa
             recordToken(top);
 
             frames.push({
+                arrayItems: [],
+                arrayUnknown: false,
                 calleeText:
                     character === '('
                         ? (TRAILING_MEMBER_CHAIN.exec(text.slice(0, position).trimEnd())?.[0] ?? '')
                         : undefined,
                 character,
+                elementIndex: 0,
                 firstArgumentOfCall:
-                    character === '{' && top?.character === '(' && previous === '(' && top.tokenCount === 0,
-                keyForValue: keyForValue ?? (top?.character === '[' ? '0' : undefined),
+                    character === '{' &&
+                    top?.character === '(' &&
+                    ((previous === '(' && top.tokenCount === 0) ||
+                        (language === 'python' && PYTHON_INPUT_KEYWORD.test(text.slice(top.start, position)))),
+                keyForValue: keyForValue ?? (top?.character === '[' ? String(top.elementIndex) : undefined),
                 keys: [],
                 literals: {},
                 segmentStart: position + 1,
+                start: position,
                 tokenCount: 0,
             });
 
@@ -270,6 +339,15 @@ function scanActionCall(source: string, cursorOffset: number, language: ScriptLa
 
             if (closedFrame?.character === '{') {
                 closeSegment(closedFrame);
+
+                attachClosedValue(frames[frames.length - 1], closedFrame.literals);
+            } else if (closedFrame?.character === '[') {
+                closeElement(closedFrame);
+
+                attachClosedValue(
+                    frames[frames.length - 1],
+                    closedFrame.arrayUnknown ? undefined : closedFrame.arrayItems
+                );
             }
 
             position++;
@@ -281,6 +359,16 @@ function scanActionCall(source: string, cursorOffset: number, language: ScriptLa
             closeSegment(top);
 
             top.segmentStart = position + 1;
+
+            position++;
+
+            continue;
+        }
+
+        if (top?.character === '[' && character === ',') {
+            closeElement(top);
+
+            top.elementIndex++;
 
             position++;
 
@@ -328,7 +416,12 @@ function locateFirstArgument(frames: FrameType[]): FirstArgumentLocationType | u
         const frame = frames[index];
 
         if (frame.character === '{' && frame.firstArgumentOfCall) {
-            return {calleeText: frames[index - 1].calleeText ?? '', propertyPath, rootFrame: frame};
+            return {
+                callStart: frames[index - 1].start,
+                calleeText: frames[index - 1].calleeText ?? '',
+                propertyPath,
+                rootFrame: frame,
+            };
         }
 
         if (frame.keyForValue === undefined) {
@@ -375,12 +468,14 @@ export function findActionCallKeySlot(
     }
 
     return {
+        argumentStart: location.rootFrame.start,
+        callStart: location.callStart,
         calleeText: location.calleeText,
         existingKeys: objectFrame.keys,
         prefix,
         propertyPath: location.propertyPath,
         rootKeys: location.rootFrame.keys,
-        rootValues: location.rootFrame.literals,
+        rootValues: nestedRootValues(frames, location.rootFrame),
     };
 }
 
@@ -414,11 +509,129 @@ export function findActionCallValueSlot(
     }
 
     return {
+        argumentStart: location.rootFrame.start,
+        callStart: location.callStart,
         calleeText: location.calleeText,
         prefix: openString ? text.slice(openString.start + 1) : (prefixMatch[1] ?? ''),
         propertyPath: [...location.propertyPath, objectFrame.segmentKey],
         ...(openString && {quote: text[openString.start]}),
         rootKeys: location.rootFrame.keys,
-        rootValues: location.rootFrame.literals,
+        rootValues: nestedRootValues(frames, location.rootFrame),
     };
+}
+
+function readCallArguments(source: string, callStart: number, language: ScriptLanguageType): string[] {
+    const callArguments: string[] = [];
+
+    let argumentStart = callStart + 1;
+    let depth = 0;
+    let position = callStart;
+
+    while (position < source.length) {
+        const character = source[position];
+        const commentEnd = skipComment(source, position, language);
+
+        if (commentEnd !== undefined) {
+            position = commentEnd;
+
+            continue;
+        }
+
+        if (character === '"' || character === "'" || character === '`') {
+            position = readString(source, position).end;
+
+            continue;
+        }
+
+        if (character === '(' || character === '[' || character === '{') {
+            depth++;
+        } else if (character === ')' || character === ']' || character === '}') {
+            depth--;
+
+            if (depth === 0) {
+                callArguments.push(source.slice(argumentStart, position));
+
+                return callArguments;
+            }
+        } else if (character === ',' && depth === 1) {
+            callArguments.push(source.slice(argumentStart, position));
+
+            argumentStart = position + 1;
+        }
+
+        position++;
+    }
+
+    return callArguments;
+}
+
+function findConnectionKeywordArgument(
+    source: string,
+    callStart: number,
+    language: ScriptLanguageType
+): string | undefined {
+    for (const callArgument of readCallArguments(source, callStart, language)) {
+        const match = PYTHON_CONNECTION_KEYWORD.exec(callArgument);
+
+        if (match) {
+            return match[2];
+        }
+    }
+
+    return undefined;
+}
+
+export function findConnectionNameArgument(
+    source: string,
+    argumentStart: number,
+    language: ScriptLanguageType,
+    callStart?: number
+): string | undefined {
+    const positionalName = findPositionalConnectionName(source, argumentStart, language);
+
+    if (positionalName !== undefined || language !== 'python' || callStart === undefined) {
+        return positionalName;
+    }
+
+    return findConnectionKeywordArgument(source, callStart, language);
+}
+
+function findPositionalConnectionName(
+    source: string,
+    argumentStart: number,
+    language: ScriptLanguageType
+): string | undefined {
+    let depth = 0;
+    let position = argumentStart;
+
+    while (position < source.length) {
+        const character = source[position];
+        const commentEnd = skipComment(source, position, language);
+
+        if (commentEnd !== undefined) {
+            position = commentEnd;
+
+            continue;
+        }
+
+        if (character === '"' || character === "'" || character === '`') {
+            position = readString(source, position).end;
+
+            continue;
+        }
+
+        if (character === '(' || character === '[' || character === '{') {
+            depth++;
+        } else if (character === ')' || character === ']' || character === '}') {
+            depth--;
+
+            if (depth === 0) {
+                return CONNECTION_NAME_ARGUMENT.exec(source.slice(position + 1))?.[2];
+            }
+        }
+
+        position++;
+    }
+
+    return undefined;
 }

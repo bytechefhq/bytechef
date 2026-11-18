@@ -62,6 +62,19 @@ describe('buildPropertyItems', () => {
         expect(items.map((item) => item.sortText)).toEqual(['0_000', '1_001', '1_002', '1_005']);
         expect(items[3].detail).toBe('OBJECT');
     });
+
+    it('offers a key once when several properties share its name', () => {
+        const variants = [
+            {displayCondition: "type == 'STRING'", name: 'value', type: 'STRING'},
+            {displayCondition: "type == 'OBJECT'", name: 'value', type: 'OBJECT'},
+            {name: 'type', type: 'STRING'},
+        ] as unknown as Property[];
+
+        expect(buildPropertyItems(variants, []).map((item) => [item.label, item.detail])).toEqual([
+            ['value', 'STRING'],
+            ['type', 'STRING'],
+        ]);
+    });
 });
 
 describe('getPropertyCompletionItems', () => {
@@ -286,5 +299,90 @@ describe('getPropertyValueItems', () => {
         });
 
         expect(items.map((item) => item.label)).toEqual(['Done']);
+    });
+});
+
+describe('getPropertyCompletionItems and getPropertyValueItems for nested properties', () => {
+    const nestedProperties = [
+        {
+            name: 'body',
+            properties: [
+                {name: 'contentType', type: 'STRING'},
+                {displayCondition: "body.contentType == 'raw'", name: 'raw', type: 'STRING'},
+                {name: 'mode', type: 'STRING'},
+            ],
+            type: 'OBJECT',
+        },
+        {
+            items: [
+                {
+                    properties: [
+                        {name: 'type', type: 'STRING'},
+                        {displayCondition: "items[index].type == 'list'", name: 'values', type: 'ARRAY'},
+                        {name: 'field', optionsDataSource: {optionsLookupDependsOn: ['body.mode']}, type: 'STRING'},
+                    ],
+                    type: 'OBJECT',
+                },
+            ],
+            name: 'items',
+            type: 'ARRAY',
+        },
+    ] as unknown as Property[];
+
+    it('hides a nested property whose condition on a nested value is false', async () => {
+        const loadDisplayConditions = vi.fn(async () => ({}));
+        const items = await getPropertyCompletionItems({
+            existingKeys: ['contentType'],
+            loadDisplayConditions,
+            parameters: {body: {contentType: 'json'}},
+            presentKeys: ['body'],
+            properties: nestedProperties,
+            propertyPath: ['body'],
+        });
+
+        expect(items.map((item) => item.label)).toEqual(['mode']);
+        expect(loadDisplayConditions).toHaveBeenCalledWith({body: {contentType: 'json'}});
+    });
+
+    it('substitutes the array index of the item being written', async () => {
+        const request = {
+            existingKeys: ['type'],
+            parameters: {items: [{type: 'a'}, {type: 'list'}]},
+            presentKeys: ['items'],
+            properties: nestedProperties,
+        };
+
+        const first = await getPropertyCompletionItems({
+            ...request,
+            loadDisplayConditions: vi.fn(async () => ({"items[1].type == 'list'": true})),
+            propertyPath: ['items', '0'],
+        });
+        const second = await getPropertyCompletionItems({
+            ...request,
+            loadDisplayConditions: vi.fn(async () => ({"items[1].type == 'list'": true})),
+            propertyPath: ['items', '1'],
+        });
+
+        expect(first.map((item) => item.label)).toEqual(['field']);
+        expect(second.map((item) => item.label)).toEqual(['values', 'field']);
+    });
+
+    it('loads connection options of a nested property by its path, without its own value', async () => {
+        const loadOptions = vi.fn(async () => [{value: 'name'}] as Option[]);
+        const items = await getPropertyValueItems({
+            loadOptions,
+            parameters: {body: {mode: 'm'}, items: [{field: 'na', type: 't'}]},
+            presentKeys: ['body', 'items'],
+            properties: nestedProperties,
+            propertyPath: ['items', '0', 'field'],
+            replaceLength: 2,
+            toInsertText: String,
+        });
+
+        expect(items.map((item) => item.insertText)).toEqual(['name']);
+        expect(loadOptions).toHaveBeenCalledWith('items[].field', ['body.mode'], {
+            body: {mode: 'm'},
+            items: [{type: 't'}],
+        });
     });
 });
