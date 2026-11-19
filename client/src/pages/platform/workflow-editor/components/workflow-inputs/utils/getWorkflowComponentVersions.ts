@@ -1,5 +1,7 @@
 import {Workflow} from '@/shared/middleware/platform/configuration';
 
+import {getWorkflowDefinitionNodes} from './getWorkflowDefinitionNodes';
+
 export function getWorkflowComponentVersions(workflow: Workflow): Record<string, number> {
     if (!workflow.definition) {
         return {};
@@ -17,32 +19,24 @@ export function getWorkflowComponentVersions(workflow: Workflow): Record<string,
 
     const componentVersions: Record<string, number> = {};
 
-    const collectFromNodes = (nodes: unknown) => {
-        if (!Array.isArray(nodes)) {
-            return;
+    for (const node of getWorkflowDefinitionNodes(definition)) {
+        const [componentName, versionToken] = node.type.split('/');
+
+        if (!componentName || !versionToken || !versionToken.startsWith('v')) {
+            continue;
         }
 
-        for (const node of nodes) {
-            const type = (node as {type?: string})?.type;
+        const version = Number.parseInt(versionToken.slice(1), 10);
 
-            if (!type) {
-                continue;
-            }
-
-            const [componentName, versionToken] = type.split('/');
-
-            if (componentName && versionToken && versionToken.startsWith('v')) {
-                const version = Number.parseInt(versionToken.slice(1), 10);
-
-                if (!Number.isNaN(version)) {
-                    componentVersions[componentName] = version;
-                }
-            }
+        if (Number.isNaN(version)) {
+            continue;
         }
-    };
 
-    collectFromNodes(definition.tasks);
-    collectFromNodes(definition.triggers);
+        const collectedVersion = componentVersions[componentName];
+
+        componentVersions[componentName] =
+            collectedVersion === undefined ? version : Math.max(collectedVersion, version);
+    }
 
     return componentVersions;
 }

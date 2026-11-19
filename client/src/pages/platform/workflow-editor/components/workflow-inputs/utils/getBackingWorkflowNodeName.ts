@@ -1,7 +1,13 @@
 import {Workflow} from '@/shared/middleware/platform/configuration';
 
-export function getBackingWorkflowNodeName(workflow: Workflow, componentName?: string): string | undefined {
-    if (!componentName || !workflow.definition) {
+import {getWorkflowDefinitionNodes} from './getWorkflowDefinitionNodes';
+
+export function getBackingWorkflowNodeName(
+    workflow: Workflow,
+    componentName?: string,
+    componentVersion?: number
+): string | undefined {
+    if (!componentName || componentVersion === undefined || !workflow.definition) {
         return undefined;
     }
 
@@ -13,24 +19,9 @@ export function getBackingWorkflowNodeName(workflow: Workflow, componentName?: s
         return undefined;
     }
 
-    const prefix = `${componentName}/`;
+    const typePrefix = `${componentName}/v${componentVersion}/`;
 
-    const findNodeName = (nodes: unknown): string | undefined => {
-        if (!Array.isArray(nodes)) {
-            return undefined;
-        }
+    const backingNode = getWorkflowDefinitionNodes(definition).find((node) => node.type.startsWith(typePrefix));
 
-        for (const node of nodes) {
-            const type = (node as {type?: string})?.type;
-            const name = (node as {name?: string})?.name;
-
-            if (type && name && type.startsWith(prefix)) {
-                return name;
-            }
-        }
-
-        return undefined;
-    };
-
-    return findNodeName(definition.tasks) ?? findNodeName(definition.triggers);
+    return backingNode?.name;
 }
