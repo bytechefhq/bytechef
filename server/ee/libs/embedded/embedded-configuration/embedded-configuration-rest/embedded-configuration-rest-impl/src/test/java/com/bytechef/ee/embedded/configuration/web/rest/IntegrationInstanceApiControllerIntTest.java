@@ -170,6 +170,40 @@ class IntegrationInstanceApiControllerIntTest {
     }
 
     @Test
+    void testPutIntegrationInstanceConnection() {
+        this.webTestClient
+            .put()
+            .uri("/internal/integration-instances/7/connection")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(
+                """
+                    {"connectionId":11}""")
+            .exchange()
+            .expectStatus()
+            .isNoContent();
+
+        verify(integrationInstanceFacade).updateIntegrationInstanceConnection(7L, 11L);
+    }
+
+    @Test
+    void testPutIntegrationInstanceConnectionAnswersNotFoundForAnUnknownOrSelfActivatedInstance() {
+        doThrow(new NoSuchElementException("Integration instance id=8 not found"))
+            .when(integrationInstanceFacade)
+            .updateIntegrationInstanceConnection(8L, 11L);
+
+        this.webTestClient
+            .put()
+            .uri("/internal/integration-instances/8/connection")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(
+                """
+                    {"connectionId":11}""")
+            .exchange()
+            .expectStatus()
+            .isNotFound();
+    }
+
+    @Test
     void testPutIntegrationInstanceCredentials() {
         this.webTestClient
             .put()

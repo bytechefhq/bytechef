@@ -174,6 +174,11 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
     }
 
     @Override
+    public void updateConnectionId(long id, long connectionId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void updateEnabled(long id, boolean enable) {
         throw new UnsupportedOperationException();
     }
