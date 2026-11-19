@@ -18,6 +18,7 @@ package com.bytechef.atlas.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyIterable;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doThrow;
@@ -243,6 +244,80 @@ public class WorkflowServiceIntTest {
         WorkflowRepository jdbcRepository = jdbcWorkflowRepository;
 
         verify(jdbcRepository, never()).findById(anyString());
+    }
+
+    @Test
+    public void testGetWorkflowsReturnsOnlyTheGivenWorkflowsWithoutLoadingAll() {
+        Workflow firstWorkflow = workflowCrudRepository.save(getWorkflow());
+        Workflow secondWorkflow = workflowCrudRepository.save(getWorkflow());
+
+        workflowCrudRepository.save(getWorkflow());
+
+        String firstWorkflowId = Validate.notNull(firstWorkflow.getId(), "id");
+        String secondWorkflowId = Validate.notNull(secondWorkflow.getId(), "id");
+
+        clearInvocations(probingWorkflowRepository, jdbcWorkflowRepository);
+
+        List<Workflow> workflows = workflowService.getWorkflows(
+            List.of(firstWorkflowId, secondWorkflowId, "missing-" + System.nanoTime()));
+
+        assertThat(workflows).extracting(Workflow::getId)
+            .containsExactlyInAnyOrder(firstWorkflowId, secondWorkflowId);
+        assertThat(workflows).allSatisfy(
+            workflow -> assertThat(workflow.getSourceType()).isEqualTo(Workflow.SourceType.JDBC));
+
+        verify(probingWorkflowRepository, never()).findAll();
+
+        WorkflowRepository jdbcRepository = jdbcWorkflowRepository;
+
+        verify(jdbcRepository, never()).findAll();
+        verify(jdbcRepository, never()).findById(anyString());
+    }
+
+    @Test
+    public void testGetWorkflowsReturnsCachedWorkflowsWithoutQueryingRepositories() {
+        Workflow workflow = workflowCrudRepository.save(getWorkflow());
+
+        String workflowId = Validate.notNull(workflow.getId(), "id");
+
+        assertThat(workflowService.getWorkflows(List.of(workflowId))).hasSize(1);
+
+        workflowCrudRepository.deleteById(workflowId);
+
+        clearInvocations(probingWorkflowRepository, jdbcWorkflowRepository);
+
+        assertThat(workflowService.getWorkflows(List.of(workflowId))).extracting(Workflow::getId)
+            .containsExactly(workflowId);
+
+        verify(probingWorkflowRepository, never()).findAllById(anyIterable());
+
+        WorkflowRepository jdbcRepository = jdbcWorkflowRepository;
+
+        verify(jdbcRepository, never()).findAllById(anyIterable());
+    }
+
+    @Test
+    public void testGetWorkflowsFallsBackToLaterRepositoryWhenEarlierThrows() {
+        Workflow workflow = workflowCrudRepository.save(getWorkflow());
+
+        String workflowId = Validate.notNull(workflow.getId(), "id");
+
+        doThrow(new IllegalStateException("datasource unavailable")).when(probingWorkflowRepository)
+            .findAllById(anyIterable());
+
+        assertThat(workflowService.getWorkflows(List.of(workflowId))).extracting(Workflow::getId)
+            .containsExactly(workflowId);
+    }
+
+    @Test
+    public void testGetWorkflowsRethrowsRepositoryFailureWhenAWorkflowIsNotFound() {
+        IllegalStateException failure = new IllegalStateException("datasource unavailable");
+
+        doThrow(failure).when(probingWorkflowRepository)
+            .findAllById(anyIterable());
+
+        assertThatThrownBy(() -> workflowService.getWorkflows(List.of("missing-" + System.nanoTime())))
+            .isSameAs(failure);
     }
 
     @Test

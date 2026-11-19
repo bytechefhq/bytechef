@@ -20,6 +20,7 @@ package com.bytechef.atlas.configuration.repository;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +32,18 @@ import java.util.Optional;
 public interface WorkflowRepository {
 
     List<Workflow> findAll();
+
+    default List<Workflow> findAllById(Iterable<String> ids) {
+        List<Workflow> workflows = new ArrayList<>();
+
+        for (String id : ids) {
+            Optional<Workflow> workflowOptional = findById(id);
+
+            workflowOptional.ifPresent(workflows::add);
+        }
+
+        return workflows;
+    }
 
     Optional<Workflow> findById(String id);
 
