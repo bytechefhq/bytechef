@@ -78,7 +78,11 @@ record RemoteTaskRunnerSettings(
         return List.of(
             string(PULL_POLICY)
                 .label("Pull Policy")
-                .description("When the image is pulled from its registry.")
+                .description(
+                    "When the image is pulled from its registry. Always pulls it on every run, so a " +
+                        "moving tag such as latest stays current. If Not Present, the default, pulls it " +
+                        "only when it is not there yet. Never uses only an image that is already there " +
+                        "and fails without one.")
                 .options(
                     option("Always", RemotePullPolicy.ALWAYS.name()),
                     option("If Not Present", RemotePullPolicy.IF_NOT_PRESENT.name()),
@@ -88,28 +92,32 @@ record RemoteTaskRunnerSettings(
             bool(RESUME)
                 .label("Resume")
                 .description(
-                    "After a server restart, re-attach to the job this task execution already started instead of " +
-                        "starting another one.")
+                    "After a server restart, re-attach to the job this task execution already started " +
+                        "and wait for its result instead of starting the code again. On by default; when " +
+                        "off, a restart starts a new job.")
                 .defaultValue(true)
                 .required(false),
             bool(DELETE)
                 .label("Delete")
                 .description(
-                    "Remove the job and whatever it left behind once it has finished. Turn it off to inspect a " +
-                        "failed job by hand.")
+                    "Removes the job and whatever it left behind once it has finished. On by default; " +
+                        "turn it off to inspect a failed job by hand.")
                 .defaultValue(true)
                 .required(false),
             string(WAIT_UNTIL_RUNNING)
                 .label("Wait Until Running")
                 .description(
-                    "How long the job may take to be scheduled, pull its image and start, as an ISO-8601 duration.")
+                    "How long the job may take to be scheduled, pull its image and start, as an " +
+                        "ISO-8601 duration such as PT10M, the default. Raise it for large images or busy " +
+                        "clusters.")
                 .defaultValue("PT10M")
                 .required(false),
             string(WAIT_UNTIL_COMPLETION)
                 .label("Wait Until Completion")
                 .description(
-                    "How long the job may run before it is killed, as an ISO-8601 duration. The task's Timeout, " +
-                        "when set, takes precedence; both are capped by the operator's max-wait.")
+                    "How long the job may run once started before it is killed, as an ISO-8601 " +
+                        "duration such as PT1H, the default. The task's Timeout, when set, takes " +
+                        "precedence; both are capped by the operator's max-wait.")
                 .defaultValue("PT1H")
                 .required(false));
     }

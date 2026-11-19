@@ -44,7 +44,12 @@ public class CommandsPythonAction {
         properties.add(
             array(COMMANDS)
                 .label("Commands")
-                .description("The lines handed to the interpreter, in order.")
+                .description(
+                    "The lines of a Python program, run in order as one file by python3, so " +
+                        "indentation carries across lines. The task fails when the program exits with a " +
+                        "non-zero code or an uncaught error. Write a JSON object to output.json in the " +
+                        "folder named by the BYTECHEF_OUTPUT_DIR environment variable to return it as the " +
+                        "task's vars.")
                 .items(string())
                 .required(true)
                 .expressionEnabled(false));
@@ -56,7 +61,10 @@ public class CommandsPythonAction {
         properties.add(
             bool(WARN_ON_STD_ERR)
                 .label("Warn On Standard Error")
-                .description("Logs a warning when the execution writes to standard error.")
+                .description(
+                    "Logs a warning when the code writes anything to standard error, which also comes " +
+                        "back in the result's stderr. On by default; turn it off for tools that print " +
+                        "progress there.")
                 .defaultValue(true)
                 .required(false));
 
