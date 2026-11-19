@@ -31,7 +31,7 @@ import org.jspecify.annotations.Nullable;
     justification = "Each repetition in the pill grammar starts with a '.' or '[' delimiter, so a path matches one way")
 record DataPillPath(String path) {
 
-    private static final String INDEX_REGEX = "\\[(?:\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')]";
+    private static final String INDEX_REGEX = "\\[(?:\\d+|'[^'\\\\{}\\r\\n]*')]";
     private static final String NAME_REGEX = "[a-zA-Z_][a-zA-Z0-9_]*";
 
     static final String PATH_REGEX = NAME_REGEX + "(?:" + INDEX_REGEX + ")*(?:\\.(?:" + NAME_REGEX + "(?:" +
