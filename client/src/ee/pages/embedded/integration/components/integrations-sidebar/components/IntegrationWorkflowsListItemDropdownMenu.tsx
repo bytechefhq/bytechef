@@ -1,8 +1,10 @@
 import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
 import {Integration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import {useDeleteWorkflowMutation, useUpdateWorkflowMutation} from '@/ee/shared/mutations/embedded/workflows.mutations';
-import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
-import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
+import {
+    IntegrationWorkflowKeys,
+    invalidateIntegrationsAfterWorkflowDelete,
+} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {WorkflowKeys, useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import WorkflowListItemDropdownMenu from '@/shared/components/workflow/WorkflowListItemDropdownMenu';
@@ -37,16 +39,7 @@ const IntegrationWorkflowsListItemDropdownMenu = ({
 
             queryClient.removeQueries({queryKey: WorkflowKeys.workflow(workflow.id!)});
 
-            if (deletedIntegrationWorkflowId) {
-                queryClient.removeQueries({
-                    queryKey: IntegrationWorkflowKeys.integrationWorkflow(integrationId, deletedIntegrationWorkflowId),
-                });
-            }
-
-            void queryClient.invalidateQueries({
-                queryKey: IntegrationWorkflowKeys.integrationWorkflows(integrationId),
-            });
-            void queryClient.invalidateQueries({queryKey: IntegrationKeys.integrations});
+            void invalidateIntegrationsAfterWorkflowDelete(queryClient, integrationId, deletedIntegrationWorkflowId);
 
             if (workflow.id !== currentWorkflowId) {
                 return;

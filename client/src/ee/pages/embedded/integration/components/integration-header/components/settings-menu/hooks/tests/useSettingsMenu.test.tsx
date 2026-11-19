@@ -1,7 +1,7 @@
 import {Integration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {NodeDataType} from '@/shared/types';
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {QueryClient, QueryClientProvider, QueryObserver} from '@tanstack/react-query';
 import {act, renderHook} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -10,6 +10,8 @@ import {useSettingsMenu} from '../useSettingsMenu';
 
 const hoisted = vi.hoisted(() => ({
     clearWorkflowHistory: vi.fn(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    deleteWorkflowOptions: undefined as any,
     navigate: vi.fn(),
     noopMutation: () => ({isPending: false, mutate: vi.fn()}),
     restoreIntegrationVersionMutate: vi.fn(),
@@ -34,7 +36,12 @@ vi.mock('@/ee/shared/mutations/embedded/integrations.mutations', () => ({
 
 vi.mock('@/ee/shared/mutations/embedded/workflows.mutations', () => ({
     useCreateIntegrationWorkflowMutation: hoisted.noopMutation,
-    useDeleteWorkflowMutation: hoisted.noopMutation,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    useDeleteWorkflowMutation: (options: any) => {
+        hoisted.deleteWorkflowOptions = options;
+
+        return {isPending: false, mutate: vi.fn()};
+    },
 }));
 
 vi.mock('@/shared/hooks/useAnalytics', () => ({
@@ -154,5 +161,38 @@ describe('useSettingsMenu', () => {
         });
 
         expect(hoisted.navigate).toHaveBeenCalledWith('/embedded/integrations');
+    });
+
+    it('does not fetch the deleted workflow again while the editor still shows it', async () => {
+        const deletedWorkflowQueryFn = vi.fn().mockResolvedValue(workflow);
+        const deletedWorkflowObserverOptions = {
+            queryFn: deletedWorkflowQueryFn,
+            queryKey: ['integrations', 7, 'integrationWorkflows', 11],
+            staleTime: Infinity,
+        };
+
+        queryClient.setQueryData(['integrations', 7, 'integrationWorkflows', 11], workflow);
+
+        const deletedWorkflowObserver = new QueryObserver(queryClient, deletedWorkflowObserverOptions);
+
+        const unsubscribe = deletedWorkflowObserver.subscribe(() => {});
+
+        queryClient.setQueryData(['integrations', 7], integration);
+
+        renderSettingsMenu();
+
+        await act(async () => {
+            hoisted.deleteWorkflowOptions.onSuccess();
+
+            deletedWorkflowObserver.setOptions(deletedWorkflowObserverOptions);
+        });
+
+        expect(hoisted.navigate).toHaveBeenCalledWith(
+            '/embedded/integrations/7/integration-workflows/12?environmentId=1'
+        );
+        expect(deletedWorkflowQueryFn).not.toHaveBeenCalled();
+        expect(queryClient.getQueryState(['integrations', 7])?.isInvalidated).toBe(true);
+
+        unsubscribe();
     });
 });
