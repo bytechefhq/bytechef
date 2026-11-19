@@ -98,11 +98,11 @@ const AutomationProjectConfigurationWorkflowListItem = ({
         });
 
     return (
-        <li className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
-            <div className="relative flex flex-1 items-center">
+        <li className="flex items-center justify-between gap-x-4 rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
+            <div className="relative flex min-w-0 flex-1 items-center">
                 <div
                     className={twMerge(
-                        'flex w-80 items-center gap-2 text-sm font-semibold',
+                        'flex w-full max-w-80 min-w-0 shrink items-center gap-2 text-sm font-semibold sm:w-80 sm:shrink-0',
                         !workflow.enabled && 'text-muted-foreground'
                     )}
                 >
@@ -121,7 +121,7 @@ const AutomationProjectConfigurationWorkflowListItem = ({
                 </div>
 
                 {workflowTemplate && (
-                    <div className="relative z-10 ml-6 flex items-center gap-1">
+                    <div className="relative z-10 ml-6 flex min-w-0 items-center gap-1 overflow-hidden">
                         <WorkflowTriggerAndComponentsRow
                             className="hidden sm:flex"
                             filteredComponentNames={filteredComponentNames}
@@ -133,11 +133,11 @@ const AutomationProjectConfigurationWorkflowListItem = ({
                 )}
             </div>
 
-            <div className="flex items-center gap-x-3">
+            <div className="flex shrink-0 items-center gap-x-3">
                 {lastExecutionDate ? (
                     <Tooltip>
                         <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
-                            <span className="text-xs">
+                            <span className="text-xs whitespace-nowrap">
                                 {`Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`}
                             </span>
                         </TooltipTrigger>
@@ -145,7 +145,7 @@ const AutomationProjectConfigurationWorkflowListItem = ({
                         <TooltipContent side="left">Last Execution Date</TooltipContent>
                     </Tooltip>
                 ) : (
-                    <span className="text-xs">No executions</span>
+                    <span className="text-xs whitespace-nowrap">No executions</span>
                 )}
 
                 <Switch
