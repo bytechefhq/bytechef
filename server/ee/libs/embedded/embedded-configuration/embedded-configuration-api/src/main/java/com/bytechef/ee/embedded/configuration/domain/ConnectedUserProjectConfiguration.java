@@ -43,6 +43,9 @@ public class ConnectedUserProjectConfiguration {
     @Column("automation_project_configuration_id")
     private AggregateReference<AutomationProjectConfiguration, Long> configurationId;
 
+    @Column
+    private boolean enabled = true;
+
     @CreatedBy
     @Column("created_by")
     private String createdBy;
@@ -125,8 +128,16 @@ public class ConnectedUserProjectConfiguration {
         return version;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
     public void setConfigurationId(long configurationId) {
         this.configurationId = AggregateReference.to(configurationId);
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     @Override
@@ -136,6 +147,7 @@ public class ConnectedUserProjectConfiguration {
             ", connectedUserId=" + connectedUserId +
             ", projectId=" + projectId +
             ", configurationId=" + configurationId +
+            ", enabled=" + enabled +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +

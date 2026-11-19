@@ -83,6 +83,15 @@ public class ConnectedUserMcpAutomationResolverImpl implements ConnectedUserMcpA
             return Optional.empty();
         }
 
+        boolean assignmentEnabled = connectedUserProjectConfigurationService
+            .fetchAssignment(connectedUserId, configuration.getProjectId())
+            .map(ConnectedUserProjectConfiguration::isEnabled)
+            .orElse(true);
+
+        if (!assignmentEnabled) {
+            return Optional.empty();
+        }
+
         Optional<ConnectedUserProjectWorkflow> referenceOptional = fetchReference(
             connectedUserId, configuration, workflowUuid);
 

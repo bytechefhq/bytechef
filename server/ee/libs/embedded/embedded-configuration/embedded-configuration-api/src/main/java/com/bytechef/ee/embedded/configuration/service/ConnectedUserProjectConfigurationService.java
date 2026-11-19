@@ -48,4 +48,14 @@ public interface ConnectedUserProjectConfigurationService {
      * @return the connected user's assignments, one per automation project
      */
     List<ConnectedUserProjectConfiguration> getConnectedUserAssignments(long connectedUserId);
+
+    /**
+     * Turns the connected user's assignment to the project's configuration on or off.
+     *
+     * @param connectedUserId the connected user id
+     * @param projectId       the project id
+     * @param enabled         if the workflows of the assigned configuration run for the connected user
+     * @return the saved assignment
+     */
+    ConnectedUserProjectConfiguration updateEnabled(long connectedUserId, long projectId, boolean enabled);
 }

@@ -34,6 +34,7 @@ type ConnectedUserAutomationProjectConfiguration {
     configurationName: String!
     configurationProjectVersion: Int!
     configurationEnabled: Boolean!
+    enabled: Boolean!
 }
 
 type ConnectedUserProjectWorkflow {

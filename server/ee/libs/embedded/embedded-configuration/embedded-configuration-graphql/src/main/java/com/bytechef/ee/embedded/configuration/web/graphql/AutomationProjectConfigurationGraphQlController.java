@@ -156,6 +156,16 @@ public class AutomationProjectConfigurationGraphQlController {
     }
 
     @MutationMapping
+    public boolean enableConnectedUserAutomationProjectConfiguration(
+        @Argument String connectedUserId, @Argument String projectId, @Argument boolean enable) {
+
+        automationProjectConfigurationFacade.enableConnectedUserConfiguration(
+            Long.parseLong(connectedUserId), Long.parseLong(projectId), enable);
+
+        return true;
+    }
+
+    @MutationMapping
     public ConfigurationMoveResultDTO moveAutomationProjectConfigurationConnectedUsers(
         @Argument String sourceId, @Argument String targetId, @Argument List<String> connectedUserIds) {
 

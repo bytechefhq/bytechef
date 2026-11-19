@@ -103,4 +103,17 @@ public class ConnectedUserProjectConfigurationServiceImpl implements ConnectedUs
     public List<ConnectedUserProjectConfiguration> getConnectedUserAssignments(long connectedUserId) {
         return connectedUserProjectConfigurationRepository.findAllByConnectedUserId(connectedUserId);
     }
+
+    @Override
+    public ConnectedUserProjectConfiguration updateEnabled(long connectedUserId, long projectId, boolean enabled) {
+        ConnectedUserProjectConfiguration assignment = connectedUserProjectConfigurationRepository
+            .findByConnectedUserIdAndProjectId(connectedUserId, projectId)
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Connected user id=%s is not assigned to a configuration of project id=%s".formatted(
+                    connectedUserId, projectId)));
+
+        assignment.setEnabled(enabled);
+
+        return connectedUserProjectConfigurationRepository.save(assignment);
+    }
 }

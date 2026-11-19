@@ -897,7 +897,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         return new ConnectedUserAutomationProjectConfigurationDTO(
             assignment.getProjectId(), configuration.getId(), configuration.getName(),
-            configuration.getProjectVersion(), configuration.isEnabled());
+            configuration.getProjectVersion(), configuration.isEnabled(), assignment.isEnabled());
     }
 
     private ProvisionableAutomationProjectDTO toProvisionableProject(

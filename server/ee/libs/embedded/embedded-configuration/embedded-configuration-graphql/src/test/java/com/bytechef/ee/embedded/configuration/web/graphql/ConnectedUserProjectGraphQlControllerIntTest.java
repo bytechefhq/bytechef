@@ -175,8 +175,8 @@ class ConnectedUserProjectGraphQlControllerIntTest {
         when(connectedUserProjectFacade.getConnectedUserProjectConfigurations(7L))
             .thenReturn(
                 List.of(
-                    new ConnectedUserAutomationProjectConfigurationDTO(5L, 11L, "Beta", 3, true),
-                    new ConnectedUserAutomationProjectConfigurationDTO(6L, 12L, "DEVELOPMENT", 1, false)));
+                    new ConnectedUserAutomationProjectConfigurationDTO(5L, 11L, "Beta", 3, true, true),
+                    new ConnectedUserAutomationProjectConfigurationDTO(6L, 12L, "DEVELOPMENT", 1, false, true)));
 
         this.graphQlTester
             .document("""

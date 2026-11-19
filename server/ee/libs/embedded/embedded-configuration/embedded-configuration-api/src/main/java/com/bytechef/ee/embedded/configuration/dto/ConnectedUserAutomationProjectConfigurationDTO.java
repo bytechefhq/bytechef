@@ -23,5 +23,5 @@ package com.bytechef.ee.embedded.configuration.dto;
  */
 public record ConnectedUserAutomationProjectConfigurationDTO(
     long projectId, long configurationId, String configurationName, int configurationProjectVersion,
-    boolean configurationEnabled) {
+    boolean configurationEnabled, boolean enabled) {
 }

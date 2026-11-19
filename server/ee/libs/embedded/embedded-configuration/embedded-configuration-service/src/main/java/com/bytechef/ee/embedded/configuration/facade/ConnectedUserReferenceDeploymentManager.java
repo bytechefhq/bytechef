@@ -19,6 +19,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeployment;
 import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
@@ -175,14 +176,21 @@ class ConnectedUserReferenceDeploymentManager {
     public boolean isAdministrativelyEnabled(
         long connectedUserId, long automationProjectId, String automationUuid) {
 
-        Optional<AutomationProjectConfiguration> configurationOptional = fetchAssignedConfiguration(
-            connectedUserId, automationProjectId);
+        Optional<ConnectedUserProjectConfiguration> assignmentOptional =
+            connectedUserProjectConfigurationService.fetchAssignment(connectedUserId, automationProjectId);
 
-        if (configurationOptional.isEmpty()) {
+        if (assignmentOptional.isEmpty()) {
             return false;
         }
 
-        AutomationProjectConfiguration configuration = configurationOptional.get();
+        ConnectedUserProjectConfiguration assignment = assignmentOptional.get();
+
+        if (!assignment.isEnabled()) {
+            return false;
+        }
+
+        AutomationProjectConfiguration configuration = automationProjectConfigurationService.getConfiguration(
+            assignment.getConfigurationId());
 
         return configuration.isEnabled() && automationProjectConfigurationService.isWorkflowEnabled(
             configuration, UUID.fromString(automationUuid));
