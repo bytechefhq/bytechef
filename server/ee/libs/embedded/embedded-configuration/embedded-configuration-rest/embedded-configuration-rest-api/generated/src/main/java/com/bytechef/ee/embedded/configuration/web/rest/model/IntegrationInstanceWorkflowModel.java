@@ -50,6 +50,8 @@ public class IntegrationInstanceWorkflowModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime lastModifiedDate;
 
+  private @Nullable String staticWebhookUrl;
+
   private String workflowId;
 
   public IntegrationInstanceWorkflowModel() {
@@ -262,6 +264,27 @@ public class IntegrationInstanceWorkflowModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
+  public IntegrationInstanceWorkflowModel staticWebhookUrl(@Nullable String staticWebhookUrl) {
+    this.staticWebhookUrl = staticWebhookUrl;
+    return this;
+  }
+
+  /**
+   * The static webhook url of the workflow for this integration instance, set when the workflow starts with a static webhook trigger.
+   * @return staticWebhookUrl
+   */
+  
+  @Schema(name = "staticWebhookUrl", accessMode = Schema.AccessMode.READ_ONLY, description = "The static webhook url of the workflow for this integration instance, set when the workflow starts with a static webhook trigger.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("staticWebhookUrl")
+  public @Nullable String getStaticWebhookUrl() {
+    return staticWebhookUrl;
+  }
+
+  @JsonProperty("staticWebhookUrl")
+  public void setStaticWebhookUrl(@Nullable String staticWebhookUrl) {
+    this.staticWebhookUrl = staticWebhookUrl;
+  }
+
   public IntegrationInstanceWorkflowModel workflowId(String workflowId) {
     this.workflowId = workflowId;
     return this;
@@ -301,12 +324,13 @@ public class IntegrationInstanceWorkflowModel {
         Objects.equals(this.lastExecutionDate, integrationInstanceWorkflow.lastExecutionDate) &&
         Objects.equals(this.lastModifiedBy, integrationInstanceWorkflow.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, integrationInstanceWorkflow.lastModifiedDate) &&
+        Objects.equals(this.staticWebhookUrl, integrationInstanceWorkflow.staticWebhookUrl) &&
         Objects.equals(this.workflowId, integrationInstanceWorkflow.workflowId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, inputs, enabled, id, integrationInstanceConfigurationWorkflowId, lastExecutionDate, lastModifiedBy, lastModifiedDate, workflowId);
+    return Objects.hash(createdBy, createdDate, inputs, enabled, id, integrationInstanceConfigurationWorkflowId, lastExecutionDate, lastModifiedBy, lastModifiedDate, staticWebhookUrl, workflowId);
   }
 
   @Override
@@ -322,6 +346,7 @@ public class IntegrationInstanceWorkflowModel {
     sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
+    sb.append("    staticWebhookUrl: ").append(toIndentedString(staticWebhookUrl)).append("\n");
     sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
     sb.append("}");
     return sb.toString();
