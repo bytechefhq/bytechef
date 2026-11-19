@@ -18,10 +18,13 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChangeCalculator;
 import com.bytechef.platform.configuration.service.WorkflowDefinitionDiffService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
+import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,22 +68,50 @@ class IntegrationVersionWorkflowChangeFacadeImpl implements IntegrationVersionWo
 
         long integrationId = integration.getId();
 
+        List<IntegrationWorkflow> baseIntegrationWorkflows = integrationWorkflowService.getIntegrationWorkflows(
+            integrationId, baseVersion);
+        List<IntegrationWorkflow> draftIntegrationWorkflows = integrationWorkflowService.getIntegrationWorkflows(
+            integrationId, draftIntegrationVersion);
+
+        Map<String, Workflow> workflowsById = getWorkflowsById(baseIntegrationWorkflows, draftIntegrationWorkflows);
+
         return VersionWorkflowChangeCalculator.hasChanges(
-            fetchWorkflows(integrationId, baseVersion), fetchWorkflows(integrationId, draftIntegrationVersion),
-            workflowDefinitionDiffService);
+            fetchWorkflows(baseIntegrationWorkflows, workflowsById),
+            fetchWorkflows(draftIntegrationWorkflows, workflowsById), workflowDefinitionDiffService);
     }
 
-    private Map<String, @Nullable Workflow> fetchWorkflows(long integrationId, int integrationVersion) {
+    private static Map<String, @Nullable Workflow> fetchWorkflows(
+        List<IntegrationWorkflow> integrationWorkflows, Map<String, Workflow> workflowsById) {
+
         Map<String, @Nullable Workflow> workflows = new LinkedHashMap<>();
 
-        for (IntegrationWorkflow integrationWorkflow : integrationWorkflowService.getIntegrationWorkflows(
-            integrationId, integrationVersion)) {
-
-            Optional<Workflow> workflowOptional = workflowService.fetchWorkflow(integrationWorkflow.getWorkflowId());
-
-            workflows.put(integrationWorkflow.getUuidAsString(), workflowOptional.orElse(null));
+        for (IntegrationWorkflow integrationWorkflow : integrationWorkflows) {
+            workflows.put(integrationWorkflow.getUuidAsString(),
+                workflowsById.get(integrationWorkflow.getWorkflowId()));
         }
 
         return workflows;
+    }
+
+    private Map<String, Workflow> getWorkflowsById(
+        List<IntegrationWorkflow> baseIntegrationWorkflows, List<IntegrationWorkflow> draftIntegrationWorkflows) {
+
+        Set<String> workflowIds = new LinkedHashSet<>();
+
+        for (IntegrationWorkflow integrationWorkflow : baseIntegrationWorkflows) {
+            workflowIds.add(integrationWorkflow.getWorkflowId());
+        }
+
+        for (IntegrationWorkflow integrationWorkflow : draftIntegrationWorkflows) {
+            workflowIds.add(integrationWorkflow.getWorkflowId());
+        }
+
+        Map<String, Workflow> workflowsById = new HashMap<>();
+
+        for (Workflow workflow : workflowService.getWorkflows(List.copyOf(workflowIds))) {
+            workflowsById.put(Validate.notNull(workflow.getId(), "id"), workflow);
+        }
+
+        return workflowsById;
     }
 }

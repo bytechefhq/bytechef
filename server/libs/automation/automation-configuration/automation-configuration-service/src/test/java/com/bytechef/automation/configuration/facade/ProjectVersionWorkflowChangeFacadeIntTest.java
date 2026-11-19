@@ -18,6 +18,11 @@ package com.bytechef.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
@@ -47,6 +52,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * @author Ivica Cardic
@@ -75,7 +81,7 @@ class ProjectVersionWorkflowChangeFacadeIntTest {
     @Autowired
     private WorkflowCrudRepository workflowRepository;
 
-    @Autowired
+    @MockitoSpyBean
     private WorkflowService workflowService;
 
     @Autowired
@@ -297,6 +303,43 @@ class ProjectVersionWorkflowChangeFacadeIntTest {
 
         assertThat(projectVersionWorkflowChangeFacade.hasUnpublishedChanges(projectService.getProject(projectId)))
             .isTrue();
+    }
+
+    @Test
+    void testHasUnpublishedChangesLoadsTheWorkflowsOfBothVersionsInOneLookup() {
+        createVersions(2);
+        addWorkflow(1, "a", "A", false);
+        addWorkflow(1, "b", "B", false);
+        addWorkflow(2, "a", "A", false);
+        addWorkflow(2, "b", "B", false);
+
+        Project project = projectService.getProject(projectId);
+
+        clearInvocations(workflowService);
+
+        assertThat(projectVersionWorkflowChangeFacade.hasUnpublishedChanges(project)).isFalse();
+
+        verify(workflowService).getWorkflows(anyList());
+        verify(workflowService, never()).fetchWorkflow(anyString());
+        verify(workflowService, never()).getWorkflow(anyString());
+    }
+
+    @Test
+    void testVersionWorkflowChangesLoadTheWorkflowsOfBothVersionsInOneLookup() {
+        createVersions(2);
+        addWorkflow(1, "a", "A", false);
+        addWorkflow(2, "a", "A", true);
+        addWorkflow(2, "b", "B", false);
+
+        clearInvocations(workflowService);
+
+        VersionWorkflowChanges changes = projectVersionWorkflowChangeFacade.getVersionWorkflowChanges(projectId, 2);
+
+        assertThat(changes.workflows()).hasSize(2);
+
+        verify(workflowService).getWorkflows(anyList());
+        verify(workflowService, never()).fetchWorkflow(anyString());
+        verify(workflowService, never()).getWorkflow(anyString());
     }
 
     private String addWorkflow(int projectVersion, String key, String label, boolean withDescription) {
