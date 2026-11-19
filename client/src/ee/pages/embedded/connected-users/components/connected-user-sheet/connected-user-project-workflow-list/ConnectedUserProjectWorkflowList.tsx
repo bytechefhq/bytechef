@@ -1,6 +1,7 @@
 import Badge from '@/components/Badge/Badge';
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import ConnectedUserVersionBadge from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserVersionBadge';
 import ConnectedUserProjectConfigurationMenu, {
     ConnectedUserCurrentConfigurationI,
 } from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectConfigurationMenu';
@@ -46,11 +47,13 @@ const ConnectedUserProjectWorkflowList = ({
     configurations,
     connectedUser,
     connectedUserProjectWorkflows,
+    lastPublishedVersionsByProjectId,
     workflowTemplateSourcesByWorkflowUuid,
 }: {
     configurations?: ConnectedUserProjectConfigurationType[];
     connectedUser?: {connectedUserId: string; email?: string | null; externalId: string; name?: string | null};
     connectedUserProjectWorkflows: ConnectedUserProjectWorkflowType[];
+    lastPublishedVersionsByProjectId?: Map<string, number>;
     workflowTemplateSourcesByWorkflowUuid: Map<string, ConnectedUserWorkflowTemplateSourceI>;
 }) => {
     const [openGroupKeys, setOpenGroupKeys] = useState<Set<string>>(new Set());
@@ -209,17 +212,15 @@ const ConnectedUserProjectWorkflowList = ({
                                 <div className="flex items-center gap-x-2">
                                     <div className="flex w-28 shrink-0 justify-start">
                                         {group.configuration && (
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Badge
-                                                        label={`V${group.configuration.configurationProjectVersion}`}
-                                                        styleType="secondary-filled"
-                                                        weight="semibold"
-                                                    />
-                                                </TooltipTrigger>
-
-                                                <TooltipContent>The project version</TooltipContent>
-                                            </Tooltip>
+                                            <ConnectedUserVersionBadge
+                                                newerVersionAvailable={
+                                                    (lastPublishedVersionsByProjectId?.get(
+                                                        group.configuration.projectId
+                                                    ) ?? 0) > group.configuration.configurationProjectVersion
+                                                }
+                                                tooltip="The project version"
+                                                version={group.configuration.configurationProjectVersion}
+                                            />
                                         )}
                                     </div>
 
