@@ -71,6 +71,11 @@ const ConnectedUserMcpServerListItem = ({
             (integrationInstance) => String(integrationInstance.id) === integrationInstanceId
         )?.credentialStatus;
 
+    const findIntegrationInstance = (integrationInstanceId: string) =>
+        connectedUserIntegrationInstances.find(
+            (integrationInstance) => String(integrationInstance.id) === integrationInstanceId
+        );
+
     const lastExecutionDate = useMemo(() => getLastExecutionDate(mcpServer.workflows), [mcpServer.workflows]);
 
     const handleRowClick = (event: MouseEvent<HTMLDivElement>) => {
@@ -186,6 +191,12 @@ const ConnectedUserMcpServerListItem = ({
                                         componentName={group.componentName}
                                         credentialStatus={getCredentialStatus(group.items[0].integrationInstanceId)}
                                         key={`${group.componentName}_${group.version}`}
+                                        provisioned={
+                                            findIntegrationInstance(group.items[0].integrationInstanceId)?.provisioned
+                                        }
+                                        provisionedBy={
+                                            findIntegrationInstance(group.items[0].integrationInstanceId)?.provisionedBy
+                                        }
                                         version={group.version}
                                         versionKind="component"
                                     >
@@ -211,6 +222,12 @@ const ConnectedUserMcpServerListItem = ({
                                         credentialStatus={getCredentialStatus(group.items[0].integrationInstanceId)}
                                         key={`${group.componentName}_${group.version}`}
                                         lastExecutionDate={getLastExecutionDate(group.items)}
+                                        provisioned={
+                                            findIntegrationInstance(group.items[0].integrationInstanceId)?.provisioned
+                                        }
+                                        provisionedBy={
+                                            findIntegrationInstance(group.items[0].integrationInstanceId)?.provisionedBy
+                                        }
                                         version={group.version}
                                         versionKind="integration"
                                     >

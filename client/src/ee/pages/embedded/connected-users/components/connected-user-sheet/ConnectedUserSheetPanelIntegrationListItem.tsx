@@ -5,6 +5,7 @@ import Switch from '@/components/Switch/Switch';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectedUserCredentialStatus from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserCredentialStatus';
+import ConnectedUserOriginBadge from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserOriginBadge';
 import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
 import ConnectedUserSheetPanelIntegrationWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationWorkflowList';
 import {
@@ -178,12 +179,15 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                     <CollapsibleTrigger className="flex-1 py-3" disabled={workflowCount === 0}>
                         <div className="flex items-center gap-x-3">
                             {componentDefinition.icon ? (
-                                <InlineSVG
-                                    aria-hidden="true"
-                                    className="size-6 shrink-0"
-                                    key={componentDefinition.name!}
-                                    src={componentDefinition.icon}
-                                />
+                                <span aria-hidden="true" className="flex size-6 shrink-0">
+                                    <InlineSVG
+                                        className="size-6"
+                                        key={componentDefinition.name!}
+                                        src={componentDefinition.icon}
+                                    >
+                                        <ComponentIcon className="size-6 text-content-neutral-secondary" />
+                                    </InlineSVG>
+                                </span>
                             ) : (
                                 <ComponentIcon
                                     aria-hidden="true"
@@ -205,6 +209,11 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                                             {integrationInstance.integrationInstanceConfiguration.name}
                                         </span>
                                     )}
+
+                                    <ConnectedUserOriginBadge
+                                        provisioned={!!connectedUserIntegrationInstance.provisioned}
+                                        resourceName="integration"
+                                    />
                                 </div>
 
                                 <div className="flex min-h-6 items-center text-xs font-semibold text-muted-foreground">

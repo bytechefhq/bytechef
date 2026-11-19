@@ -9,6 +9,7 @@ import {
     TURNED_OFF_BY_ADMINISTRATOR_REASON,
 } from '@/ee/pages/embedded/automation-hub/utils/attentionReason';
 import useAutomationExecutionsSheetStore from '@/ee/pages/embedded/automations/stores/useAutomationExecutionsSheetStore';
+import ConnectedUserOriginBadge from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserOriginBadge';
 import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
 import ConnectedUserProjectWorkflowEditDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectWorkflowEditDialog';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
@@ -210,8 +211,8 @@ const ConnectedUserProjectWorkflowListItem = ({
                     }}
                     role="presentation"
                 >
-                    <div className="flex min-w-0 flex-1 items-center gap-2">
-                        <div className="flex w-80 min-w-0 shrink-0 flex-col gap-y-1 pr-1">
+                    <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
+                        <div className="flex w-48 min-w-0 shrink flex-col gap-y-1 pr-1">
                             <div className="flex min-w-0 items-center gap-2">
                                 <button
                                     className="min-w-0 cursor-pointer truncate text-left text-sm font-semibold"
@@ -221,31 +222,6 @@ const ConnectedUserProjectWorkflowListItem = ({
                                     {connectedUserProjectWorkflow.workflow.label}
                                 </button>
                             </div>
-
-                            {staticWebhookUrl && (
-                                <div className="flex min-w-0 items-center gap-x-1">
-                                    <span
-                                        className="truncate font-mono text-xs text-content-neutral-secondary"
-                                        title={staticWebhookUrl}
-                                    >
-                                        {staticWebhookUrl}
-                                    </span>
-
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button
-                                                aria-label="Copy webhook URL"
-                                                icon={<ClipboardIcon />}
-                                                onClick={handleCopyStaticWebhookUrlClick}
-                                                size="iconXs"
-                                                variant="ghost"
-                                            />
-                                        </TooltipTrigger>
-
-                                        <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>
-                                    </Tooltip>
-                                </div>
-                            )}
                         </div>
 
                         {workflowTemplate && (
@@ -260,27 +236,29 @@ const ConnectedUserProjectWorkflowListItem = ({
                         )}
                     </div>
 
-                    <div className="flex items-center gap-x-2">
+                    <div className="flex shrink-0 items-center gap-x-2">
                         <div className="flex items-center gap-x-2">
-                            <div className="flex w-28 shrink-0 justify-start">
-                                {versionLabel && (
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Badge
-                                                label={versionLabel}
-                                                styleType="secondary-filled"
-                                                weight="semibold"
-                                            />
-                                        </TooltipTrigger>
+                            <div className="flex shrink-0 items-center justify-end gap-x-3">
+                                <div className="mr-3 flex shrink-0 items-center gap-x-2">
+                                    {versionLabel && (
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Badge
+                                                    label={versionLabel}
+                                                    styleType="secondary-filled"
+                                                    weight="semibold"
+                                                />
+                                            </TooltipTrigger>
 
-                                        <TooltipContent>The workflow version</TooltipContent>
-                                    </Tooltip>
-                                )}
-                            </div>
+                                            <TooltipContent>The workflow version</TooltipContent>
+                                        </Tooltip>
+                                    )}
 
-                            <div className="flex w-72 shrink-0 items-center justify-end gap-x-4">
+                                    <ConnectedUserOriginBadge provisioned={provisioned} resourceName="automation" />
+                                </div>
+
                                 <Tooltip>
-                                    <TooltipTrigger className="text-xs text-content-neutral-secondary">
+                                    <TooltipTrigger className="flex w-52 justify-end text-xs whitespace-nowrap text-content-neutral-secondary">
                                         {lastExecutionDate
                                             ? `Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`
                                             : 'No executions'}
@@ -288,6 +266,24 @@ const ConnectedUserProjectWorkflowListItem = ({
 
                                     <TooltipContent side="left">Last Execution Date</TooltipContent>
                                 </Tooltip>
+
+                                <div className="min-w-[36px]">
+                                    {staticWebhookUrl && (
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    aria-label="Copy webhook URL"
+                                                    icon={<ClipboardIcon />}
+                                                    onClick={handleCopyStaticWebhookUrlClick}
+                                                    size="icon"
+                                                    variant="ghost"
+                                                />
+                                            </TooltipTrigger>
+
+                                            <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>
+                                        </Tooltip>
+                                    )}
+                                </div>
 
                                 {connectedUserProjectWorkflow.toolOnly ? (
                                     <Tooltip>
