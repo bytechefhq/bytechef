@@ -191,6 +191,7 @@ const AutomationProjectList = ({
                                         setConfigurationDialog({configuration, project, updateProjectVersion: true})
                                     }
                                     project={project}
+                                    showOpenInProject
                                 />
                             }
                             onTabChange={(tab) =>

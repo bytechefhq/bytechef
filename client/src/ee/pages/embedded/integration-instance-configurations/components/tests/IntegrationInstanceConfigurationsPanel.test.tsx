@@ -43,11 +43,17 @@ vi.mock(
         default: ({
             expandAll,
             integrationInstanceConfigurations,
+            showOpenInIntegration,
         }: {
             expandAll?: boolean;
             integrationInstanceConfigurations: IntegrationInstanceConfiguration[];
+            showOpenInIntegration?: boolean;
         }) => (
-            <ul data-expand-all={String(!!expandAll)} data-testid="integration-instance-configuration-list">
+            <ul
+                data-expand-all={String(!!expandAll)}
+                data-show-open-in-integration={String(!!showOpenInIntegration)}
+                data-testid="integration-instance-configuration-list"
+            >
                 {integrationInstanceConfigurations.map((integrationInstanceConfiguration) => (
                     <li key={integrationInstanceConfiguration.id}>{integrationInstanceConfiguration.name}</li>
                 ))}
@@ -112,7 +118,7 @@ describe('IntegrationInstanceConfigurationsPanel', () => {
         expect(hoisted.queryRequests[0]).toEqual({enabled: true, filters: {environmentId: 0, integrationId: 7}});
     });
 
-    it('lists the instance configurations sorted by name and expanded', () => {
+    it('lists the instance configurations sorted by name, expanded and with workflow links', () => {
         hoisted.integrationInstanceConfigurations = [
             {environmentId: 0, id: 2, integrationId: 7, integrationVersion: 1, name: 'Zeta'},
             {environmentId: 0, id: 1, integrationId: 7, integrationVersion: 1, name: 'Alpha'},
@@ -123,6 +129,7 @@ describe('IntegrationInstanceConfigurationsPanel', () => {
         const list = screen.getByTestId('integration-instance-configuration-list');
 
         expect(list).toHaveAttribute('data-expand-all', 'true');
+        expect(list).toHaveAttribute('data-show-open-in-integration', 'true');
         expect(list).toHaveTextContent('AlphaZeta');
     });
 
