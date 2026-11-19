@@ -137,8 +137,8 @@ const AutomationProjectListItem = ({
             >
                 <ListItemExpandButton label="Toggle project" />
 
-                <div className="flex flex-1 items-center py-3 group-data-[state='open']:border-none">
-                    <div aria-label={project.name} className="flex-1" data-testid="project-item">
+                <div className="flex min-w-0 flex-1 flex-col items-stretch gap-y-2 py-3 group-data-[state='open']:border-none sm:flex-row sm:items-center sm:gap-y-0">
+                    <div aria-label={project.name} className="min-w-0 flex-1" data-testid="project-item">
                         <div className="flex items-center gap-2">
                             {project.description ? (
                                 <Tooltip>
@@ -215,8 +215,8 @@ const AutomationProjectListItem = ({
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
-                        <div className="flex min-w-52 flex-col items-end gap-y-4">
+                    <div className="flex items-center justify-between gap-x-6 sm:justify-end [&>:last-child]:-ml-3">
+                        <div className="flex items-center gap-x-3 sm:min-w-52 sm:flex-col sm:items-end sm:gap-x-0 sm:gap-y-4">
                             <div className="flex items-center space-x-2">
                                 {project.published ? (
                                     <Badge
