@@ -2541,6 +2541,10 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
+        staticWebhookUrl:
+          description: "The static webhook url of the workflow for this integration instance, set when the workflow starts with a static webhook trigger."
+          type: "string"
+          readOnly: true
         workflowId:
           description: "The id of a workflow."
           type: "string"
