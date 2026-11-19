@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.service;
+package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
@@ -26,7 +26,7 @@ import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
  *
  * @author Ivica Cardic
  */
-public interface ProjectVersionWorkflowChangeService {
+public interface ProjectVersionWorkflowChangeFacade {
 
     VersionWorkflowChanges getVersionWorkflowChanges(long projectId, int projectVersion);
 

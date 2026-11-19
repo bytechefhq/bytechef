@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.service;
+package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -22,6 +22,8 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.exception.ProjectErrorType;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChangeCalculator;
@@ -43,14 +45,14 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(readOnly = true)
-public class ProjectVersionWorkflowChangeServiceImpl implements ProjectVersionWorkflowChangeService {
+public class ProjectVersionWorkflowChangeFacadeImpl implements ProjectVersionWorkflowChangeFacade {
 
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final WorkflowDefinitionDiffService workflowDefinitionDiffService;
     private final WorkflowService workflowService;
 
-    ProjectVersionWorkflowChangeServiceImpl(
+    ProjectVersionWorkflowChangeFacadeImpl(
         ProjectService projectService, ProjectWorkflowService projectWorkflowService,
         WorkflowDefinitionDiffService workflowDefinitionDiffService, WorkflowService workflowService) {
 

@@ -36,7 +36,6 @@ import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
-import com.bytechef.automation.configuration.service.ProjectVersionWorkflowChangeService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
 import com.bytechef.automation.configuration.util.ComponentDefinitionHelper;
@@ -101,7 +100,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private final PreBuiltTemplateService preBuiltTemplateService;
     private final ProjectOwnershipService projectOwnershipService;
     private final ProjectService projectService;
-    private final ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService;
+    private final ProjectVersionWorkflowChangeFacade projectVersionWorkflowChangeFacade;
     private final ProjectWorkflowService projectWorkflowService;
     private final ProjectDeploymentFacade projectDeploymentFacade;
     private final ProjectDeploymentService projectDeploymentService;
@@ -121,7 +120,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         ComponentDefinitionHelper componentDefinitionHelper, PreBuiltTemplateService preBuiltTemplateService,
         ProjectWorkflowService projectWorkflowService,
         ProjectDeploymentService projectDeploymentService, ProjectOwnershipService projectOwnershipService,
-        ProjectService projectService, ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService,
+        ProjectService projectService, ProjectVersionWorkflowChangeFacade projectVersionWorkflowChangeFacade,
         ProjectDeploymentFacade projectDeploymentFacade, ProjectWorkflowFacade projectWorkflowFacade,
         SharedTemplateFileStorage sharedTemplateFileStorage, SharedTemplateService sharedTemplateService,
         TagService tagService, WorkflowService workflowService,
@@ -136,7 +135,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         this.projectDeploymentService = projectDeploymentService;
         this.projectOwnershipService = projectOwnershipService;
         this.projectService = projectService;
-        this.projectVersionWorkflowChangeService = projectVersionWorkflowChangeService;
+        this.projectVersionWorkflowChangeFacade = projectVersionWorkflowChangeFacade;
         this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.publicUrl = applicationProperties.getPublicUrl();
@@ -808,7 +807,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             return true;
         }
 
-        return projectVersionWorkflowChangeService.hasUnpublishedChanges(project);
+        return projectVersionWorkflowChangeFacade.hasUnpublishedChanges(project);
     }
 
     private List<Workflow> getWorkflows(TemplateFiles templateFiles) {

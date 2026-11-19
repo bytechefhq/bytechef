@@ -19,7 +19,6 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
-import com.bytechef.ee.embedded.configuration.service.IntegrationVersionWorkflowChangeService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.AuditData;
@@ -58,7 +57,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     private final CategoryService categoryService;
     private final ComponentDefinitionService componentDefinitionService;
     private final IntegrationService integrationService;
-    private final IntegrationVersionWorkflowChangeService integrationVersionWorkflowChangeService;
+    private final IntegrationVersionWorkflowChangeFacade integrationVersionWorkflowChangeFacade;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
@@ -73,7 +72,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         CategoryService categoryService,
         ComponentDefinitionService componentDefinitionService,
         IntegrationService integrationService,
-        IntegrationVersionWorkflowChangeService integrationVersionWorkflowChangeService,
+        IntegrationVersionWorkflowChangeFacade integrationVersionWorkflowChangeFacade,
         IntegrationWorkflowService integrationWorkflowService,
         IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
@@ -85,7 +84,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         this.categoryService = categoryService;
         this.componentDefinitionService = componentDefinitionService;
         this.integrationService = integrationService;
-        this.integrationVersionWorkflowChangeService = integrationVersionWorkflowChangeService;
+        this.integrationVersionWorkflowChangeFacade = integrationVersionWorkflowChangeFacade;
         this.integrationWorkflowService = integrationWorkflowService;
         this.integrationInstanceConfigurationFacade = integrationInstanceConfigurationFacade;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
@@ -377,7 +376,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
             return true;
         }
 
-        return integrationVersionWorkflowChangeService.hasUnpublishedChanges(integration);
+        return integrationVersionWorkflowChangeFacade.hasUnpublishedChanges(integration);
     }
 
     private void deleteWorkflow(String workflowId) {

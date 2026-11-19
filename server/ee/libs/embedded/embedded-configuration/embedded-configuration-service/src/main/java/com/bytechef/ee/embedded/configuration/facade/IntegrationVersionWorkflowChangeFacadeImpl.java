@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.configuration.service;
+package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -13,6 +13,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
+import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChangeCalculator;
 import com.bytechef.platform.configuration.service.WorkflowDefinitionDiffService;
@@ -33,14 +34,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @ConditionalOnEEVersion
-class IntegrationVersionWorkflowChangeServiceImpl implements IntegrationVersionWorkflowChangeService {
+class IntegrationVersionWorkflowChangeFacadeImpl implements IntegrationVersionWorkflowChangeFacade {
 
     private final IntegrationWorkflowService integrationWorkflowService;
     private final WorkflowDefinitionDiffService workflowDefinitionDiffService;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    IntegrationVersionWorkflowChangeServiceImpl(
+    IntegrationVersionWorkflowChangeFacadeImpl(
         IntegrationWorkflowService integrationWorkflowService,
         WorkflowDefinitionDiffService workflowDefinitionDiffService, WorkflowService workflowService) {
 
