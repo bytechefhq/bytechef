@@ -18,6 +18,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -33,6 +34,7 @@ import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
@@ -45,6 +47,9 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
+import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceDTO;
+import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
@@ -56,6 +61,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
+import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -88,6 +94,7 @@ import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
@@ -182,6 +189,12 @@ class IntegrationInstanceFacadeIntTest {
         "tasks":[]}
         """;
 
+    private static final String STATIC_WEBHOOK_WORKFLOW_DEFINITION = """
+        {"label":"Static webhook","inputs":[],"triggers":[\
+        {"name":"trigger_1","type":"webhook/v1/awaitWorkflowAndRespond"}],\
+        "tasks":[]}
+        """;
+
     private static final String WORKFLOW_DEFINITION = """
         {"label":"Sync contacts","inputs":[],"triggers":[],"tasks":[]}
         """;
@@ -224,6 +237,9 @@ class IntegrationInstanceFacadeIntTest {
 
     @Autowired
     private RecordingDataStorage recordingDataStorage;
+
+    @Autowired
+    private TriggerDefinitionService triggerDefinitionService;
 
     @Autowired
     private TriggerLifecycleFacade triggerLifecycleFacade;
@@ -649,6 +665,99 @@ class IntegrationInstanceFacadeIntTest {
 
         assertThat(recordingDataStorage.getAttempts()).isPositive();
         assertThat(integrationInstanceService.getIntegrationInstances(List.of(integrationInstanceAId))).isEmpty();
+    }
+
+    @Test
+    void testGetIntegrationInstanceReturnsTheStaticWebhookUrlOfAWorkflowWithAStaticWebhookTrigger() {
+        TriggerDefinition triggerDefinition = mock(TriggerDefinition.class);
+
+        when(triggerDefinition.getType()).thenReturn(TriggerType.STATIC_WEBHOOK);
+        when(triggerDefinitionService.getTriggerDefinition("webhook", 1, "awaitWorkflowAndRespond"))
+            .thenReturn(triggerDefinition);
+
+        Workflow staticWebhookWorkflow = workflowService.create(
+            STATIC_WEBHOOK_WORKFLOW_DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC);
+
+        String staticWebhookWorkflowId = staticWebhookWorkflow.getId();
+
+        IntegrationWorkflow staticWebhookIntegrationWorkflow = integrationWorkflowService.addWorkflow(
+            integrationId, 1, staticWebhookWorkflowId);
+
+        configureIntegrationInstanceAWorkflow(staticWebhookWorkflowId);
+
+        authenticate(createTenantAdminAuthentication());
+
+        IntegrationInstanceWorkflowDTO integrationInstanceWorkflowDTO = getIntegrationInstanceAWorkflowDTO(
+            staticWebhookWorkflowId);
+
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            PlatformType.EMBEDDED, integrationInstanceAId, staticWebhookIntegrationWorkflow.getUuidAsString(),
+            "trigger_1");
+
+        assertThat(integrationInstanceWorkflowDTO.staticWebhookUrl()).isEqualTo("/webhooks/" + workflowExecutionId);
+    }
+
+    @Test
+    void testGetIntegrationInstanceReturnsNoStaticWebhookUrlForAWorkflowWithoutAStaticWebhookTrigger() {
+        createIntegrationInstanceAWorkflow(workflowId);
+
+        authenticate(createTenantAdminAuthentication());
+
+        IntegrationInstanceWorkflowDTO integrationInstanceWorkflowDTO = getIntegrationInstanceAWorkflowDTO(workflowId);
+
+        assertThat(integrationInstanceWorkflowDTO.staticWebhookUrl()).isNull();
+    }
+
+    @Test
+    void testGetIntegrationInstanceReturnsNoStaticWebhookUrlWhenTheIntegrationWorkflowIsMissing() {
+        Workflow danglingWorkflow = workflowService.create(
+            STATIC_WEBHOOK_WORKFLOW_DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC);
+
+        String danglingWorkflowId = danglingWorkflow.getId();
+
+        configureIntegrationInstanceAWorkflow(danglingWorkflowId);
+
+        authenticate(createTenantAdminAuthentication());
+
+        IntegrationInstanceWorkflowDTO integrationInstanceWorkflowDTO = getIntegrationInstanceAWorkflowDTO(
+            danglingWorkflowId);
+
+        assertThat(integrationInstanceWorkflowDTO.staticWebhookUrl()).isNull();
+    }
+
+    private void configureIntegrationInstanceAWorkflow(String configuredWorkflowId) {
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            new IntegrationInstanceConfigurationWorkflow();
+
+        integrationInstanceConfigurationWorkflow.setEnabled(true);
+        integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
+            integrationInstanceConfigurationId);
+        integrationInstanceConfigurationWorkflow.setWorkflowId(configuredWorkflowId);
+
+        integrationInstanceConfigurationWorkflowService.create(integrationInstanceConfigurationWorkflow);
+
+        createIntegrationInstanceAWorkflow(configuredWorkflowId);
+    }
+
+    private void createIntegrationInstanceAWorkflow(String configuredWorkflowId) {
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                integrationInstanceConfigurationId, configuredWorkflowId);
+
+        integrationInstanceWorkflowService.createIntegrationInstanceWorkflow(
+            integrationInstanceAId, integrationInstanceConfigurationWorkflow.getId());
+    }
+
+    private IntegrationInstanceWorkflowDTO getIntegrationInstanceAWorkflowDTO(String integrationInstanceWorkflowId) {
+        IntegrationInstanceDTO integrationInstanceDTO = integrationInstanceFacade.getIntegrationInstance(
+            integrationInstanceAId);
+
+        return integrationInstanceDTO.integrationInstanceWorkflows()
+            .stream()
+            .filter(integrationInstanceWorkflowDTO -> integrationInstanceWorkflowId.equals(
+                integrationInstanceWorkflowDTO.workflowId()))
+            .findFirst()
+            .orElseThrow();
     }
 
     private String createInternalOnlyInputWorkflow(Map<String, ?> configurationInputs) {

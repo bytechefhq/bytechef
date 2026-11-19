@@ -732,8 +732,6 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
             integrationInstanceId);
     }
 
-// TODO Don’t validate inputs as they are currently entered one by one in ConnectDialog, check if it is possible to
-// change the logic and send the all inputs at once
     private @Nullable String getStaticWebhookUrl(long integrationInstanceId, @Nullable String workflowId) {
         ConnectedUserWorkflowWebhookUrlResolver connectedUserWorkflowWebhookUrlResolver =
             connectedUserWorkflowWebhookUrlResolverProvider.getIfAvailable();
@@ -742,14 +740,27 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
             return null;
         }
 
-        IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(workflowId);
+        Optional<IntegrationWorkflow> integrationWorkflowOptional =
+            integrationWorkflowService.fetchWorkflowIntegrationWorkflow(workflowId);
 
-        Workflow workflow = workflowService.getWorkflow(integrationWorkflow.getWorkflowId());
+        if (integrationWorkflowOptional.isEmpty()) {
+            return null;
+        }
+
+        IntegrationWorkflow integrationWorkflow = integrationWorkflowOptional.get();
+
+        Optional<Workflow> workflowOptional = workflowService.fetchWorkflow(integrationWorkflow.getWorkflowId());
+
+        if (workflowOptional.isEmpty()) {
+            return null;
+        }
 
         return connectedUserWorkflowWebhookUrlResolver.resolveIntegrationInstanceWorkflow(
-            integrationInstanceId, integrationWorkflow.getUuidAsString(), workflow);
+            integrationInstanceId, integrationWorkflow.getUuidAsString(), workflowOptional.get());
     }
 
+// TODO Don’t validate inputs as they are currently entered one by one in ConnectDialog, check if it is possible to
+// change the logic and send the all inputs at once
 //    private void validateInputs(Map<String, ?> inputs, Workflow workflow) {
 //        for (Workflow.Input input : workflow.getInputs()) {
 //            if (input.required()) {
