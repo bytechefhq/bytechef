@@ -128,4 +128,13 @@ describe('Header', () => {
 
         expect(screen.getByRole('button', {name: 'Toggle sidebar'})).toBeInTheDocument();
     });
+
+    it('keeps the actions in a row as tall as the title so a page header does not grow when its button appears', () => {
+        render(<Header right={<button type="button">New App Event</button>} title="App Events" />);
+
+        const actions = screen.getByRole('button', {name: 'New App Event'}).parentElement;
+
+        expect(actions).toHaveClass('h-header-height');
+        expect(actions).toHaveClass('items-center');
+    });
 });
