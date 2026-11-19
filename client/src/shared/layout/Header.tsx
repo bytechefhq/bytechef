@@ -70,12 +70,12 @@ const Header = ({
 
                 {showSidebarHeaderToggle ? (
                     <div className="flex items-center gap-1">
-                        {right && <div>{right}</div>}
+                        {right && <div className="flex h-header-height items-center">{right}</div>}
 
                         <LeftSidebarToggle />
                     </div>
                 ) : (
-                    right && <div>{right}</div>
+                    right && <div className="flex h-header-height items-center">{right}</div>
                 )}
             </div>
         </header>
