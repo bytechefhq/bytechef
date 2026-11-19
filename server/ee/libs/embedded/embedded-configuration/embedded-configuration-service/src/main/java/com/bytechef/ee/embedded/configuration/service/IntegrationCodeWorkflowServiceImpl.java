@@ -57,6 +57,15 @@ public class IntegrationCodeWorkflowServiceImpl implements IntegrationCodeWorkfl
     }
 
     @Override
+    public Optional<IntegrationCodeWorkflow> fetchPublishedIntegrationCodeWorkflow(
+        long integrationId, int integrationVersion) {
+
+        return integrationCodeWorkflowRepository
+            .findFirstByIntegrationIdAndIntegrationVersionLessThanEqualOrderByIdDesc(
+                integrationId, integrationVersion);
+    }
+
+    @Override
     public List<Long> getCodeWorkflowIntegrationIds() {
         return integrationCodeWorkflowRepository.findDistinctIntegrationIds();
     }

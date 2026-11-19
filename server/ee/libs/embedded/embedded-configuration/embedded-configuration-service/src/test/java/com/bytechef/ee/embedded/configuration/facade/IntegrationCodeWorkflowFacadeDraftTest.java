@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -36,6 +37,7 @@ import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowCo
 import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade.CodeWorkflowReconciliation;
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.service.TagService;
@@ -781,6 +783,114 @@ class IntegrationCodeWorkflowFacadeDraftTest {
         when(codeWorkflowContainer.getWorkflowNameIds()).thenReturn(workflowNameIds);
 
         return new CodeWorkflowReconciliation(codeWorkflowContainer, addedWorkflowNameIds, removedWorkflowNameIds);
+    }
+
+    @Test
+    void testRestoreCodeWorkflowSourceSavesThePublishedSourceAsTheDraft() {
+        Integration integration = new Integration();
+
+        integration.setId(1L);
+        integration.setComponentName("my-integration");
+        integration.setName("my-integration");
+        integration.setIntegrationVersions(List.of(new IntegrationVersion(3)));
+
+        IntegrationCodeWorkflow publishedIntegrationCodeWorkflow = mock(IntegrationCodeWorkflow.class);
+
+        when(publishedIntegrationCodeWorkflow.getCodeWorkflowContainerId()).thenReturn(9L);
+
+        IntegrationCodeWorkflow draftIntegrationCodeWorkflow = mock(IntegrationCodeWorkflow.class);
+
+        when(draftIntegrationCodeWorkflow.getCodeWorkflowContainerId()).thenReturn(5L);
+        when(draftIntegrationCodeWorkflow.getIntegrationVersion()).thenReturn(3);
+
+        IntegrationCodeWorkflowService integrationCodeWorkflowService = mock(IntegrationCodeWorkflowService.class);
+
+        when(integrationCodeWorkflowService.fetchPublishedIntegrationCodeWorkflow(1L, 1))
+            .thenReturn(Optional.of(publishedIntegrationCodeWorkflow));
+        when(integrationCodeWorkflowService.fetchIntegrationCodeWorkflow(1L))
+            .thenReturn(Optional.of(draftIntegrationCodeWorkflow));
+
+        CodeWorkflowContainer publishedCodeWorkflowContainer = mock(CodeWorkflowContainer.class);
+
+        when(publishedCodeWorkflowContainer.getLanguage()).thenReturn(Language.JAVASCRIPT);
+
+        CodeWorkflowContainer draftCodeWorkflowContainer = mock(CodeWorkflowContainer.class);
+
+        when(draftCodeWorkflowContainer.getLanguage()).thenReturn(Language.JAVASCRIPT);
+
+        CodeWorkflowContainerService codeWorkflowContainerService = mock(CodeWorkflowContainerService.class);
+
+        when(codeWorkflowContainerService.getCodeWorkflowContainer(9L)).thenReturn(publishedCodeWorkflowContainer);
+        when(codeWorkflowContainerService.getCodeWorkflowContainer(5L)).thenReturn(draftCodeWorkflowContainer);
+
+        String publishedSource = integrationScript("my-integration", "published-workflow");
+
+        CodeWorkflowFileStorage codeWorkflowFileStorage = mock(CodeWorkflowFileStorage.class);
+
+        when(codeWorkflowFileStorage.readCodeWorkflowFileContent(any())).thenReturn(publishedSource);
+
+        IntegrationService integrationService = mock(IntegrationService.class);
+
+        when(integrationService.getIntegration(1L)).thenReturn(integration);
+
+        CodeWorkflowReconciliation reconciliation = new CodeWorkflowReconciliation(
+            mock(CodeWorkflowContainer.class), Map.of(), Map.of());
+
+        CodeWorkflowContainerFacade codeWorkflowContainerFacade = mock(CodeWorkflowContainerFacade.class);
+
+        when(codeWorkflowContainerFacade.update(
+            eq(draftCodeWorkflowContainer), any(), any(), any(), eq(PlatformType.EMBEDDED)))
+                .thenReturn(reconciliation);
+
+        IntegrationCodeWorkflowFacadeImpl integrationCodeWorkflowFacade = newFacade(
+            integrationService, mock(IntegrationWorkflowService.class), codeWorkflowContainerFacade,
+            integrationCodeWorkflowService, codeWorkflowContainerService, codeWorkflowFileStorage,
+            mock(WorkflowService.class));
+
+        integrationCodeWorkflowFacade.restoreCodeWorkflowSource(1L, 1);
+
+        ArgumentCaptor<byte[]> bytesCaptor = ArgumentCaptor.forClass(byte[].class);
+
+        verify(codeWorkflowContainerFacade).update(
+            eq(draftCodeWorkflowContainer), any(), any(), bytesCaptor.capture(), eq(PlatformType.EMBEDDED));
+        verify(codeWorkflowContainerFacade, never()).update(
+            eq(publishedCodeWorkflowContainer), any(), any(), any(), any());
+        verify(codeWorkflowContainerService).getCodeWorkflowContainer(9L);
+
+        assertThat(new String(bytesCaptor.getValue(), StandardCharsets.UTF_8)).isEqualTo(publishedSource);
+
+        verify(integrationService, never()).publishIntegration(anyLong(), any());
+    }
+
+    @Test
+    void testRestoreCodeWorkflowSourceFailsWhenTheVersionHasNoSource() {
+        Integration integration = new Integration();
+
+        integration.setId(1L);
+        integration.setComponentName("my-integration");
+        integration.setName("my-integration");
+
+        IntegrationCodeWorkflowService integrationCodeWorkflowService = mock(IntegrationCodeWorkflowService.class);
+
+        when(integrationCodeWorkflowService.fetchPublishedIntegrationCodeWorkflow(1L, 1))
+            .thenReturn(Optional.empty());
+
+        IntegrationService integrationService = mock(IntegrationService.class);
+
+        when(integrationService.getIntegration(1L)).thenReturn(integration);
+
+        CodeWorkflowContainerFacade codeWorkflowContainerFacade = mock(CodeWorkflowContainerFacade.class);
+
+        IntegrationCodeWorkflowFacadeImpl integrationCodeWorkflowFacade = newFacade(
+            integrationService, mock(IntegrationWorkflowService.class), codeWorkflowContainerFacade,
+            integrationCodeWorkflowService, mock(CodeWorkflowContainerService.class),
+            mock(CodeWorkflowFileStorage.class), mock(WorkflowService.class));
+
+        assertThatThrownBy(() -> integrationCodeWorkflowFacade.restoreCodeWorkflowSource(1L, 1))
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("Integration version 1 has no code workflow source to restore");
+
+        verifyNoInteractions(codeWorkflowContainerFacade);
     }
 
     private static String integrationScript(String componentName) {
