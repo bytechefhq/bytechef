@@ -28,5 +28,5 @@ public interface OAuth2Service {
 
     String getRedirectUri();
 
-    List<String> getPredefinedApps();
+    List<String> getPredefinedOAuth2Apps();
 }

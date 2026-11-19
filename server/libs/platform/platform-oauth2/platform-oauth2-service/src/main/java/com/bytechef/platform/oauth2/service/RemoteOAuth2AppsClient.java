@@ -16,14 +16,16 @@
 
 package com.bytechef.platform.oauth2.service;
 
-import com.bytechef.config.ApplicationProperties.Oauth2.OAuth2App;
 import com.bytechef.platform.githubproxy.client.OAuthAppProxyClient;
 import com.bytechef.platform.githubproxy.client.model.OAuthApp;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -32,40 +34,40 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestClientResponseException;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class RemoteOAuth2Apps {
+public class RemoteOAuth2AppsClient {
 
-    private static final Logger log = LoggerFactory.getLogger(RemoteOAuth2Apps.class);
+    private static final Logger log = LoggerFactory.getLogger(RemoteOAuth2AppsClient.class);
 
     private static final Duration REFRESH_INTERVAL = Duration.ofMinutes(5);
     private static final Duration RETRY_INTERVAL = Duration.ofSeconds(60);
     private static final Duration WARN_INTERVAL = Duration.ofHours(1);
 
     private final Clock clock;
+    private final Map<String, Instant> lastWarnAtByReason = new ConcurrentHashMap<>();
     private final ReentrantLock lock = new ReentrantLock();
     private final ObjectProvider<OAuthAppProxyClient> oAuthAppProxyClientProvider;
 
     private volatile Snapshot snapshot = new Snapshot(Map.of(), null, null);
-    private volatile Instant lastWarnAt;
     private volatile boolean clientResolved;
     private volatile OAuthAppProxyClient oAuthAppProxyClient;
 
     @Autowired
-    public RemoteOAuth2Apps(ObjectProvider<OAuthAppProxyClient> oAuthAppProxyClientProvider) {
+    public RemoteOAuth2AppsClient(ObjectProvider<OAuthAppProxyClient> oAuthAppProxyClientProvider) {
         this(oAuthAppProxyClientProvider, Clock.systemUTC());
     }
 
-    RemoteOAuth2Apps(ObjectProvider<OAuthAppProxyClient> oAuthAppProxyClientProvider, Clock clock) {
+    RemoteOAuth2AppsClient(ObjectProvider<OAuthAppProxyClient> oAuthAppProxyClientProvider, Clock clock) {
         this.oAuthAppProxyClientProvider = oAuthAppProxyClientProvider;
         this.clock = clock;
     }
 
-    public Map<String, OAuth2App> getOAuth2Apps() {
+    public Map<String, OAuthApp> getOAuth2Apps() {
         OAuthAppProxyClient oAuthAppProxyClient = resolveClient();
 
         if (oAuthAppProxyClient == null) {
@@ -104,7 +106,10 @@ public class RemoteOAuth2Apps {
             try {
                 oAuthAppProxyClient = oAuthAppProxyClientProvider.getIfAvailable();
             } catch (RuntimeException exception) {
-                warn(exception, clock.instant());
+                Class<?> exceptionClass = exception.getClass();
+
+                warn("the OAuth apps proxy client could not be created: " + exceptionClass.getSimpleName(),
+                    clock.instant());
 
                 return null;
             }
@@ -135,55 +140,90 @@ public class RemoteOAuth2Apps {
         return false;
     }
 
-    private Map<String, OAuth2App> refresh(OAuthAppProxyClient oAuthAppProxyClient, Snapshot currentSnapshot) {
+    private Map<String, OAuthApp> refresh(OAuthAppProxyClient oAuthAppProxyClient, Snapshot currentSnapshot) {
         Instant now = clock.instant();
+
+        Map<String, OAuthApp> apps;
 
         try {
             Map<String, OAuthApp> oAuthApps = oAuthAppProxyClient.getOAuthApps();
 
-            Map<String, OAuth2App> apps = convert(oAuthApps);
-
-            snapshot = new Snapshot(apps, now, null);
-
-            return apps;
+            apps = validApps(oAuthApps, now);
         } catch (RuntimeException exception) {
             snapshot = new Snapshot(currentSnapshot.apps(), currentSnapshot.fetchedAt(), now);
 
-            warn(exception, now);
+            warn(describe(exception), now);
 
             return currentSnapshot.apps();
         }
-    }
 
-    private static Map<String, OAuth2App> convert(Map<String, OAuthApp> oAuthApps) {
-        if (oAuthApps == null) {
-            return Map.of();
+        snapshot = new Snapshot(apps, now, null);
+
+        if (currentSnapshot.failedAt() != null) {
+            lastWarnAtByReason.clear();
+
+            log.info("Loaded {} predefined OAuth apps from the GitHub proxy again", apps.size());
         }
 
-        Map<String, OAuth2App> apps = new HashMap<>();
+        return apps;
+    }
+
+    private Map<String, OAuthApp> validApps(Map<String, OAuthApp> oAuthApps, Instant now) {
+        Map<String, OAuthApp> apps = new HashMap<>();
+        List<String> ignoredNames = new ArrayList<>();
 
         for (Map.Entry<String, OAuthApp> entry : oAuthApps.entrySet()) {
             OAuthApp oAuthApp = entry.getValue();
 
-            if (oAuthApp == null || StringUtils.isBlank(oAuthApp.clientId()) ||
-                StringUtils.isBlank(oAuthApp.clientSecret())) {
+            if (StringUtils.isBlank(entry.getKey()) || oAuthApp == null ||
+                StringUtils.isBlank(oAuthApp.clientId()) || StringUtils.isBlank(oAuthApp.clientSecret())) {
+
+                ignoredNames.add(String.valueOf(entry.getKey()));
 
                 continue;
             }
 
-            OAuth2App oAuth2App = new OAuth2App();
+            apps.put(entry.getKey(), oAuthApp);
+        }
 
-            oAuth2App.setClientId(oAuthApp.clientId());
-            oAuth2App.setClientSecret(oAuthApp.clientSecret());
+        if (!ignoredNames.isEmpty()) {
+            ignoredNames.sort(null);
 
-            apps.put(entry.getKey(), oAuth2App);
+            warn("ignored entries without a clientId or clientSecret: " + String.join(", ", ignoredNames), now);
         }
 
         return Map.copyOf(apps);
     }
 
-    private void warn(RuntimeException exception, Instant now) {
-        Instant previousWarnAt = lastWarnAt;
+    private static String describe(RuntimeException exception) {
+        if (exception instanceof RestClientResponseException restClientResponseException) {
+            HttpStatusCode statusCode = restClientResponseException.getStatusCode();
+
+            int status = statusCode.value();
+
+            if (status == 401 || status == 403) {
+                return "the proxy rejected the API key (HTTP " + status +
+                    "), check github-proxy.oauth-apps.api-key";
+            }
+
+            if (statusCode.is3xxRedirection()) {
+                return "the proxy answered with a redirect (HTTP " + status + "), check github-proxy.base-url";
+            }
+
+            if (statusCode.is2xxSuccessful()) {
+                return "the proxy answered without a body (HTTP " + status + ")";
+            }
+
+            return "the proxy answered HTTP " + status;
+        }
+
+        Class<?> exceptionClass = exception.getClass();
+
+        return "the request to the proxy failed: " + exceptionClass.getSimpleName();
+    }
+
+    private void warn(String reason, Instant now) {
+        Instant previousWarnAt = lastWarnAtByReason.get(reason);
 
         if (previousWarnAt != null) {
             Duration sinceWarn = Duration.between(previousWarnAt, now);
@@ -193,21 +233,11 @@ public class RemoteOAuth2Apps {
             }
         }
 
-        lastWarnAt = now;
+        lastWarnAtByReason.put(reason, now);
 
-        Class<?> exceptionClass = exception.getClass();
-
-        String reason = exceptionClass.getSimpleName();
-
-        if (exception instanceof HttpStatusCodeException httpStatusCodeException) {
-            HttpStatusCode statusCode = httpStatusCodeException.getStatusCode();
-
-            reason += " (status " + statusCode.value() + ")";
-        }
-
-        log.warn("Failed to load predefined OAuth apps from the GitHub proxy: {}", reason);
+        log.warn("Predefined OAuth apps from the GitHub proxy: {}", reason);
     }
 
-    private record Snapshot(Map<String, OAuth2App> apps, Instant fetchedAt, Instant failedAt) {
+    private record Snapshot(Map<String, OAuthApp> apps, Instant fetchedAt, Instant failedAt) {
     }
 }

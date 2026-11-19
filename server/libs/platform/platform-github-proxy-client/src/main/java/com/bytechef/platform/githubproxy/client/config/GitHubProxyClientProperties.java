@@ -40,7 +40,7 @@ class GitHubProxyClientProperties {
         this.oauthApps = oauthApps;
     }
 
-    public static class OauthApps {
+    static class OauthApps {
 
         private String apiKey = "";
 
