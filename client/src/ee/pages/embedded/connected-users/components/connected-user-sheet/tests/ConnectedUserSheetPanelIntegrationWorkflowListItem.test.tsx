@@ -258,6 +258,15 @@ describe('ConnectedUserSheetPanelIntegrationWorkflowListItem', () => {
         expect(hoisted.copyToClipboard).toHaveBeenCalledWith('https://example.com/webhooks/abc');
     });
 
+    it('disables copying the static webhook url of a disabled workflow', () => {
+        renderWithIntegrationInstanceWorkflow({
+            enabled: false,
+            staticWebhookUrl: 'https://example.com/webhooks/abc',
+        } as IntegrationInstanceWorkflow);
+
+        expect(screen.getByRole('button', {name: 'Copy webhook URL'})).toBeDisabled();
+    });
+
     it('shows no webhook url for a workflow without a static webhook trigger', () => {
         renderWithIntegrationInstanceWorkflow({enabled: true} as IntegrationInstanceWorkflow);
 

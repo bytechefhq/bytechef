@@ -146,6 +146,7 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
                                 <TooltipTrigger asChild>
                                     <Button
                                         aria-label="Copy webhook URL"
+                                        disabled={!integrationInstanceWorkflow?.enabled}
                                         icon={<ClipboardIcon />}
                                         onClick={handleCopyStaticWebhookUrlClick}
                                         size="icon"
