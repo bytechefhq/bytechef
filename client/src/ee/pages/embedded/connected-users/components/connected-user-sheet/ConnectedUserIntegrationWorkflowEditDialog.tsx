@@ -24,6 +24,7 @@ import {useUpdateIntegrationInstanceConnectionMutation} from '@/ee/shared/mutati
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {
+    ConnectionKeys,
     useGetAllConnectedUserConnectionsQuery,
     useGetConnectionsQuery,
 } from '@/ee/shared/queries/embedded/connections.queries';
@@ -159,6 +160,8 @@ const ConnectedUserIntegrationWorkflowEditDialog = ({
         defaultValues: {inputs: {...(integrationInstanceWorkflow?.inputs ?? {})}},
     });
 
+    const {isDirty: inputsDirty} = formState;
+
     const updateIntegrationInstanceConnectionMutation = useUpdateIntegrationInstanceConnectionMutation();
 
     const updateIntegrationInstanceWorkflowMutation = useUpdateIntegrationInstanceWorkflowMutation();
@@ -166,16 +169,31 @@ const ConnectedUserIntegrationWorkflowEditDialog = ({
     const savePending =
         updateIntegrationInstanceConnectionMutation.isPending || updateIntegrationInstanceWorkflowMutation.isPending;
 
+    const invalidateConnectedUserIntegrationInstance = () => {
+        void queryClient.invalidateQueries({
+            queryKey: ConnectedUserKeys.connectedUser(integrationInstance.connectedUserId!),
+        });
+        void queryClient.invalidateQueries({
+            queryKey: IntegrationInstanceKeys.integrationInstance(integrationInstance.id!),
+        });
+    };
+
     const handleSave = async ({inputs: formInputs}: WorkflowInputsFormI) => {
+        const inputsChanged = inputs.length > 0 && (inputsDirty || !connectionChanged);
+
         try {
             if (connectionChanged) {
                 await updateIntegrationInstanceConnectionMutation.mutateAsync({
                     id: integrationInstance.id!,
                     updateIntegrationInstanceConnectionRequest: {connectionId: Number(changedConnectionId)},
                 });
+
+                void queryClient.invalidateQueries({queryKey: ConnectionKeys.connections});
+
+                invalidateConnectedUserIntegrationInstance();
             }
 
-            if (inputs.length > 0) {
+            if (inputsChanged) {
                 await updateIntegrationInstanceWorkflowMutation.mutateAsync({
                     id: integrationInstance.id!,
                     updateIntegrationInstanceWorkflowRequest: {
@@ -183,17 +201,12 @@ const ConnectedUserIntegrationWorkflowEditDialog = ({
                     },
                     workflowId: workflow.id!,
                 });
+
+                invalidateConnectedUserIntegrationInstance();
             }
         } catch {
             return;
         }
-
-        void queryClient.invalidateQueries({
-            queryKey: ConnectedUserKeys.connectedUser(integrationInstance.connectedUserId!),
-        });
-        void queryClient.invalidateQueries({
-            queryKey: IntegrationInstanceKeys.integrationInstance(integrationInstance.id!),
-        });
 
         onClose();
     };

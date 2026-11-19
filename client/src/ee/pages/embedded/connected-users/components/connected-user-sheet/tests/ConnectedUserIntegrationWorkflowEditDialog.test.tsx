@@ -52,15 +52,26 @@ vi.mock('@/ee/shared/queries/embedded/componentDefinitions.queries', () => ({
 }));
 
 vi.mock('@/ee/shared/queries/embedded/connections.queries', () => ({
+    ConnectionKeys: {connections: ['connections']},
     useGetAllConnectedUserConnectionsQuery: () => ({data: connectionHoisted.userConnections}),
     useGetConnectionsQuery: () => ({data: connectionHoisted.environmentConnections}),
 }));
 
 vi.mock('@/shared/components/InputConfigurationList', () => ({
-    default: ({inputs}: {inputs: Array<{name: string}>}) => (
+    default: ({
+        control,
+        inputs,
+    }: {
+        control: {register: (name: string) => Record<string, unknown>};
+        inputs: Array<{name: string}>;
+    }) => (
         <ul>
             {inputs.map((input) => (
-                <li key={input.name}>{`input ${input.name}`}</li>
+                <li key={input.name}>
+                    {`input ${input.name}`}
+
+                    <input aria-label={input.name} {...control.register(`inputs.${input.name}`)} />
+                </li>
             ))}
         </ul>
     ),
@@ -75,9 +86,11 @@ const workflow = {
     label: 'Rate Ticket from Email',
 } as unknown as Workflow;
 
+let queryClient: QueryClient;
+
 const renderDialog = (inputs: Workflow['inputs'] = workflow.inputs, provisioned = false) =>
     render(
-        <QueryClientProvider client={new QueryClient()}>
+        <QueryClientProvider client={queryClient}>
             <ConnectedUserIntegrationWorkflowEditDialog
                 integrationInstance={{connectedUserId: 3, connectionId: 11, id: 7, name: 'instance'} as never}
                 integrationInstanceConfiguration={
@@ -108,6 +121,8 @@ describe('ConnectedUserIntegrationWorkflowEditDialog', () => {
         Element.prototype.releasePointerCapture = vi.fn();
         Element.prototype.scrollIntoView = vi.fn();
         Element.prototype.setPointerCapture = vi.fn();
+
+        queryClient = new QueryClient();
 
         hoisted.onClose.mockReset();
         hoisted.updateConnection.mockReset();
@@ -181,6 +196,8 @@ describe('ConnectedUserIntegrationWorkflowEditDialog', () => {
         await userEvent.click(screen.getByRole('tab', {name: /Connections/}));
         await userEvent.click(screen.getByRole('combobox', {name: 'cevisio connection'}));
         await userEvent.click(screen.getByRole('option', {name: /Jane cevisio backup/}));
+        await userEvent.click(screen.getByRole('tab', {name: /Inputs/}));
+        await userEvent.type(screen.getByRole('textbox', {name: 'channel'}), '-ops');
         await userEvent.click(screen.getByRole('button', {name: 'Save'}));
 
         expect(hoisted.updateConnection).toHaveBeenCalledWith({
@@ -192,6 +209,39 @@ describe('ConnectedUserIntegrationWorkflowEditDialog', () => {
             hoisted.updateWorkflow.mock.invocationCallOrder[0]
         );
         expect(hoisted.onClose).toHaveBeenCalled();
+    });
+
+    it('switches only the connection when the inputs are unchanged, so the triggers restart once', async () => {
+        renderDialog(workflow.inputs, true);
+
+        await userEvent.click(screen.getByRole('tab', {name: /Connections/}));
+        await userEvent.click(screen.getByRole('combobox', {name: 'cevisio connection'}));
+        await userEvent.click(screen.getByRole('option', {name: /Jane cevisio backup/}));
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(hoisted.updateConnection).toHaveBeenCalled();
+        expect(hoisted.updateWorkflow).not.toHaveBeenCalled();
+        expect(hoisted.onClose).toHaveBeenCalled();
+    });
+
+    it('refreshes the connected user after the connection switch even when the inputs then fail to save', async () => {
+        hoisted.updateWorkflow.mockRejectedValue(new Error('inputs failed'));
+
+        const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+        renderDialog(workflow.inputs, true);
+
+        await userEvent.click(screen.getByRole('tab', {name: /Connections/}));
+        await userEvent.click(screen.getByRole('combobox', {name: 'cevisio connection'}));
+        await userEvent.click(screen.getByRole('option', {name: /Jane cevisio backup/}));
+        await userEvent.click(screen.getByRole('tab', {name: /Inputs/}));
+        await userEvent.type(screen.getByRole('textbox', {name: 'channel'}), '-ops');
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(hoisted.updateWorkflow).toHaveBeenCalled();
+        expect(hoisted.onClose).not.toHaveBeenCalled();
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['connections']});
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['connectedUsers', 3]});
     });
 
     it('saves a changed connection even when the workflow has no inputs to set', async () => {
