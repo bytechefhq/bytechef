@@ -30,7 +30,7 @@ class OAuthAppsApiKeyPresentCondition implements Condition {
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
         Environment environment = context.getEnvironment();
 
-        String apiKey = environment.getProperty("github-proxy.oauth-apps-api-key");
+        String apiKey = environment.getProperty("github-proxy.oauth-apps.api-key");
 
         return apiKey != null && !apiKey.isBlank();
     }
