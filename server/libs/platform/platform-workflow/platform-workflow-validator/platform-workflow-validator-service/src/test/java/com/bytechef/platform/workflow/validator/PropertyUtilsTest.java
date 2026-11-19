@@ -138,4 +138,36 @@ class PropertyUtilsTest {
 
         assertThat(PropertyUtils.getObjectItemProperties(objectPropertyInfo)).isNull();
     }
+
+    @Test
+    void testSplitPropertyPathKeepsDotsAndSlashesInsideQuotedKeys() {
+        assertThat(PropertyUtils.splitPropertyPath("outputFiles['report.csv']"))
+            .containsExactly("outputFiles", "report.csv");
+        assertThat(PropertyUtils.splitPropertyPath("outputFiles['charts/summary.txt'].url"))
+            .containsExactly("outputFiles", "charts/summary.txt", "url");
+        assertThat(PropertyUtils.splitPropertyPath("['first key'].name"))
+            .containsExactly("first key", "name");
+    }
+
+    @Test
+    void testSplitPropertyPathKeepsNumericIndexesAttached() {
+        assertThat(PropertyUtils.splitPropertyPath("items[0].name"))
+            .containsExactly("items[0]", "name");
+        assertThat(PropertyUtils.splitPropertyPath("matrix[1][2]"))
+            .containsExactly("matrix[1][2]");
+    }
+
+    @Test
+    void testCheckPropertyExistsResolvesAQuotedKeyWithADot() {
+        PropertyInfo outputInfo = new PropertyInfo(
+            null, "OBJECT", null, false, false, null, null, List.of(
+                new PropertyInfo("outputFiles", "OBJECT", null, false, false, null, null, List.of(
+                    new PropertyInfo("report.csv", "FILE_ENTRY", null, false, false, null, null)),
+                    null)),
+            null);
+
+        assertThat(PropertyUtils.checkPropertyExists(outputInfo, "outputFiles['report.csv']")).isTrue();
+        assertThat(PropertyUtils.checkPropertyExists(outputInfo, "outputFiles['missing.csv']")).isFalse();
+        assertThat(PropertyUtils.getPropertyType(outputInfo, "outputFiles['report.csv']")).isEqualTo("FILE_ENTRY");
+    }
 }
