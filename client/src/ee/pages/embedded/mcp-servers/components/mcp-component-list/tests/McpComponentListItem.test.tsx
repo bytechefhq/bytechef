@@ -3,7 +3,7 @@ import {McpComponent, McpServer} from '@/shared/middleware/graphql';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import McpComponentListItem from './McpComponentListItem';
+import McpComponentListItem from '../McpComponentListItem';
 
 const hoisted = vi.hoisted(() => ({
     setShowEditDialog: vi.fn(),
@@ -22,15 +22,17 @@ vi.mock('@/pages/automation/mcp-servers/components/mcp-component-list/McpCompone
     ),
 }));
 
-vi.mock('../mcp-component-dialog/McpComponentDialog', () => ({
+vi.mock('../../mcp-component-dialog/McpComponentDialog', () => ({
     default: ({integrationUnavailable, open}: {integrationUnavailable?: boolean; open: boolean}) =>
         open ? (
             <div data-integration-unavailable={String(integrationUnavailable)} data-testid="mcp-component-dialog" />
         ) : null,
 }));
 
-vi.mock('./McpComponentToolList', () => ({
-    default: () => <div data-testid="mcp-component-tool-list" />,
+vi.mock('@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentToolList', () => ({
+    default: ({embedded}: {embedded?: boolean}) => (
+        <div data-embedded={String(embedded)} data-testid="mcp-component-tool-list" />
+    ),
 }));
 
 const mcpServer = {id: '5', name: 'Server'} as McpServer;
@@ -106,7 +108,7 @@ describe('McpComponentListItem', () => {
 
         await userEvent.click(screen.getByRole('button', {name: 'Show tools'}));
 
-        expect(screen.getByTestId('mcp-component-tool-list')).toBeInTheDocument();
+        expect(screen.getByTestId('mcp-component-tool-list')).toHaveAttribute('data-embedded', 'true');
         expect(screen.getByRole('button', {name: 'Hide tools'})).toBeInTheDocument();
     });
 
