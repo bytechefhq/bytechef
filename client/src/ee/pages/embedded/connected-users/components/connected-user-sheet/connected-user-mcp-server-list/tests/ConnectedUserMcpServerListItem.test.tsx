@@ -29,6 +29,23 @@ const hoisted = vi.hoisted(() => ({
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<object>()),
+    useAutomationProjectsQuery: () => ({
+        data: {
+            automationProjects: [
+                {
+                    id: '20',
+                    name: 'Support Desk',
+                    workflowTemplates: [
+                        {
+                            components: [{icon: null, name: 'zendesk', title: 'Zendesk'}],
+                            triggers: [{icon: null, name: 'manual', title: 'Manual'}],
+                            workflowUuid: 'uuid-1',
+                        },
+                    ],
+                },
+            ],
+        },
+    }),
     useDeleteConnectedUserMcpServerMutation: (options: MutationOptionsI) => {
         hoisted.deleteServerOptions = options;
 
@@ -85,6 +102,19 @@ vi.mock('@/ee/shared/queries/embedded/workflows.queries', () => ({
             label: id === 'workflow-1' ? 'Send Email' : 'Archive Email',
             workflowTaskComponentNames: id === 'workflow-1' ? ['gmail'] : [],
         },
+    }),
+}));
+
+vi.mock('@/ee/shared/queries/embedded/integrationVersions.queries', () => ({
+    useGetIntegrationVersionsQuery: (integrationId: number, enabled?: boolean) => ({
+        data:
+            enabled === false
+                ? undefined
+                : [
+                      {status: 'PUBLISHED', version: 6},
+                      {status: 'PUBLISHED', version: integrationId === 40 ? 7 : 6},
+                      {status: 'DRAFT', version: 8},
+                  ],
     }),
 }));
 
@@ -193,13 +223,17 @@ const automationMcpServer = {
     ],
 } as ConnectedUserMcpServer;
 
-const renderListItem = (mcpServer: ConnectedUserMcpServer, queryClient = new QueryClient()) =>
+const renderListItem = (
+    mcpServer: ConnectedUserMcpServer,
+    queryClient = new QueryClient(),
+    integrationInstances = connectedUserIntegrationInstances
+) =>
     render(
         <QueryClientProvider client={queryClient}>
             <TooltipProvider>
                 <ConnectedUserMcpServerListItem
                     connectedUserId={5}
-                    connectedUserIntegrationInstances={connectedUserIntegrationInstances}
+                    connectedUserIntegrationInstances={integrationInstances}
                     mcpServer={mcpServer}
                 />
             </TooltipProvider>
@@ -425,6 +459,8 @@ describe('ConnectedUserMcpServerListItem', () => {
 
         await expandCard();
 
+        await expandGroups();
+
         expect(screen.getByText('Automation Tools')).toBeInTheDocument();
 
         const escalateRow = screen.getByText('Escalate Ticket').closest('li')!;
@@ -438,6 +474,8 @@ describe('ConnectedUserMcpServerListItem', () => {
         renderListItem(automationMcpServer);
 
         await expandCard();
+
+        await expandGroups();
 
         const escalateRow = screen.getByText('Escalate Ticket').closest('li')!;
         const closeRow = screen.getByText('Close Ticket').closest('li')!;
@@ -453,6 +491,8 @@ describe('ConnectedUserMcpServerListItem', () => {
 
         await expandCard();
 
+        await expandGroups();
+
         await userEvent.hover(screen.getByText('Close Ticket'));
 
         expect(await screen.findByRole('tooltip')).toHaveTextContent('Not available to this user');
@@ -462,6 +502,8 @@ describe('ConnectedUserMcpServerListItem', () => {
         renderListItem(automationMcpServer);
 
         await expandCard();
+
+        await expandGroups();
 
         const closeRow = screen.getByText('Close Ticket').closest('li')!;
 
@@ -477,6 +519,8 @@ describe('ConnectedUserMcpServerListItem', () => {
         renderListItem(automationMcpServer, queryClient);
 
         await expandCard();
+
+        await expandGroups();
 
         const escalateRow = screen.getByText('Escalate Ticket').closest('li')!;
 
@@ -502,6 +546,8 @@ describe('ConnectedUserMcpServerListItem', () => {
 
         await expandCard();
 
+        await expandGroups();
+
         const closeRow = screen.getByText('Close Ticket').closest('li')!;
         const closeSwitch = within(closeRow).getByRole('switch');
 
@@ -514,5 +560,61 @@ describe('ConnectedUserMcpServerListItem', () => {
             enable: false,
             id: '302',
         });
+    });
+
+    it('groups automation tools under their project', async () => {
+        renderListItem({
+            ...automationMcpServer,
+            automations: [
+                ...automationMcpServer.automations,
+                {...automationMcpServer.automations[0], automationName: 'Billing', id: '303', name: 'Refund Order'},
+            ],
+        });
+
+        await expandCard();
+
+        const supportDeskGroup = screen.getByRole('group', {name: 'Support Desk'});
+        const billingGroup = screen.getByRole('group', {name: 'Billing'});
+
+        await expandGroups();
+
+        expect(within(supportDeskGroup).getByText('Escalate Ticket')).toBeInTheDocument();
+        expect(within(supportDeskGroup).getByText('Close Ticket')).toBeInTheDocument();
+        expect(within(billingGroup).getByText('Refund Order')).toBeInTheDocument();
+        expect(within(billingGroup).queryByText('Escalate Ticket')).not.toBeInTheDocument();
+    });
+
+    it('shows the trigger and components of an automation tool from its project workflow', async () => {
+        renderListItem(automationMcpServer);
+
+        await expandCard();
+
+        await expandGroups();
+
+        const escalateRow = screen.getByText('Escalate Ticket').closest('li')!;
+        const closeRow = screen.getByText('Close Ticket').closest('li')!;
+
+        expect(within(escalateRow).getByTestId('trigger-and-components-row')).toHaveTextContent('manual,zendesk');
+        expect(within(closeRow).queryByTestId('trigger-and-components-row')).not.toBeInTheDocument();
+    });
+
+    it('marks a workflow tool group whose integration has a newer published version', async () => {
+        renderListItem(mixedMcpServer, new QueryClient(), [
+            {credentialStatus: 'VALID', id: 10, integrationId: 40},
+        ] as ConnectedUserIntegrationInstance[]);
+
+        await expandCard();
+
+        expect(screen.getAllByRole('img', {name: 'Newer version available'})).toHaveLength(1);
+    });
+
+    it('does not mark a workflow tool group already on the last published version', async () => {
+        renderListItem(mixedMcpServer, new QueryClient(), [
+            {credentialStatus: 'VALID', id: 10, integrationId: 41},
+        ] as ConnectedUserIntegrationInstance[]);
+
+        await expandCard();
+
+        expect(screen.queryByRole('img', {name: 'Newer version available'})).not.toBeInTheDocument();
     });
 });

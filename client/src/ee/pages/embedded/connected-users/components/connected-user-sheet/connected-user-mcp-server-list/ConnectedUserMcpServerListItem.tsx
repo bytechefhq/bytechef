@@ -8,12 +8,15 @@ import ConnectedUserMcpServerComponentGroup from '@/ee/pages/embedded/connected-
 import ConnectedUserMcpServerListItemAutomationRow from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerListItemAutomationRow';
 import ConnectedUserMcpServerListItemToolRow from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerListItemToolRow';
 import ConnectedUserMcpServerListItemWorkflowRow from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerListItemWorkflowRow';
+import ConnectedUserMcpServerProjectGroup from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerProjectGroup';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import isCollapsibleRowClick from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
 import {
     ConnectedUserMcpServer,
+    ConnectedUserMcpServerAutomation,
+    useAutomationProjectsQuery,
     useDeleteConnectedUserMcpServerMutation,
     useEnableConnectedUserMcpServerMutation,
 } from '@/shared/middleware/graphql';
@@ -64,6 +67,22 @@ const ConnectedUserMcpServerListItem = ({
     const workflowsByComponentName = useMemo(
         () => groupByComponent(mcpServer.workflows, (workflow) => workflow.integrationVersion),
         [mcpServer.workflows]
+    );
+
+    const automationsByProjectName = useMemo(() => groupByProjectName(mcpServer.automations), [mcpServer.automations]);
+
+    const {data: automationProjectsData} = useAutomationProjectsQuery(undefined, {enabled: automationCount > 0});
+
+    const workflowTemplatesByWorkflowUuid = useMemo(
+        () =>
+            new Map(
+                (automationProjectsData?.automationProjects ?? []).flatMap((automationProject) =>
+                    automationProject.workflowTemplates.map(
+                        (workflowTemplate) => [workflowTemplate.workflowUuid, workflowTemplate] as const
+                    )
+                )
+            ),
+        [automationProjectsData]
     );
 
     const getCredentialStatus = (integrationInstanceId: string) =>
@@ -220,6 +239,9 @@ const ConnectedUserMcpServerListItem = ({
                                     <ConnectedUserMcpServerComponentGroup
                                         componentName={group.componentName}
                                         credentialStatus={getCredentialStatus(group.items[0].integrationInstanceId)}
+                                        integrationId={
+                                            findIntegrationInstance(group.items[0].integrationInstanceId)?.integrationId
+                                        }
                                         key={`${group.componentName}_${group.version}`}
                                         lastExecutionDate={getLastExecutionDate(group.items)}
                                         provisioned={
@@ -250,15 +272,26 @@ const ConnectedUserMcpServerListItem = ({
                                 Automation Tools
                             </h3>
 
-                            <ul className="flex flex-col gap-2 px-3">
-                                {mcpServer.automations.map((automation) => (
-                                    <ConnectedUserMcpServerListItemAutomationRow
-                                        automation={automation}
-                                        connectedUserId={connectedUserId}
-                                        key={automation.id}
-                                    />
+                            <div className="flex flex-col gap-2 px-3">
+                                {automationsByProjectName.map((group) => (
+                                    <ConnectedUserMcpServerProjectGroup
+                                        key={group.projectName}
+                                        lastExecutionDate={getLastExecutionDate(group.items)}
+                                        projectName={group.projectName}
+                                    >
+                                        {group.items.map((automation) => (
+                                            <ConnectedUserMcpServerListItemAutomationRow
+                                                automation={automation}
+                                                connectedUserId={connectedUserId}
+                                                key={automation.id}
+                                                workflowTemplate={workflowTemplatesByWorkflowUuid.get(
+                                                    automation.workflowUuid
+                                                )}
+                                            />
+                                        ))}
+                                    </ConnectedUserMcpServerProjectGroup>
                                 ))}
-                            </ul>
+                            </div>
                         </div>
                     )}
 
@@ -316,6 +349,28 @@ function groupByComponent<T extends {componentName: string}>(
     }
 
     return [...groupsByKey.values()];
+}
+
+interface ProjectGroupI {
+    items: ConnectedUserMcpServerAutomation[];
+    projectName: string;
+}
+
+function groupByProjectName(automations: ConnectedUserMcpServerAutomation[]): ProjectGroupI[] {
+    const groupsByProjectName = new Map<string, ProjectGroupI>();
+
+    for (const automation of automations) {
+        const group = groupsByProjectName.get(automation.automationName) ?? {
+            items: [],
+            projectName: automation.automationName,
+        };
+
+        group.items.push(automation);
+
+        groupsByProjectName.set(automation.automationName, group);
+    }
+
+    return [...groupsByProjectName.values()];
 }
 
 export default ConnectedUserMcpServerListItem;
