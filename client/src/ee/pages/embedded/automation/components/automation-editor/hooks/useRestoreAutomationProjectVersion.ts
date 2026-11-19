@@ -60,6 +60,9 @@ export const useRestoreAutomationProjectVersion = ({
                     void queryClient.invalidateQueries({queryKey: ['automationProjectVersions']});
                     void queryClient.invalidateQueries({queryKey: ['automationProjectVersionWorkflowChanges']});
                     void queryClient.invalidateQueries({queryKey: ['automationProjectVersionWorkflowChange']});
+                    void queryClient.invalidateQueries({
+                        queryKey: ['automationProjectCodeWorkflowSource', {automationProjectId: projectId}],
+                    });
 
                     toast(`Version V${projectVersion} applied to the draft.`);
 
