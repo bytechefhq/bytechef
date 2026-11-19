@@ -49,6 +49,8 @@ const workflow = {
 
 interface RenderListItemOverridesI {
     projectDeploymentWorkflow?: ProjectDeploymentWorkflow;
+    showRunSlot?: boolean;
+    showTriggerUrlSlot?: boolean;
     workflow?: Workflow;
 }
 
@@ -68,6 +70,8 @@ const renderListItem = (projectName?: string, projectId?: number, overrides: Ren
                         projectId={projectId}
                         projectName={projectName}
                         projectVersion={2}
+                        showRunSlot={overrides.showRunSlot}
+                        showTriggerUrlSlot={overrides.showTriggerUrlSlot}
                         workflow={overrides.workflow ?? workflow}
                         workflowComponentDefinitions={{}}
                         workflowTaskDispatcherDefinitions={{}}
@@ -178,6 +182,25 @@ describe('ProjectDeploymentWorkflowListItem', () => {
         renderListItem('Subflow');
 
         expect(screen.queryByRole('button', {name: 'Open in project'})).not.toBeInTheDocument();
+    });
+
+    it('keeps a fixed run slot and trigger url slot so the buttons line up across rows', () => {
+        const {container} = renderListItem('Subflow');
+
+        expect(container.querySelectorAll('div.size-9.shrink-0')).toHaveLength(2);
+    });
+
+    it('leaves out the trigger url slot when no row of the deployment has a trigger url', () => {
+        const {container} = renderListItem('Subflow', undefined, {showTriggerUrlSlot: false});
+
+        expect(container.querySelectorAll('div.size-9.shrink-0')).toHaveLength(1);
+        expect(screen.getByRole('button', {name: ''})).toBeInTheDocument();
+    });
+
+    it('leaves out the run slot when no row of the deployment can run manually', () => {
+        const {container} = renderListItem('Subflow', undefined, {showRunSlot: false, showTriggerUrlSlot: false});
+
+        expect(container.querySelectorAll('div.size-9.shrink-0')).toHaveLength(0);
     });
 
     it('does not open the executions sheet when the enable switch is toggled', async () => {

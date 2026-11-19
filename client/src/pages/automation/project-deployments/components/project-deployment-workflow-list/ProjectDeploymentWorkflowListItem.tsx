@@ -5,6 +5,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
 import ProjectDeploymentWorkflowListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/ProjectDeploymentWorkflowListItemDropdownMenu';
 import {getPageUrl} from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/util/pageUrl-utils';
+import {canRunWorkflowManually} from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/util/workflowActionSlot-utils';
 import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
@@ -38,6 +39,8 @@ interface ProjectDeploymentWorkflowListItemProps {
     projectId?: number;
     projectName?: string;
     projectVersion?: number;
+    showRunSlot?: boolean;
+    showTriggerUrlSlot?: boolean;
     workflow: Workflow;
     workflowComponentDefinitions: {
         [key: string]: ComponentDefinitionBasic | undefined;
@@ -57,6 +60,8 @@ const ProjectDeploymentWorkflowListItem = ({
     projectId,
     projectName,
     projectVersion,
+    showRunSlot = true,
+    showTriggerUrlSlot = true,
     workflow,
     workflowComponentDefinitions,
     workflowTaskDispatcherDefinitions,
@@ -256,98 +261,101 @@ const ProjectDeploymentWorkflowListItem = ({
 
                 <div className="flex items-center gap-x-4">
                     <div className="flex items-center gap-x-1">
-                        <div className="size-9 shrink-0">
-                            {(!workflow.triggers?.length ||
-                                workflow.triggers?.some((trigger) => trigger.type.includes('manual'))) && (
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            disabled={!projectDeploymentEnabled || !enabled}
-                                            icon={<PlayIcon className="text-success" />}
-                                            onClick={handleRunWorkflowClick}
-                                            size="icon"
-                                            variant="ghost"
-                                        />
-                                    </TooltipTrigger>
-
-                                    <TooltipContent>Run workflow manually</TooltipContent>
-                                </Tooltip>
-                            )}
-                        </div>
-
-                        <div className="size-9 shrink-0">
-                            {!hostedChatTrigger && !formTrigger && staticWebhookUrl && (
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            disabled={!enabled}
-                                            icon={<ClipboardIcon />}
-                                            onClick={() =>
-                                                copyToClipboard(
-                                                    staticWebhookUrl! + (workflow.sseStreamResponse ? '/sse' : '')
-                                                )
-                                            }
-                                            size="icon"
-                                            variant="ghost"
-                                        />
-                                    </TooltipTrigger>
-
-                                    <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>
-                                </Tooltip>
-                            )}
-
-                            {formTrigger && staticWebhookUrl && (
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        {enabled ? (
-                                            <Link
-                                                aria-label="Open form"
-                                                className={TRIGGER_PAGE_LINK_CLASS_NAME}
-                                                to={formTriggerPageUrl}
-                                            >
-                                                <FormIcon />
-                                            </Link>
-                                        ) : (
+                        {showRunSlot && (
+                            <div className="size-9 shrink-0">
+                                {canRunWorkflowManually(workflow) && (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
                                             <Button
-                                                aria-label="Open form"
-                                                disabled
-                                                icon={<FormIcon />}
+                                                disabled={!projectDeploymentEnabled || !enabled}
+                                                icon={<PlayIcon className="text-success" />}
+                                                onClick={handleRunWorkflowClick}
                                                 size="icon"
                                                 variant="ghost"
                                             />
-                                        )}
-                                    </TooltipTrigger>
+                                        </TooltipTrigger>
 
-                                    <TooltipContent>Click to open a form</TooltipContent>
-                                </Tooltip>
-                            )}
+                                        <TooltipContent>Run workflow manually</TooltipContent>
+                                    </Tooltip>
+                                )}
+                            </div>
+                        )}
 
-                            {hostedChatTrigger && staticWebhookUrl && (
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        {enabled ? (
-                                            <Link
-                                                aria-label="Open hosted chat"
-                                                className={TRIGGER_PAGE_LINK_CLASS_NAME}
-                                                to={hostedChatTriggerPageUrl}
-                                            >
-                                                <MessageCircleMoreIcon />
-                                            </Link>
-                                        ) : (
+                        {showTriggerUrlSlot && (
+                            <div className="size-9 shrink-0">
+                                {!hostedChatTrigger && !formTrigger && staticWebhookUrl && (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
                                             <Button
-                                                aria-label="Open hosted chat"
-                                                disabled
-                                                icon={<MessageCircleMoreIcon />}
+                                                disabled={!enabled}
+                                                icon={<ClipboardIcon />}
+                                                onClick={() =>
+                                                    copyToClipboard(
+                                                        staticWebhookUrl! + (workflow.sseStreamResponse ? '/sse' : '')
+                                                    )
+                                                }
                                                 size="icon"
                                                 variant="ghost"
                                             />
-                                        )}
-                                    </TooltipTrigger>
+                                        </TooltipTrigger>
 
-                                    <TooltipContent>Open hosted chat (URL is not copied)</TooltipContent>
-                                </Tooltip>
-                            )}
-                        </div>
+                                        <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>
+                                    </Tooltip>
+                                )}
+
+                                {formTrigger && staticWebhookUrl && (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            {enabled ? (
+                                                <Link
+                                                    aria-label="Open form"
+                                                    className={TRIGGER_PAGE_LINK_CLASS_NAME}
+                                                    to={formTriggerPageUrl}
+                                                >
+                                                    <FormIcon />
+                                                </Link>
+                                            ) : (
+                                                <Button
+                                                    aria-label="Open form"
+                                                    disabled
+                                                    icon={<FormIcon />}
+                                                    size="icon"
+                                                    variant="ghost"
+                                                />
+                                            )}
+                                        </TooltipTrigger>
+
+                                        <TooltipContent>Click to open a form</TooltipContent>
+                                    </Tooltip>
+                                )}
+
+                                {hostedChatTrigger && staticWebhookUrl && (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            {enabled ? (
+                                                <Link
+                                                    aria-label="Open hosted chat"
+                                                    className={TRIGGER_PAGE_LINK_CLASS_NAME}
+                                                    to={hostedChatTriggerPageUrl}
+                                                >
+                                                    <MessageCircleMoreIcon />
+                                                </Link>
+                                            ) : (
+                                                <Button
+                                                    aria-label="Open hosted chat"
+                                                    disabled
+                                                    icon={<MessageCircleMoreIcon />}
+                                                    size="icon"
+                                                    variant="ghost"
+                                                />
+                                            )}
+                                        </TooltipTrigger>
+
+                                        <TooltipContent>Open hosted chat (URL is not copied)</TooltipContent>
+                                    </Tooltip>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <div className="relative flex items-center">
