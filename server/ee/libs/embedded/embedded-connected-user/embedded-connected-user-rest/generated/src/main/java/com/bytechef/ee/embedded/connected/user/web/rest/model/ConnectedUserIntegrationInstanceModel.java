@@ -44,6 +44,8 @@ public class ConnectedUserIntegrationInstanceModel {
 
   private @Nullable Boolean provisioned;
 
+  private @Nullable String provisionedBy;
+
   public ConnectedUserIntegrationInstanceModel componentName(@Nullable String componentName) {
     this.componentName = componentName;
     return this;
@@ -218,11 +220,11 @@ public class ConnectedUserIntegrationInstanceModel {
   }
 
   /**
-   * If a tenant admin provisioned the integration instance.
+   * If a tenant admin or the API set up the integration instance for the connected user.
    * @return provisioned
    */
   
-  @Schema(name = "provisioned", accessMode = Schema.AccessMode.READ_ONLY, description = "If a tenant admin provisioned the integration instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "provisioned", accessMode = Schema.AccessMode.READ_ONLY, description = "If a tenant admin or the API set up the integration instance for the connected user.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("provisioned")
   public @Nullable Boolean getProvisioned() {
     return provisioned;
@@ -231,6 +233,27 @@ public class ConnectedUserIntegrationInstanceModel {
   @JsonProperty("provisioned")
   public void setProvisioned(@Nullable Boolean provisioned) {
     this.provisioned = provisioned;
+  }
+
+  public ConnectedUserIntegrationInstanceModel provisionedBy(@Nullable String provisionedBy) {
+    this.provisionedBy = provisionedBy;
+    return this;
+  }
+
+  /**
+   * Who set up the integration instance: the tenant admin's login, or api-key for the server-to-server API.
+   * @return provisionedBy
+   */
+  
+  @Schema(name = "provisionedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "Who set up the integration instance: the tenant admin's login, or api-key for the server-to-server API.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("provisionedBy")
+  public @Nullable String getProvisionedBy() {
+    return provisionedBy;
+  }
+
+  @JsonProperty("provisionedBy")
+  public void setProvisionedBy(@Nullable String provisionedBy) {
+    this.provisionedBy = provisionedBy;
   }
 
   @Override
@@ -250,12 +273,13 @@ public class ConnectedUserIntegrationInstanceModel {
         Objects.equals(this.integrationVersion, connectedUserIntegrationInstance.integrationVersion) &&
         Objects.equals(this.connectionId, connectedUserIntegrationInstance.connectionId) &&
         Objects.equals(this.credentialStatus, connectedUserIntegrationInstance.credentialStatus) &&
-        Objects.equals(this.provisioned, connectedUserIntegrationInstance.provisioned);
+        Objects.equals(this.provisioned, connectedUserIntegrationInstance.provisioned) &&
+        Objects.equals(this.provisionedBy, connectedUserIntegrationInstance.provisionedBy);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, enabled, id, integrationId, integrationInstanceConfigurationId, integrationVersion, connectionId, credentialStatus, provisioned);
+    return Objects.hash(componentName, enabled, id, integrationId, integrationInstanceConfigurationId, integrationVersion, connectionId, credentialStatus, provisioned, provisionedBy);
   }
 
   @Override
@@ -271,6 +295,7 @@ public class ConnectedUserIntegrationInstanceModel {
     sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
     sb.append("    credentialStatus: ").append(toIndentedString(credentialStatus)).append("\n");
     sb.append("    provisioned: ").append(toIndentedString(provisioned)).append("\n");
+    sb.append("    provisionedBy: ").append(toIndentedString(provisionedBy)).append("\n");
     sb.append("}");
     return sb.toString();
   }

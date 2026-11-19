@@ -46,6 +46,7 @@ export * from './Tag';
 export * from './UpdateConnectionCredentialsRequest';
 export * from './UpdateConnectionRequest';
 export * from './UpdateIntegrationInstanceConnectionRequest';
+export * from './UpdateIntegrationInstanceWorkflowRequest';
 export * from './UpdateTagsRequest';
 export * from './Workflow';
 export * from './Workflow1';
