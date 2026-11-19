@@ -22,7 +22,7 @@ export function getWorkflowComponentVersions(workflow: Workflow): Record<string,
     for (const node of getWorkflowDefinitionNodes(definition)) {
         const [componentName, versionToken] = node.type.split('/');
 
-        if (!componentName || !versionToken || !versionToken.startsWith('v')) {
+        if (!componentName || !versionToken?.startsWith('v')) {
             continue;
         }
 

@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import formatWorkflowInputTestValue from '@/pages/platform/workflow-editor/components/workflow-inputs/utils/formatWorkflowInputTestValue';
 import {WorkflowInput, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {EditIcon, Trash2Icon} from 'lucide-react';
 
@@ -10,21 +11,6 @@ interface WorkflowInputsTableProps {
     workflowInputs: WorkflowInput[];
     workflowTestConfigurationInputs?: WorkflowTestConfiguration['inputs'];
 }
-
-const formatTestValue = (value: unknown): string => {
-    if (value == null) {
-        return '';
-    }
-
-    if (typeof value === 'object') {
-        return Object.values(value as Record<string, unknown>)
-            .filter((memberValue) => memberValue != null && memberValue !== '')
-            .map((memberValue) => String(memberValue))
-            .join(', ');
-    }
-
-    return String(value);
-};
 
 const WorkflowInputsTable = ({
     internalOnlyVisible,
@@ -57,7 +43,7 @@ const WorkflowInputsTable = ({
         <TableBody>
             {workflowInputs?.map((input, index) => {
                 const inputType = input.componentReference ? 'component' : input.type;
-                const testValue = formatTestValue(workflowTestConfigurationInputs?.[input.name]);
+                const testValue = formatWorkflowInputTestValue(workflowTestConfigurationInputs?.[input.name]);
 
                 return (
                     <TableRow className="cursor-pointer border-b-border/50" key={`${input.name}-${index}`}>
