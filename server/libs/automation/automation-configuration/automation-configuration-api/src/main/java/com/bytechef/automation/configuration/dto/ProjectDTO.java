@@ -34,7 +34,7 @@ public record ProjectDTO(
     Integer developmentDeploymentCount, Long id, String name, String lastModifiedBy, Instant lastModifiedDate,
     Instant lastPublishedDate, Status lastStatus,
     int lastProjectVersion, List<ProjectVersion> projectVersions, List<Long> projectWorkflowIds, List<Tag> tags,
-    String uuid, int version, Long workspaceId) {
+    String uuid, int version, Long workspaceId, boolean unpublishedChanges) {
 
     public ProjectDTO(Category category, Project project, List<Long> projectWorkflowIds, List<Tag> tags) {
         this(category, project, projectWorkflowIds, tags, null);
@@ -50,7 +50,7 @@ public record ProjectDTO(
             project.getName(), project.getLastModifiedBy(), project.getLastModifiedDate(),
             project.getLastPublishedDate(), project.getLastStatus(), project.getLastProjectVersion(),
             project.getProjectVersions(), projectWorkflowIds, tags, project.getUuid(), project.getVersion(),
-            project.getWorkspaceId());
+            project.getWorkspaceId(), false);
     }
 
     public ProjectDTO(Project project) {
@@ -59,11 +59,18 @@ public record ProjectDTO(
             project.getCreatedDate(), project.getDescription(), null, project.getId(), project.getName(),
             project.getLastModifiedBy(), project.getLastModifiedDate(), project.getLastPublishedDate(),
             project.getLastStatus(), project.getLastProjectVersion(), project.getProjectVersions(), List.of(),
-            List.of(), project.getUuid(), project.getVersion(), project.getWorkspaceId());
+            List.of(), project.getUuid(), project.getVersion(), project.getWorkspaceId(), false);
     }
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public ProjectDTO withUnpublishedChanges(boolean unpublishedChanges) {
+        return new ProjectDTO(
+            category, createdBy, createdDate, description, developmentDeploymentCount, id, name, lastModifiedBy,
+            lastModifiedDate, lastPublishedDate, lastStatus, lastProjectVersion, projectVersions, projectWorkflowIds,
+            tags, uuid, version, workspaceId, unpublishedChanges);
     }
 
     public Project toProject() {
@@ -210,7 +217,7 @@ public record ProjectDTO(
             return new ProjectDTO(
                 category, createdBy, createdDate, description, null, id, name, lastModifiedBy, lastModifiedDate,
                 lastPublishedDate, lastStatus, lastProjectVersion, projectVersions, projectWorkflowIds, tags, uuid,
-                version, workspaceId);
+                version, workspaceId, false);
         }
     }
 }

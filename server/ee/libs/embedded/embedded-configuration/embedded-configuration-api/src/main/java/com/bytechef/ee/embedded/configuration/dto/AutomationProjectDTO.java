@@ -22,5 +22,16 @@ public record AutomationProjectDTO(
     long id, String name, String description, Long categoryId, List<Long> tagIds, boolean published, int version,
     Integer lastPublishedVersion, List<ConnectedUserWorkflowTemplateDTO> workflowTemplates,
     String permissionExpression, boolean automationHubVisible, int configurationCount,
-    @Nullable Instant lastPublishedDate) {
+    @Nullable Instant lastPublishedDate, boolean unpublishedChanges) {
+
+    public AutomationProjectDTO(
+        long id, String name, String description, Long categoryId, List<Long> tagIds, boolean published, int version,
+        Integer lastPublishedVersion, List<ConnectedUserWorkflowTemplateDTO> workflowTemplates,
+        String permissionExpression, boolean automationHubVisible, int configurationCount,
+        @Nullable Instant lastPublishedDate) {
+
+        this(
+            id, name, description, categoryId, tagIds, published, version, lastPublishedVersion, workflowTemplates,
+            permissionExpression, automationHubVisible, configurationCount, lastPublishedDate, false);
+    }
 }

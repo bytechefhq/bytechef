@@ -94,6 +94,7 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
@@ -337,7 +338,7 @@ public class IntegrationFacadeIntTest {
 
         assertThat(integrationFacade.getIntegration(integrationDTO.id()))
             .usingRecursiveComparison()
-            .ignoringFields("developmentConfigurationCount")
+            .ignoringFields("developmentConfigurationCount", "unpublishedChanges")
             .isEqualTo(integrationDTO);
         assertThat(integrationFacade.getIntegration(integrationDTO.id()))
             .hasFieldOrPropertyWithValue("category", category)
@@ -451,6 +452,31 @@ public class IntegrationFacadeIntTest {
                 .map(IntegrationWorkflowDTO::getId)
                 .toList())
                     .contains(workflow.getId());
+    }
+
+    @Test
+    public void testGetIntegrationsReportsUnpublishedChanges() {
+        long integrationId = Validate.notNull(createIntegration("unpublished").getId(), "id");
+
+        integrationWorkflowFacade.addWorkflow(integrationId, VERSION_1_WORKFLOW_DEFINITION);
+
+        assertThat(getIntegrationDTO(integrationId).unpublishedChanges()).isTrue();
+
+        integrationFacade.publishIntegration(integrationId, "first");
+
+        assertThat(getIntegrationDTO(integrationId).unpublishedChanges()).isFalse();
+
+        IntegrationWorkflow draftIntegrationWorkflow = integrationWorkflowRepository
+            .findAllByIntegrationIdAndIntegrationVersion(integrationId, 2)
+            .getFirst();
+
+        String draftWorkflowId = draftIntegrationWorkflow.getWorkflowId();
+
+        Workflow draftWorkflow = workflowService.getWorkflow(draftWorkflowId);
+
+        workflowService.update(draftWorkflowId, VERSION_2_WORKFLOW_DEFINITION, draftWorkflow.getVersion());
+
+        assertThat(getIntegrationDTO(integrationId).unpublishedChanges()).isTrue();
     }
 
     @Test
@@ -591,6 +617,15 @@ public class IntegrationFacadeIntTest {
         integrationDTO = integrationFacade.getIntegration(integrationDTO.id());
 
         assertThat(integrationDTO.tags()).hasSize(1);
+    }
+
+    private IntegrationDTO getIntegrationDTO(long integrationId) {
+        List<IntegrationDTO> integrationDTOs = integrationFacade.getIntegrations(null, false, null, null, true);
+
+        return integrationDTOs.stream()
+            .filter(integrationDTO -> Objects.equals(integrationDTO.id(), integrationId))
+            .findFirst()
+            .orElseThrow();
     }
 
     private Integration createIntegration(String name) {

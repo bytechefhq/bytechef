@@ -745,7 +745,7 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
             project.id(), project.name(), project.description(), project.categoryId(), project.tagIds(),
             project.published(), project.version(), project.lastPublishedVersion(), visibleTemplates,
             project.permissionExpression(), project.automationHubVisible(), project.configurationCount(),
-            project.lastPublishedDate());
+            project.lastPublishedDate(), project.unpublishedChanges());
     }
 
     private ConnectedUserWorkflowTemplateDTO markProvided(
@@ -873,11 +873,13 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         boolean published = lastPublishedProjectVersion != null;
         Integer lastPublishedVersion = published ? lastPublishedProjectVersion.getVersion() : null;
 
+        boolean unpublishedChanges = !published || projectVersionWorkflowChangeService.hasUnpublishedChanges(project);
+
         return new AutomationProjectDTO(
             project.getId(), project.getName(), project.getDescription(), project.getCategoryId(),
             project.getTagIds(), published, project.getLastProjectVersion(), lastPublishedVersion, workflowTemplates,
             automationProject.getPermissionExpression(), true, configurationCount,
-            project.getLastPublishedDate());
+            project.getLastPublishedDate(), unpublishedChanges);
     }
 
     private AutomationProjectDTO toPublishedDTO(

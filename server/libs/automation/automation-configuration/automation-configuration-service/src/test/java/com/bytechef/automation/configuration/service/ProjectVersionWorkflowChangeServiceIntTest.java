@@ -220,6 +220,45 @@ class ProjectVersionWorkflowChangeServiceIntTest {
                 .hasMessage("Workflow uuid=" + missingWorkflowUuid + " not found in project version v=2");
     }
 
+    @Test
+    void testHasUnpublishedChangesWhenProjectWasNeverPublished() {
+        addWorkflow(1, "a", "A", false);
+
+        assertThat(projectVersionWorkflowChangeService.hasUnpublishedChanges(projectService.getProject(projectId)))
+            .isTrue();
+    }
+
+    @Test
+    void testHasNoUnpublishedChangesWhenDraftMatchesPublishedVersion() {
+        createVersions(2);
+        addWorkflow(1, "a", "A", false);
+        addWorkflow(2, "a", "A", false);
+
+        assertThat(projectVersionWorkflowChangeService.hasUnpublishedChanges(projectService.getProject(projectId)))
+            .isFalse();
+    }
+
+    @Test
+    void testHasUnpublishedChangesWhenDraftModifiesWorkflow() {
+        createVersions(2);
+        addWorkflow(1, "a", "A", false);
+        addWorkflow(2, "a", "A", true);
+
+        assertThat(projectVersionWorkflowChangeService.hasUnpublishedChanges(projectService.getProject(projectId)))
+            .isTrue();
+    }
+
+    @Test
+    void testHasUnpublishedChangesWhenDraftAddsWorkflow() {
+        createVersions(2);
+        addWorkflow(1, "a", "A", false);
+        addWorkflow(2, "a", "A", false);
+        addWorkflow(2, "b", "B", false);
+
+        assertThat(projectVersionWorkflowChangeService.hasUnpublishedChanges(projectService.getProject(projectId)))
+            .isTrue();
+    }
+
     private void addWorkflow(int projectVersion, String key, String label, boolean withDescription) {
         String description = withDescription ? ",\"description\":\"x\"" : "";
 
