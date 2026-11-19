@@ -290,6 +290,16 @@ describe('AppSidebar', () => {
             expect(screen.getByRole('link', {name: 'MCP Servers'})).toHaveClass('hover:bg-sidebar-accent');
         });
 
+        it('marks the flyout of a collapsed group so dark mode keeps the environment border on it', async () => {
+            renderSidebar(false, '/automation/projects', groupedNavigation);
+
+            fireEvent.pointerEnter(screen.getByRole('button', {name: 'Servers'}), {pointerType: 'mouse'});
+
+            const flyoutNavigation = await screen.findByRole('navigation', {name: 'Servers'});
+
+            expect(flyoutNavigation.parentElement).toHaveAttribute('data-sidebar-flyout');
+        });
+
         it('renders a one-item group as a plain row on the collapsed sidebar', () => {
             renderSidebar(false, '/automation/projects', [...navigation, groupedNavigation[navigation.length]]);
 

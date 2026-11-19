@@ -43,6 +43,7 @@ const AppSidebarCollapsedGroup = ({group, isActive, items, onOpenChange, open}: 
                 <HoverCardContent
                     align="start"
                     className="w-56 border-sidebar-border bg-sidebar p-1 text-sidebar-foreground"
+                    data-sidebar-flyout
                     side="right"
                     sideOffset={0}
                 >

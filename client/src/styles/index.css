@@ -68,6 +68,10 @@
         border-color: hsl(var(--surface-neutral-tertiary)) !important;
     }
 
+    .dark [data-slot='hover-card-content'][data-sidebar-flyout] {
+        border-color: hsl(var(--sidebar-border)) !important;
+    }
+
     .dark
         :is(
             [data-slot='context-menu-content'],
