@@ -1,5 +1,6 @@
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
+import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {QueryClient} from '@tanstack/react-query';
 
 interface UpdateCachedProjectWorkflowVersionI {
@@ -12,6 +13,8 @@ export default function updateCachedProjectWorkflowVersion(
     queryClient: QueryClient,
     {projectId, version, workflowId}: UpdateCachedProjectWorkflowVersionI
 ) {
+    void queryClient.invalidateQueries({exact: true, queryKey: ProjectKeys.project(projectId)});
+
     const queryKey = ProjectWorkflowKeys.projectWorkflows(projectId);
 
     const projectWorkflows = queryClient.getQueryData<Workflow[]>(queryKey);

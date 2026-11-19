@@ -1,7 +1,8 @@
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
+import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {QueryClient} from '@tanstack/react-query';
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 
 import updateCachedProjectWorkflowVersion from './updateCachedProjectWorkflowVersion';
 
@@ -30,6 +31,16 @@ describe('updateCachedProjectWorkflowVersion', () => {
             {id: 'workflow-a', version: 1},
             {id: 'workflow-b', version: 3},
         ]);
+    });
+
+    it('refreshes the project so its version badge reflects the saved change', () => {
+        const queryClient = createQueryClientWithCachedWorkflows();
+
+        const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+        updateCachedProjectWorkflowVersion(queryClient, {projectId: PROJECT_ID, version: 3, workflowId: 'workflow-b'});
+
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({exact: true, queryKey: ProjectKeys.project(PROJECT_ID)});
     });
 
     it('keeps the cache untouched when the response carries no version', () => {

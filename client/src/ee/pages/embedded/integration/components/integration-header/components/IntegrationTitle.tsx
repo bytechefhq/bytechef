@@ -27,6 +27,10 @@ const IntegrationTitle = ({integration, integrations, onIntegrationValueChange}:
         [integrations]
     );
 
+    const showPublishedVersion =
+        !!(integration.lastPublishedDate && integration.lastIntegrationVersion) &&
+        integration.unpublishedChanges === false;
+
     return (
         <BreadcrumbTitleSelect
             ariaLabel="Integration select"
@@ -34,13 +38,20 @@ const IntegrationTitle = ({integration, integrations, onIntegrationValueChange}:
                 <Badge
                     className="flex shrink-0 space-x-1 border-transparent"
                     styleType={
-                        integration.lastStatus === IntegrationStatus.Published ? 'success-outline' : 'secondary-filled'
+                        showPublishedVersion || integration.lastStatus === IntegrationStatus.Published
+                            ? 'success-outline'
+                            : 'secondary-filled'
                     }
                     weight="semibold"
                 >
-                    <span>V{integration.lastIntegrationVersion}</span>
+                    <span>
+                        V
+                        {showPublishedVersion
+                            ? integration.lastIntegrationVersion! - 1
+                            : integration.lastIntegrationVersion}
+                    </span>
 
-                    <span>{integration.lastStatus}</span>
+                    <span>{showPublishedVersion ? IntegrationStatus.Published : integration.lastStatus}</span>
                 </Badge>
             }
             currentId={integration.id !== undefined ? String(integration.id) : undefined}

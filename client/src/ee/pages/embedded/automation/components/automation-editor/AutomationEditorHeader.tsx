@@ -477,6 +477,7 @@ const AutomationEditorHeader = ({
                     open={showProjectVersionHistorySheet}
                     projectId={project.id}
                     restoreProjectVersionPending={restoreProjectVersionPending}
+                    unpublishedChanges={project.unpublishedChanges}
                 />
             )}
         </header>

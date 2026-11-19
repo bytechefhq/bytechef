@@ -31,7 +31,7 @@ const AutomationEditorBreadcrumb = ({
         [projects]
     );
 
-    const projectPublished = project.lastPublishedVersion === project.version;
+    const projectPublished = project.published && project.unpublishedChanges === false;
 
     return (
         <Breadcrumb className="min-w-0">
@@ -47,7 +47,7 @@ const AutomationEditorBreadcrumb = ({
                                 styleType={projectPublished ? 'success-outline' : 'secondary-filled'}
                                 weight="semibold"
                             >
-                                <span>V{project.version}</span>
+                                <span>V{projectPublished ? project.lastPublishedVersion : project.version}</span>
 
                                 <span>{projectPublished ? 'PUBLISHED' : 'DRAFT'}</span>
                             </Badge>

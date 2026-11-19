@@ -25,18 +25,25 @@ const ProjectTitle = ({onProjectValueChange, project, projects}: ProjectTitlePro
         [projects]
     );
 
+    const showPublishedVersion =
+        !!(project.lastPublishedDate && project.lastProjectVersion) && project.unpublishedChanges === false;
+
     return (
         <BreadcrumbTitleSelect
             ariaLabel="Project select"
             badge={
                 <Badge
                     className="flex shrink-0 space-x-1 border-transparent"
-                    styleType={project.lastStatus === ProjectStatus.Published ? 'success-outline' : 'secondary-filled'}
+                    styleType={
+                        showPublishedVersion || project.lastStatus === ProjectStatus.Published
+                            ? 'success-outline'
+                            : 'secondary-filled'
+                    }
                     weight="semibold"
                 >
-                    <span>V{project.lastProjectVersion}</span>
+                    <span>V{showPublishedVersion ? project.lastProjectVersion! - 1 : project.lastProjectVersion}</span>
 
-                    <span>{project.lastStatus}</span>
+                    <span>{showPublishedVersion ? ProjectStatus.Published : project.lastStatus}</span>
                 </Badge>
             }
             currentId={project.id !== undefined ? String(project.id) : undefined}

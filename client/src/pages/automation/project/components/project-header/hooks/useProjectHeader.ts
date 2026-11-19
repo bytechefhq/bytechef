@@ -123,6 +123,10 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
     });
 
     const hasUnpublishedChanges = useMemo(() => {
+        if (project?.unpublishedChanges !== undefined) {
+            return project.unpublishedChanges;
+        }
+
         if (!project?.lastPublishedDate) {
             return true;
         }
@@ -143,7 +147,7 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
             projectWorkflows.length !== publishedWorkflowUuids.size ||
             projectWorkflows.some((projectWorkflow) => !publishedWorkflowUuids.has(projectWorkflow.workflowUuid))
         );
-    }, [lastPublishedProjectWorkflows, project?.lastPublishedDate, projectWorkflows]);
+    }, [lastPublishedProjectWorkflows, project?.lastPublishedDate, project?.unpublishedChanges, projectWorkflows]);
 
     const navigateToProjectWorkflow = useCallback(
         (targetProjectId: number, projectWorkflowId: number) => {

@@ -15,6 +15,7 @@ interface IntegrationVersionHistorySheetProps {
     onClose: () => void;
     onRestoreIntegrationVersion: (integrationVersion: number, onSuccess: () => void) => void;
     restoreIntegrationVersionPending?: boolean;
+    unpublishedChanges?: boolean;
 }
 
 const IntegrationVersionHistorySheet = ({
@@ -22,6 +23,7 @@ const IntegrationVersionHistorySheet = ({
     onClose,
     onRestoreIntegrationVersion,
     restoreIntegrationVersionPending,
+    unpublishedChanges,
 }: IntegrationVersionHistorySheetProps) => {
     const [restoreConfirmationOpen, setRestoreConfirmationOpen] = useState(false);
     const [selectedVersion, setSelectedVersion] = useState<number | undefined>();
@@ -76,6 +78,7 @@ const IntegrationVersionHistorySheet = ({
                             />
                         )}
                         selectedVersion={selectedVersion}
+                        unpublishedChanges={unpublishedChanges}
                     />
                 )}
 

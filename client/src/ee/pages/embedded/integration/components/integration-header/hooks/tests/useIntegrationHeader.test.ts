@@ -216,6 +216,15 @@ describe('useIntegrationHeader', () => {
         expect(result.current.hasUnpublishedChanges).toBe(true);
     });
 
+    it('follows the server when it reports that the draft matches the last published version', () => {
+        hoisted.integrationQuery = {data: {id: 5, lastPublishedDate: new Date(), unpublishedChanges: false}};
+        hoisted.integrationWorkflowsQuery = {data: [{version: 1}, {version: 2}]};
+
+        const {result} = renderIntegrationHeaderHook();
+
+        expect(result.current.hasUnpublishedChanges).toBe(false);
+    });
+
     it('reports no unpublished changes when every workflow is still at the version set by publishing', () => {
         hoisted.integrationQuery = {data: {id: 5, lastPublishedDate: new Date()}};
         hoisted.integrationWorkflowsQuery = {data: [{version: 1}, {version: 1}]};
