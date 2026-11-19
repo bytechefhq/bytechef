@@ -20,7 +20,7 @@ export const ENVIRONMENT_CONFIGS: Record<number, EnvironmentConfigI> = {
         styleType: 'secondary-outline',
     },
     [PRODUCTION_ENVIRONMENT]: {
-        description: 'Live environment used by real users. Optimized for performance with strict safeguards.',
+        description: 'Live environment serving real users, with strict safeguards in place.',
         icon: BoxIcon,
         label: 'PRODUCTION',
         shortLabel: 'PRD',
@@ -28,7 +28,7 @@ export const ENVIRONMENT_CONFIGS: Record<number, EnvironmentConfigI> = {
         styleType: 'destructive-outline',
     },
     [STAGING_ENVIRONMENT]: {
-        description: 'Used for final testing, QA, and validation before release.',
+        description: 'Final testing, QA, and validation of changes before they reach production.',
         icon: FlaskConicalIcon,
         label: 'STAGING',
         shortLabel: 'STG',
