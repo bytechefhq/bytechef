@@ -120,9 +120,9 @@ const ConnectedUserProjectWorkflowListItem = ({
         ? new Date(Date.parse(connectedUserProjectWorkflow.lastExecutionDate))
         : undefined;
 
-    const provisioned = connectedUserProjectWorkflow.automationUuid != null;
+    const referencesAutomation = connectedUserProjectWorkflow.automationUuid != null;
 
-    const isDraft = !provisioned && connectedUserProjectWorkflow.workflowVersion == null;
+    const isDraft = !referencesAutomation && connectedUserProjectWorkflow.workflowVersion == null;
 
     const enableDisabled = isDraft && !connectedUserProjectWorkflow.enabled;
 
@@ -146,12 +146,12 @@ const ConnectedUserProjectWorkflowListItem = ({
     }, [configuration?.configurationEnabled, configuration?.enabled, enableDisabled, turnedOffByAdministrator]);
 
     const versionLabel = useMemo(() => {
-        if (provisioned) {
+        if (referencesAutomation) {
             return undefined;
         }
 
         return isDraft ? 'V1 DRAFT' : `V${connectedUserProjectWorkflow.workflowVersion}`;
-    }, [connectedUserProjectWorkflow.workflowVersion, isDraft, provisioned]);
+    }, [connectedUserProjectWorkflow.workflowVersion, isDraft, referencesAutomation]);
 
     const {automationUuid, staticWebhookUrl} = connectedUserProjectWorkflow;
 
@@ -241,7 +241,11 @@ const ConnectedUserProjectWorkflowListItem = ({
                                         </Tooltip>
                                     )}
 
-                                    <ConnectedUserOriginBadge provisioned={provisioned} resourceName="automation" />
+                                    <ConnectedUserOriginBadge
+                                        provisioned={connectedUserProjectWorkflow.provisionedBy != null}
+                                        provisionedBy={connectedUserProjectWorkflow.provisionedBy ?? undefined}
+                                        resourceName="automation"
+                                    />
                                 </div>
 
                                 <Tooltip>
