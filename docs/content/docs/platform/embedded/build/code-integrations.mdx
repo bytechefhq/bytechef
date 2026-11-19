@@ -330,6 +330,18 @@ configuration for any other. Until that connection is picked, the list is empty.
 [Inputs, outputs and triggers](/platform/automation/build/workflows/code-workflows#inputs-outputs-and-triggers) for the
 syntax in each language.
 
+## Internal-only inputs
+
+Set `internalOnly: true` on an input that an administrator sets once for every connected user, such as a fixed redirect
+URL. The input then appears in the integration configuration's workflow settings instead of the connect dialog, and
+connected users can neither see nor override its value:
+
+```javascript
+inputs: [
+    {name: "contactPageUrl", label: "Contact Page URL", type: "STRING", required: true, internalOnly: true}
+]
+```
+
 ## Creating a code integration
 
 On Embedded → **Integrations**, the arrow next to **New Integration** opens a menu with **New Code Integration** and
