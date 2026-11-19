@@ -1,6 +1,10 @@
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Skeleton} from '@/components/ui/skeleton';
 import ProjectDeploymentWorkflowListItem from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/ProjectDeploymentWorkflowListItem';
+import {
+    canRunWorkflowManually,
+    hasWorkflowTriggerUrl,
+} from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/util/workflowActionSlot-utils';
 import {ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
@@ -95,6 +99,12 @@ const ProjectDeploymentWorkflowList = ({
 
     const allRenderedWorkflows = [...enabledWorkflows, ...disabledWorkflows];
 
+    const showRunSlot = allRenderedWorkflows.some(({workflow}) => canRunWorkflowManually(workflow));
+
+    const showTriggerUrlSlot = allRenderedWorkflows.some(({projectDeploymentWorkflow}) =>
+        hasWorkflowTriggerUrl(projectDeploymentWorkflow)
+    );
+
     allRenderedWorkflows.forEach(({workflow}) => {
         const componentNames = [
             ...(workflow.workflowTriggerComponentNames ?? []),
@@ -148,6 +158,8 @@ const ProjectDeploymentWorkflowList = ({
                                 projectId={projectId}
                                 projectName={projectName}
                                 projectVersion={projectVersion}
+                                showRunSlot={showRunSlot}
+                                showTriggerUrlSlot={showTriggerUrlSlot}
                                 workflow={workflow}
                                 workflowComponentDefinitions={workflowComponentDefinitions}
                                 workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
@@ -189,6 +201,8 @@ const ProjectDeploymentWorkflowList = ({
                                         projectId={projectId}
                                         projectName={projectName}
                                         projectVersion={projectVersion}
+                                        showRunSlot={showRunSlot}
+                                        showTriggerUrlSlot={showTriggerUrlSlot}
                                         workflow={workflow}
                                         workflowComponentDefinitions={workflowComponentDefinitions}
                                         workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
