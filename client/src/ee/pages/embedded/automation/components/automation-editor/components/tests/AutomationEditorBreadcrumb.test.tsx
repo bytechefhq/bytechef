@@ -36,7 +36,14 @@ it('shows the draft being edited, not the last published version, of a published
         <MemoryRouter>
             <TooltipProvider>
                 <AutomationEditorBreadcrumb
-                    project={{...draftProject, lastPublishedVersion: 2, published: true} as never as ProjectPropType}
+                    project={
+                        {
+                            ...draftProject,
+                            lastPublishedVersion: 2,
+                            published: true,
+                            unpublishedChanges: true,
+                        } as never as ProjectPropType
+                    }
                 />
             </TooltipProvider>
         </MemoryRouter>
@@ -47,18 +54,25 @@ it('shows the draft being edited, not the last published version, of a published
     expect(screen.queryByText('PUBLISHED')).not.toBeInTheDocument();
 });
 
-it('shows the published status of a project whose latest version is published', () => {
+it('shows the last published version of a project whose draft has no unpublished changes', () => {
     render(
         <MemoryRouter>
             <TooltipProvider>
                 <AutomationEditorBreadcrumb
-                    project={{...draftProject, lastPublishedVersion: 3, published: true} as never as ProjectPropType}
+                    project={
+                        {
+                            ...draftProject,
+                            lastPublishedVersion: 2,
+                            published: true,
+                            unpublishedChanges: false,
+                        } as never as ProjectPropType
+                    }
                 />
             </TooltipProvider>
         </MemoryRouter>
     );
 
-    expect(screen.getByText('V3')).toBeInTheDocument();
+    expect(screen.getByText('V2')).toBeInTheDocument();
     expect(screen.getByText('PUBLISHED')).toBeInTheDocument();
     expect(screen.queryByText('DRAFT')).not.toBeInTheDocument();
     expect(screen.getByText('PUBLISHED').parentElement).toHaveClass('text-content-success-primary');

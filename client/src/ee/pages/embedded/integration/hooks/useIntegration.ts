@@ -5,6 +5,7 @@ import {
     IntegrationWorkflowKeys,
     useGetIntegrationWorkflowQuery,
 } from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
+import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import {WorkflowKeys} from '@/ee/shared/queries/embedded/workflows.queries';
 import {RequestI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
@@ -79,7 +80,13 @@ export const useIntegration = () => {
 
     const deleteClusterElementParameterMutation = useDeleteClusterElementParameterMutation();
 
+    const invalidateIntegration = () =>
+        queryClient.invalidateQueries({exact: true, queryKey: IntegrationKeys.integration(+integrationId!)});
+
     const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
+        onSuccess: () => {
+            void invalidateIntegration();
+        },
         useUpdateWorkflowMutation,
         workflowId: workflow.id!,
         workflowKeys: WorkflowKeys,
@@ -101,10 +108,16 @@ export const useIntegration = () => {
     const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
         onSuccess: (_result, variables) => {
             invalidateWorkflowNodeParameterQueries(queryClient, variables);
+
+            void invalidateIntegration();
         },
     });
 
-    const updateClusterElementParameterMutation = useUpdateClusterElementParameterMutation();
+    const updateClusterElementParameterMutation = useUpdateClusterElementParameterMutation({
+        onSuccess: () => {
+            void invalidateIntegration();
+        },
+    });
 
     const cancelWorkflowQueries = () => {
         const queryKey = IntegrationWorkflowKeys.integrationWorkflows(+integrationId!);

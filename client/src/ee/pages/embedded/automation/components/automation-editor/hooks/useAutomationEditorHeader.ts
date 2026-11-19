@@ -91,8 +91,9 @@ export const useAutomationEditorHeader = ({bottomResizablePanelRef, projectId}: 
     });
 
     const hasUnpublishedChanges =
-        !project?.published ||
-        (draftWorkflowChangesData?.automationProjectVersionWorkflowChanges.workflows.length ?? 0) > 0;
+        project?.unpublishedChanges ??
+        (!project?.published ||
+            (draftWorkflowChangesData?.automationProjectVersionWorkflowChanges.workflows.length ?? 0) > 0);
 
     const handlePublishProjectSubmit = ({description, onSuccess}: {description?: string; onSuccess: () => void}) => {
         if (project) {

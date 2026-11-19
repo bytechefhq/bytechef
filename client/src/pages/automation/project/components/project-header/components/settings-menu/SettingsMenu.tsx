@@ -265,6 +265,7 @@ const SettingsMenu = ({
                     projectVersions={projectVersions}
                     restoreProjectVersionPending={restoreProjectVersionPending}
                     sheetOpen={showProjectVersionHistorySheet}
+                    unpublishedChanges={project.unpublishedChanges}
                 />
             )}
 

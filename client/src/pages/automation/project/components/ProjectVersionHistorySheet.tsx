@@ -25,6 +25,7 @@ interface ProjectVersionHistorySheetProps {
     projectVersions: ProjectVersion[];
     restoreProjectVersionPending?: boolean;
     sheetOpen: boolean;
+    unpublishedChanges?: boolean;
 }
 
 const ProjectVersionHistorySheet = ({
@@ -36,6 +37,7 @@ const ProjectVersionHistorySheet = ({
     projectVersions,
     restoreProjectVersionPending,
     sheetOpen,
+    unpublishedChanges,
 }: ProjectVersionHistorySheetProps) => {
     const [deleteCandidateVersion, setDeleteCandidateVersion] = useState<number | undefined>();
     const [restoreConfirmationOpen, setRestoreConfirmationOpen] = useState(false);
@@ -140,6 +142,7 @@ const ProjectVersionHistorySheet = ({
                         />
                     )}
                     selectedVersion={selectedVersion}
+                    unpublishedChanges={unpublishedChanges}
                 />
 
                 <footer className="flex shrink-0 justify-end gap-x-2 rounded-b-md border-t border-t-border/50 bg-surface-neutral-primary p-3">

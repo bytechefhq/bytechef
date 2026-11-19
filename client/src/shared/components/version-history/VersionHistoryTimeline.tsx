@@ -18,6 +18,7 @@ interface VersionHistoryTimelineProps {
     renderActions?: (item: VersionHistoryItemI) => ReactNode;
     renderChanges: (item: VersionHistoryItemI) => ReactNode;
     selectedVersion?: number;
+    unpublishedChanges?: boolean;
 }
 
 const formatVersionDate = (date: Date) =>
@@ -30,10 +31,15 @@ const VersionHistoryTimeline = ({
     renderActions,
     renderChanges,
     selectedVersion,
+    unpublishedChanges,
 }: VersionHistoryTimelineProps) => {
     const [expandedVersions, setExpandedVersions] = useState<Set<number>>(new Set());
 
     const selectable = onSelectVersion !== undefined;
+
+    const hideDraft = unpublishedChanges === false && items.some((item) => item.published);
+
+    const visibleItems = hideDraft ? items.filter((item) => item.published) : items;
 
     const handleToggleExpanded = (version: number) => {
         setExpandedVersions((previousVersions) => {
@@ -55,11 +61,11 @@ const VersionHistoryTimeline = ({
             className="flex min-h-0 flex-1 flex-col gap-y-3 overflow-y-auto p-3"
             role={selectable ? 'listbox' : undefined}
         >
-            {items.map((item, index) => {
+            {visibleItems.map((item, index) => {
                 const {published, version} = item;
 
                 const expanded = expandedVersions.has(version);
-                const lastItem = index === items.length - 1;
+                const lastItem = index === visibleItems.length - 1;
                 const selected = selectedVersion === version;
                 const versionSelectable = selectable && published;
 

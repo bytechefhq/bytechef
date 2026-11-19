@@ -15,6 +15,7 @@ interface AutomationProjectVersionHistorySheetPropsI {
     open: boolean;
     projectId: string;
     restoreProjectVersionPending?: boolean;
+    unpublishedChanges?: boolean;
 }
 
 const AutomationProjectVersionHistorySheet = ({
@@ -23,6 +24,7 @@ const AutomationProjectVersionHistorySheet = ({
     open,
     projectId,
     restoreProjectVersionPending,
+    unpublishedChanges,
 }: AutomationProjectVersionHistorySheetPropsI) => {
     const [restoreConfirmationOpen, setRestoreConfirmationOpen] = useState(false);
     const [selectedVersion, setSelectedVersion] = useState<number | undefined>();
@@ -84,6 +86,7 @@ const AutomationProjectVersionHistorySheet = ({
                             />
                         )}
                         selectedVersion={selectedVersion}
+                        unpublishedChanges={unpublishedChanges}
                     />
                 )}
 

@@ -36,6 +36,14 @@ vi.mock('@/shared/middleware/graphql', () => ({
                 {id: 'project-1', name: 'Mailing', workflowTemplates: [{workflowUuid: 'workflow-1'}]},
                 {id: 'project-4', name: 'Published', published: true, version: 3, workflowTemplates: []},
                 {
+                    id: 'project-5',
+                    name: 'Unchanged',
+                    published: true,
+                    unpublishedChanges: false,
+                    version: 3,
+                    workflowTemplates: [],
+                },
+                {
                     id: 'project-2',
                     name: 'Billing',
                     workflowTemplates: [{workflowUuid: 'workflow-21'}, {workflowUuid: 'workflow-22'}],
@@ -234,6 +242,17 @@ describe('useAutomationEditorHeader', () => {
         };
 
         const {result} = renderAutomationEditorHeaderHook('project-4');
+
+        expect(result.current.hasUnpublishedChanges).toBe(false);
+    });
+
+    it('follows the server when it reports that the draft matches the last published version', () => {
+        hoisted.draftWorkflowChangesQuery = {
+            data: {automationProjectVersionWorkflowChanges: {workflows: [{}]}},
+            refetch: vi.fn(),
+        };
+
+        const {result} = renderAutomationEditorHeaderHook('project-5');
 
         expect(result.current.hasUnpublishedChanges).toBe(false);
     });

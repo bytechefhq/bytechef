@@ -46,6 +46,30 @@ it('should render the correct project title', () => {
     expect(screen.queryByLabelText('Project select')).not.toBeInTheDocument();
 });
 
+it('shows the last published version when the draft has no unpublished changes', () => {
+    render(
+        <TooltipProvider>
+            <ProjectTitle project={{...mockProject, lastPublishedDate: new Date(), unpublishedChanges: false}} />
+        </TooltipProvider>
+    );
+
+    expect(screen.getByText('V2')).toBeInTheDocument();
+    expect(screen.getByText('PUBLISHED')).toBeInTheDocument();
+    expect(screen.queryByText('DRAFT')).not.toBeInTheDocument();
+});
+
+it('shows the draft version when the draft has unpublished changes', () => {
+    render(
+        <TooltipProvider>
+            <ProjectTitle project={{...mockProject, lastPublishedDate: new Date(), unpublishedChanges: true}} />
+        </TooltipProvider>
+    );
+
+    expect(screen.getByText('V3')).toBeInTheDocument();
+    expect(screen.getByText('DRAFT')).toBeInTheDocument();
+    expect(screen.queryByText('PUBLISHED')).not.toBeInTheDocument();
+});
+
 it('lists workspace projects and switches to the selected one', async () => {
     render(
         <TooltipProvider>

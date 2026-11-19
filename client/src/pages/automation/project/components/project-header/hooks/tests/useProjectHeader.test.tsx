@@ -41,7 +41,9 @@ const hoisted = vi.hoisted(() => {
 // Mutable query results so individual tests can control project/workflow data
 const queryMocks = vi.hoisted(() => ({
     lastPublishedProjectWorkflowsQuery: {data: undefined} as {data?: {workflowUuid?: string}[]},
-    projectQuery: {data: {id: 42}} as {data?: {id: number; lastProjectVersion?: number; lastPublishedDate?: Date}},
+    projectQuery: {data: {id: 42}} as {
+        data?: {id: number; lastProjectVersion?: number; lastPublishedDate?: Date; unpublishedChanges?: boolean};
+    },
     projectVersionWorkflowsQueryArguments: [] as unknown[],
     projectWorkflowsQuery: {data: []} as {data?: {version?: number; workflowUuid?: string}[]},
     workspaceProjectsQuery: {data: undefined} as {data?: {id: number; projectWorkflowIds?: number[]}[]},
@@ -510,6 +512,17 @@ describe('useProjectHeader', () => {
     it('reports no unpublished changes when every workflow is still at the version set by publishing', () => {
         queryMocks.projectQuery = {data: {id: 42, lastPublishedDate: new Date()}};
         queryMocks.projectWorkflowsQuery = {data: [{version: 1}, {version: 1}]};
+
+        const {result} = renderHook(() =>
+            useProjectHeader({bottomResizablePanelRef: makePanelRef(0), chatTrigger: false, projectId: 42})
+        );
+
+        expect(result.current.hasUnpublishedChanges).toBe(false);
+    });
+
+    it('follows the server when it reports that the draft matches the last published version', () => {
+        queryMocks.projectQuery = {data: {id: 42, lastPublishedDate: new Date(), unpublishedChanges: false}};
+        queryMocks.projectWorkflowsQuery = {data: [{version: 1}, {version: 2}]};
 
         const {result} = renderHook(() =>
             useProjectHeader({bottomResizablePanelRef: makePanelRef(0), chatTrigger: false, projectId: 42})

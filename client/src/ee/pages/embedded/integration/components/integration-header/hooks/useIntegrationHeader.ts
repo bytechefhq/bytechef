@@ -111,6 +111,10 @@ export const useIntegrationHeader = ({bottomResizablePanelRef, integrationId}: U
     });
 
     const hasUnpublishedChanges = useMemo(() => {
+        if (integration?.unpublishedChanges !== undefined) {
+            return integration.unpublishedChanges;
+        }
+
         if (!integration?.lastPublishedDate) {
             return true;
         }
@@ -133,7 +137,12 @@ export const useIntegrationHeader = ({bottomResizablePanelRef, integrationId}: U
                 (integrationWorkflow) => !publishedWorkflowUuids.has(integrationWorkflow.workflowUuid)
             )
         );
-    }, [integration?.lastPublishedDate, integrationWorkflows, lastPublishedIntegrationWorkflows]);
+    }, [
+        integration?.lastPublishedDate,
+        integration?.unpublishedChanges,
+        integrationWorkflows,
+        lastPublishedIntegrationWorkflows,
+    ]);
 
     const navigateToIntegrationWorkflow = useCallback(
         (targetIntegrationId: number, integrationWorkflowId: number) => {

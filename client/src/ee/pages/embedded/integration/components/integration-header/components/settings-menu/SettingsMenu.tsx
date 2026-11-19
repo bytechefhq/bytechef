@@ -204,6 +204,7 @@ const SettingsMenu = ({
                     onClose={() => setShowIntegrationVersionHistorySheet(false)}
                     onRestoreIntegrationVersion={handleRestoreIntegrationVersion}
                     restoreIntegrationVersionPending={restoreIntegrationVersionPending}
+                    unpublishedChanges={integration.unpublishedChanges}
                 />
             )}
         </>

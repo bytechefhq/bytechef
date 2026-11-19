@@ -105,11 +105,24 @@ const Automation = () => {
 
     const deleteClusterElementParameterMutation = useDeleteClusterElementParameterMutation();
 
-    const updateClusterElementParameterMutation = useUpdateClusterElementParameterMutation();
+    const invalidateAutomationProjects = () => queryClient.invalidateQueries({queryKey: ['automationProjects']});
 
-    const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation();
+    const updateClusterElementParameterMutation = useUpdateClusterElementParameterMutation({
+        onSuccess: () => {
+            void invalidateAutomationProjects();
+        },
+    });
+
+    const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
+        onSuccess: () => {
+            void invalidateAutomationProjects();
+        },
+    });
 
     const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
+        onSuccess: () => {
+            void invalidateAutomationProjects();
+        },
         useUpdateWorkflowMutation,
         workflowId: workflow.id!,
         workflowKeys: WorkflowKeys,
