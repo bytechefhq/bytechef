@@ -114,7 +114,7 @@ export interface Integration {
      */
     tags?: Array<Tag>;
     /**
-     * If the integration's draft version differs from its last published version. Only set by the integration list.
+     * If the integration's draft version differs from its last published version. Computed only by the integration list endpoint; false in every other response.
      */
     readonly unpublishedChanges?: boolean;
     /**
