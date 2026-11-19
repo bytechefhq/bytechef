@@ -270,8 +270,9 @@ class ConnectedUserApiControllerIntTest {
                 new ConnectedUserDTO(
                     null, Instant.now(), null, true, Environment.STAGING, "user-9", 9L,
                     List.of(
-                        new ConnectedUserDTO.IntegrationInstance("slack", null, true, 1L, 2L, 3L, 1, 4L, true),
-                        new ConnectedUserDTO.IntegrationInstance("jira", null, true, 5L, 6L, 7L, 1, 8L, false)),
+                        new ConnectedUserDTO.IntegrationInstance("slack", null, true, 1L, 2L, 3L, 1, 4L, true,
+                            "admin@localhost.com"),
+                        new ConnectedUserDTO.IntegrationInstance("jira", null, true, 5L, 6L, 7L, 1, 8L, false, null)),
                     Map.of(), null, Instant.now(), null, 0));
 
         this.webTestClient
@@ -283,8 +284,12 @@ class ConnectedUserApiControllerIntTest {
             .expectBody()
             .jsonPath("$.integrationInstances[0].provisioned")
             .isEqualTo(true)
+            .jsonPath("$.integrationInstances[0].provisionedBy")
+            .isEqualTo("admin@localhost.com")
             .jsonPath("$.integrationInstances[1].provisioned")
-            .isEqualTo(false);
+            .isEqualTo(false)
+            .jsonPath("$.integrationInstances[1].provisionedBy")
+            .doesNotExist();
     }
 
     private static ConnectedUserDTO connectedUserDTO(long id, int version) {

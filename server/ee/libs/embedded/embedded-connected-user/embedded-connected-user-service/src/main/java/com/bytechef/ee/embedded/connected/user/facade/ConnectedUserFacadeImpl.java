@@ -329,7 +329,8 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
                         Validate.notNull(integrationInstance.getId(), "id"),
                         integrationInstanceConfiguration.getIntegrationId(), integrationInstanceConfiguration.getId(),
                         integrationInstanceConfiguration.getIntegrationVersion(),
-                        integrationInstance.getConnectionId(), integrationInstance.getProvisionedBy() != null);
+                        integrationInstance.getConnectionId(), integrationInstance.getProvisionedBy() != null,
+                        integrationInstance.getProvisionedBy());
                 }));
     }
 
