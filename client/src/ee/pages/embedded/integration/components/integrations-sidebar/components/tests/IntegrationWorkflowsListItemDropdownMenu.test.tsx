@@ -1,5 +1,6 @@
 import IntegrationWorkflowsListItemDropdownMenu from '@/ee/pages/embedded/integration/components/integrations-sidebar/components/IntegrationWorkflowsListItemDropdownMenu';
-import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
+import {QueryClient, QueryClientProvider, QueryObserver} from '@tanstack/react-query';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
@@ -199,5 +200,45 @@ describe('IntegrationWorkflowsListItemDropdownMenu', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Delete'}));
 
         expect(hoisted.navigate).toHaveBeenCalledWith('/embedded/integrations/100/integration-workflows/11?');
+    });
+
+    it('does not fetch the deleted workflow again while the editor still shows it', async () => {
+        const queryClient = new QueryClient();
+        const deletedWorkflowQueryFn = vi.fn().mockResolvedValue(workflow);
+        const deletedWorkflowObserverOptions = {
+            queryFn: deletedWorkflowQueryFn,
+            queryKey: ['integrations', 100, 'integrationWorkflows', 10],
+            staleTime: Infinity,
+        };
+
+        queryClient.setQueryData(['integrations', 100, 'integrationWorkflows', 10], workflow);
+        queryClient.setQueryData(['integrations', 100], integration);
+
+        const deletedWorkflowObserver = new QueryObserver(queryClient, deletedWorkflowObserverOptions);
+
+        const unsubscribe = deletedWorkflowObserver.subscribe(() => {});
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <IntegrationWorkflowsListItemDropdownMenu
+                    currentWorkflowId="workflow-1"
+                    integration={integration}
+                    workflow={workflow}
+                />
+            </QueryClientProvider>
+        );
+
+        await openMenu();
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Delete'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Delete'}));
+
+        deletedWorkflowObserver.setOptions(deletedWorkflowObserverOptions);
+
+        await waitFor(() => expect(hoisted.navigate).toHaveBeenCalled());
+
+        expect(deletedWorkflowQueryFn).not.toHaveBeenCalled();
+        expect(queryClient.getQueryState(['integrations', 100])?.isInvalidated).toBe(true);
+
+        unsubscribe();
     });
 });

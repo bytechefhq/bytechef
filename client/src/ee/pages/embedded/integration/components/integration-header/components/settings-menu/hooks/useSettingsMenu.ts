@@ -10,7 +10,10 @@ import {
 import {IntegrationCategoryKeys} from '@/ee/shared/queries/embedded/integrationCategories.queries';
 import {IntegrationTagKeys} from '@/ee/shared/queries/embedded/integrationTags.quries';
 import {IntegrationVersionKeys} from '@/ee/shared/queries/embedded/integrationVersions.queries';
-import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
+import {
+    IntegrationWorkflowKeys,
+    invalidateIntegrationsAfterWorkflowDelete,
+} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import {WorkflowKeys} from '@/ee/shared/queries/embedded/workflows.queries';
 import {clearWorkflowHistory} from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -59,15 +62,13 @@ export const useSettingsMenu = ({integration, workflow}: {integration: Integrati
                 void navigate('/embedded/integrations');
             }
 
-            queryClient.removeQueries({
-                queryKey: IntegrationWorkflowKeys.integrationWorkflow(
-                    integrationId!,
-                    (workflow as Workflow).integrationWorkflowId!
-                ),
-            });
             queryClient.removeQueries({queryKey: WorkflowKeys.workflow(workflow.id!)});
 
-            void queryClient.invalidateQueries({queryKey: IntegrationKeys.integrations});
+            void invalidateIntegrationsAfterWorkflowDelete(
+                queryClient,
+                integrationId!,
+                (workflow as Workflow).integrationWorkflowId
+            );
         },
     });
 

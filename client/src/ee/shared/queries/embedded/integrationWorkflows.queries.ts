@@ -1,7 +1,7 @@
 /* eslint-disable sort-keys */
 import {Workflow, WorkflowApi} from '@/ee/shared/middleware/embedded/configuration';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
-import {useQuery} from '@tanstack/react-query';
+import {QueryClient, hashKey, useQuery} from '@tanstack/react-query';
 
 export const IntegrationWorkflowKeys = {
     integrationVersionWorkflows: (id: number, integrationVersion: number, includeAllFields: boolean) => [
@@ -18,6 +18,22 @@ export const IntegrationWorkflowKeys = {
         integrationWorkflowId,
     ],
     integrationWorkflows: (id: number) => [...IntegrationKeys.integrations, id, 'integrationWorkflows'],
+};
+
+export const invalidateIntegrationsAfterWorkflowDelete = (
+    queryClient: QueryClient,
+    integrationId: number,
+    deletedIntegrationWorkflowId?: number
+) => {
+    const deletedIntegrationWorkflowQueryHash =
+        deletedIntegrationWorkflowId === undefined
+            ? undefined
+            : hashKey(IntegrationWorkflowKeys.integrationWorkflow(integrationId, deletedIntegrationWorkflowId));
+
+    return queryClient.invalidateQueries({
+        predicate: (query) => query.queryHash !== deletedIntegrationWorkflowQueryHash,
+        queryKey: IntegrationKeys.integrations,
+    });
 };
 
 export const useGetIntegrationWorkflowQuery = (id: number, integrationWorkflowId: number, enabled?: boolean) =>
