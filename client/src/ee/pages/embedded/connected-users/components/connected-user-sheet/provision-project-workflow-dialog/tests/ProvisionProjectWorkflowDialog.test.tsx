@@ -357,7 +357,9 @@ describe('ProvisionProjectWorkflowDialog', () => {
 
         expect(screen.getByLabelText('Configuration')).toHaveValue('Beta · v2');
         expect(screen.getByLabelText('Configuration')).toHaveAttribute('readonly');
-        expect(screen.getByText('Use Change configuration to move this user.')).toBeInTheDocument();
+        expect(
+            screen.getByText(/choose Change configuration… in the project's ⋮ menu on the Automations tab/)
+        ).toBeInTheDocument();
         expect(screen.getByRole('checkbox', {name: 'Beta only'})).toBeInTheDocument();
 
         await userEvent.click(screen.getByRole('checkbox', {name: 'Beta only'}));
@@ -371,6 +373,27 @@ describe('ProvisionProjectWorkflowDialog', () => {
             connectedUserId: '7',
             workflows: [{workflowUuid: 'wf-5'}],
         });
+    });
+
+    it('says there is nowhere to move the user when the assigned configuration is the only one', async () => {
+        hoisted.provisionableQuery.mockReturnValue({
+            data: {
+                provisionableConnectedUserProjects: [
+                    {
+                        ...PROJECTS[0],
+                        assignedConfigurationId: '50',
+                        configurations: [PROJECTS[0].configurations[0]],
+                    },
+                ],
+            },
+        });
+
+        renderDialog();
+
+        await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
+
+        expect(screen.getByText(/It is the only configuration of this project here/)).toBeInTheDocument();
+        expect(screen.queryByText(/choose Change configuration…/)).not.toBeInTheDocument();
     });
 
     it('shows the assigned name and blocks provisioning when the assigned configuration is disabled', async () => {

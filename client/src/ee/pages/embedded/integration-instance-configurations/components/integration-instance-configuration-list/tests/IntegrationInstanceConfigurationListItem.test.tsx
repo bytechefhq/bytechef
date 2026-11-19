@@ -188,11 +188,11 @@ describe('IntegrationInstanceConfigurationListItem integration icon', () => {
         expect(container.querySelector('svg.lucide-settings-2')).not.toBeInTheDocument();
     });
 
-    it('should show the configuration icon when showIntegrationIcon is false', () => {
+    it('should show no icon when showIntegrationIcon is false', () => {
         const {container} = renderItem({integration}, false);
 
         expect(screen.queryByTestId('integration-icon')).not.toBeInTheDocument();
-        expect(container.querySelector('svg.lucide-settings-2')).toBeInTheDocument();
+        expect(container.querySelector('svg.lucide-settings-2')).not.toBeInTheDocument();
     });
 });
 

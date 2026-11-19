@@ -2,6 +2,7 @@ import Badge from '@/components/Badge/Badge';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectedUserCredentialStatus from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserCredentialStatus';
+import ConnectedUserOriginBadge from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserOriginBadge';
 import {CredentialStatus} from '@/ee/shared/middleware/embedded/connected-user';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ChevronDownIcon, ChevronRightIcon, ComponentIcon} from 'lucide-react';
@@ -13,6 +14,8 @@ const ConnectedUserMcpServerComponentGroup = ({
     componentName,
     credentialStatus,
     lastExecutionDate,
+    provisioned,
+    provisionedBy,
     version,
     versionKind,
 }: {
@@ -20,6 +23,8 @@ const ConnectedUserMcpServerComponentGroup = ({
     componentName: string;
     credentialStatus?: CredentialStatus;
     lastExecutionDate?: Date;
+    provisioned?: boolean;
+    provisionedBy?: string;
     version: number;
     versionKind: 'component' | 'integration';
 }) => {
@@ -67,7 +72,15 @@ const ConnectedUserMcpServerComponentGroup = ({
 
                 <div className="flex items-center gap-x-2">
                     <div className="flex items-center gap-x-4">
-                        <div className="flex w-28 justify-start">
+                        <div className="flex w-48 items-center justify-end gap-x-2">
+                            {provisioned !== undefined && (
+                                <ConnectedUserOriginBadge
+                                    provisioned={provisioned}
+                                    provisionedBy={provisionedBy}
+                                    resourceName="integration"
+                                />
+                            )}
+
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Badge

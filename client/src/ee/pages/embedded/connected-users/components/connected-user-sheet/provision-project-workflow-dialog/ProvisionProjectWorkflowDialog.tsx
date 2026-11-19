@@ -104,6 +104,19 @@ const ProvisionProjectWorkflowDialog = ({
         [assignedConfigurationId, configurationId, provisionableProject]
     );
 
+    const hasOtherConfiguration = !!provisionableProject?.configurations.some(
+        (configuration) => configuration.id !== assignedConfigurationId
+    );
+
+    const assignedConfigurationHint = [
+        selectedConfiguration
+            ? "This user is already on this project's configuration."
+            : 'This configuration is disabled, so it cannot provision workflows.',
+        hasOtherConfiguration
+            ? "To move them to another one, close this dialog and choose Change configuration… in the project's ⋮ menu on the Automations tab."
+            : 'It is the only configuration of this project here, so to move them, first add another configuration to the project.',
+    ].join(' ');
+
     const assignedConfigurationLabel = useMemo(() => {
         if (!assignedConfigurationId) {
             return undefined;
@@ -258,11 +271,7 @@ const ProvisionProjectWorkflowDialog = ({
 
                                 <Input id="provision-configuration-id" readOnly value={assignedConfigurationLabel} />
 
-                                <p className="text-xs text-content-neutral-secondary">
-                                    {selectedConfiguration
-                                        ? 'Use Change configuration to move this user.'
-                                        : 'This configuration is disabled, so it cannot provision workflows. Use Change configuration to move this user.'}
-                                </p>
+                                <p className="text-xs text-content-neutral-secondary">{assignedConfigurationHint}</p>
                             </fieldset>
                         ) : provisionableProject.configurations.length === 0 ? (
                             <p className="text-sm text-content-neutral-secondary">
@@ -334,7 +343,14 @@ const ProvisionProjectWorkflowDialog = ({
                                     {workflow.dangling ? (
                                         <Badge label="Needs attention" styleType="warning-filled" />
                                     ) : (
-                                        workflow.provisioned && <Badge label="Provisioned" styleType="success-filled" />
+                                        workflow.provisioned && (
+                                            <Badge
+                                                className="uppercase"
+                                                label="Provisioned"
+                                                styleType="secondary-outline"
+                                                weight="semibold"
+                                            />
+                                        )
                                     )}
                                 </div>
 
