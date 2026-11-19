@@ -466,15 +466,34 @@ public class IntegrationFacadeIntTest {
 
         assertThat(getIntegrationDTO(integrationId).unpublishedChanges()).isFalse();
 
-        IntegrationWorkflow draftIntegrationWorkflow = integrationWorkflowRepository
-            .findAllByIntegrationIdAndIntegrationVersion(integrationId, 2)
-            .getFirst();
+        List<IntegrationWorkflow> draftIntegrationWorkflows =
+            integrationWorkflowRepository.findAllByIntegrationIdAndIntegrationVersion(integrationId, 2);
+
+        IntegrationWorkflow draftIntegrationWorkflow = draftIntegrationWorkflows.getFirst();
 
         String draftWorkflowId = draftIntegrationWorkflow.getWorkflowId();
 
         Workflow draftWorkflow = workflowService.getWorkflow(draftWorkflowId);
 
         workflowService.update(draftWorkflowId, VERSION_2_WORKFLOW_DEFINITION, draftWorkflow.getVersion());
+
+        assertThat(getIntegrationDTO(integrationId).unpublishedChanges()).isTrue();
+    }
+
+    @Test
+    public void testGetIntegrationsReportsUnpublishedChangesWhenPublishedWorkflowIsMissing() {
+        long integrationId = Validate.notNull(createIntegration("missing-workflow").getId(), "id");
+
+        integrationWorkflowFacade.addWorkflow(integrationId, VERSION_1_WORKFLOW_DEFINITION);
+
+        integrationFacade.publishIntegration(integrationId, "first");
+
+        List<IntegrationWorkflow> publishedIntegrationWorkflows =
+            integrationWorkflowRepository.findAllByIntegrationIdAndIntegrationVersion(integrationId, 1);
+
+        IntegrationWorkflow publishedIntegrationWorkflow = publishedIntegrationWorkflows.getFirst();
+
+        workflowService.delete(publishedIntegrationWorkflow.getWorkflowId());
 
         assertThat(getIntegrationDTO(integrationId).unpublishedChanges()).isTrue();
     }
