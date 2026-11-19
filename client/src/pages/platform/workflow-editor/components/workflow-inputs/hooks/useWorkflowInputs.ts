@@ -11,6 +11,7 @@ import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowDataStore from '../../../stores/useWorkflowDataStore';
 import saveWorkflowDefinitionUpdate from '../../../utils/saveWorkflowDefinitionUpdate';
+import {fromWorkflowDefinitionInput} from '../utils/fromWorkflowDefinitionInput';
 
 const EMPTY_WORKFLOW_INPUT: WorkflowInputType = {
     label: '',
@@ -71,6 +72,7 @@ export default function useWorkflowInputs({
             testValue: workflowTestConfiguration?.inputs
                 ? workflowTestConfiguration?.inputs[currentInput?.name]
                 : undefined,
+            type: currentInput.componentReference ? 'component' : currentInput.type,
         };
     }
 
@@ -116,6 +118,7 @@ export default function useWorkflowInputs({
         form.reset({
             ...currentInput,
             testValue,
+            type: currentInput.componentReference ? 'component' : currentInput.type,
         });
     }
 
@@ -165,6 +168,12 @@ export default function useWorkflowInputs({
 
         delete inputFields.testValue;
 
+        if (inputFields.type === 'component') {
+            inputFields.componentReference = getValues('componentReference');
+
+            delete inputFields.type;
+        }
+
         const input = toDefinitionInput(inputFields);
 
         const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
@@ -182,14 +191,14 @@ export default function useWorkflowInputs({
 
         setWorkflow({
             ...workflow,
-            inputs: applyInput(previousInputs),
+            inputs: applyInput(previousInputs).map(fromWorkflowDefinitionInput),
         });
 
         saveWorkflowDefinitionUpdate({
             onError: () => {
                 setWorkflow({
                     ...useWorkflowDataStore.getState().workflow,
-                    inputs: previousInputs,
+                    inputs: previousInputs.map(fromWorkflowDefinitionInput),
                 });
             },
             onSuccess: () => {
@@ -232,7 +241,7 @@ export default function useWorkflowInputs({
 
         setWorkflow({
             ...workflow,
-            inputs: removeInput(originalInputs),
+            inputs: removeInput(originalInputs).map(fromWorkflowDefinitionInput),
         });
 
         setIsDeletePending(true);
@@ -241,7 +250,7 @@ export default function useWorkflowInputs({
             onError: () => {
                 setWorkflow({
                     ...useWorkflowDataStore.getState().workflow,
-                    inputs: originalInputs,
+                    inputs: originalInputs.map(fromWorkflowDefinitionInput),
                 });
 
                 setIsDeletePending(false);
