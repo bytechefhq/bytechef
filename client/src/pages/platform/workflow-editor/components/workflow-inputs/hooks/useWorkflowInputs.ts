@@ -172,6 +172,8 @@ export default function useWorkflowInputs({
             inputFields.componentReference = getValues('componentReference');
 
             delete inputFields.type;
+        } else {
+            delete inputFields.componentReference;
         }
 
         const input = toDefinitionInput(inputFields);

@@ -59,6 +59,7 @@ const WorkflowInputsEditDialog = ({
 
     const selectedType = useWatch({control: form.control, name: 'type'});
     const selectedComponentName = useWatch({control: form.control, name: 'componentReference.componentName'});
+    const selectedComponentVersion = useWatch({control: form.control, name: 'componentReference.componentVersion'});
     const selectedGroupName = useWatch({control: form.control, name: 'componentReference.groupName'});
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({});
@@ -78,16 +79,20 @@ const WorkflowInputsEditDialog = ({
 
     const componentVersions = getWorkflowComponentVersions(workflow);
 
-    const resolvedComponentVersion = selectedComponentName ? componentVersions[selectedComponentName] : undefined;
+    const resolvedComponentVersion = selectedComponentName
+        ? (selectedComponentVersion ?? componentVersions[selectedComponentName])
+        : undefined;
 
     const {data: componentDefinition} = useGetComponentDefinitionQuery(
-        {componentName: selectedComponentName ?? '', componentVersion: resolvedComponentVersion ?? 1},
-        !!selectedComponentName
+        {componentName: selectedComponentName ?? '', componentVersion: resolvedComponentVersion ?? 0},
+        !!selectedComponentName && resolvedComponentVersion !== undefined
     );
 
-    const selectedPropertyOrGroup = selectedGroupName ? `group:${selectedGroupName}` : '';
-
-    const backingWorkflowNodeName = getBackingWorkflowNodeName(workflow, selectedComponentName);
+    const backingWorkflowNodeName = getBackingWorkflowNodeName(
+        workflow,
+        selectedComponentName,
+        resolvedComponentVersion
+    );
 
     const resolvedComponentGroup =
         selectedType === 'component' && selectedComponentName && selectedGroupName
@@ -119,14 +124,15 @@ const WorkflowInputsEditDialog = ({
         onChange(value);
 
         form.setValue('componentReference.componentVersion', componentVersions[value]);
-        form.setValue('componentReference.groupName', undefined);
+        form.setValue('componentReference.groupName', '');
+        form.setValue('testValue', '');
     };
 
     const handlePropertyOrGroupChange = (value: string) => {
         const values = getComponentPropertyInputValues({
             componentDefinition,
             componentName: selectedComponentName ?? '',
-            componentVersion: resolvedComponentVersion ?? 1,
+            componentVersion: resolvedComponentVersion,
             currentLabel: form.getValues('label') ?? '',
             currentName: form.getValues('name') ?? '',
             selection: value,
@@ -134,7 +140,8 @@ const WorkflowInputsEditDialog = ({
 
         form.setValue('componentReference.componentName', values.componentName);
         form.setValue('componentReference.componentVersion', values.componentVersion);
-        form.setValue('componentReference.groupName', values.groupName);
+        form.setValue('componentReference.groupName', values.groupName, {shouldValidate: true});
+        form.setValue('testValue', '');
 
         if (values.name !== undefined) {
             form.setValue('name', values.name);
@@ -185,6 +192,13 @@ const WorkflowInputsEditDialog = ({
                                                     onValueChange={(value) => {
                                                         if (value !== field.value && value !== 'component') {
                                                             form.setValue('testValue', '');
+                                                        }
+
+                                                        if (value !== 'component') {
+                                                            form.setValue('componentReference', undefined);
+                                                        } else if (field.value !== 'component') {
+                                                            form.setValue('componentReference.componentName', '');
+                                                            form.setValue('componentReference.groupName', '');
                                                         }
 
                                                         field.onChange(value);
@@ -264,36 +278,43 @@ const WorkflowInputsEditDialog = ({
                                             rules={{required: true}}
                                         />
 
-                                        <FormItem>
-                                            <FormLabel>
-                                                Input <RequiredMark />
-                                            </FormLabel>
+                                        <FormField
+                                            control={form.control}
+                                            name="componentReference.groupName"
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        Input <RequiredMark />
+                                                    </FormLabel>
 
-                                            <FormControl>
-                                                <Select
-                                                    disabled={!selectedComponentName}
-                                                    onValueChange={handlePropertyOrGroupChange}
-                                                    value={selectedPropertyOrGroup}
-                                                >
-                                                    <SelectTrigger className="w-full">
-                                                        <SelectValue placeholder="Select input" />
-                                                    </SelectTrigger>
+                                                    <FormControl>
+                                                        <Select
+                                                            disabled={!selectedComponentName}
+                                                            onValueChange={handlePropertyOrGroupChange}
+                                                            value={field.value ? `group:${field.value}` : ''}
+                                                        >
+                                                            <SelectTrigger className="w-full">
+                                                                <SelectValue placeholder="Select input" />
+                                                            </SelectTrigger>
 
-                                                    <SelectContent>
-                                                        {componentDefinition?.inputs?.map((group) => (
-                                                            <SelectItem
-                                                                key={`group:${group.name}`}
-                                                                value={`group:${group.name}`}
-                                                            >
-                                                                {getComponentInputGroupLabel(group)}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </FormControl>
+                                                            <SelectContent>
+                                                                {componentDefinition?.inputs?.map((group) => (
+                                                                    <SelectItem
+                                                                        key={`group:${group.name}`}
+                                                                        value={`group:${group.name}`}
+                                                                    >
+                                                                        {getComponentInputGroupLabel(group)}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </FormControl>
 
-                                            <FormMessage />
-                                        </FormItem>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                            rules={{required: true}}
+                                        />
                                     </>
                                 )}
 

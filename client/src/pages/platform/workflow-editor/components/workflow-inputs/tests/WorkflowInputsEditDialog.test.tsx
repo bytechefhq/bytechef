@@ -12,7 +12,8 @@ const {useGetComponentDefinitionQueryMock} = vi.hoisted(() => ({
 }));
 
 vi.mock('@/shared/queries/platform/componentDefinitions.queries', () => ({
-    useGetComponentDefinitionQuery: () => useGetComponentDefinitionQueryMock(),
+    useGetComponentDefinitionQuery: (request: unknown, enabled: boolean) =>
+        useGetComponentDefinitionQueryMock(request, enabled),
 }));
 
 vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () => ({
@@ -27,10 +28,19 @@ vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () 
 }));
 
 const workflow = {
-    definition: JSON.stringify({tasks: [{type: 'slack/v2/sendMessage'}], triggers: []}),
+    definition: JSON.stringify({tasks: [{name: 'sendMessage_1', type: 'slack/v2/sendMessage'}], triggers: []}),
     label: 'Test',
     workflowTaskComponentNames: ['slack'],
 } as never;
+
+const savedChannelInput = {
+    componentReference: {componentName: 'slack', componentVersion: 2, groupName: 'channel'},
+    label: 'Channel',
+    name: 'channel',
+    required: false,
+    testValue: 'C123',
+    type: 'component',
+} as WorkflowInputType;
 
 const saveWorkflowInputMock = vi.fn();
 
@@ -103,7 +113,15 @@ const newInputDefaultValues = (name: string): WorkflowInputType => ({
     type: 'string',
 });
 
-const Harness = ({defaultValues = {label: '', name: '', required: false}}: {defaultValues?: WorkflowInputType}) => {
+interface HarnessProps {
+    defaultValues?: WorkflowInputType;
+    harnessWorkflow?: never;
+}
+
+const Harness = ({
+    defaultValues = {label: '', name: '', required: false},
+    harnessWorkflow = workflow,
+}: HarnessProps) => {
     const form = useForm<WorkflowInputType>({defaultValues});
     const nameInputRef = useRef<HTMLInputElement>(null);
 
@@ -117,12 +135,17 @@ const Harness = ({defaultValues = {label: '', name: '', required: false}}: {defa
             nameInputRef={nameInputRef}
             openEditDialog={() => {}}
             saveWorkflowInput={saveWorkflowInputMock}
-            workflow={workflow}
+            workflow={harnessWorkflow}
         />
     );
 };
 
-const EditHarness = ({defaultValues}: {defaultValues: WorkflowInputType}) => {
+interface EditHarnessProps {
+    defaultValues: WorkflowInputType;
+    harnessWorkflow?: never;
+}
+
+const EditHarness = ({defaultValues, harnessWorkflow = workflow}: EditHarnessProps) => {
     const form = useForm<WorkflowInputType>({defaultValues});
     const nameInputRef = useRef<HTMLInputElement>(null);
 
@@ -136,13 +159,31 @@ const EditHarness = ({defaultValues}: {defaultValues: WorkflowInputType}) => {
             nameInputRef={nameInputRef}
             openEditDialog={() => {}}
             saveWorkflowInput={saveWorkflowInputMock}
-            workflow={workflow}
+            workflow={harnessWorkflow}
         />
     );
 };
 
 const selectOption = async (user: ReturnType<typeof userEvent.setup>, triggerText: string, optionName: string) => {
     await user.click(await screen.findByText(triggerText));
+
+    const listbox = await screen.findByRole('listbox');
+
+    await user.click(within(listbox).getByRole('option', {name: optionName}));
+};
+
+const TYPE_COMBOBOX_INDEX = 0;
+const COMPONENT_COMBOBOX_INDEX = 1;
+const GROUP_COMBOBOX_INDEX = 2;
+
+const selectComboboxOption = async (
+    user: ReturnType<typeof userEvent.setup>,
+    comboboxIndex: number,
+    optionName: string
+) => {
+    const comboboxes = await screen.findAllByRole('combobox');
+
+    await user.click(comboboxes[comboboxIndex]);
 
     const listbox = await screen.findByRole('listbox');
 
@@ -265,6 +306,170 @@ describe('WorkflowInputsEditDialog', () => {
         expect(nameInput).toHaveValue('channelId');
         expect(nameInput).toHaveAttribute('readonly');
     });
+    it('should block saving a component property input until an input is selected', async () => {
+        const user = setupUser();
+
+        render(<Harness defaultValues={{label: 'Channel', name: 'channel', required: false}} />);
+
+        await selectOption(user, 'Select input type', 'Component property');
+        await selectOption(user, 'Select component', 'slack');
+
+        await user.click(screen.getByRole('button', {name: 'Save'}));
+
+        await selectOption(user, 'Select input', 'Channel');
+
+        await user.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() => expect(saveWorkflowInputMock).toHaveBeenCalled());
+
+        expect(saveWorkflowInputMock).toHaveBeenCalledOnce();
+        expect(saveWorkflowInputMock.mock.calls[0][0].componentReference.groupName).toBe('channel');
+    });
+
+    it('should drop the component reference when a component input is switched to another type', async () => {
+        const user = setupUser();
+
+        render(<EditHarness defaultValues={savedChannelInput} />);
+
+        await selectComboboxOption(user, TYPE_COMBOBOX_INDEX, 'String');
+
+        await user.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() => expect(saveWorkflowInputMock).toHaveBeenCalled());
+
+        const savedInput = saveWorkflowInputMock.mock.calls[0][0];
+
+        expect(savedInput.type).toBe('string');
+        expect(savedInput.componentReference).toBeUndefined();
+    });
+
+    it('should show empty component selectors after switching a component input away and back', async () => {
+        const user = setupUser();
+
+        render(<EditHarness defaultValues={savedChannelInput} />);
+
+        await selectComboboxOption(user, TYPE_COMBOBOX_INDEX, 'String');
+        await selectComboboxOption(user, TYPE_COMBOBOX_INDEX, 'Component property');
+
+        expect(await screen.findByText('Select component')).toBeInTheDocument();
+        expect(screen.getByText('Select input')).toBeInTheDocument();
+    });
+
+    it('should resolve the version of a component used only inside a task dispatcher', async () => {
+        const user = setupUser();
+
+        const nestedWorkflow = {
+            definition: JSON.stringify({
+                tasks: [
+                    {
+                        name: 'loop_1',
+                        parameters: {iteratee: [{name: 'sendMessage_1', type: 'slack/v2/sendMessage'}]},
+                        type: 'loop/v1',
+                    },
+                ],
+                triggers: [],
+            }),
+            label: 'Test',
+            workflowTaskComponentNames: ['loop', 'slack'],
+        } as never;
+
+        render(<Harness harnessWorkflow={nestedWorkflow} />);
+
+        await selectOption(user, 'Select input type', 'Component property');
+        await selectOption(user, 'Select component', 'slack');
+        await selectOption(user, 'Select input', 'Channel');
+
+        await user.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() => expect(saveWorkflowInputMock).toHaveBeenCalled());
+
+        expect(saveWorkflowInputMock.mock.calls[0][0].componentReference.componentVersion).toBe(2);
+        expect(useGetComponentDefinitionQueryMock).toHaveBeenLastCalledWith(
+            {componentName: 'slack', componentVersion: 2},
+            true
+        );
+    });
+
+    it('should keep the saved component version when the workflow uses the component in two versions', () => {
+        const twoVersionsWorkflow = {
+            definition: JSON.stringify({
+                tasks: [
+                    {name: 'sendMessage_1', type: 'slack/v1/sendMessage'},
+                    {name: 'sendMessage_2', type: 'slack/v2/sendMessage'},
+                ],
+                triggers: [],
+            }),
+            label: 'Test',
+            workflowTaskComponentNames: ['slack'],
+        } as never;
+
+        render(
+            <EditHarness
+                defaultValues={{
+                    ...savedChannelInput,
+                    componentReference: {componentName: 'slack', componentVersion: 1, groupName: 'channel'},
+                }}
+                harnessWorkflow={twoVersionsWorkflow}
+            />
+        );
+
+        expect(useGetComponentDefinitionQueryMock).toHaveBeenLastCalledWith(
+            {componentName: 'slack', componentVersion: 1},
+            true
+        );
+    });
+
+    it('should reset the test value when another input of the component is selected', async () => {
+        const user = setupUser();
+
+        render(<EditHarness defaultValues={savedChannelInput} />);
+
+        await selectComboboxOption(user, GROUP_COMBOBOX_INDEX, 'Date Range');
+
+        await user.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() => expect(saveWorkflowInputMock).toHaveBeenCalled());
+
+        const savedInput = saveWorkflowInputMock.mock.calls[0][0];
+
+        expect(savedInput.componentReference.groupName).toBe('dateRange');
+        expect(savedInput.testValue).not.toBe('C123');
+    });
+
+    it('should reset the test value when another component is selected', async () => {
+        const user = setupUser();
+
+        const twoComponentsWorkflow = {
+            definition: JSON.stringify({
+                tasks: [
+                    {name: 'sendMessage_1', type: 'slack/v2/sendMessage'},
+                    {name: 'getRows_1', type: 'googleSheets/v1/getRows'},
+                ],
+                triggers: [],
+            }),
+            label: 'Test',
+            workflowTaskComponentNames: ['googleSheets', 'slack'],
+        } as never;
+
+        render(<EditHarness defaultValues={savedChannelInput} harnessWorkflow={twoComponentsWorkflow} />);
+
+        await selectComboboxOption(user, COMPONENT_COMBOBOX_INDEX, 'googleSheets');
+        await selectOption(user, 'Select input', 'Channel');
+
+        await user.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() => expect(saveWorkflowInputMock).toHaveBeenCalled());
+
+        const savedInput = saveWorkflowInputMock.mock.calls[0][0];
+
+        expect(savedInput.componentReference).toEqual({
+            componentName: 'googleSheets',
+            componentVersion: 1,
+            groupName: 'channel',
+        });
+        expect(savedInput.testValue).not.toBe('C123');
+    });
+
     it('should keep the existing test value when an input is opened for editing', async () => {
         render(
             <EditHarness
