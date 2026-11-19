@@ -22,6 +22,7 @@ Name | Type
 `developmentDeploymentCount` | number
 `projectWorkflowIds` | Array&lt;number&gt;
 `tags` | [Array&lt;Tag&gt;](Tag.md)
+`unpublishedChanges` | boolean
 `workspaceId` | number
 `version` | number
 
@@ -47,6 +48,7 @@ const example = {
   "developmentDeploymentCount": null,
   "projectWorkflowIds": null,
   "tags": null,
+  "unpublishedChanges": null,
   "workspaceId": null,
   "version": null,
 } satisfies Project

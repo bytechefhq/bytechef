@@ -102,6 +102,10 @@ export interface Project {
      */
     tags?: Array<Tag>;
     /**
+     * If the project's draft version differs from its last published version. Only set by the workspace project list.
+     */
+    readonly unpublishedChanges?: boolean;
+    /**
      * The workspace id.
      */
     workspaceId: number;
@@ -147,6 +151,7 @@ export function ProjectFromJSONTyped(json: any, ignoreDiscriminator: boolean): P
         'developmentDeploymentCount': json['developmentDeploymentCount'] == null ? undefined : json['developmentDeploymentCount'],
         'projectWorkflowIds': json['projectWorkflowIds'] == null ? undefined : json['projectWorkflowIds'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
+        'unpublishedChanges': json['unpublishedChanges'] == null ? undefined : json['unpublishedChanges'],
         'workspaceId': json['workspaceId'],
         'version': json['__version'] == null ? undefined : json['__version'],
     };
@@ -156,7 +161,7 @@ export function ProjectToJSON(json: any): Project {
     return ProjectToJSONTyped(json, false);
 }
 
-export function ProjectToJSONTyped(value?: Omit<Project, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastProjectVersion'|'developmentDeploymentCount'> | null, ignoreDiscriminator: boolean = false): any {
+export function ProjectToJSONTyped(value?: Omit<Project, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastProjectVersion'|'developmentDeploymentCount'|'unpublishedChanges'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
