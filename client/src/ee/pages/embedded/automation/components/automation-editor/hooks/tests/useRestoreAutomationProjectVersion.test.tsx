@@ -101,6 +101,21 @@ describe('useRestoreAutomationProjectVersion', () => {
         expect(hoisted.navigate).not.toHaveBeenCalled();
     });
 
+    it('reloads the code workflow source after a version is restored', async () => {
+        const {invalidateQueriesSpy, onSuccess} = restoreVersion({
+            projectId: 'project-1',
+            workflowUuids: ['workflow-1', 'workflow-2'],
+        });
+
+        await waitFor(() => {
+            expect(onSuccess).toHaveBeenCalledTimes(1);
+        });
+
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+            queryKey: ['automationProjectCodeWorkflowSource', {automationProjectId: 'project-1'}],
+        });
+    });
+
     it('opens the first workflow of the restored draft when the current workflow is not part of it', async () => {
         const {onSuccess} = restoreVersion({projectId: 'project-1', workflowUuids: ['workflow-2', 'workflow-3']});
 

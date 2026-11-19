@@ -137,6 +137,7 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
 
             void queryClient.invalidateQueries({queryKey: ProjectKeys.project(id)});
             void queryClient.invalidateQueries({queryKey: ProjectVersionKeys.projectProjectVersions(id)});
+            void queryClient.invalidateQueries({queryKey: ['codeWorkflowSource', {projectId: String(id)}]});
 
             toast(`Version V${projectVersion} applied to the draft.`);
         },

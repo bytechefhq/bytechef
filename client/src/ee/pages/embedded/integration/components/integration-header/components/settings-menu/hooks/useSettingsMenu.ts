@@ -125,6 +125,9 @@ export const useSettingsMenu = ({integration, workflow}: {integration: Integrati
             void queryClient.invalidateQueries({
                 queryKey: IntegrationVersionKeys.integrationIntegrationVersions(id),
             });
+            void queryClient.invalidateQueries({
+                queryKey: ['integrationCodeWorkflowSource', {integrationId: String(id)}],
+            });
 
             toast(`Version V${integrationVersion} applied to the draft.`);
         },

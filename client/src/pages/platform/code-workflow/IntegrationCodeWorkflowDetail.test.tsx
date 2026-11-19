@@ -1,6 +1,8 @@
 import {CodeWorkflowLanguage} from '@/shared/middleware/graphql';
 import {fireEvent, render, resetAll, screen, waitFor} from '@/shared/util/test-utils';
-import {QueryClient} from '@tanstack/react-query';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {renderHook} from '@testing-library/react';
+import {ReactNode} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import IntegrationCodeWorkflowDetail from './IntegrationCodeWorkflowDetail';
@@ -57,6 +59,25 @@ afterEach(() => {
 });
 
 describe('IntegrationCodeWorkflowDetail', () => {
+    it('caches its source under the key a version restore invalidates', async () => {
+        const graphqlModule =
+            await vi.importActual<typeof import('@/shared/middleware/graphql')>('@/shared/middleware/graphql');
+
+        const queryClient = new QueryClient();
+
+        renderHook(() => graphqlModule.useIntegrationCodeWorkflowSourceQuery({integrationId: '7'}, {enabled: false}), {
+            wrapper: ({children}: {children: ReactNode}) => (
+                <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+            ),
+        });
+
+        const queryCache = queryClient.getQueryCache();
+
+        expect(
+            queryCache.find({exact: true, queryKey: ['integrationCodeWorkflowSource', {integrationId: '7'}]})
+        ).toBeDefined();
+    });
+
     it('fetches the source for the given integration and renders it in the editor', async () => {
         render(<IntegrationCodeWorkflowDetail integrationId="1" language={CodeWorkflowLanguage.Javascript} />);
 
