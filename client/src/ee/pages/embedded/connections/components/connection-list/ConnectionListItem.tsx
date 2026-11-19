@@ -1,6 +1,7 @@
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Connection, Tag} from '@/ee/shared/middleware/embedded/configuration';
 import {useUpdateConnectionTagsMutation} from '@/ee/shared/mutations/embedded/connectionTags.mutations';
 import {
@@ -82,7 +83,20 @@ const ConnectionListItem = ({badges, componentDefinitions, connection, remaining
             badges={
                 badges ??
                 (connection.shared && (
-                    <Badge className="uppercase" label="Shared" styleType="secondary-outline" weight="semibold" />
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Badge
+                                className="uppercase"
+                                label="Shared"
+                                styleType="secondary-outline"
+                                weight="semibold"
+                            />
+                        </TooltipTrigger>
+
+                        <TooltipContent>
+                            Every connected user in this environment can use this connection
+                        </TooltipContent>
+                    </Tooltip>
                 ))
             }
             createdDate={connection.createdDate}

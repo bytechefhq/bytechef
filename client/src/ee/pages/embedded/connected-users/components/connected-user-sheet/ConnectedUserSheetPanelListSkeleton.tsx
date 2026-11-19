@@ -119,10 +119,14 @@ const ConnectedUserSheetPanelListSkeleton = ({
                                     </div>
                                 )}
 
+                                {parts.badges && (
+                                    <Skeleton className="h-5 w-24 rounded-full" data-testid="skeleton-usageBadge" />
+                                )}
+
                                 <div
                                     className={twMerge(
                                         'flex shrink-0 flex-col items-end gap-y-1',
-                                        !parts.badges && 'w-72'
+                                        parts.badges ? 'ml-4' : 'w-72'
                                     )}
                                 >
                                     <div className="flex min-h-6 items-center gap-2">
@@ -134,11 +138,10 @@ const ConnectedUserSheetPanelListSkeleton = ({
                                         )}
 
                                         {parts.badges && (
-                                            <div className="flex items-center gap-2" data-testid="skeleton-badges">
-                                                <Skeleton className="h-5 w-20 rounded-full" />
-
-                                                <Skeleton className="h-5 w-20 rounded-full" />
-                                            </div>
+                                            <Skeleton
+                                                className="h-5 w-20 rounded-full"
+                                                data-testid="skeleton-originBadge"
+                                            />
                                         )}
                                     </div>
 

@@ -59,25 +59,37 @@ const ConnectionListItemLayout = ({
                 </div>
 
                 <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
+                    {badges && <div className="flex items-center gap-2">{badges}</div>}
+
                     <div className="flex min-w-52 flex-col items-end gap-y-4">
                         <div className="flex flex-wrap items-center justify-end gap-2">
-                            {badges}
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    {credentialStatus === 'VALID' ? (
+                                        <Badge
+                                            className="border-transparent uppercase"
+                                            label={active ? 'Active' : 'Not Active'}
+                                            styleType={active ? 'success-outline' : 'secondary-outline'}
+                                            weight="semibold"
+                                        />
+                                    ) : (
+                                        <Badge
+                                            className="border-transparent uppercase"
+                                            label={credentialStatus ?? 'INVALID'}
+                                            styleType="destructive-outline"
+                                            weight="semibold"
+                                        />
+                                    )}
+                                </TooltipTrigger>
 
-                            {credentialStatus === 'VALID' ? (
-                                <Badge
-                                    className="border-transparent uppercase"
-                                    label={active ? 'Active' : 'Not Active'}
-                                    styleType={active ? 'success-outline' : 'secondary-outline'}
-                                    weight="semibold"
-                                />
-                            ) : (
-                                <Badge
-                                    className="border-transparent uppercase"
-                                    label={credentialStatus ?? 'INVALID'}
-                                    styleType="destructive-outline"
-                                    weight="semibold"
-                                />
-                            )}
+                                <TooltipContent>
+                                    {credentialStatus === 'VALID'
+                                        ? active
+                                            ? 'A deployed or tested workflow uses this connection'
+                                            : 'No workflow uses this connection yet'
+                                        : 'The credentials no longer work. Edit the connection to reconnect'}
+                                </TooltipContent>
+                            </Tooltip>
                         </div>
 
                         {createdDate && (

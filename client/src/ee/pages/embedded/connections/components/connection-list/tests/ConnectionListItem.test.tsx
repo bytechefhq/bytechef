@@ -1,3 +1,4 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {Connection} from '@/ee/shared/middleware/embedded/configuration';
 import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver, within} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -62,9 +63,11 @@ const connection: Connection = {
 
 const renderConnectionListItem = () =>
     render(
-        <ul>
-            <ConnectionListItem componentDefinitions={[]} connection={connection} />
-        </ul>
+        <TooltipProvider>
+            <ul>
+                <ConnectionListItem componentDefinitions={[]} connection={connection} />
+            </ul>
+        </TooltipProvider>
     );
 
 const openMenu = async () => {
