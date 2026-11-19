@@ -799,7 +799,10 @@ class SpelEvaluatorTest {
         "user['first name']",
         "user['ключ']",
         "foo.[0]",
-        "foo.['bar-baz']"
+        "foo.['bar-baz']",
+        "produceReport.outputFiles['report.csv']",
+        "produceReport.outputFiles['charts/summary.txt']",
+        "files['Q3 report (final) v2.1+draft@team.csv']"
     })
     void testShouldAcceptValidAccessors(String accessor) {
         assertDoesNotThrow(
@@ -818,6 +821,9 @@ class SpelEvaluatorTest {
         "user['unclosed]",
         "user[1a]",
         "user['x']y",
+        "user['it''s']",
+        "user['a\\'b']",
+        "user['a'] + T(java.lang.System)",
         "1abc",
         "user.1name"
     })
@@ -826,6 +832,44 @@ class SpelEvaluatorTest {
             ExpressionEvaluationException.class,
             () -> EVALUATOR.evaluate(Map.of("key", "${" + accessor + "}"), Collections.emptyMap()),
             accessor);
+    }
+
+    @Test
+    void testDataPillResolvesAnOutputFileKeyContainingDotsAndSlashes() {
+        Map<String, Object> reportFileEntry = Map.of("name", "report.csv", "url", "file:/report.csv");
+        Map<String, Object> summaryFileEntry = Map.of("name", "summary.txt", "url", "file:/summary.txt");
+
+        Map<String, Object> context = Map.of(
+            "produceReport",
+            Map.of("outputFiles", Map.of("report.csv", reportFileEntry, "charts/summary.txt", summaryFileEntry)));
+
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of(
+                "report", "${produceReport.outputFiles['report.csv']}",
+                "summary", "${produceReport.outputFiles['charts/summary.txt']}",
+                "summaryName", "${produceReport.outputFiles['charts/summary.txt'].name}"),
+            context);
+
+        assertEquals(reportFileEntry, map.get("report"));
+        assertEquals(summaryFileEntry, map.get("summary"));
+        assertEquals("summary.txt", map.get("summaryName"));
+    }
+
+    @Test
+    void testDataPillArgumentResolvesAnOutputFileKeyContainingDotsAndSlashes() {
+        Map<String, Object> context = Map.of(
+            "produceReport", Map.of("outputFiles", Map.of("charts/summary.txt", Map.of("name", "summary.txt"))));
+
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of(
+                "exists", "=exists(${produceReport.outputFiles['charts/summary.txt']})",
+                "missing", "=exists(${produceReport.outputFiles['charts/other.txt']})",
+                "name", "=getOrDefault(${produceReport.outputFiles['charts/summary.txt'].name}, 'none')"),
+            context);
+
+        assertEquals(true, map.get("exists"));
+        assertEquals(false, map.get("missing"));
+        assertEquals("summary.txt", map.get("name"));
     }
 
     @Test
