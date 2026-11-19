@@ -67,6 +67,7 @@ docs/StartWebhookTriggerTest200Response.md
 docs/Tag.md
 docs/UpdateConnectionCredentialsRequest.md
 docs/UpdateConnectionRequest.md
+docs/UpdateIntegrationInstanceConnectionRequest.md
 docs/UpdateTagsRequest.md
 docs/WebhookTriggerTestApi.md
 docs/Workflow.md
@@ -124,6 +125,7 @@ models/StartWebhookTriggerTest200Response.ts
 models/Tag.ts
 models/UpdateConnectionCredentialsRequest.ts
 models/UpdateConnectionRequest.ts
+models/UpdateIntegrationInstanceConnectionRequest.ts
 models/UpdateTagsRequest.ts
 models/Workflow.ts
 models/Workflow1.ts
