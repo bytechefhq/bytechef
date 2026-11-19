@@ -4,6 +4,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectedUserProjectConfigurationMenu, {
     ConnectedUserCurrentConfigurationI,
 } from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectConfigurationMenu';
+import ConnectedUserProjectConfigurationSwitch from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectConfigurationSwitch';
 import ConnectedUserProjectWorkflowListItem, {
     ConnectedUserProjectWorkflowType,
     ConnectedUserWorkflowTemplateSourceI,
@@ -20,6 +21,7 @@ const OTHER_GROUP_NAME = 'Created by this user';
 
 type ConnectedUserProjectConfigurationType = ConnectedUserCurrentConfigurationI & {
     configurationEnabled: boolean;
+    enabled: boolean;
     projectId: string;
 };
 
@@ -192,24 +194,6 @@ const ConnectedUserProjectWorkflowList = ({
                                     {group.configuration ? (
                                         <span className="flex min-h-6 items-center gap-x-2 text-base font-semibold">
                                             {group.configuration.configurationName}
-
-                                            {!group.configuration.configurationEnabled && (
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <span className="flex shrink-0">
-                                                            <Badge
-                                                                label="Disabled"
-                                                                styleType="destructive-outline"
-                                                                weight="semibold"
-                                                            />
-                                                        </span>
-                                                    </TooltipTrigger>
-
-                                                    <TooltipContent>
-                                                        Workflows of a disabled configuration do not run for this user
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            )}
                                         </span>
                                     ) : (
                                         <span className="flex min-h-6 items-center text-base font-semibold text-content-neutral-secondary">
@@ -240,7 +224,16 @@ const ConnectedUserProjectWorkflowList = ({
                                     </div>
 
                                     <div className="flex w-72 shrink-0 flex-col items-end gap-y-1">
-                                        <div aria-hidden="true" className="min-h-6" />
+                                        {group.configuration && connectedUser ? (
+                                            <div className="flex min-h-6 items-center">
+                                                <ConnectedUserProjectConfigurationSwitch
+                                                    configuration={group.configuration}
+                                                    connectedUserId={connectedUser.connectedUserId}
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div aria-hidden="true" className="min-h-6" />
+                                        )}
 
                                         <Tooltip>
                                             <TooltipTrigger className="flex min-h-6 items-center text-xs text-content-neutral-secondary">

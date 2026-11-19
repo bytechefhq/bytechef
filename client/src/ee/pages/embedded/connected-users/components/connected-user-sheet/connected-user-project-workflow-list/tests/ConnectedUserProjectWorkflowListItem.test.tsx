@@ -89,7 +89,7 @@ const renderListItem = (
     connectedUserProjectWorkflow: ConnectedUserProjectWorkflowType,
     projectName?: string,
     workflowTemplate?: ConnectedUserWorkflowTemplateType,
-    configuration?: {configurationEnabled?: boolean; configurationId: string; projectId: string}
+    configuration?: {configurationEnabled?: boolean; configurationId: string; enabled?: boolean; projectId: string}
 ) =>
     render(
         <QueryClientProvider client={new QueryClient()}>
@@ -291,6 +291,31 @@ describe('ConnectedUserProjectWorkflowListItem', () => {
         expect(
             await screen.findByRole('tooltip', {
                 name: 'The configuration is disabled. This workflow runs again when the configuration is enabled.',
+            })
+        ).toBeInTheDocument();
+    });
+
+    it('shows a reference of a configuration turned off for this user as switched off and locked', async () => {
+        renderListItem(
+            createConnectedUserProjectWorkflow(null, {
+                attentionReason: 'TURNED_OFF_BY_ADMINISTRATOR',
+                automationUuid: 'template-uuid',
+            }),
+            'Automation Playground',
+            undefined,
+            {configurationEnabled: true, configurationId: '60', enabled: false, projectId: '20'}
+        );
+
+        const enableSwitch = screen.getByRole('switch', {name: 'Enable WhatsApp Agent - Human reply'});
+
+        expect(enableSwitch).not.toBeChecked();
+        expect(enableSwitch).toBeDisabled();
+
+        await userEvent.hover(enableSwitch.parentElement as HTMLElement);
+
+        expect(
+            await screen.findByRole('tooltip', {
+                name: 'The configuration is turned off for this user. This workflow runs again when it is turned on.',
             })
         ).toBeInTheDocument();
     });

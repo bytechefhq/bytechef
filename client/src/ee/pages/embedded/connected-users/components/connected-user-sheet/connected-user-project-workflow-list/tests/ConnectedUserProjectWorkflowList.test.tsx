@@ -37,6 +37,18 @@ vi.mock('../ConnectedUserProjectConfigurationMenu', () => ({
     ),
 }));
 
+vi.mock('../ConnectedUserProjectConfigurationSwitch', () => ({
+    default: ({
+        configuration,
+        connectedUserId,
+    }: {
+        configuration: {configurationName: string; enabled: boolean};
+        connectedUserId: string;
+    }) => (
+        <span>{`Configuration switch ${configuration.configurationName} ${configuration.enabled} ${connectedUserId}`}</span>
+    ),
+}));
+
 vi.mock('@/components/ui/tooltip', () => ({
     Tooltip: ({children}: {children: React.ReactNode}) => <>{children}</>,
     TooltipContent: () => null,
@@ -191,6 +203,7 @@ describe('ConnectedUserProjectWorkflowList', () => {
                         configurationId: '51',
                         configurationName: 'Alpha',
                         configurationProjectVersion: 1,
+                        enabled: true,
                         projectId: '10',
                     },
                 ]}
@@ -277,6 +290,7 @@ describe('ConnectedUserProjectWorkflowList', () => {
                         configurationId: '51',
                         configurationName: 'Default',
                         configurationProjectVersion: 3,
+                        enabled: true,
                         projectId: '10',
                     },
                 ]}
@@ -319,7 +333,7 @@ describe('ConnectedUserProjectWorkflowList', () => {
         ).not.toBeInTheDocument();
     });
 
-    it('marks a disabled configuration with a Disabled badge', () => {
+    it('shows no Disabled badge on a configuration an admin disabled', () => {
         render(
             <ConnectedUserProjectWorkflowList
                 configurations={[
@@ -328,6 +342,7 @@ describe('ConnectedUserProjectWorkflowList', () => {
                         configurationId: '51',
                         configurationName: 'Default',
                         configurationProjectVersion: 3,
+                        enabled: true,
                         projectId: '10',
                     },
                     {
@@ -335,6 +350,7 @@ describe('ConnectedUserProjectWorkflowList', () => {
                         configurationId: '61',
                         configurationName: 'Beta',
                         configurationProjectVersion: 2,
+                        enabled: true,
                         projectId: '20',
                     },
                 ]}
@@ -351,11 +367,43 @@ describe('ConnectedUserProjectWorkflowList', () => {
             />
         );
 
+        expect(screen.queryByText('Disabled')).not.toBeInTheDocument();
         expect(
-            within(screen.getByRole('region', {name: 'Automation Playground'})).getByText('Disabled')
+            within(screen.getByRole('region', {name: 'Automation Playground'})).getByText(
+                'Configuration switch Default true 1050'
+            )
+        ).toBeInTheDocument();
+    });
+
+    it('shows a switch on a configured project card and none on the Created by this user card', () => {
+        render(
+            <ConnectedUserProjectWorkflowList
+                configurations={[
+                    {
+                        configurationEnabled: true,
+                        configurationId: '61',
+                        configurationName: 'Beta',
+                        configurationProjectVersion: 2,
+                        enabled: false,
+                        projectId: '20',
+                    },
+                ]}
+                connectedUser={{connectedUserId: '1050', externalId: 'ext-1050'}}
+                connectedUserProjectWorkflows={[
+                    createConnectedUserProjectWorkflow('1', 'Daily Standup', {
+                        automationUuid: 'template-standup',
+                    }),
+                    createConnectedUserProjectWorkflow('2', 'My Own Workflow'),
+                ]}
+                workflowTemplateSourcesByWorkflowUuid={workflowTemplateSourcesByWorkflowUuid}
+            />
+        );
+
+        expect(
+            within(screen.getByRole('region', {name: 'Team Rituals'})).getByText('Configuration switch Beta false 1050')
         ).toBeInTheDocument();
         expect(
-            within(screen.getByRole('region', {name: 'Team Rituals'})).queryByText('Disabled')
+            within(screen.getByRole('region', {name: 'Created by this user'})).queryByText(/Configuration switch/)
         ).not.toBeInTheDocument();
     });
 
@@ -368,6 +416,7 @@ describe('ConnectedUserProjectWorkflowList', () => {
                         configurationId: '51',
                         configurationName: 'Default',
                         configurationProjectVersion: 3,
+                        enabled: true,
                         projectId: '10',
                     },
                 ]}
@@ -397,6 +446,7 @@ describe('ConnectedUserProjectWorkflowList', () => {
                         configurationId: '51',
                         configurationName: 'Default',
                         configurationProjectVersion: 3,
+                        enabled: true,
                         projectId: '10',
                     },
                 ]}
@@ -452,6 +502,7 @@ describe('ConnectedUserProjectWorkflowList', () => {
                         configurationId: '51',
                         configurationName: 'Alpha',
                         configurationProjectVersion: 1,
+                        enabled: true,
                         projectId: '10',
                     },
                     {
@@ -459,6 +510,7 @@ describe('ConnectedUserProjectWorkflowList', () => {
                         configurationId: '61',
                         configurationName: 'Beta',
                         configurationProjectVersion: 2,
+                        enabled: true,
                         projectId: '20',
                     },
                 ]}
@@ -501,6 +553,7 @@ describe('ConnectedUserProjectWorkflowList', () => {
                         configurationId: '51',
                         configurationName: 'Alpha',
                         configurationProjectVersion: 1,
+                        enabled: true,
                         projectId: '10',
                     },
                     {
@@ -508,6 +561,7 @@ describe('ConnectedUserProjectWorkflowList', () => {
                         configurationId: '61',
                         configurationName: 'Beta',
                         configurationProjectVersion: 2,
+                        enabled: true,
                         projectId: '20',
                     },
                 ]}
