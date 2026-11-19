@@ -10,6 +10,7 @@ import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstance
 import com.bytechef.ee.embedded.configuration.web.rest.model.ProvisionIntegrationInstanceRequestModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ProvisionableIntegrationModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionCredentialsRequestModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateIntegrationInstanceConnectionRequestModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateIntegrationInstanceWorkflowRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,7 +39,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-19T13:55:46.359655+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-19T23:38:58.514983+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 @Validated
 @Tag(name = "integration-instance", description = "the integration-instance API")
 public interface IntegrationInstanceApi {
@@ -170,7 +171,7 @@ public interface IntegrationInstanceApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"connectionId\" : 0, \"connectedUserId\" : 6, \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"enabled\" : true, \"environmentId\" : 1, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"integrationInstanceConfigurationId\" : 5, \"integrationInstanceConfiguration\" : { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"description\" : \"description\", \"enabled\" : true, \"environmentId\" : 2, \"id\" : 7, \"integrationId\" : 9, \"integrationVersion\" : 3, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"permissionExpression\" : \"permissionExpression\", \"authorizationType\" : \"API_KEY\" }, \"integrationInstanceWorkflows\" : [ { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"enabled\" : true, \"id\" : 2, \"integrationInstanceConfigurationWorkflowId\" : 4, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"workflowId\" : \"workflowId\" }, { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"enabled\" : true, \"id\" : 2, \"integrationInstanceConfigurationWorkflowId\" : 4, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"workflowId\" : \"workflowId\" } ], \"__version\" : 7 }";
+                    String exampleString = "{ \"connectionId\" : 0, \"connectedUserId\" : 6, \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"enabled\" : true, \"environmentId\" : 1, \"id\" : 5, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"integrationInstanceConfigurationId\" : 5, \"integrationInstanceConfiguration\" : { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"description\" : \"description\", \"enabled\" : true, \"environmentId\" : 2, \"id\" : 7, \"integrationId\" : 9, \"integrationVersion\" : 3, \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"name\" : \"name\", \"permissionExpression\" : \"permissionExpression\", \"authorizationType\" : \"API_KEY\" }, \"integrationInstanceWorkflows\" : [ { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"enabled\" : true, \"id\" : 2, \"integrationInstanceConfigurationWorkflowId\" : 4, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"staticWebhookUrl\" : \"staticWebhookUrl\", \"workflowId\" : \"workflowId\" }, { \"createdBy\" : \"createdBy\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"enabled\" : true, \"id\" : 2, \"integrationInstanceConfigurationWorkflowId\" : 4, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"staticWebhookUrl\" : \"staticWebhookUrl\", \"workflowId\" : \"workflowId\" } ], \"__version\" : 7 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -292,6 +293,38 @@ public interface IntegrationInstanceApi {
     default ResponseEntity<Long> provisionIntegrationInstance(
         @Parameter(name = "connectedUserId", description = "The id of a connected user.", required = true, in = ParameterIn.PATH) @PathVariable("connectedUserId") Long connectedUserId,
         @Parameter(name = "ProvisionIntegrationInstanceRequestModel", description = "", required = true) @Valid @RequestBody ProvisionIntegrationInstanceRequestModel provisionIntegrationInstanceRequestModel
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_UPDATE_INTEGRATION_INSTANCE_CONNECTION = "/integration-instances/{id}/connection";
+    /**
+     * PUT /integration-instances/{id}/connection : Switch the connection of a provisioned integration instance
+     * Switches an integration instance provisioned by a tenant admin to another connection of its connected user.
+     *
+     * @param id The id of an integration instance. (required)
+     * @param updateIntegrationInstanceConnectionRequestModel  (required)
+     * @return Successful operation. (status code 204)
+     */
+    @Operation(
+        operationId = "updateIntegrationInstanceConnection",
+        summary = "Switch the connection of a provisioned integration instance",
+        description = "Switches an integration instance provisioned by a tenant admin to another connection of its connected user.",
+        tags = { "integration-instance" },
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = IntegrationInstanceApi.PATH_UPDATE_INTEGRATION_INSTANCE_CONNECTION,
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<Void> updateIntegrationInstanceConnection(
+        @Parameter(name = "id", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "UpdateIntegrationInstanceConnectionRequestModel", description = "", required = true) @Valid @RequestBody UpdateIntegrationInstanceConnectionRequestModel updateIntegrationInstanceConnectionRequestModel
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
