@@ -231,4 +231,36 @@ describe('ConnectedUserSheetPanelIntegrationWorkflowListItem', () => {
 
         expect(hoisted.copyToClipboard).toHaveBeenCalledWith('workflow-uuid-1');
     });
+
+    const renderWithIntegrationInstanceWorkflow = (integrationInstanceWorkflow: IntegrationInstanceWorkflow) =>
+        render(
+            <TooltipProvider>
+                <ul>
+                    <ConnectedUserSheetPanelIntegrationWorkflowListItem
+                        integrationInstance={integrationInstance}
+                        integrationInstanceConfiguration={integrationInstanceConfiguration}
+                        integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
+                        integrationInstanceWorkflow={integrationInstanceWorkflow}
+                        workflow={workflow}
+                    />
+                </ul>
+            </TooltipProvider>
+        );
+
+    it('copies the static webhook url of a workflow that starts with a webhook trigger', async () => {
+        renderWithIntegrationInstanceWorkflow({
+            enabled: true,
+            staticWebhookUrl: 'https://example.com/webhooks/abc',
+        } as IntegrationInstanceWorkflow);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Copy webhook URL'}));
+
+        expect(hoisted.copyToClipboard).toHaveBeenCalledWith('https://example.com/webhooks/abc');
+    });
+
+    it('shows no webhook url for a workflow without a static webhook trigger', () => {
+        renderWithIntegrationInstanceWorkflow({enabled: true} as IntegrationInstanceWorkflow);
+
+        expect(screen.queryByRole('button', {name: 'Copy webhook URL'})).not.toBeInTheDocument();
+    });
 });
