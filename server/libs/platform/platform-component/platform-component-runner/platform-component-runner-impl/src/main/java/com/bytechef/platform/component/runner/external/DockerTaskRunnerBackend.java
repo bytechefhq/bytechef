@@ -171,61 +171,91 @@ public class DockerTaskRunnerBackend implements RemoteTaskRunnerBackend {
         properties.add(
             string(IMAGE)
                 .label("Image")
-                .description("The container image the task runs in. Defaults to the image for the action's language.")
+                .description(
+                    "The container image the code runs in, as a registry reference such as " +
+                        "ghcr.io/acme/tools:1.4. It must contain the interpreter for the action's " +
+                        "language. Defaults to an official image for the language: Ubuntu for Bash and " +
+                        "shell commands, Node.js for JavaScript and Python for Python.")
                 .required(false));
         properties.add(
             array(ENTRYPOINT)
                 .label("Entrypoint")
                 .description(
-                    "Replaces the interpreter the source is handed to. Defaults to the interpreter for the action's " +
-                        "language; the source file is appended either way.")
+                    "Replaces the interpreter as a list of arguments, such as python3 and -u. The " +
+                        "script or commands file is appended as the last argument either way. Defaults to " +
+                        "the interpreter for the action's language.")
                 .items(string())
                 .required(false));
         properties.add(
             string(USER)
                 .label("User")
-                .description("The user the container runs as, as a name or a numeric uid[:gid].")
+                .description(
+                    "The user the code runs as inside the container, as a name or a numeric " +
+                        "uid[:gid], such as 1000:1000. Defaults to the image's own user, often root.")
                 .required(false));
         properties.add(
             number(CPU)
                 .label("CPU")
-                .description("How many CPUs the container may use, as a decimal fraction of one CPU.")
+                .description(
+                    "How many CPUs the container may use, such as 0.5 or 2. Empty means no limit.")
                 .required(false));
         properties.add(
             string(MEMORY)
                 .label("Memory")
-                .description("How much memory the container may use, in bytes or with a b, k, m or g suffix.")
+                .description(
+                    "The most memory the container may use, in bytes or with a b, k, m or g suffix, " +
+                        "such as 512m or 2g. The container is stopped when it uses more. Empty means no " +
+                        "limit.")
                 .required(false));
         properties.add(
             string(NETWORK_MODE)
                 .label("Network Mode")
-                .description("The network the container is attached to: bridge, none, host, or a named network.")
+                .description(
+                    "The network the container joins: bridge (Docker's default, with internet " +
+                        "access), none (no network at all), host (the Docker host's own network), or the " +
+                        "name of a user-defined network, to reach other containers on it.")
                 .required(false));
         properties.add(
             array(EXTRA_HOSTS)
                 .label("Extra Hosts")
-                .description("Additional entries for the container's hosts file, each written as host:ip.")
+                .description(
+                    "Extra entries for the container's hosts file, each written as host:ip, such as " +
+                        "api.internal:10.0.0.5. Use host.docker.internal:host-gateway to reach the Docker " +
+                        "host.")
                 .items(string())
                 .required(false));
         properties.add(
             bool(PRIVILEGED)
                 .label("Privileged")
-                .description("Gives the container every capability of the daemon's host.")
+                .description(
+                    "Runs the container with every capability of the Docker host and access to its " +
+                        "devices. Off by default; turn it on only for trusted code that needs it, such as " +
+                        "Docker in Docker.")
                 .defaultValue(false)
                 .required(false));
         properties.add(
             object(CREDENTIALS)
                 .label("Registry Credentials")
-                .description("How the image is pulled from a private registry.")
+                .description(
+                    "Credentials for pulling the image from a private registry: a username and " +
+                        "password, or a registry token instead.")
                 .properties(
                     string(REGISTRY).label("Registry")
+                        .description(
+                            "The registry's address, such as ghcr.io or registry.example.com:5000.")
                         .required(false),
                     string(USERNAME).label("Username")
+                        .description(
+                            "The user name for the registry.")
                         .required(false),
                     string(PASSWORD).label("Password")
+                        .description(
+                            "The password or access token of the registry user.")
                         .controlType(ControlType.PASSWORD)
                         .required(false),
                     string(REGISTRY_TOKEN).label("Registry Token")
+                        .description(
+                            "A token for the registry, used instead of a username and password.")
                         .controlType(ControlType.PASSWORD)
                         .required(false))
                 .required(false));
@@ -233,9 +263,9 @@ public class DockerTaskRunnerBackend implements RemoteTaskRunnerBackend {
             string(KILL_GRACE_PERIOD)
                 .label("Kill Grace Period")
                 .description(
-                    "How long a still-running container is given to stop on its own when it is killed - on a " +
-                        "timeout or a non-resumable shutdown - before it is forced, as an ISO-8601 duration. Zero " +
-                        "forces it at once.")
+                    "How long the container may take to stop on its own when the task is killed, on a " +
+                        "timeout or a shutdown it cannot resume from, before it is forced, as an " +
+                        "ISO-8601 duration such as PT30S. The default PT0S forces it at once.")
                 .defaultValue("PT0S")
                 .required(false));
 
@@ -253,7 +283,11 @@ public class DockerTaskRunnerBackend implements RemoteTaskRunnerBackend {
             properties.add(
                 array(VOLUMES)
                     .label("Volumes")
-                    .description("Bind mounts, each written as host-path:container-path[:ro].")
+                    .description(
+                        "Folders of the Docker host mounted into the container, each written as " +
+                            "host-path:container-path, with :ro added for read-only, such as " +
+                            "/data/shared:/shared:ro. The host path is on the Docker host, which may not " +
+                            "be the ByteChef server.")
                     .items(string())
                     .required(false));
         }

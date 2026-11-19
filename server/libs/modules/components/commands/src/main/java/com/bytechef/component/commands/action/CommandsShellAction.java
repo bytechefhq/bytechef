@@ -44,7 +44,13 @@ public class CommandsShellAction {
         properties.add(
             array(COMMANDS)
                 .label("Commands")
-                .description("The lines handed to the interpreter, in order.")
+                .description(
+                    "The lines to run, in order. They are written into one script file and run by " +
+                        "/bin/sh, so a variable set on one line is visible on the next. A failing line " +
+                        "does not stop the lines after it unless the first line is set -e; the task fails " +
+                        "when the script exits with a non-zero code. Write a JSON object to output.json " +
+                        "in the folder named by the BYTECHEF_OUTPUT_DIR environment variable to return it " +
+                        "as the task's vars.")
                 .items(string())
                 .required(true)
                 .expressionEnabled(false));
@@ -56,7 +62,10 @@ public class CommandsShellAction {
         properties.add(
             bool(WARN_ON_STD_ERR)
                 .label("Warn On Standard Error")
-                .description("Logs a warning when the execution writes to standard error.")
+                .description(
+                    "Logs a warning when the code writes anything to standard error, which also comes " +
+                        "back in the result's stderr. On by default; turn it off for tools that print " +
+                        "progress there.")
                 .defaultValue(true)
                 .required(false));
 

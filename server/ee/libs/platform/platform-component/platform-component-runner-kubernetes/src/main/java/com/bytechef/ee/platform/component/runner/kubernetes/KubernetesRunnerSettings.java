@@ -132,51 +132,77 @@ record KubernetesRunnerSettings(
         properties.add(
             string(IMAGE)
                 .label("Image")
-                .description("The container image the task runs in. Defaults to the image for the action's language.")
+                .description(
+                    "The container image the code runs in, as a registry reference such as " +
+                        "ghcr.io/acme/tools:1.4. It must contain the interpreter for the action's " +
+                        "language. Defaults to an official image for the language: Ubuntu for Bash and " +
+                        "shell commands, Node.js for JavaScript and Python for Python.")
                 .required(false));
         properties.add(
             array(ENTRYPOINT)
                 .label("Entrypoint")
                 .description(
-                    "Replaces the interpreter the source is handed to. Defaults to the interpreter for the action's " +
-                        "language; the source file is appended either way. The image must provide /bin/sh.")
+                    "Replaces the interpreter as a list of arguments, such as python3 and -u. The " +
+                        "script or commands file is appended as the last argument either way. Defaults to " +
+                        "the interpreter for the action's language. The image must provide /bin/sh.")
                 .items(string())
                 .required(false));
         properties.add(
             string(NAMESPACE)
                 .label("Namespace")
-                .description("The namespace the pod runs in. Defaults to the connection's namespace.")
+                .description(
+                    "The namespace the pod runs in. Defaults to the connection's namespace, or " +
+                        "default.")
                 .required(false));
         properties.add(
             string(SERVICE_ACCOUNT_NAME)
                 .label("Service Account")
                 .description(
-                    "The service account the pod runs as. Without one, no service account token is mounted.")
+                    "The service account the pod runs as. Set one when the code calls the Kubernetes " +
+                        "API or a cloud API through workload identity. Without one, no service account " +
+                        "token is mounted.")
                 .required(false));
         properties.add(
             object(RESOURCES)
                 .label("Resources")
-                .description("CPU and memory requests and limits for the task's container, as Kubernetes quantities.")
+                .description(
+                    "CPU and memory for the task's container, as Kubernetes quantities. A request is " +
+                        "what the scheduler reserves; a limit is the most the container may use. Empty " +
+                        "values leave the namespace's defaults.")
                 .properties(
                     string(CPU_REQUEST).label("CPU Request")
+                        .description(
+                            "The CPU the scheduler reserves for the container, such as 250m or 1.")
                         .required(false),
                     string(CPU_LIMIT).label("CPU Limit")
+                        .description(
+                            "The most CPU the container may use, such as 500m or 2; it is slowed down " +
+                                "above it.")
                         .required(false),
                     string(MEMORY_REQUEST).label("Memory Request")
+                        .description(
+                            "The memory the scheduler reserves for the container, such as 256Mi.")
                         .required(false),
                     string(MEMORY_LIMIT).label("Memory Limit")
+                        .description(
+                            "The most memory the container may use, such as 1Gi; it is stopped when " +
+                                "it uses more.")
                         .required(false))
                 .required(false));
         properties.add(
             object(NODE_SELECTOR)
                 .label("Node Selector")
-                .description("Node labels the pod must be scheduled onto.")
+                .description(
+                    "Node labels the pod must be scheduled onto, such as kubernetes.io/arch set to " +
+                        "arm64 or a node pool's label.")
                 .additionalProperties(string())
                 .required(false));
         properties.add(
             array(TOLERATIONS)
                 .label("Tolerations")
-                .description("Taints the pod tolerates.")
+                .description(
+                    "Taints the pod tolerates, so it may run on nodes reserved with a matching taint, " +
+                        "such as a GPU pool.")
                 .items(
                     object().properties(
                         string("key").label("Key")
@@ -207,13 +233,21 @@ record KubernetesRunnerSettings(
         properties.add(
             object(CREDENTIALS)
                 .label("Registry Credentials")
-                .description("How the image is pulled from a private registry; a temporary pull secret is created.")
+                .description(
+                    "Credentials for pulling the image from a private registry; a temporary pull " +
+                        "secret is created for the pod.")
                 .properties(
                     string(REGISTRY).label("Registry")
+                        .description(
+                            "The registry's address, such as ghcr.io or registry.example.com:5000.")
                         .required(true),
                     string(USERNAME).label("Username")
+                        .description(
+                            "The user name for the registry.")
                         .required(true),
                     string(PASSWORD).label("Password")
+                        .description(
+                            "The password or access token of the registry user.")
                         .controlType(ControlType.PASSWORD)
                         .required(true))
                 .required(false));
@@ -221,15 +255,18 @@ record KubernetesRunnerSettings(
             string(FILE_SIDECAR_IMAGE)
                 .label("File Sidecar Image")
                 .description(
-                    "The image that moves files in and out of the pod; it needs sh, head, tar, test, sleep and touch.")
+                    "The image that moves files in and out of the pod; it needs sh, head, tar, test, " +
+                        "sleep and touch. Defaults to a small BusyBox image; change it when the cluster " +
+                        "can only pull from an internal registry.")
                 .defaultValue(DEFAULT_FILE_SIDECAR_IMAGE)
                 .required(false));
         properties.add(
             string(KILL_GRACE_PERIOD)
                 .label("Kill Grace Period")
                 .description(
-                    "How long a still-running pod is given to stop on its own when it is killed - on a timeout or a " +
-                        "non-resumable shutdown - before it is forced, as an ISO-8601 duration.")
+                    "How long the pod may take to stop on its own when the task is killed, on a " +
+                        "timeout or a shutdown it cannot resume from, before it is forced, as an ISO-8601 " +
+                        "duration such as PT30S. The default PT0S forces it at once.")
                 .defaultValue("PT0S")
                 .required(false));
 

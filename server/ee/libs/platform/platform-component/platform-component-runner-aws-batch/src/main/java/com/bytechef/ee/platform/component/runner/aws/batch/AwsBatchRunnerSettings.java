@@ -138,14 +138,19 @@ record AwsBatchRunnerSettings(
         properties.add(
             string(IMAGE)
                 .label("Image")
-                .description("The container image the task runs in. Defaults to the image for the action's language.")
+                .description(
+                    "The container image the code runs in, as a registry reference such as " +
+                        "ghcr.io/acme/tools:1.4. It must contain the interpreter for the action's " +
+                        "language. Defaults to an official image for the language: Ubuntu for Bash and " +
+                        "shell commands, Node.js for JavaScript and Python for Python.")
                 .required(false));
         properties.add(
             array(ENTRYPOINT)
                 .label("Entrypoint")
                 .description(
-                    "Replaces the interpreter the source is handed to. Defaults to the interpreter for the action's " +
-                        "language; the source file is appended either way. The image must provide /bin/sh.")
+                    "Replaces the interpreter as a list of arguments, such as python3 and -u. The " +
+                        "script or commands file is appended as the last argument either way. Defaults to " +
+                        "the interpreter for the action's language. The image must provide /bin/sh.")
                 .items(string())
                 .required(false));
         properties.add(
@@ -164,7 +169,9 @@ record AwsBatchRunnerSettings(
         properties.add(
             string(PLATFORM)
                 .label("Platform")
-                .description("The compute the job queue runs on.")
+                .description(
+                    "The compute the job queue runs on: Fargate, the default, or EC2. It must match " +
+                        "the queue's compute environment.")
                 .options(option("Fargate", Platform.FARGATE.name()), option("EC2", Platform.EC2.name()))
                 .defaultValue(Platform.FARGATE.name())
                 .required(false));
@@ -182,15 +189,16 @@ record AwsBatchRunnerSettings(
             string(VCPU)
                 .label("vCPU")
                 .description(
-                    "The task's total vCPU, sidecars included (they take 0.5). On Fargate: 1, 2, 4, 8 or 16.")
+                    "The task's total vCPU, sidecars included (they take 0.5). Defaults to 1. On " +
+                        "Fargate: 1, 2, 4, 8 or 16.")
                 .defaultValue("1")
                 .required(false));
         properties.add(
             integer(MEMORY)
                 .label("Memory (MiB)")
                 .description(
-                    "The task's total memory in MiB, sidecars included (they take 128). On Fargate it must suit the " +
-                        "vCPU.")
+                    "The task's total memory in MiB, sidecars included (they take 128). Defaults to " +
+                        "2048. On Fargate it must suit the vCPU.")
                 .defaultValue(DEFAULT_MEMORY)
                 .required(false));
         properties.add(
@@ -204,13 +212,18 @@ record AwsBatchRunnerSettings(
         properties.add(
             string(COMPLETION_CHECK_INTERVAL)
                 .label("Completion Check Interval")
-                .description("How often the job's state and logs are polled, as an ISO-8601 duration.")
+                .description(
+                    "How often the job's state and logs are polled, as an ISO-8601 duration. Defaults " +
+                        "to PT5S.")
                 .defaultValue("PT5S")
                 .required(false));
         properties.add(
             string(FILE_SIDECAR_IMAGE)
                 .label("File Sidecar Image")
-                .description("The image that moves files in and out of the task; it needs sh, curl and tar.")
+                .description(
+                    "The image that moves files in and out of the task; it needs sh, curl and tar. " +
+                        "Defaults to a small curl image; change it when the account can only pull from a " +
+                        "private registry.")
                 .defaultValue(DEFAULT_FILE_SIDECAR_IMAGE)
                 .required(false));
 
