@@ -16,6 +16,7 @@ Name | Type
 `lastExecutionDate` | Date
 `lastModifiedBy` | string
 `lastModifiedDate` | Date
+`staticWebhookUrl` | string
 `workflowId` | string
 
 ## Example
@@ -34,6 +35,7 @@ const example = {
   "lastExecutionDate": null,
   "lastModifiedBy": null,
   "lastModifiedDate": null,
+  "staticWebhookUrl": null,
   "workflowId": null,
 } satisfies IntegrationInstanceWorkflow
 

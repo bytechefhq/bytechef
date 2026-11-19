@@ -56,6 +56,10 @@ export interface IntegrationInstanceWorkflow {
      */
     readonly lastModifiedDate?: Date;
     /**
+     * The static webhook url of the workflow for this integration instance, set when the workflow starts with a static webhook trigger.
+     */
+    readonly staticWebhookUrl?: string;
+    /**
      * The id of a workflow.
      */
     workflowId: string;
@@ -90,6 +94,7 @@ export function IntegrationInstanceWorkflowFromJSONTyped(json: any, ignoreDiscri
         'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (parseDateTime(json['lastExecutionDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
+        'staticWebhookUrl': json['staticWebhookUrl'] == null ? undefined : json['staticWebhookUrl'],
         'workflowId': json['workflowId'],
     };
 }
@@ -98,7 +103,7 @@ export function IntegrationInstanceWorkflowToJSON(json: any): IntegrationInstanc
     return IntegrationInstanceWorkflowToJSONTyped(json, false);
 }
 
-export function IntegrationInstanceWorkflowToJSONTyped(value?: Omit<IntegrationInstanceWorkflow, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
+export function IntegrationInstanceWorkflowToJSONTyped(value?: Omit<IntegrationInstanceWorkflow, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'staticWebhookUrl'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
