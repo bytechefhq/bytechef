@@ -1922,7 +1922,7 @@ components:
               items:
                 $ref: "#/components/schemas/Tag"
             unpublishedChanges:
-              description: "If the integration's draft version differs from its last published version. Only set by the integration list."
+              description: "If the integration's draft version differs from its last published version. Computed only by the integration list endpoint; false in every other response."
               type: "boolean"
               readOnly: true
             __version:
