@@ -73,6 +73,8 @@ public class IntegrationModel {
 
   private List<@Valid TagModel> tags = new ArrayList<>();
 
+  private @Nullable Boolean unpublishedChanges;
+
   private @Nullable Integer version;
 
   public IntegrationModel() {
@@ -481,6 +483,27 @@ public class IntegrationModel {
     this.tags = tags;
   }
 
+  public IntegrationModel unpublishedChanges(@Nullable Boolean unpublishedChanges) {
+    this.unpublishedChanges = unpublishedChanges;
+    return this;
+  }
+
+  /**
+   * If the integration's draft version differs from its last published version. Only set by the integration list.
+   * @return unpublishedChanges
+   */
+  
+  @Schema(name = "unpublishedChanges", accessMode = Schema.AccessMode.READ_ONLY, description = "If the integration's draft version differs from its last published version. Only set by the integration list.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("unpublishedChanges")
+  public @Nullable Boolean getUnpublishedChanges() {
+    return unpublishedChanges;
+  }
+
+  @JsonProperty("unpublishedChanges")
+  public void setUnpublishedChanges(@Nullable Boolean unpublishedChanges) {
+    this.unpublishedChanges = unpublishedChanges;
+  }
+
   public IntegrationModel version(@Nullable Integer version) {
     this.version = version;
     return this;
@@ -529,12 +552,13 @@ public class IntegrationModel {
         Objects.equals(this.developmentConfigurationCount, integration.developmentConfigurationCount) &&
         Objects.equals(this.integrationWorkflowIds, integration.integrationWorkflowIds) &&
         Objects.equals(this.tags, integration.tags) &&
+        Objects.equals(this.unpublishedChanges, integration.unpublishedChanges) &&
         Objects.equals(this.version, integration.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, createdBy, createdDate, description, icon, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, multipleInstances, name, permissionExpression, category, developmentConfigurationCount, integrationWorkflowIds, tags, version);
+    return Objects.hash(componentName, createdBy, createdDate, description, icon, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, multipleInstances, name, permissionExpression, category, developmentConfigurationCount, integrationWorkflowIds, tags, unpublishedChanges, version);
   }
 
   @Override
@@ -559,6 +583,7 @@ public class IntegrationModel {
     sb.append("    developmentConfigurationCount: ").append(toIndentedString(developmentConfigurationCount)).append("\n");
     sb.append("    integrationWorkflowIds: ").append(toIndentedString(integrationWorkflowIds)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
+    sb.append("    unpublishedChanges: ").append(toIndentedString(unpublishedChanges)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();

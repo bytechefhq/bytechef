@@ -67,6 +67,8 @@ public class ProjectModel {
 
   private List<@Valid TagModel> tags = new ArrayList<>();
 
+  private @Nullable Boolean unpublishedChanges;
+
   private Long workspaceId;
 
   private @Nullable Integer version;
@@ -414,6 +416,27 @@ public class ProjectModel {
     this.tags = tags;
   }
 
+  public ProjectModel unpublishedChanges(@Nullable Boolean unpublishedChanges) {
+    this.unpublishedChanges = unpublishedChanges;
+    return this;
+  }
+
+  /**
+   * If the project's draft version differs from its last published version. Only set by the workspace project list.
+   * @return unpublishedChanges
+   */
+  
+  @Schema(name = "unpublishedChanges", accessMode = Schema.AccessMode.READ_ONLY, description = "If the project's draft version differs from its last published version. Only set by the workspace project list.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("unpublishedChanges")
+  public @Nullable Boolean getUnpublishedChanges() {
+    return unpublishedChanges;
+  }
+
+  @JsonProperty("unpublishedChanges")
+  public void setUnpublishedChanges(@Nullable Boolean unpublishedChanges) {
+    this.unpublishedChanges = unpublishedChanges;
+  }
+
   public ProjectModel workspaceId(Long workspaceId) {
     this.workspaceId = workspaceId;
     return this;
@@ -480,13 +503,14 @@ public class ProjectModel {
         Objects.equals(this.developmentDeploymentCount, project.developmentDeploymentCount) &&
         Objects.equals(this.projectWorkflowIds, project.projectWorkflowIds) &&
         Objects.equals(this.tags, project.tags) &&
+        Objects.equals(this.unpublishedChanges, project.unpublishedChanges) &&
         Objects.equals(this.workspaceId, project.workspaceId) &&
         Objects.equals(this.version, project.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastProjectVersion, uuid, category, developmentDeploymentCount, projectWorkflowIds, tags, workspaceId, version);
+    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, lastPublishedDate, lastStatus, lastProjectVersion, uuid, category, developmentDeploymentCount, projectWorkflowIds, tags, unpublishedChanges, workspaceId, version);
   }
 
   @Override
@@ -508,6 +532,7 @@ public class ProjectModel {
     sb.append("    developmentDeploymentCount: ").append(toIndentedString(developmentDeploymentCount)).append("\n");
     sb.append("    projectWorkflowIds: ").append(toIndentedString(projectWorkflowIds)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
+    sb.append("    unpublishedChanges: ").append(toIndentedString(unpublishedChanges)).append("\n");
     sb.append("    workspaceId: ").append(toIndentedString(workspaceId)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
