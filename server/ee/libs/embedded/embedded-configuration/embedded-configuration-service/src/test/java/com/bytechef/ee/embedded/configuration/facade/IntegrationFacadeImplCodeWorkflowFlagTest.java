@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationCodeWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.ee.embedded.configuration.service.IntegrationCodeWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
@@ -218,6 +219,32 @@ class IntegrationFacadeImplCodeWorkflowFlagTest {
 
         integrationFacade.updateIntegration(renamedIntegrationDTO("Slack Sync"));
 
+        verifyNoInteractions(integrationCodeWorkflowFacadeProvider);
+    }
+
+    @Test
+    void testRestoreIntegrationVersionRestoresTheCodeWorkflowSource() {
+        when(integrationCodeWorkflowService.fetchIntegrationCodeWorkflow(INTEGRATION_ID))
+            .thenReturn(Optional.of(mock(IntegrationCodeWorkflow.class)));
+        when(integrationCodeWorkflowFacadeProvider.getObject()).thenReturn(integrationCodeWorkflowFacade);
+
+        integrationFacade.restoreIntegrationVersion(INTEGRATION_ID, 2);
+
+        verify(integrationService).getPublishedIntegrationVersion(INTEGRATION_ID, 2);
+        verify(integrationCodeWorkflowFacade).restoreCodeWorkflowSource(INTEGRATION_ID, 2);
+        verifyNoInteractions(integrationWorkflowService, workflowService);
+    }
+
+    @Test
+    void testRestoreIntegrationVersionLeavesANonCodeIntegrationToTheWorkflowCopy() {
+        when(integrationCodeWorkflowService.fetchIntegrationCodeWorkflow(INTEGRATION_ID))
+            .thenReturn(Optional.empty());
+
+        integration.setIntegrationVersions(List.of(new IntegrationVersion(3)));
+
+        integrationFacade.restoreIntegrationVersion(INTEGRATION_ID, 2);
+
+        verify(integrationWorkflowService).getIntegrationWorkflows(INTEGRATION_ID, 2);
         verifyNoInteractions(integrationCodeWorkflowFacadeProvider);
     }
 

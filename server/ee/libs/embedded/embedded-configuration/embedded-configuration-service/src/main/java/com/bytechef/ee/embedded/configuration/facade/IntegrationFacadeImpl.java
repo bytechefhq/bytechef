@@ -336,6 +336,18 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
         integrationService.getPublishedIntegrationVersion(id, integrationVersion);
 
+        Optional<IntegrationCodeWorkflow> integrationCodeWorkflow =
+            integrationCodeWorkflowService.fetchIntegrationCodeWorkflow(id);
+
+        if (integrationCodeWorkflow.isPresent()) {
+            IntegrationCodeWorkflowFacade integrationCodeWorkflowFacade =
+                integrationCodeWorkflowFacadeProvider.getObject();
+
+            integrationCodeWorkflowFacade.restoreCodeWorkflowSource(id, integrationVersion);
+
+            return;
+        }
+
         int draftIntegrationVersion = integration.getLastIntegrationVersion();
 
         Map<String, IntegrationWorkflow> draftIntegrationWorkflowMap = new HashMap<>();
