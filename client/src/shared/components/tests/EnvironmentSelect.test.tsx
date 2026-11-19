@@ -108,4 +108,20 @@ describe('EnvironmentSelect', () => {
         expect(await screen.findByText('STAGING')).toBeInTheDocument();
         expect(screen.getByText('PRODUCTION')).toBeInTheDocument();
     });
+
+    it('should show every environment badge without a border', async () => {
+        renderEnvironmentSelect();
+
+        await userEvent.click(screen.getByRole('button'));
+
+        await screen.findByText('STAGING');
+
+        for (const label of ['DEVELOPMENT', 'STAGING', 'PRODUCTION']) {
+            for (const badge of screen.getAllByText(label)) {
+                expect(badge).not.toHaveClass('border-stroke-neutral-secondary');
+                expect(badge).not.toHaveClass('border-stroke-warning-primary');
+                expect(badge).not.toHaveClass('border-stroke-destructive-primary');
+            }
+        }
+    });
 });
