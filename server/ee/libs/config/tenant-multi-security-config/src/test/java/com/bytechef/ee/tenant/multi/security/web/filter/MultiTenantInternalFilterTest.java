@@ -42,6 +42,36 @@ class MultiTenantInternalFilterTest {
     }
 
     @Test
+    void testIconRequestRunsAsTheSessionTenant() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/icons/acme.svg");
+
+        request.getSession()
+            .setAttribute(TenantConstants.CURRENT_TENANT_ID, "000042");
+
+        AtomicReference<String> tenantId = new AtomicReference<>();
+
+        multiTenantInternalFilter.doFilter(
+            request, new MockHttpServletResponse(),
+            (servletRequest, servletResponse) -> tenantId.set(TenantContext.getCurrentTenantId()));
+
+        assertThat(tenantId.get()).isEqualTo("000042");
+    }
+
+    @Test
+    void testAnonymousIconRequestPassesAsTheDefaultTenantWithoutCreatingASession() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/icons/acme.svg");
+
+        AtomicReference<String> tenantId = new AtomicReference<>();
+
+        multiTenantInternalFilter.doFilter(
+            request, new MockHttpServletResponse(),
+            (servletRequest, servletResponse) -> tenantId.set(TenantContext.getCurrentTenantId()));
+
+        assertThat(tenantId.get()).isEqualTo(TenantContext.DEFAULT_TENANT_ID);
+        assertThat(request.getSession(false)).isNull();
+    }
+
+    @Test
     void testOtherInternalRequestWithoutASessionTenantIsStillRejected() {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/platform/internal/approval-tasks");
 
