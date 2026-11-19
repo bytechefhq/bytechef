@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -22,6 +23,7 @@ import useWorkflowComponentDefinitions, {
 } from '@/shared/hooks/useWorkflowComponentDefinitions';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
+import {ClipboardIcon} from 'lucide-react';
 import {useMemo} from 'react';
 import {toast} from 'sonner';
 
@@ -66,6 +68,8 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
 
     const lastExecutionDate = integrationInstanceWorkflow?.lastExecutionDate;
 
+    const staticWebhookUrl = integrationInstanceWorkflow?.staticWebhookUrl;
+
     const handleWorkflowClick = () => {
         openIntegrationInstanceConfigurationWorkflowSheet({
             connectedUserId: integrationInstance.connectedUserId,
@@ -74,6 +78,14 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
             integrationVersion: integrationInstanceConfiguration.integrationVersion,
             workflow,
         });
+    };
+
+    const handleCopyStaticWebhookUrlClick = async () => {
+        if (staticWebhookUrl) {
+            await copyToClipboard(staticWebhookUrl);
+
+            toast('Webhook URL copied to clipboard');
+        }
     };
 
     const handleCopyWorkflowUuidClick = async () => {
@@ -127,6 +139,24 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
 
                         <TooltipContent side="left">Last Execution Date</TooltipContent>
                     </Tooltip>
+
+                    <div className="min-w-[36px]">
+                        {staticWebhookUrl && (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        aria-label="Copy webhook URL"
+                                        icon={<ClipboardIcon />}
+                                        onClick={handleCopyStaticWebhookUrlClick}
+                                        size="icon"
+                                        variant="ghost"
+                                    />
+                                </TooltipTrigger>
+
+                                <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>
+                            </Tooltip>
+                        )}
+                    </div>
 
                     <div className="flex items-center gap-x-1">
                         <div className="relative flex items-center">
