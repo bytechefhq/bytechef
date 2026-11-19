@@ -143,6 +143,7 @@ const IntegrationInstanceConfigurationsPanel = ({
                         integration={integration}
                         integrationInstanceConfigurations={sortedIntegrationInstanceConfigurations}
                         showIntegrationIcon={false}
+                        showOpenInIntegration
                         showTags={false}
                         tags={tags ?? []}
                         taskDispatcherDefinitions={taskDispatcherDefinitions}
