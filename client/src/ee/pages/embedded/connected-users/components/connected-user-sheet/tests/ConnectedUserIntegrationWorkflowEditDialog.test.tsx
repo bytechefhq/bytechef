@@ -5,15 +5,41 @@ import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-const hoisted = vi.hoisted(() => ({mutate: vi.fn()}));
+const hoisted = vi.hoisted(() => ({
+    onClose: vi.fn(),
+    updateConnection: vi.fn(),
+    updateWorkflow: vi.fn(),
+}));
 
 vi.mock('@/ee/shared/mutations/embedded/integrationInstanceWorkflows.mutations', () => ({
-    useUpdateIntegrationInstanceWorkflowMutation: () => ({isPending: false, mutate: hoisted.mutate}),
+    useUpdateIntegrationInstanceWorkflowMutation: () => ({isPending: false, mutateAsync: hoisted.updateWorkflow}),
+}));
+
+vi.mock('@/ee/shared/mutations/embedded/integrationInstances.mutations', () => ({
+    useUpdateIntegrationInstanceConnectionMutation: () => ({isPending: false, mutateAsync: hoisted.updateConnection}),
+}));
+
+vi.mock('@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserNewConnectionDialog', () => ({
+    default: ({
+        componentName,
+        onConnectionCreate,
+    }: {
+        componentName: string;
+        onConnectionCreate: (connectionId: number) => void;
+    }) => (
+        <button onClick={() => onConnectionCreate(99)} type="button">
+            {`Create ${componentName} connection`}
+        </button>
+    ),
 }));
 
 const connectionHoisted = vi.hoisted(() => ({
     environmentConnections: [{componentName: 'gmail', id: 21, name: 'Support Gmail'}],
-    userConnections: [{componentName: 'cevisio', id: 11, name: 'Jane cevisio'}],
+    userConnections: [
+        {componentName: 'cevisio', id: 11, name: 'Jane cevisio', origin: 'PROVISIONED'},
+        {componentName: 'cevisio', id: 12, name: 'Jane cevisio backup', origin: 'SELF_SERVE'},
+        {componentName: 'gmail', id: 13, name: 'Jane Gmail', origin: 'SELF_SERVE'},
+    ],
 }));
 
 vi.mock('@/ee/shared/queries/embedded/componentDefinitions.queries', () => ({
@@ -49,12 +75,14 @@ const workflow = {
     label: 'Rate Ticket from Email',
 } as unknown as Workflow;
 
-const renderDialog = (inputs: Workflow['inputs'] = workflow.inputs) =>
+const renderDialog = (inputs: Workflow['inputs'] = workflow.inputs, provisioned = false) =>
     render(
         <QueryClientProvider client={new QueryClient()}>
             <ConnectedUserIntegrationWorkflowEditDialog
                 integrationInstance={{connectedUserId: 3, connectionId: 11, id: 7, name: 'instance'} as never}
-                integrationInstanceConfiguration={{environmentId: 1, id: 4, name: 'Development'} as never}
+                integrationInstanceConfiguration={
+                    {environmentId: 1, id: 4, integration: {componentName: 'cevisio'}, name: 'Development'} as never
+                }
                 integrationInstanceConfigurationWorkflow={
                     {
                         connections: [{connectionId: 21, workflowConnectionKey: 'gmail', workflowNodeName: 'gmail_1'}],
@@ -67,7 +95,8 @@ const renderDialog = (inputs: Workflow['inputs'] = workflow.inputs) =>
                     integrationInstanceConfigurationWorkflowId: 1,
                     workflowId: 'workflow-1',
                 }}
-                onClose={vi.fn()}
+                onClose={hoisted.onClose}
+                provisioned={provisioned}
                 workflow={{...workflow, inputs}}
             />
         </QueryClientProvider>
@@ -75,7 +104,16 @@ const renderDialog = (inputs: Workflow['inputs'] = workflow.inputs) =>
 
 describe('ConnectedUserIntegrationWorkflowEditDialog', () => {
     beforeEach(() => {
-        hoisted.mutate.mockReset();
+        Element.prototype.hasPointerCapture = vi.fn().mockReturnValue(false);
+        Element.prototype.releasePointerCapture = vi.fn();
+        Element.prototype.scrollIntoView = vi.fn();
+        Element.prototype.setPointerCapture = vi.fn();
+
+        hoisted.onClose.mockReset();
+        hoisted.updateConnection.mockReset();
+        hoisted.updateConnection.mockResolvedValue(undefined);
+        hoisted.updateWorkflow.mockReset();
+        hoisted.updateWorkflow.mockResolvedValue(undefined);
     });
 
     it("shows the user's account connection and the admin's internal connections read-only", async () => {
@@ -103,7 +141,8 @@ describe('ConnectedUserIntegrationWorkflowEditDialog', () => {
 
         await userEvent.click(screen.getByRole('button', {name: 'Save'}));
 
-        expect(hoisted.mutate).toHaveBeenCalledWith({
+        expect(hoisted.updateConnection).not.toHaveBeenCalled();
+        expect(hoisted.updateWorkflow).toHaveBeenCalledWith({
             id: 7,
             updateIntegrationInstanceWorkflowRequest: {
                 inputs: {channel: 'general', contactPageUrl: 'https://vendor'},
@@ -119,5 +158,71 @@ describe('ConnectedUserIntegrationWorkflowEditDialog', () => {
 
         expect(screen.getByText(/Internal-only inputs are set on the integration configuration/)).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
+    });
+
+    it("lets an admin pick another of the connected user's connections of the integration's component when it is provisioned", async () => {
+        renderDialog(workflow.inputs, true);
+
+        await userEvent.click(screen.getByRole('tab', {name: /Connections/}));
+
+        expect(screen.getByRole('combobox', {name: 'cevisio connection'})).toHaveTextContent('Jane cevisio');
+        expect(screen.getByText(/A change applies to every workflow of this integration/)).toBeInTheDocument();
+        expect(screen.getByLabelText('Gmail')).toHaveAttribute('readonly');
+
+        await userEvent.click(screen.getByRole('combobox', {name: 'cevisio connection'}));
+
+        expect(screen.getByRole('option', {name: /Jane cevisio backup/})).toBeInTheDocument();
+        expect(screen.queryByRole('option', {name: /Jane Gmail/})).not.toBeInTheDocument();
+    });
+
+    it('switches the connection before saving the inputs and closes once both are saved', async () => {
+        renderDialog(workflow.inputs, true);
+
+        await userEvent.click(screen.getByRole('tab', {name: /Connections/}));
+        await userEvent.click(screen.getByRole('combobox', {name: 'cevisio connection'}));
+        await userEvent.click(screen.getByRole('option', {name: /Jane cevisio backup/}));
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(hoisted.updateConnection).toHaveBeenCalledWith({
+            id: 7,
+            updateIntegrationInstanceConnectionRequest: {connectionId: 12},
+        });
+        expect(hoisted.updateWorkflow).toHaveBeenCalled();
+        expect(hoisted.updateConnection.mock.invocationCallOrder[0]).toBeLessThan(
+            hoisted.updateWorkflow.mock.invocationCallOrder[0]
+        );
+        expect(hoisted.onClose).toHaveBeenCalled();
+    });
+
+    it('saves a changed connection even when the workflow has no inputs to set', async () => {
+        renderDialog([{internalOnly: true, name: 'contactPageUrl'}] as Workflow['inputs'], true);
+
+        await userEvent.click(screen.getByRole('tab', {name: /Connections/}));
+
+        expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
+
+        await userEvent.click(screen.getByRole('button', {name: 'New cevisio connection'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Create cevisio connection'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(hoisted.updateConnection).toHaveBeenCalledWith({
+            id: 7,
+            updateIntegrationInstanceConnectionRequest: {connectionId: 99},
+        });
+        expect(hoisted.updateWorkflow).not.toHaveBeenCalled();
+    });
+
+    it('keeps the dialog open and skips the inputs when the connection switch fails', async () => {
+        hoisted.updateConnection.mockRejectedValue(new Error('restart failed'));
+
+        renderDialog(workflow.inputs, true);
+
+        await userEvent.click(screen.getByRole('tab', {name: /Connections/}));
+        await userEvent.click(screen.getByRole('combobox', {name: 'cevisio connection'}));
+        await userEvent.click(screen.getByRole('option', {name: /Jane cevisio backup/}));
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(hoisted.updateWorkflow).not.toHaveBeenCalled();
+        expect(hoisted.onClose).not.toHaveBeenCalled();
     });
 });

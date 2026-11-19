@@ -23,6 +23,15 @@ vi.mock('@/ee/shared/mutations/embedded/integrationInstanceWorkflows.mutations',
     useEnableIntegrationInstanceWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
 }));
 
+vi.mock(
+    '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserIntegrationWorkflowEditDialog',
+    () => ({
+        default: ({provisioned}: {provisioned?: boolean}) => (
+            <div role="dialog">{provisioned ? 'provisioned edit dialog' : 'self-created edit dialog'}</div>
+        ),
+    })
+);
+
 vi.mock('@/shared/hooks/useWorkflowComponentDefinitions', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/hooks/useWorkflowComponentDefinitions')>()),
     default: () => ({workflowComponentDefinitions: {}, workflowTaskDispatcherDefinitions: {}}),
@@ -271,5 +280,29 @@ describe('ConnectedUserSheetPanelIntegrationWorkflowListItem', () => {
         renderWithIntegrationInstanceWorkflow({enabled: true} as IntegrationInstanceWorkflow);
 
         expect(screen.queryByRole('button', {name: 'Copy webhook URL'})).not.toBeInTheDocument();
+    });
+
+    it.each([
+        [true, 'provisioned edit dialog'],
+        [false, 'self-created edit dialog'],
+    ])('tells the edit dialog whether the integration is provisioned (%s)', async (provisioned, dialogText) => {
+        render(
+            <TooltipProvider>
+                <ul>
+                    <ConnectedUserSheetPanelIntegrationWorkflowListItem
+                        integrationInstance={integrationInstance}
+                        integrationInstanceConfiguration={integrationInstanceConfiguration}
+                        integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
+                        provisioned={provisioned}
+                        workflow={workflow}
+                    />
+                </ul>
+            </TooltipProvider>
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Edit'}));
+
+        expect(screen.getByRole('dialog')).toHaveTextContent(dialogText);
     });
 });

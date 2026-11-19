@@ -3,6 +3,7 @@ import {
     EnableIntegrationInstanceRequest,
     IntegrationInstanceApi,
     ProvisionIntegrationInstanceOperationRequest,
+    UpdateIntegrationInstanceConnectionOperationRequest,
     UpdateIntegrationInstanceCredentialsRequest,
 } from '@/ee/shared/middleware/embedded/configuration';
 import {useMutation} from '@tanstack/react-query';
@@ -20,6 +21,11 @@ interface EnableIntegrationInstanceMutationProps {
 interface ProvisionIntegrationInstanceMutationProps {
     onError?: (error: Error, variables: ProvisionIntegrationInstanceOperationRequest) => void;
     onSuccess?: (result: number, variables: ProvisionIntegrationInstanceOperationRequest) => void;
+}
+
+interface UpdateIntegrationInstanceConnectionMutationProps {
+    onError?: (error: Error, variables: UpdateIntegrationInstanceConnectionOperationRequest) => void;
+    onSuccess?: (result: void, variables: UpdateIntegrationInstanceConnectionOperationRequest) => void;
 }
 
 interface UpdateIntegrationInstanceCredentialsMutationProps {
@@ -49,6 +55,21 @@ export const useProvisionIntegrationInstanceMutation = (mutationProps?: Provisio
     useMutation<number, Error, ProvisionIntegrationInstanceOperationRequest>({
         mutationFn: (provisionIntegrationInstanceRequest: ProvisionIntegrationInstanceOperationRequest) => {
             return new IntegrationInstanceApi().provisionIntegrationInstance(provisionIntegrationInstanceRequest);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+export const useUpdateIntegrationInstanceConnectionMutation = (
+    mutationProps?: UpdateIntegrationInstanceConnectionMutationProps
+) =>
+    useMutation<void, Error, UpdateIntegrationInstanceConnectionOperationRequest>({
+        mutationFn: (
+            updateIntegrationInstanceConnectionRequest: UpdateIntegrationInstanceConnectionOperationRequest
+        ) => {
+            return new IntegrationInstanceApi().updateIntegrationInstanceConnection(
+                updateIntegrationInstanceConnectionRequest
+            );
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,

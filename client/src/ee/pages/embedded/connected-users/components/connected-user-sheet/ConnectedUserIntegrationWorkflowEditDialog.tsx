@@ -10,6 +10,8 @@ import {
 } from '@/components/Dialog';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
+import ConnectedUserNewConnectionDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserNewConnectionDialog';
+import ProvisionProjectWorkflowConnectionField from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/provision-project-workflow-dialog/ProvisionProjectWorkflowConnectionField';
 import {
     IntegrationInstance,
     IntegrationInstanceConfiguration,
@@ -18,6 +20,7 @@ import {
     Workflow,
 } from '@/ee/shared/middleware/embedded/configuration';
 import {useUpdateIntegrationInstanceWorkflowMutation} from '@/ee/shared/mutations/embedded/integrationInstanceWorkflows.mutations';
+import {useUpdateIntegrationInstanceConnectionMutation} from '@/ee/shared/mutations/embedded/integrationInstances.mutations';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {
@@ -30,7 +33,7 @@ import InputConfigurationList from '@/shared/components/InputConfigurationList';
 import WorkflowConfigurationCard from '@/shared/components/workflow-configuration/WorkflowConfigurationCard';
 import {WorkflowInput} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
-import {useMemo} from 'react';
+import {useMemo, useState} from 'react';
 import {Control, FieldValues, FormState, useForm} from 'react-hook-form';
 
 interface WorkflowInputsFormI {
@@ -40,6 +43,7 @@ interface WorkflowInputsFormI {
 interface WorkflowConnectionRowI {
     connectionName?: string;
     description: string;
+    editable: boolean;
     id: string;
     title: string;
 }
@@ -50,6 +54,7 @@ interface ConnectedUserIntegrationWorkflowEditDialogProps {
     integrationInstanceConfigurationWorkflow: IntegrationInstanceConfigurationWorkflow;
     integrationInstanceWorkflow?: IntegrationInstanceWorkflow;
     onClose: () => void;
+    provisioned?: boolean;
     workflow: Workflow;
 }
 
@@ -59,8 +64,12 @@ const ConnectedUserIntegrationWorkflowEditDialog = ({
     integrationInstanceConfigurationWorkflow,
     integrationInstanceWorkflow,
     onClose,
+    provisioned = false,
     workflow,
 }: ConnectedUserIntegrationWorkflowEditDialogProps) => {
+    const [changedConnectionId, setChangedConnectionId] = useState<string>();
+    const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
+
     const queryClient = useQueryClient();
 
     const inputs = (workflow.inputs ?? []).filter((input) => !input.internalOnly) as unknown as WorkflowInput[];
@@ -71,6 +80,21 @@ const ConnectedUserIntegrationWorkflowEditDialog = ({
         integrationInstance.connectedUserId!,
         integrationInstance.connectedUserId !== undefined
     );
+
+    const integrationComponentName = integrationInstanceConfiguration.integration?.componentName;
+
+    const integrationConnections = useMemo(
+        () =>
+            (connectedUserConnections ?? []).filter(
+                (connection) => connection.componentName === integrationComponentName
+            ),
+        [connectedUserConnections, integrationComponentName]
+    );
+
+    const currentConnectionId =
+        integrationInstance.connectionId !== undefined ? String(integrationInstance.connectionId) : undefined;
+
+    const connectionChanged = changedConnectionId !== undefined && changedConnectionId !== currentConnectionId;
 
     const configurationConnections = useMemo(
         () => integrationInstanceConfigurationWorkflow.connections ?? [],
@@ -97,9 +121,12 @@ const ConnectedUserIntegrationWorkflowEditDialog = ({
 
             rows.push({
                 connectionName: userConnection?.name,
-                description: "The connected user's own account. Manage it on the Connections tab.",
+                description: provisioned
+                    ? "The connected user's account, provisioned by an admin. A change applies to every workflow of this integration."
+                    : "The connected user's own account. Manage it on the Connections tab.",
+                editable: provisioned,
                 id: `user-${integrationInstance.connectionId}`,
-                title: getComponentTitle(userConnection?.componentName),
+                title: getComponentTitle(userConnection?.componentName ?? integrationComponentName),
             });
         }
 
@@ -111,6 +138,7 @@ const ConnectedUserIntegrationWorkflowEditDialog = ({
             rows.push({
                 connectionName: internalConnection?.name,
                 description: `Internal connection for ${configurationConnection.workflowNodeName}, set by an admin on the integration configuration.`,
+                editable: false,
                 id: `internal-${configurationConnection.workflowNodeName}-${configurationConnection.workflowConnectionKey}`,
                 title: getComponentTitle(internalConnection?.componentName),
             });
@@ -122,34 +150,52 @@ const ConnectedUserIntegrationWorkflowEditDialog = ({
         configurationConnections,
         connectedUserConnections,
         environmentConnections,
+        integrationComponentName,
         integrationInstance.connectionId,
+        provisioned,
     ]);
 
     const {control, formState, handleSubmit} = useForm<WorkflowInputsFormI>({
         defaultValues: {inputs: {...(integrationInstanceWorkflow?.inputs ?? {})}},
     });
 
-    const updateIntegrationInstanceWorkflowMutation = useUpdateIntegrationInstanceWorkflowMutation({
-        onSuccess: () => {
-            void queryClient.invalidateQueries({
-                queryKey: ConnectedUserKeys.connectedUser(integrationInstance.connectedUserId!),
-            });
-            void queryClient.invalidateQueries({
-                queryKey: IntegrationInstanceKeys.integrationInstance(integrationInstance.id!),
-            });
+    const updateIntegrationInstanceConnectionMutation = useUpdateIntegrationInstanceConnectionMutation();
 
-            onClose();
-        },
-    });
+    const updateIntegrationInstanceWorkflowMutation = useUpdateIntegrationInstanceWorkflowMutation();
 
-    const handleSave = ({inputs: formInputs}: WorkflowInputsFormI) => {
-        updateIntegrationInstanceWorkflowMutation.mutate({
-            id: integrationInstance.id!,
-            updateIntegrationInstanceWorkflowRequest: {
-                inputs: {...(integrationInstanceWorkflow?.inputs ?? {}), ...formInputs},
-            },
-            workflowId: workflow.id!,
+    const savePending =
+        updateIntegrationInstanceConnectionMutation.isPending || updateIntegrationInstanceWorkflowMutation.isPending;
+
+    const handleSave = async ({inputs: formInputs}: WorkflowInputsFormI) => {
+        try {
+            if (connectionChanged) {
+                await updateIntegrationInstanceConnectionMutation.mutateAsync({
+                    id: integrationInstance.id!,
+                    updateIntegrationInstanceConnectionRequest: {connectionId: Number(changedConnectionId)},
+                });
+            }
+
+            if (inputs.length > 0) {
+                await updateIntegrationInstanceWorkflowMutation.mutateAsync({
+                    id: integrationInstance.id!,
+                    updateIntegrationInstanceWorkflowRequest: {
+                        inputs: {...(integrationInstanceWorkflow?.inputs ?? {}), ...formInputs},
+                    },
+                    workflowId: workflow.id!,
+                });
+            }
+        } catch {
+            return;
+        }
+
+        void queryClient.invalidateQueries({
+            queryKey: ConnectedUserKeys.connectedUser(integrationInstance.connectedUserId!),
         });
+        void queryClient.invalidateQueries({
+            queryKey: IntegrationInstanceKeys.integrationInstance(integrationInstance.id!),
+        });
+
+        onClose();
     };
 
     return (
@@ -157,7 +203,11 @@ const ConnectedUserIntegrationWorkflowEditDialog = ({
             <DialogContent className="gap-0 p-0" onInteractOutside={(event) => event.preventDefault()}>
                 <DialogMain>
                     <DialogHeader
-                        description="See the connections and set the inputs this connected user's workflow runs with."
+                        description={
+                            provisioned
+                                ? "Set the connection and inputs this connected user's workflow runs with."
+                                : "See the connections and set the inputs this connected user's workflow runs with."
+                        }
                         title={`Edit ${workflow.label} Workflow`}
                     />
 
@@ -174,15 +224,30 @@ const ConnectedUserIntegrationWorkflowEditDialog = ({
                                         <fieldset className="space-y-3 border-0 p-0">
                                             {connectionRows.map((connectionRow) => (
                                                 <fieldset className="space-y-1 border-0 p-0" key={connectionRow.id}>
-                                                    <Label htmlFor={`edit-workflow-connection-${connectionRow.id}`}>
-                                                        {connectionRow.title}
-                                                    </Label>
+                                                    {connectionRow.editable ? (
+                                                        <ProvisionProjectWorkflowConnectionField
+                                                            componentTitle={connectionRow.title}
+                                                            connections={integrationConnections}
+                                                            id={`edit-workflow-connection-${connectionRow.id}`}
+                                                            onChange={setChangedConnectionId}
+                                                            onNewConnection={() => setShowNewConnectionDialog(true)}
+                                                            value={changedConnectionId ?? currentConnectionId}
+                                                        />
+                                                    ) : (
+                                                        <>
+                                                            <Label
+                                                                htmlFor={`edit-workflow-connection-${connectionRow.id}`}
+                                                            >
+                                                                {connectionRow.title}
+                                                            </Label>
 
-                                                    <Input
-                                                        id={`edit-workflow-connection-${connectionRow.id}`}
-                                                        readOnly
-                                                        value={connectionRow.connectionName ?? ''}
-                                                    />
+                                                            <Input
+                                                                id={`edit-workflow-connection-${connectionRow.id}`}
+                                                                readOnly
+                                                                value={connectionRow.connectionName ?? ''}
+                                                            />
+                                                        </>
+                                                    )}
 
                                                     <p className="text-xs text-content-neutral-secondary">
                                                         {connectionRow.description}
@@ -223,13 +288,26 @@ const ConnectedUserIntegrationWorkflowEditDialog = ({
                         <DialogCancelButton />
 
                         <Button
-                            disabled={inputs.length === 0 || updateIntegrationInstanceWorkflowMutation.isPending}
+                            disabled={(inputs.length === 0 && !connectionChanged) || savePending}
                             label="Save"
                             onClick={() => void handleSubmit(handleSave)()}
                             type="button"
                         />
                     </DialogFooter>
                 </DialogMain>
+
+                {showNewConnectionDialog && integrationComponentName && (
+                    <ConnectedUserNewConnectionDialog
+                        componentName={integrationComponentName}
+                        connectedUserId={integrationInstance.connectedUserId!}
+                        onClose={() => setShowNewConnectionDialog(false)}
+                        onConnectionCreate={(connectionId) => {
+                            setChangedConnectionId(connectionId.toString());
+
+                            setShowNewConnectionDialog(false);
+                        }}
+                    />
+                )}
             </DialogContent>
         </Dialog>
     );
