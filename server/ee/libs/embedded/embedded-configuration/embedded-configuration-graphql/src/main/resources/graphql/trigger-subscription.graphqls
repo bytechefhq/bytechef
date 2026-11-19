@@ -1,0 +1,48 @@
+extend type Query {
+    connectedUserTriggerSubscriptions(connectedUserId: ID!): [TriggerSubscription!]!
+    triggerSubscriptionWebhookSettings(environmentId: ID!): TriggerSubscriptionWebhookSettings!
+}
+
+extend type Mutation {
+    deleteTriggerSubscription(id: ID!): Boolean
+    enableTriggerSubscription(id: ID!, enable: Boolean!): Boolean
+    rotateTriggerSubscriptionWebhookSecret(environmentId: ID!): TriggerSubscriptionWebhookSettings!
+    sendTriggerSubscriptionTestEvent(environmentId: ID!): TriggerSubscriptionTestEventResult!
+    updateTriggerSubscriptionWebhookUrl(environmentId: ID!, webhookUrl: String!): TriggerSubscriptionWebhookSettings!
+}
+
+type TriggerSubscription {
+    componentName: String!
+    componentVersion: Int!
+    createdDate: Long
+    errorCode: String
+    errorMessage: String
+    externalId: String
+    id: ID!
+    lastDeliveryError: String
+    lastDeliveryStatus: String
+    lastEventDate: Long
+    name: String
+    staticWebhookUrl: String
+    status: TriggerSubscriptionStatus!
+    triggerName: String!
+    webhookUrl: String
+}
+
+enum TriggerSubscriptionStatus {
+    CONNECTION_ERROR
+    DISABLED
+    ENABLED
+    FAILED
+}
+
+type TriggerSubscriptionWebhookSettings {
+    signingSecret: String
+    webhookUrl: String
+}
+
+type TriggerSubscriptionTestEventResult {
+    error: String
+    statusCode: Int
+    success: Boolean!
+}

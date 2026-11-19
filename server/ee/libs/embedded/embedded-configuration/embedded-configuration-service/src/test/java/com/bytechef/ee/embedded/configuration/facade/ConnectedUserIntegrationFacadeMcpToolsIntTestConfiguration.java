@@ -101,7 +101,8 @@ public class ConnectedUserIntegrationFacadeMcpToolsIntTestConfiguration {
         return new ConnectedUserIntegrationFacadeImpl(
             clusterElementDefinitionService, null, null, null, null, null, null, null, null, null, null, null, null,
             null, null, null, mcpComponentService, mcpIntegrationComponentService, null, null, null,
-            mcpIntegrationInstanceToolService, null, mcpServerService, mcpToolService, null, null, null, null, null);
+            mcpIntegrationInstanceToolService, null, mcpServerService, mcpToolService, null, null, null, null, null,
+            null);
     }
 
     @Bean

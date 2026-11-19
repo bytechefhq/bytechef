@@ -64,6 +64,7 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-github-proxy-client"))
     testImplementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
     testImplementation(project(":server:libs:platform:platform-mcp:platform-mcp-service"))
+    testImplementation(project(":server:libs:platform:platform-notification:platform-notification-delivery"))
     testImplementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-api"))
     testImplementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))

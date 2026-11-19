@@ -4,6 +4,7 @@ import ConnectedUserSheetPanelExternalInvocationList from '@/ee/pages/embedded/c
 import ConnectedUserSheetPanelIntegrationList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationList';
 import ConnectedUserSheetPanelMcpServerList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelMcpServerList';
 import ConnectedUserSheetPanelProfile from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelProfile';
+import ConnectedUserSheetPanelTriggerSubscriptionList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelTriggerSubscriptionList';
 import ConnectedUserSheetPanelWorkflowExecutionList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelWorkflowExecutionList';
 import ConnectedUserSheetPanelWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelWorkflowList';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
@@ -32,6 +33,8 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                     <TabsTrigger value="connections">Connections</TabsTrigger>
 
                     <TabsTrigger value="workflow-executions">Workflow Executions</TabsTrigger>
+
+                    <TabsTrigger value="triggers">Triggers</TabsTrigger>
 
                     <TabsTrigger value="external-invocations">External Invocations</TabsTrigger>
                 </TabsList>
@@ -77,6 +80,12 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                 <TabsContent value="workflow-executions">
                     {connectedUser.id != null && (
                         <ConnectedUserSheetPanelWorkflowExecutionList connectedUserId={connectedUser.id} />
+                    )}
+                </TabsContent>
+
+                <TabsContent value="triggers">
+                    {connectedUser.id != null && (
+                        <ConnectedUserSheetPanelTriggerSubscriptionList connectedUserId={connectedUser.id} />
                     )}
                 </TabsContent>
 

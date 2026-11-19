@@ -24,5 +24,6 @@ public enum ExternalInvocationSource {
     MCP_SERVER,
     API_ACTION,
     API_TOOL,
-    A2A_SERVER
+    A2A_SERVER,
+    API_TRIGGER
 }

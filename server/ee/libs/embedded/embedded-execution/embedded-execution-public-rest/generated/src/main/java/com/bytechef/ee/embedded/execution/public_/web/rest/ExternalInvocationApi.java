@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-13T08:33:26.798853+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-18T09:21:09.459814+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 @Validated
 @Tag(name = "external-invocation", description = "The Embedded External Invocation Public API")
 public interface ExternalInvocationApi {
@@ -52,7 +52,7 @@ public interface ExternalInvocationApi {
     String PATH_GET_EXTERNAL_INVOCATIONS_PAGE = "/{externalUserId}/external-invocations";
     /**
      * GET /{externalUserId}/external-invocations : Returns a page of the connected user&#39;s external invocations
-     * Returns a page of the connected user&#39;s external invocations: embedded MCP component and workflow tool calls, executeAction calls and executeTool calls. Tool inputs and outputs are not included.
+     * Returns a page of the connected user&#39;s external invocations: embedded MCP component and workflow tool calls, executeAction calls, executeTool calls and trigger event deliveries (API_TRIGGER). Tool inputs and outputs are not included.
      *
      * @param externalUserId The external user id. (required)
      * @param xEnvironment The environment. (optional)
@@ -71,7 +71,7 @@ public interface ExternalInvocationApi {
     @Operation(
         operationId = "getExternalInvocationsPage",
         summary = "Returns a page of the connected user's external invocations",
-        description = "Returns a page of the connected user's external invocations: embedded MCP component and workflow tool calls, executeAction calls and executeTool calls. Tool inputs and outputs are not included.",
+        description = "Returns a page of the connected user's external invocations: embedded MCP component and workflow tool calls, executeAction calls, executeTool calls and trigger event deliveries (API_TRIGGER). Tool inputs and outputs are not included.",
         tags = { "external-invocation" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The page of external invocations.", content = {
@@ -115,7 +115,7 @@ public interface ExternalInvocationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"content\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"durationMs\" : 6, \"errorMessage\" : \"errorMessage\", \"errorType\" : \"errorType\", \"id\" : 1, \"integrationInstanceId\" : 5, \"jobId\" : 5, \"kind\" : \"COMPONENT\", \"operationName\" : \"operationName\", \"source\" : \"MCP_SERVER\", \"status\" : \"SUCCESS\", \"toolName\" : \"toolName\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"durationMs\" : 6, \"errorMessage\" : \"errorMessage\", \"errorType\" : \"errorType\", \"id\" : 1, \"integrationInstanceId\" : 5, \"jobId\" : 5, \"kind\" : \"COMPONENT\", \"operationName\" : \"operationName\", \"source\" : \"MCP_SERVER\", \"status\" : \"SUCCESS\", \"toolName\" : \"toolName\" } ], \"number\" : 2, \"numberOfElements\" : 7, \"size\" : 9, \"totalElements\" : 3, \"totalPages\" : 2 }";
+                    String exampleString = "{ \"content\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"durationMs\" : 6, \"errorMessage\" : \"errorMessage\", \"errorType\" : \"errorType\", \"id\" : 1, \"integrationInstanceId\" : 5, \"invocationName\" : \"invocationName\", \"jobId\" : 5, \"kind\" : \"COMPONENT\", \"operationName\" : \"operationName\", \"source\" : \"MCP_SERVER\", \"status\" : \"SUCCESS\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"durationMs\" : 6, \"errorMessage\" : \"errorMessage\", \"errorType\" : \"errorType\", \"id\" : 1, \"integrationInstanceId\" : 5, \"invocationName\" : \"invocationName\", \"jobId\" : 5, \"kind\" : \"COMPONENT\", \"operationName\" : \"operationName\", \"source\" : \"MCP_SERVER\", \"status\" : \"SUCCESS\" } ], \"number\" : 2, \"numberOfElements\" : 7, \"size\" : 9, \"totalElements\" : 3, \"totalPages\" : 2 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

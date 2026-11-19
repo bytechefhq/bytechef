@@ -40,6 +40,8 @@ import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.configuration.repository.PropertyRepository;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.configuration.service.PropertyServiceImpl;
+import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
+import com.bytechef.platform.notification.delivery.WebhookDeliveryService;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowValidationResult;
@@ -47,6 +49,7 @@ import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executor;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -57,6 +60,7 @@ import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import tools.jackson.databind.ObjectMapper;
 
@@ -98,6 +102,12 @@ public class EmbeddedGettingStartedIntTestConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    ExternalInvocationRecorder externalInvocationRecorder() {
+        return mock(ExternalInvocationRecorder.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     PropertyService propertyService(PropertyRepository propertyRepository) {
         return new PropertyServiceImpl(propertyRepository);
     }
@@ -111,6 +121,18 @@ public class EmbeddedGettingStartedIntTestConfiguration {
     @ConditionalOnMissingBean
     ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService() {
         return mock(ProjectVersionWorkflowChangeService.class);
+    }
+
+    @Bean("webhookDeliveryExecutor")
+    @ConditionalOnMissingBean(name = "webhookDeliveryExecutor")
+    Executor webhookDeliveryExecutor() {
+        return new SyncTaskExecutor();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    WebhookDeliveryService webhookDeliveryService() {
+        return mock(WebhookDeliveryService.class);
     }
 
     @Bean

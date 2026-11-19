@@ -78,7 +78,7 @@ public class AutomationConfigurationJdbcRepositoryConfigurationIntTest {
     private void assertEmbeddedOwnersMissing(OwnerContributorMissingException ownerContributorMissingException) {
         assertThat(ownerContributorMissingException.getProjectOwners())
             .containsExactlyInAnyOrder(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
-                ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT);
+                ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT, ProjectOwner.EMBEDDED_TRIGGER_SUBSCRIPTION);
         assertThat(ownerContributorMissingException.getProjectDeploymentOwners())
             .containsExactly(ProjectDeploymentOwner.EMBEDDED);
     }

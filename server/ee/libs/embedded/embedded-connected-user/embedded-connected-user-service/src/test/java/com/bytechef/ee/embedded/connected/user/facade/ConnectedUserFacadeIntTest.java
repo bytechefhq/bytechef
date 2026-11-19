@@ -13,6 +13,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -21,8 +22,10 @@ import static org.mockito.Mockito.when;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.TriggerSubscriptionDisableReason;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
+import com.bytechef.ee.embedded.configuration.facade.TriggerSubscriptionAdminFacade;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -114,6 +117,9 @@ class ConnectedUserFacadeIntTest {
 
     @MockitoBean
     private IntegrationService integrationService;
+
+    @MockitoBean
+    private TriggerSubscriptionAdminFacade triggerSubscriptionAdminFacade;
 
     @AfterEach
     void afterEach() {
@@ -299,6 +305,67 @@ class ConnectedUserFacadeIntTest {
         assertThat(connectedUserDTO.integrationInstances())
             .extracting(ConnectedUserDTO.IntegrationInstance::id, ConnectedUserDTO.IntegrationInstance::provisioned)
             .containsExactly(tuple(1L, true), tuple(2L, false));
+    }
+
+    @Test
+    void testDisableConnectedUserDisablesItsTriggerSubscriptions() {
+        ConnectedUser connectedUser = connectedUserService.createConnectedUser(
+            "trigger-subscription-disable", Environment.PRODUCTION);
+
+        connectedUserFacade.enableConnectedUser(connectedUser.getId(), false);
+
+        verify(triggerSubscriptionAdminFacade).disableConnectedUserTriggerSubscriptions(
+            connectedUser.getId(), TriggerSubscriptionDisableReason.CONNECTED_USER_DISABLED);
+    }
+
+    @Test
+    void testEnableConnectedUserLeavesTriggerSubscriptionsAlone() {
+        ConnectedUser connectedUser = connectedUserService.createConnectedUser(
+            "trigger-subscription-enable", Environment.PRODUCTION);
+
+        connectedUserFacade.enableConnectedUser(connectedUser.getId(), true);
+
+        verify(triggerSubscriptionAdminFacade, never()).disableConnectedUserTriggerSubscriptions(
+            connectedUser.getId(), TriggerSubscriptionDisableReason.CONNECTED_USER_DISABLED);
+    }
+
+    @Test
+    void testDeleteConnectedUserDeletesTriggerSubscriptionsBeforeTheIntegrationInstances() {
+        ConnectedUser connectedUser = connectedUserService.createConnectedUser(
+            "trigger-subscription-delete", Environment.PRODUCTION);
+
+        when(integrationInstanceService.getConnectedUserIntegrationInstances(connectedUser.getId()))
+            .thenReturn(List.of(createIntegrationInstance(7L, connectedUser.getId(), null)));
+
+        connectedUserFacade.deleteConnectedUser(connectedUser.getId());
+
+        InOrder inOrder = inOrder(triggerSubscriptionAdminFacade, integrationInstanceFacade);
+
+        inOrder.verify(triggerSubscriptionAdminFacade)
+            .deleteConnectedUserTriggerSubscriptions(connectedUser.getId());
+        inOrder.verify(integrationInstanceFacade)
+            .deleteIntegrationInstance(7L);
+    }
+
+    @Test
+    void testDeleteConnectedUserWithAConnectionThatCannotBeDeletedTouchesNoTriggerSubscription() {
+        ConnectedUser connectedUser = connectedUserService.createConnectedUser(
+            "trigger-subscription-delete-refused", Environment.PRODUCTION);
+
+        when(integrationInstanceService.getConnectedUserIntegrationInstances(connectedUser.getId()))
+            .thenReturn(List.of(createIntegrationInstance(8L, connectedUser.getId(), null)));
+
+        IllegalStateException connectionIsUsed = new IllegalStateException("Connection id=8 is used");
+
+        doThrow(connectionIsUsed).when(connectionFacade)
+            .checkDeletable(8L);
+
+        assertThatThrownBy(() -> connectedUserFacade.deleteConnectedUser(connectedUser.getId()))
+            .isSameAs(connectionIsUsed);
+
+        verify(triggerSubscriptionAdminFacade, never()).deleteConnectedUserTriggerSubscriptions(anyLong());
+        verify(integrationInstanceFacade, never()).deleteIntegrationInstance(anyLong());
+        verify(connectionFacade, never()).delete(anyLong());
     }
 
     @Test

@@ -1,0 +1,7 @@
+mutation sendTriggerSubscriptionTestEvent($environmentId: ID!) {
+    sendTriggerSubscriptionTestEvent(environmentId: $environmentId) {
+        error
+        statusCode
+        success
+    }
+}

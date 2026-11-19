@@ -11,7 +11,7 @@ import {
     PINNED_HEAD_CLASS_NAME,
     PINNED_STRIPED_CELL_CLASS_NAME,
 } from '@/shared/components/workflow-executions/workflowExecutionsTableClassNames';
-import {type LucideIcon, PuzzleIcon, SparklesIcon, WorkflowIcon, ZapIcon} from 'lucide-react';
+import {type LucideIcon, PuzzleIcon, RadioTowerIcon, SparklesIcon, WorkflowIcon, ZapIcon} from 'lucide-react';
 import {KeyboardEvent} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -50,7 +50,10 @@ const KIND_TYPES: Record<string, InvocationTypeI> = {
 const SOURCE_TYPES: Record<string, InvocationTypeI> = {
     A2A_SERVER: {icon: SparklesIcon, label: 'Skill'},
     API_ACTION: {icon: ZapIcon, label: 'Action'},
+    API_TRIGGER: {icon: RadioTowerIcon, label: 'Trigger'},
 };
+
+const SOURCES_WITHOUT_JOB_VIEW = ['API_TRIGGER'];
 
 const serverLabel = (
     externalInvocationLog: ExternalInvocationLogItemType,
@@ -143,7 +146,10 @@ const ExternalInvocationsTable = ({
         <TableBody>
             {externalInvocationLogs.map((externalInvocationLog) => {
                 const jobId = externalInvocationLog.jobId;
-                const viewable = onViewJob != null && jobId != null;
+                const viewable =
+                    onViewJob != null &&
+                    jobId != null &&
+                    !SOURCES_WITHOUT_JOB_VIEW.includes(externalInvocationLog.source);
 
                 const openRow = onSelect
                     ? () => onSelect(externalInvocationLog)

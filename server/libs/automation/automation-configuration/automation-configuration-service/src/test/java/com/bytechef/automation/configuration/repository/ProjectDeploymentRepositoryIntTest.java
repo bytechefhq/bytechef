@@ -158,6 +158,30 @@ public class ProjectDeploymentRepositoryIntTest {
         }
 
         @Test
+        public void testEmbeddedFilterExcludesTriggerSubscriptionDeployments() {
+            Project connectedUserProject = projectRepository.save(getProject("ext"));
+            Project triggerSubscriptionProject = projectRepository.save(getProject("subscription"));
+
+            ProjectDeployment connectedUserDeployment = saveProjectDeployment("user", connectedUserProject);
+            ProjectDeployment triggerSubscriptionDeployment = saveProjectDeployment(
+                "subscription", triggerSubscriptionProject);
+
+            testOwnerContributors.addDeploymentId(ProjectDeploymentOwner.EMBEDDED, connectedUserDeployment.getId());
+            testOwnerContributors.addDeploymentId(
+                ProjectDeploymentOwner.EMBEDDED, triggerSubscriptionDeployment.getId());
+            testOwnerContributors.addTriggerSubscriptionProjectId(triggerSubscriptionProject.getId());
+
+            assertThat(
+                projectDeploymentRepository.findAllProjectDeployments(true, null, null, null, workspace.getId()))
+                    .extracting(ProjectDeployment::getName)
+                    .containsExactly("user");
+            assertThat(
+                projectDeploymentRepository.findAllProjectDeployments(null, null, null, null, workspace.getId()))
+                    .extracting(ProjectDeployment::getName)
+                    .containsExactly("subscription", "user");
+        }
+
+        @Test
         public void testNonEmbeddedFilterExcludesPlainDeploymentsOfAutomationProjects() {
             Project automationProject = projectRepository.save(getProject("Automation Project"));
             Project project = projectRepository.save(getProject("project"));

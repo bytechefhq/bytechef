@@ -310,6 +310,21 @@ bytechef:
     provider: REDIS
   # Edition (CE - Community Edition | EE - Enterprise Edition) default: EE
   edition: EE
+  embedded:
+    trigger-subscription:
+      # Trigger subscriptions a connected user may have, 0 for no limit
+      max-per-connected-user: 100
+      # How long a subscription's registration lease lasts without renewal. The request that registers the trigger
+      # renews it every third of this while its call to the app runs; a request that dies while registering blocks
+      # other enables of the subscription until its lease expires. An event the trigger captures while its subscription
+      # is being enabled waits about this long at most for the enable to complete
+      registration-lease: 5m
+      delivery:
+        # Retries of a failed trigger subscription event delivery to the developer's webhook endpoint
+        retry:
+          initial-interval: 1s
+          max-retries: 3
+          multiplier: 2.0
   # Encryption key provider (FILESYSTEM - the key generated on filesystem, PROPERTY - the key read from property) default: FILESYSTEM
   encryption:
     provider: FILESYSTEM
@@ -370,7 +385,8 @@ bytechef:
   tenant:
     mode: SINGLE
   webhook-delivery:
-    # Hosts that notification webhook and Slack URLs may use even when they resolve to a private or loopback address
+    # Hosts that notification webhook, Slack and trigger subscription URLs may use even when they resolve to a private
+    # or loopback address
     # (comma-separated, matched exactly). Empty blocks every private address.
     allowed-hosts:
     # Outbound webhook POSTs (job status and task started webhooks, notification webhooks, Slack)

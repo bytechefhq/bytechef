@@ -35,6 +35,15 @@ vi.mock(
 );
 
 vi.mock(
+    '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelTriggerSubscriptionList',
+    () => ({
+        default: ({connectedUserId}: {connectedUserId: number}) => (
+            <div>{`trigger subscription list ${connectedUserId}`}</div>
+        ),
+    })
+);
+
+vi.mock(
     '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelWorkflowList',
     () => ({
         default: ({
@@ -82,5 +91,23 @@ describe('ConnectedUserSheetPanel', () => {
         await userEvent.click(screen.getByRole('tab', {name: 'Automations'}));
 
         expect(screen.getByText('workflow list 7 Jane jane@example.com')).toBeInTheDocument();
+    });
+
+    it("shows the connected user's trigger subscriptions on the Triggers tab before External Invocations", async () => {
+        render(<ConnectedUserSheetPanel connectedUser={{externalId: 'external-user-1', id: 7} as ConnectedUser} />);
+
+        expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
+            'Integrations',
+            'Automations',
+            'MCP Servers',
+            'Connections',
+            'Workflow Executions',
+            'Triggers',
+            'External Invocations',
+        ]);
+
+        await userEvent.click(screen.getByRole('tab', {name: 'Triggers'}));
+
+        expect(screen.getByText('trigger subscription list 7')).toBeInTheDocument();
     });
 });

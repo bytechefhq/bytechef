@@ -2163,6 +2163,7 @@ export type Mutation = {
   deleteRegisteredClient: Scalars['Boolean']['output'];
   deleteSharedProject: Scalars['Boolean']['output'];
   deleteSharedWorkflow: Scalars['Boolean']['output'];
+  deleteTriggerSubscription?: Maybe<Scalars['Boolean']['output']>;
   deleteUser: Scalars['Boolean']['output'];
   deleteWorkspaceApiKey: Scalars['Boolean']['output'];
   deleteWorkspaceMcpServer?: Maybe<Scalars['Boolean']['output']>;
@@ -2180,6 +2181,7 @@ export type Mutation = {
   enableConnectedUserMcpWorkflow?: Maybe<Scalars['Boolean']['output']>;
   enableConnectedUserProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   enableCustomComponent: Scalars['Boolean']['output'];
+  enableTriggerSubscription?: Maybe<Scalars['Boolean']['output']>;
   exportSharedProject?: Maybe<Scalars['Boolean']['output']>;
   exportSharedWorkflow: Scalars['Boolean']['output'];
   generateFromDocumentation: ApiConnector;
@@ -2201,9 +2203,11 @@ export type Mutation = {
   restoreAutomationProjectVersion: Scalars['Boolean']['output'];
   revokeRegisteredClientGrant: Scalars['Boolean']['output'];
   revokeRegisteredClientGrants: Scalars['Boolean']['output'];
+  rotateTriggerSubscriptionWebhookSecret: TriggerSubscriptionWebhookSettings;
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   saveClusterElementTestOutput?: Maybe<WorkflowNodeTestOutputResult>;
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
+  sendTriggerSubscriptionTestEvent: TriggerSubscriptionTestEventResult;
   startAiAgentEvalRun: AiAgentEvalRun;
   startDiscoverEndpoints: EndpointDiscoveryResult;
   startGenerateForEndpoints: GenerationJobStatus;
@@ -2278,6 +2282,7 @@ export type Mutation = {
   updateMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   updateMcpServerUrl: Scalars['String']['output'];
   updateMcpTool?: Maybe<McpTool>;
+  updateTriggerSubscriptionWebhookUrl: TriggerSubscriptionWebhookSettings;
   updateUser: AdminUser;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
   updateWorkspaceMcpToolEnabled?: Maybe<McpTool>;
@@ -2707,6 +2712,11 @@ export type MutationDeleteSharedWorkflowArgs = {
 };
 
 
+export type MutationDeleteTriggerSubscriptionArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteUserArgs = {
   login: Scalars['String']['input'];
 };
@@ -2799,6 +2809,12 @@ export type MutationEnableConnectedUserProjectWorkflowArgs = {
 
 
 export type MutationEnableCustomComponentArgs = {
+  enable: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationEnableTriggerSubscriptionArgs = {
   enable: Scalars['Boolean']['input'];
   id: Scalars['ID']['input'];
 };
@@ -2925,6 +2941,11 @@ export type MutationRevokeRegisteredClientGrantsArgs = {
 };
 
 
+export type MutationRotateTriggerSubscriptionWebhookSecretArgs = {
+  environmentId: Scalars['ID']['input'];
+};
+
+
 export type MutationSaveClusterElementTestConfigurationConnectionArgs = {
   clusterElementType: Scalars['String']['input'];
   clusterElementWorkflowNodeName: Scalars['String']['input'];
@@ -2952,6 +2973,11 @@ export type MutationSaveWorkflowTestConfigurationConnectionArgs = {
   workflowConnectionKey: Scalars['String']['input'];
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationSendTriggerSubscriptionTestEventArgs = {
+  environmentId: Scalars['ID']['input'];
 };
 
 
@@ -3315,6 +3341,12 @@ export type MutationUpdateMcpServerUrlArgs = {
 export type MutationUpdateMcpToolArgs = {
   id: Scalars['ID']['input'];
   input: McpToolInput;
+};
+
+
+export type MutationUpdateTriggerSubscriptionWebhookUrlArgs = {
+  environmentId: Scalars['ID']['input'];
+  webhookUrl: Scalars['String']['input'];
 };
 
 
@@ -3770,6 +3802,7 @@ export type Query = {
   connectedUserMcpServers: Array<ConnectedUserMcpServer>;
   connectedUserProjectWorkflowReferenceValues: ConnectedUserProjectWorkflowReferenceValues;
   connectedUserProjects: Array<ConnectedUserProject>;
+  connectedUserTriggerSubscriptions: Array<TriggerSubscription>;
   connectedUsers?: Maybe<ConnectedUserPage>;
   connectionComponentDefinition: ComponentDefinition;
   connectionDefinition: ConnectionDefinition;
@@ -3887,6 +3920,7 @@ export type Query = {
   triggerDefinitions: Array<TriggerDefinition>;
   triggerExecutionFileLogs: LogPage;
   triggerExecutionFileLogsExist: Scalars['Boolean']['output'];
+  triggerSubscriptionWebhookSettings: TriggerSubscriptionWebhookSettings;
   unifiedApiComponentDefinitions: Array<ComponentDefinition>;
   user?: Maybe<AdminUser>;
   users?: Maybe<AdminUserPage>;
@@ -4303,6 +4337,11 @@ export type QueryConnectedUserProjectWorkflowReferenceValuesArgs = {
 export type QueryConnectedUserProjectsArgs = {
   connectedUserId?: InputMaybe<Scalars['ID']['input']>;
   environmentId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryConnectedUserTriggerSubscriptionsArgs = {
+  connectedUserId: Scalars['ID']['input'];
 };
 
 
@@ -4827,6 +4866,11 @@ export type QueryTriggerExecutionFileLogsExistArgs = {
 };
 
 
+export type QueryTriggerSubscriptionWebhookSettingsArgs = {
+  environmentId: Scalars['ID']['input'];
+};
+
+
 export type QueryUnifiedApiComponentDefinitionsArgs = {
   category: UnifiedApiCategory;
 };
@@ -5120,6 +5164,45 @@ export type TriggerDefinition = {
   title?: Maybe<Scalars['String']['output']>;
   type: TriggerType;
   workflowNodeDescriptionDefined?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type TriggerSubscription = {
+  __typename?: 'TriggerSubscription';
+  componentName: Scalars['String']['output'];
+  componentVersion: Scalars['Int']['output'];
+  createdDate?: Maybe<Scalars['Long']['output']>;
+  errorCode?: Maybe<Scalars['String']['output']>;
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  externalId?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  lastDeliveryError?: Maybe<Scalars['String']['output']>;
+  lastDeliveryStatus?: Maybe<Scalars['String']['output']>;
+  lastEventDate?: Maybe<Scalars['Long']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  staticWebhookUrl?: Maybe<Scalars['String']['output']>;
+  status: TriggerSubscriptionStatus;
+  triggerName: Scalars['String']['output'];
+  webhookUrl?: Maybe<Scalars['String']['output']>;
+};
+
+export enum TriggerSubscriptionStatus {
+  ConnectionError = 'CONNECTION_ERROR',
+  Disabled = 'DISABLED',
+  Enabled = 'ENABLED',
+  Failed = 'FAILED'
+}
+
+export type TriggerSubscriptionTestEventResult = {
+  __typename?: 'TriggerSubscriptionTestEventResult';
+  error?: Maybe<Scalars['String']['output']>;
+  statusCode?: Maybe<Scalars['Int']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
+export type TriggerSubscriptionWebhookSettings = {
+  __typename?: 'TriggerSubscriptionWebhookSettings';
+  signingSecret?: Maybe<Scalars['String']['output']>;
+  webhookUrl?: Maybe<Scalars['String']['output']>;
 };
 
 export enum TriggerType {

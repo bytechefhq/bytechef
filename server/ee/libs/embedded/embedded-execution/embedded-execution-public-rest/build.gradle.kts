@@ -57,7 +57,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-external-invocation:platform-external-invocation-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
-//    implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
+    implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
 //    implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:ee:libs:embedded:embedded-execution:embedded-execution-api"))
     implementation(project(":server:ee:libs:platform:platform-external-invocation-log:platform-external-invocation-log-api"))
@@ -66,5 +66,10 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation(project(":server:libs:core:tenant:tenant-api"))
+    testImplementation(project(":server:libs:platform:platform-security:platform-security-api"))
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
+    testImplementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-api"))
+    testImplementation(project(":server:ee:libs:embedded:embedded-security-web:embedded-security-web-impl"))
 }

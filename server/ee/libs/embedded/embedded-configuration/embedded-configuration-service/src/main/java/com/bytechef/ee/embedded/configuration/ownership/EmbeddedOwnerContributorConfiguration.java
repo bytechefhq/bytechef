@@ -32,6 +32,12 @@ public class EmbeddedOwnerContributorConfiguration {
     private static final String REFERENCE_DEPLOYMENT_CLAIM_CONDITION =
         "EXISTS (SELECT 1 FROM connected_user_reference_deployment WHERE " +
             "connected_user_reference_deployment.project_deployment_id = %1$s)";
+    private static final String TRIGGER_SUBSCRIPTION_PROJECT_CLAIM_CONDITION =
+        "EXISTS (SELECT 1 FROM connected_user_trigger_subscription WHERE " +
+            "connected_user_trigger_subscription.project_id = %1$s)";
+    private static final String TRIGGER_SUBSCRIPTION_DEPLOYMENT_CLAIM_CONDITION =
+        "EXISTS (SELECT 1 FROM connected_user_trigger_subscription WHERE " +
+            "connected_user_trigger_subscription.project_deployment_id = %1$s)";
 
     @Bean
     ProjectOwnerContributor embeddedAutomationProjectOwnerContributor() {
@@ -54,5 +60,17 @@ public class EmbeddedOwnerContributorConfiguration {
     ProjectDeploymentOwnerContributor embeddedReferenceProjectDeploymentOwnerContributor() {
         return ProjectDeploymentOwnerContributor.of(
             ProjectDeploymentOwner.EMBEDDED, REFERENCE_DEPLOYMENT_CLAIM_CONDITION);
+    }
+
+    @Bean
+    ProjectOwnerContributor embeddedTriggerSubscriptionProjectOwnerContributor() {
+        return ProjectOwnerContributor.of(
+            ProjectOwner.EMBEDDED_TRIGGER_SUBSCRIPTION, TRIGGER_SUBSCRIPTION_PROJECT_CLAIM_CONDITION);
+    }
+
+    @Bean
+    ProjectDeploymentOwnerContributor embeddedTriggerSubscriptionProjectDeploymentOwnerContributor() {
+        return ProjectDeploymentOwnerContributor.of(
+            ProjectDeploymentOwner.EMBEDDED, TRIGGER_SUBSCRIPTION_DEPLOYMENT_CLAIM_CONDITION);
     }
 }

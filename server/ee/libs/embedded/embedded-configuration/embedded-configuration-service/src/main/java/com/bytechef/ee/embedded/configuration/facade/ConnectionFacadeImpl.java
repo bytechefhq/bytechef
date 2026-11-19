@@ -46,19 +46,22 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     private final com.bytechef.platform.connection.facade.ConnectionFacade connectionFacade;
     private final ConnectionService connectionService;
     private final TagService tagService;
+    private final TriggerSubscriptionManager triggerSubscriptionManager;
 
     @SuppressFBWarnings("EI")
     public ConnectionFacadeImpl(
         ConnectedUserConnectionMembership connectedUserConnectionMembership,
         ConnectedUserConnectionService connectedUserConnectionService,
         com.bytechef.platform.connection.facade.ConnectionFacade connectionFacade,
-        ConnectionService connectionService, TagService tagService) {
+        ConnectionService connectionService, TagService tagService,
+        TriggerSubscriptionManager triggerSubscriptionManager) {
 
         this.connectedUserConnectionMembership = connectedUserConnectionMembership;
         this.connectedUserConnectionService = connectedUserConnectionService;
         this.connectionFacade = connectionFacade;
         this.connectionService = connectionService;
         this.tagService = tagService;
+        this.triggerSubscriptionManager = triggerSubscriptionManager;
     }
 
     @Override
@@ -86,6 +89,10 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     })
     public void deleteConnection(long id) {
         requireAdminConnection(id);
+
+        connectionFacade.checkDeletable(id);
+
+        triggerSubscriptionManager.deleteByConnectionId(id);
 
         connectedUserConnectionService.deleteByConnectionId(id);
 
