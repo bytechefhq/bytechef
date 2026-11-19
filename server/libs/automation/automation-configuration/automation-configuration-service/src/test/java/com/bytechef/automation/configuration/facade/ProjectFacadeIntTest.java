@@ -534,6 +534,42 @@ public class ProjectFacadeIntTest {
     }
 
     @Test
+    public void testGetProjectsReportsUnpublishedChanges() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
+
+        assertThat(getListedProjectDTO(projectDTO.id()).unpublishedChanges()).isTrue();
+
+        projectFacade.publishProject(projectDTO.id(), "first", false);
+
+        assertThat(getListedProjectDTO(projectDTO.id()).unpublishedChanges()).isFalse();
+
+        Workflow draftWorkflow = getFirstWorkflow(projectDTO.id(), 2);
+
+        projectWorkflowFacade.updateWorkflow(
+            draftWorkflow.getId(), "{\"label\": \"Test Workflow\", \"description\": \"Changed\", \"tasks\": []}",
+            draftWorkflow.getVersion());
+
+        assertThat(getListedProjectDTO(projectDTO.id()).unpublishedChanges()).isTrue();
+    }
+
+    @Test
+    public void testGetProjectsReportsUnpublishedChangesWhenPublishedWorkflowIsMissing() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
+
+        projectFacade.publishProject(projectDTO.id(), "first", false);
+
+        Workflow publishedWorkflow = getFirstWorkflow(projectDTO.id(), 1);
+
+        workflowService.delete(publishedWorkflow.getId());
+
+        assertThat(getListedProjectDTO(projectDTO.id()).unpublishedChanges()).isTrue();
+    }
+
+    @Test
     public void testGetWorkspaceProjectsDevelopmentDeploymentCount() {
         ProjectDTO developmentProjectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
 
@@ -1498,6 +1534,24 @@ public class ProjectFacadeIntTest {
 
     private void backdateProjectLastModifiedDate(long projectId) {
         projectRepository.updateLastModified(projectId, "earlier@localhost.com", EARLIER_DATE);
+    }
+
+    private Workflow getFirstWorkflow(long projectId, int projectVersion) {
+        List<ProjectWorkflow> projectWorkflows = projectWorkflowRepository.findAllByProjectIdAndProjectVersion(
+            projectId, projectVersion);
+
+        ProjectWorkflow projectWorkflow = projectWorkflows.getFirst();
+
+        return workflowService.getWorkflow(projectWorkflow.getWorkflowId());
+    }
+
+    private ProjectDTO getListedProjectDTO(long projectId) {
+        List<ProjectDTO> projectDTOs = projectFacade.getProjects(null, null, null, null);
+
+        return projectDTOs.stream()
+            .filter(projectDTO -> projectDTO.id() == projectId)
+            .findFirst()
+            .orElseThrow();
     }
 
     private Project getProject(long projectId) {

@@ -656,6 +656,24 @@ class AutomationProjectFacadeIntTest {
     }
 
     @Test
+    void testGetProjectsReportsUnpublishedChanges() {
+        long projectId = automationProjectFacade.createProject("DraftBadge", "", null, List.of(), null);
+
+        String workflowUuid = automationProjectFacade.createProjectWorkflow(
+            projectId, "{\"label\":\"Original\",\"tasks\":[]}", null);
+
+        assertThat(getListedProject(projectId).unpublishedChanges()).isTrue();
+
+        automationProjectFacade.publishProject(projectId);
+
+        assertThat(getListedProject(projectId).unpublishedChanges()).isFalse();
+
+        automationProjectFacade.updateProjectWorkflow(workflowUuid, "Renamed", "");
+
+        assertThat(getListedProject(projectId).unpublishedChanges()).isTrue();
+    }
+
+    @Test
     void testUpdateProjectWorkflowRenameSetsProjectLastModifiedDateToTheWorkflowLastModifiedDate() {
         long projectId = automationProjectFacade.createProject("RenameDates", "", null, List.of(), null);
 
@@ -1220,6 +1238,15 @@ class AutomationProjectFacadeIntTest {
             .stream()
             .map(ConnectedUserWorkflowTemplateDTO::workflowUuid)
             .toList();
+    }
+
+    private AutomationProjectDTO getListedProject(long projectId) {
+        List<AutomationProjectDTO> automationProjectDTOs = automationProjectFacade.getProjects();
+
+        return automationProjectDTOs.stream()
+            .filter(project -> project.id() == projectId)
+            .findFirst()
+            .orElseThrow();
     }
 
     private List<String> getPublishedTemplateUuids(long projectId) {

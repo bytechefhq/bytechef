@@ -259,14 +259,56 @@ class ProjectVersionWorkflowChangeServiceIntTest {
             .isTrue();
     }
 
-    private void addWorkflow(int projectVersion, String key, String label, boolean withDescription) {
+    @Test
+    void testHasUnpublishedChangesWhenDraftRemovesWorkflow() {
+        createVersions(2);
+        addWorkflow(1, "a", "A", false);
+        addWorkflow(1, "b", "B", false);
+        addWorkflow(2, "a", "A", false);
+
+        assertThat(projectVersionWorkflowChangeService.hasUnpublishedChanges(projectService.getProject(projectId)))
+            .isTrue();
+    }
+
+    @Test
+    void testHasUnpublishedChangesWhenPublishedWorkflowIsMissing() {
+        createVersions(2);
+
+        String publishedWorkflowId = addWorkflow(1, "a", "A", false);
+
+        addWorkflow(2, "a", "A", false);
+
+        workflowService.delete(publishedWorkflowId);
+
+        assertThat(projectVersionWorkflowChangeService.hasUnpublishedChanges(projectService.getProject(projectId)))
+            .isTrue();
+    }
+
+    @Test
+    void testHasUnpublishedChangesWhenDraftWorkflowIsMissing() {
+        createVersions(2);
+        addWorkflow(1, "a", "A", false);
+
+        String draftWorkflowId = addWorkflow(2, "a", "A", false);
+
+        workflowService.delete(draftWorkflowId);
+
+        assertThat(projectVersionWorkflowChangeService.hasUnpublishedChanges(projectService.getProject(projectId)))
+            .isTrue();
+    }
+
+    private String addWorkflow(int projectVersion, String key, String label, boolean withDescription) {
         String description = withDescription ? ",\"description\":\"x\"" : "";
 
         Workflow workflow = workflowService.create(
             "{\"label\":\"" + label + "\",\"tasks\":[]" + description + "}", Workflow.Format.JSON,
             Workflow.SourceType.JDBC);
 
-        projectWorkflowService.addWorkflow(projectId, projectVersion, workflow.getId(), uuid(key));
+        String workflowId = Validate.notNull(workflow.getId(), "id");
+
+        projectWorkflowService.addWorkflow(projectId, projectVersion, workflowId, uuid(key));
+
+        return workflowId;
     }
 
     private void createVersions(int lastVersion) {
