@@ -194,7 +194,7 @@ describe('ProjectDeploymentWorkflowListItem', () => {
         const {container} = renderListItem('Subflow', undefined, {showTriggerUrlSlot: false});
 
         expect(container.querySelectorAll('div.size-9.shrink-0')).toHaveLength(1);
-        expect(screen.getByRole('button', {name: ''})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Run workflow manually'})).toBeInTheDocument();
     });
 
     it('leaves out the run slot when no row of the deployment can run manually', () => {
