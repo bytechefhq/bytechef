@@ -1,10 +1,10 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {CustomComponent, CustomComponentLanguage, CustomComponentStatus} from '@/shared/middleware/graphql';
-import {fireEvent, render, resetAll, screen} from '@/shared/util/test-utils';
+import {fireEvent, render, resetAll, screen, userEvent} from '@/shared/util/test-utils';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import CustomComponentListItem from './CustomComponentListItem';
+import CustomComponentListItem from '../CustomComponentListItem';
 
 const hoisted = vi.hoisted(() => ({
     mockNavigate: vi.fn(),
@@ -111,7 +111,7 @@ describe('CustomComponentListItem', () => {
 
         renderListItem(customComponent);
 
-        await screen.getAllByRole('button')[0].click();
+        await screen.getByRole('button', {name: 'Show actions and triggers'}).click();
 
         expect(hoisted.mockNavigate).not.toHaveBeenCalled();
         expect(await screen.findByText('Do Something')).toBeInTheDocument();
@@ -149,8 +149,8 @@ describe('CustomComponentListItem', () => {
 
         const {unmount} = renderListItem(draftCustomComponent);
 
-        expect(screen.getByText('Draft')).toBeInTheDocument();
-        expect(screen.queryByText('Published')).not.toBeInTheDocument();
+        expect(screen.getByText('DRAFT')).toBeInTheDocument();
+        expect(screen.queryByText('PUBLISHED')).not.toBeInTheDocument();
 
         unmount();
 
@@ -161,7 +161,115 @@ describe('CustomComponentListItem', () => {
 
         renderListItem(publishedCustomComponent);
 
-        expect(screen.getByText('Published')).toBeInTheDocument();
-        expect(screen.queryByText('Draft')).not.toBeInTheDocument();
+        expect(screen.getByText('PUBLISHED')).toBeInTheDocument();
+        expect(screen.queryByText('DRAFT')).not.toBeInTheDocument();
+    });
+
+    it('renders the language badge before the version badge', () => {
+        renderListItem(createCustomComponent(CustomComponentLanguage.Java));
+
+        const versionBadge = screen.getByText('V1');
+        const languageBadge = screen.getByText('Java');
+
+        expect(languageBadge.compareDocumentPosition(versionBadge) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+        expect(screen.getByText('My Component').parentElement).not.toContainElement(versionBadge);
+    });
+
+    it('shows actions and triggers of a Java component in separate tabs', async () => {
+        hoisted.mockUseCustomComponentDefinitionQuery.mockReturnValue({
+            data: {
+                customComponentDefinition: {
+                    actions: [{description: 'Fetches a ticket', name: 'getTicket', title: 'Get Ticket'}],
+                    triggers: [{description: null, name: 'newTicket', title: 'New Ticket'}],
+                },
+            },
+            isLoading: false,
+        });
+
+        renderListItem(createCustomComponent(CustomComponentLanguage.Java));
+
+        await userEvent.click(screen.getByRole('button', {name: 'Show actions and triggers'}));
+
+        expect(screen.getByRole('tab', {name: 'Actions (1)'})).toHaveAttribute('aria-selected', 'true');
+        expect(screen.getByText('Get Ticket')).toBeInTheDocument();
+        expect(screen.queryByText('New Ticket')).not.toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('tab', {name: 'Triggers (1)'}));
+
+        expect(screen.getByText('New Ticket')).toBeInTheDocument();
+        expect(screen.queryByText('Get Ticket')).not.toBeInTheDocument();
+    });
+
+    it('shows the empty message in the triggers tab when a Java component has no triggers', async () => {
+        hoisted.mockUseCustomComponentDefinitionQuery.mockReturnValue({
+            data: {customComponentDefinition: {actions: [], triggers: []}},
+            isLoading: false,
+        });
+
+        renderListItem(createCustomComponent(CustomComponentLanguage.Java));
+
+        await userEvent.click(screen.getByRole('button', {name: 'Show actions and triggers'}));
+
+        expect(screen.getByText('No actions defined')).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('tab', {name: 'Triggers (0)'}));
+
+        expect(screen.getByText('No triggers defined')).toBeInTheDocument();
+    });
+
+    it('expands the actions and triggers of a JavaScript component without opening its editor', async () => {
+        hoisted.mockUseCustomComponentDefinitionQuery.mockReturnValue({
+            data: {
+                customComponentDefinition: {
+                    actions: [{description: null, name: 'createTicket', title: 'Create Ticket'}],
+                    triggers: [],
+                },
+            },
+            isError: false,
+            isLoading: false,
+        });
+
+        renderListItem(createCustomComponent(CustomComponentLanguage.Javascript));
+
+        await userEvent.click(screen.getByRole('button', {name: 'Show actions and triggers'}));
+
+        expect(hoisted.mockNavigate).not.toHaveBeenCalled();
+        expect(screen.getByText('Create Ticket')).toBeInTheDocument();
+        expect(hoisted.mockUseCustomComponentDefinitionQuery).toHaveBeenLastCalledWith({id: '1'}, {enabled: true});
+    });
+
+    it('loads no definition until a component is expanded', () => {
+        renderListItem(createCustomComponent(CustomComponentLanguage.Python));
+
+        expect(hoisted.mockUseCustomComponentDefinitionQuery).toHaveBeenLastCalledWith({id: '1'}, {enabled: false});
+    });
+
+    it('tells the user to fix the source when a JavaScript component definition cannot be loaded', async () => {
+        hoisted.mockUseCustomComponentDefinitionQuery.mockReturnValue({
+            data: undefined,
+            isError: true,
+            isLoading: false,
+        });
+
+        renderListItem(createCustomComponent(CustomComponentLanguage.Javascript));
+
+        await userEvent.click(screen.getByRole('button', {name: 'Show actions and triggers'}));
+
+        expect(
+            screen.getByText('The component definition could not be loaded. Open the component to fix its source.')
+        ).toBeInTheDocument();
+        expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+    });
+
+    it('underlines the title on row hover only for components that open a details page', () => {
+        const {unmount} = renderListItem(createCustomComponent(CustomComponentLanguage.Javascript));
+
+        expect(screen.getByText('My Component')).toHaveClass('group-hover:underline');
+
+        unmount();
+
+        renderListItem(createCustomComponent(CustomComponentLanguage.Java));
+
+        expect(screen.getByText('My Component')).not.toHaveClass('group-hover:underline');
     });
 });
