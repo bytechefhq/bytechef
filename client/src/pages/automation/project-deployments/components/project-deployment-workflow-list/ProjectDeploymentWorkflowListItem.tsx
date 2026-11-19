@@ -228,7 +228,7 @@ const ProjectDeploymentWorkflowListItem = ({
                 </div>
             </div>
 
-            <div className="flex shrink-0 items-center gap-x-3">
+            <div className="flex shrink-0 items-center gap-x-4">
                 <div className="hidden xl:block">
                     {projectDeploymentWorkflow?.lastExecutionDate ? (
                         <Tooltip>
@@ -254,8 +254,8 @@ const ProjectDeploymentWorkflowListItem = ({
                     )}
                 </div>
 
-                <div className="flex items-center gap-x-6">
-                    <div className="min-w-[36px]">
+                <div className="flex items-center gap-x-4">
+                    <div className="size-9 shrink-0">
                         {(!workflow.triggers?.length ||
                             workflow.triggers?.some((trigger) => trigger.type.includes('manual'))) && (
                             <Tooltip>
@@ -272,7 +272,9 @@ const ProjectDeploymentWorkflowListItem = ({
                                 <TooltipContent>Run workflow manually</TooltipContent>
                             </Tooltip>
                         )}
+                    </div>
 
+                    <div className="size-9 shrink-0">
                         {!hostedChatTrigger && !formTrigger && staticWebhookUrl && (
                             <Tooltip>
                                 <TooltipTrigger asChild>
