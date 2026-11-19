@@ -117,7 +117,7 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
                                 <SettingsNavGroup
                                     isCurrent={(href) => location.pathname.includes(href)}
                                     items={navItem.items as SettingsNavGroupItemI[]}
-                                    key={navItem.title}
+                                    key={navItem.items.map((groupItem) => groupItem.href).join()}
                                     title={navItem.title}
                                 />
                             );
