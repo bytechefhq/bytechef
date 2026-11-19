@@ -29,6 +29,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -36,6 +37,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.StandardEnvironment;
+import org.springframework.core.env.SystemEnvironmentPropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestClientResponseException;
 
@@ -77,6 +82,20 @@ class GitHubProxyClientConfigurationTest {
                 Map<String, OAuthApp> oAuthApps = oAuthAppProxyClient.getOAuthApps();
 
                 assertThat(oAuthApps).containsExactly(Map.entry("googleDrive", new OAuthApp("id", "secret")));
+                assertThat(receivedAuthorization.get()).isEqualTo("Bearer k1");
+            });
+    }
+
+    @Test
+    void testOAuthAppProxyClientSendsBearerKeyFromEnvironmentVariable() {
+        contextRunner.withInitializer(context -> setEnvironmentVariable(
+            context.getEnvironment(), "GITHUB_PROXY_OAUTH_APPS_API_KEY", "k1"))
+            .withPropertyValues("github-proxy.base-url=" + baseUrl(""))
+            .run(context -> {
+                OAuthAppProxyClient oAuthAppProxyClient = context.getBean(OAuthAppProxyClient.class);
+
+                oAuthAppProxyClient.getOAuthApps();
+
                 assertThat(receivedAuthorization.get()).isEqualTo("Bearer k1");
             });
     }
@@ -173,5 +192,18 @@ class GitHubProxyClientConfigurationTest {
 
         exchange.sendResponseHeaders(200, -1);
         exchange.close();
+    }
+
+    private static void setEnvironmentVariable(ConfigurableEnvironment environment, String name, String value) {
+        MutablePropertySources propertySources = environment.getPropertySources();
+
+        Map<String, Object> environmentVariables = new HashMap<>(System.getenv());
+
+        environmentVariables.put(name, value);
+
+        propertySources.replace(
+            StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME,
+            new SystemEnvironmentPropertySource(
+                StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, environmentVariables));
     }
 }
