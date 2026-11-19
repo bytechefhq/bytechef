@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.configuration.service;
 
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
 
@@ -30,4 +31,6 @@ public interface ProjectVersionWorkflowChangeService {
     VersionWorkflowChanges getVersionWorkflowChanges(long projectId, int projectVersion);
 
     VersionWorkflowChange getVersionWorkflowChange(long projectId, int projectVersion, String workflowUuid);
+
+    boolean hasUnpublishedChanges(Project project);
 }

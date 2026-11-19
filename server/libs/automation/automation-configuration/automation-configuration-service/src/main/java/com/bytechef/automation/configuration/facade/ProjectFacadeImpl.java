@@ -36,6 +36,7 @@ import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectVersionWorkflowChangeService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
 import com.bytechef.automation.configuration.util.ComponentDefinitionHelper;
@@ -100,6 +101,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private final PreBuiltTemplateService preBuiltTemplateService;
     private final ProjectOwnershipService projectOwnershipService;
     private final ProjectService projectService;
+    private final ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService;
     private final ProjectWorkflowService projectWorkflowService;
     private final ProjectDeploymentFacade projectDeploymentFacade;
     private final ProjectDeploymentService projectDeploymentService;
@@ -119,7 +121,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         ComponentDefinitionHelper componentDefinitionHelper, PreBuiltTemplateService preBuiltTemplateService,
         ProjectWorkflowService projectWorkflowService,
         ProjectDeploymentService projectDeploymentService, ProjectOwnershipService projectOwnershipService,
-        ProjectService projectService,
+        ProjectService projectService, ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService,
         ProjectDeploymentFacade projectDeploymentFacade, ProjectWorkflowFacade projectWorkflowFacade,
         SharedTemplateFileStorage sharedTemplateFileStorage, SharedTemplateService sharedTemplateService,
         TagService tagService, WorkflowService workflowService,
@@ -134,6 +136,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         this.projectDeploymentService = projectDeploymentService;
         this.projectOwnershipService = projectOwnershipService;
         this.projectService = projectService;
+        this.projectVersionWorkflowChangeService = projectVersionWorkflowChangeService;
         this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.publicUrl = applicationProperties.getPublicUrl();
@@ -771,26 +774,39 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
             return CollectionUtils.map(
                 projects,
-                project -> new ProjectDTO(
-                    CollectionUtils.findFirstFilterOrElse(
-                        categories,
-                        category -> Objects.equals(project.getCategoryId(), category.getId()),
-                        null),
-                    project,
-                    allProjectWorkflows.stream()
-                        .filter(projectWorkflow -> Objects.equals(projectWorkflow.getProjectId(), project.getId()) &&
-                            projectWorkflow.getProjectVersion() == project.getLastProjectVersion())
-                        .map(ProjectWorkflow::getId)
-                        .toList(),
-                    CollectionUtils.filter(
-                        allTags,
-                        tag -> CollectionUtils.contains(project.getTagIds(), tag.getId())),
-                    developmentDeploymentCounts == null
-                        ? null
-                        : Math.toIntExact(developmentDeploymentCounts.getOrDefault(project.getId(), 0L))));
+                project -> {
+                    ProjectDTO projectDTO = new ProjectDTO(
+                        CollectionUtils.findFirstFilterOrElse(
+                            categories,
+                            category -> Objects.equals(project.getCategoryId(), category.getId()),
+                            null),
+                        project,
+                        allProjectWorkflows.stream()
+                            .filter(
+                                projectWorkflow -> Objects.equals(projectWorkflow.getProjectId(), project.getId()) &&
+                                    projectWorkflow.getProjectVersion() == project.getLastProjectVersion())
+                            .map(ProjectWorkflow::getId)
+                            .toList(),
+                        CollectionUtils.filter(
+                            allTags,
+                            tag -> CollectionUtils.contains(project.getTagIds(), tag.getId())),
+                        developmentDeploymentCounts == null
+                            ? null
+                            : Math.toIntExact(developmentDeploymentCounts.getOrDefault(project.getId(), 0L)));
+
+                    return projectDTO.withUnpublishedChanges(hasUnpublishedChanges(project));
+                });
         } else {
             return CollectionUtils.map(projects, ProjectDTO::new);
         }
+    }
+
+    private boolean hasUnpublishedChanges(Project project) {
+        if (project.getLastPublishedDate() == null) {
+            return true;
+        }
+
+        return projectVersionWorkflowChangeService.hasUnpublishedChanges(project);
     }
 
     private List<Workflow> getWorkflows(TemplateFiles templateFiles) {

@@ -528,7 +528,7 @@ public class ProjectFacadeIntTest {
         assertThat(projectsDTOs).hasSize(1);
 
         assertThat(projectFacade.getProject(Validate.notNull(project.getId(), "id")))
-            .isEqualTo(projectDTO)
+            .isEqualTo(projectDTO.withUnpublishedChanges(false))
             .hasFieldOrPropertyWithValue("category", category)
             .hasFieldOrPropertyWithValue("tags", projectDTO.tags());
     }

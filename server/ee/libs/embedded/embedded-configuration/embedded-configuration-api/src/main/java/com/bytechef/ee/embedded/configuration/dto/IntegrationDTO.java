@@ -30,7 +30,23 @@ public record IntegrationDTO(
     String description, Integer developmentConfigurationCount, String icon, Long id,
     List<IntegrationVersion> integrationVersions, List<Long> integrationWorkflowIds, String lastModifiedBy,
     Instant lastModifiedDate, Instant lastPublishedDate, Status lastStatus, Integer lastIntegrationVersion,
-    boolean multipleInstances, String name, String permissionExpression, List<Tag> tags, String title, int version) {
+    boolean multipleInstances, String name, String permissionExpression, List<Tag> tags, String title, int version,
+    boolean unpublishedChanges) {
+
+    public IntegrationDTO(
+        Category category, String componentName, int componentVersion, String createdBy, Instant createdDate,
+        String description, Integer developmentConfigurationCount, String icon, Long id,
+        List<IntegrationVersion> integrationVersions, List<Long> integrationWorkflowIds, String lastModifiedBy,
+        Instant lastModifiedDate, Instant lastPublishedDate, Status lastStatus, Integer lastIntegrationVersion,
+        boolean multipleInstances, String name, String permissionExpression, List<Tag> tags, String title,
+        int version) {
+
+        this(
+            category, componentName, componentVersion, createdBy, createdDate, description,
+            developmentConfigurationCount, icon, id, integrationVersions, integrationWorkflowIds, lastModifiedBy,
+            lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, multipleInstances, name,
+            permissionExpression, tags, title, version, false);
+    }
 
     public IntegrationDTO(Integration integration) {
         this(
@@ -41,7 +57,7 @@ public record IntegrationDTO(
             integration.getLastModifiedDate(), integration.getLastPublishedDate(), integration.getLastStatus(),
             integration.getLastIntegrationVersion(), integration.isMultipleInstances(), integration.getName(),
             integration.getPermissionExpression(), List.of(), null,
-            integration.getVersion());
+            integration.getVersion(), false);
     }
 
     public IntegrationDTO(
@@ -65,7 +81,15 @@ public record IntegrationDTO(
             integration.getLastIntegrationVersion(), integration.isMultipleInstances(), integration.getName(),
             integration.getPermissionExpression(), tags,
             componentDefinition == null ? integration.getComponentName() : componentDefinition.getTitle(),
-            integration.getVersion());
+            integration.getVersion(), false);
+    }
+
+    public IntegrationDTO withUnpublishedChanges(boolean unpublishedChanges) {
+        return new IntegrationDTO(
+            category, componentName, componentVersion, createdBy, createdDate, description,
+            developmentConfigurationCount, icon, id, integrationVersions, integrationWorkflowIds, lastModifiedBy,
+            lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, multipleInstances, name,
+            permissionExpression, tags, title, version, unpublishedChanges);
     }
 
     public static Builder builder() {
@@ -234,7 +258,7 @@ public record IntegrationDTO(
                 category, componentName, componentVersion, createdBy,
                 createdDate, description, null, null, id, integrationVersions, integrationWorkflowIds, lastModifiedBy,
                 lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, multipleInstances, name,
-                permissionExpression, tags, null, version);
+                permissionExpression, tags, null, version, false);
         }
     }
 

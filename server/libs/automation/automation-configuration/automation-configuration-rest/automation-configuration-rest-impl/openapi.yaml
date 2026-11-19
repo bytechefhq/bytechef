@@ -1385,6 +1385,10 @@ components:
               type: "array"
               items:
                 $ref: "#/components/schemas/Tag"
+            unpublishedChanges:
+              description: "If the project's draft version differs from its last published version. Only set by the workspace project list."
+              type: "boolean"
+              readOnly: true
             workspaceId:
               description: "The workspace id."
               type: "integer"

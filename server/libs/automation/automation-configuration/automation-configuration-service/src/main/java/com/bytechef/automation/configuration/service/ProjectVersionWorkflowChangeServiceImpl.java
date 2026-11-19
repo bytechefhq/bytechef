@@ -25,6 +25,7 @@ import com.bytechef.automation.configuration.exception.ProjectErrorType;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChangeCalculator;
+import com.bytechef.platform.configuration.dto.VersionWorkflowChangeSummary;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
 import com.bytechef.platform.configuration.service.WorkflowDefinitionDiffService;
 import java.util.ArrayList;
@@ -79,16 +80,42 @@ public class ProjectVersionWorkflowChangeServiceImpl implements ProjectVersionWo
                 "Workflow uuid=%s not found in project version v=%s".formatted(workflowUuid, projectVersion)));
     }
 
+    @Override
+    public boolean hasUnpublishedChanges(Project project) {
+        int draftProjectVersion = project.getLastProjectVersion();
+
+        Integer baseVersion = VersionWorkflowChangeCalculator.resolveBaseVersion(
+            getVersions(project), draftProjectVersion);
+
+        if (baseVersion == null) {
+            return true;
+        }
+
+        long projectId = project.getId();
+
+        VersionWorkflowChanges versionWorkflowChanges = VersionWorkflowChangeCalculator.summarize(
+            baseVersion, draftProjectVersion, getWorkflows(projectId, baseVersion),
+            getWorkflows(projectId, draftProjectVersion), workflowDefinitionDiffService);
+
+        List<VersionWorkflowChangeSummary> workflows = versionWorkflowChanges.workflows();
+
+        return !workflows.isEmpty();
+    }
+
+    private static List<Integer> getVersions(Project project) {
+        List<Integer> versions = new ArrayList<>();
+
+        for (ProjectVersion projectVersion : project.getProjectVersions()) {
+            versions.add(projectVersion.getVersion());
+        }
+
+        return versions;
+    }
+
     private @Nullable Integer getBaseVersion(long projectId, int projectVersion) {
         Project project = getProject(projectId, projectVersion);
 
-        List<Integer> versions = new ArrayList<>();
-
-        for (ProjectVersion existingProjectVersion : project.getProjectVersions()) {
-            versions.add(existingProjectVersion.getVersion());
-        }
-
-        return VersionWorkflowChangeCalculator.resolveBaseVersion(versions, projectVersion);
+        return VersionWorkflowChangeCalculator.resolveBaseVersion(getVersions(project), projectVersion);
     }
 
     private Project getProject(long projectId, int projectVersion) {
