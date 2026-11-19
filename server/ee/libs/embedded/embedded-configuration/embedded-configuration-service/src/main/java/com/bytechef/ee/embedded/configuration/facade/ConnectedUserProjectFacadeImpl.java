@@ -1192,10 +1192,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             .toList();
     }
 
-    /**
-     * A reference runs on the connected user's own deployment of the catalog project, so its last execution is the last
-     * job of that deployment for the catalog workflow, in any of its versions.
-     */
     @Nullable
     private Instant getReferenceLastExecutionDate(ConnectedUserProjectWorkflow reference) {
         Long projectDeploymentId = reference.getProjectDeploymentId();
