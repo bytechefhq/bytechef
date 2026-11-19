@@ -1197,6 +1197,29 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Connection"
+    put:
+      description: "Switches an integration instance provisioned by a tenant admin to another connection of its connected user."
+      summary: "Switch the connection of a provisioned integration instance"
+      tags:
+        - "integration-instance"
+      operationId: "updateIntegrationInstanceConnection"
+      parameters:
+        - name: "id"
+          description: "The id of an integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateIntegrationInstanceConnectionRequest"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
   /integration-instances/{id}/connection/credentials:
     put:
       description: "Replaces the credentials of the connection of an integration instance provisioned by a tenant admin."
@@ -2672,6 +2695,16 @@ components:
       $ref: "../../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/page.yaml"
     Tag:
       $ref: "../../../../../../libs/platform/platform-tag/platform-tag-rest/openapi/components/schemas/objects/tag.yaml"
+    UpdateIntegrationInstanceConnectionRequest:
+      description: "Contains the connection an integration instance switches to."
+      type: "object"
+      required:
+        - "connectionId"
+      properties:
+        connectionId:
+          description: "The id of a connection of the integration instance's connected user."
+          type: "integer"
+          format: "int64"
     UpdateTagsRequest:
       description: "The request object that contains the array of tags."
       type: "object"
