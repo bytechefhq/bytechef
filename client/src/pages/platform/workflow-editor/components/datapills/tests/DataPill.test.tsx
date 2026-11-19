@@ -40,6 +40,22 @@ const SAMPLE_OUTPUT = {
     },
 };
 
+const OUTPUT_FILES_PROPERTY = {
+    name: 'outputFiles',
+    properties: [
+        {name: 'report.csv', properties: [{name: 'name', type: 'STRING'}], type: 'OBJECT'},
+        {name: 'charts/summary.txt', properties: [{name: 'name', type: 'STRING'}], type: 'OBJECT'},
+    ],
+    type: 'OBJECT',
+} as unknown as PropertyAllType;
+
+const OUTPUT_FILES_SAMPLE_OUTPUT = {
+    outputFiles: {
+        'charts/summary.txt': {name: 'summary.txt'},
+        'report.csv': {name: 'q3-report.csv'},
+    },
+};
+
 const createPillTarget = (acceptsPill = true): PillTargetI & {insertPill: Mock<(mentionId: string) => void>} => ({
     acceptsPill: () => acceptsPill,
     insertPill: vi.fn<(mentionId: string) => void>(),
@@ -133,13 +149,38 @@ describe('DataPill', () => {
             expect(pillTarget.insertPill).not.toHaveBeenCalled();
         });
 
+        it('quotes an output file key and keeps its dots and slashes inside the key', async () => {
+            const pillTarget = createPillTarget();
+
+            useWorkflowNodeDetailsPanelStore.setState({pillTarget});
+
+            renderDataPill({
+                property: OUTPUT_FILES_PROPERTY,
+                sampleOutput: OUTPUT_FILES_SAMPLE_OUTPUT,
+                workflowNodeName: 'produceReport',
+            });
+
+            await userEvent.click(getPill('report.csv'));
+            await userEvent.click(getPill('charts/summary.txt'));
+
+            const summaryList = getPill('charts/summary.txt').parentElement!.querySelector('ul') as HTMLElement;
+
+            await userEvent.click(within(summaryList).getByText('name'));
+
+            expect(pillTarget.insertPill.mock.calls).toEqual([
+                ["produceReport.outputFiles['report.csv']"],
+                ["produceReport.outputFiles['charts/summary.txt']"],
+                ["produceReport.outputFiles['charts/summary.txt'].name"],
+            ]);
+        });
+
         it('names an unnamed array builder item "[index]"', async () => {
             const pillTarget = createPillTarget();
 
             useWorkflowNodeDetailsPanelStore.setState({pillTarget});
 
             renderDataPill({
-                path: 'items/[index]',
+                pathSegments: ['items', '[index]'],
                 property: {controlType: 'ARRAY_BUILDER', type: 'ARRAY'} as PropertyAllType,
                 sampleOutput: undefined,
             });
@@ -206,6 +247,18 @@ describe('DataPill', () => {
             expect(getSampleValueOf('email')).toHaveTextContent('ann@example.com');
             expect(getSampleValueOf('first-name')).toHaveTextContent('Ann');
             expect(getSampleValueOf('manager')).toHaveTextContent('null');
+        });
+
+        it('shows the sample value under an output file key that contains dots and slashes', () => {
+            renderDataPill({
+                property: OUTPUT_FILES_PROPERTY,
+                sampleOutput: OUTPUT_FILES_SAMPLE_OUTPUT,
+                workflowNodeName: 'produceReport',
+            });
+
+            const summaryList = getPill('charts/summary.txt').parentElement!.querySelector('ul') as HTMLElement;
+
+            expect(within(summaryList).getByText('summary.txt')).toBeInTheDocument();
         });
 
         it('shows the sample value of an array item', () => {

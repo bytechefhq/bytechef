@@ -71,4 +71,38 @@ describe('getDataPillsFromProperties', () => {
 
         expect(dataPills.map((dataPill) => dataPill.value)).toEqual(['textHelper_1', 'textHelper_1[index]']);
     });
+
+    it('quotes output file keys so a reference keeps their dots and slashes inside the key', () => {
+        const outputFilesProperty = {
+            name: 'outputFiles',
+            properties: [
+                {name: 'report.csv', properties: [stringProperty('name')], type: 'OBJECT'},
+                {name: 'charts/summary.txt', properties: [stringProperty('name')], type: 'OBJECT'},
+            ],
+            type: 'OBJECT',
+        } as unknown as PropertyAllType;
+
+        const dataPills = getDataPillsFromProperties(
+            [componentProperties('produceReport', [outputFilesProperty])],
+            ['produceReport']
+        );
+
+        expect(dataPills.map((dataPill) => dataPill.value)).toEqual([
+            'produceReport',
+            'produceReport.outputFiles',
+            "produceReport.outputFiles['report.csv']",
+            "produceReport.outputFiles['report.csv'].name",
+            "produceReport.outputFiles['charts/summary.txt']",
+            "produceReport.outputFiles['charts/summary.txt'].name",
+        ]);
+    });
+
+    it('quotes a top-level key that is not a plain identifier', () => {
+        const dataPills = getDataPillsFromProperties(
+            [componentProperties('component_1', [stringProperty('first-name')])],
+            ['component_1']
+        );
+
+        expect(dataPills.map((dataPill) => dataPill.value)).toEqual(['component_1', "component_1['first-name']"]);
+    });
 });

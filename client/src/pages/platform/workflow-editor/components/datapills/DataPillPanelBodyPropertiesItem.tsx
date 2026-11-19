@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
 import DataPill from '@/pages/platform/workflow-editor/components/datapills/DataPill';
-import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
+import {getDataPillSampleValue} from '@/pages/platform/workflow-editor/utils/dataPillPath';
 import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {AccordionContent, AccordionTrigger} from '@radix-ui/react-accordion';
 import {ChevronDownIcon} from 'lucide-react';
@@ -153,7 +153,7 @@ const DataPillPanelBodyPropertiesItem = ({
                                 let value;
 
                                 if (typeof sampleOutput === 'object' && property.name) {
-                                    value = getNestedObject(sampleOutput, property.name.replaceAll('/', '.'));
+                                    value = getDataPillSampleValue(sampleOutput, [property.name]);
                                 } else {
                                     value = sampleOutput;
                                 }
