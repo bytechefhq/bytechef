@@ -30,10 +30,13 @@ import com.bytechef.platform.configuration.dto.VersionWorkflowChangeCalculator;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
 import com.bytechef.platform.configuration.service.WorkflowDefinitionDiffService;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
+import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,18 +69,28 @@ public class ProjectVersionWorkflowChangeFacadeImpl implements ProjectVersionWor
     public VersionWorkflowChanges getVersionWorkflowChanges(long projectId, int projectVersion) {
         Integer baseVersion = getBaseVersion(projectId, projectVersion);
 
+        List<ProjectWorkflow> baseProjectWorkflows = getProjectWorkflows(projectId, baseVersion);
+        List<ProjectWorkflow> projectWorkflows = getProjectWorkflows(projectId, projectVersion);
+
+        Map<String, Workflow> workflowsById = getWorkflowsById(baseProjectWorkflows, projectWorkflows);
+
         return VersionWorkflowChangeCalculator.summarize(
-            baseVersion, projectVersion, getWorkflows(projectId, baseVersion), getWorkflows(projectId, projectVersion),
-            workflowDefinitionDiffService);
+            baseVersion, projectVersion, getWorkflows(baseProjectWorkflows, workflowsById),
+            getWorkflows(projectWorkflows, workflowsById), workflowDefinitionDiffService);
     }
 
     @Override
     public VersionWorkflowChange getVersionWorkflowChange(long projectId, int projectVersion, String workflowUuid) {
         Integer baseVersion = getBaseVersion(projectId, projectVersion);
 
+        List<ProjectWorkflow> baseProjectWorkflows = getProjectWorkflows(projectId, baseVersion);
+        List<ProjectWorkflow> projectWorkflows = getProjectWorkflows(projectId, projectVersion);
+
+        Map<String, Workflow> workflowsById = getWorkflowsById(baseProjectWorkflows, projectWorkflows);
+
         return VersionWorkflowChangeCalculator.fetchChange(
-            baseVersion, projectVersion, workflowUuid, getWorkflows(projectId, baseVersion),
-            getWorkflows(projectId, projectVersion), workflowDefinitionDiffService)
+            baseVersion, projectVersion, workflowUuid, getWorkflows(baseProjectWorkflows, workflowsById),
+            getWorkflows(projectWorkflows, workflowsById), workflowDefinitionDiffService)
             .orElseThrow(() -> new IllegalArgumentException(
                 "Workflow uuid=%s not found in project version v=%s".formatted(workflowUuid, projectVersion)));
     }
@@ -95,8 +108,13 @@ public class ProjectVersionWorkflowChangeFacadeImpl implements ProjectVersionWor
 
         long projectId = project.getId();
 
+        List<ProjectWorkflow> baseProjectWorkflows = getProjectWorkflows(projectId, baseVersion);
+        List<ProjectWorkflow> draftProjectWorkflows = getProjectWorkflows(projectId, draftProjectVersion);
+
+        Map<String, Workflow> workflowsById = getWorkflowsById(baseProjectWorkflows, draftProjectWorkflows);
+
         return VersionWorkflowChangeCalculator.hasChanges(
-            fetchWorkflows(projectId, baseVersion), fetchWorkflows(projectId, draftProjectVersion),
+            fetchWorkflows(baseProjectWorkflows, workflowsById), fetchWorkflows(draftProjectWorkflows, workflowsById),
             workflowDefinitionDiffService);
     }
 
@@ -127,34 +145,65 @@ public class ProjectVersionWorkflowChangeFacadeImpl implements ProjectVersionWor
         return project;
     }
 
-    private Map<String, @Nullable Workflow> fetchWorkflows(long projectId, int projectVersion) {
+    private static Map<String, @Nullable Workflow> fetchWorkflows(
+        List<ProjectWorkflow> projectWorkflows, Map<String, Workflow> workflowsById) {
+
         Map<String, @Nullable Workflow> workflows = new LinkedHashMap<>();
 
-        for (ProjectWorkflow projectWorkflow : projectWorkflowService.getProjectWorkflows(
-            projectId, projectVersion)) {
-
-            Optional<Workflow> workflowOptional = workflowService.fetchWorkflow(projectWorkflow.getWorkflowId());
-
-            workflows.put(projectWorkflow.getUuidAsString(), workflowOptional.orElse(null));
+        for (ProjectWorkflow projectWorkflow : projectWorkflows) {
+            workflows.put(projectWorkflow.getUuidAsString(), workflowsById.get(projectWorkflow.getWorkflowId()));
         }
 
         return workflows;
     }
 
-    private Map<String, Workflow> getWorkflows(long projectId, @Nullable Integer projectVersion) {
-        Map<String, Workflow> workflows = new LinkedHashMap<>();
-
+    private List<ProjectWorkflow> getProjectWorkflows(long projectId, @Nullable Integer projectVersion) {
         if (projectVersion == null) {
-            return workflows;
+            return List.of();
         }
 
-        for (ProjectWorkflow projectWorkflow : projectWorkflowService.getProjectWorkflows(
-            projectId, projectVersion)) {
+        return projectWorkflowService.getProjectWorkflows(projectId, projectVersion);
+    }
 
-            workflows.put(
-                projectWorkflow.getUuidAsString(), workflowService.getWorkflow(projectWorkflow.getWorkflowId()));
+    private Map<String, Workflow> getWorkflows(
+        List<ProjectWorkflow> projectWorkflows, Map<String, Workflow> workflowsById) {
+
+        Map<String, Workflow> workflows = new LinkedHashMap<>();
+
+        for (ProjectWorkflow projectWorkflow : projectWorkflows) {
+            String workflowId = projectWorkflow.getWorkflowId();
+
+            Workflow workflow = workflowsById.get(workflowId);
+
+            if (workflow == null) {
+                workflow = workflowService.getWorkflow(workflowId);
+            }
+
+            workflows.put(projectWorkflow.getUuidAsString(), workflow);
         }
 
         return workflows;
+    }
+
+    private Map<String, Workflow> getWorkflowsById(
+        List<ProjectWorkflow> baseProjectWorkflows, List<ProjectWorkflow> projectWorkflows) {
+
+        Set<String> workflowIds = new LinkedHashSet<>();
+
+        for (ProjectWorkflow projectWorkflow : baseProjectWorkflows) {
+            workflowIds.add(projectWorkflow.getWorkflowId());
+        }
+
+        for (ProjectWorkflow projectWorkflow : projectWorkflows) {
+            workflowIds.add(projectWorkflow.getWorkflowId());
+        }
+
+        Map<String, Workflow> workflowsById = new HashMap<>();
+
+        for (Workflow workflow : workflowService.getWorkflows(List.copyOf(workflowIds))) {
+            workflowsById.put(Validate.notNull(workflow.getId(), "id"), workflow);
+        }
+
+        return workflowsById;
     }
 }
