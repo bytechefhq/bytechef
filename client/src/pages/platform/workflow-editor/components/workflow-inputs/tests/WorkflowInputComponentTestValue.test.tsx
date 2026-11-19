@@ -1,9 +1,8 @@
+import WorkflowInputComponentTestValue from '@/pages/platform/workflow-editor/components/workflow-inputs/WorkflowInputComponentTestValue';
 import {PropertyAllType} from '@/shared/types';
 import {render, screen} from '@testing-library/react';
 import {Control, FieldValues, useForm} from 'react-hook-form';
 import {describe, expect, it, vi} from 'vitest';
-
-import WorkflowInputComponentTestValue from './WorkflowInputComponentTestValue';
 
 vi.mock('@/shared/queries/platform/workflowNodeOptions.queries', () => ({
     useGetWorkflowNodeOptionsQuery: () => ({

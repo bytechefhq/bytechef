@@ -1,7 +1,6 @@
+import {getWorkflowComponentVersions} from '@/pages/platform/workflow-editor/components/workflow-inputs/utils/getWorkflowComponentVersions';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {describe, expect, it} from 'vitest';
-
-import {getWorkflowComponentVersions} from './getWorkflowComponentVersions';
 
 describe('getWorkflowComponentVersions', () => {
     it('maps component names to versions from tasks and triggers', () => {

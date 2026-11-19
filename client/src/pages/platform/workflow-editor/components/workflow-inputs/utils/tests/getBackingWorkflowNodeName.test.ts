@@ -1,7 +1,6 @@
+import {getBackingWorkflowNodeName} from '@/pages/platform/workflow-editor/components/workflow-inputs/utils/getBackingWorkflowNodeName';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {describe, expect, it} from 'vitest';
-
-import {getBackingWorkflowNodeName} from './getBackingWorkflowNodeName';
 
 const workflow = {
     definition: JSON.stringify({

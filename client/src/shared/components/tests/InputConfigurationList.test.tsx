@@ -1,7 +1,6 @@
+import {resolveBackingWorkflowNodeName, resolveComponentInputGroup} from '@/shared/components/InputConfigurationList';
 import {ControlType, PropertyType, WorkflowInput} from '@/shared/middleware/platform/configuration';
 import {describe, expect, it} from 'vitest';
-
-import {resolveBackingWorkflowNodeName, resolveComponentInputGroup} from './InputConfigurationList';
 
 import type {ComponentConnection} from '@/shared/middleware/automation/configuration';
 import type {ComponentDefinition} from '@/shared/middleware/platform/configuration';

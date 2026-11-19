@@ -1,14 +1,13 @@
-import {WorkflowInput} from '@/shared/middleware/platform/configuration';
-import {act, renderHook} from '@testing-library/react';
-import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
-
+import useWorkflowInputs from '@/pages/platform/workflow-editor/components/workflow-inputs/hooks/useWorkflowInputs';
 import {
     clearAllWorkflowMutations,
     drainPendingSaves,
     hasPendingSaves,
     setWorkflowMutating,
-} from '../../../utils/workflowMutationGuard';
-import useWorkflowInputs from './useWorkflowInputs';
+} from '@/pages/platform/workflow-editor/utils/workflowMutationGuard';
+import {WorkflowInput} from '@/shared/middleware/platform/configuration';
+import {act, renderHook} from '@testing-library/react';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const {saveTestConfigurationInputsMock, updateWorkflowMutationMock, workflowDataState} = vi.hoisted(() => ({
     saveTestConfigurationInputsMock: vi.fn(),
@@ -32,7 +31,7 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
         selector({currentEnvironmentId: 1}),
 }));
 
-vi.mock('../../../stores/useWorkflowDataStore', () => ({
+vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowDataStore', () => ({
     default: Object.assign((selector: (state: typeof workflowDataState) => unknown) => selector(workflowDataState), {
         getState: () => workflowDataState,
     }),

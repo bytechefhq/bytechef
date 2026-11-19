@@ -1,7 +1,6 @@
+import {getComponentPropertyInputValues} from '@/pages/platform/workflow-editor/components/workflow-inputs/utils/getComponentPropertyInputValues';
 import {ComponentDefinition} from '@/shared/middleware/platform/configuration';
 import {describe, expect, it} from 'vitest';
-
-import {getComponentPropertyInputValues} from './getComponentPropertyInputValues';
 
 const componentDefinition = {
     inputs: [
