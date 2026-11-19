@@ -11,6 +11,7 @@ import com.bytechef.ee.embedded.configuration.web.rest.model.ProvisionIntegratio
 import com.bytechef.ee.embedded.configuration.web.rest.model.ProvisionableIntegrationModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionCredentialsRequestModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateIntegrationInstanceConnectionRequestModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateIntegrationInstanceWorkflowRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,7 +39,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-19T23:32:39.701444+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-20T12:20:24.938987+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 @Validated
 @Tag(name = "integration-instance", description = "the integration-instance API")
 public interface IntegrationInstanceApi {
@@ -356,6 +357,40 @@ public interface IntegrationInstanceApi {
     default ResponseEntity<Void> updateIntegrationInstanceCredentials(
         @Parameter(name = "id", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "UpdateConnectionCredentialsRequestModel", description = "", required = true) @Valid @RequestBody UpdateConnectionCredentialsRequestModel updateConnectionCredentialsRequestModel
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_UPDATE_INTEGRATION_INSTANCE_WORKFLOW = "/integration-instances/{id}/workflows/{workflowId}";
+    /**
+     * PUT /integration-instances/{id}/workflows/{workflowId} : Update the inputs of an integration instance workflow
+     * Update the inputs of an integration instance workflow.
+     *
+     * @param id The id of an integration instance. (required)
+     * @param workflowId The id of an integration instance workflow. (required)
+     * @param updateIntegrationInstanceWorkflowRequestModel  (required)
+     * @return Successful operation. (status code 204)
+     */
+    @Operation(
+        operationId = "updateIntegrationInstanceWorkflow",
+        summary = "Update the inputs of an integration instance workflow",
+        description = "Update the inputs of an integration instance workflow.",
+        tags = { "integration-instance" },
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = IntegrationInstanceApi.PATH_UPDATE_INTEGRATION_INSTANCE_WORKFLOW,
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<Void> updateIntegrationInstanceWorkflow(
+        @Parameter(name = "id", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "workflowId", description = "The id of an integration instance workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
+        @Parameter(name = "UpdateIntegrationInstanceWorkflowRequestModel", description = "", required = true) @Valid @RequestBody UpdateIntegrationInstanceWorkflowRequestModel updateIntegrationInstanceWorkflowRequestModel
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 

@@ -73,6 +73,7 @@ docs/Tag.md
 docs/UpdateConnectionCredentialsRequest.md
 docs/UpdateConnectionRequest.md
 docs/UpdateIntegrationInstanceConnectionRequest.md
+docs/UpdateIntegrationInstanceWorkflowRequest.md
 docs/UpdateTagsRequest.md
 docs/WebhookTriggerTestApi.md
 docs/Workflow.md
@@ -132,6 +133,7 @@ models/Tag.ts
 models/UpdateConnectionCredentialsRequest.ts
 models/UpdateConnectionRequest.ts
 models/UpdateIntegrationInstanceConnectionRequest.ts
+models/UpdateIntegrationInstanceWorkflowRequest.ts
 models/UpdateTagsRequest.ts
 models/Workflow.ts
 models/Workflow1.ts

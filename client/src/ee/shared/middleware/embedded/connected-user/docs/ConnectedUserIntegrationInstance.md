@@ -15,6 +15,7 @@ Name | Type
 `connectionId` | number
 `credentialStatus` | [CredentialStatus](CredentialStatus.md)
 `provisioned` | boolean
+`provisionedBy` | string
 
 ## Example
 
@@ -32,6 +33,7 @@ const example = {
   "connectionId": null,
   "credentialStatus": null,
   "provisioned": null,
+  "provisionedBy": null,
 } satisfies ConnectedUserIntegrationInstance
 
 console.log(example)
