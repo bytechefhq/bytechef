@@ -79,6 +79,7 @@ import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacad
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -665,7 +666,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             try {
                 connectedUserWorkflowReferenceFacade.getOrCreateReference(
                     connectedUser.getExternalId(), workflow.workflowUuid(), connectedUser.getEnvironment(),
-                    workflow.connections(), inputs == null || inputs.isEmpty() ? null : inputs);
+                    workflow.connections(), inputs == null || inputs.isEmpty() ? null : inputs,
+                    SecurityUtils.getCurrentUserLogin());
             } catch (MissingConnectionException missingConnectionException) {
                 if (log.isDebugEnabled()) {
                     log.debug(

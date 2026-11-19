@@ -135,6 +135,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -144,6 +145,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
@@ -1413,9 +1416,19 @@ class ConnectedUserProjectFacadeIntTest {
     @Nested
     class Provisioning {
 
+        private static final String ADMIN_LOGIN = "admin@localhost.com";
+
         @BeforeEach
         void setUpProvisioning() {
             reset(connectedUserConnectionFacade);
+
+            SecurityContextHolder.getContext()
+                .setAuthentication(new UsernamePasswordAuthenticationToken(ADMIN_LOGIN, null, List.of()));
+        }
+
+        @AfterEach
+        void tearDownProvisioning() {
+            SecurityContextHolder.clearContext();
         }
 
         private static final AtomicLong NEXT_CONNECTION_ID = new AtomicLong(1000L);
@@ -1619,6 +1632,54 @@ class ConnectedUserProjectFacadeIntTest {
         }
 
         @Test
+        void testProvisionProjectWorkflowsRecordsTheAdminAsProvisioner() {
+            givenSlackAutomationEnvironment();
+
+            long projectId = createProjectWithWorkflows("Provision Recorded", 1);
+
+            publishAndPinProject(projectId);
+
+            ConnectedUser connectedUser = createConnectedUserWithConnection();
+
+            List<ConnectedUserWorkflowTemplateDTO> templates = findPublishedProject(connectedUser, projectId)
+                .workflowTemplates();
+
+            String workflowUuid = templates.getFirst()
+                .workflowUuid();
+
+            connectedUserProjectFacade.provisionProjectWorkflows(
+                connectedUser.getId(), getConfigurationId(projectId),
+                List.of(new ProvisionConnectedUserProjectWorkflowDTO(workflowUuid, null)));
+
+            assertThat(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId()))
+                .extracting(ConnectedUserProjectWorkflow::getAutomationUuid,
+                    ConnectedUserProjectWorkflow::getProvisionedBy)
+                .containsExactly(tuple(workflowUuid, ADMIN_LOGIN));
+        }
+
+        @Test
+        void testGetOrCreateReferenceThroughThePublicPathLeavesTheProvisionerEmpty() {
+            givenSlackAutomationEnvironment();
+
+            long projectId = createProjectWithWorkflows("Public Reference", 1);
+
+            publishAndPinProject(projectId);
+
+            ConnectedUser connectedUser = createConnectedUserWithConnection();
+
+            List<ConnectedUserWorkflowTemplateDTO> templates = findPublishedProject(connectedUser, projectId)
+                .workflowTemplates();
+
+            String workflowUuid = templates.getFirst()
+                .workflowUuid();
+
+            ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+                connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+
+            assertThat(reference.getProvisionedBy()).isNull();
+        }
+
+        @Test
         void testProvisionProjectWorkflowsRejectsUnprovisionableUuidBeforeWriting() {
             givenSlackAutomationEnvironment();
 
@@ -1681,7 +1742,7 @@ class ConnectedUserProjectFacadeIntTest {
             doThrow(new IllegalStateException("Trigger registration failed"))
                 .when(connectedUserWorkflowReferenceFacade)
                 .getOrCreateReference(
-                    anyString(), eq(failingWorkflowUuid), any(Environment.class), anyMap(), any());
+                    anyString(), eq(failingWorkflowUuid), any(Environment.class), anyMap(), any(), any());
 
             long connectedUserId = connectedUser.getId();
             long configurationId = getConfigurationId(projectId);
