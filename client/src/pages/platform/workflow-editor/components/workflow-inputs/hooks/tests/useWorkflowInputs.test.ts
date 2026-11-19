@@ -212,10 +212,47 @@ describe('useWorkflowInputs', () => {
             label: 'Slack Channel',
             name: 'channel',
             required: true,
-            type: 'string',
         };
 
         setDefinition([definitionInput as WorkflowInput]);
+
+        const {result} = renderInputs();
+
+        act(() => {
+            result.current.openEditDialog(0);
+        });
+
+        const componentReference = {componentName: 'slack', componentVersion: 1, groupName: 'channel'};
+
+        act(() => {
+            result.current.form.setValue('componentReference', componentReference);
+        });
+
+        act(() => {
+            result.current.saveWorkflowInput({
+                componentReference,
+                label: 'Channel',
+                name: 'channel',
+                required: true,
+                testValue: 'general',
+                type: 'component',
+            });
+        });
+
+        expect(sentDefinition().inputs).toEqual([{...definitionInput, label: 'Channel'}]);
+    });
+
+    it('drops the component reference when a component input is saved as another type', () => {
+        setDefinition([
+            {
+                componentName: 'slack',
+                componentVersion: 1,
+                groupName: 'channel',
+                label: 'Channel',
+                name: 'channel',
+                required: false,
+            } as WorkflowInput,
+        ]);
 
         const {result} = renderInputs();
 
@@ -228,13 +265,12 @@ describe('useWorkflowInputs', () => {
                 componentReference: {componentName: 'slack', componentVersion: 1, groupName: 'channel'},
                 label: 'Channel',
                 name: 'channel',
-                required: true,
-                testValue: 'general',
+                required: false,
                 type: 'string',
             });
         });
 
-        expect(sentDefinition().inputs).toEqual([{...definitionInput, label: 'Channel'}]);
+        expect(sentDefinition().inputs).toEqual([{label: 'Channel', name: 'channel', required: false, type: 'string'}]);
     });
 
     it('stores the test value and refocuses the name field once the save lands', () => {
