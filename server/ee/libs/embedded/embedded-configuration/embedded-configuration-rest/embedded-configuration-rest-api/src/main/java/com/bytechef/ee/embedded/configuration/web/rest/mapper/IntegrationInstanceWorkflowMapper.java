@@ -28,6 +28,7 @@ public class IntegrationInstanceWorkflowMapper {
 
         @Override
         @Mapping(target = "lastExecutionDate", ignore = true)
+        @Mapping(target = "staticWebhookUrl", ignore = true)
         @Mapping(target = "workflowId", ignore = true)
         IntegrationInstanceWorkflowModel convert(IntegrationInstanceWorkflow integrationInstanceWorkflow);
     }
