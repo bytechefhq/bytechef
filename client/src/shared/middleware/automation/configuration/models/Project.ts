@@ -102,7 +102,7 @@ export interface Project {
      */
     tags?: Array<Tag>;
     /**
-     * If the project's draft version differs from its last published version. Only set by the workspace project list.
+     * If the project's draft version differs from its last published version. Computed only by the project list endpoints; false in every other response.
      */
     readonly unpublishedChanges?: boolean;
     /**
