@@ -41,37 +41,23 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
                 </CollapsibleTrigger>
 
                 {mcpComponent.integrationId ? (
-                    integrationName ? (
+                    !integrationName &&
+                    integrationUnavailable && (
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Badge
                                     className="relative z-10"
-                                    label={integrationName}
-                                    styleType="secondary-filled"
+                                    label="Integration unavailable"
+                                    styleType="warning-filled"
                                     weight="semibold"
                                 />
                             </TooltipTrigger>
 
-                            <TooltipContent>Integration whose connection these tools use</TooltipContent>
+                            <TooltipContent>
+                                The integration of this component is no longer published or configured. Edit this
+                                component to choose another integration.
+                            </TooltipContent>
                         </Tooltip>
-                    ) : (
-                        integrationUnavailable && (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Badge
-                                        className="relative z-10"
-                                        label="Integration unavailable"
-                                        styleType="warning-filled"
-                                        weight="semibold"
-                                    />
-                                </TooltipTrigger>
-
-                                <TooltipContent>
-                                    The integration of this component is no longer published or configured. Edit this
-                                    component to choose another integration.
-                                </TooltipContent>
-                            </Tooltip>
-                        )
                     )
                 ) : (
                     <Tooltip>

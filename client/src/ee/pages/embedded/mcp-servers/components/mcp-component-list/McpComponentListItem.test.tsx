@@ -66,13 +66,13 @@ describe('McpComponentListItem', () => {
         });
     });
 
-    it('shows the integration a bound component belongs to', () => {
+    it('shows no integration badge for a bound component', () => {
         renderItem(boundMcpComponent);
 
         expect(hoisted.useMcpComponentListItem).toHaveBeenCalledWith('googleMail', 1, '6');
-        expect(screen.getByText('Gmail Code')).toBeInTheDocument();
-        expect(screen.queryByText('No integration')).not.toBeInTheDocument();
         expect(screen.getByText('Gmail')).toBeInTheDocument();
+        expect(screen.queryByText('Gmail Code')).not.toBeInTheDocument();
+        expect(screen.queryByText('No integration')).not.toBeInTheDocument();
         expect(screen.getByText('v1')).toBeInTheDocument();
     });
 
