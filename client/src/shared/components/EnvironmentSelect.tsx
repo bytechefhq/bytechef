@@ -12,7 +12,7 @@ import {ENVIRONMENT_CONFIGS, type EnvironmentConfigI} from '@/shared/constants/e
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {CheckIcon, ChevronDownIcon} from 'lucide-react';
+import {ChevronDownIcon, CircleCheckIcon} from 'lucide-react';
 import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -136,24 +136,29 @@ const EnvironmentSelect = ({onChange, variant = 'default'}: EnvironmentSelectPro
 
                         return (
                             <DropdownMenuRadioItem
-                                className="cursor-pointer items-start px-3 py-3 [&>span:first-child]:hidden"
+                                className="cursor-pointer items-center gap-3 px-3 py-3 [&>span:first-child]:hidden"
                                 key={id}
                                 value={id}
                             >
-                                <div className="flex flex-1 flex-col gap-1">
-                                    <div className="flex items-center justify-between">
-                                        <Badge
-                                            icon={<Icon className="size-3" />}
-                                            label={config.label}
-                                            styleType={config.styleType}
-                                            weight="semibold"
-                                        />
-
-                                        {isSelected && <CheckIcon className="size-4 text-muted-foreground" />}
-                                    </div>
+                                <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
+                                    <Badge
+                                        icon={<Icon className="size-3" />}
+                                        label={config.label}
+                                        styleType={config.styleType}
+                                        weight="semibold"
+                                    />
 
                                     <p className="text-xs font-normal text-muted-foreground">{config.description}</p>
                                 </div>
+
+                                {isSelected ? (
+                                    <CircleCheckIcon
+                                        aria-label="Current environment"
+                                        className="size-4 shrink-0 text-content-brand-primary"
+                                    />
+                                ) : (
+                                    <span aria-hidden="true" className="size-4 shrink-0" />
+                                )}
                             </DropdownMenuRadioItem>
                         );
                     })}
