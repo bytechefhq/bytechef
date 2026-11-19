@@ -48,6 +48,9 @@ public interface JdbcWorkflowRepository
     List<Workflow> findAll();
 
     @Override
+    List<Workflow> findAllById(Iterable<String> ids);
+
+    @Override
     default SourceType getSourceType() {
         return SourceType.JDBC;
     }
