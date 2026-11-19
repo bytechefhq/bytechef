@@ -77,7 +77,12 @@ public class TaskRunnerPropertyFactory {
         allProperties.add(
             string(TYPE)
                 .label("Type")
-                .description("Where this task runs.")
+                .description(
+                    "Where this task runs. GraalVM runs JavaScript or Python inside the server and is " +
+                        "the only runner that gives the code a context, with component and log. Process " +
+                        "starts the interpreter as a program on the server's machine. Docker, Kubernetes " +
+                        "and AWS Batch run the code in a container. Bash scripts and commands need " +
+                        "Process or a container runner.")
                 .options(options)
                 .defaultValue(defaultTaskRunnerType(taskRunners))
                 .required(!taskRunners.isEmpty()));
@@ -86,7 +91,9 @@ public class TaskRunnerPropertyFactory {
 
         return object(TASK_RUNNER)
             .label("Task Runner")
-            .description("Selects the environment this task executes in.")
+            .description(
+                "Chooses where and how this task's code runs. Each runner type shows its own " +
+                    "settings, and only the runners an operator has enabled are offered.")
             .properties(allProperties)
             .required(false)
             .expressionEnabled(false);
@@ -99,7 +106,13 @@ public class TaskRunnerPropertyFactory {
             properties, taskRunnerRegistry, TaskRunnerCapability.ENVIRONMENT,
             object(ENV)
                 .label("Environment")
-                .description("Environment variables the execution sees. The host's own environment is not inherited.")
+                .description(
+                    "Environment variables the script or commands see, as name and value pairs. The " +
+                        "host's own environment is not passed on unless the Process runner's Inherit " +
+                        "Environment option is on, so add every variable the code needs here. ByteChef " +
+                        "also sets BYTECHEF_WORKING_DIR (the folder the code runs in), " +
+                        "BYTECHEF_OUTPUT_DIR, BYTECHEF_INPUT_FILE and, when the task has connections, " +
+                        "BYTECHEF_CONNECTIONS_FILE.")
                 .additionalProperties(string())
                 .required(false));
 
@@ -108,8 +121,11 @@ public class TaskRunnerPropertyFactory {
             object(INPUT_FILES)
                 .label("Input Files")
                 .description(
-                    "Files written into the working directory before the execution, keyed by file name. A value may " +
-                        "be inline text or a file entry.")
+                    "Files placed in the working folder (BYTECHEF_WORKING_DIR) before the code runs, " +
+                        "keyed by file name. A name may include folders, such as data/orders.csv. A value " +
+                        "is either inline text, written as is, or a file from an earlier step, such as " +
+                        "another task's output file, whose content is copied in. The code reads them by " +
+                        "name, relative to the working folder.")
                 .additionalProperties(string(), fileEntry())
                 .required(false));
 
@@ -117,7 +133,14 @@ public class TaskRunnerPropertyFactory {
             properties, taskRunnerRegistry, TaskRunnerCapability.OUTPUT_FILES,
             array(OUTPUT_FILES)
                 .label("Output Files")
-                .description("Glob patterns matched against the output directory after the execution.")
+                .description(
+                    "Glob patterns for the files to keep from the output folder (BYTECHEF_OUTPUT_DIR) " +
+                        "after the code finishes, such as *.csv or charts/summary.png. Each matching " +
+                        "file is stored and returned in the task's outputFiles, keyed by its path " +
+                        "relative to the output folder, so a later step can use it, for example " +
+                        "task_1.outputFiles['report.csv']. Without patterns no file is kept and " +
+                        "outputFiles is empty. Files that match no pattern are discarded, and output.json " +
+                        "is never kept as a file because it becomes the task's vars.")
                 .items(string())
                 .required(false));
 
@@ -125,7 +148,11 @@ public class TaskRunnerPropertyFactory {
             properties, taskRunnerRegistry,
             integer(TIMEOUT)
                 .label("Timeout (seconds)")
-                .description("How long the execution may run before it is killed.")
+                .description(
+                    "How many seconds the code may run before it is stopped and the task fails. When " +
+                        "empty, Process and GraalVM's Trusted mode stop it after 5 minutes, and container " +
+                        "runners use Wait Until Completion. For container runners the operator's " +
+                        "max-wait caps it.")
                 .required(false));
 
         return properties;

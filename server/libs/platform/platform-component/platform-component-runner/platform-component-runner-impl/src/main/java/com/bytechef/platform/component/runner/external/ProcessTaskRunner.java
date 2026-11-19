@@ -92,15 +92,20 @@ public class ProcessTaskRunner implements TaskRunner {
             string(INTERPRETER)
                 .label("Interpreter")
                 .description(
-                    "The executable the source is handed to. Defaults to the interpreter for the action's language.")
+                    "The program the script or commands file is handed to, such as bash or " +
+                        "/usr/local/bin/python3. It must be installed on the server's machine. Defaults " +
+                        "to bash for Bash, node for JavaScript, python3 for Python and /bin/sh for shell " +
+                        "commands, looked up on the server's PATH.")
                 .required(false));
 
         properties.add(
             bool(INHERIT_ENVIRONMENT)
                 .label("Inherit Environment")
                 .description(
-                    "Passes the server process's own environment to the execution. Off by default, because that " +
-                        "environment holds the server's credentials.")
+                    "Passes the server process's own environment variables to the code as well as the " +
+                        "Environment property. Off by default, because that environment holds the " +
+                        "server's credentials, such as database passwords and API keys. Turn it on only " +
+                        "for code you trust with them.")
                 .defaultValue(false)
                 .required(false));
 
