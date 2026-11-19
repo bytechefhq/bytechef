@@ -285,13 +285,44 @@ function parseSegmentWithBrackets(segment: string): {bracketNotation: string; pr
     return null;
 }
 
+function splitPathOutsideQuotedKeys(path: string): string[] {
+    const segments: string[] = [];
+
+    let currentSegment = '';
+    let insideQuotedKey = false;
+
+    for (const character of path) {
+        if (character === "'") {
+            insideQuotedKey = !insideQuotedKey;
+        }
+
+        if (character === '.' && !insideQuotedKey) {
+            if (currentSegment) {
+                segments.push(currentSegment);
+            }
+
+            currentSegment = '';
+
+            continue;
+        }
+
+        currentSegment += character;
+    }
+
+    if (currentSegment) {
+        segments.push(currentSegment);
+    }
+
+    return segments;
+}
+
 // Transform: "user.first-name" → "user['first-name']"
 export function transformPathForObjectAccess(path: string): string {
     if (!path || !path.includes('.')) {
         return path;
     }
 
-    const segments = path.split('.').filter(Boolean);
+    const segments = splitPathOutsideQuotedKeys(path);
 
     if (segments.length === 0) {
         return path;

@@ -1,5 +1,6 @@
 import {ComponentPropertiesType, DataPillType, PropertyAllType} from '@/shared/types';
 
+import {appendDataPillPathSegment} from './dataPillPath';
 import getSubProperties from './getSubProperties';
 
 export default function getDataPillsFromProperties(
@@ -41,11 +42,7 @@ export default function getDataPillsFromProperties(
 
             const subProperties = properties?.length ? properties : items;
 
-            let value = `${nodeName}.${name ?? '[index]'}`;
-
-            if (value.includes('.[index]')) {
-                value = value.replace('.[index]', '[index]');
-            }
+            const value = appendDataPillPathSegment(nodeName, name ?? '[index]');
 
             if (subProperties?.length) {
                 const subResults = getSubProperties(componentDefinition.icon!, nodeName, subProperties, value);
