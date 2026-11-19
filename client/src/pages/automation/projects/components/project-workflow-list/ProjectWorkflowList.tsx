@@ -7,12 +7,12 @@ import {
 } from '@/components/DropdownMenu/DropdownMenu';
 import EmptyList from '@/components/EmptyList';
 import {ButtonGroup} from '@/components/ui/button-group';
-import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useConvertN8nToWorkflow} from '@/pages/automation/project/hooks/useConverterN8nToWorkflow';
 import handleImportN8nWorkflow from '@/pages/automation/project/utils/handleImportN8nWorkflow';
 import handleImportWorkflow from '@/pages/automation/project/utils/handleImportWorkflow';
 import ProjectWorkflowListItem from '@/pages/automation/projects/components/project-workflow-list/ProjectWorkflowListItem';
+import WorkflowListSkeleton from '@/shared/components/WorkflowListSkeleton';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import useButtonGroupDropdownAlign from '@/shared/hooks/useButtonGroupDropdownAlign';
@@ -96,25 +96,11 @@ const ProjectWorkflowList = ({
     });
 
     return !componentDefinitions || !taskDispatcherDefinitions || isProjectWorkflowsLoading ? (
-        <div className="space-y-3 p-3">
-            <Skeleton className="h-5 w-40" />
-
-            {[1, 2].map((value) => (
-                <div className="flex items-center space-x-4" key={value}>
-                    <Skeleton className="h-4 w-80" />
-
-                    <div className="flex w-60 items-center space-x-1">
-                        <Skeleton className="h-6 w-7 rounded-full" />
-
-                        <Skeleton className="size-7 rounded-full" />
-
-                        <Skeleton className="size-7 rounded-full" />
-                    </div>
-
-                    <Skeleton className="h-4 flex-1" />
-                </div>
-            ))}
-        </div>
+        <WorkflowListSkeleton
+            label={`Loading workflows of ${project.name}`}
+            modifiedDateUnderName
+            workflowCount={project.projectWorkflowIds?.length}
+        />
     ) : (
         <div>
             {workflows && workflows.length > 0 ? (

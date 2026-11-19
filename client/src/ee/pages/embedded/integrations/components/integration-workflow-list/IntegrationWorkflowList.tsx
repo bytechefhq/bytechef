@@ -7,12 +7,12 @@ import {
 } from '@/components/DropdownMenu/DropdownMenu';
 import EmptyList from '@/components/EmptyList';
 import {ButtonGroup} from '@/components/ui/button-group';
-import {Skeleton} from '@/components/ui/skeleton';
 import IntegrationWorkflowListItem from '@/ee/pages/embedded/integrations/components/integration-workflow-list/IntegrationWorkflowListItem';
 import {Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {useCreateIntegrationWorkflowMutation} from '@/ee/shared/mutations/embedded/workflows.mutations';
 import {useGetIntegrationWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
+import WorkflowListSkeleton from '@/shared/components/WorkflowListSkeleton';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import useButtonGroupDropdownAlign from '@/shared/hooks/useButtonGroupDropdownAlign';
@@ -92,25 +92,10 @@ const IntegrationWorkflowList = ({
     };
 
     return !componentDefinitions || !taskDispatcherDefinitions || isIntegrationWorkflowsLoading ? (
-        <div className="space-y-3 p-3">
-            <Skeleton className="h-5 w-40" />
-
-            {[1, 2].map((value) => (
-                <div className="flex items-center space-x-4" key={value}>
-                    <Skeleton className="h-4 w-80" />
-
-                    <div className="flex w-60 items-center space-x-1">
-                        <Skeleton className="h-6 w-7 rounded-full" />
-
-                        <Skeleton className="size-7 rounded-full" />
-
-                        <Skeleton className="size-7 rounded-full" />
-                    </div>
-
-                    <Skeleton className="h-4 flex-1" />
-                </div>
-            ))}
-        </div>
+        <WorkflowListSkeleton
+            label={`Loading workflows of ${integration.name}`}
+            workflowCount={integration.integrationWorkflowIds?.length}
+        />
     ) : (
         <div>
             {workflows && workflows.length > 0 ? (
