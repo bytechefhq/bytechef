@@ -35,6 +35,7 @@ query connectedUserProjects($connectedUserId: ID, $environmentId: ID) {
             configurationName
             configurationProjectVersion
             configurationEnabled
+            enabled
         }
         environmentId
         lastExecutionDate

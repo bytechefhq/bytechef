@@ -42,7 +42,12 @@ const ConnectedUserProjectWorkflowListItem = ({
     projectName,
     workflowTemplate,
 }: {
-    configuration?: {configurationEnabled?: boolean; configurationId: string; projectId: string};
+    configuration?: {
+        configurationEnabled?: boolean;
+        configurationId: string;
+        enabled?: boolean;
+        projectId: string;
+    };
     connectedUserProjectWorkflow: ConnectedUserProjectWorkflowType;
     projectName?: string;
     workflowTemplate?: ConnectedUserWorkflowTemplateType;
@@ -125,13 +130,19 @@ const ConnectedUserProjectWorkflowListItem = ({
 
     const enableTooltip = useMemo(() => {
         if (turnedOffByAdministrator) {
-            return configuration?.configurationEnabled === false
-                ? 'The configuration is disabled. This workflow runs again when the configuration is enabled.'
-                : 'This workflow is disabled in the configuration. It runs again when it is enabled there.';
+            if (configuration?.configurationEnabled === false) {
+                return 'The configuration is disabled. This workflow runs again when the configuration is enabled.';
+            }
+
+            if (configuration?.enabled === false) {
+                return 'The configuration is turned off for this user. This workflow runs again when it is turned on.';
+            }
+
+            return 'This workflow is disabled in the configuration. It runs again when it is enabled there.';
         }
 
         return enableDisabled ? 'Publish the workflow before enabling it' : undefined;
-    }, [configuration?.configurationEnabled, enableDisabled, turnedOffByAdministrator]);
+    }, [configuration?.configurationEnabled, configuration?.enabled, enableDisabled, turnedOffByAdministrator]);
 
     const versionLabel = useMemo(() => {
         if (provisioned) {

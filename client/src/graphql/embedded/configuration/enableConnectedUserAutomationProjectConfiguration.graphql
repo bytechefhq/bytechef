@@ -1,0 +1,7 @@
+mutation enableConnectedUserAutomationProjectConfiguration($connectedUserId: ID!, $projectId: ID!, $enable: Boolean!) {
+    enableConnectedUserAutomationProjectConfiguration(
+        connectedUserId: $connectedUserId
+        projectId: $projectId
+        enable: $enable
+    )
+}
