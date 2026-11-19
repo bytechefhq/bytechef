@@ -6,7 +6,9 @@ const getWorkflowComponentNames = (workflow: Workflow): string[] => {
         ...(workflow.workflowTriggerComponentNames ?? []),
     ]);
 
-    return Array.from(componentNames).sort();
+    return Array.from(componentNames).sort((firstComponentName, secondComponentName) =>
+        firstComponentName.localeCompare(secondComponentName)
+    );
 };
 
 export default getWorkflowComponentNames;

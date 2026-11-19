@@ -15,4 +15,12 @@ describe('getWorkflowComponentNames', () => {
     it('returns an empty array when no components are present', () => {
         expect(getWorkflowComponentNames({} as Workflow)).toEqual([]);
     });
+
+    it('sorts names alphabetically regardless of case', () => {
+        const workflow = {
+            workflowTaskComponentNames: ['Zendesk', 'aiAgent'],
+        } as Workflow;
+
+        expect(getWorkflowComponentNames(workflow)).toEqual(['aiAgent', 'Zendesk']);
+    });
 });
