@@ -282,6 +282,32 @@ public class AutomationProjectConfigurationFacadeImpl
     }
 
     @Override
+    @Audited(
+        event = AutomationProjectAuditEvents.CONNECTED_USER_PROJECT_CONFIGURATION_ENABLED_UPDATED,
+        data = {
+            @AuditData(key = "connectedUserId", value = "#connectedUserId"),
+            @AuditData(key = "projectId", value = "#projectId"),
+            @AuditData(key = "enabled", value = "#enable")
+        })
+    public void enableConnectedUserConfiguration(long connectedUserId, long projectId, boolean enable) {
+        lockConnectedUserProjects(connectedUserId);
+
+        connectedUserProjectConfigurationService.updateEnabled(connectedUserId, projectId, enable);
+
+        Optional<ConnectedUserReferenceDeployment> referenceDeploymentOptional =
+            connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(connectedUserId, projectId);
+
+        if (referenceDeploymentOptional.isEmpty()) {
+            return;
+        }
+
+        ConnectedUserReferenceDeployment referenceDeployment = referenceDeploymentOptional.get();
+
+        connectedUserReferenceRolloutManager.applyDeploymentConfigurationState(
+            referenceDeployment.getProjectDeploymentId(), Map.of());
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public AutomationProjectConfigurationDTO getConfiguration(long id) {
         AutomationProjectConfiguration configuration =

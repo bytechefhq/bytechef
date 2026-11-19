@@ -35,6 +35,8 @@ public interface AutomationProjectConfigurationFacade {
 
     void enableConfigurationWorkflow(long id, String workflowUuid, boolean enable);
 
+    void enableConnectedUserConfiguration(long connectedUserId, long projectId, boolean enable);
+
     AutomationProjectConfigurationDTO getConfiguration(long id);
 
     List<AutomationProjectConfigurationConnectedUserDTO> getConfigurationConnectedUsers(long id);

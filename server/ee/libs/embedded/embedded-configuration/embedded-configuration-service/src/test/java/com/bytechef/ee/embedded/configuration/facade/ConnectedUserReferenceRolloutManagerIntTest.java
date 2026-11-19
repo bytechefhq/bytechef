@@ -2041,6 +2041,48 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
+    void testEnableConnectedUserConfigurationTurnsOnlyThatUsersRowsOffAndBackOn() {
+        long automationProjectId = createAutomationProject("Per User Configuration Toggle");
+
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationProjectFacade.publishProject(automationProjectId);
+
+        AutomationProjectConfiguration configuration = automationProjectConfigurationService
+            .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Toggle", null, 1, true, true);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUser connectedUser = assignNewConnectedUser(automationProjectId, configuration);
+        ConnectedUser otherConnectedUser = assignNewConnectedUser(automationProjectId, configuration);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+        ConnectedUserProjectWorkflow otherReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            otherConnectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isTrue();
+
+        automationProjectConfigurationFacade.enableConnectedUserConfiguration(
+            connectedUser.getId(), automationProjectId, false);
+
+        assertThat(connectedUserProjectConfigurationService.fetchAssignment(connectedUser.getId(), automationProjectId))
+            .get()
+            .extracting(ConnectedUserProjectConfiguration::isEnabled)
+            .isEqualTo(false);
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isFalse();
+        assertThat(fetchDeploymentRow(otherReference).isEnabled()).isTrue();
+        assertThat(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId()))
+            .extracting(ConnectedUserProjectWorkflow::isEnabled)
+            .containsExactly(true);
+
+        automationProjectConfigurationFacade.enableConnectedUserConfiguration(
+            connectedUser.getId(), automationProjectId, true);
+
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isTrue();
+    }
+
+    @Test
     void testMoveConnectedUserRemapsRows() {
         long automationProjectId = createAutomationProject("Move Remaps Mcp Rows");
 

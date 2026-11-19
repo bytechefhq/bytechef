@@ -117,6 +117,7 @@ extend type Mutation {
     deleteAutomationProjectConfiguration(id: ID!): Boolean!
     enableAutomationProjectConfiguration(id: ID!, enable: Boolean!): Boolean!
     enableAutomationProjectConfigurationWorkflow(id: ID!, workflowUuid: ID!, enable: Boolean!): Boolean!
+    enableConnectedUserAutomationProjectConfiguration(connectedUserId: ID!, projectId: ID!, enable: Boolean!): Boolean!
     moveAutomationProjectConfigurationConnectedUsers(sourceId: ID!, targetId: ID!, connectedUserIds: [ID!]!): ConfigurationMoveResult!
     upgradeAutomationProjectConfigurationConnectedUsers(targetId: ID!, connectedUserIds: [ID!]!): ConfigurationMoveResult!
     updateAutomationProjectConfigurationWorkflow(id: ID!, workflowUuid: ID!, providedConnections: Map, providedInputs: Map): Boolean!
