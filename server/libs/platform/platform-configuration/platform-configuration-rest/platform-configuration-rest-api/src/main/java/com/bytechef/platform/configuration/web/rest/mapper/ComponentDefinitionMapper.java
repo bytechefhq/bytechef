@@ -18,6 +18,7 @@ package com.bytechef.platform.configuration.web.rest.mapper;
 
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.domain.PropertyGroup;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionModel;
@@ -65,6 +66,10 @@ public class ComponentDefinitionMapper {
             @MappingTarget ComponentDefinitionBasicModel componentDefinitionBasicModel) {
 
             componentDefinitionBasicModel.setIcon("/icons/%s.svg".formatted(componentDefinition.getName()));
+
+            List<PropertyGroup> inputs = componentDefinition.getInputs();
+
+            componentDefinitionBasicModel.setInputsCount(inputs.size());
         }
     }
 }

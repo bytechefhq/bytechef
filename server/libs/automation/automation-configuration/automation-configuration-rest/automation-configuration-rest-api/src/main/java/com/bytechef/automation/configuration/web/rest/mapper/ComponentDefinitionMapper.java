@@ -18,7 +18,9 @@ package com.bytechef.automation.configuration.web.rest.mapper;
 
 import com.bytechef.automation.configuration.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.domain.PropertyGroup;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
+import java.util.List;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -41,6 +43,10 @@ public class ComponentDefinitionMapper {
             @MappingTarget ComponentDefinitionBasicModel componentDefinitionBasicModel) {
 
             componentDefinitionBasicModel.setIcon("/icons/%s.svg".formatted(componentDefinition.getName()));
+
+            List<PropertyGroup> inputs = componentDefinition.getInputs();
+
+            componentDefinitionBasicModel.setInputsCount(inputs.size());
         }
     }
 }
