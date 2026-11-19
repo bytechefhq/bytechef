@@ -24,11 +24,7 @@ const McpAutomationProjectConfigurationListItem = ({
 
     return (
         <>
-            <Collapsible
-                className="group rounded-md border border-border/50"
-                onOpenChange={setExpanded}
-                open={expanded}
-            >
+            <Collapsible className="group" onOpenChange={setExpanded} open={expanded}>
                 <div className="relative flex items-center gap-2.5 rounded-md py-2.5 pl-3 hover:bg-surface-neutral-primary-hover">
                     <ListItemExpandButton
                         className="mr-0 after:absolute after:inset-0"
@@ -63,7 +59,7 @@ const McpAutomationProjectConfigurationListItem = ({
                 </div>
 
                 <CollapsibleContent>
-                    <div className="flex flex-col gap-1 border-t border-border/50 px-3 py-2 pl-10">
+                    <div className="divide-y divide-stroke-neutral-primary px-3 py-2 pl-10">
                         {mcpAutomationProjectConfiguration.workflows.map((workflow) => (
                             <McpAutomationProjectConfigurationWorkflowListItem
                                 environmentId={mcpServer?.environmentId}

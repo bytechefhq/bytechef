@@ -103,11 +103,7 @@ const A2aProjectListItem = ({a2aProject, a2aServer}: A2aProjectListItemProps) =>
 
     return (
         <>
-            <Collapsible
-                className="group rounded-md border border-border/50"
-                onOpenChange={setExpanded}
-                open={expanded}
-            >
+            <Collapsible className="group" onOpenChange={setExpanded} open={expanded}>
                 <div className="relative flex items-center gap-2.5 rounded-md py-2.5 pl-3 hover:bg-surface-neutral-primary-hover">
                     <ListItemExpandButton
                         className="mr-0 after:absolute after:inset-0"
@@ -193,7 +189,7 @@ const A2aProjectListItem = ({a2aProject, a2aServer}: A2aProjectListItemProps) =>
                 </div>
 
                 <CollapsibleContent>
-                    <div className="border-t border-border/50 px-3 py-2 pl-10">
+                    <div className="px-3 py-2 pl-10">
                         <A2aProjectWorkflowList a2aProject={a2aProject} projectName={projectName} />
                     </div>
                 </CollapsibleContent>

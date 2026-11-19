@@ -20,7 +20,7 @@ const McpProjectList = ({mcpServer}: McpProjectListProps) => {
     }
 
     return (
-        <div className="flex flex-col gap-1.5">
+        <div className="divide-y divide-stroke-neutral-primary">
             {mcpProjects.map((mcpProject) => (
                 <McpProjectListItem key={mcpProject.id} mcpProject={mcpProject} />
             ))}

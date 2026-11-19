@@ -18,6 +18,7 @@ type AutomationProjectConfigurationType =
 type AutomationProjectType = AutomationProjectsQuery['automationProjects'][number];
 
 interface AutomationProjectConfigurationListProps {
+    divided?: boolean;
     environmentId: number;
     onCreate: () => void;
     onEdit: (configuration: AutomationProjectConfigurationType) => void;
@@ -29,6 +30,7 @@ interface AutomationProjectConfigurationListProps {
 }
 
 const AutomationProjectConfigurationList = ({
+    divided = false,
     environmentId,
     onCreate,
     onEdit,
@@ -108,11 +110,12 @@ const AutomationProjectConfigurationList = ({
     }
 
     return (
-        <div className="flex flex-col gap-2">
+        <div className={divided ? 'divide-y divide-stroke-neutral-primary' : 'flex flex-col gap-2'}>
             {configurations.map((configuration) => (
                 <AutomationProjectConfigurationListItem
                     configuration={configuration}
                     configurations={configurations}
+                    divided={divided}
                     key={configuration.id}
                     onEdit={onEdit}
                     onUpdateVersion={onUpdateVersion}

@@ -46,7 +46,7 @@ const McpComponentToolList = ({
     }, [componentDefinition?.clusterElements]);
 
     return tools.length > 0 ? (
-        <div className="flex flex-col gap-1">
+        <div className="divide-y divide-stroke-neutral-primary">
             {tools.map((tool) => (
                 <McpComponentToolListItem
                     componentName={componentName}

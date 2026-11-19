@@ -37,6 +37,7 @@ type AutomationProjectType = AutomationProjectsQuery['automationProjects'][numbe
 interface AutomationProjectConfigurationListItemProps {
     configuration: AutomationProjectConfigurationType;
     configurations?: AutomationProjectConfigurationType[];
+    divided?: boolean;
     onEdit: (configuration: AutomationProjectConfigurationType) => void;
     onUpdateVersion: (configuration: AutomationProjectConfigurationType) => void;
     project: AutomationProjectType;
@@ -49,6 +50,7 @@ const formatCount = (count: number, noun: string): string => `${count} ${count =
 const AutomationProjectConfigurationListItem = ({
     configuration,
     configurations = [],
+    divided = false,
     onEdit,
     onUpdateVersion,
     project,
@@ -129,7 +131,7 @@ const AutomationProjectConfigurationListItem = ({
     }, []);
 
     return (
-        <Collapsible className="rounded border border-border/50" defaultOpen>
+        <Collapsible className={divided ? undefined : 'rounded border border-border/50'} defaultOpen>
             <div
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={handleConfigurationListItemClick}

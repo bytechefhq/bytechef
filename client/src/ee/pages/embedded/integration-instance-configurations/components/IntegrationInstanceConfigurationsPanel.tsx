@@ -138,6 +138,7 @@ const IntegrationInstanceConfigurationsPanel = ({
                 >
                     <IntegrationInstanceConfigurationList
                         componentDefinitions={componentDefinitions}
+                        divided
                         expandAll
                         integration={integration}
                         integrationInstanceConfigurations={sortedIntegrationInstanceConfigurations}

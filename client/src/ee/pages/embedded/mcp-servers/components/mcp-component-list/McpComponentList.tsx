@@ -28,7 +28,7 @@ const McpComponentList = ({mcpServer}: {mcpServer: McpServer}) => {
     }
 
     return (
-        <div className="flex flex-col gap-1.5">
+        <div className="divide-y divide-stroke-neutral-primary">
             {sortedComponents.map((mcpComponent) => (
                 <McpComponentListItem key={mcpComponent.id} mcpComponent={mcpComponent} mcpServer={mcpServer} />
             ))}

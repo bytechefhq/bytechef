@@ -182,6 +182,7 @@ const AutomationProjectList = ({
                             activeTab={activeTabs[project.id] || 'workflows'}
                             configurationsContent={
                                 <AutomationProjectConfigurationList
+                                    divided
                                     environmentId={DEVELOPMENT_ENVIRONMENT}
                                     onCreate={() => setConfigurationDialog({project})}
                                     onEdit={(configuration) => setConfigurationDialog({configuration, project})}

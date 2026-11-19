@@ -23,7 +23,7 @@ const A2aProjectList = ({a2aServer}: A2aProjectListProps) => {
     }
 
     return (
-        <div className="flex flex-col gap-1.5">
+        <div className="divide-y divide-stroke-neutral-primary">
             {a2aProjects.map((a2aProject) => (
                 <A2aProjectListItem a2aProject={a2aProject} a2aServer={a2aServer} key={a2aProject.id} />
             ))}
