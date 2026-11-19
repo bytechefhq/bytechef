@@ -1,5 +1,4 @@
 import AlertDialog from '@/components/AlertDialog';
-import Badge from '@/components/Badge/Badge';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
@@ -8,6 +7,8 @@ import ConnectedUserCredentialStatus from '@/ee/pages/embedded/connected-users/c
 import ConnectedUserOriginBadge from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserOriginBadge';
 import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
 import ConnectedUserSheetPanelIntegrationWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationWorkflowList';
+import ConnectedUserVersionBadge from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserVersionBadge';
+import useNewerIntegrationVersionAvailable from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/hooks/useNewerIntegrationVersionAvailable';
 import {
     CONFIGURATIONS_LOAD_FAILED_REASON,
     NO_OTHER_CONFIGURATION_REASON,
@@ -59,6 +60,11 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
     const {data: integrationInstance} = useGetIntegrationInstanceQuery(connectedUserIntegrationInstance.id!);
 
     const {data: provisionableIntegrations} = useGetProvisionableIntegrationsQuery(connectedUserId);
+
+    const newerIntegrationVersionAvailable = useNewerIntegrationVersionAvailable(
+        connectedUserIntegrationInstance.integrationId,
+        integrationInstance?.integrationInstanceConfiguration?.integrationVersion
+    );
 
     const [showChangeConfigurationDialog, setShowChangeConfigurationDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -224,17 +230,13 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                                 />
 
                                 {integrationInstance && (
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Badge
-                                                label={`V${integrationInstance.integrationInstanceConfiguration?.integrationVersion}`}
-                                                styleType="secondary-filled"
-                                                weight="semibold"
-                                            />
-                                        </TooltipTrigger>
-
-                                        <TooltipContent>The integration version</TooltipContent>
-                                    </Tooltip>
+                                    <ConnectedUserVersionBadge
+                                        newerVersionAvailable={newerIntegrationVersionAvailable}
+                                        tooltip="The integration version"
+                                        version={
+                                            integrationInstance.integrationInstanceConfiguration?.integrationVersion
+                                        }
+                                    />
                                 )}
                             </div>
 

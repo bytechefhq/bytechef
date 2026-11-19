@@ -1,8 +1,9 @@
-import Badge from '@/components/Badge/Badge';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectedUserCredentialStatus from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserCredentialStatus';
 import ConnectedUserOriginBadge from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserOriginBadge';
+import ConnectedUserVersionBadge from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserVersionBadge';
+import useNewerIntegrationVersionAvailable from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/hooks/useNewerIntegrationVersionAvailable';
 import {CredentialStatus} from '@/ee/shared/middleware/embedded/connected-user';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ChevronDownIcon, ChevronRightIcon, ComponentIcon} from 'lucide-react';
@@ -13,6 +14,7 @@ const ConnectedUserMcpServerComponentGroup = ({
     children,
     componentName,
     credentialStatus,
+    integrationId,
     lastExecutionDate,
     provisioned,
     provisionedBy,
@@ -22,6 +24,7 @@ const ConnectedUserMcpServerComponentGroup = ({
     children: ReactNode;
     componentName: string;
     credentialStatus?: CredentialStatus;
+    integrationId?: number;
     lastExecutionDate?: Date;
     provisioned?: boolean;
     provisionedBy?: string;
@@ -31,6 +34,11 @@ const ConnectedUserMcpServerComponentGroup = ({
     const [expanded, setExpanded] = useState(false);
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({connectionDefinitions: true});
+
+    const newerIntegrationVersionAvailable = useNewerIntegrationVersionAvailable(
+        versionKind === 'integration' ? integrationId : undefined,
+        version
+    );
 
     const componentDefinition = componentDefinitions?.find((definition) => definition.name === componentName);
 
@@ -81,19 +89,14 @@ const ConnectedUserMcpServerComponentGroup = ({
                                 />
                             )}
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Badge
-                                        label={`V${version}`}
-                                        styleType={versionKind === 'component' ? 'outline-outline' : 'secondary-filled'}
-                                        weight="semibold"
-                                    />
-                                </TooltipTrigger>
-
-                                <TooltipContent>
-                                    {versionKind === 'component' ? 'Component Version' : 'Integration Version'}
-                                </TooltipContent>
-                            </Tooltip>
+                            <ConnectedUserVersionBadge
+                                newerVersionAvailable={
+                                    versionKind === 'integration' && newerIntegrationVersionAvailable
+                                }
+                                styleType={versionKind === 'component' ? 'outline-outline' : 'secondary-filled'}
+                                tooltip={versionKind === 'component' ? 'Component Version' : 'Integration Version'}
+                                version={version}
+                            />
                         </div>
 
                         <div className="flex w-72 items-center justify-end">

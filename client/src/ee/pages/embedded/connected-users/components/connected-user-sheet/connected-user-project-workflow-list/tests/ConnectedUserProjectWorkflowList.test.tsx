@@ -586,4 +586,45 @@ describe('ConnectedUserProjectWorkflowList', () => {
             within(createdByUserGroup).queryByRole('button', {name: /Change configuration/})
         ).not.toBeInTheDocument();
     });
+
+    it.each([
+        [4, true],
+        [3, false],
+    ])(
+        'marks the project version when the last published version is %i: %s',
+        (lastPublishedVersion, newerVersionAvailable) => {
+            render(
+                <ConnectedUserProjectWorkflowList
+                    configurations={[
+                        {
+                            configurationEnabled: true,
+                            configurationId: '51',
+                            configurationName: 'Default',
+                            configurationProjectVersion: 3,
+                            enabled: true,
+                            projectId: '10',
+                        },
+                    ]}
+                    connectedUser={{connectedUserId: '1050', externalId: 'ext-1050'}}
+                    connectedUserProjectWorkflows={[
+                        {
+                            ...createConnectedUserProjectWorkflow('1', 'Greet on Request', {
+                                automationUuid: 'template-greeting',
+                            }),
+                            projectId: '10',
+                        },
+                    ]}
+                    lastPublishedVersionsByProjectId={new Map([['10', lastPublishedVersion]])}
+                    workflowTemplateSourcesByWorkflowUuid={workflowTemplateSourcesByWorkflowUuid}
+                />
+            );
+
+            const playgroundGroup = screen.getByRole('region', {name: 'Automation Playground'});
+
+            expect(within(playgroundGroup).getByText('V3')).toBeInTheDocument();
+            expect(within(playgroundGroup).queryAllByRole('img', {name: 'Newer version available'})).toHaveLength(
+                newerVersionAvailable ? 1 : 0
+            );
+        }
+    );
 });
