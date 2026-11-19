@@ -119,7 +119,7 @@ const ConnectedUserSheetPanelWorkflowList = ({
                 </>
             ) : (
                 <ConnectedUserSheetEmptyState
-                    description="Provision a workflow from one of your automation projects. This user gets their own copy to adjust."
+                    description="Provision a workflow from your automation projects for this user. It runs with their connections and inputs, and follows the versions you publish."
                     icon={<FolderIcon />}
                     nothingToProvision={nothingToProvision}
                     nothingToProvisionDescription="No project has a configuration released to this user's environment yet. Release one first, then provision its workflows for this user."

@@ -12,14 +12,15 @@ const SKELETON_PARTS = [
     'icon',
     'version',
     'switch',
-    'badges',
+    'usageBadge',
+    'originBadge',
     'date',
     'menu',
 ] as const;
 
 const EXPECTED_PARTS: Record<ConnectedUserSheetPanelListSkeletonVariantType, (typeof SKELETON_PARTS)[number][]> = {
     automation: ['toolbar', 'expand', 'groupHeader', 'version', 'date', 'menu'],
-    connection: ['icon', 'badges', 'date', 'menu'],
+    connection: ['icon', 'usageBadge', 'originBadge', 'date', 'menu'],
     integration: ['toolbar', 'expand', 'icon', 'version', 'switch', 'date', 'menu'],
     mcpServer: ['toolbar', 'expand', 'switch', 'date', 'menu'],
 };

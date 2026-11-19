@@ -86,7 +86,9 @@ describe('ConnectedUserSheetPanelMcpServerList', () => {
 
         expect(screen.getByRole('heading', {name: 'No MCP servers yet'})).toBeInTheDocument();
         expect(
-            screen.getByText("An MCP server lets the AI agents you build call tools on this user's integrations.")
+            screen.getByText(
+                "An MCP server lets the AI agents you build call tools on this user's integrations, running each tool with this user's own connections."
+            )
         ).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Provision MCP Server'})).toBeInTheDocument();
     });
