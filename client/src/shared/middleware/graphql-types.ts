@@ -569,6 +569,7 @@ export type AutomationProject = {
   permissionExpression?: Maybe<Scalars['String']['output']>;
   published: Scalars['Boolean']['output'];
   tagIds: Array<Scalars['ID']['output']>;
+  unpublishedChanges: Scalars['Boolean']['output'];
   version: Scalars['Int']['output'];
   workflowTemplates: Array<AutomationProjectWorkflowTemplate>;
 };

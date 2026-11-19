@@ -1398,7 +1398,7 @@ export type AutomationProjectsQueryVariables = Exact<{
 }>;
 
 
-export type AutomationProjectsQuery = { automationProjects: Array<{ id: string, name: string, description: string | null, categoryId: string | null, tagIds: Array<string>, published: boolean, version: number, lastPublishedVersion: number | null, permissionExpression: string | null, configurationCount: number, lastPublishedDate: string | null, workflowTemplates: Array<{ workflowUuid: string, workflowId: string, label: string | null, description: string | null, permissionExpression: string | null, lastModifiedDate: string | null, triggers: Array<{ name: string, title: string | null, icon: string | null }>, components: Array<{ name: string, title: string | null, icon: string | null }> }> }> };
+export type AutomationProjectsQuery = { automationProjects: Array<{ id: string, name: string, description: string | null, categoryId: string | null, tagIds: Array<string>, published: boolean, version: number, lastPublishedVersion: number | null, permissionExpression: string | null, configurationCount: number, lastPublishedDate: string | null, unpublishedChanges: boolean, workflowTemplates: Array<{ workflowUuid: string, workflowId: string, label: string | null, description: string | null, permissionExpression: string | null, lastModifiedDate: string | null, triggers: Array<{ name: string, title: string | null, icon: string | null }>, components: Array<{ name: string, title: string | null, icon: string | null }> }> }> };
 
 export type CreateAutomationProjectMutationVariables = Exact<{
   name: string;
@@ -7909,6 +7909,7 @@ export const AutomationProjectsDocument = new TypedDocumentString(`
     permissionExpression
     configurationCount
     lastPublishedDate
+    unpublishedChanges
     workflowTemplates {
       workflowUuid
       workflowId
