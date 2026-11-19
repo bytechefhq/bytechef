@@ -12,6 +12,7 @@ All URIs are relative to */api/embedded/internal*
 | [**getProvisionableIntegrations**](IntegrationInstanceApi.md#getprovisionableintegrations) | **GET** /connected-users/{connectedUserId}/provisionable-integrations | Get the integrations that can be provisioned to the connected user |
 | [**provisionIntegrationInstance**](IntegrationInstanceApi.md#provisionintegrationinstanceoperation) | **POST** /connected-users/{connectedUserId}/integration-instances | Provision an integration instance for the connected user |
 | [**updateIntegrationInstanceCredentials**](IntegrationInstanceApi.md#updateintegrationinstancecredentials) | **PUT** /integration-instances/{id}/connection/credentials | Replaces the credentials of a provisioned integration instance |
+| [**updateIntegrationInstanceWorkflow**](IntegrationInstanceApi.md#updateintegrationinstanceworkflowoperation) | **PUT** /integration-instances/{id}/workflows/{workflowId} | Update the inputs of an integration instance workflow |
 
 
 
@@ -543,6 +544,79 @@ example().catch(console.error);
 |------------- | ------------- | ------------- | -------------|
 | **id** | `number` | The id of an integration instance. | [Defaults to `undefined`] |
 | **updateConnectionCredentialsRequest** | [UpdateConnectionCredentialsRequest](UpdateConnectionCredentialsRequest.md) |  | |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | Successful operation. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## updateIntegrationInstanceWorkflow
+
+> updateIntegrationInstanceWorkflow(id, workflowId, updateIntegrationInstanceWorkflowRequest)
+
+Update the inputs of an integration instance workflow
+
+Update the inputs of an integration instance workflow.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  IntegrationInstanceApi,
+} from '';
+import type { UpdateIntegrationInstanceWorkflowOperationRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new IntegrationInstanceApi();
+
+  const body = {
+    // number | The id of an integration instance.
+    id: 789,
+    // string | The id of an integration instance workflow.
+    workflowId: workflowId_example,
+    // UpdateIntegrationInstanceWorkflowRequest
+    updateIntegrationInstanceWorkflowRequest: ...,
+  } satisfies UpdateIntegrationInstanceWorkflowOperationRequest;
+
+  try {
+    const data = await api.updateIntegrationInstanceWorkflow(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of an integration instance. | [Defaults to `undefined`] |
+| **workflowId** | `string` | The id of an integration instance workflow. | [Defaults to `undefined`] |
+| **updateIntegrationInstanceWorkflowRequest** | [UpdateIntegrationInstanceWorkflowRequest](UpdateIntegrationInstanceWorkflowRequest.md) |  | |
 
 ### Return type
 
