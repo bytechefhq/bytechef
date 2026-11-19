@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class IconController {
 
     static final CacheControl CACHE_CONTROL = CacheControl.maxAge(1, TimeUnit.HOURS)
+        .cachePrivate()
         .noTransform()
         .mustRevalidate();
 
