@@ -1,20 +1,59 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
+import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {
+    AutomationProjectsQuery,
     ConnectedUserMcpServerAutomation,
     useEnableConnectedUserMcpAutomationMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
+import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
+
+type WorkflowTemplateType = AutomationProjectsQuery['automationProjects'][number]['workflowTemplates'][number];
 
 const ConnectedUserMcpServerListItemAutomationRow = ({
     automation,
     connectedUserId,
+    workflowTemplate,
 }: {
     automation: ConnectedUserMcpServerAutomation;
     connectedUserId: number;
+    workflowTemplate?: WorkflowTemplateType;
 }) => {
+    const workflowTemplateComponents = useMemo(
+        () => [...(workflowTemplate?.triggers ?? []), ...(workflowTemplate?.components ?? [])],
+        [workflowTemplate]
+    );
+
+    const filteredComponentNames = useMemo(() => {
+        const componentNames = workflowTemplateComponents.map((component) => component.name);
+
+        return componentNames.filter((componentName, index) => componentNames.indexOf(componentName) === index);
+    }, [workflowTemplateComponents]);
+
+    const workflowComponentDefinitions = useMemo(
+        () =>
+            Object.fromEntries(
+                workflowTemplateComponents.map((component) => [
+                    component.name,
+                    {icon: component.icon ?? undefined, name: component.name, title: component.title ?? undefined},
+                ])
+            ) as Record<string, WorkflowComponentIconDefinitionType>,
+        [workflowTemplateComponents]
+    );
+
+    const triggerSource = useMemo(() => {
+        const templateTriggers = workflowTemplate?.triggers ?? [];
+
+        return {
+            triggers: templateTriggers.map((templateTrigger) => ({label: templateTrigger.title ?? undefined})),
+            workflowTriggerComponentNames: templateTriggers.map((templateTrigger) => templateTrigger.name),
+        };
+    }, [workflowTemplate]);
+
     const lastExecutionDate = automation.lastExecutionDate
         ? new Date(Date.parse(automation.lastExecutionDate))
         : undefined;
@@ -37,18 +76,32 @@ const ConnectedUserMcpServerListItemAutomationRow = ({
                     !automation.available && 'opacity-50'
                 )}
             >
-                <div className="flex min-w-0 flex-1 items-center gap-2">
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <span className="max-w-full truncate text-left text-sm font-medium">{automation.name}</span>
-                        </TooltipTrigger>
+                <div className="flex min-w-0 flex-1 items-center">
+                    <div className="flex w-full max-w-80 min-w-0 shrink items-center gap-2 sm:w-80 sm:shrink-0">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <span className="max-w-full truncate text-left text-sm font-medium">
+                                    {automation.name}
+                                </span>
+                            </TooltipTrigger>
 
-                        <TooltipContent align="start">
-                            {automation.available ? automation.name : 'Not available to this user'}
-                        </TooltipContent>
-                    </Tooltip>
+                            <TooltipContent align="start">
+                                {automation.available ? automation.name : 'Not available to this user'}
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
 
-                    <span className="truncate text-xs text-content-neutral-secondary">{automation.automationName}</span>
+                    {workflowTemplate && (
+                        <div className="ml-6 flex min-w-0 items-center gap-1 overflow-hidden">
+                            <WorkflowTriggerAndComponentsRow
+                                className="hidden sm:flex"
+                                filteredComponentNames={filteredComponentNames}
+                                workflow={triggerSource}
+                                workflowComponentDefinitions={workflowComponentDefinitions}
+                                workflowTaskDispatcherDefinitions={workflowComponentDefinitions}
+                            />
+                        </div>
+                    )}
                 </div>
 
                 <Tooltip>
