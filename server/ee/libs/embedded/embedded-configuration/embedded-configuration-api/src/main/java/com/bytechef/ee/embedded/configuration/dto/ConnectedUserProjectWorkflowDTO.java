@@ -27,7 +27,7 @@ public record ConnectedUserProjectWorkflowDTO(
     String workflowUuid, Integer workflowVersion, Kind kind, String automationUuid,
     String copiedFromWorkflowUuid, boolean dangling, List<ConnectedUserWorkflowTemplateDTO.Component> components,
     List<ConnectedUserWorkflowTemplateDTO.Input> inputs, Map<String, ?> inputValues, Map<String, Long> connections,
-    @Nullable String attentionReason, @Nullable String staticWebhookUrl) {
+    @Nullable String attentionReason, @Nullable String staticWebhookUrl, @Nullable String provisionedBy) {
     public enum Kind {
         COPY, REFERENCE
     }
@@ -51,7 +51,7 @@ public record ConnectedUserProjectWorkflowDTO(
             projectWorkflow.getProjectId(), workflow, projectWorkflow.getUuidAsString(),
             connectedUserProjectWorkflow.getWorkflowVersion(), Kind.COPY, null,
             connectedUserProjectWorkflow.getCopiedFromWorkflowUuid(), false, components, inputs, inputValues, Map.of(),
-            null, null);
+            null, null, null);
     }
 
     public static ConnectedUserProjectWorkflowDTO ofReference(
@@ -69,21 +69,21 @@ public record ConnectedUserProjectWorkflowDTO(
             reference.getId(), connectedUserId, reference.isEnabled(), null, 0L, automation,
             reference.getAutomationUuid(), reference.getWorkflowVersion(), Kind.REFERENCE,
             reference.getAutomationUuid(), null, reference.isDangling(), components, inputs, inputValues, connections,
-            attentionReason, null);
+            attentionReason, null, reference.getProvisionedBy());
     }
 
     public ConnectedUserProjectWorkflowDTO withLastExecutionDate(@Nullable Instant lastExecutionDate) {
         return new ConnectedUserProjectWorkflowDTO(
             id, connectedUserId, enabled, lastExecutionDate, projectId, workflow, workflowUuid, workflowVersion, kind,
             automationUuid, copiedFromWorkflowUuid, dangling, components, inputs, inputValues, connections,
-            attentionReason, staticWebhookUrl);
+            attentionReason, staticWebhookUrl, provisionedBy);
     }
 
     public ConnectedUserProjectWorkflowDTO withAttentionReason(@Nullable String attentionReason) {
         return new ConnectedUserProjectWorkflowDTO(
             id, connectedUserId, enabled, lastExecutionDate, projectId, workflow, workflowUuid, workflowVersion, kind,
             automationUuid, copiedFromWorkflowUuid, dangling, components, inputs, inputValues, connections,
-            attentionReason, staticWebhookUrl);
+            attentionReason, staticWebhookUrl, provisionedBy);
     }
 
     /**
@@ -95,6 +95,6 @@ public record ConnectedUserProjectWorkflowDTO(
         return new ConnectedUserProjectWorkflowDTO(
             id, connectedUserId, enabled, lastExecutionDate, projectId, workflow, workflowUuid, workflowVersion, kind,
             automationUuid, copiedFromWorkflowUuid, dangling, components, inputs, inputValues, connections,
-            attentionReason, staticWebhookUrl);
+            attentionReason, staticWebhookUrl, provisionedBy);
     }
 }
