@@ -213,8 +213,8 @@ const IntegrationListItem = ({
             >
                 <ListItemExpandButton label="Toggle integration" />
 
-                <div className="flex flex-1 items-center py-3 group-data-[state='open']/integration:border-none">
-                    <div className="flex-1">
+                <div className="flex min-w-0 flex-1 flex-col items-stretch gap-y-2 py-3 group-data-[state='open']/integration:border-none sm:flex-row sm:items-center sm:gap-y-0">
+                    <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between">
                             <div className="relative flex items-center gap-2">
                                 {hasWorkflows ? (
@@ -302,9 +302,9 @@ const IntegrationListItem = ({
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
+                    <div className="flex items-center justify-between gap-x-6 sm:justify-end [&>:last-child]:-ml-3">
                         {integration.lastIntegrationVersion && (
-                            <div className="flex flex-col items-end gap-y-4">
+                            <div className="flex items-center gap-x-3 sm:flex-col sm:items-end sm:gap-x-0 sm:gap-y-4">
                                 <div className="flex items-center">
                                     {integration.lastPublishedDate && integration.lastIntegrationVersion ? (
                                         <Badge
