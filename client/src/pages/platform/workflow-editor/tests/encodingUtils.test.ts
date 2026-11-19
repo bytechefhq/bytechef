@@ -183,6 +183,33 @@ describe('encodingUtils', () => {
         });
     });
 
+    describe('quoted keys containing dots and slashes', () => {
+        it('keeps an output file key intact', () => {
+            expect(transformPathForObjectAccess("produceReport.outputFiles['report.csv']")).toBe(
+                "produceReport.outputFiles['report.csv']"
+            );
+        });
+
+        it('keeps a key with slashes intact and still handles the segments after it', () => {
+            expect(transformPathForObjectAccess("produceReport.outputFiles['charts/summary.txt'].name")).toBe(
+                "produceReport.outputFiles['charts/summary.txt'].name"
+            );
+            expect(transformPathForObjectAccess("produceReport.outputFiles['charts/summary.txt'].first-name")).toBe(
+                "produceReport.outputFiles['charts/summary.txt']['first-name']"
+            );
+        });
+
+        it('keeps output file keys intact inside a template string', () => {
+            expect(
+                transformValueForObjectAccess(
+                    "Report ${produceReport.outputFiles['report.csv']} and ${produceReport.outputFiles['charts/summary.txt'].name}"
+                )
+            ).toBe(
+                "Report ${produceReport.outputFiles['report.csv']} and ${produceReport.outputFiles['charts/summary.txt'].name}"
+            );
+        });
+    });
+
     describe('transformValueForObjectAccess', () => {
         it('should transform template strings with paths containing bracket notation', () => {
             const value = "${loop_1.item['4broj telefona']}";

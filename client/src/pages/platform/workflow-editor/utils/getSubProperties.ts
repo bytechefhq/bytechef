@@ -1,5 +1,6 @@
 import {DataPillType, PropertyAllType} from '@/shared/types';
 
+import {appendDataPillPathSegment} from './dataPillPath';
 import {transformValueForObjectAccess} from './encodingUtils';
 
 export default function getSubProperties(
@@ -22,7 +23,7 @@ export default function getSubProperties(
 
         const nestedSubProperties = properties?.length ? properties : items;
 
-        const subValue = name ? `${value}.${name}` : `${value}[index]`;
+        const subValue = appendDataPillPathSegment(value, name ?? '[index]');
 
         dataPills.push({
             componentIcon,

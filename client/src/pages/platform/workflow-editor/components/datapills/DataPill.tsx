@@ -1,8 +1,7 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {resolveArrayIndexTemplate} from '@/pages/platform/workflow-editor/utils/dataPillArrayIndex';
-import {transformPathForObjectAccess} from '@/pages/platform/workflow-editor/utils/encodingUtils';
-import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
+import {buildDataPillPath, getDataPillSampleValue} from '@/pages/platform/workflow-editor/utils/dataPillPath';
 import {TYPE_ICONS} from '@/shared/typeIcons';
 import {DataPillDragPayloadType, PropertyAllType} from '@/shared/types';
 import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
@@ -16,7 +15,7 @@ interface HandleDataPillClickProps {
     workflowNodeName: string;
     propertyName?: string;
     parentPropertyName?: string;
-    path?: string;
+    pathSegments?: Array<string>;
 }
 
 interface DataPillProps {
@@ -24,8 +23,8 @@ interface DataPillProps {
     workflowNodeName: string;
     onClick?: (event: MouseEvent<HTMLDivElement>) => void;
     parentProperty?: PropertyAllType;
+    pathSegments?: Array<string>;
     property?: PropertyAllType;
-    path?: string;
     root?: boolean;
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     sampleOutput?: any;
@@ -54,33 +53,23 @@ const DataPillSampleValue = ({sampleOutput}: {sampleOutput: string | number | bo
 
 const buildMentionId = ({
     parentPropertyName,
-    path,
+    pathSegments,
     propertyName,
     workflowNodeName,
 }: HandleDataPillClickProps): string => {
-    const dataPillName = parentPropertyName
-        ? `${parentPropertyName}.${propertyName}`
-        : `${propertyName || workflowNodeName}`;
-
-    let value = workflowNodeName;
-
-    if (propertyName) {
-        value = `${workflowNodeName}.${path || dataPillName}`;
+    if (!propertyName) {
+        return workflowNodeName;
     }
 
-    if (value.includes('/')) {
-        value = value.replaceAll('/', '.');
-    }
+    const parentSegments = parentPropertyName ? [parentPropertyName, propertyName] : [propertyName];
 
-    const resolvedReference = resolveArrayIndexTemplate(value);
-
-    return transformPathForObjectAccess(resolvedReference);
+    return resolveArrayIndexTemplate(buildDataPillPath(workflowNodeName, pathSegments || parentSegments));
 };
 
 const DataPill = ({
     componentIcon,
     parentProperty,
-    path,
+    pathSegments,
     property,
     root = false,
     sampleOutput,
@@ -102,7 +91,7 @@ const DataPill = ({
 
     const handleDataPillClick = ({
         parentPropertyName,
-        path,
+        pathSegments,
         propertyName,
         workflowNodeName,
     }: HandleDataPillClickProps) => {
@@ -113,7 +102,7 @@ const DataPill = ({
         pillTarget.insertPill(
             buildMentionId({
                 parentPropertyName,
-                path,
+                pathSegments,
                 propertyName,
                 workflowNodeName,
             })
@@ -152,8 +141,10 @@ const DataPill = ({
         setIsDraggingDataPill(false);
     };
 
-    const getSubPropertyPath = (subPropertyName = '[index]') =>
-        path ? `${path}/${subPropertyName}` : `${property?.name || '[index]'}/${subPropertyName}`;
+    const getSubPropertyPathSegments = (subPropertyName = '[index]') => [
+        ...(pathSegments || [property?.name || '[index]']),
+        subPropertyName,
+    ];
 
     if (root) {
         return (
@@ -205,7 +196,7 @@ const DataPill = ({
                         onClick={() =>
                             handleDataPillClick({
                                 parentPropertyName: parentProperty?.name,
-                                path,
+                                pathSegments,
                                 propertyName: property?.name || '[index]',
                                 workflowNodeName,
                             })
@@ -214,7 +205,7 @@ const DataPill = ({
                         onDragStart={(event) =>
                             handleDragStart(event, {
                                 parentPropertyName: parentProperty?.name,
-                                path,
+                                pathSegments,
                                 propertyName: property?.name || '[index]',
                                 workflowNodeName,
                             })
@@ -252,11 +243,10 @@ const DataPill = ({
                         let sampleValue;
 
                         if (typeof sampleOutput === 'object') {
-                            const subPropertyPath = getSubPropertyPath(subProperty.name);
-
-                            const dottedSubPropertyPath = subPropertyPath.replaceAll('/', '.');
-
-                            sampleValue = getNestedObject(sampleOutput, dottedSubPropertyPath);
+                            sampleValue = getDataPillSampleValue(
+                                sampleOutput,
+                                getSubPropertyPathSegments(subProperty.name)
+                            );
                         } else {
                             sampleValue = sampleOutput;
                         }
@@ -277,7 +267,7 @@ const DataPill = ({
                                 <DataPill
                                     componentIcon={componentIcon}
                                     parentProperty={property}
-                                    path={getSubPropertyPath(subProperty.name)}
+                                    pathSegments={getSubPropertyPathSegments(subProperty.name)}
                                     property={subProperty}
                                     sampleOutput={sampleOutput}
                                     workflowNodeName={workflowNodeName}
