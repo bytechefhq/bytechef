@@ -1561,7 +1561,7 @@ export type ConnectedUserProjectsQueryVariables = Exact<{
 }>;
 
 
-export type ConnectedUserProjectsQuery = { connectedUserProjects: Array<{ id: string, environmentId: string, lastExecutionDate: string | null, projectId: string, projectVersion: number | null, connectedUser: { id: string, environmentId: string, externalId: string }, connectedUserProjectWorkflows: Array<{ id: string, attentionReason: string | null, automationUuid: string | null, connectedUserId: string, copiedFromWorkflowUuid: string | null, enabled: boolean, lastExecutionDate: string | null, projectId: string, staticWebhookUrl: string | null, toolOnly: boolean, workflowUuid: string, workflowVersion: number | null, workflow: { id: string, label: string, triggers: Array<{ name: string, type: string, parameters: any }> } }>, automationProjectConfigurations: Array<{ projectId: string, configurationId: string, configurationName: string, configurationProjectVersion: number, configurationEnabled: boolean, enabled: boolean }> }> };
+export type ConnectedUserProjectsQuery = { connectedUserProjects: Array<{ id: string, environmentId: string, lastExecutionDate: string | null, projectId: string, projectVersion: number | null, connectedUser: { id: string, environmentId: string, externalId: string }, connectedUserProjectWorkflows: Array<{ id: string, attentionReason: string | null, automationUuid: string | null, connectedUserId: string, copiedFromWorkflowUuid: string | null, enabled: boolean, lastExecutionDate: string | null, projectId: string, provisionedBy: string | null, staticWebhookUrl: string | null, toolOnly: boolean, workflowUuid: string, workflowVersion: number | null, workflow: { id: string, label: string, triggers: Array<{ name: string, type: string, parameters: any }> } }>, automationProjectConfigurations: Array<{ projectId: string, configurationId: string, configurationName: string, configurationProjectVersion: number, configurationEnabled: boolean, enabled: boolean }> }> };
 
 export type CreateAutomationProjectConfigurationMutationVariables = Exact<{
   projectId: string | number;
@@ -8566,6 +8566,7 @@ export const ConnectedUserProjectsDocument = new TypedDocumentString(`
       enabled
       lastExecutionDate
       projectId
+      provisionedBy
       staticWebhookUrl
       toolOnly
       workflowUuid
