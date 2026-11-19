@@ -267,6 +267,7 @@ const ProjectDeploymentWorkflowListItem = ({
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <Button
+                                                aria-label="Run workflow manually"
                                                 disabled={!projectDeploymentEnabled || !enabled}
                                                 icon={<PlayIcon className="text-success" />}
                                                 onClick={handleRunWorkflowClick}
