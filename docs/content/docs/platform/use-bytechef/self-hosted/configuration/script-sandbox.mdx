@@ -103,7 +103,7 @@ property path and replace dots and dashes with underscores.
 | `bytechef.script.sandbox.enabled` | `BYTECHEF_SCRIPT_SANDBOX_ENABLED` | `true` | Applies GraalVM's constrained sandbox policy and the resource limits to strict JavaScript and Python contexts. |
 | `bytechef.script.sandbox.max-cpu-time` | `BYTECHEF_SCRIPT_SANDBOX_MAX_CPU_TIME` | `5m` | The CPU time one strict execution may use. |
 | `bytechef.script.sandbox.max-heap-memory` | `BYTECHEF_SCRIPT_SANDBOX_MAX_HEAP_MEMORY` | `512MB` | The heap one strict execution may allocate. |
-| `bytechef.script.sandbox.max-concurrent-executions` | `BYTECHEF_SCRIPT_SANDBOX_MAX_CONCURRENT_EXECUTIONS` | the larger of `16` and 4 times the number of CPUs | How many strict executions may run at once when they are started from virtual threads. Must be at least `1`. |
+| `bytechef.script.sandbox.max-concurrent-executions` | `BYTECHEF_SCRIPT_SANDBOX_MAX_CONCURRENT_EXECUTIONS` | `16` | How many strict executions may run at once when they are started from virtual threads. Must be at least `1`. |
 
 Durations use Spring Boot's format (`30s`, `5m`, `PT5M`), and sizes use its data size format (`64MB`, `1GB`).
 
