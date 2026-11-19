@@ -7,7 +7,7 @@ export interface EnvironmentConfigI {
     label: string;
     shortLabel: string;
     sidebarTheme: 'development' | 'production' | 'staging';
-    styleType: 'destructive-outline' | 'secondary-outline' | 'warning-outline';
+    styleType: 'destructive-filled' | 'secondary-filled' | 'warning-filled';
 }
 
 export const ENVIRONMENT_CONFIGS: Record<number, EnvironmentConfigI> = {
@@ -17,7 +17,7 @@ export const ENVIRONMENT_CONFIGS: Record<number, EnvironmentConfigI> = {
         label: 'DEVELOPMENT',
         shortLabel: 'DEV',
         sidebarTheme: 'development',
-        styleType: 'secondary-outline',
+        styleType: 'secondary-filled',
     },
     [PRODUCTION_ENVIRONMENT]: {
         description: 'Live environment serving real users, with strict safeguards in place.',
@@ -25,7 +25,7 @@ export const ENVIRONMENT_CONFIGS: Record<number, EnvironmentConfigI> = {
         label: 'PRODUCTION',
         shortLabel: 'PRD',
         sidebarTheme: 'production',
-        styleType: 'destructive-outline',
+        styleType: 'destructive-filled',
     },
     [STAGING_ENVIRONMENT]: {
         description: 'Final testing, QA, and validation of changes before they reach production.',
@@ -33,6 +33,6 @@ export const ENVIRONMENT_CONFIGS: Record<number, EnvironmentConfigI> = {
         label: 'STAGING',
         shortLabel: 'STG',
         sidebarTheme: 'staging',
-        styleType: 'warning-outline',
+        styleType: 'warning-filled',
     },
 };
