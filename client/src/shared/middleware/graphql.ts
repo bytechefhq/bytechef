@@ -1491,7 +1491,7 @@ export type ConnectedUserProjectsQueryVariables = Exact<{
 }>;
 
 
-export type ConnectedUserProjectsQuery = { connectedUserProjects: Array<{ id: string, environmentId: string, lastExecutionDate: string | null, projectId: string, projectVersion: number | null, connectedUser: { id: string, environmentId: string, externalId: string }, connectedUserProjectWorkflows: Array<{ id: string, attentionReason: string | null, automationUuid: string | null, connectedUserId: string, copiedFromWorkflowUuid: string | null, enabled: boolean, lastExecutionDate: string | null, projectId: string, staticWebhookUrl: string | null, toolOnly: boolean, workflowUuid: string, workflowVersion: number | null, workflow: { id: string, label: string, triggers: Array<{ name: string, type: string, parameters: any }> } }>, automationProjectConfigurations: Array<{ projectId: string, configurationId: string, configurationName: string, configurationProjectVersion: number, configurationEnabled: boolean }> }> };
+export type ConnectedUserProjectsQuery = { connectedUserProjects: Array<{ id: string, environmentId: string, lastExecutionDate: string | null, projectId: string, projectVersion: number | null, connectedUser: { id: string, environmentId: string, externalId: string }, connectedUserProjectWorkflows: Array<{ id: string, attentionReason: string | null, automationUuid: string | null, connectedUserId: string, copiedFromWorkflowUuid: string | null, enabled: boolean, lastExecutionDate: string | null, projectId: string, staticWebhookUrl: string | null, toolOnly: boolean, workflowUuid: string, workflowVersion: number | null, workflow: { id: string, label: string, triggers: Array<{ name: string, type: string, parameters: any }> } }>, automationProjectConfigurations: Array<{ projectId: string, configurationId: string, configurationName: string, configurationProjectVersion: number, configurationEnabled: boolean, enabled: boolean }> }> };
 
 export type CreateAutomationProjectConfigurationMutationVariables = Exact<{
   projectId: string | number;
@@ -1670,6 +1670,15 @@ export type EnableAutomationProjectConfigurationWorkflowMutationVariables = Exac
 
 
 export type EnableAutomationProjectConfigurationWorkflowMutation = { enableAutomationProjectConfigurationWorkflow: boolean };
+
+export type EnableConnectedUserAutomationProjectConfigurationMutationVariables = Exact<{
+  connectedUserId: string | number;
+  projectId: string | number;
+  enable: boolean;
+}>;
+
+
+export type EnableConnectedUserAutomationProjectConfigurationMutation = { enableConnectedUserAutomationProjectConfiguration: boolean };
 
 export type EnableConnectedUserMcpAutomationMutationVariables = Exact<{
   connectedUserId: string | number;
@@ -8241,6 +8250,7 @@ export const ConnectedUserProjectsDocument = new TypedDocumentString(`
       configurationName
       configurationProjectVersion
       configurationEnabled
+      enabled
     }
     environmentId
     lastExecutionDate
@@ -8891,6 +8901,29 @@ export const useEnableAutomationProjectConfigurationWorkflowMutation = <
       {
     mutationKey: ['enableAutomationProjectConfigurationWorkflow'],
     mutationFn: (variables?: EnableAutomationProjectConfigurationWorkflowMutationVariables) => fetcher<EnableAutomationProjectConfigurationWorkflowMutation, EnableAutomationProjectConfigurationWorkflowMutationVariables>(EnableAutomationProjectConfigurationWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EnableConnectedUserAutomationProjectConfigurationDocument = new TypedDocumentString(`
+    mutation enableConnectedUserAutomationProjectConfiguration($connectedUserId: ID!, $projectId: ID!, $enable: Boolean!) {
+  enableConnectedUserAutomationProjectConfiguration(
+    connectedUserId: $connectedUserId
+    projectId: $projectId
+    enable: $enable
+  )
+}
+    `);
+
+export const useEnableConnectedUserAutomationProjectConfigurationMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<EnableConnectedUserAutomationProjectConfigurationMutation, TError, EnableConnectedUserAutomationProjectConfigurationMutationVariables, TContext>) => {
+    
+    return useMutation<EnableConnectedUserAutomationProjectConfigurationMutation, TError, EnableConnectedUserAutomationProjectConfigurationMutationVariables, TContext>(
+      {
+    mutationKey: ['enableConnectedUserAutomationProjectConfiguration'],
+    mutationFn: (variables?: EnableConnectedUserAutomationProjectConfigurationMutationVariables) => fetcher<EnableConnectedUserAutomationProjectConfigurationMutation, EnableConnectedUserAutomationProjectConfigurationMutationVariables>(EnableConnectedUserAutomationProjectConfigurationDocument, variables)(),
     ...options
   }
     )};
