@@ -1,5 +1,6 @@
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
+import WorkflowNodeOptionsSelect from '@/shared/components/WorkflowNodeOptionsSelect';
 import {useGetWorkflowNodeOptionsQuery} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {PropertyAllType} from '@/shared/types';
@@ -41,21 +42,12 @@ const TestValueDynamicSelect = ({
             control={control}
             name={fieldName}
             render={({field}) => (
-                <select
-                    className="flex h-9 w-full rounded-md border border-stroke-neutral-secondary bg-surface-neutral-primary px-3 py-1 text-sm text-content-neutral-primary"
-                    onChange={(event) => field.onChange(event.target.value)}
-                    value={field.value ?? ''}
-                >
-                    <option disabled value="">
-                        {isLoading ? 'Loading...' : 'Select...'}
-                    </option>
-
-                    {(options ?? []).map((option) => (
-                        <option key={String(option.value)} value={String(option.value)}>
-                            {option.label ?? String(option.value)}
-                        </option>
-                    ))}
-                </select>
+                <WorkflowNodeOptionsSelect
+                    isLoading={isLoading}
+                    onChange={field.onChange}
+                    options={options}
+                    value={field.value}
+                />
             )}
         />
     );
