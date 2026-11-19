@@ -276,34 +276,88 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
             return;
         }
 
+        String content = codeWorkflowFileStorage.readCodeWorkflowFileContent(codeWorkflowContainer.getWorkflows());
+
+        NamedSource namedSource = renameToIntegrationName(integration, language, content);
+
+        if (!namedSource.renamed()) {
+            return;
+        }
+
+        saveDraft(integration, namedSource.integrationDefinition(), language, namedSource.bytes());
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public void restoreCodeWorkflowSource(long integrationId, int integrationVersion) {
+        Integration integration = integrationService.getIntegration(integrationId);
+
+        Optional<IntegrationCodeWorkflow> publishedIntegrationCodeWorkflowOptional =
+            integrationCodeWorkflowService.fetchPublishedIntegrationCodeWorkflow(integrationId, integrationVersion);
+
+        if (publishedIntegrationCodeWorkflowOptional.isEmpty()) {
+            throw new ConfigurationException(
+                "Integration version " + integrationVersion + " has no code workflow source to restore",
+                CodeWorkflowErrorType.SOURCE_LOAD_FAILED);
+        }
+
+        IntegrationCodeWorkflow publishedIntegrationCodeWorkflow = publishedIntegrationCodeWorkflowOptional.get();
+
+        CodeWorkflowContainer codeWorkflowContainer = codeWorkflowContainerService.getCodeWorkflowContainer(
+            publishedIntegrationCodeWorkflow.getCodeWorkflowContainerId());
+
+        Language language = codeWorkflowContainer.getLanguage();
+
+        if (language == Language.JAVA) {
+            byte[] bytes = codeWorkflowFileStorage.readCodeWorkflowFileBytes(codeWorkflowContainer.getWorkflows());
+
+            saveDraft(integration, readIntegrationDefinition(language, bytes), language, bytes);
+
+            return;
+        }
+
+        String content = codeWorkflowFileStorage.readCodeWorkflowFileContent(codeWorkflowContainer.getWorkflows());
+
+        NamedSource namedSource = renameToIntegrationName(integration, language, content);
+
+        saveDraft(integration, namedSource.integrationDefinition(), language, namedSource.bytes());
+    }
+
+    private NamedSource renameToIntegrationName(Integration integration, Language language, String content) {
         String integrationName = integration.getName();
 
         validateName(integrationName);
 
-        String content = codeWorkflowFileStorage.readCodeWorkflowFileContent(codeWorkflowContainer.getWorkflows());
+        byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
 
-        IntegrationDefinition integrationDefinition = readIntegrationDefinition(
-            language, content.getBytes(StandardCharsets.UTF_8));
+        IntegrationDefinition integrationDefinition = readIntegrationDefinition(language, bytes);
 
         Optional<String> declaredName = integrationDefinition.getName();
 
         if (declaredName.isEmpty() || Objects.equals(declaredName.get(), integrationName)) {
-            return;
+            return new NamedSource(bytes, integrationDefinition, false);
         }
 
-        byte[] bytes = rewriteDeclaredName(content, declaredName.get(), integrationName)
-            .getBytes(StandardCharsets.UTF_8);
+        String renamedContent = rewriteDeclaredName(content, declaredName.get(), integrationName);
+
+        bytes = renamedContent.getBytes(StandardCharsets.UTF_8);
 
         integrationDefinition = readIntegrationDefinition(language, bytes);
 
-        if (!Objects.equals(integrationDefinition.getName()
-            .orElse(null), integrationName)) {
+        Optional<String> renamedName = integrationDefinition.getName();
 
+        if (!Objects.equals(renamedName.orElse(null), integrationName)) {
             throw new ConfigurationException(
                 "Could not rename the code workflow to '" + integrationName +
                     "'; declare the integration name as a plain string literal",
                 CodeWorkflowErrorType.CODE_WORKFLOW_NAME_MISMATCH);
         }
+
+        return new NamedSource(bytes, integrationDefinition, true);
+    }
+
+    private void saveDraft(
+        Integration integration, IntegrationDefinition integrationDefinition, Language language, byte[] bytes) {
 
         List<WorkflowDefinition> workflowDefinitions = integrationDefinition.getWorkflows()
             .orElseGet(List::of);
@@ -615,6 +669,9 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private record NamedSource(byte[] bytes, IntegrationDefinition integrationDefinition, boolean renamed) {
     }
 
     private record PublishedIntegration(long integrationId, int integrationVersion) {

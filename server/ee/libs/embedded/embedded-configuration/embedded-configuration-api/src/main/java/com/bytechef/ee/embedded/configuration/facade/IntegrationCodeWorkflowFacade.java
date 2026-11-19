@@ -35,6 +35,8 @@ public interface IntegrationCodeWorkflowFacade {
 
     void renameCodeWorkflowSource(long integrationId);
 
+    void restoreCodeWorkflowSource(long integrationId, int integrationVersion);
+
     void save(byte[] bytes, Language language);
 
     void save(byte[] bytes, Language language, Environment environment, boolean enable);

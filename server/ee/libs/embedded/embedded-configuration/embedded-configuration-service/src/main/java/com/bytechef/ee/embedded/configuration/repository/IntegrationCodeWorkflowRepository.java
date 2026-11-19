@@ -43,4 +43,7 @@ public interface IntegrationCodeWorkflowRepository extends ListCrudRepository<In
         """)
     Optional<IntegrationCodeWorkflow> findFirstByIntegrationIdOrderByIdDesc(
         @Param("integrationId") long integrationId);
+
+    Optional<IntegrationCodeWorkflow> findFirstByIntegrationIdAndIntegrationVersionLessThanEqualOrderByIdDesc(
+        long integrationId, int integrationVersion);
 }
