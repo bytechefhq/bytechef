@@ -128,6 +128,7 @@ const project = {
     permissionExpression: null,
     published: true,
     tagIds: [],
+    unpublishedChanges: false,
     version: 4,
     workflowTemplates: [],
 };

@@ -218,7 +218,7 @@ const AutomationProjectListItem = ({
                     <div className="flex items-center justify-between gap-x-6 sm:justify-end [&>:last-child]:-ml-3">
                         <div className="flex items-center gap-x-3 sm:min-w-52 sm:flex-col sm:items-end sm:gap-x-0 sm:gap-y-4">
                             <div className="flex items-center space-x-2">
-                                {project.published ? (
+                                {project.published && !project.unpublishedChanges ? (
                                     <Badge
                                         className="flex space-x-1 border-transparent"
                                         styleType="success-outline"

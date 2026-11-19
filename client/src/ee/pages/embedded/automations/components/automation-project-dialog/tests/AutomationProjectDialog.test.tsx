@@ -14,6 +14,7 @@ const existingProject = {
     permissionExpression: null,
     published: false,
     tagIds: [],
+    unpublishedChanges: false,
     version: 1,
     workflowTemplates: [],
 };
