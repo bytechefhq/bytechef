@@ -176,7 +176,9 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     public IntegrationDTO getIntegration(long id) {
         Integration integration = integrationService.getIntegration(id);
 
-        return toIntegrationDTO(integration);
+        IntegrationDTO integrationDTO = toIntegrationDTO(integration);
+
+        return integrationDTO.withUnpublishedChanges(hasUnpublishedChanges(integration));
     }
 
     @Override

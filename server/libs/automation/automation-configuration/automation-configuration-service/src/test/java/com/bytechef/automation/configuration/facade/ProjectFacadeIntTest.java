@@ -528,7 +528,7 @@ public class ProjectFacadeIntTest {
         assertThat(projectsDTOs).hasSize(1);
 
         assertThat(projectFacade.getProject(Validate.notNull(project.getId(), "id")))
-            .isEqualTo(projectDTO.withUnpublishedChanges(false))
+            .isEqualTo(projectDTO)
             .hasFieldOrPropertyWithValue("category", category)
             .hasFieldOrPropertyWithValue("tags", projectDTO.tags());
     }
@@ -544,6 +544,7 @@ public class ProjectFacadeIntTest {
         projectFacade.publishProject(projectDTO.id(), "first", false);
 
         assertThat(getListedProjectDTO(projectDTO.id()).unpublishedChanges()).isFalse();
+        assertThat(getProjectDTO(projectDTO.id()).unpublishedChanges()).isFalse();
 
         Workflow draftWorkflow = getFirstWorkflow(projectDTO.id(), 2);
 
@@ -552,6 +553,7 @@ public class ProjectFacadeIntTest {
             draftWorkflow.getVersion());
 
         assertThat(getListedProjectDTO(projectDTO.id()).unpublishedChanges()).isTrue();
+        assertThat(getProjectDTO(projectDTO.id()).unpublishedChanges()).isTrue();
     }
 
     @Test
@@ -1543,6 +1545,10 @@ public class ProjectFacadeIntTest {
         ProjectWorkflow projectWorkflow = projectWorkflows.getFirst();
 
         return workflowService.getWorkflow(projectWorkflow.getWorkflowId());
+    }
+
+    private ProjectDTO getProjectDTO(long projectId) {
+        return projectFacade.getProject(projectId);
     }
 
     private ProjectDTO getListedProjectDTO(long projectId) {
