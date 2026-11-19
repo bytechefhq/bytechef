@@ -82,6 +82,7 @@ const project = {
     permissionExpression: null,
     published: false,
     tagIds: [],
+    unpublishedChanges: false,
     version: 1,
     workflowTemplates: [workflow, {...workflow, label: 'Workflow Two', workflowUuid: 'uuid-2'}],
 };

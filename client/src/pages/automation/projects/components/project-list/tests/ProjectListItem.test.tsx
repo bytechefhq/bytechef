@@ -2,7 +2,7 @@ import {Collapsible} from '@/components/ui/collapsible';
 import {TooltipProvider} from '@/components/ui/tooltip';
 import ProjectListItem from '@/pages/automation/projects/components/project-list/ProjectListItem';
 import {ProjectListItemTabType} from '@/pages/automation/projects/components/project-list/ProjectListItemTabs';
-import {Project} from '@/shared/middleware/automation/configuration';
+import {Project, ProjectStatus} from '@/shared/middleware/automation/configuration';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {fireEvent, render, screen} from '@/shared/util/test-utils';
 import userEvent from '@testing-library/user-event';
@@ -258,4 +258,25 @@ it('opens the deployments page in production after deploying to production', asy
         state: {projectDeploymentId: 43},
     });
     expect(onTabChange).not.toHaveBeenCalledWith('deployments', 43);
+});
+
+it('shows the published version when the draft matches it', () => {
+    renderProjectListItem(undefined, {
+        lastProjectVersion: 3,
+        lastStatus: ProjectStatus.Draft,
+        unpublishedChanges: false,
+    });
+
+    expect(screen.getByText('PUBLISHED').parentElement).toHaveTextContent('V2PUBLISHED');
+});
+
+it('shows the draft version when the draft has unpublished changes', () => {
+    renderProjectListItem(undefined, {
+        lastProjectVersion: 3,
+        lastStatus: ProjectStatus.Draft,
+        unpublishedChanges: true,
+    });
+
+    expect(screen.getByText('DRAFT').parentElement).toHaveTextContent('V3DRAFT');
+    expect(screen.queryByText('PUBLISHED')).not.toBeInTheDocument();
 });

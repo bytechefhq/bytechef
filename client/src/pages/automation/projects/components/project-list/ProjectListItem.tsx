@@ -134,6 +134,7 @@ const ProjectListItem = ({
     const workflowCount = project.projectWorkflowIds?.length ?? 0;
     const hasWorkflows = workflowCount > 0;
     const isPublished = !!(project.lastPublishedDate && project.lastProjectVersion);
+    const showPublishedBadge = isPublished && !project.unpublishedChanges;
     const [isImportingN8nWorkflow, setIsImportingN8nWorkflow] = useState(false);
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
@@ -323,7 +324,7 @@ const ProjectListItem = ({
 
                         <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center gap-2">
-                                <CollapsibleTrigger className="group mr-2 flex items-center text-xs font-semibold text-muted-foreground">
+                                <CollapsibleTrigger className="group mr-2 flex shrink-0 items-center text-xs font-semibold whitespace-nowrap text-muted-foreground">
                                     <span className="mr-1">
                                         {workflowCount === 1 ? '1 workflow' : `${workflowCount} workflows`}
                                     </span>
@@ -362,7 +363,7 @@ const ProjectListItem = ({
                     <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
                         <div className="flex flex-col items-end gap-y-4">
                             <div className="flex items-center space-x-2">
-                                {isPublished ? (
+                                {showPublishedBadge ? (
                                     <Badge
                                         className="flex space-x-1 border-transparent"
                                         styleType="success-outline"

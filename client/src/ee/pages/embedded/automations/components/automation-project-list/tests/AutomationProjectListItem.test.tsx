@@ -68,6 +68,7 @@ const project: AutomationProjectType = {
     permissionExpression: null,
     published: false,
     tagIds: [],
+    unpublishedChanges: false,
     version: 1,
     workflowTemplates: [
         {
@@ -345,6 +346,13 @@ describe('AutomationProjectListItem', () => {
             renderItem({lastPublishedVersion: 2, published: true, version: 3});
 
             expect(screen.getByText('PUBLISHED').parentElement).toHaveTextContent('V2PUBLISHED');
+        });
+
+        it('should show the draft version next to DRAFT when the draft has unpublished changes', () => {
+            renderItem({lastPublishedVersion: 2, published: true, unpublishedChanges: true, version: 3});
+
+            expect(screen.getByText('DRAFT').parentElement).toHaveTextContent('V3DRAFT');
+            expect(screen.queryByText('PUBLISHED')).not.toBeInTheDocument();
         });
     });
 

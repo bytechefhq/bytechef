@@ -35,6 +35,7 @@ const project: AutomationProjectType = {
     permissionExpression: null,
     published: true,
     tagIds: [],
+    unpublishedChanges: false,
     version: 2,
     workflowTemplates: [],
 };

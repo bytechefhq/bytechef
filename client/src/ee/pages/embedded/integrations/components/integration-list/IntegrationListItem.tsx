@@ -306,7 +306,9 @@ const IntegrationListItem = ({
                         {integration.lastIntegrationVersion && (
                             <div className="flex items-center gap-x-3 sm:flex-col sm:items-end sm:gap-x-0 sm:gap-y-4">
                                 <div className="flex items-center">
-                                    {integration.lastPublishedDate && integration.lastIntegrationVersion ? (
+                                    {integration.lastPublishedDate &&
+                                    integration.lastIntegrationVersion &&
+                                    !integration.unpublishedChanges ? (
                                         <Badge
                                             className="flex space-x-1 border-transparent"
                                             styleType="success-outline"

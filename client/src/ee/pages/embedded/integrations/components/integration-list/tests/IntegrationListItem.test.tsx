@@ -2,7 +2,11 @@ import {Collapsible} from '@/components/ui/collapsible';
 import {TooltipProvider} from '@/components/ui/tooltip';
 import IntegrationListItem from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationListItem';
 import {IntegrationListItemTabType} from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationListItemTabs';
-import {Integration, IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
+import {
+    Integration,
+    IntegrationInstanceConfiguration,
+    IntegrationStatus,
+} from '@/ee/shared/middleware/embedded/configuration';
 import {act, fireEvent, render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -475,6 +479,21 @@ describe('IntegrationListItem', () => {
 
             expect(screen.queryByLabelText('Create Configuration')).not.toBeInTheDocument();
             expect(screen.queryByText(/Configuration dialog/)).not.toBeInTheDocument();
+        });
+    });
+
+    describe('status badge', () => {
+        it('should show the published version when the draft matches it', () => {
+            renderItem({lastIntegrationVersion: 3, lastStatus: IntegrationStatus.Draft, unpublishedChanges: false});
+
+            expect(screen.getByText('PUBLISHED').parentElement).toHaveTextContent('V2PUBLISHED');
+        });
+
+        it('should show the draft version when the draft has unpublished changes', () => {
+            renderItem({lastIntegrationVersion: 3, lastStatus: IntegrationStatus.Draft, unpublishedChanges: true});
+
+            expect(screen.getByText('DRAFT').parentElement).toHaveTextContent('V3DRAFT');
+            expect(screen.queryByText('PUBLISHED')).not.toBeInTheDocument();
         });
     });
 });
