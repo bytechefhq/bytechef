@@ -87,6 +87,7 @@ const AutomationConfigurationsSheet = ({onSheetOpenChange, project, sheetOpen}: 
 
                 <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-surface-neutral-primary p-3">
                     <AutomationProjectConfigurationList
+                        divided
                         environmentId={DEVELOPMENT_ENVIRONMENT}
                         onCreate={() => setConfigurationDialog({})}
                         onEdit={(configuration) => setConfigurationDialog({configuration})}

@@ -69,7 +69,7 @@ const A2aProjectWorkflowList = ({a2aProject, projectName}: A2aProjectWorkflowLis
 
     return (
         <>
-            <div className="flex flex-col gap-1">
+            <div className="divide-y divide-stroke-neutral-primary">
                 {a2aProjectWorkflows.map((a2aProjectWorkflow) => {
                     const workflowLabel =
                         a2aProjectWorkflow.workflowLabel || a2aProjectWorkflow.workflowId || 'Unnamed Workflow';

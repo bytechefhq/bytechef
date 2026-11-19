@@ -9,6 +9,7 @@ import ProjectDeploymentListItem from './ProjectDeploymentListItem';
 
 interface ProjectDeploymentListProps {
     componentDefinitions?: ComponentDefinitionBasic[];
+    divided?: boolean;
     expandAll?: boolean;
     hideOpenInProject?: boolean;
     hideOpenWorkflowInProject?: boolean;
@@ -22,6 +23,7 @@ interface ProjectDeploymentListProps {
 
 const ProjectDeploymentList = ({
     componentDefinitions,
+    divided = false,
     expandAll = false,
     hideOpenInProject,
     hideOpenWorkflowInProject,
@@ -65,7 +67,7 @@ const ProjectDeploymentList = ({
     }, [newlyCreatedDeploymentId]);
 
     return (
-        <>
+        <div className={divided ? 'divide-y divide-stroke-neutral-primary' : undefined}>
             {projectDeployments.map((projectDeployment) => {
                 const projectTagIds = projectDeployment.tags?.map((tag) => tag.id);
 
@@ -75,7 +77,7 @@ const ProjectDeploymentList = ({
 
                 return (
                     <Collapsible
-                        className="group mb-2 rounded border border-border/50 last:mb-0"
+                        className={divided ? 'group' : 'group mb-2 rounded border border-border/50 last:mb-0'}
                         key={projectDeployment.id}
                         onOpenChange={(open) => handleOpenChange(open, projectDeployment.id!)}
                         open={openCollapsibles.has(projectDeployment.id!)}
@@ -111,7 +113,7 @@ const ProjectDeploymentList = ({
                     </Collapsible>
                 );
             })}
-        </>
+        </div>
     );
 };
 

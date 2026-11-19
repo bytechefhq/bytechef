@@ -15,7 +15,7 @@ const McpAutomationProjectConfigurationList = ({mcpServer}: McpAutomationProject
     const {isLoading, mcpAutomationProjectConfigurations} = useMcpAutomationProjectConfigurationList(mcpServer.id);
 
     return (
-        <section className="mt-4 flex flex-col gap-1.5">
+        <section className="mt-4 divide-y divide-stroke-neutral-primary">
             <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold">Automations</h3>
 

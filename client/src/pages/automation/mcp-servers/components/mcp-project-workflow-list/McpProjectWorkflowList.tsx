@@ -17,7 +17,7 @@ const McpProjectWorkflowList = ({mcpProject, mcpProjectWorkflows}: McpProjectWor
     const projectId = mcpProject.project?.id != null ? Number(mcpProject.project.id) : undefined;
 
     return (
-        <div className="flex flex-col gap-1">
+        <div className="divide-y divide-stroke-neutral-primary">
             {workflows.map((workflow) => (
                 <McpProjectWorkflowListItem
                     key={workflow.id}

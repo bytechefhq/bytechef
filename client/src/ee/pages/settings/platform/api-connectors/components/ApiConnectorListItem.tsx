@@ -125,7 +125,7 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
 
             <CollapsibleContent className="mt-4">
                 {apiConnector.endpoints && apiConnector.endpoints.length > 0 ? (
-                    <ul className="space-y-1 border-t pt-4">
+                    <ul className="divide-y divide-stroke-neutral-primary">
                         {apiConnector.endpoints.map((endpoint) => (
                             <li
                                 className="flex items-center justify-between rounded-md p-2 hover:bg-surface-neutral-primary-hover"

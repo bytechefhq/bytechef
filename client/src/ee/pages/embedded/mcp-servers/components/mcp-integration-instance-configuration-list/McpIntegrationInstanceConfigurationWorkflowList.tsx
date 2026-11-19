@@ -24,7 +24,7 @@ const McpIntegrationInstanceConfigurationWorkflowList = ({
     }
 
     return (
-        <div className="flex flex-col gap-1">
+        <div className="divide-y divide-stroke-neutral-primary">
             {workflows.map((workflow) => (
                 <McpIntegrationInstanceConfigurationWorkflowListItem
                     componentName={componentName}

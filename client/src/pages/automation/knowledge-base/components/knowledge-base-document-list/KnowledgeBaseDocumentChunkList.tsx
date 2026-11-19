@@ -33,11 +33,11 @@ const KnowledgeBaseDocumentChunkList = ({
     }
 
     return (
-        <div className="ml-7 space-y-2 border-l border-border/50 py-2 pl-4">
+        <div className="ml-7 divide-y divide-stroke-neutral-primary border-l border-border/50 pl-4">
             <KnowledgeBaseDocumentChunkListSelectionBar />
 
             {chunks.map((chunk, index) => (
-                <div className="rounded-lg border border-border/50 bg-background p-4" key={chunk.id}>
+                <div className="py-3" key={chunk.id}>
                     <div className="mb-2 flex items-center justify-between">
                         <KnowledgeBaseDocumentChunkListItemHeader
                             chunkId={chunk.id}

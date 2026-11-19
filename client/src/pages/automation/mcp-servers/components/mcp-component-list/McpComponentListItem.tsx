@@ -21,7 +21,7 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
     const [expanded, setExpanded] = useState(false);
 
     return (
-        <Collapsible className="group rounded-md border border-border/50" onOpenChange={setExpanded} open={expanded}>
+        <Collapsible className="group" onOpenChange={setExpanded} open={expanded}>
             <div className="relative flex items-center gap-2.5 rounded-md py-2.5 pl-3 hover:bg-surface-neutral-primary-hover">
                 <ListItemExpandButton
                     className="mr-0 after:absolute after:inset-0"
@@ -72,7 +72,7 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
             </div>
 
             <CollapsibleContent>
-                <div className="border-t border-border/50 px-3 py-3 pl-10">
+                <div className="px-3 py-3 pl-10">
                     <McpComponentToolList
                         componentName={mcpComponent.componentName}
                         componentVersion={mcpComponent.componentVersion}

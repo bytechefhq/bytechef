@@ -20,7 +20,7 @@ const McpIntegrationInstanceConfigurationList = ({mcpServer}: McpIntegrationInst
     }
 
     return (
-        <div className="flex flex-col gap-1.5">
+        <div className="divide-y divide-stroke-neutral-primary">
             {mcpIntegrationInstanceConfigurations.map((mcpIntegrationInstanceConfiguration) => (
                 <McpIntegrationInstanceConfigurationListItem
                     key={mcpIntegrationInstanceConfiguration.id}

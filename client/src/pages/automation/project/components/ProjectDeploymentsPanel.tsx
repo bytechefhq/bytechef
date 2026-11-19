@@ -163,6 +163,7 @@ const ProjectDeploymentsPanel = ({
                 >
                     <ProjectDeploymentList
                         componentDefinitions={componentDefinitions}
+                        divided
                         expandAll={expandAll}
                         hideOpenInProject
                         hideOpenWorkflowInProject={hideOpenWorkflowInProject}
