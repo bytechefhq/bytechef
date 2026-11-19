@@ -57,6 +57,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
@@ -360,7 +361,12 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_CONNECTION_UPDATED, data = {
+        @AuditData(key = "integrationInstanceId", value = "#integrationInstanceId"),
+        @AuditData(key = "connectionId", value = "#connectionId")
+    })
     @PreAuthorize("isTenantAdmin()")
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void updateIntegrationInstanceConnection(long integrationInstanceId, long connectionId) {
         IntegrationInstance integrationInstance = requireProvisioned(integrationInstanceId);
 
@@ -376,6 +382,8 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
         if (!integrationInstance.isEnabled() || !connectedUser.isEnabled()) {
             integrationInstanceService.updateConnectionId(integrationInstanceId, connectionId);
+
+            integrationInstanceConnectionCleanup.keepForConnectedUser(connectedUser.getId(), previousConnectionId);
 
             return;
         }
@@ -402,6 +410,8 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
             restartedIntegrationInstanceWorkflows.add(integrationInstanceWorkflow);
         }
+
+        integrationInstanceConnectionCleanup.keepForConnectedUser(connectedUser.getId(), previousConnectionId);
     }
 
     @Override
@@ -852,7 +862,10 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         List<ConnectionDTO> connectionDTOs = connectedUserConnectionFacade.getConnectedUserConnectionsForAdmin(
             integrationInstance.getConnectedUserId(), integration.getComponentName(), List.of(connectionId));
 
-        boolean connectionValid = connectionDTOs.stream()
+        Set<Long> ownedConnectionIds = connectedUserConnectionFacade.getOwnedConnectionIds(
+            integrationInstance.getConnectedUserId());
+
+        boolean connectionValid = ownedConnectionIds.contains(connectionId) && connectionDTOs.stream()
             .anyMatch(connectionDTO -> Objects.equals(connectionDTO.id(), connectionId) &&
                 connectionDTO.environmentId() == integrationInstanceConfiguration.getEnvironmentId());
 

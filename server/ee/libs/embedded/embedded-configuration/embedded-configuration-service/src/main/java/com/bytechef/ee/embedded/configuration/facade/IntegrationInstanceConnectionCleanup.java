@@ -59,4 +59,14 @@ public class IntegrationInstanceConnectionCleanup {
             connectionService.delete(connectionId);
         }
     }
+
+    public void keepForConnectedUser(long connectedUserId, long connectionId) {
+        if (connectedUserConnectionService.existsByConnectionId(connectionId) ||
+            integrationInstanceService.existsByConnectionId(connectionId)) {
+
+            return;
+        }
+
+        connectedUserConnectionService.create(connectedUserId, connectionId);
+    }
 }
