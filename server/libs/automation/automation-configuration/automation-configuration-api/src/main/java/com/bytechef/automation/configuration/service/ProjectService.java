@@ -73,9 +73,9 @@ public interface ProjectService {
     void removeProjectVersion(long id, int projectVersion);
 
     /**
-     * Sets the project's created and last modified dates to the ones the draft had when the given published version
-     * was the draft: created at the publish of the previous version (or at its own publish for version 1), last
-     * modified at its own publish.
+     * Sets the project's created and last modified dates to the ones the draft had when the given published version was
+     * the draft: created at the publish of the previous version (or at its own publish for version 1), last modified at
+     * its own publish.
      */
     void restoreProjectVersionDates(long id, int projectVersion);
 
