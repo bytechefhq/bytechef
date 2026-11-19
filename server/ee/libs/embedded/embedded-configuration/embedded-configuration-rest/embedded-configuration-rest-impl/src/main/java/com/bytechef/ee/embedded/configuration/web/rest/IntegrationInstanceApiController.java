@@ -21,6 +21,7 @@ import com.bytechef.ee.embedded.configuration.web.rest.model.ProvisionableIntegr
 import com.bytechef.ee.embedded.configuration.web.rest.model.ProvisionableIntegrationModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionCredentialsRequestModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateIntegrationInstanceConnectionRequestModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateIntegrationInstanceWorkflowRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -149,6 +150,19 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
         integrationInstanceFacade.updateIntegrationInstanceCredentials(
             id, updateConnectionCredentialsRequestModel.getParameters(),
             Objects.requireNonNull(updateConnectionCredentialsRequestModel.getVersion()));
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
+    public ResponseEntity<Void> updateIntegrationInstanceWorkflow(
+        Long id, String workflowId,
+        UpdateIntegrationInstanceWorkflowRequestModel updateIntegrationInstanceWorkflowRequestModel) {
+
+        Map<String, Object> inputs = updateIntegrationInstanceWorkflowRequestModel.getInputs();
+
+        integrationInstanceFacade.updateIntegrationInstanceWorkflow(id, workflowId, inputs == null ? Map.of() : inputs);
 
         return ResponseEntity.noContent()
             .build();

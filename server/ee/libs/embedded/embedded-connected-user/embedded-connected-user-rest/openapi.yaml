@@ -310,8 +310,12 @@ components:
         credentialStatus:
           $ref: "#/components/schemas/CredentialStatus"
         provisioned:
-          description: "If a tenant admin provisioned the integration instance."
+          description: "If a tenant admin or the API set up the integration instance for the connected user."
           type: "boolean"
+          readOnly: true
+        provisionedBy:
+          description: "Who set up the integration instance: the tenant admin's login, or api-key for the server-to-server API."
+          type: "string"
           readOnly: true
     ConnectedUserImportResult:
       type: "object"

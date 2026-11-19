@@ -1296,6 +1296,36 @@ paths:
       responses:
         "204":
           description: "Successful operation."
+  /integration-instances/{id}/workflows/{workflowId}:
+    put:
+      description: "Update the inputs of an integration instance workflow."
+      summary: "Update the inputs of an integration instance workflow"
+      tags:
+        - "integration-instance"
+      operationId: "updateIntegrationInstanceWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of an integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowId"
+          description: "The id of an integration instance workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateIntegrationInstanceWorkflowRequest"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
   /integration-instances/{id}/workflows/{workflowId}/enable/{enable}:
     patch:
       description: "Enable/disable an integration instance workflow."
@@ -1984,6 +2014,14 @@ components:
                 - "PENDING_REASSIGNMENT"
                 - "REVOKED"
               readOnly: true
+    UpdateIntegrationInstanceWorkflowRequest:
+      description: "The inputs of an integration instance workflow."
+      type: "object"
+      properties:
+        inputs:
+          description: "The input values, keyed by input name."
+          type: "object"
+          additionalProperties: true
     UpdateConnectionCredentialsRequest:
       description: "Contains the replacement credentials of a connection."
       type: "object"
