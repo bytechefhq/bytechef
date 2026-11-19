@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
@@ -131,5 +132,33 @@ class IntegrationInstanceApiControllerIntTest {
             .exchange()
             .expectStatus()
             .isNotFound();
+    }
+
+    @Test
+    @WithMockUser(username = EXTERNAL_USER_ID)
+    void testCreateIntegrationInstanceThroughTheApiKeyLeavesItSelfCreated() {
+        IntegrationInstance integrationInstance = mock(IntegrationInstance.class);
+
+        when(integrationInstance.getId()).thenReturn(INTEGRATION_INSTANCE_ID);
+        when(connectedUserIntegrationFacade.createIntegrationInstance(
+            EXTERNAL_USER_ID, INTEGRATION_ID, Map.of(), Environment.PRODUCTION))
+                .thenReturn(integrationInstance);
+
+        webTestClient
+            .post()
+            .uri("/v1/{externalUserId}/integrations/{id}/instances", EXTERNAL_USER_ID, INTEGRATION_ID)
+            .header("X-Environment", "PRODUCTION")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue("""
+                {"connection":{"parameters":{}}}""")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$")
+            .isEqualTo(INTEGRATION_INSTANCE_ID);
+
+        verify(connectedUserIntegrationFacade).createIntegrationInstance(
+            EXTERNAL_USER_ID, INTEGRATION_ID, Map.of(), Environment.PRODUCTION);
     }
 }

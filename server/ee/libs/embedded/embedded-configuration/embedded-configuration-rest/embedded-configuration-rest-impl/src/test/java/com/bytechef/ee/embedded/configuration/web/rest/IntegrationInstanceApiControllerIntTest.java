@@ -220,6 +220,23 @@ class IntegrationInstanceApiControllerIntTest {
     }
 
     @Test
+    void testPutIntegrationInstanceWorkflowUpdatesItsInputs() {
+        this.webTestClient
+            .put()
+            .uri("/internal/integration-instances/7/workflows/workflow-1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(
+                """
+                    {"inputs":{"contactPageUrl":"https://example.com/contact"}}""")
+            .exchange()
+            .expectStatus()
+            .isNoContent();
+
+        verify(integrationInstanceFacade).updateIntegrationInstanceWorkflow(
+            7L, "workflow-1", Map.of("contactPageUrl", "https://example.com/contact"));
+    }
+
+    @Test
     void testPutIntegrationInstanceCredentialsAnswersNotFoundForAnUnknownOrSelfActivatedInstance() {
         doThrow(new NoSuchElementException("Integration instance id=8 not found"))
             .when(integrationInstanceFacade)
