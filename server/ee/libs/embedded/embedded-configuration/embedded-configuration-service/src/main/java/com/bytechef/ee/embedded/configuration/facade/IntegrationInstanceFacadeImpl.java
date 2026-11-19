@@ -79,6 +79,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     private final ObjectProvider<ConnectedUserIntegrationFacade> connectedUserIntegrationFacadeProvider;
     private final ObjectProvider<ConnectedUserIntegrationInstanceFacade> connectedUserIntegrationInstanceFacadeProvider;
     private final ConnectedUserService connectedUserService;
+    private final ObjectProvider<ConnectedUserWorkflowWebhookUrlResolver> connectedUserWorkflowWebhookUrlResolverProvider;
     private final Evaluator evaluator;
     private final PrincipalJobService principalJobService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
@@ -101,8 +102,9 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         ApplicationProperties applicationProperties, ConnectedUserConnectionFacade connectedUserConnectionFacade,
         ObjectProvider<ConnectedUserIntegrationFacade> connectedUserIntegrationFacadeProvider,
         ObjectProvider<ConnectedUserIntegrationInstanceFacade> connectedUserIntegrationInstanceFacadeProvider,
-        ConnectedUserService connectedUserService, Evaluator evaluator,
-        IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
+        ConnectedUserService connectedUserService,
+        ObjectProvider<ConnectedUserWorkflowWebhookUrlResolver> connectedUserWorkflowWebhookUrlResolverProvider,
+        Evaluator evaluator, IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceConnectionCleanup integrationInstanceConnectionCleanup,
         IntegrationInstanceCredentialsUpdater integrationInstanceCredentialsUpdater,
@@ -118,6 +120,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         this.connectedUserIntegrationFacadeProvider = connectedUserIntegrationFacadeProvider;
         this.connectedUserIntegrationInstanceFacadeProvider = connectedUserIntegrationInstanceFacadeProvider;
         this.connectedUserService = connectedUserService;
+        this.connectedUserWorkflowWebhookUrlResolverProvider = connectedUserWorkflowWebhookUrlResolverProvider;
         this.evaluator = evaluator;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
@@ -275,7 +278,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
                     return new IntegrationInstanceWorkflowDTO(
                         integrationInstanceWorkflow, getIntegrationInstanceWorkflowLastExecutionDate(id, workflowId),
-                        workflowId);
+                        workflowId, getStaticWebhookUrl(id, workflowId));
                 })
                 .collect(Collectors.toSet()),
             getIntegrationInstanceLastExecutionDate(integrationInstance.getId()));
@@ -731,6 +734,22 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
 // TODO Don’t validate inputs as they are currently entered one by one in ConnectDialog, check if it is possible to
 // change the logic and send the all inputs at once
+    private @Nullable String getStaticWebhookUrl(long integrationInstanceId, @Nullable String workflowId) {
+        ConnectedUserWorkflowWebhookUrlResolver connectedUserWorkflowWebhookUrlResolver =
+            connectedUserWorkflowWebhookUrlResolverProvider.getIfAvailable();
+
+        if (connectedUserWorkflowWebhookUrlResolver == null || workflowId == null) {
+            return null;
+        }
+
+        IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(workflowId);
+
+        Workflow workflow = workflowService.getWorkflow(integrationWorkflow.getWorkflowId());
+
+        return connectedUserWorkflowWebhookUrlResolver.resolveIntegrationInstanceWorkflow(
+            integrationInstanceId, integrationWorkflow.getUuidAsString(), workflow);
+    }
+
 //    private void validateInputs(Map<String, ?> inputs, Workflow workflow) {
 //        for (Workflow.Input input : workflow.getInputs()) {
 //            if (input.required()) {

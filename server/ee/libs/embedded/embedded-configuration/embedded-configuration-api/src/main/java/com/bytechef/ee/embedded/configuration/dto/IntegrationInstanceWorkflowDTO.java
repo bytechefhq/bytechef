@@ -22,17 +22,18 @@ import org.jspecify.annotations.Nullable;
 public record IntegrationInstanceWorkflowDTO(
     String createdBy, Instant createdDate, Long id, long integrationInstanceConfigurationWorkflowId,
     Map<String, ?> inputs, @Nullable Instant lastExecutionDate, String lastModifiedBy, Instant lastModifiedDate,
-    boolean enabled, String workflowId) {
+    boolean enabled, String workflowId, @Nullable String staticWebhookUrl) {
 
     public IntegrationInstanceWorkflowDTO(
         IntegrationInstanceWorkflow integrationInstanceWorkflow, @Nullable Instant lastExecutionDate,
-        String workflowId) {
+        String workflowId, @Nullable String staticWebhookUrl) {
 
         this(
             integrationInstanceWorkflow.getCreatedBy(), integrationInstanceWorkflow.getCreatedDate(),
             integrationInstanceWorkflow.getId(),
             integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId(),
             integrationInstanceWorkflow.getInputs(), lastExecutionDate, integrationInstanceWorkflow.getLastModifiedBy(),
-            integrationInstanceWorkflow.getLastModifiedDate(), integrationInstanceWorkflow.isEnabled(), workflowId);
+            integrationInstanceWorkflow.getLastModifiedDate(), integrationInstanceWorkflow.isEnabled(), workflowId,
+            staticWebhookUrl);
     }
 }
