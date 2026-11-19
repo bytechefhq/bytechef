@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.codeworkflow.loader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -535,6 +536,35 @@ class IntegrationHandlerPolyglotEngineTest {
                 .getComponentInput());
         assertEquals(Optional.empty(), inputs.get(1)
             .getComponentInput());
+    }
+
+    @Test
+    void testLoadsAnInternalOnlyInput() {
+        String source = """
+            ({
+                componentName: 'googleMail',
+                componentVersion: 1,
+                workflows: [{
+                    name: 'notify',
+                    inputs: [{name: 'contactPageUrl', internalOnly: true}, {name: 'note'}],
+                    tasks: [{name: 'post', perform: (input, context) => input.note}],
+                }],
+            })
+            """;
+
+        WorkflowDefinition workflowDefinition = IntegrationHandlerPolyglotEngine.load("js", source)
+            .getDefinition()
+            .getWorkflows()
+            .orElseThrow()
+            .getFirst();
+
+        List<? extends Input> inputs = workflowDefinition.getInputs()
+            .orElseThrow();
+
+        assertTrue(inputs.getFirst()
+            .isInternalOnly());
+        assertFalse(inputs.get(1)
+            .isInternalOnly());
     }
 
     @Test

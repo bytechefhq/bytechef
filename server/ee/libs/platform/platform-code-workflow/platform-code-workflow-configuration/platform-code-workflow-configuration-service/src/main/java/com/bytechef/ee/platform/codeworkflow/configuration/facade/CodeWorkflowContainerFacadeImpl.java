@@ -363,6 +363,10 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
                 inputNode.put("label", input.getLabel());
             }
 
+            if (input.isInternalOnly()) {
+                inputNode.put(WorkflowExtConstants.INTERNAL_ONLY, true);
+            }
+
             OptionalUtils.ifPresent(
                 input.getComponentInput(),
                 componentInput -> inputNode

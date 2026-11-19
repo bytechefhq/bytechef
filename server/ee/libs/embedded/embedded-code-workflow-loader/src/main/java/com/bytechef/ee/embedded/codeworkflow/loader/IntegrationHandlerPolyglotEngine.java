@@ -565,13 +565,15 @@ class IntegrationHandlerPolyglotEngine {
         for (Object entry : inputList) {
             Map<?, ?> input = (Map<?, ?>) entry;
 
+            Object internalOnly = input.get("internalOnly");
             Object required = input.get("required");
 
             inputDefinitions.add(
                 new PolyglotInput(
                     (String) input.get("name"), (String) input.get("label"),
                     input.get("type") == null ? "STRING" : String.valueOf(input.get("type")),
-                    Boolean.TRUE.equals(required), toComponentInputReference(input)));
+                    Boolean.TRUE.equals(required), Boolean.TRUE.equals(internalOnly),
+                    toComponentInputReference(input)));
         }
 
         return inputDefinitions;
@@ -618,8 +620,8 @@ class IntegrationHandlerPolyglotEngine {
 
     @SuppressFBWarnings("EI")
     private record PolyglotInput(
-        String name, String label, String type, boolean required, Input.ComponentInputReference componentInput)
-        implements Input {
+        String name, String label, String type, boolean required, boolean internalOnly,
+        Input.ComponentInputReference componentInput) implements Input {
 
         @Override
         public Optional<ComponentInputReference> getComponentInput() {
@@ -639,6 +641,11 @@ class IntegrationHandlerPolyglotEngine {
         @Override
         public String getType() {
             return type;
+        }
+
+        @Override
+        public boolean isInternalOnly() {
+            return internalOnly;
         }
 
         @Override
