@@ -58,4 +58,16 @@ public class WorkflowDefinitionDiffServiceImpl implements WorkflowDefinitionDiff
             WorkflowChangeType.MODIFIED, WorkflowStructuralDiffer.diff(oldNormalized, newNormalized), oldDefinition,
             newDefinition);
     }
+
+    @Override
+    public boolean hasChanges(@Nullable Workflow oldWorkflow, @Nullable Workflow newWorkflow) {
+        if (oldWorkflow == null || newWorkflow == null) {
+            return true;
+        }
+
+        Map<String, Object> oldNormalized = WorkflowDefinitionNormalizer.normalize(oldWorkflow);
+        Map<String, Object> newNormalized = WorkflowDefinitionNormalizer.normalize(newWorkflow);
+
+        return !oldNormalized.equals(newNormalized);
+    }
 }

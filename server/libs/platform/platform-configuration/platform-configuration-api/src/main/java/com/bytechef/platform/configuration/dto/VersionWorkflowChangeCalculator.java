@@ -58,6 +58,28 @@ public final class VersionWorkflowChangeCalculator {
             VersionWorkflowChangeFactory.change(workflowUuid, baseVersion, version, oldWorkflow, newWorkflow, diff));
     }
 
+    public static boolean hasChanges(
+        Map<String, @Nullable Workflow> oldWorkflowsByUuid, Map<String, @Nullable Workflow> newWorkflowsByUuid,
+        WorkflowDefinitionDiffService workflowDefinitionDiffService) {
+
+        Set<String> oldWorkflowUuids = oldWorkflowsByUuid.keySet();
+
+        if (!oldWorkflowUuids.equals(newWorkflowsByUuid.keySet())) {
+            return true;
+        }
+
+        for (String workflowUuid : oldWorkflowUuids) {
+            Workflow oldWorkflow = oldWorkflowsByUuid.get(workflowUuid);
+            Workflow newWorkflow = newWorkflowsByUuid.get(workflowUuid);
+
+            if (workflowDefinitionDiffService.hasChanges(oldWorkflow, newWorkflow)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static @Nullable Integer resolveBaseVersion(Collection<Integer> versions, int version) {
         Integer baseVersion = null;
 

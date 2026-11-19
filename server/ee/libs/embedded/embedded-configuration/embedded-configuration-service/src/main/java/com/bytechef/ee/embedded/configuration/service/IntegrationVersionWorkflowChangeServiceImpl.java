@@ -15,13 +15,13 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChangeCalculator;
-import com.bytechef.platform.configuration.dto.VersionWorkflowChangeSummary;
-import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
 import com.bytechef.platform.configuration.service.WorkflowDefinitionDiffService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,24 +64,20 @@ class IntegrationVersionWorkflowChangeServiceImpl implements IntegrationVersionW
 
         long integrationId = integration.getId();
 
-        VersionWorkflowChanges versionWorkflowChanges = VersionWorkflowChangeCalculator.summarize(
-            baseVersion, draftIntegrationVersion, getWorkflows(integrationId, baseVersion),
-            getWorkflows(integrationId, draftIntegrationVersion), workflowDefinitionDiffService);
-
-        List<VersionWorkflowChangeSummary> workflows = versionWorkflowChanges.workflows();
-
-        return !workflows.isEmpty();
+        return VersionWorkflowChangeCalculator.hasChanges(
+            fetchWorkflows(integrationId, baseVersion), fetchWorkflows(integrationId, draftIntegrationVersion),
+            workflowDefinitionDiffService);
     }
 
-    private Map<String, Workflow> getWorkflows(long integrationId, int integrationVersion) {
-        Map<String, Workflow> workflows = new LinkedHashMap<>();
+    private Map<String, @Nullable Workflow> fetchWorkflows(long integrationId, int integrationVersion) {
+        Map<String, @Nullable Workflow> workflows = new LinkedHashMap<>();
 
         for (IntegrationWorkflow integrationWorkflow : integrationWorkflowService.getIntegrationWorkflows(
             integrationId, integrationVersion)) {
 
-            workflows.put(
-                integrationWorkflow.getUuidAsString(),
-                workflowService.getWorkflow(integrationWorkflow.getWorkflowId()));
+            Optional<Workflow> workflowOptional = workflowService.fetchWorkflow(integrationWorkflow.getWorkflowId());
+
+            workflows.put(integrationWorkflow.getUuidAsString(), workflowOptional.orElse(null));
         }
 
         return workflows;

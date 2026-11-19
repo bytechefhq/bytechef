@@ -25,13 +25,13 @@ import com.bytechef.automation.configuration.exception.ProjectErrorType;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChangeCalculator;
-import com.bytechef.platform.configuration.dto.VersionWorkflowChangeSummary;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
 import com.bytechef.platform.configuration.service.WorkflowDefinitionDiffService;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -93,13 +93,9 @@ public class ProjectVersionWorkflowChangeServiceImpl implements ProjectVersionWo
 
         long projectId = project.getId();
 
-        VersionWorkflowChanges versionWorkflowChanges = VersionWorkflowChangeCalculator.summarize(
-            baseVersion, draftProjectVersion, getWorkflows(projectId, baseVersion),
-            getWorkflows(projectId, draftProjectVersion), workflowDefinitionDiffService);
-
-        List<VersionWorkflowChangeSummary> workflows = versionWorkflowChanges.workflows();
-
-        return !workflows.isEmpty();
+        return VersionWorkflowChangeCalculator.hasChanges(
+            fetchWorkflows(projectId, baseVersion), fetchWorkflows(projectId, draftProjectVersion),
+            workflowDefinitionDiffService);
     }
 
     private static List<Integer> getVersions(Project project) {
@@ -127,6 +123,20 @@ public class ProjectVersionWorkflowChangeServiceImpl implements ProjectVersionWo
                 ProjectErrorType.PROJECT_VERSION_NOT_FOUND));
 
         return project;
+    }
+
+    private Map<String, @Nullable Workflow> fetchWorkflows(long projectId, int projectVersion) {
+        Map<String, @Nullable Workflow> workflows = new LinkedHashMap<>();
+
+        for (ProjectWorkflow projectWorkflow : projectWorkflowService.getProjectWorkflows(
+            projectId, projectVersion)) {
+
+            Optional<Workflow> workflowOptional = workflowService.fetchWorkflow(projectWorkflow.getWorkflowId());
+
+            workflows.put(projectWorkflow.getUuidAsString(), workflowOptional.orElse(null));
+        }
+
+        return workflows;
     }
 
     private Map<String, Workflow> getWorkflows(long projectId, @Nullable Integer projectVersion) {
