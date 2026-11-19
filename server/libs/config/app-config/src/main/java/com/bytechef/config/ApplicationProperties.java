@@ -5069,15 +5069,13 @@ public class ApplicationProperties {
 
         public static class Sandbox {
 
-            private boolean enabled = true;
+            private boolean enabled;
 
-            private Duration maxCpuTime = Duration.ofMinutes(5);
+            private int maxConcurrentExecutions;
 
-            private DataSize maxHeapMemory = DataSize.ofBytes(512L * 1024 * 1024);
+            private Duration maxCpuTime;
 
-            private int maxConcurrentExecutions = Math.max(
-                16, Runtime.getRuntime()
-                    .availableProcessors() * 4);
+            private DataSize maxHeapMemory;
 
             public int getMaxConcurrentExecutions() {
                 return maxConcurrentExecutions;
