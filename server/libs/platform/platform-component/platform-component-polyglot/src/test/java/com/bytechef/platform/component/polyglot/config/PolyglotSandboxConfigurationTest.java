@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.polyglot;
+package com.bytechef.platform.component.polyglot.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.component.polyglot.PolyglotSandboxSettings;
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.unit.DataSize;
 
 /**
  * @author Ivica Cardic
@@ -27,11 +30,21 @@ import org.junit.jupiter.api.Test;
 public class PolyglotSandboxConfigurationTest {
 
     @Test
-    public void testDefaultApplicationPropertiesYieldTheDefaultSettings() {
+    public void testSandboxPropertiesMapToTheSandboxSettings() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        ApplicationProperties.Script.Sandbox sandbox = applicationProperties.getScript()
+            .getSandbox();
+
+        sandbox.setEnabled(true);
+        sandbox.setMaxConcurrentExecutions(16);
+        sandbox.setMaxCpuTime(Duration.ofMinutes(5));
+        sandbox.setMaxHeapMemory(DataSize.ofMegabytes(512));
+
         PolyglotSandboxConfiguration polyglotSandboxConfiguration = new PolyglotSandboxConfiguration(
-            new ApplicationProperties());
+            applicationProperties);
 
         assertThat(polyglotSandboxConfiguration.getPolyglotSandboxSettings())
-            .isEqualTo(PolyglotSandboxSettings.defaults());
+            .isEqualTo(new PolyglotSandboxSettings(true, Duration.ofMinutes(5), 512L * 1024 * 1024, 16));
     }
 }

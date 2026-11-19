@@ -29,9 +29,7 @@ public record PolyglotSandboxSettings(
 
     public static final long DEFAULT_MAX_HEAP_MEMORY = 512L * 1024 * 1024;
 
-    public static final int DEFAULT_MAX_CONCURRENT_EXECUTIONS =
-        Math.max(16, Runtime.getRuntime()
-            .availableProcessors() * 4);
+    public static final int DEFAULT_MAX_CONCURRENT_EXECUTIONS = 16;
 
     public PolyglotSandboxSettings {
         if (maxConcurrentExecutions < 1) {

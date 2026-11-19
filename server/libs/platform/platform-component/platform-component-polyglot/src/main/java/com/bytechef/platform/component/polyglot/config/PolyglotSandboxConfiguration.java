@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.polyglot;
+package com.bytechef.platform.component.polyglot.config;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.component.polyglot.PolyglotSandbox;
+import com.bytechef.platform.component.polyglot.PolyglotSandboxSettings;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
