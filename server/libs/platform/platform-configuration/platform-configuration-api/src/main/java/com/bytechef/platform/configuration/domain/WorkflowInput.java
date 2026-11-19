@@ -70,19 +70,18 @@ public class WorkflowInput {
 
     /**
      * Resolves the component-input-group reference carried in the input extensions, or {@code null} when the input does
-     * not reference a component.
+     * not carry a complete reference (component name, component version and group name).
      */
     public ComponentInputReference getComponentInputReference() {
         String componentName = getExtension(WorkflowExtConstants.COMPONENT_NAME, String.class, null);
+        Integer componentVersion = getExtension(WorkflowExtConstants.COMPONENT_VERSION, Integer.class, null);
+        String groupName = getExtension(WorkflowExtConstants.GROUP_NAME, String.class, null);
 
-        if (componentName == null) {
+        if (componentName == null || componentVersion == null || groupName == null) {
             return null;
         }
 
-        return new ComponentInputReference(
-            componentName,
-            getExtension(WorkflowExtConstants.COMPONENT_VERSION, Integer.class, null),
-            getExtension(WorkflowExtConstants.GROUP_NAME, String.class, null));
+        return new ComponentInputReference(componentName, componentVersion, groupName);
     }
 
     public String getObjectName() {

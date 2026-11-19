@@ -60,6 +60,25 @@ class WorkflowInputTest {
     }
 
     @Test
+    void testComponentInputReferenceIsNullWhenGroupNameIsMissing() {
+        WorkflowInput workflowInput = new WorkflowInput(
+            new Workflow.Input(
+                "sheet", "Sheet", "string", false, Map.of("componentName", "googleSheets", "componentVersion", 2)));
+
+        assertNull(workflowInput.getComponentInputReference());
+    }
+
+    @Test
+    void testComponentInputReferenceIsNullWhenComponentVersionIsMissing() {
+        WorkflowInput workflowInput = new WorkflowInput(
+            new Workflow.Input(
+                "sheet", "Sheet", "string", false,
+                Map.of("componentName", "googleSheets", "groupName", "sheetSelection")));
+
+        assertNull(workflowInput.getComponentInputReference());
+    }
+
+    @Test
     void testObjectNameAndInternalOnlyReadFromExtensions() {
         WorkflowInput workflowInput = new WorkflowInput(
             new Workflow.Input(
