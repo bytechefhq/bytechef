@@ -28,6 +28,7 @@ import static com.bytechef.platform.component.runner.TaskRunnerConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
@@ -87,7 +88,7 @@ public class CommandsActionDefinition extends AbstractActionDefinitionWrapper {
         TaskRunnerRequest taskRunnerRequest = new TaskRunnerRequest(
             languageId, null, inputParameters.getRequiredList(COMMANDS, String.class), Map.of(),
             inputParameters.getMap(ENV, String.class, Map.of()),
-            inputParameters.getMap(INPUT_FILES, Object.class, Map.of()),
+            inputParameters.getMap(INPUT_FILES, List.of(FileEntry.class), Map.of()),
             inputParameters.getList(OUTPUT_FILES, String.class, List.of()), inputParameters, runnerParameters,
             timeoutSeconds == null ? null : Duration.ofSeconds(timeoutSeconds), connectionParameters, context);
 

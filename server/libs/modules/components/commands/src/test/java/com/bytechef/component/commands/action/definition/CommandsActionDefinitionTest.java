@@ -36,9 +36,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.commands.action.CommandsShellAction;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
@@ -56,6 +58,12 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 /**
  * @author Ivica Cardic
@@ -172,6 +180,36 @@ class CommandsActionDefinitionTest {
         Parameters inputParameters = taskRunnerRequest.inputParameters();
 
         assertThat(inputParameters.getList(COMMANDS, String.class)).isEqualTo(LINES);
+    }
+
+    @Test
+    void testPerformPassesStoredInputFilesToTheRunnerAsFileEntries() throws Exception {
+        registerFileEntryDeserializer();
+
+        when(taskRunnerRegistry.getTaskRunner(PROCESS)).thenReturn(taskRunner);
+        when(taskRunner.run(any())).thenReturn(new TaskRunnerResult(Map.of(), 0, "", "", Map.of()));
+
+        perform(
+            Map.of(
+                COMMANDS, LINES,
+                INPUT_FILES, Map.of(
+                    "notes.txt", "inline text",
+                    "report.csv", Map.of(
+                        "extension", "csv", "mimeType", "text/csv", "name", "report.csv",
+                        "url", "file:/editor/temp/report.csv")),
+                TASK_RUNNER, Map.of(TYPE, PROCESS)));
+
+        ArgumentCaptor<TaskRunnerRequest> requestCaptor = ArgumentCaptor.forClass(TaskRunnerRequest.class);
+
+        verify(taskRunner).run(requestCaptor.capture());
+
+        TaskRunnerRequest taskRunnerRequest = requestCaptor.getValue();
+
+        Map<String, ?> inputFiles = taskRunnerRequest.inputFiles();
+
+        assertThat(inputFiles.get("notes.txt")).isEqualTo("inline text");
+        assertThat(inputFiles.get("report.csv")).isInstanceOfSatisfying(
+            FileEntry.class, fileEntry -> assertThat(fileEntry.getUrl()).isEqualTo("file:/editor/temp/report.csv"));
     }
 
     @Test
@@ -307,5 +345,42 @@ class CommandsActionDefinitionTest {
 
         return performFunction.apply(
             ParametersFactory.create(inputParameters), Map.of(), ParametersFactory.create(Map.of()), context);
+    }
+
+    private static void registerFileEntryDeserializer() {
+        SimpleModule simpleModule = new SimpleModule();
+
+        simpleModule.addDeserializer(FileEntry.class, new StoredFileEntryDeserializer());
+
+        MapUtils.setObjectMapper(
+            JsonMapper.builder()
+                .addModule(simpleModule)
+                .build());
+    }
+
+    private record StoredFileEntry(String getExtension, String getMimeType, String getName, String getUrl)
+        implements FileEntry {
+    }
+
+    private static class StoredFileEntryDeserializer extends ValueDeserializer<FileEntry> {
+
+        @Override
+        public FileEntry deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) {
+            JsonNode jsonNode = deserializationContext.readTree(jsonParser);
+
+            if (!jsonNode.has("name") || !jsonNode.has("url")) {
+                throw new IllegalArgumentException("Not a file entry");
+            }
+
+            return new StoredFileEntry(
+                jsonNode.path("extension")
+                    .asString(),
+                jsonNode.path("mimeType")
+                    .asString(),
+                jsonNode.path("name")
+                    .asString(),
+                jsonNode.path("url")
+                    .asString());
+        }
     }
 }
