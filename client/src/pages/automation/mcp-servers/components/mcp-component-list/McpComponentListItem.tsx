@@ -1,15 +1,9 @@
-import Badge from '@/components/Badge/Badge';
-import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import McpComponentListItemDropdownMenu from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentListItemDropdownMenu';
 import useMcpComponentListItem from '@/pages/automation/mcp-servers/components/mcp-component-list/hooks/useMcpComponentListItem';
-import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import {McpComponent, McpServer} from '@/shared/middleware/graphql';
-import {ComponentIcon} from 'lucide-react';
-import {useState} from 'react';
-import InlineSVG from 'react-inlinesvg';
 
 import McpComponentDialog from '../mcp-component-dialog/McpComponentDialog';
+import McpComponentCollapsible from './McpComponentCollapsible';
 import McpComponentToolList from './McpComponentToolList';
 
 const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpComponent; mcpServer: McpServer}) => {
@@ -18,79 +12,40 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
         mcpComponent.componentVersion
     );
 
-    const [expanded, setExpanded] = useState(false);
-
     return (
-        <Collapsible className="group" onOpenChange={setExpanded} open={expanded}>
-            <div className="relative flex items-center gap-2.5 rounded-md py-2.5 pl-3 hover:bg-surface-neutral-primary-hover">
-                <ListItemExpandButton
-                    className="mr-0 after:absolute after:inset-0"
-                    label={expanded ? 'Hide tools' : 'Show tools'}
+        <McpComponentCollapsible
+            dialog={
+                <McpComponentDialog
+                    mcpComponent={mcpComponent}
+                    mcpServerId={mcpServer.id}
+                    onOpenChange={setShowEditDialog}
+                    open={showEditDialog}
                 />
-
-                {componentDefinition?.icon ? (
-                    <InlineSVG className="size-6 shrink-0" src={componentDefinition.icon} />
-                ) : (
-                    <ComponentIcon className="size-6 shrink-0 text-content-neutral-secondary" />
-                )}
-
-                <CollapsibleTrigger asChild>
-                    <button className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-left" type="button">
-                        <span className="truncate text-sm font-medium">
-                            {mcpComponent.title || mcpComponent.componentName}
-                        </span>
-                    </button>
-                </CollapsibleTrigger>
-
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Badge
-                            className="relative z-10"
-                            label={`v${mcpComponent.componentVersion}`}
-                            styleType="outline-outline"
-                            weight="semibold"
-                        />
-                    </TooltipTrigger>
-
-                    <TooltipContent>Component Version</TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                    <TooltipTrigger className="relative z-10 flex min-w-56 items-center justify-end text-xs text-content-neutral-secondary tabular-nums">
-                        {mcpComponent.lastModifiedDate
-                            ? `Modified at ${new Date(mcpComponent.lastModifiedDate).toLocaleDateString()} ${new Date(mcpComponent.lastModifiedDate).toLocaleTimeString()}`
-                            : '-'}
-                    </TooltipTrigger>
-
-                    <TooltipContent>Last Updated Date</TooltipContent>
-                </Tooltip>
-
+            }
+            dropdownMenu={
                 <McpComponentListItemDropdownMenu
                     mcpComponent={mcpComponent}
                     onEditClick={() => setShowEditDialog(true)}
                 />
-            </div>
-
-            <CollapsibleContent>
-                <div className="px-3 py-3 pl-10">
-                    <McpComponentToolList
-                        componentName={mcpComponent.componentName}
-                        componentVersion={mcpComponent.componentVersion}
-                        connectionId={mcpComponent.connectionId}
+            }
+            iconSrc={componentDefinition?.icon}
+            mcpComponent={mcpComponent}
+        >
+            <McpComponentToolList
+                componentName={mcpComponent.componentName}
+                componentVersion={mcpComponent.componentVersion}
+                connectionId={mcpComponent.connectionId}
+                mcpTools={mcpComponent.mcpTools}
+                renderEditDialog={(open, onOpenChange) => (
+                    <McpComponentDialog
                         mcpComponent={mcpComponent}
                         mcpServerId={mcpServer.id!}
-                        mcpTools={mcpComponent.mcpTools}
+                        onOpenChange={onOpenChange}
+                        open={open}
                     />
-                </div>
-            </CollapsibleContent>
-
-            <McpComponentDialog
-                mcpComponent={mcpComponent}
-                mcpServerId={mcpServer.id}
-                onOpenChange={setShowEditDialog}
-                open={showEditDialog}
+                )}
             />
-        </Collapsible>
+        </McpComponentCollapsible>
     );
 };
 

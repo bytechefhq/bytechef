@@ -1,46 +1,21 @@
 import Badge from '@/components/Badge/Badge';
-import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useMcpComponentListItem from '@/ee/pages/embedded/mcp-servers/components/mcp-component-list/hooks/useMcpComponentListItem';
+import McpComponentCollapsible from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentCollapsible';
 import McpComponentListItemDropdownMenu from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentListItemDropdownMenu';
-import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
+import McpComponentToolList from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentToolList';
 import {McpComponent, McpServer} from '@/shared/middleware/graphql';
-import {ComponentIcon} from 'lucide-react';
-import {useState} from 'react';
-import InlineSVG from 'react-inlinesvg';
 
 import McpComponentDialog from '../mcp-component-dialog/McpComponentDialog';
-import McpComponentToolList from './McpComponentToolList';
 
 const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpComponent; mcpServer: McpServer}) => {
     const {componentDefinition, integrationName, integrationUnavailable, setShowEditDialog, showEditDialog} =
         useMcpComponentListItem(mcpComponent.componentName, mcpComponent.componentVersion, mcpComponent.integrationId);
 
-    const [expanded, setExpanded] = useState(false);
-
     return (
-        <Collapsible className="group" onOpenChange={setExpanded} open={expanded}>
-            <div className="relative flex items-center gap-2.5 rounded-md py-2.5 pl-3 hover:bg-surface-neutral-primary-hover">
-                <ListItemExpandButton
-                    className="mr-0 after:absolute after:inset-0"
-                    label={expanded ? 'Hide tools' : 'Show tools'}
-                />
-
-                {componentDefinition?.icon ? (
-                    <InlineSVG className="size-6 shrink-0" src={componentDefinition.icon} />
-                ) : (
-                    <ComponentIcon className="size-6 shrink-0 text-content-neutral-secondary" />
-                )}
-
-                <CollapsibleTrigger asChild>
-                    <button className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-left" type="button">
-                        <span className="truncate text-sm font-medium">
-                            {mcpComponent.title || mcpComponent.componentName}
-                        </span>
-                    </button>
-                </CollapsibleTrigger>
-
-                {mcpComponent.integrationId ? (
+        <McpComponentCollapsible
+            badges={
+                mcpComponent.integrationId ? (
                     !integrationName &&
                     integrationUnavailable && (
                         <Tooltip>
@@ -74,60 +49,44 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
                             Edit this component to choose the integration whose connection its tools use.
                         </TooltipContent>
                     </Tooltip>
-                )}
-
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Badge
-                            className="relative z-10"
-                            label={`v${mcpComponent.componentVersion}`}
-                            styleType="outline-outline"
-                            weight="semibold"
-                        />
-                    </TooltipTrigger>
-
-                    <TooltipContent>Component Version</TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                    <TooltipTrigger className="relative z-10 flex min-w-56 items-center justify-end text-xs text-content-neutral-secondary tabular-nums">
-                        {mcpComponent.lastModifiedDate
-                            ? `Modified at ${new Date(mcpComponent.lastModifiedDate).toLocaleDateString()} ${new Date(mcpComponent.lastModifiedDate).toLocaleTimeString()}`
-                            : '-'}
-                    </TooltipTrigger>
-
-                    <TooltipContent>Last Updated Date</TooltipContent>
-                </Tooltip>
-
+                )
+            }
+            dialog={
+                <McpComponentDialog
+                    integrationUnavailable={integrationUnavailable}
+                    key={String(integrationUnavailable)}
+                    mcpComponent={mcpComponent}
+                    mcpServerId={mcpServer.id}
+                    onOpenChange={setShowEditDialog}
+                    open={showEditDialog}
+                />
+            }
+            dropdownMenu={
                 <McpComponentListItemDropdownMenu
                     embedded
                     mcpComponent={mcpComponent}
                     onEditClick={() => setShowEditDialog(true)}
                 />
-            </div>
-
-            <CollapsibleContent>
-                <div className="px-3 py-2 pl-10">
-                    <McpComponentToolList
-                        componentName={mcpComponent.componentName}
-                        componentVersion={mcpComponent.componentVersion}
-                        connectionId={mcpComponent.connectionId}
+            }
+            iconSrc={componentDefinition?.icon}
+            mcpComponent={mcpComponent}
+        >
+            <McpComponentToolList
+                componentName={mcpComponent.componentName}
+                componentVersion={mcpComponent.componentVersion}
+                connectionId={mcpComponent.connectionId}
+                embedded
+                mcpTools={mcpComponent.mcpTools}
+                renderEditDialog={(open, onOpenChange) => (
+                    <McpComponentDialog
                         mcpComponent={mcpComponent}
                         mcpServerId={mcpServer.id!}
-                        mcpTools={mcpComponent.mcpTools}
+                        onOpenChange={onOpenChange}
+                        open={open}
                     />
-                </div>
-            </CollapsibleContent>
-
-            <McpComponentDialog
-                integrationUnavailable={integrationUnavailable}
-                key={String(integrationUnavailable)}
-                mcpComponent={mcpComponent}
-                mcpServerId={mcpServer.id}
-                onOpenChange={setShowEditDialog}
-                open={showEditDialog}
+                )}
             />
-        </Collapsible>
+        </McpComponentCollapsible>
     );
 };
 

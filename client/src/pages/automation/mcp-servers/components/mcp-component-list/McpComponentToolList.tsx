@@ -1,29 +1,28 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
-import {McpComponent, McpTool} from '@/shared/middleware/graphql';
+import {McpTool} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ComponentIcon} from 'lucide-react';
-import {useMemo, useState} from 'react';
+import {ReactNode, useMemo, useState} from 'react';
 
-import McpComponentDialog from '../mcp-component-dialog/McpComponentDialog';
 import McpComponentToolListItem from './McpComponentToolListItem';
 
 interface McpComponentToolListProps {
     componentName: string;
     componentVersion: number;
     connectionId?: string | null;
-    mcpComponent: McpComponent;
-    mcpServerId: string;
+    embedded?: boolean;
     mcpTools?: Array<McpTool | null> | null;
+    renderEditDialog: (open: boolean, onOpenChange: (open: boolean) => void) => ReactNode;
 }
 
 const McpComponentToolList = ({
     componentName,
     componentVersion,
     connectionId,
-    mcpComponent,
-    mcpServerId,
+    embedded = false,
     mcpTools,
+    renderEditDialog,
 }: McpComponentToolListProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
 
@@ -54,7 +53,8 @@ const McpComponentToolList = ({
                     connectionId={connectionId}
                     connectionRequired={componentDefinition?.connectionRequired ?? true}
                     description={toolDescriptionsByName[tool.name]}
-                    enabledSwitchVisible
+                    embedded={embedded}
+                    enabledSwitchVisible={!embedded}
                     key={tool.name}
                     mcpTool={tool}
                 />
@@ -69,12 +69,7 @@ const McpComponentToolList = ({
                 title="No Tools"
             />
 
-            <McpComponentDialog
-                mcpComponent={mcpComponent}
-                mcpServerId={mcpServerId}
-                onOpenChange={setShowEditDialog}
-                open={showEditDialog}
-            />
+            {renderEditDialog(showEditDialog, setShowEditDialog)}
         </div>
     );
 };
