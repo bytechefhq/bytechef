@@ -14,6 +14,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -38,6 +39,6 @@ public record ConnectedUserDTO(
     public record IntegrationInstance(
         String componentName, CredentialStatus credentialStatus, boolean enabled, long id, long integrationId,
         long integrationInstanceConfigurationId, int integrationVersion, Long connectionId,
-        boolean provisioned) {
+        boolean provisioned, @Nullable String provisionedBy) {
     }
 }
