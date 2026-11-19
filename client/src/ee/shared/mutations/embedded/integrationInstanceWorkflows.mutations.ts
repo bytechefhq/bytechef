@@ -1,6 +1,7 @@
 import {
     EnableIntegrationInstanceWorkflowRequest,
     IntegrationInstanceApi,
+    UpdateIntegrationInstanceWorkflowOperationRequest,
 } from '@/ee/shared/middleware/embedded/configuration';
 import {useMutation} from '@tanstack/react-query';
 
@@ -15,6 +16,22 @@ export const useEnableIntegrationInstanceWorkflowMutation = (
     useMutation({
         mutationFn: (request: EnableIntegrationInstanceWorkflowRequest) => {
             return new IntegrationInstanceApi().enableIntegrationInstanceWorkflow(request);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+interface UpdateIntegrationInstanceWorkflowMutationProps {
+    onSuccess?: (result: void, variables: UpdateIntegrationInstanceWorkflowOperationRequest) => void;
+    onError?: (error: Error, variables: UpdateIntegrationInstanceWorkflowOperationRequest) => void;
+}
+
+export const useUpdateIntegrationInstanceWorkflowMutation = (
+    mutationProps: UpdateIntegrationInstanceWorkflowMutationProps
+) =>
+    useMutation({
+        mutationFn: (request: UpdateIntegrationInstanceWorkflowOperationRequest) => {
+            return new IntegrationInstanceApi().updateIntegrationInstanceWorkflow(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
