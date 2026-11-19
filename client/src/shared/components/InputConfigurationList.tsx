@@ -4,6 +4,7 @@ import Button from '@/components/Button/Button';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Label} from '@/components/ui/label';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
+import WorkflowNodeOptionsSelect from '@/shared/components/WorkflowNodeOptionsSelect';
 import {ComponentConnection} from '@/shared/middleware/automation/configuration';
 import {
     ComponentDefinition,
@@ -244,21 +245,12 @@ const ComponentReferenceDynamicSelect = ({
                 control={control}
                 name={`${controlPath}.${valuePropertyName ?? property.name}`}
                 render={({field}) => (
-                    <select
-                        className="flex h-9 w-full rounded-md border border-stroke-neutral-secondary bg-surface-neutral-primary px-3 py-1 text-sm text-content-neutral-primary"
-                        onChange={(event) => field.onChange(event.target.value)}
-                        value={field.value ?? ''}
-                    >
-                        <option disabled value="">
-                            {isLoading ? 'Loading...' : 'Select...'}
-                        </option>
-
-                        {(options ?? []).map((option) => (
-                            <option key={String(option.value)} value={String(option.value)}>
-                                {option.label ?? String(option.value)}
-                            </option>
-                        ))}
-                    </select>
+                    <WorkflowNodeOptionsSelect
+                        isLoading={isLoading}
+                        onChange={field.onChange}
+                        options={options}
+                        value={field.value}
+                    />
                 )}
             />
 
