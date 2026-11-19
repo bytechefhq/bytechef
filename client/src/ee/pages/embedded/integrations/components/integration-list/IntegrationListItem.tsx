@@ -264,14 +264,6 @@ const IntegrationListItem = ({
                                         </span>
                                     </div>
                                 )}
-
-                                {integration.codeWorkflow && (
-                                    <Badge
-                                        label={getCodeWorkflowLanguageLabel(integration.codeWorkflowLanguage) ?? 'Code'}
-                                        styleType="secondary-filled"
-                                        weight="semibold"
-                                    />
-                                )}
                             </div>
                         </div>
 
@@ -314,8 +306,19 @@ const IntegrationListItem = ({
                     </div>
 
                     <div className="flex items-center justify-between gap-x-6 sm:justify-end [&>:last-child]:-ml-3">
+                        <div className="flex w-24 shrink-0 justify-end">
+                            {integration.codeWorkflow && (
+                                <Badge
+                                    className="uppercase"
+                                    label={getCodeWorkflowLanguageLabel(integration.codeWorkflowLanguage) ?? 'Code'}
+                                    styleType="secondary-filled"
+                                    weight="semibold"
+                                />
+                            )}
+                        </div>
+
                         {integration.lastIntegrationVersion && (
-                            <div className="flex items-center gap-x-3 sm:flex-col sm:items-end sm:gap-x-0 sm:gap-y-4">
+                            <div className="flex items-center gap-x-3 sm:w-60 sm:shrink-0 sm:flex-col sm:items-end sm:gap-x-0 sm:gap-y-4">
                                 <div className="flex items-center">
                                     {integration.lastPublishedDate &&
                                     integration.lastIntegrationVersion &&

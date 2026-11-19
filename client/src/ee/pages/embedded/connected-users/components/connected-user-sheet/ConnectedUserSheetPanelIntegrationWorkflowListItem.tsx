@@ -102,7 +102,7 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
     return (
         <li key={workflow.id}>
             <div
-                className="flex min-h-12 cursor-pointer items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
+                className="flex min-h-12 cursor-pointer items-center justify-between gap-x-4 rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
                 onClick={(event) => {
                     if (isCollapsibleRowClick(event)) {
                         handleWorkflowClick();
@@ -126,6 +126,7 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
                     <WorkflowTriggerAndComponentsRow
                         className="hidden sm:flex"
                         filteredComponentNames={filteredComponentNames}
+                        fitToWidth
                         workflow={workflow}
                         workflowComponentDefinitions={workflowComponentDefinitions}
                         workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
@@ -134,7 +135,7 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
 
                 <div className="flex shrink-0 items-center gap-x-4">
                     <Tooltip>
-                        <TooltipTrigger className="text-xs text-content-neutral-secondary">
+                        <TooltipTrigger className="text-xs whitespace-nowrap text-content-neutral-secondary">
                             {lastExecutionDate
                                 ? `Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`
                                 : 'No executions'}
@@ -192,6 +193,8 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
             {showEditDialog && (
                 <ConnectedUserIntegrationWorkflowEditDialog
                     integrationInstance={integrationInstance}
+                    integrationInstanceConfiguration={integrationInstanceConfiguration}
+                    integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
                     integrationInstanceWorkflow={integrationInstanceWorkflow}
                     onClose={() => setShowEditDialog(false)}
                     workflow={workflow}
