@@ -60,9 +60,13 @@ export interface ConnectedUserIntegrationInstance {
      */
     credentialStatus?: CredentialStatus;
     /**
-     * If a tenant admin provisioned the integration instance.
+     * If a tenant admin or the API set up the integration instance for the connected user.
      */
     readonly provisioned?: boolean;
+    /**
+     * Who set up the integration instance: the tenant admin's login, or api-key for the server-to-server API.
+     */
+    readonly provisionedBy?: string;
 }
 
 
@@ -93,6 +97,7 @@ export function ConnectedUserIntegrationInstanceFromJSONTyped(json: any, ignoreD
         'connectionId': json['connectionId'] == null ? undefined : json['connectionId'],
         'credentialStatus': json['credentialStatus'] == null ? undefined : CredentialStatusFromJSON(json['credentialStatus']),
         'provisioned': json['provisioned'] == null ? undefined : json['provisioned'],
+        'provisionedBy': json['provisionedBy'] == null ? undefined : json['provisionedBy'],
     };
 }
 
@@ -100,7 +105,7 @@ export function ConnectedUserIntegrationInstanceToJSON(json: any): ConnectedUser
     return ConnectedUserIntegrationInstanceToJSONTyped(json, false);
 }
 
-export function ConnectedUserIntegrationInstanceToJSONTyped(value?: Omit<ConnectedUserIntegrationInstance, 'id'|'integrationId'|'integrationInstanceConfigurationId'|'integrationVersion'|'connectionId'|'provisioned'> | null, ignoreDiscriminator: boolean = false): any {
+export function ConnectedUserIntegrationInstanceToJSONTyped(value?: Omit<ConnectedUserIntegrationInstance, 'id'|'integrationId'|'integrationInstanceConfigurationId'|'integrationVersion'|'connectionId'|'provisioned'|'provisionedBy'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
