@@ -1,5 +1,8 @@
 import {CodeWorkflowLanguage} from '@/shared/middleware/graphql';
 import {fireEvent, render, resetAll, screen, waitFor} from '@/shared/util/test-utils';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {renderHook} from '@testing-library/react';
+import {ReactNode} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ProjectCodeWorkflowDetail from './ProjectCodeWorkflowDetail';
@@ -56,6 +59,23 @@ afterEach(() => {
 });
 
 describe('ProjectCodeWorkflowDetail', () => {
+    it('caches its source under the key a version restore invalidates', async () => {
+        const graphqlModule =
+            await vi.importActual<typeof import('@/shared/middleware/graphql')>('@/shared/middleware/graphql');
+
+        const queryClient = new QueryClient();
+
+        renderHook(() => graphqlModule.useCodeWorkflowSourceQuery({projectId: '7'}, {enabled: false}), {
+            wrapper: ({children}: {children: ReactNode}) => (
+                <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+            ),
+        });
+
+        const queryCache = queryClient.getQueryCache();
+
+        expect(queryCache.find({exact: true, queryKey: ['codeWorkflowSource', {projectId: '7'}]})).toBeDefined();
+    });
+
     it('fetches the source for the given project and renders it in the editor', async () => {
         render(<ProjectCodeWorkflowDetail language={CodeWorkflowLanguage.Javascript} projectId="1" />);
 

@@ -109,6 +109,22 @@ describe('useSettingsMenu', () => {
         expect(hoisted.toast).toHaveBeenCalledWith('Version V1 applied to the draft.');
     });
 
+    it('reloads the code workflow source after a version is restored', async () => {
+        vi.spyOn(queryClient, 'query').mockResolvedValue({...integration, integrationWorkflowIds: [11, 13]});
+
+        const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+        renderSettingsMenu();
+
+        await act(async () => {
+            await hoisted.restoreIntegrationVersionOptions.onSuccess(undefined, {id: 7, integrationVersion: 1});
+        });
+
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+            queryKey: ['integrationCodeWorkflowSource', {integrationId: '7'}],
+        });
+    });
+
     it('closes the node details panel after a version is restored', async () => {
         vi.spyOn(queryClient, 'query').mockResolvedValue({...integration, integrationWorkflowIds: [11, 13]});
 

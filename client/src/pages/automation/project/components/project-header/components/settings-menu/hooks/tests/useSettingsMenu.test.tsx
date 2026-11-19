@@ -136,6 +136,20 @@ describe('useSettingsMenu', () => {
         expect(hoisted.toast).toHaveBeenCalledWith('Version V1 applied to the draft.');
     });
 
+    it('reloads the code workflow source after a version is restored', async () => {
+        vi.spyOn(queryClient, 'query').mockResolvedValue({...project, projectWorkflowIds: [11, 13]});
+
+        const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+        renderSettingsMenu();
+
+        await act(async () => {
+            await hoisted.restoreProjectVersionOptions.onSuccess(undefined, {id: 7, projectVersion: 1});
+        });
+
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['codeWorkflowSource', {projectId: '7'}]});
+    });
+
     it('closes the node details panel after a version is restored', async () => {
         vi.spyOn(queryClient, 'query').mockResolvedValue({...project, projectWorkflowIds: [11, 13]});
 
