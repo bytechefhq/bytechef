@@ -203,6 +203,7 @@ describe('AutomationProjectConfigurationListItem', () => {
 
         expect(screen.getByText('V2')).toBeInTheDocument();
         expect(screen.getByText('Newer version available')).toBeInTheDocument();
+        expect(screen.getByText('Newer version available')).not.toHaveClass('border-stroke-warning-primary');
     });
 
     it('does not show the newer version hint when the configuration is current', () => {

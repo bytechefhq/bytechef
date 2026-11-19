@@ -505,6 +505,7 @@ describe('IntegrationInstanceConfigurationListItem newer version', () => {
         renderItem();
 
         expect(screen.getByText('Newer version available')).toBeInTheDocument();
+        expect(screen.getByText('Newer version available')).not.toHaveClass('border-stroke-warning-primary');
     });
 
     it('should not show the newer version hint when only a draft is newer', () => {

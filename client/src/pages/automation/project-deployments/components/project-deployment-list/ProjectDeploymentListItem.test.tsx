@@ -118,6 +118,7 @@ describe('ProjectDeploymentListItem', () => {
         render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
 
         expect(screen.getByText('Newer version available')).toBeInTheDocument();
+        expect(screen.getByText('Newer version available')).not.toHaveClass('border-stroke-warning-primary');
         expect(hoisted.projectVersionsQueryMock).toHaveBeenCalledWith(7, true);
     });
 

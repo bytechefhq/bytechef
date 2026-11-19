@@ -173,7 +173,7 @@ const AutomationProjectConfigurationListItem = ({
                             <Badge label="Hidden from hub" styleType="secondary-outline" />
                         )}
 
-                        {newerVersionAvailable && <Badge label="Newer version available" styleType="warning-outline" />}
+                        {newerVersionAvailable && <Badge label="Newer version available" styleType="warning-filled" />}
 
                         <Tooltip>
                             <TooltipTrigger asChild>

@@ -203,7 +203,7 @@ const ProjectDeploymentListItem = ({
                     </div>
 
                     <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
-                        {newerVersionAvailable && <Badge label="Newer version available" styleType="warning-outline" />}
+                        {newerVersionAvailable && <Badge label="Newer version available" styleType="warning-filled" />}
 
                         <Tooltip>
                             <TooltipTrigger asChild>
