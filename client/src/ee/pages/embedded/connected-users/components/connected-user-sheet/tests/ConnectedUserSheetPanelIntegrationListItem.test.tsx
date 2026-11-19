@@ -62,10 +62,6 @@ vi.mock('@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutati
     useMoveIntegrationInstanceConfigurationConnectedUsersMutation: () => ({mutateAsync: hoisted.moveMutateAsyncMock}),
 }));
 
-vi.mock('react-inlinesvg', () => ({
-    default: () => <svg data-testid="integration-icon" />,
-}));
-
 const componentDefinition = {icon: 'icon.svg', name: 'github', title: 'GitHub', version: 1};
 
 const connectedUserIntegrationInstance = {
@@ -144,11 +140,17 @@ describe('ConnectedUserSheetPanelIntegrationListItem', () => {
         expect(screen.getByText('1 workflow')).toBeInTheDocument();
     });
 
-    it("marks the integration with its component's icon", () => {
-        const {container} = renderItem();
+    it('titles the row with the configuration name only', () => {
+        hoisted.integrationInstance = {
+            id: 40,
+            integrationInstanceConfiguration: {name: 'Current Configuration'},
+            integrationInstanceWorkflows: [],
+        };
 
-        expect(screen.getByTestId('integration-icon')).toBeInTheDocument();
-        expect(container.querySelector('svg.lucide-component')).not.toBeInTheDocument();
+        renderItem();
+
+        expect(screen.getByText('Current Configuration')).toBeInTheDocument();
+        expect(screen.queryByText('GitHub')).not.toBeInTheDocument();
     });
 
     it('leaves the Credentials action to the Connections tab even for provisioned integrations', () => {
