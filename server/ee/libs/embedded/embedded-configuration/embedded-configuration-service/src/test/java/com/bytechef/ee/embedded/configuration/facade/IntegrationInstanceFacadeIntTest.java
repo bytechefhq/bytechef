@@ -16,6 +16,7 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -103,10 +104,12 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -130,6 +133,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * @version ee
@@ -826,9 +830,9 @@ class IntegrationInstanceFacadeIntTest {
         private static final long PROVISIONED_CONNECTED_USER_ID = 5L;
         private static final long PROVISIONED_CONNECTION_ID = 9L;
         private static final long PROVISIONED_INTEGRATION_INSTANCE_ID = 9_000_001L;
-        private static final long PREVIOUS_CONNECTION_ID = 101L;
         private static final long NEW_CONNECTION_ID = 202L;
 
+        private long previousConnectionId;
         private String triggerWorkflowId;
 
         @MockitoBean
@@ -992,11 +996,11 @@ class IntegrationInstanceFacadeIntTest {
             assertThat(integrationInstance.getConnectionId()).isEqualTo(NEW_CONNECTION_ID);
 
             verify(triggerLifecycleFacade, times(2)).executeTriggerDisable(
-                eq(triggerWorkflowId), any(), any(), anyMap(), eq(PREVIOUS_CONNECTION_ID));
+                eq(triggerWorkflowId), any(), any(), anyMap(), eq(previousConnectionId));
             verify(triggerLifecycleFacade, times(2)).executeTriggerEnable(
                 eq(triggerWorkflowId), any(), any(), anyMap(), eq(NEW_CONNECTION_ID), anyString(), anyLong());
             verify(triggerLifecycleFacade, never()).executeTriggerEnable(
-                any(), any(), any(), anyMap(), eq(PREVIOUS_CONNECTION_ID), anyString(), anyLong());
+                any(), any(), any(), anyMap(), eq(previousConnectionId), anyString(), anyLong());
         }
 
         @Test
@@ -1023,14 +1027,15 @@ class IntegrationInstanceFacadeIntTest {
             IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
                 integrationInstanceId);
 
-            assertThat(integrationInstance.getConnectionId()).isEqualTo(PREVIOUS_CONNECTION_ID);
+            assertThat(integrationInstance.getConnectionId()).isEqualTo(previousConnectionId);
+            assertThat(connectedUserConnectionService.getConnectionIds(connectedUserA.getId())).isEmpty();
 
             verify(triggerLifecycleFacade).executeTriggerDisable(
                 eq(triggerWorkflowId),
                 argThat(workflowExecutionId -> "trigger_1".equals(workflowExecutionId.getTriggerName())),
                 any(), anyMap(), eq(NEW_CONNECTION_ID));
             verify(triggerLifecycleFacade, times(2)).executeTriggerEnable(
-                eq(triggerWorkflowId), any(), any(), anyMap(), eq(PREVIOUS_CONNECTION_ID), anyString(), anyLong());
+                eq(triggerWorkflowId), any(), any(), anyMap(), eq(previousConnectionId), anyString(), anyLong());
         }
 
         @Test
@@ -1066,7 +1071,7 @@ class IntegrationInstanceFacadeIntTest {
             IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
                 integrationInstanceId);
 
-            assertThat(integrationInstance.getConnectionId()).isEqualTo(PREVIOUS_CONNECTION_ID);
+            assertThat(integrationInstance.getConnectionId()).isEqualTo(previousConnectionId);
 
             verifyNoInteractions(triggerLifecycleFacade);
         }
@@ -1084,6 +1089,94 @@ class IntegrationInstanceFacadeIntTest {
                     .isInstanceOf(IllegalArgumentException.class);
 
             verifyNoInteractions(triggerLifecycleFacade);
+        }
+
+        @Test
+        void testUpdateIntegrationInstanceConnectionRejectsASharedConnection() {
+            authenticate(createTenantAdminAuthentication());
+
+            long integrationInstanceId = createProvisionedIntegrationInstanceWithTriggers();
+
+            givenSharedConnection(NEW_CONNECTION_ID);
+
+            assertThatThrownBy(() -> integrationInstanceFacade.updateIntegrationInstanceConnection(
+                integrationInstanceId, NEW_CONNECTION_ID))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
+                integrationInstanceId);
+
+            assertThat(integrationInstance.getConnectionId()).isEqualTo(previousConnectionId);
+
+            verifyNoInteractions(triggerLifecycleFacade);
+        }
+
+        @Test
+        void testUpdateIntegrationInstanceConnectionKeepsThePreviousConnectionForTheConnectedUser() {
+            authenticate(createTenantAdminAuthentication());
+
+            long integrationInstanceId = createProvisionedIntegrationInstanceWithTriggers();
+
+            givenConnectedUserConnection(NEW_CONNECTION_ID, Environment.PRODUCTION);
+
+            integrationInstanceFacade.updateIntegrationInstanceConnection(integrationInstanceId, NEW_CONNECTION_ID);
+
+            assertThat(connectedUserConnectionService.getConnectionIds(connectedUserA.getId()))
+                .containsExactly(previousConnectionId);
+        }
+
+        @Test
+        void testUpdateIntegrationInstanceConnectionOfADisabledInstanceKeepsThePreviousConnectionForTheConnectedUser() {
+            authenticate(createTenantAdminAuthentication());
+
+            long integrationInstanceId = createProvisionedIntegrationInstanceWithTriggers();
+
+            integrationInstanceService.updateEnabled(integrationInstanceId, false);
+
+            givenConnectedUserConnection(NEW_CONNECTION_ID, Environment.PRODUCTION);
+
+            integrationInstanceFacade.updateIntegrationInstanceConnection(integrationInstanceId, NEW_CONNECTION_ID);
+
+            assertThat(connectedUserConnectionService.getConnectionIds(connectedUserA.getId()))
+                .containsExactly(previousConnectionId);
+        }
+
+        @Test
+        void testUpdateIntegrationInstanceConnectionRestartsTheTriggersOutsideATransaction() {
+            authenticate(createTenantAdminAuthentication());
+
+            long integrationInstanceId = createProvisionedIntegrationInstanceWithTriggers();
+
+            givenConnectedUserConnection(NEW_CONNECTION_ID, Environment.PRODUCTION);
+
+            List<Boolean> transactionActiveDuringEnable = new ArrayList<>();
+
+            doAnswer(invocation -> {
+                transactionActiveDuringEnable.add(TransactionSynchronizationManager.isActualTransactionActive());
+
+                return null;
+            })
+                .when(triggerLifecycleFacade)
+                .executeTriggerEnable(
+                    eq(triggerWorkflowId), any(), any(), anyMap(), eq(NEW_CONNECTION_ID), anyString(), anyLong());
+
+            integrationInstanceFacade.updateIntegrationInstanceConnection(integrationInstanceId, NEW_CONNECTION_ID);
+
+            assertThat(transactionActiveDuringEnable).containsExactly(false, false);
+        }
+
+        @Test
+        void testUpdateIntegrationInstanceConnectionToTheCurrentConnectionDoesNothing() {
+            authenticate(createTenantAdminAuthentication());
+
+            long integrationInstanceId = createProvisionedIntegrationInstanceWithTriggers();
+
+            integrationInstanceFacade.updateIntegrationInstanceConnection(
+                integrationInstanceId, previousConnectionId);
+
+            verifyNoInteractions(connectedUserConnectionFacade, triggerLifecycleFacade);
+
+            assertThat(connectedUserConnectionService.getConnectionIds(connectedUserA.getId())).isEmpty();
         }
 
         @Test
@@ -1114,6 +1207,9 @@ class IntegrationInstanceFacadeIntTest {
         }
 
         private long createProvisionedIntegrationInstanceWithTriggers() {
+            previousConnectionId = UUID.randomUUID()
+                .getMostSignificantBits() & Long.MAX_VALUE;
+
             Workflow triggerWorkflow = workflowService.create(
                 TWO_TRIGGER_WORKFLOW_DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
@@ -1133,7 +1229,7 @@ class IntegrationInstanceFacadeIntTest {
                 integrationInstanceConfigurationWorkflow);
 
             IntegrationInstance integrationInstance = integrationInstanceService.create(
-                connectedUserA.getId(), PREVIOUS_CONNECTION_ID, integrationInstanceConfigurationId,
+                connectedUserA.getId(), previousConnectionId, integrationInstanceConfigurationId,
                 "admin@localhost.com");
 
             IntegrationInstanceWorkflow integrationInstanceWorkflow =
@@ -1148,6 +1244,19 @@ class IntegrationInstanceFacadeIntTest {
         private void givenConnectedUserConnection(long connectionId, Environment environment) {
             ConnectionDTO connectionDTO = ConnectionDTO.builder()
                 .environmentId(environment.ordinal())
+                .id(connectionId)
+                .build();
+
+            when(connectedUserConnectionFacade.getConnectedUserConnectionsForAdmin(
+                connectedUserA.getId(), "slack", List.of(connectionId)))
+                    .thenReturn(List.of(connectionDTO));
+            when(connectedUserConnectionFacade.getOwnedConnectionIds(connectedUserA.getId()))
+                .thenReturn(Set.of(connectionId));
+        }
+
+        private void givenSharedConnection(long connectionId) {
+            ConnectionDTO connectionDTO = ConnectionDTO.builder()
+                .environmentId(Environment.PRODUCTION.ordinal())
                 .id(connectionId)
                 .build();
 
