@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.validator;
 
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
+import java.util.ArrayList;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
@@ -115,7 +116,7 @@ class PropertyUtils {
     }
 
     public static boolean checkPropertyExists(PropertyInfo outputInfo, String propertyName) {
-        return checkPropertyExistsRecursive(outputInfo, propertyName.split("\\."));
+        return checkPropertyExistsRecursive(outputInfo, splitPropertyPath(propertyName));
     }
 
     /**
@@ -128,7 +129,57 @@ class PropertyUtils {
     }
 
     public static @Nullable PropertyInfo getProperty(PropertyInfo outputInfo, String propertyName) {
-        return getPropertyRecursive(outputInfo, propertyName.split("\\."));
+        return getPropertyRecursive(outputInfo, splitPropertyPath(propertyName));
+    }
+
+    /**
+     * Splits a property path into its segments. A dot inside a quoted key does not split it, and a quoted key such as
+     * {@code outputFiles['report.csv']} becomes a segment of its own, named by the key, since it names an object
+     * property. A numeric index such as {@code items[0]} stays attached to its name.
+     */
+    static String[] splitPropertyPath(String propertyPath) {
+        List<String> segments = new ArrayList<>();
+        StringBuilder segment = new StringBuilder();
+
+        int index = 0;
+
+        while (index < propertyPath.length()) {
+            char character = propertyPath.charAt(index);
+
+            if (character == '[' && index + 1 < propertyPath.length() && propertyPath.charAt(index + 1) == '\'') {
+                int keyEndIndex = propertyPath.indexOf("']", index + 2);
+
+                if (keyEndIndex >= 0) {
+                    addSegment(segments, segment);
+
+                    segments.add(propertyPath.substring(index + 2, keyEndIndex));
+
+                    index = keyEndIndex + 2;
+
+                    continue;
+                }
+            }
+
+            if (character == '.') {
+                addSegment(segments, segment);
+            } else {
+                segment.append(character);
+            }
+
+            index++;
+        }
+
+        addSegment(segments, segment);
+
+        return segments.toArray(String[]::new);
+    }
+
+    private static void addSegment(List<String> segments, StringBuilder segment) {
+        if (!segment.isEmpty()) {
+            segments.add(segment.toString());
+
+            segment.setLength(0);
+        }
     }
 
     private static boolean checkPropertyExistsRecursive(PropertyInfo outputInfo, String[] propertyPath) {

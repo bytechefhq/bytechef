@@ -53,6 +53,15 @@ class WorkflowValidatorInvalidExpressionTest {
                 new PropertyInfo("linesPerRow", "INTEGER", null, false, false, null, null),
                 new PropertyInfo("names", "ARRAY", null, false, false, null, List.of(
                     new PropertyInfo(null, "STRING", null, false, false, null, null)))),
+            null),
+        "produceReport", new PropertyInfo(
+            null, "OBJECT", null, false, false, null, null, List.of(
+                new PropertyInfo("outputFiles", "OBJECT", null, false, false, null, null, List.of(
+                    new PropertyInfo("report.csv", "FILE_ENTRY", null, false, false, null, null),
+                    new PropertyInfo("charts/summary.txt", "FILE_ENTRY", null, false, false, null, null),
+                    new PropertyInfo(
+                        "Q3 report (final) v2.1+draft@team.csv", "FILE_ENTRY", null, false, false, null, null)),
+                    null)),
             null));
 
     @Test
@@ -116,6 +125,63 @@ class WorkflowValidatorInvalidExpressionTest {
 
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
+    }
+
+    @Test
+    void validateWorkflowTasksAcceptsQuotedKeysWithDotsAndSlashes() {
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        validate(
+            logText(
+                "${produceReport.outputFiles['report.csv']} ${produceReport.outputFiles['charts/summary.txt']} " +
+                    "${produceReport.outputFiles['Q3 report (final) v2.1+draft@team.csv']}"),
+            errors, warnings);
+
+        assertEquals("", errors.toString());
+        assertEquals("", warnings.toString());
+    }
+
+    @Test
+    void validateWorkflowTasksReportsAQuotedKeyWithADoubledQuote() {
+        StringBuilder errors = new StringBuilder();
+
+        validate(logText("${produceReport.outputFiles['it''s']}"), errors, new StringBuilder());
+
+        assertEquals(
+            "[logger_1] Property 'text' has an invalid expression: ${produceReport.outputFiles['it''s']}",
+            errors.toString());
+    }
+
+    @Test
+    void validateWorkflowTasksReportsAQuotedKeyWithAnEscapedQuote() {
+        StringBuilder errors = new StringBuilder();
+
+        validate(logText("${produceReport.outputFiles['a\\'b']}"), errors, new StringBuilder());
+
+        assertEquals(
+            "[logger_1] Property 'text' has an invalid expression: ${produceReport.outputFiles['a\\'b']}",
+            errors.toString());
+    }
+
+    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
+    private static String logText(String text) {
+        return """
+            [
+                {
+                    "label": "Produce report",
+                    "name": "produceReport",
+                    "type": "var/v1/set",
+                    "parameters": {"type": "OBJECT", "value": {"outputFiles": {}}}
+                },
+                {
+                    "label": "Log",
+                    "name": "logger_1",
+                    "type": "logger/v1/info",
+                    "parameters": {"text": "%s"}
+                }
+            ]
+            """.formatted(text.replace("\\", "\\\\"));
     }
 
     @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
