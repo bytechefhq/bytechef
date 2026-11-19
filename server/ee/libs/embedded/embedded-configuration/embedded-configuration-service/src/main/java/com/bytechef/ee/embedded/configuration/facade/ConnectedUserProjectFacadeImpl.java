@@ -1182,11 +1182,50 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                         withoutProvidedConnections(referenceState.connections(), connectionComponents),
                         referenceState.attentionReason());
 
+                connectedUserProjectWorkflowDTO = connectedUserProjectWorkflowDTO.withLastExecutionDate(
+                    getReferenceLastExecutionDate(reference));
+
                 return connectedUserProjectWorkflowDTO.withStaticWebhookUrl(
                     reference.isDangling() ? null : connectedUserWorkflowWebhookUrlResolver.resolve(
                         reference.getProjectDeploymentId(), reference.getAutomationUuid()));
             })
             .toList();
+    }
+
+    /**
+     * A reference runs on the connected user's own deployment of the catalog project, so its last execution is the last
+     * job of that deployment for the catalog workflow, in any of its versions.
+     */
+    @Nullable
+    private Instant getReferenceLastExecutionDate(ConnectedUserProjectWorkflow reference) {
+        Long projectDeploymentId = reference.getProjectDeploymentId();
+
+        if (projectDeploymentId == null) {
+            return null;
+        }
+
+        Optional<ProjectDeployment> projectDeploymentOptional = projectDeploymentService.fetchProjectDeployment(
+            projectDeploymentId);
+
+        if (projectDeploymentOptional.isEmpty()) {
+            return null;
+        }
+
+        ProjectDeployment projectDeployment = projectDeploymentOptional.get();
+
+        List<String> workflowIds = projectWorkflowService
+            .getProjectWorkflows(projectDeployment.getProjectId(), reference.getAutomationUuid())
+            .stream()
+            .map(ProjectWorkflow::getWorkflowId)
+            .toList();
+
+        if (workflowIds.isEmpty()) {
+            return null;
+        }
+
+        return OptionalUtils.mapOrElse(
+            principalJobService.fetchLastWorkflowJobId(projectDeploymentId, workflowIds, PlatformType.AUTOMATION),
+            this::getJobEndDate, null);
     }
 
     private List<WorkflowTriggerDTO> getReferenceWorkflowTriggers(ConnectedUserProjectWorkflow reference) {

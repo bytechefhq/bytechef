@@ -600,6 +600,44 @@ class ConnectedUserProjectFacadeIntTest {
     }
 
     @Test
+    void testGetConnectedUserProjectWorkflowsReportsTheLastExecutionOfAReferenceOnItsOwnDeployment() {
+        long automationProjectId = createAutomationProject("Reference Last Execution");
+
+        String automationUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationProjectId);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            externalUserId, automationUuid, Environment.PRODUCTION);
+
+        long projectDeploymentId = reference.getProjectDeploymentId();
+
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows =
+            projectDeploymentWorkflowService.getProjectDeploymentWorkflows(projectDeploymentId);
+
+        String deployedWorkflowId = projectDeploymentWorkflows.getFirst()
+            .getWorkflowId();
+
+        Instant endDate = Instant.parse("2026-11-19T14:50:46Z");
+
+        Job job = new Job(4242L);
+
+        job.setEndDate(endDate);
+
+        when(principalJobService.fetchLastWorkflowJobId(
+            eq(projectDeploymentId), argThat((List<String> workflowIds) -> workflowIds.contains(deployedWorkflowId)),
+            eq(PlatformType.AUTOMATION)))
+                .thenReturn(Optional.of(4242L));
+        when(jobService.getJob(4242L))
+            .thenReturn(job);
+
+        assertThat(connectedUserProjectFacade.getConnectedUserProjectWorkflows(externalUserId, Environment.PRODUCTION))
+            .singleElement()
+            .extracting(ConnectedUserProjectWorkflowDTO::lastExecutionDate)
+            .isEqualTo(endDate);
+    }
+
+    @Test
     void testUpdateProjectWorkflowInputsOnADanglingReferenceIsRefused() {
         long automationProjectId = createAutomationProject("Dangling Inputs");
 

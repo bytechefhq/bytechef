@@ -72,6 +72,13 @@ public record ConnectedUserProjectWorkflowDTO(
             attentionReason, null);
     }
 
+    public ConnectedUserProjectWorkflowDTO withLastExecutionDate(@Nullable Instant lastExecutionDate) {
+        return new ConnectedUserProjectWorkflowDTO(
+            id, connectedUserId, enabled, lastExecutionDate, projectId, workflow, workflowUuid, workflowVersion, kind,
+            automationUuid, copiedFromWorkflowUuid, dangling, components, inputs, inputValues, connections,
+            attentionReason, staticWebhookUrl);
+    }
+
     public ConnectedUserProjectWorkflowDTO withAttentionReason(@Nullable String attentionReason) {
         return new ConnectedUserProjectWorkflowDTO(
             id, connectedUserId, enabled, lastExecutionDate, projectId, workflow, workflowUuid, workflowVersion, kind,
