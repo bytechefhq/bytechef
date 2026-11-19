@@ -489,11 +489,11 @@ public class IntegrationModel {
   }
 
   /**
-   * If the integration's draft version differs from its last published version. Only set by the integration list.
+   * If the integration's draft version differs from its last published version. Computed only by the integration list endpoint; false in every other response.
    * @return unpublishedChanges
    */
   
-  @Schema(name = "unpublishedChanges", accessMode = Schema.AccessMode.READ_ONLY, description = "If the integration's draft version differs from its last published version. Only set by the integration list.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "unpublishedChanges", accessMode = Schema.AccessMode.READ_ONLY, description = "If the integration's draft version differs from its last published version. Computed only by the integration list endpoint; false in every other response.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("unpublishedChanges")
   public @Nullable Boolean getUnpublishedChanges() {
     return unpublishedChanges;
