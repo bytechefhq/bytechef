@@ -174,6 +174,17 @@ class PropertyUtils {
         return segments.toArray(String[]::new);
     }
 
+    /**
+     * An object that declares no properties, such as a task's {@code outputFiles} keyed by the file paths an execution
+     * keeps, can hold any key, so no path below it can be ruled out.
+     */
+    private static boolean isOpenObject(PropertyInfo propertyInfo) {
+        List<PropertyInfo> nestedPropertyInfos = propertyInfo.nestedProperties();
+
+        return "OBJECT".equalsIgnoreCase(propertyInfo.type()) &&
+            (nestedPropertyInfos == null || nestedPropertyInfos.isEmpty());
+    }
+
     private static void addSegment(List<String> segments, StringBuilder segment) {
         if (!segment.isEmpty()) {
             segments.add(segment.toString());
@@ -251,7 +262,7 @@ class PropertyUtils {
     }
 
     private static boolean checkCurrentPropertyExists(PropertyInfo outputInfo, String[] propertyPath) {
-        if (propertyPath.length == 1) {
+        if (propertyPath.length == 1 || isOpenObject(outputInfo)) {
             return true;
         }
 
@@ -274,7 +285,7 @@ class PropertyUtils {
         if (outputPropertyInfo.nestedProperties() != null) {
             for (PropertyInfo nestedProp : outputPropertyInfo.nestedProperties()) {
                 if (currentProperty.equals(nestedProp.name())) {
-                    if (propertyPath.length == 1) {
+                    if (propertyPath.length == 1 || isOpenObject(nestedProp)) {
                         return true;
                     }
 

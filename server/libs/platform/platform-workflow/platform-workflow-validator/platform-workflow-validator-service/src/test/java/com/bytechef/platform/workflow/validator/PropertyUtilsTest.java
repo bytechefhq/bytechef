@@ -170,4 +170,18 @@ class PropertyUtilsTest {
         assertThat(PropertyUtils.checkPropertyExists(outputInfo, "outputFiles['missing.csv']")).isFalse();
         assertThat(PropertyUtils.getPropertyType(outputInfo, "outputFiles['report.csv']")).isEqualTo("FILE_ENTRY");
     }
+
+    @Test
+    void testCheckPropertyExistsAcceptsAnyKeyOfAnObjectThatDeclaresNoProperties() {
+        PropertyInfo outputInfo = new PropertyInfo(
+            null, "OBJECT", null, false, false, null, null, List.of(
+                new PropertyInfo("outputFiles", "OBJECT", null, false, false, null, null, List.of(), null),
+                new PropertyInfo("exitCode", "INTEGER", null, false, false, null, null)),
+            null);
+
+        assertThat(PropertyUtils.checkPropertyExists(outputInfo, "outputFiles['report.csv']")).isTrue();
+        assertThat(PropertyUtils.checkPropertyExists(outputInfo, "outputFiles['charts/summary.txt'].url")).isTrue();
+        assertThat(PropertyUtils.checkPropertyExists(outputInfo, "exitCode.value")).isFalse();
+        assertThat(PropertyUtils.checkPropertyExists(outputInfo, "missing['report.csv']")).isFalse();
+    }
 }
