@@ -422,11 +422,11 @@ public class ProjectModel {
   }
 
   /**
-   * If the project's draft version differs from its last published version. Only set by the workspace project list.
+   * If the project's draft version differs from its last published version. Computed only by the project list endpoints; false in every other response.
    * @return unpublishedChanges
    */
   
-  @Schema(name = "unpublishedChanges", accessMode = Schema.AccessMode.READ_ONLY, description = "If the project's draft version differs from its last published version. Only set by the workspace project list.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "unpublishedChanges", accessMode = Schema.AccessMode.READ_ONLY, description = "If the project's draft version differs from its last published version. Computed only by the project list endpoints; false in every other response.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("unpublishedChanges")
   public @Nullable Boolean getUnpublishedChanges() {
     return unpublishedChanges;
