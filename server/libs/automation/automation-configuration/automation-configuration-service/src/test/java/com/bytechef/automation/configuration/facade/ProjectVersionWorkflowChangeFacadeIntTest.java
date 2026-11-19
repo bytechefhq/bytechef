@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.service;
+package com.bytechef.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -30,6 +30,8 @@ import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChangeSummary;
@@ -53,7 +55,7 @@ import org.springframework.context.annotation.Import;
     classes = ProjectIntTestConfiguration.class, properties = "bytechef.workflow.repository.jdbc.enabled=true")
 @Import(PostgreSQLContainerConfiguration.class)
 @ProjectIntTestConfigurationSharedMocks
-class ProjectVersionWorkflowChangeServiceIntTest {
+class ProjectVersionWorkflowChangeFacadeIntTest {
 
     @Autowired
     private ProjectRepository projectRepository;
@@ -62,7 +64,7 @@ class ProjectVersionWorkflowChangeServiceIntTest {
     private ProjectService projectService;
 
     @Autowired
-    private ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService;
+    private ProjectVersionWorkflowChangeFacade projectVersionWorkflowChangeFacade;
 
     @Autowired
     private ProjectWorkflowRepository projectWorkflowRepository;
@@ -110,7 +112,7 @@ class ProjectVersionWorkflowChangeServiceIntTest {
     void testBaseVersionIsPreviousExistingVersion() {
         createVersions(3);
 
-        VersionWorkflowChanges changes = projectVersionWorkflowChangeService.getVersionWorkflowChanges(projectId, 3);
+        VersionWorkflowChanges changes = projectVersionWorkflowChangeFacade.getVersionWorkflowChanges(projectId, 3);
 
         assertThat(changes.baseVersion()).isEqualTo(2);
         assertThat(changes.version()).isEqualTo(3);
@@ -127,7 +129,7 @@ class ProjectVersionWorkflowChangeServiceIntTest {
                 .extracting(ProjectVersion::getVersion)
                 .containsExactlyInAnyOrder(1, 3);
 
-        VersionWorkflowChanges changes = projectVersionWorkflowChangeService.getVersionWorkflowChanges(projectId, 3);
+        VersionWorkflowChanges changes = projectVersionWorkflowChangeFacade.getVersionWorkflowChanges(projectId, 3);
 
         assertThat(changes.baseVersion()).isEqualTo(1);
     }
@@ -138,7 +140,7 @@ class ProjectVersionWorkflowChangeServiceIntTest {
         addWorkflow(1, "a", "A", false);
         addWorkflow(1, "b", "B", false);
 
-        VersionWorkflowChanges changes = projectVersionWorkflowChangeService.getVersionWorkflowChanges(projectId, 1);
+        VersionWorkflowChanges changes = projectVersionWorkflowChangeFacade.getVersionWorkflowChanges(projectId, 1);
 
         assertThat(changes.baseVersion()).isNull();
         assertThat(changes.workflows())
@@ -154,7 +156,7 @@ class ProjectVersionWorkflowChangeServiceIntTest {
         addWorkflow(2, "a", "A", false);
         addWorkflow(2, "b", "B", true);
 
-        VersionWorkflowChanges changes = projectVersionWorkflowChangeService.getVersionWorkflowChanges(projectId, 2);
+        VersionWorkflowChanges changes = projectVersionWorkflowChangeFacade.getVersionWorkflowChanges(projectId, 2);
 
         assertThat(changes.workflows()).hasSize(1);
         assertThat(changes.workflows()
@@ -176,7 +178,7 @@ class ProjectVersionWorkflowChangeServiceIntTest {
         addWorkflow(2, "a2", "alpha", false);
         addWorkflow(2, "a1", "Able", false);
 
-        VersionWorkflowChanges changes = projectVersionWorkflowChangeService.getVersionWorkflowChanges(projectId, 2);
+        VersionWorkflowChanges changes = projectVersionWorkflowChangeFacade.getVersionWorkflowChanges(projectId, 2);
 
         assertThat(changes.workflows())
             .extracting(VersionWorkflowChangeSummary::workflowUuid)
@@ -188,7 +190,7 @@ class ProjectVersionWorkflowChangeServiceIntTest {
     void testUnknownVersionThrows() {
         createVersions(2);
 
-        assertThatThrownBy(() -> projectVersionWorkflowChangeService.getVersionWorkflowChanges(projectId, 9))
+        assertThatThrownBy(() -> projectVersionWorkflowChangeFacade.getVersionWorkflowChanges(projectId, 9))
             .isInstanceOf(ConfigurationException.class);
     }
 
@@ -197,7 +199,7 @@ class ProjectVersionWorkflowChangeServiceIntTest {
         createVersions(2);
         addWorkflow(1, "a", "A", false);
 
-        VersionWorkflowChange change = projectVersionWorkflowChangeService.getVersionWorkflowChange(
+        VersionWorkflowChange change = projectVersionWorkflowChangeFacade.getVersionWorkflowChange(
             projectId, 2, uuidString("a"));
 
         assertThat(change.changeType()).isEqualTo(WorkflowChangeType.REMOVED);
@@ -215,7 +217,7 @@ class ProjectVersionWorkflowChangeServiceIntTest {
         String missingWorkflowUuid = uuidString("missing");
 
         assertThatThrownBy(
-            () -> projectVersionWorkflowChangeService.getVersionWorkflowChange(projectId, 2, missingWorkflowUuid))
+            () -> projectVersionWorkflowChangeFacade.getVersionWorkflowChange(projectId, 2, missingWorkflowUuid))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Workflow uuid=" + missingWorkflowUuid + " not found in project version v=2");
     }
@@ -224,7 +226,7 @@ class ProjectVersionWorkflowChangeServiceIntTest {
     void testHasUnpublishedChangesWhenProjectWasNeverPublished() {
         addWorkflow(1, "a", "A", false);
 
-        assertThat(projectVersionWorkflowChangeService.hasUnpublishedChanges(projectService.getProject(projectId)))
+        assertThat(projectVersionWorkflowChangeFacade.hasUnpublishedChanges(projectService.getProject(projectId)))
             .isTrue();
     }
 
@@ -234,7 +236,7 @@ class ProjectVersionWorkflowChangeServiceIntTest {
         addWorkflow(1, "a", "A", false);
         addWorkflow(2, "a", "A", false);
 
-        assertThat(projectVersionWorkflowChangeService.hasUnpublishedChanges(projectService.getProject(projectId)))
+        assertThat(projectVersionWorkflowChangeFacade.hasUnpublishedChanges(projectService.getProject(projectId)))
             .isFalse();
     }
 
@@ -244,7 +246,7 @@ class ProjectVersionWorkflowChangeServiceIntTest {
         addWorkflow(1, "a", "A", false);
         addWorkflow(2, "a", "A", true);
 
-        assertThat(projectVersionWorkflowChangeService.hasUnpublishedChanges(projectService.getProject(projectId)))
+        assertThat(projectVersionWorkflowChangeFacade.hasUnpublishedChanges(projectService.getProject(projectId)))
             .isTrue();
     }
 
@@ -255,7 +257,7 @@ class ProjectVersionWorkflowChangeServiceIntTest {
         addWorkflow(2, "a", "A", false);
         addWorkflow(2, "b", "B", false);
 
-        assertThat(projectVersionWorkflowChangeService.hasUnpublishedChanges(projectService.getProject(projectId)))
+        assertThat(projectVersionWorkflowChangeFacade.hasUnpublishedChanges(projectService.getProject(projectId)))
             .isTrue();
     }
 
@@ -266,7 +268,7 @@ class ProjectVersionWorkflowChangeServiceIntTest {
         addWorkflow(1, "b", "B", false);
         addWorkflow(2, "a", "A", false);
 
-        assertThat(projectVersionWorkflowChangeService.hasUnpublishedChanges(projectService.getProject(projectId)))
+        assertThat(projectVersionWorkflowChangeFacade.hasUnpublishedChanges(projectService.getProject(projectId)))
             .isTrue();
     }
 
@@ -280,7 +282,7 @@ class ProjectVersionWorkflowChangeServiceIntTest {
 
         workflowService.delete(publishedWorkflowId);
 
-        assertThat(projectVersionWorkflowChangeService.hasUnpublishedChanges(projectService.getProject(projectId)))
+        assertThat(projectVersionWorkflowChangeFacade.hasUnpublishedChanges(projectService.getProject(projectId)))
             .isTrue();
     }
 
@@ -293,7 +295,7 @@ class ProjectVersionWorkflowChangeServiceIntTest {
 
         workflowService.delete(draftWorkflowId);
 
-        assertThat(projectVersionWorkflowChangeService.hasUnpublishedChanges(projectService.getProject(projectId)))
+        assertThat(projectVersionWorkflowChangeFacade.hasUnpublishedChanges(projectService.getProject(projectId)))
             .isTrue();
     }
 

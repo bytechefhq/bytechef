@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.configuration.service;
+package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 
@@ -14,7 +14,7 @@ import com.bytechef.ee.embedded.configuration.domain.Integration;
  *
  * @author Ivica Cardic
  */
-public interface IntegrationVersionWorkflowChangeService {
+public interface IntegrationVersionWorkflowChangeFacade {
 
     boolean hasUnpublishedChanges(Integration integration);
 }

@@ -15,12 +15,12 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.facade.ProjectVersionWorkflowChangeFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectService;
-import com.bytechef.automation.configuration.service.ProjectVersionWorkflowChangeService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.AutomationProject;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
@@ -94,7 +94,7 @@ class AutomationProjectFacadeAuthorizationIntTest {
     private ProjectService projectService;
 
     @MockitoBean
-    private ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService;
+    private ProjectVersionWorkflowChangeFacade projectVersionWorkflowChangeFacade;
 
     @AfterEach
     void afterEach() {
@@ -108,7 +108,7 @@ class AutomationProjectFacadeAuthorizationIntTest {
         when(projectService.getProject(5L)).thenReturn(new Project());
         when(automationProjectService.fetchAutomationProject(5L))
             .thenReturn(Optional.of(new AutomationProject()));
-        when(projectVersionWorkflowChangeService.getVersionWorkflowChanges(5L, 1))
+        when(projectVersionWorkflowChangeFacade.getVersionWorkflowChanges(5L, 1))
             .thenReturn(versionWorkflowChanges);
 
         authenticate(tenantAdmin());
@@ -149,7 +149,7 @@ class AutomationProjectFacadeAuthorizationIntTest {
                 .isInstanceOf(AccessDeniedException.class);
         }
 
-        verifyNoInteractions(automationProjectService, projectService, projectVersionWorkflowChangeService);
+        verifyNoInteractions(automationProjectService, projectService, projectVersionWorkflowChangeFacade);
     }
 
     @Test

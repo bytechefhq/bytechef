@@ -13,10 +13,10 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.facade.ProjectVersionWorkflowChangeFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.automation.configuration.service.ProjectService;
-import com.bytechef.automation.configuration.service.ProjectVersionWorkflowChangeService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.embedded.configuration.audit.AutomationProjectAuditEvents;
@@ -104,7 +104,7 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationService integrationService;
     private final ProjectService projectService;
-    private final ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService;
+    private final ProjectVersionWorkflowChangeFacade projectVersionWorkflowChangeFacade;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
     private final TagService tagService;
@@ -124,7 +124,7 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         ConnectedUserService connectedUserService, EmbeddedPermissionEvaluator embeddedPermissionEvaluator,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationService integrationService, ProjectService projectService,
-        ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService,
+        ProjectVersionWorkflowChangeFacade projectVersionWorkflowChangeFacade,
         ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
         TagService tagService, WorkflowComponentResolver workflowComponentResolver,
         WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowService workflowService,
@@ -141,7 +141,7 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationService = integrationService;
         this.projectService = projectService;
-        this.projectVersionWorkflowChangeService = projectVersionWorkflowChangeService;
+        this.projectVersionWorkflowChangeFacade = projectVersionWorkflowChangeFacade;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
         this.tagService = tagService;
@@ -349,7 +349,7 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
 
         getProjectOfAutomationProject(projectId);
 
-        return projectVersionWorkflowChangeService.getVersionWorkflowChange(projectId, projectVersion, workflowUuid);
+        return projectVersionWorkflowChangeFacade.getVersionWorkflowChange(projectId, projectVersion, workflowUuid);
     }
 
     @Override
@@ -357,7 +357,7 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
     public VersionWorkflowChanges getProjectVersionWorkflowChanges(long projectId, int projectVersion) {
         getProjectOfAutomationProject(projectId);
 
-        return projectVersionWorkflowChangeService.getVersionWorkflowChanges(projectId, projectVersion);
+        return projectVersionWorkflowChangeFacade.getVersionWorkflowChanges(projectId, projectVersion);
     }
 
     @Override
@@ -873,7 +873,7 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         boolean published = lastPublishedProjectVersion != null;
         Integer lastPublishedVersion = published ? lastPublishedProjectVersion.getVersion() : null;
 
-        boolean unpublishedChanges = !published || projectVersionWorkflowChangeService.hasUnpublishedChanges(project);
+        boolean unpublishedChanges = !published || projectVersionWorkflowChangeFacade.hasUnpublishedChanges(project);
 
         return new AutomationProjectDTO(
             project.getId(), project.getName(), project.getDescription(), project.getCategoryId(),

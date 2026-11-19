@@ -21,7 +21,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.automation.configuration.service.ProjectVersionWorkflowChangeService;
+import com.bytechef.automation.configuration.facade.ProjectVersionWorkflowChangeFacade;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
@@ -108,8 +108,8 @@ public class IntegrationIntTestConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    ProjectVersionWorkflowChangeService projectVersionWorkflowChangeService() {
-        return mock(ProjectVersionWorkflowChangeService.class);
+    ProjectVersionWorkflowChangeFacade projectVersionWorkflowChangeFacade() {
+        return mock(ProjectVersionWorkflowChangeFacade.class);
     }
 
     @Bean
