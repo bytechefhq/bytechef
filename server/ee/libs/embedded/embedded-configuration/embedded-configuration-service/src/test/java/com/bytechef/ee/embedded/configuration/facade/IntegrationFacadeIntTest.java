@@ -465,6 +465,8 @@ public class IntegrationFacadeIntTest {
         integrationFacade.publishIntegration(integrationId, "first");
 
         assertThat(getIntegrationDTO(integrationId).unpublishedChanges()).isFalse();
+        assertThat(integrationFacade.getIntegration(integrationId)
+            .unpublishedChanges()).isFalse();
 
         List<IntegrationWorkflow> draftIntegrationWorkflows =
             integrationWorkflowRepository.findAllByIntegrationIdAndIntegrationVersion(integrationId, 2);
@@ -478,6 +480,8 @@ public class IntegrationFacadeIntTest {
         workflowService.update(draftWorkflowId, VERSION_2_WORKFLOW_DEFINITION, draftWorkflow.getVersion());
 
         assertThat(getIntegrationDTO(integrationId).unpublishedChanges()).isTrue();
+        assertThat(integrationFacade.getIntegration(integrationId)
+            .unpublishedChanges()).isTrue();
     }
 
     @Test

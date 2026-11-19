@@ -321,7 +321,9 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public ProjectDTO getProject(long id) {
         Project project = projectService.getProject(id);
 
-        return toProjectDTO(project);
+        ProjectDTO projectDTO = toProjectDTO(project);
+
+        return projectDTO.withUnpublishedChanges(hasUnpublishedChanges(project));
     }
 
     @Override
