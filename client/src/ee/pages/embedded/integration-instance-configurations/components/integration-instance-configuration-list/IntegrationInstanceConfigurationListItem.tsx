@@ -28,7 +28,6 @@ import TagList from '@/shared/components/TagList';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {Settings2Icon} from 'lucide-react';
 import {useCallback, useMemo, useRef, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
@@ -216,15 +215,10 @@ const IntegrationInstanceConfigurationListItem = ({
                         <div className="flex items-center justify-between">
                             <div className="flex w-full items-center gap-2">
                                 <div className="flex items-center gap-2">
-                                    {showIntegrationIcon && integrationInstanceConfiguration?.integration?.icon ? (
+                                    {showIntegrationIcon && integrationInstanceConfiguration?.integration?.icon && (
                                         <InlineSVG
                                             className="size-6 shrink-0"
                                             src={integrationInstanceConfiguration?.integration.icon}
-                                        />
-                                    ) : (
-                                        <Settings2Icon
-                                            aria-hidden="true"
-                                            className="size-6 shrink-0 text-content-neutral-secondary"
                                         />
                                     )}
 

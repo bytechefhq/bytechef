@@ -189,17 +189,6 @@ const AutomationProjectListItem = ({
                                     {project.name}
                                 </button>
                             )}
-
-                            {project.codeWorkflowProject && (
-                                <Badge
-                                    label={
-                                        getCodeWorkflowLanguageLabel(project.codeWorkflowLanguage ?? undefined) ??
-                                        'Code'
-                                    }
-                                    styleType="secondary-filled"
-                                    weight="semibold"
-                                />
-                            )}
                         </div>
 
                         <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
@@ -237,7 +226,21 @@ const AutomationProjectListItem = ({
                     </div>
 
                     <div className="flex items-center justify-between gap-x-6 sm:justify-end [&>:last-child]:-ml-3">
-                        <div className="flex items-center gap-x-3 sm:min-w-52 sm:flex-col sm:items-end sm:gap-x-0 sm:gap-y-4">
+                        <div className="flex w-24 shrink-0 justify-end">
+                            {project.codeWorkflowProject && (
+                                <Badge
+                                    className="uppercase"
+                                    label={
+                                        getCodeWorkflowLanguageLabel(project.codeWorkflowLanguage ?? undefined) ??
+                                        'Code'
+                                    }
+                                    styleType="secondary-filled"
+                                    weight="semibold"
+                                />
+                            )}
+                        </div>
+
+                        <div className="flex items-center gap-x-3 sm:w-60 sm:shrink-0 sm:flex-col sm:items-end sm:gap-x-0 sm:gap-y-4">
                             <div className="flex items-center space-x-2">
                                 {project.published && !project.unpublishedChanges ? (
                                     <Badge

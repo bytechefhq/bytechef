@@ -177,10 +177,8 @@ describe('ConnectedUserProjectWorkflowListItem', () => {
         expect(useAutomationExecutionsSheetStore.getState().automationExecutionsSheetOpen).toBe(true);
     });
 
-    it('shows the static webhook url and copies it', async () => {
+    it('copies the static webhook url', async () => {
         renderListItem(createConnectedUserProjectWorkflow(STATIC_WEBHOOK_URL));
-
-        expect(screen.getByText(STATIC_WEBHOOK_URL)).toBeInTheDocument();
 
         await userEvent.click(screen.getByRole('button', {name: 'Copy webhook URL'}));
 

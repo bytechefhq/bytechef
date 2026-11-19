@@ -62,41 +62,42 @@ const ConnectedUserSheetPanelConnectionListItem = ({
             </div>
 
             <div className="flex items-center gap-x-2">
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Badge
-                            label={usedByIntegration ? 'Integration' : 'Automation'}
-                            styleType="secondary-filled"
-                            weight="semibold"
-                        />
-                    </TooltipTrigger>
+                {originBadge && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Badge
+                                className="uppercase"
+                                label={originBadge.label}
+                                styleType="secondary-outline"
+                                weight="semibold"
+                            />
+                        </TooltipTrigger>
 
-                    <TooltipContent>
-                        {usedByIntegration
-                            ? `Used by this user's ${componentTitle || connection.componentName} integration`
-                            : connection.origin === ConnectionOriginEnum.Internal
-                              ? 'An admin connection automation configurations provide to their workflows'
-                              : 'Used by automation workflows'}
-                    </TooltipContent>
-                </Tooltip>
+                        <TooltipContent>{originBadge.description}</TooltipContent>
+                    </Tooltip>
+                )}
 
                 <div className="ml-4 flex shrink-0 items-center justify-end">
-                    <div className="flex flex-col items-end gap-y-1">
+                    <div className="flex w-52 flex-col items-end gap-y-1">
                         <div className="flex min-h-6 items-center gap-2">
-                            {originBadge && (
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Badge
-                                            className="uppercase"
-                                            label={originBadge.label}
-                                            styleType="secondary-outline"
-                                            weight="semibold"
-                                        />
-                                    </TooltipTrigger>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Badge
+                                        className="uppercase"
+                                        label={usedByIntegration ? 'Integration' : 'Automation'}
+                                        styleType="secondary-filled"
+                                        weight="semibold"
+                                    />
+                                </TooltipTrigger>
 
-                                    <TooltipContent>{originBadge.description}</TooltipContent>
-                                </Tooltip>
-                            )}
+                                <TooltipContent>
+                                    {usedByIntegration
+                                        ? `Used by this user's ${componentTitle || connection.componentName} integration`
+                                        : connection.origin === ConnectionOriginEnum.Internal
+                                          ? 'An admin connection automation configurations provide to their workflows'
+                                          : 'Used by automation workflows'}
+                                </TooltipContent>
+                            </Tooltip>
                         </div>
 
                         {connection.createdDate && (
