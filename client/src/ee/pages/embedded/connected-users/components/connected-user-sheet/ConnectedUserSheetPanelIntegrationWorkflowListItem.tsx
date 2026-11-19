@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import ConnectedUserIntegrationWorkflowEditDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserIntegrationWorkflowEditDialog';
 import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
 import McpToolBadge from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/McpToolBadge';
 import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/ee/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
@@ -24,7 +25,7 @@ import useWorkflowComponentDefinitions, {
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon} from 'lucide-react';
-import {useMemo} from 'react';
+import {useMemo, useState} from 'react';
 import {toast} from 'sonner';
 
 const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
@@ -51,6 +52,8 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
     const openIntegrationInstanceConfigurationWorkflowSheet = useIntegrationInstanceConfigurationWorkflowSheetStore(
         (state) => state.openIntegrationInstanceConfigurationWorkflowSheet
     );
+
+    const [showEditDialog, setShowEditDialog] = useState(false);
 
     const [, copyToClipboard] = useCopyToClipboard();
     const queryClient = useQueryClient();
@@ -180,10 +183,20 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
 
                         <ConnectedUserSheetDeleteDropdownMenu
                             onCopyWorkflowUuidClick={workflow.workflowUuid ? handleCopyWorkflowUuidClick : undefined}
+                            onEditClick={() => setShowEditDialog(true)}
                         />
                     </div>
                 </div>
             </div>
+
+            {showEditDialog && (
+                <ConnectedUserIntegrationWorkflowEditDialog
+                    integrationInstance={integrationInstance}
+                    integrationInstanceWorkflow={integrationInstanceWorkflow}
+                    onClose={() => setShowEditDialog(false)}
+                    workflow={workflow}
+                />
+            )}
         </li>
     );
 };
