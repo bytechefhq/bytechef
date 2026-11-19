@@ -1,7 +1,6 @@
+import {fromWorkflowDefinitionInput} from '@/pages/platform/workflow-editor/components/workflow-inputs/utils/fromWorkflowDefinitionInput';
 import {WorkflowInput} from '@/shared/middleware/platform/configuration';
 import {describe, expect, it} from 'vitest';
-
-import {fromWorkflowDefinitionInput} from './fromWorkflowDefinitionInput';
 
 describe('fromWorkflowDefinitionInput', () => {
     it('rebuilds a nested componentReference from flat definition keys', () => {

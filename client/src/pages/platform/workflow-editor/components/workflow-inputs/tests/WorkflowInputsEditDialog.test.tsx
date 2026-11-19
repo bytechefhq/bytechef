@@ -1,3 +1,4 @@
+import WorkflowInputsEditDialog from '@/pages/platform/workflow-editor/components/workflow-inputs/WorkflowInputsEditDialog';
 import {WorkflowInputType} from '@/shared/types';
 import {mockScrollIntoView, windowResizeObserver} from '@/shared/util/test-utils';
 import {fireEvent, render, screen, waitFor, within} from '@testing-library/react';
@@ -5,8 +6,6 @@ import userEvent from '@testing-library/user-event';
 import {useEffect, useRef} from 'react';
 import {useForm} from 'react-hook-form';
 import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
-
-import WorkflowInputsEditDialog from './WorkflowInputsEditDialog';
 
 const {useGetComponentDefinitionQueryMock} = vi.hoisted(() => ({
     useGetComponentDefinitionQueryMock: vi.fn(),

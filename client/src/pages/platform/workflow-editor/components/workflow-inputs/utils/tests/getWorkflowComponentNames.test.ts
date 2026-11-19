@@ -1,7 +1,6 @@
+import getWorkflowComponentNames from '@/pages/platform/workflow-editor/components/workflow-inputs/utils/getWorkflowComponentNames';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {describe, expect, it} from 'vitest';
-
-import getWorkflowComponentNames from './getWorkflowComponentNames';
 
 describe('getWorkflowComponentNames', () => {
     it('returns the union of task and trigger component names, de-duplicated and sorted', () => {
