@@ -38,10 +38,11 @@ class DataPillValidator {
     private static final Set<String> INPUT_PREFIXES = Set.of("input", "inputs");
     private static final Pattern LOOP_ITEM_SEGMENT_PATTERN = Pattern.compile("\\.item(?!\\w)");
 
+    private static final String INDEX_REGEX = "\\[(?:\\d+|'[^'\\\\{}\\r\\n]*')]";
+
     private static final Pattern ACCESSOR_PATH_PATTERN = Pattern.compile(
-        "(?!T\\()[a-zA-Z_][a-zA-Z0-9_]*(?:\\[(?:\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')])*" +
-            "(?:\\.(?:[a-zA-Z_][a-zA-Z0-9_]*(?:\\[(?:\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')])*|" +
-            "\\[(?:\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')]))*");
+        "(?!T\\()[a-zA-Z_][a-zA-Z0-9_]*(?:" + INDEX_REGEX + ")*" +
+            "(?:\\.(?:[a-zA-Z_][a-zA-Z0-9_]*(?:" + INDEX_REGEX + ")*|" + INDEX_REGEX + "))*");
 
     private DataPillValidator() {
     }
