@@ -60,6 +60,16 @@ const ConnectedUserSheetPanelWorkflowList = ({
         [automationProjectsData]
     );
 
+    const lastPublishedVersionsByProjectId = useMemo(
+        () =>
+            new Map(
+                (automationProjectsData?.automationProjects ?? [])
+                    .filter((automationProject) => automationProject.lastPublishedVersion != null)
+                    .map((automationProject) => [automationProject.id, automationProject.lastPublishedVersion!])
+            ),
+        [automationProjectsData]
+    );
+
     if (isLoading || automationProjectsIsLoading) {
         return <ConnectedUserSheetPanelListSkeleton label="Loading automations" variant="automation" />;
     }
@@ -114,6 +124,7 @@ const ConnectedUserSheetPanelWorkflowList = ({
                         configurations={configurations}
                         connectedUser={connectedUser}
                         connectedUserProjectWorkflows={connectedUserProjectWorkflows}
+                        lastPublishedVersionsByProjectId={lastPublishedVersionsByProjectId}
                         workflowTemplateSourcesByWorkflowUuid={workflowTemplateSourcesByWorkflowUuid}
                     />
                 </>
