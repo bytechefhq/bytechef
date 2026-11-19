@@ -11,6 +11,7 @@ query automationProjects($environmentId: ID) {
         permissionExpression
         configurationCount
         lastPublishedDate
+        unpublishedChanges
         workflowTemplates {
             workflowUuid
             workflowId
