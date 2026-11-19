@@ -38,6 +38,11 @@ import {
     UpdateConnectionCredentialsRequestFromJSON,
     UpdateConnectionCredentialsRequestToJSON,
 } from '../models/UpdateConnectionCredentialsRequest';
+import {
+    type UpdateIntegrationInstanceConnectionRequest,
+    UpdateIntegrationInstanceConnectionRequestFromJSON,
+    UpdateIntegrationInstanceConnectionRequestToJSON,
+} from '../models/UpdateIntegrationInstanceConnectionRequest';
 
 export interface DeleteIntegrationInstanceRequest {
     /**
@@ -102,6 +107,17 @@ export interface ProvisionIntegrationInstanceOperationRequest {
      * 
      */
     provisionIntegrationInstanceRequest: ProvisionIntegrationInstanceRequest;
+}
+
+export interface UpdateIntegrationInstanceConnectionOperationRequest {
+    /**
+     * The id of an integration instance.
+     */
+    id: number;
+    /**
+     * 
+     */
+    updateIntegrationInstanceConnectionRequest: UpdateIntegrationInstanceConnectionRequest;
 }
 
 export interface UpdateIntegrationInstanceCredentialsRequest {
@@ -482,6 +498,62 @@ export class IntegrationInstanceApi extends runtime.BaseAPI {
     async provisionIntegrationInstance(requestParameters: ProvisionIntegrationInstanceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<number> {
         const response = await this.provisionIntegrationInstanceRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Creates request options for updateIntegrationInstanceConnection without sending the request
+     */
+    async updateIntegrationInstanceConnectionRequestOpts(requestParameters: UpdateIntegrationInstanceConnectionOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updateIntegrationInstanceConnection().'
+            );
+        }
+
+        if (requestParameters['updateIntegrationInstanceConnectionRequest'] == null) {
+            throw new runtime.RequiredError(
+                'updateIntegrationInstanceConnectionRequest',
+                'Required parameter "updateIntegrationInstanceConnectionRequest" was null or undefined when calling updateIntegrationInstanceConnection().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/integration-instances/{id}/connection`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdateIntegrationInstanceConnectionRequestToJSON(requestParameters['updateIntegrationInstanceConnectionRequest']),
+        };
+    }
+
+    /**
+     * Switches an integration instance provisioned by a tenant admin to another connection of its connected user.
+     * Switch the connection of a provisioned integration instance
+     */
+    async updateIntegrationInstanceConnectionRaw(requestParameters: UpdateIntegrationInstanceConnectionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateIntegrationInstanceConnectionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Switches an integration instance provisioned by a tenant admin to another connection of its connected user.
+     * Switch the connection of a provisioned integration instance
+     */
+    async updateIntegrationInstanceConnection(requestParameters: UpdateIntegrationInstanceConnectionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateIntegrationInstanceConnectionRaw(requestParameters, initOverrides);
     }
 
     /**

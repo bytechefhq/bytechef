@@ -11,6 +11,7 @@ All URIs are relative to */api/embedded/internal*
 | [**getIntegrationInstanceConnection**](IntegrationInstanceApi.md#getintegrationinstanceconnection) | **GET** /integration-instances/{id}/connection | Get the connection of a provisioned integration instance |
 | [**getProvisionableIntegrations**](IntegrationInstanceApi.md#getprovisionableintegrations) | **GET** /connected-users/{connectedUserId}/provisionable-integrations | Get the integrations that can be provisioned to the connected user |
 | [**provisionIntegrationInstance**](IntegrationInstanceApi.md#provisionintegrationinstanceoperation) | **POST** /connected-users/{connectedUserId}/integration-instances | Provision an integration instance for the connected user |
+| [**updateIntegrationInstanceConnection**](IntegrationInstanceApi.md#updateintegrationinstanceconnectionoperation) | **PUT** /integration-instances/{id}/connection | Switch the connection of a provisioned integration instance |
 | [**updateIntegrationInstanceCredentials**](IntegrationInstanceApi.md#updateintegrationinstancecredentials) | **PUT** /integration-instances/{id}/connection/credentials | Replaces the credentials of a provisioned integration instance |
 
 
@@ -492,6 +493,76 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **200** | The integration instance id. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## updateIntegrationInstanceConnection
+
+> updateIntegrationInstanceConnection(id, updateIntegrationInstanceConnectionRequest)
+
+Switch the connection of a provisioned integration instance
+
+Switches an integration instance provisioned by a tenant admin to another connection of its connected user.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  IntegrationInstanceApi,
+} from '';
+import type { UpdateIntegrationInstanceConnectionOperationRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new IntegrationInstanceApi();
+
+  const body = {
+    // number | The id of an integration instance.
+    id: 789,
+    // UpdateIntegrationInstanceConnectionRequest
+    updateIntegrationInstanceConnectionRequest: ...,
+  } satisfies UpdateIntegrationInstanceConnectionOperationRequest;
+
+  try {
+    const data = await api.updateIntegrationInstanceConnection(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of an integration instance. | [Defaults to `undefined`] |
+| **updateIntegrationInstanceConnectionRequest** | [UpdateIntegrationInstanceConnectionRequest](UpdateIntegrationInstanceConnectionRequest.md) |  | |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | Successful operation. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
