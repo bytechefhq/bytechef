@@ -33,9 +33,7 @@ import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import isCollapsibleRowClick from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
-import {ComponentIcon} from 'lucide-react';
 import {type MouseEvent, useMemo, useState} from 'react';
-import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
 const ConnectedUserSheetPanelIntegrationListItem = ({
@@ -161,6 +159,8 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
         }
     };
 
+    const configurationName = integrationInstance?.integrationInstanceConfiguration?.name ?? componentDefinition.title;
+
     return (
         <Collapsible
             className="mb-2 rounded border border-border/50"
@@ -170,50 +170,24 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
         >
             {componentDefinition && (
                 <div
-                    className="flex cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
+                    className="flex cursor-pointer items-center justify-between gap-x-4 rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                     onClick={handleRowClick}
                     role="presentation"
                 >
                     <ListItemExpandButton disabled={workflowCount === 0} label="Toggle integration" />
 
-                    <CollapsibleTrigger className="flex-1 py-3" disabled={workflowCount === 0}>
-                        <div className="flex items-center gap-x-3">
-                            {componentDefinition.icon ? (
-                                <span aria-hidden="true" className="flex size-6 shrink-0">
-                                    <InlineSVG
-                                        className="size-6"
-                                        key={componentDefinition.name!}
-                                        src={componentDefinition.icon}
-                                    >
-                                        <ComponentIcon className="size-6 text-content-neutral-secondary" />
-                                    </InlineSVG>
-                                </span>
-                            ) : (
-                                <ComponentIcon
-                                    aria-hidden="true"
-                                    className="size-6 shrink-0 text-content-neutral-secondary"
-                                />
-                            )}
-
-                            <div className="flex flex-col items-start justify-center gap-y-1">
+                    <CollapsibleTrigger className="min-w-0 flex-1 py-3" disabled={workflowCount === 0}>
+                        <div className="flex min-w-0 items-center gap-x-3">
+                            <div className="flex min-w-0 flex-col items-start justify-center gap-y-1">
                                 <div
                                     className={twMerge(
-                                        'flex min-h-6 items-baseline gap-x-2 text-base font-semibold',
+                                        'flex min-h-6 max-w-full min-w-0 items-baseline gap-x-2 text-base font-semibold',
                                         !connectedUserIntegrationInstance.enabled && 'text-muted-foreground'
                                     )}
                                 >
-                                    <span>{componentDefinition.title}</span>
-
-                                    {integrationInstance?.integrationInstanceConfiguration?.name && (
-                                        <span className="text-sm font-normal text-muted-foreground">
-                                            {integrationInstance.integrationInstanceConfiguration.name}
-                                        </span>
-                                    )}
-
-                                    <ConnectedUserOriginBadge
-                                        provisioned={!!connectedUserIntegrationInstance.provisioned}
-                                        resourceName="integration"
-                                    />
+                                    <span className="min-w-0 truncate" title={configurationName}>
+                                        {configurationName}
+                                    </span>
                                 </div>
 
                                 <div className="flex min-h-6 items-center text-xs font-semibold text-muted-foreground">
@@ -242,7 +216,13 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
 
                     <div className="flex items-center gap-x-2">
                         <div className="flex items-center gap-x-4">
-                            <div className="flex w-28 items-center justify-start gap-x-4">
+                            <div className="flex w-48 items-center justify-end gap-x-2">
+                                <ConnectedUserOriginBadge
+                                    provisioned={!!connectedUserIntegrationInstance.provisioned}
+                                    provisionedBy={connectedUserIntegrationInstance.provisionedBy}
+                                    resourceName="integration"
+                                />
+
                                 {integrationInstance && (
                                     <Tooltip>
                                         <TooltipTrigger asChild>
