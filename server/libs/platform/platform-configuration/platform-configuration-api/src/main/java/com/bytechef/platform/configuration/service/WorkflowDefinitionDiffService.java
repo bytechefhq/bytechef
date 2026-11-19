@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.service;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.platform.configuration.dto.WorkflowChangeType;
 import com.bytechef.platform.configuration.dto.WorkflowDefinitionDiff;
 import org.jspecify.annotations.Nullable;
 
@@ -26,4 +27,10 @@ import org.jspecify.annotations.Nullable;
 public interface WorkflowDefinitionDiffService {
 
     WorkflowDefinitionDiff diff(@Nullable Workflow oldWorkflow, @Nullable Workflow newWorkflow);
+
+    default boolean hasChanges(@Nullable Workflow oldWorkflow, @Nullable Workflow newWorkflow) {
+        WorkflowDefinitionDiff workflowDefinitionDiff = diff(oldWorkflow, newWorkflow);
+
+        return workflowDefinitionDiff.changeType() != WorkflowChangeType.UNCHANGED;
+    }
 }
