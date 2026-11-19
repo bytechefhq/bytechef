@@ -25,6 +25,7 @@ Name | Type
 `developmentConfigurationCount` | number
 `integrationWorkflowIds` | Array&lt;number&gt;
 `tags` | [Array&lt;Tag&gt;](Tag.md)
+`unpublishedChanges` | boolean
 `version` | number
 
 ## Example
@@ -52,6 +53,7 @@ const example = {
   "developmentConfigurationCount": null,
   "integrationWorkflowIds": null,
   "tags": null,
+  "unpublishedChanges": null,
   "version": null,
 } satisfies Integration
 
