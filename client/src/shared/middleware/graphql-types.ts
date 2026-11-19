@@ -884,6 +884,7 @@ export type ConnectedUserAutomationProjectConfiguration = {
   configurationId: Scalars['ID']['output'];
   configurationName: Scalars['String']['output'];
   configurationProjectVersion: Scalars['Int']['output'];
+  enabled: Scalars['Boolean']['output'];
   projectId: Scalars['ID']['output'];
 };
 
@@ -2174,6 +2175,7 @@ export type Mutation = {
   enableApiConnector: Scalars['Boolean']['output'];
   enableAutomationProjectConfiguration: Scalars['Boolean']['output'];
   enableAutomationProjectConfigurationWorkflow: Scalars['Boolean']['output'];
+  enableConnectedUserAutomationProjectConfiguration: Scalars['Boolean']['output'];
   enableConnectedUserMcpAutomation?: Maybe<ConnectedUserMcpServerAutomation>;
   enableConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
   enableConnectedUserMcpTool?: Maybe<Scalars['Boolean']['output']>;
@@ -2763,6 +2765,13 @@ export type MutationEnableAutomationProjectConfigurationWorkflowArgs = {
   enable: Scalars['Boolean']['input'];
   id: Scalars['ID']['input'];
   workflowUuid: Scalars['ID']['input'];
+};
+
+
+export type MutationEnableConnectedUserAutomationProjectConfigurationArgs = {
+  connectedUserId: Scalars['ID']['input'];
+  enable: Scalars['Boolean']['input'];
+  projectId: Scalars['ID']['input'];
 };
 
 
