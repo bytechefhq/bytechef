@@ -361,6 +361,51 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
     @Override
     @PreAuthorize("isTenantAdmin()")
+    public void updateIntegrationInstanceConnection(long integrationInstanceId, long connectionId) {
+        IntegrationInstance integrationInstance = requireProvisioned(integrationInstanceId);
+
+        long previousConnectionId = integrationInstance.getConnectionId();
+
+        if (previousConnectionId == connectionId) {
+            return;
+        }
+
+        validateIntegrationInstanceConnection(integrationInstance, connectionId);
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(integrationInstance.getConnectedUserId());
+
+        if (!integrationInstance.isEnabled() || !connectedUser.isEnabled()) {
+            integrationInstanceService.updateConnectionId(integrationInstanceId, connectionId);
+
+            return;
+        }
+
+        List<IntegrationInstanceWorkflow> enabledIntegrationInstanceWorkflows =
+            getEnabledIntegrationInstanceWorkflows(integrationInstanceId);
+
+        disableWorkflowTriggers(enabledIntegrationInstanceWorkflows);
+
+        integrationInstanceService.updateConnectionId(integrationInstanceId, connectionId);
+
+        List<IntegrationInstanceWorkflow> restartedIntegrationInstanceWorkflows = new ArrayList<>();
+
+        for (IntegrationInstanceWorkflow integrationInstanceWorkflow : enabledIntegrationInstanceWorkflows) {
+            try {
+                enableWorkflowTriggers(integrationInstanceWorkflow);
+            } catch (RuntimeException exception) {
+                restorePreviousConnection(
+                    integrationInstanceId, previousConnectionId, enabledIntegrationInstanceWorkflows,
+                    restartedIntegrationInstanceWorkflows, exception);
+
+                throw exception;
+            }
+
+            restartedIntegrationInstanceWorkflows.add(integrationInstanceWorkflow);
+        }
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
     @Transactional(propagation = Propagation.SUPPORTS)
     public void updateIntegrationInstanceCredentials(
         long integrationInstanceId, Map<String, ?> parameters, int version) {
@@ -418,6 +463,29 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
             .filter(integrationInstance -> integrationInstance.getProvisionedBy() != null)
             .orElseThrow(() -> new NoSuchElementException(
                 "Integration instance id=%s not found".formatted(integrationInstanceId)));
+    }
+
+    private void disableWorkflowTriggers(List<IntegrationInstanceWorkflow> integrationInstanceWorkflows) {
+        List<IntegrationInstanceWorkflow> disabledIntegrationInstanceWorkflows = new ArrayList<>();
+
+        for (IntegrationInstanceWorkflow integrationInstanceWorkflow : integrationInstanceWorkflows) {
+            try {
+                disableWorkflowTriggers(integrationInstanceWorkflow);
+            } catch (RuntimeException exception) {
+                for (IntegrationInstanceWorkflow disabledIntegrationInstanceWorkflow : disabledIntegrationInstanceWorkflows) {
+
+                    try {
+                        enableWorkflowTriggers(disabledIntegrationInstanceWorkflow);
+                    } catch (RuntimeException enableException) {
+                        exception.addSuppressed(enableException);
+                    }
+                }
+
+                throw exception;
+            }
+
+            disabledIntegrationInstanceWorkflows.add(integrationInstanceWorkflow);
+        }
     }
 
     private void disableWorkflowTriggers(IntegrationInstanceWorkflow integrationInstanceWorkflow) {
@@ -586,6 +654,24 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         return activeIntegrationInstanceWorkflows;
     }
 
+    private List<IntegrationInstanceWorkflow> getEnabledIntegrationInstanceWorkflows(long integrationInstanceId) {
+        List<IntegrationInstanceWorkflow> enabledIntegrationInstanceWorkflows = new ArrayList<>();
+
+        for (IntegrationInstanceWorkflow integrationInstanceWorkflow : integrationInstanceWorkflowService
+            .getIntegrationInstanceWorkflows(integrationInstanceId)) {
+
+            IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+                integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                    integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId());
+
+            if (integrationInstanceConfigurationWorkflow.isEnabled() && integrationInstanceWorkflow.isEnabled()) {
+                enabledIntegrationInstanceWorkflows.add(integrationInstanceWorkflow);
+            }
+        }
+
+        return enabledIntegrationInstanceWorkflows;
+    }
+
     private Long getConnectionId(
         long integrationId, IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow,
         long integrationInstanceId, WorkflowTrigger workflowTrigger) {
@@ -724,12 +810,58 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         }
     }
 
+    private void restorePreviousConnection(
+        long integrationInstanceId, long previousConnectionId,
+        List<IntegrationInstanceWorkflow> enabledIntegrationInstanceWorkflows,
+        List<IntegrationInstanceWorkflow> restartedIntegrationInstanceWorkflows, RuntimeException restartFailure) {
+
+        for (IntegrationInstanceWorkflow integrationInstanceWorkflow : restartedIntegrationInstanceWorkflows) {
+            try {
+                disableWorkflowTriggers(integrationInstanceWorkflow);
+            } catch (RuntimeException exception) {
+                restartFailure.addSuppressed(exception);
+            }
+        }
+
+        integrationInstanceService.updateConnectionId(integrationInstanceId, previousConnectionId);
+
+        for (IntegrationInstanceWorkflow integrationInstanceWorkflow : enabledIntegrationInstanceWorkflows) {
+            try {
+                enableWorkflowTriggers(integrationInstanceWorkflow);
+            } catch (RuntimeException exception) {
+                restartFailure.addSuppressed(exception);
+            }
+        }
+    }
+
     private void validateCurrentPrincipalIntegrationInstanceOwnership(long integrationInstanceId) {
         ConnectedUserIntegrationInstanceFacade connectedUserIntegrationInstanceFacade =
             connectedUserIntegrationInstanceFacadeProvider.getObject();
 
         connectedUserIntegrationInstanceFacade.validateCurrentPrincipalIntegrationInstanceOwnership(
             integrationInstanceId);
+    }
+
+    private void validateIntegrationInstanceConnection(IntegrationInstance integrationInstance, long connectionId) {
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfiguration(integrationInstance.getIntegrationInstanceConfigurationId());
+
+        Integration integration = integrationService.getIntegration(
+            integrationInstanceConfiguration.getIntegrationId());
+
+        List<ConnectionDTO> connectionDTOs = connectedUserConnectionFacade.getConnectedUserConnectionsForAdmin(
+            integrationInstance.getConnectedUserId(), integration.getComponentName(), List.of(connectionId));
+
+        boolean connectionValid = connectionDTOs.stream()
+            .anyMatch(connectionDTO -> Objects.equals(connectionDTO.id(), connectionId) &&
+                connectionDTO.environmentId() == integrationInstanceConfiguration.getEnvironmentId());
+
+        if (!connectionValid) {
+            throw new IllegalArgumentException(
+                "Connection id=%s is not a %s connection of connected user id=%s in environment=%s".formatted(
+                    connectionId, integration.getComponentName(), integrationInstance.getConnectedUserId(),
+                    integrationInstanceConfiguration.getEnvironment()));
+        }
     }
 
     private @Nullable String getStaticWebhookUrl(long integrationInstanceId, @Nullable String workflowId) {

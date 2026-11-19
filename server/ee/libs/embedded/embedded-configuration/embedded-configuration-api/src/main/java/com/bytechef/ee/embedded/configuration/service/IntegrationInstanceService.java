@@ -84,5 +84,7 @@ public interface IntegrationInstanceService {
 
     IntegrationInstance updateIntegrationInstanceConfigurationId(long id, long integrationInstanceConfigurationId);
 
+    void updateConnectionId(long id, long connectionId);
+
     void updateEnabled(long id, boolean enable);
 }

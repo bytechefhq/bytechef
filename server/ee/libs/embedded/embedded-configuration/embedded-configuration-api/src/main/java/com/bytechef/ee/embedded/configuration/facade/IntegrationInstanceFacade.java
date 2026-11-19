@@ -47,6 +47,8 @@ public interface IntegrationInstanceFacade {
         IntegrationInstanceConfigurationWorkflow previousIntegrationInstanceConfigurationWorkflow,
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow);
 
+    void updateIntegrationInstanceConnection(long integrationInstanceId, long connectionId);
+
     void updateIntegrationInstanceCredentials(long integrationInstanceId, Map<String, ?> parameters, int version);
 
     void updateIntegrationInstanceWorkflow(
