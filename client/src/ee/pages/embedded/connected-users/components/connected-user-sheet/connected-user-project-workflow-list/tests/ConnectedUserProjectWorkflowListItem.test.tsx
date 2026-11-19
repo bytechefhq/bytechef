@@ -73,6 +73,7 @@ const createConnectedUserProjectWorkflow = (
     id: '1052',
     lastExecutionDate: null,
     projectId: '0',
+    provisionedBy: null,
     staticWebhookUrl,
     toolOnly: false,
     workflow: {
@@ -203,6 +204,28 @@ describe('ConnectedUserProjectWorkflowListItem', () => {
         renderListItem(createConnectedUserProjectWorkflow(null, {enabled: true, workflowVersion: null}));
 
         expect(screen.getByRole('switch', {name: 'Enable WhatsApp Agent - Human reply'})).toBeEnabled();
+    });
+
+    it('marks a reference an admin provisioned as provisioned', () => {
+        renderListItem(
+            createConnectedUserProjectWorkflow(null, {
+                automationUuid: 'template-uuid',
+                provisionedBy: 'admin@localhost.com',
+                workflowVersion: null,
+            })
+        );
+
+        expect(screen.getByText('Provisioned')).toBeInTheDocument();
+        expect(screen.queryByText('Self-created')).not.toBeInTheDocument();
+    });
+
+    it('marks a reference the connected user created through the API as self-created', () => {
+        renderListItem(
+            createConnectedUserProjectWorkflow(null, {automationUuid: 'template-uuid', workflowVersion: null})
+        );
+
+        expect(screen.getByText('Self-created')).toBeInTheDocument();
+        expect(screen.queryByText('Provisioned')).not.toBeInTheDocument();
     });
 
     it('shows no version for a provisioned workflow, whose configuration already shows the project version', () => {
