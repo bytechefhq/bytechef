@@ -142,11 +142,13 @@ class _InputDefinitionRequired(TypedDict):
 class InputDefinition(_InputDefinitionRequired, total=False):
     """A workflow input. At run time it arrives in ``perform``'s ``input`` under its own name. ``type`` defaults to
     ``STRING``; ``componentName``, ``componentVersion`` and ``groupName`` name the component input it takes its
-    options from."""
+    options from. ``internalOnly`` keeps an embedded integration's input on its configuration, set by an administrator
+    and hidden from connected users."""
 
     componentName: str
     componentVersion: int
     groupName: str
+    internalOnly: bool
     label: str
     required: bool
     type: InputType

@@ -138,6 +138,12 @@ export interface InputDefinition {
     componentName?: string;
     componentVersion?: number;
     groupName?: string;
+
+    /**
+     * On an embedded integration, an administrator sets the value on the integration configuration; connected users
+     * neither see nor override it. Automation projects ignore it.
+     */
+    internalOnly?: boolean;
     label?: string;
     name: string;
     required?: boolean;

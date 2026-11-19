@@ -41,6 +41,14 @@ public interface Input {
 
     String getType();
 
+    /**
+     * Returns whether only an administrator sets this input, on an embedded integration's configuration. Connected
+     * users neither see nor override it, and automation projects ignore it.
+     */
+    default boolean isInternalOnly() {
+        return false;
+    }
+
     record ComponentInputReference(String componentName, int componentVersion, String groupName) {
 
         public ComponentInputReference {
