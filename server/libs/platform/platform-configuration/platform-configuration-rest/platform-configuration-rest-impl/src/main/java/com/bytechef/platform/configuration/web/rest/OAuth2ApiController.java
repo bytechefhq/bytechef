@@ -74,7 +74,7 @@ public class OAuth2ApiController implements Oauth2Api {
     public ResponseEntity<OAuth2PropertiesModel> getOAuth2Properties() {
         return ResponseEntity.ok(
             new OAuth2PropertiesModel()
-                .predefinedApps(oAuth2Service.getPredefinedOAuth2Apps())
+                .predefinedApps(oAuth2Service.getPredefinedApps())
                 .redirectUri(oAuth2Service.getRedirectUri()));
     }
 }

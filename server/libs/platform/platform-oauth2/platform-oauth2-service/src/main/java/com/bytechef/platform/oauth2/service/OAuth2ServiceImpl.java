@@ -82,7 +82,7 @@ public class OAuth2ServiceImpl implements OAuth2Service {
     }
 
     @Override
-    public List<String> getPredefinedOAuth2Apps() {
+    public List<String> getPredefinedApps() {
         Map<String, OAuth2App> predefinedOAuth2Apps = oauth2.getPredefinedApps();
 
         Set<String> names = new LinkedHashSet<>(predefinedOAuth2Apps.keySet());

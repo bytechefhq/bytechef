@@ -123,7 +123,7 @@ class OAuth2ServiceTest {
 
         OAuth2ServiceImpl oAuth2Service = new OAuth2ServiceImpl(applicationProperties, remoteOAuth2AppsClient);
 
-        List<String> names = oAuth2Service.getPredefinedOAuth2Apps();
+        List<String> names = oAuth2Service.getPredefinedApps();
 
         assertThat(names).containsExactly("slack", "googleDrive", "asana", "zendesk");
     }
