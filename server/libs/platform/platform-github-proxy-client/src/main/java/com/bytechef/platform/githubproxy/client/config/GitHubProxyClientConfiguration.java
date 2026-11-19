@@ -72,10 +72,12 @@ class GitHubProxyClientConfiguration {
 
         requestFactory.setReadTimeout(Duration.ofSeconds(10));
 
+        GitHubProxyClientProperties.OauthApps oauthApps = properties.getOauthApps();
+
         RestClient restClient = RestClient.builder()
             .baseUrl(properties.getBaseUrl())
             .requestFactory(requestFactory)
-            .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + properties.getOauthAppsApiKey())
+            .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + oauthApps.getApiKey())
             .build();
 
         return new RestOAuthAppProxyClient(restClient);
