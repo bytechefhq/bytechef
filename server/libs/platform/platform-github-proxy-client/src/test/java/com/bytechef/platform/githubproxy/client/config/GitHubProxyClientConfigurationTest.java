@@ -17,10 +17,27 @@
 package com.bytechef.platform.githubproxy.client.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.platform.githubproxy.client.OAuthAppProxyClient;
+import com.bytechef.platform.githubproxy.client.model.OAuthApp;
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.RestClientResponseException;
 
 /**
  * @author Ivica Cardic
@@ -29,6 +46,55 @@ class GitHubProxyClientConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
         .withUserConfiguration(GitHubProxyClientConfiguration.class);
+
+    private final AtomicReference<String> receivedAuthorization = new AtomicReference<>();
+    private final AtomicInteger redirectTargetHits = new AtomicInteger();
+
+    private HttpServer httpServer;
+
+    @BeforeEach
+    void beforeEach() throws IOException {
+        httpServer = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0);
+
+        httpServer.createContext("/oauth-apps", this::handleOAuthApps);
+        httpServer.createContext("/redirect/oauth-apps", this::handleRedirect);
+        httpServer.createContext("/elsewhere", this::handleRedirectTarget);
+
+        httpServer.start();
+    }
+
+    @AfterEach
+    void afterEach() {
+        httpServer.stop(0);
+    }
+
+    @Test
+    void testOAuthAppProxyClientSendsBearerKeyFromProperties() {
+        contextRunner.withPropertyValues("github-proxy.base-url=" + baseUrl(""), "github-proxy.oauth-apps.api-key=k1")
+            .run(context -> {
+                OAuthAppProxyClient oAuthAppProxyClient = context.getBean(OAuthAppProxyClient.class);
+
+                Map<String, OAuthApp> oAuthApps = oAuthAppProxyClient.getOAuthApps();
+
+                assertThat(oAuthApps).containsExactly(Map.entry("googleDrive", new OAuthApp("id", "secret")));
+                assertThat(receivedAuthorization.get()).isEqualTo("Bearer k1");
+            });
+    }
+
+    @Test
+    void testOAuthAppProxyClientDoesNotFollowRedirects() {
+        contextRunner
+            .withPropertyValues("github-proxy.base-url=" + baseUrl("/redirect"), "github-proxy.oauth-apps.api-key=k1")
+            .run(context -> {
+                OAuthAppProxyClient oAuthAppProxyClient = context.getBean(OAuthAppProxyClient.class);
+
+                assertThatThrownBy(oAuthAppProxyClient::getOAuthApps)
+                    .isInstanceOfSatisfying(
+                        RestClientResponseException.class,
+                        exception -> assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.FOUND));
+                assertThat(redirectTargetHits.get()).isZero();
+            });
+    }
 
     @Test
     void testNoOAuthAppProxyClientWithoutApiKey() {
@@ -66,5 +132,46 @@ class GitHubProxyClientConfigurationTest {
                 assertThat(context).hasNotFailed();
                 assertThat(context).hasSingleBean(OAuthAppProxyClient.class);
             });
+    }
+
+    private String baseUrl(String path) {
+        InetSocketAddress address = httpServer.getAddress();
+
+        return "http://127.0.0.1:" + address.getPort() + path;
+    }
+
+    private void handleOAuthApps(HttpExchange exchange) throws IOException {
+        Headers requestHeaders = exchange.getRequestHeaders();
+
+        receivedAuthorization.set(requestHeaders.getFirst("Authorization"));
+
+        byte[] body = "{\"googleDrive\":{\"clientId\":\"id\",\"clientSecret\":\"secret\"}}"
+            .getBytes(StandardCharsets.UTF_8);
+
+        Headers responseHeaders = exchange.getResponseHeaders();
+
+        responseHeaders.add("Content-Type", "application/json");
+
+        exchange.sendResponseHeaders(200, body.length);
+
+        try (OutputStream outputStream = exchange.getResponseBody()) {
+            outputStream.write(body);
+        }
+    }
+
+    private void handleRedirect(HttpExchange exchange) throws IOException {
+        Headers responseHeaders = exchange.getResponseHeaders();
+
+        responseHeaders.add("Location", baseUrl("/elsewhere"));
+
+        exchange.sendResponseHeaders(302, -1);
+        exchange.close();
+    }
+
+    private void handleRedirectTarget(HttpExchange exchange) throws IOException {
+        redirectTargetHits.incrementAndGet();
+
+        exchange.sendResponseHeaders(200, -1);
+        exchange.close();
     }
 }

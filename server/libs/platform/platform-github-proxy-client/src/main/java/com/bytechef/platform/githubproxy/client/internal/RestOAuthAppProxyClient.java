@@ -21,8 +21,11 @@ import com.bytechef.platform.githubproxy.client.model.OAuthApp;
 import java.util.Map;
 import java.util.Objects;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 /**
  * @author Ivica Cardic
@@ -37,15 +40,22 @@ public final class RestOAuthAppProxyClient implements OAuthAppProxyClient {
 
     @Override
     public Map<String, OAuthApp> getOAuthApps() {
-        Map<String, OAuthApp> oAuthApps = restClient.get()
+        ResponseEntity<Map<String, OAuthApp>> responseEntity = restClient.get()
             .uri(uriBuilder -> uriBuilder.path("/oauth-apps")
                 .build())
             .accept(MediaType.APPLICATION_JSON)
             .retrieve()
-            .body(new ParameterizedTypeReference<Map<String, OAuthApp>>() {});
+            .onStatus(HttpStatusCode::is3xxRedirection, (request, response) -> {
+                throw new RestClientResponseException(
+                    "The OAuth apps proxy answered with a redirect", response.getStatusCode(), "", null, null, null);
+            })
+            .toEntity(new ParameterizedTypeReference<Map<String, OAuthApp>>() {});
+
+        Map<String, OAuthApp> oAuthApps = responseEntity.getBody();
 
         if (oAuthApps == null) {
-            return Map.of();
+            throw new RestClientResponseException(
+                "The OAuth apps proxy answered without a body", responseEntity.getStatusCode(), "", null, null, null);
         }
 
         return oAuthApps;

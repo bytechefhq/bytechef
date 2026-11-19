@@ -18,12 +18,15 @@ package com.bytechef.platform.oauth2.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Oauth2;
 import com.bytechef.config.ApplicationProperties.Oauth2.OAuth2App;
+import com.bytechef.platform.githubproxy.client.model.OAuthApp;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,23 +42,24 @@ import org.junit.jupiter.api.extension.ExtendWith;
 class OAuth2ServiceTest {
 
     private final ApplicationProperties applicationProperties = new ApplicationProperties();
-    private final RemoteOAuth2Apps remoteOAuth2Apps = mock(RemoteOAuth2Apps.class);
-    private Map<String, OAuth2App> yamlApps;
+    private final RemoteOAuth2AppsClient remoteOAuth2AppsClient = mock(RemoteOAuth2AppsClient.class);
+    private Map<String, OAuth2App> predefinedOAuth2Apps;
 
     @BeforeEach
     void beforeEach() {
-        yamlApps = new LinkedHashMap<>();
+        predefinedOAuth2Apps = new LinkedHashMap<>();
 
         Oauth2 oauth2 = applicationProperties.getOauth2();
 
-        oauth2.setPredefinedApps(yamlApps);
+        oauth2.setPredefinedApps(predefinedOAuth2Apps);
     }
 
     @Test
     void testRemoteAppFillsBlankClientId() {
-        when(remoteOAuth2Apps.getOAuth2Apps()).thenReturn(Map.of("googleDrive", app("remoteId", "remoteSecret")));
+        when(remoteOAuth2AppsClient.getOAuth2Apps())
+            .thenReturn(Map.of("googleDrive", new OAuthApp("remoteId", "remoteSecret")));
 
-        OAuth2ServiceImpl oAuth2Service = new OAuth2ServiceImpl(applicationProperties, remoteOAuth2Apps);
+        OAuth2ServiceImpl oAuth2Service = new OAuth2ServiceImpl(applicationProperties, remoteOAuth2AppsClient);
 
         Map<String, ?> parameters = oAuth2Service.checkPredefinedParameters("googleDrive", Map.of());
 
@@ -64,37 +68,43 @@ class OAuth2ServiceTest {
     }
 
     @Test
-    void testYamlWinsOverRemote() {
-        yamlApps.put("googleDrive", app("yamlId", "yamlSecret"));
+    void testPredefinedOAuth2AppWinsOverRemote() {
+        predefinedOAuth2Apps.put("googleDrive", app("predefinedId", "predefinedSecret"));
 
-        when(remoteOAuth2Apps.getOAuth2Apps()).thenReturn(Map.of("googleDrive", app("remoteId", "remoteSecret")));
+        when(remoteOAuth2AppsClient.getOAuth2Apps())
+            .thenReturn(Map.of("googleDrive", new OAuthApp("remoteId", "remoteSecret")));
 
-        OAuth2ServiceImpl oAuth2Service = new OAuth2ServiceImpl(applicationProperties, remoteOAuth2Apps);
+        OAuth2ServiceImpl oAuth2Service = new OAuth2ServiceImpl(applicationProperties, remoteOAuth2AppsClient);
 
         Map<String, ?> parameters = oAuth2Service.checkPredefinedParameters("googleDrive", Map.of());
 
-        assertThat(parameters.get(Authorization.CLIENT_ID)).isEqualTo("yamlId");
-        assertThat(parameters.get(Authorization.CLIENT_SECRET)).isEqualTo("yamlSecret");
+        assertThat(parameters.get(Authorization.CLIENT_ID)).isEqualTo("predefinedId");
+        assertThat(parameters.get(Authorization.CLIENT_SECRET)).isEqualTo("predefinedSecret");
+
+        verify(remoteOAuth2AppsClient, never()).getOAuth2Apps();
     }
 
     @Test
     void testProvidedClientIdIsKept() {
-        when(remoteOAuth2Apps.getOAuth2Apps()).thenReturn(Map.of("googleDrive", app("remoteId", "remoteSecret")));
+        when(remoteOAuth2AppsClient.getOAuth2Apps())
+            .thenReturn(Map.of("googleDrive", new OAuthApp("remoteId", "remoteSecret")));
 
-        OAuth2ServiceImpl oAuth2Service = new OAuth2ServiceImpl(applicationProperties, remoteOAuth2Apps);
+        OAuth2ServiceImpl oAuth2Service = new OAuth2ServiceImpl(applicationProperties, remoteOAuth2AppsClient);
 
         Map<String, ?> parameters = oAuth2Service.checkPredefinedParameters(
             "googleDrive", Map.of(Authorization.CLIENT_ID, "mine", Authorization.CLIENT_SECRET, "mySecret"));
 
         assertThat(parameters.get(Authorization.CLIENT_ID)).isEqualTo("mine");
         assertThat(parameters.get(Authorization.CLIENT_SECRET)).isEqualTo("mySecret");
+
+        verify(remoteOAuth2AppsClient, never()).getOAuth2Apps();
     }
 
     @Test
     void testUnknownComponentLeavesParametersUnchanged() {
-        when(remoteOAuth2Apps.getOAuth2Apps()).thenReturn(Map.of());
+        when(remoteOAuth2AppsClient.getOAuth2Apps()).thenReturn(Map.of());
 
-        OAuth2ServiceImpl oAuth2Service = new OAuth2ServiceImpl(applicationProperties, remoteOAuth2Apps);
+        OAuth2ServiceImpl oAuth2Service = new OAuth2ServiceImpl(applicationProperties, remoteOAuth2AppsClient);
 
         Map<String, ?> parameters = oAuth2Service.checkPredefinedParameters("slack", Map.of("a", "b"));
 
@@ -103,17 +113,19 @@ class OAuth2ServiceTest {
 
     @Test
     void testGetPredefinedAppsListsNamesFromBothSources() {
-        yamlApps.put("slack", app("yamlId", "yamlSecret"));
-        yamlApps.put("googleDrive", app("yamlId", "yamlSecret"));
+        predefinedOAuth2Apps.put("slack", app("predefinedId", "predefinedSecret"));
+        predefinedOAuth2Apps.put("googleDrive", app("predefinedId", "predefinedSecret"));
 
-        when(remoteOAuth2Apps.getOAuth2Apps()).thenReturn(
-            Map.of("googleDrive", app("remoteId", "remoteSecret"), "asana", app("id", "secret")));
+        when(remoteOAuth2AppsClient.getOAuth2Apps()).thenReturn(
+            Map.of(
+                "googleDrive", new OAuthApp("remoteId", "remoteSecret"), "zendesk", new OAuthApp("id", "secret"),
+                "asana", new OAuthApp("id", "secret")));
 
-        OAuth2ServiceImpl oAuth2Service = new OAuth2ServiceImpl(applicationProperties, remoteOAuth2Apps);
+        OAuth2ServiceImpl oAuth2Service = new OAuth2ServiceImpl(applicationProperties, remoteOAuth2AppsClient);
 
-        List<String> names = oAuth2Service.getPredefinedApps();
+        List<String> names = oAuth2Service.getPredefinedOAuth2Apps();
 
-        assertThat(names).containsExactly("slack", "googleDrive", "asana");
+        assertThat(names).containsExactly("slack", "googleDrive", "asana", "zendesk");
     }
 
     private static OAuth2App app(String clientId, String clientSecret) {

@@ -34,6 +34,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 /**
  * @author Ivica Cardic
@@ -82,7 +83,7 @@ class RestOAuthAppProxyClientTest {
     }
 
     @Test
-    void testGetOAuthAppsReturnsEmptyMapOnEmptyBody() {
+    void testGetOAuthAppsThrowsOnResponseWithoutBody() {
         RestClient.Builder restClientBuilder = RestClient.builder()
             .baseUrl("http://proxy.test");
 
@@ -94,9 +95,64 @@ class RestOAuthAppProxyClientTest {
 
         RestOAuthAppProxyClient client = new RestOAuthAppProxyClient(restClientBuilder.build());
 
-        Map<String, OAuthApp> oAuthApps = client.getOAuthApps();
+        assertThatThrownBy(client::getOAuthApps)
+            .isInstanceOfSatisfying(
+                RestClientResponseException.class,
+                exception -> assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.OK));
+    }
 
-        assertThat(oAuthApps).isEmpty();
+    @Test
+    void testGetOAuthAppsThrowsOnRedirect() {
+        RestClient.Builder restClientBuilder = RestClient.builder()
+            .baseUrl("http://proxy.test");
+
+        MockRestServiceServer server = MockRestServiceServer.bindTo(restClientBuilder)
+            .build();
+
+        server.expect(requestTo("http://proxy.test/oauth-apps"))
+            .andRespond(withStatus(HttpStatus.FOUND));
+
+        RestOAuthAppProxyClient client = new RestOAuthAppProxyClient(restClientBuilder.build());
+
+        assertThatThrownBy(client::getOAuthApps)
+            .isInstanceOfSatisfying(
+                RestClientResponseException.class,
+                exception -> assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.FOUND));
+    }
+
+    @Test
+    void testGetOAuthAppsReturnsEmptyMapOnEmptyObject() {
+        RestClient.Builder restClientBuilder = RestClient.builder()
+            .baseUrl("http://proxy.test");
+
+        MockRestServiceServer server = MockRestServiceServer.bindTo(restClientBuilder)
+            .build();
+
+        server.expect(requestTo("http://proxy.test/oauth-apps"))
+            .andRespond(withSuccess("{}", MediaType.APPLICATION_JSON));
+
+        RestOAuthAppProxyClient client = new RestOAuthAppProxyClient(restClientBuilder.build());
+
+        assertThat(client.getOAuthApps()).isEmpty();
+    }
+
+    @Test
+    void testGetOAuthAppsIgnoresUnknownFields() {
+        RestClient.Builder restClientBuilder = RestClient.builder()
+            .baseUrl("http://proxy.test");
+
+        MockRestServiceServer server = MockRestServiceServer.bindTo(restClientBuilder)
+            .build();
+
+        server.expect(requestTo("http://proxy.test/oauth-apps"))
+            .andRespond(
+                withSuccess(
+                    "{\"googleDrive\":{\"clientId\":\"id\",\"clientSecret\":\"s\",\"scopes\":[\"drive\"]}}",
+                    MediaType.APPLICATION_JSON));
+
+        RestOAuthAppProxyClient client = new RestOAuthAppProxyClient(restClientBuilder.build());
+
+        assertThat(client.getOAuthApps()).containsExactly(Map.entry("googleDrive", new OAuthApp("id", "s")));
     }
 
     @Test
@@ -105,6 +161,7 @@ class RestOAuthAppProxyClientTest {
 
         String text = oAuthApp.toString();
 
+        assertThat(text).contains("id");
         assertThat(text).doesNotContain("topSecret");
     }
 }
