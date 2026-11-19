@@ -184,6 +184,7 @@ public class WorkflowDsl {
     public static class ModifiableInput implements Input {
 
         private ComponentInputReference componentInput;
+        private boolean internalOnly;
         private String label;
         private final String name;
         private boolean required;
@@ -195,6 +196,12 @@ public class WorkflowDsl {
 
         public ModifiableInput component(String componentName, int componentVersion, String groupName) {
             this.componentInput = new ComponentInputReference(componentName, componentVersion, groupName);
+
+            return this;
+        }
+
+        public ModifiableInput internalOnly(boolean internalOnly) {
+            this.internalOnly = internalOnly;
 
             return this;
         }
@@ -235,6 +242,11 @@ public class WorkflowDsl {
         @Override
         public String getType() {
             return type;
+        }
+
+        @Override
+        public boolean isInternalOnly() {
+            return internalOnly;
         }
 
         @Override
