@@ -85,7 +85,7 @@ const createDanglingPlaceholder = (input: WorkflowInput): PropertyAllType =>
         type: PropertyType.String,
     }) as PropertyAllType;
 
-interface ResolvedComponentInputGroupI {
+export interface ResolvedComponentInputGroupI {
     label?: string;
     members: PropertyAllType[];
     name: string;
