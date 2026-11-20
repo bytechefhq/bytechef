@@ -359,12 +359,12 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
         int projectVersion = projectDeployment.getProjectVersion();
         String automationUuid = reference.getAutomationUuid();
 
-        connectedUserReferenceDeploymentManager.checkProvidedValuesNotRequested(
-            connectedUser.getId(), projectDeployment.getProjectId(), automationUuid, requestedConnectionIds,
-            inputs);
-
         String workflowId = connectedUserReferenceDeploymentManager.getWorkflowId(
             projectDeployment.getProjectId(), projectVersion, automationUuid);
+
+        connectedUserReferenceDeploymentManager.checkProvidedValuesNotRequested(
+            connectedUser.getId(), projectDeployment.getProjectId(), automationUuid, workflowId,
+            requestedConnectionIds, inputs);
 
         Optional<ProjectDeploymentWorkflow> currentRow = connectedUserReferenceDeploymentManager.fetchWorkflowRow(
             reference.getProjectDeploymentId(), workflowId);
@@ -393,7 +393,8 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
         connectedUserReferenceDeploymentManager.putWorkflows(
             reference.getProjectDeploymentId(), projectVersion, Map.of(automationUuid, rowSpec));
 
-        reference.setEnabled(enable && (reference.isEnabled() || requestedEnabled));
+        reference.setEnabled(
+            enable && (reference.isEnabled() || requestedEnabled || resolution.awaitingConfiguration()));
 
         ConnectedUserProjectWorkflow savedReference = connectedUserProjectWorkflowRepository.save(reference);
 

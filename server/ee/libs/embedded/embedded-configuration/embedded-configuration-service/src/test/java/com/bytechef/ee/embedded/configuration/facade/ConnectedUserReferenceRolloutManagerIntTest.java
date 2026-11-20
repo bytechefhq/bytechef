@@ -227,6 +227,18 @@ class ConnectedUserReferenceRolloutManagerIntTest {
          "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
         """;
 
+    private static final String SLACK_WORKFLOW_WITH_OPTIONAL_INTERNAL_ONLY_INPUT_DEFINITION = """
+        {"label":"Post","inputs":[
+         {"name":"accountId","label":"Account","type":"string","required":false,"internalOnly":true}],
+         "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
+        """;
+
+    private static final String SLACK_WORKFLOW_WITH_REQUIRED_INTERNAL_ONLY_INPUT_DEFINITION = """
+        {"label":"Post","inputs":[
+         {"name":"accountId","label":"Account","type":"string","required":true,"internalOnly":true}],
+         "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
+        """;
+
     @Autowired
     private AutomationProjectConfigurationFacade automationProjectConfigurationFacade;
 
@@ -3284,6 +3296,87 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             .satisfies(row -> {
                 assertThat(row.isEnabled()).isTrue();
                 assertThat(row.getInputs()).isEqualTo(Map.of("channel", "#second"));
+            });
+    }
+
+    @Test
+    void testRowTurnsOnOnceTheConfigurationSetsTheRequiredInternalOnlyInput() {
+        long automationProjectId = createAutomationProject("Internal Only Gate");
+
+        String workflowUuid = addWorkflow(
+            automationProjectId, SLACK_WORKFLOW_WITH_REQUIRED_INTERNAL_ONLY_INPUT_DEFINITION);
+
+        publishAndPinProject(automationProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isFalse();
+
+        provideValuesAndRollOut(automationProjectId, workflowUuid, Map.of(), Map.of("accountId", "acme"));
+
+        assertThat(fetchDeploymentRow(reference))
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isTrue();
+                assertThat(row.getInputs()).isEqualTo(Map.of("accountId", "acme"));
+            });
+    }
+
+    @Test
+    void testAUserValueOfAProvidedInternalOnlyInputIsIgnoredNotRejected() {
+        long automationProjectId = createAutomationProject("Internal Only Provided");
+
+        String workflowUuid = addWorkflow(
+            automationProjectId, SLACK_WORKFLOW_WITH_REQUIRED_INTERNAL_ONLY_INPUT_DEFINITION);
+
+        publishAndPinProject(automationProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        provideValues(automationProjectId, workflowUuid, Map.of(), Map.of("accountId", "acme"));
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION, Map.of(), Map.of("accountId", "user-account"));
+
+        assertThatCode(() -> connectedUserWorkflowReferenceFacade.updateReferenceInputs(
+            EXTERNAL_USER_ID, workflowUuid, Map.of("accountId", "user-account"), Environment.PRODUCTION))
+                .doesNotThrowAnyException();
+
+        assertThat(fetchDeploymentRow(reference))
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isTrue();
+                assertThat(row.getInputs()).isEqualTo(Map.of("accountId", "acme"));
+            });
+    }
+
+    @Test
+    void testRolloutDropsAUserValueOfAnInternalOnlyInput() {
+        long automationProjectId = createAutomationProject("Internal Only Carry Forward");
+
+        String workflowUuid = addWorkflow(
+            automationProjectId, SLACK_WORKFLOW_WITH_OPTIONAL_INTERNAL_ONLY_INPUT_DEFINITION);
+
+        publishAndPinProject(automationProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        ProjectDeploymentWorkflow legacyRow = fetchDeploymentRow(reference);
+
+        legacyRow.setInputs(Map.of("accountId", "user-account", "note", "kept"));
+
+        projectDeploymentWorkflowService.update(legacyRow);
+
+        provideValuesAndRollOut(automationProjectId, workflowUuid, Map.of(), Map.of());
+
+        assertThat(fetchDeploymentRow(reference))
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isTrue();
+                assertThat(row.getInputs()).isEqualTo(Map.of("note", "kept"));
             });
     }
 

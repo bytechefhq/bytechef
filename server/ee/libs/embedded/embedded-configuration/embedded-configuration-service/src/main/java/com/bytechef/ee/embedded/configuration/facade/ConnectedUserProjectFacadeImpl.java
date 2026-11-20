@@ -60,6 +60,7 @@ import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectServic
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
+import com.bytechef.ee.embedded.configuration.util.InternalOnlyInputUtils;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
@@ -760,7 +761,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         ProjectDeploymentWorkflow projectDeploymentWorkflow =
             projectDeploymentWorkflowService.getProjectDeploymentWorkflow(projectDeploymentId, workflowId);
 
-        projectDeploymentWorkflow.setInputs(inputs);
+        projectDeploymentWorkflow.setInputs(
+            InternalOnlyInputUtils.removeInternalOnlyInputs(workflowService.getWorkflow(workflowId), inputs));
 
         projectDeploymentWorkflowService.update(projectDeploymentWorkflow);
     }

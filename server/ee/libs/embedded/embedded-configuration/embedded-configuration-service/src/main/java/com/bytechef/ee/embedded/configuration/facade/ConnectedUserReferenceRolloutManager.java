@@ -696,8 +696,8 @@ public class ConnectedUserReferenceRolloutManager {
         String workflowId = connectedUserReferenceDeploymentManager.getWorkflowId(
             automationProjectId, projectVersion, automationUuid);
 
-        Map<String, Object> userInputs = new LinkedHashMap<>(
-            currentRow.<Map<String, ?>>map(ProjectDeploymentWorkflow::getInputs)
+        Map<String, Object> userInputs = connectedUserReferenceDeploymentManager.removeInternalOnlyInputs(
+            workflowId, currentRow.<Map<String, ?>>map(ProjectDeploymentWorkflow::getInputs)
                 .orElse(Map.of()));
 
         for (String removedInputName : removedInputNames) {
