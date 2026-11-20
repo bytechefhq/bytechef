@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.data.storage.file.storage.service;
+package com.bytechef.platform.data.storage.file.storage.facade;
 
 import com.bytechef.commons.data.jdbc.wrapper.TypedValue;
 import com.bytechef.commons.util.CompressionUtils;
@@ -34,7 +34,7 @@ import tools.jackson.databind.ObjectMapper;
 /**
  * @author Ivica Cardic
  */
-public class FileDataStorageServiceImpl implements FileDataStorageService {
+public class FileDataStorageFacadeImpl implements FileDataStorageFacade {
 
     public static final String LEGACY_DATA_ENTRIES_ROOT_DIR = "data_entries/";
     public static final String DATA_STORAGE_ROOT_DIR = "data_storage/";
@@ -48,7 +48,7 @@ public class FileDataStorageServiceImpl implements FileDataStorageService {
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI")
-    public FileDataStorageServiceImpl(FileStorageService fileStorageService, ObjectMapper objectMapper) {
+    public FileDataStorageFacadeImpl(FileStorageService fileStorageService, ObjectMapper objectMapper) {
         this.fileStorageService = fileStorageService;
         this.objectMapper = objectMapper;
     }

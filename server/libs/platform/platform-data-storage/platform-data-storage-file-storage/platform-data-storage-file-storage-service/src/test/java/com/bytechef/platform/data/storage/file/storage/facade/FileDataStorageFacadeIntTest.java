@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.data.storage.file.storage.service;
+package com.bytechef.platform.data.storage.file.storage.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,7 +49,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @ExtendWith(ObjectMapperSetupExtension.class)
 @SpringBootTest(
     classes = FileDataStorageIntTestConfiguration.class, properties = "bytechef.data-storage.provider=filesystem")
-public class FileDataStorageServiceIntTest {
+public class FileDataStorageFacadeIntTest {
 
     @Autowired
     private DataStorage dataStorage;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.data.storage.file.storage.service;
+package com.bytechef.platform.data.storage.file.storage.facade;
 
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
@@ -25,7 +25,7 @@ import java.util.function.Function;
 /**
  * @author Ivica Cardic
  */
-public interface FileDataStorageService {
+public interface FileDataStorageFacade {
 
     void delete(
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
