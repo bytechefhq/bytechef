@@ -928,6 +928,48 @@ class IntegrationInstanceConfigurationFacadeIntTest {
     }
 
     @Test
+    void testEnableIntegrationVersionCreatesWithAWorkflowNeedingAnInternalOnlyInputLeftDisabled() {
+        authenticate(admin());
+
+        stubWorkflowNeedingAnInternalOnlyInput("workflow-internal");
+
+        Integration integration = createPublishedIntegration("workflow-internal");
+
+        long integrationInstanceConfigurationId = integrationInstanceConfigurationFacade.enableIntegrationVersion(
+            integration.getId(), 1, Environment.STAGING);
+
+        assertThat(
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationId)
+                .isEnabled())
+                    .isTrue();
+        assertThat(getEnabledByWorkflowId(integrationInstanceConfigurationId))
+            .containsOnly(Map.entry("workflow-internal", false));
+    }
+
+    @Test
+    void testEnableIntegrationVersionMovesWithANewWorkflowNeedingAnInternalOnlyInputLeftDisabled() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration("workflow-a");
+
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(
+            integration.getId(), Environment.STAGING, true);
+
+        stubWorkflowNeedingAnInternalOnlyInput("workflow-internal");
+
+        integrationWorkflowService.addWorkflow(integration.getId(), 2, "workflow-b");
+        integrationWorkflowService.addWorkflow(integration.getId(), 2, "workflow-internal");
+
+        integrationService.publishIntegration(integration.getId(), null);
+
+        integrationInstanceConfigurationFacade.enableIntegrationVersion(integration.getId(), 2, Environment.STAGING);
+
+        assertThat(getEnabledByWorkflowId(integrationInstanceConfigurationId))
+            .containsOnly(Map.entry("workflow-b", true), Map.entry("workflow-internal", false));
+    }
+
+    @Test
     void testEnableIntegrationVersionCreatesWithAnAuthorizationTheConnectedUserCompletes() {
         authenticate(admin());
 
@@ -3035,6 +3077,21 @@ class IntegrationInstanceConfigurationFacadeIntTest {
             integrationInstanceConfigurationWorkflow);
 
         return integrationInstanceConfigurationWorkflow.getId();
+    }
+
+    private Map<String, Boolean> getEnabledByWorkflowId(long integrationInstanceConfigurationId) {
+        return integrationInstanceConfigurationWorkflowService
+            .getIntegrationInstanceConfigurationWorkflows(integrationInstanceConfigurationId)
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    IntegrationInstanceConfigurationWorkflow::getWorkflowId,
+                    IntegrationInstanceConfigurationWorkflow::isEnabled));
+    }
+
+    private void stubWorkflowNeedingAnInternalOnlyInput(String workflowId) {
+        when(workflowService.getWorkflow(workflowId))
+            .thenReturn(new Workflow(INTERNAL_ONLY_REQUIRED_WORKFLOW_DEFINITION, Workflow.Format.JSON));
     }
 
     private void stubWorkflowNeedingAnAdminConnection(String workflowId) {
