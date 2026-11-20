@@ -1470,7 +1470,7 @@ export type AutomationProjectWorkflowProvidableValuesQueryVariables = Exact<{
 }>;
 
 
-export type AutomationProjectWorkflowProvidableValuesQuery = { automationProjectWorkflowProvidableValues: { providedConnections: any, providedInputs: any, connectionSlots: Array<{ componentName: string, title: string, required: boolean, providableConnections: Array<{ id: string, name: string }> }>, inputs: Array<{ name: string, label: string | null, type: string | null, required: boolean, componentName: string | null, componentVersion: number | null, groupName: string | null, optionConnections: Array<{ id: string, name: string }> }> } };
+export type AutomationProjectWorkflowProvidableValuesQuery = { automationProjectWorkflowProvidableValues: { providedConnections: any, providedInputs: any, connectionSlots: Array<{ componentName: string, title: string, required: boolean, providableConnections: Array<{ id: string, name: string }> }>, inputs: Array<{ name: string, label: string | null, type: string | null, required: boolean, internalOnly: boolean, componentName: string | null, componentVersion: number | null, groupName: string | null, optionConnections: Array<{ id: string, name: string }> }> } };
 
 export type AutomationProjectsQueryVariables = Exact<{
   environmentId?: string | number | null | undefined;
@@ -8263,6 +8263,7 @@ export const AutomationProjectWorkflowProvidableValuesDocument = new TypedDocume
       label
       type
       required
+      internalOnly
       componentName
       componentVersion
       groupName
