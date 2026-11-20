@@ -19,14 +19,20 @@ import AutomationProjectDialog, {
 } from '@/ee/pages/embedded/automations/components/automation-project-dialog/AutomationProjectDialog';
 import WorkflowsListSkeleton from '@/pages/automation/project/components/projects-sidebar/components/WorkflowsListSkeleton';
 import WorkflowsListFilter from '@/shared/components/workflow/WorkflowsListFilter';
+import {CODE_WORKFLOW_SORT_OPTIONS, SORT_OPTIONS, SOURCE_ORDER_SORT_OPTION} from '@/shared/constants';
 import {
+    AutomationProjectCodeWorkflowSourceDocument,
+    AutomationProjectCodeWorkflowSourceQuery,
+    AutomationProjectCodeWorkflowSourceQueryVariables,
     AutomationProjectsQuery,
     useAutomationProjectCategoriesQuery,
     useAutomationProjectTagsQuery,
     useAutomationProjectsQuery,
     useCreateAutomationProjectMutation,
 } from '@/shared/middleware/graphql';
-import {useQueryClient} from '@tanstack/react-query';
+import {fetcher} from '@/shared/middleware/graphqlFetcher';
+import sortWorkflowsBySourceOrder from '@/shared/util/sortWorkflowsBySourceOrder';
+import {useQueries, useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon, PlusIcon, UploadIcon} from 'lucide-react';
 import {RefObject, useEffect, useMemo, useRef, useState} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
@@ -45,13 +51,18 @@ const getWorkflowLabel = (workflow: AutomationProjectWorkflowTemplateType) => wo
 const filterAndSortWorkflows = (
     workflows: AutomationProjectWorkflowTemplateType[],
     searchValue: string,
-    sortBy: string
+    sortBy: string,
+    source?: string
 ) => {
     const filteredWorkflows = workflows.filter((workflow) =>
         getWorkflowLabel(workflow).toLowerCase().includes(searchValue.toLowerCase())
     );
 
-    if (sortBy === 'last-edited') {
+    if (sortBy === SOURCE_ORDER_SORT_OPTION.value && source !== undefined) {
+        return sortWorkflowsBySourceOrder(filteredWorkflows, source, getWorkflowLabel);
+    }
+
+    if (sortBy === 'last-edited' || sortBy === SOURCE_ORDER_SORT_OPTION.value) {
         return filteredWorkflows.sort((firstWorkflow, secondWorkflow) =>
             (secondWorkflow.lastModifiedDate ?? '').localeCompare(firstWorkflow.lastModifiedDate ?? '')
         );
@@ -103,7 +114,7 @@ const AutomationEditorLeftSidebar = ({
     const [selectedProjectId, setSelectedProjectId] = useState<string>('');
     const [showProjectDialog, setShowProjectDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
-    const [sortBy, setSortBy] = useState('last-edited');
+    const [sortBy, setSortBy] = useState<string>();
 
     const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -137,18 +148,63 @@ const AutomationEditorLeftSidebar = ({
         projectId: targetProjectId,
     });
 
-    const projectWorkflowsGroups = useMemo<ProjectWorkflowsGroupI[]>(() => {
-        const visibleProjects = allProjectsSelected
-            ? projects
-            : projects.filter((automationProject) => automationProject.id === selectedProjectId);
+    const visibleProjects = useMemo(
+        () =>
+            allProjectsSelected
+                ? projects
+                : projects.filter((automationProject) => automationProject.id === selectedProjectId),
+        [allProjectsSelected, projects, selectedProjectId]
+    );
 
-        return visibleProjects
-            .map((automationProject) => ({
-                project: automationProject,
-                workflows: filterAndSortWorkflows(automationProject.workflowTemplates, searchValue, sortBy),
-            }))
-            .filter((projectWorkflowsGroup) => projectWorkflowsGroup.workflows.length > 0);
-    }, [allProjectsSelected, projects, searchValue, selectedProjectId, sortBy]);
+    const visibleCodeWorkflowProjectIds = useMemo(
+        () =>
+            visibleProjects
+                .filter((automationProject) => automationProject.codeWorkflowProject)
+                .map((automationProject) => automationProject.id),
+        [visibleProjects]
+    );
+
+    const codeWorkflowSources = useQueries({
+        combine: (results) => results.map((result) => result.data?.automationProjectCodeWorkflowSource?.content ?? ''),
+        queries: visibleCodeWorkflowProjectIds.map((automationProjectId) => ({
+            queryFn: fetcher<
+                AutomationProjectCodeWorkflowSourceQuery,
+                AutomationProjectCodeWorkflowSourceQueryVariables
+            >(AutomationProjectCodeWorkflowSourceDocument, {automationProjectId}),
+            queryKey: ['automationProjectCodeWorkflowSource', {automationProjectId}],
+        })),
+    });
+
+    const codeWorkflowSourcesByProjectId = useMemo(
+        () =>
+            new Map(
+                visibleCodeWorkflowProjectIds.map((automationProjectId, index) => [
+                    automationProjectId,
+                    codeWorkflowSources[index],
+                ])
+            ),
+        [codeWorkflowSources, visibleCodeWorkflowProjectIds]
+    );
+
+    const codeWorkflowSortShown = visibleCodeWorkflowProjectIds.length > 0;
+
+    const effectiveSortBy = sortBy || (codeWorkflowSortShown ? SOURCE_ORDER_SORT_OPTION.value : 'last-edited');
+
+    const projectWorkflowsGroups = useMemo<ProjectWorkflowsGroupI[]>(
+        () =>
+            visibleProjects
+                .map((automationProject) => ({
+                    project: automationProject,
+                    workflows: filterAndSortWorkflows(
+                        automationProject.workflowTemplates,
+                        searchValue,
+                        effectiveSortBy,
+                        codeWorkflowSourcesByProjectId.get(automationProject.id)
+                    ),
+                }))
+                .filter((projectWorkflowsGroup) => projectWorkflowsGroup.workflows.length > 0),
+        [codeWorkflowSourcesByProjectId, effectiveSortBy, searchValue, visibleProjects]
+    );
 
     const handleCreateProjectSubmit = (values: AutomationProjectFormValuesI) => {
         createProjectMutation.mutate(
@@ -254,7 +310,8 @@ const AutomationEditorLeftSidebar = ({
                     searchValue={searchValue}
                     setSearchValue={setSearchValue}
                     setSortBy={setSortBy}
-                    sortBy={sortBy}
+                    sortBy={effectiveSortBy}
+                    sortOptions={codeWorkflowSortShown ? CODE_WORKFLOW_SORT_OPTIONS : SORT_OPTIONS}
                 />
 
                 <ButtonGroup className="w-full">

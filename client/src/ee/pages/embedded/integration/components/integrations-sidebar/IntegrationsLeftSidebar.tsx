@@ -20,6 +20,8 @@ import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import WorkflowsListFilter from '@/shared/components/workflow/WorkflowsListFilter';
+import {CODE_WORKFLOW_SORT_OPTIONS, SORT_OPTIONS, SOURCE_ORDER_SORT_OPTION} from '@/shared/constants';
+import {useIntegrationCodeWorkflowSourceQuery} from '@/shared/middleware/graphql';
 import {useQueries} from '@tanstack/react-query';
 import {ChevronDownIcon, PlusIcon, UploadIcon} from 'lucide-react';
 import {RefObject, useEffect, useMemo, useRef, useState} from 'react';
@@ -41,7 +43,7 @@ const IntegrationsLeftSidebar = ({
     onIntegrationClick,
 }: IntegrationsLeftSidebarProps) => {
     const [selectedIntegrationId, setSelectedIntegrationId] = useState(!isNaN(integrationId) ? integrationId : 0);
-    const [sortBy, setSortBy] = useState('last-edited');
+    const [sortBy, setSortBy] = useState<string>();
     const [searchValue, setSearchValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
@@ -95,9 +97,22 @@ const IntegrationsLeftSidebar = ({
 
     const targetIntegration = integrations?.find((integration) => integration.id === targetIntegrationId);
 
+    const codeWorkflowSortShown = selectedIntegrationId !== 0 && !!selectedIntegration?.codeWorkflow;
+
+    const {data: codeWorkflowSourceData} = useIntegrationCodeWorkflowSourceQuery(
+        {integrationId: selectedIntegrationId},
+        {enabled: codeWorkflowSortShown}
+    );
+
+    const codeWorkflowSource = codeWorkflowSortShown
+        ? (codeWorkflowSourceData?.integrationCodeWorkflowSource ?? '')
+        : undefined;
+
+    const effectiveSortBy = sortBy || (codeWorkflowSortShown ? SOURCE_ORDER_SORT_OPTION.value : 'last-edited');
+
     const filteredWorkflowsList = useMemo(
-        () => getFilteredWorkflows(workflows, sortBy, searchValue),
-        [workflows, sortBy, searchValue, getFilteredWorkflows]
+        () => getFilteredWorkflows(workflows, effectiveSortBy, searchValue, codeWorkflowSource),
+        [workflows, effectiveSortBy, searchValue, getFilteredWorkflows, codeWorkflowSource]
     );
 
     useEffect(() => {
@@ -166,7 +181,8 @@ const IntegrationsLeftSidebar = ({
                     searchValue={searchValue}
                     setSearchValue={setSearchValue}
                     setSortBy={setSortBy}
-                    sortBy={sortBy}
+                    sortBy={effectiveSortBy}
+                    sortOptions={codeWorkflowSortShown ? CODE_WORKFLOW_SORT_OPTIONS : SORT_OPTIONS}
                 />
 
                 {!targetIntegration?.codeWorkflow && (
