@@ -53,7 +53,6 @@ src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/Prov
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/PublishFrontendProjectWorkflowRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/ReauthorizeConnectionRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/UpdateFrontendIntegrationInstanceWorkflowRequestModel.java
-src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/UpdateFrontendProjectWorkflowInputs409ResponseModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/UpdateFrontendWorkflowConfigurationConnectionRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/UpdateWorkflowInputsRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/WorkflowModel.java

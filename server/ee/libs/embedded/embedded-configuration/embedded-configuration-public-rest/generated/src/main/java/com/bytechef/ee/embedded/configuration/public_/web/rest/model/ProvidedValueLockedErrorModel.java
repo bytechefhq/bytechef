@@ -17,17 +17,15 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * Returned when a request sets the connection of a component, or the value of an input, that the configuration provides for every connected user. Exactly one of the properties is present.
+ * Returned when a request sets the connection of a component that the configuration provides for every connected user.
  */
 
-@Schema(name = "ProvidedValueLockedError", description = "Returned when a request sets the connection of a component, or the value of an input, that the configuration provides for every connected user. Exactly one of the properties is present.")
+@Schema(name = "ProvidedValueLockedError", description = "Returned when a request sets the connection of a component that the configuration provides for every connected user.")
 @JsonTypeName("ProvidedValueLockedError")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-15T19:28:21.317912+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
-public class ProvidedValueLockedErrorModel implements ProvisionFrontendWorkflowReference409ResponseModel, UpdateFrontendProjectWorkflowInputs409ResponseModel {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-20T20:08:50.901089+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+public class ProvidedValueLockedErrorModel implements ProvisionFrontendWorkflowReference409ResponseModel {
 
   private @Nullable String providedComponentName;
-
-  private @Nullable String providedInputName;
 
   public ProvidedValueLockedErrorModel providedComponentName(@Nullable String providedComponentName) {
     this.providedComponentName = providedComponentName;
@@ -50,27 +48,6 @@ public class ProvidedValueLockedErrorModel implements ProvisionFrontendWorkflowR
     this.providedComponentName = providedComponentName;
   }
 
-  public ProvidedValueLockedErrorModel providedInputName(@Nullable String providedInputName) {
-    this.providedInputName = providedInputName;
-    return this;
-  }
-
-  /**
-   * The name of the input whose value the configuration provides.
-   * @return providedInputName
-   */
-  
-  @Schema(name = "providedInputName", description = "The name of the input whose value the configuration provides.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("providedInputName")
-  public @Nullable String getProvidedInputName() {
-    return providedInputName;
-  }
-
-  @JsonProperty("providedInputName")
-  public void setProvidedInputName(@Nullable String providedInputName) {
-    this.providedInputName = providedInputName;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -80,13 +57,12 @@ public class ProvidedValueLockedErrorModel implements ProvisionFrontendWorkflowR
       return false;
     }
     ProvidedValueLockedErrorModel providedValueLockedError = (ProvidedValueLockedErrorModel) o;
-    return Objects.equals(this.providedComponentName, providedValueLockedError.providedComponentName) &&
-        Objects.equals(this.providedInputName, providedValueLockedError.providedInputName);
+    return Objects.equals(this.providedComponentName, providedValueLockedError.providedComponentName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(providedComponentName, providedInputName);
+    return Objects.hash(providedComponentName);
   }
 
   @Override
@@ -94,7 +70,6 @@ public class ProvidedValueLockedErrorModel implements ProvisionFrontendWorkflowR
     StringBuilder sb = new StringBuilder();
     sb.append("class ProvidedValueLockedErrorModel {\n");
     sb.append("    providedComponentName: ").append(toIndentedString(providedComponentName)).append("\n");
-    sb.append("    providedInputName: ").append(toIndentedString(providedInputName)).append("\n");
     sb.append("}");
     return sb.toString();
   }
