@@ -673,7 +673,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         return componentDefinitions.stream()
             .filter(Objects::nonNull)
             .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), workflowNodeType.name()))
-            .anyMatch(ComponentDefinition::isClusterRoot);
+            .anyMatch(componentDefinition -> componentDefinition.isClusterRoot(workflowNodeType.operation()));
     }
 
     private static List<String> toCategories(String category) {
