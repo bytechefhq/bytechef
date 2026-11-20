@@ -120,7 +120,6 @@ type AiAgentJudgeVerdict {
     judgeName: String!
     judgeType: AiAgentJudgeType!
     judgeScope: AiAgentJudgeScope!
-    passed: Boolean! @deprecated(reason: "Use status")
     status: AiAgentJudgeVerdictStatus!
     reasonCode: String
     score: Float

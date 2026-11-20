@@ -130,15 +130,7 @@ public final class AiAgentEvalResult {
 
     @Nullable
     public AiAgentEvalResultConclusion getConclusion() {
-        if (conclusion != null) {
-            return AiAgentEvalResultConclusion.values()[conclusion];
-        }
-
-        if (getStatus() != AiAgentEvalResultStatus.COMPLETED || score == null) {
-            return null;
-        }
-
-        return score >= 1.0 ? AiAgentEvalResultConclusion.PASS : AiAgentEvalResultConclusion.FAIL;
+        return conclusion == null ? null : AiAgentEvalResultConclusion.values()[conclusion];
     }
 
     public void setConclusion(@Nullable AiAgentEvalResultConclusion conclusion) {
