@@ -16,7 +16,9 @@ import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog'
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import WorkflowsListFilter from '@/shared/components/workflow/WorkflowsListFilter';
+import {CODE_WORKFLOW_SORT_OPTIONS, SORT_OPTIONS, SOURCE_ORDER_SORT_OPTION} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useCodeWorkflowSourceQuery} from '@/shared/middleware/graphql';
 import {useImportProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {useGetProjectWorkflowsQuery, useGetWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
@@ -42,7 +44,7 @@ const ProjectsLeftSidebar = ({
     projectId,
 }: ProjectsLeftSidebarProps) => {
     const [selectedProjectId, setSelectedProjectId] = useState(!isNaN(projectId) ? projectId : 0);
-    const [sortBy, setSortBy] = useState('last-edited');
+    const [sortBy, setSortBy] = useState<string>();
     const [searchValue, setSearchValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [showProjectDialog, setShowProjectDialog] = useState(false);
@@ -108,9 +110,20 @@ const ProjectsLeftSidebar = ({
 
     const targetProject = projects?.find((project) => project.id === targetProjectId);
 
+    const codeWorkflowSortShown = selectedProjectId !== 0 && !!selectedProject?.codeWorkflow;
+
+    const {data: codeWorkflowSourceData} = useCodeWorkflowSourceQuery(
+        {projectId: selectedProjectId},
+        {enabled: codeWorkflowSortShown}
+    );
+
+    const codeWorkflowSource = codeWorkflowSortShown ? (codeWorkflowSourceData?.codeWorkflowSource ?? '') : undefined;
+
+    const effectiveSortBy = sortBy || (codeWorkflowSortShown ? SOURCE_ORDER_SORT_OPTION.value : 'last-edited');
+
     const filteredWorkflowsList = useMemo(
-        () => getFilteredWorkflows(workflows, sortBy, searchValue),
-        [workflows, sortBy, searchValue, getFilteredWorkflows]
+        () => getFilteredWorkflows(workflows, effectiveSortBy, searchValue, codeWorkflowSource),
+        [workflows, effectiveSortBy, searchValue, getFilteredWorkflows, codeWorkflowSource]
     );
 
     useEffect(() => {
@@ -210,7 +223,8 @@ const ProjectsLeftSidebar = ({
                     searchValue={searchValue}
                     setSearchValue={setSearchValue}
                     setSortBy={setSortBy}
-                    sortBy={sortBy}
+                    sortBy={effectiveSortBy}
+                    sortOptions={codeWorkflowSortShown ? CODE_WORKFLOW_SORT_OPTIONS : SORT_OPTIONS}
                 />
 
                 {!targetProject?.codeWorkflow && (

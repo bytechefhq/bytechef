@@ -1,4 +1,6 @@
 import {Integration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
+import {SOURCE_ORDER_SORT_OPTION} from '@/shared/constants';
+import sortWorkflowsBySourceOrder from '@/shared/util/sortWorkflowsBySourceOrder';
 
 export const useIntegrationsLeftSidebar = () => {
     const getWorkflowsIntegrationId = (integrations: Integration[]) => {
@@ -13,9 +15,20 @@ export const useIntegrationsLeftSidebar = () => {
         return (workflow: Workflow) => workflowToIntegrationMap[workflow.integrationWorkflowId || 0] || 0;
     };
 
-    const getFilteredWorkflows = (workflows: Workflow[] | undefined, sortBy: string, searchValue: string) => {
+    const getFilteredWorkflows = (
+        workflows: Workflow[] | undefined,
+        sortBy: string,
+        searchValue: string,
+        source?: string
+    ) => {
         if (!workflows) {
             return [];
+        }
+
+        if (sortBy === SOURCE_ORDER_SORT_OPTION.value && source !== undefined) {
+            return sortWorkflowsBySourceOrder(workflows, source, (workflow) => workflow.label || '').filter(
+                (workflow) => (workflow.label || '').toLowerCase().includes(searchValue.toLowerCase())
+            );
         }
 
         const sortFunctions = {
@@ -25,6 +38,8 @@ export const useIntegrationsLeftSidebar = () => {
             'last-edited': (a: Workflow, b: Workflow) =>
                 (b.lastModifiedDate?.getTime() || 0) - (a.lastModifiedDate?.getTime() || 0),
             'reverse-alphabetical': (a: Workflow, b: Workflow) => (b.label || '').localeCompare(a.label || ''),
+            [SOURCE_ORDER_SORT_OPTION.value]: (a: Workflow, b: Workflow) =>
+                (b.lastModifiedDate?.getTime() || 0) - (a.lastModifiedDate?.getTime() || 0),
         };
 
         return [...workflows]

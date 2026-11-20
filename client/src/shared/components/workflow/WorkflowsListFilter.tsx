@@ -16,10 +16,11 @@ interface WorkflowsListFilterProps {
     searchValue: string;
     sortBy: string;
     setSortBy: (value: string) => void;
+    sortOptions?: {label: string; value: string}[];
 }
 
 const WorkflowsListFilter = forwardRef<HTMLInputElement, WorkflowsListFilterProps>(
-    ({searchValue, setSearchValue, setSortBy, sortBy}, ref) => {
+    ({searchValue, setSearchValue, setSortBy, sortBy, sortOptions = SORT_OPTIONS}, ref) => {
         return (
             <div className="flex items-center gap-2">
                 <div className="relative flex w-full rounded-md bg-background align-middle">
@@ -52,7 +53,7 @@ const WorkflowsListFilter = forwardRef<HTMLInputElement, WorkflowsListFilterProp
                     </Tooltip>
 
                     <DropdownMenuContent align="end">
-                        {SORT_OPTIONS.map((option) => (
+                        {sortOptions.map((option) => (
                             <DropdownMenuItem
                                 className="justify-between"
                                 key={option.value}

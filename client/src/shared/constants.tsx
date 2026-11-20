@@ -203,6 +203,13 @@ export const SORT_OPTIONS = [
     },
 ];
 
+export const SOURCE_ORDER_SORT_OPTION = {
+    label: 'As written',
+    value: 'source-order',
+};
+
+export const CODE_WORKFLOW_SORT_OPTIONS = [SOURCE_ORDER_SORT_OPTION, ...SORT_OPTIONS];
+
 export const MINIMAP_MASK_COLOR = '#f1f5f9';
 export const MINIMAP_NODE_COLOR = '#e2e8f0';
 
