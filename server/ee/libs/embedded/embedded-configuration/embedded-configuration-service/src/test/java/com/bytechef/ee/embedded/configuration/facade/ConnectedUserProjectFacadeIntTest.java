@@ -201,6 +201,12 @@ class ConnectedUserProjectFacadeIntTest {
          "triggers":[],"tasks":[]}
         """;
 
+    private static final String COPY_WORKFLOW_WITH_SHEET_AND_INTERNAL_ONLY_INPUTS_DEFINITION = """
+        {"label":"Leads","inputs":[{"name":"sheetName","label":"Sheet","type":"string","required":false},
+         {"name":"accountId","label":"Account","type":"string","required":false,"internalOnly":true}],
+         "triggers":[],"tasks":[]}
+        """;
+
     private static final String MANUAL_SLACK_WORKFLOW_DEFINITION = """
         {"label":"Post manually","description":"Posts on demand",
          "triggers":[{"label":"Manual","name":"trigger_1","type":"manual/v1/manual"}],
@@ -363,6 +369,20 @@ class ConnectedUserProjectFacadeIntTest {
 
         assertThat(projectDeploymentWorkflowService.isProjectDeploymentWorkflowEnabled(
             projectDeploymentId, publishedWorkflowId)).isTrue();
+    }
+
+    @Test
+    void testUpdateProjectWorkflowInputsIgnoresAnInternalOnlyInputOnACopy() {
+        String workflowUuid = createPublishedCopy(
+            externalUserId, COPY_WORKFLOW_WITH_SHEET_AND_INTERNAL_ONLY_INPUTS_DEFINITION);
+
+        connectedUserProjectFacade.updateProjectWorkflowInputs(
+            externalUserId, workflowUuid, Map.of("sheetName", "Leads", "accountId", "user-account"), null);
+
+        ProjectDeploymentWorkflow row = projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
+            getCopyProjectDeploymentId(externalUserId), getPublishedCopyWorkflowId(externalUserId, workflowUuid));
+
+        assertThat(row.getInputs()).isEqualTo(Map.of("sheetName", "Leads"));
     }
 
     @Test
