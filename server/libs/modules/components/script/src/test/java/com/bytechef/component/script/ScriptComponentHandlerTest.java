@@ -63,22 +63,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 /**
- * The definition is configuration dependent: the {@code taskRunner} property is assembled from whichever runners the
- * registry reports as enabled. The registry is therefore built here explicitly - an incidentally empty registry would
- * let the snapshot record a feature that is not there without anything failing.
- *
- * <p>
- * All three built-in runners are enabled, which is deliberately <em>not</em> the shipped default. The snapshot this
- * test writes is what {@code generateDocumentation} turns into the published reference page's property table, so the
- * registry decides what the documentation describes: with GraalVM alone enabled the page named no external runner at
- * all, and {@code env}, {@code inputFiles}, {@code outputFiles}, {@code timeout} and every one of Docker's own settings
- * were absent from it while the component offered them. Enabling all three makes the page describe the full surface.
- *
- * <p>
- * GraalVM's trusted mode stays off, still matching the shipped default. It is an operator-gated escape hatch rather
- * than part of the surface, and the option is genuinely not offered until the flag is set - documenting it as if it
- * were always there would be the same mistake in the other direction.
- *
  * @author Matija Petanjek
  * @author Ivica Cardic
  */

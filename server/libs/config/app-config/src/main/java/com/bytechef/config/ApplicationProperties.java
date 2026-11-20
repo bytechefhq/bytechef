@@ -5068,14 +5068,6 @@ public class ApplicationProperties {
 
         private Map<String, Runner> runners = new HashMap<>();
 
-        /**
-         * Returns the runner configured under {@code type}, or null. A key is matched by its canonical form (lower
-         * case, letters and digits only), because an environment variable cannot carry a dash: Spring binds
-         * {@code BYTECHEF_SCRIPT_RUNNERS_AWSBATCH_ENABLED} under the key {@code awsbatch}, not {@code aws-batch}. When
-         * both forms are configured, for example {@code aws-batch} in a YAML file and {@code awsbatch} from the
-         * environment, the two are merged and the canonical key, which only an environment variable produces, wins, as
-         * environment variables outrank configuration files.
-         */
         public Runner findRunner(String type) {
             if (runners == null) {
                 return null;
@@ -5204,11 +5196,6 @@ public class ApplicationProperties {
                 return properties;
             }
 
-            /**
-             * Returns the runner's properties as a read-only map whose lookups match a key by its canonical form, so
-             * {@code max-wait} finds a value bound under {@code maxwait} or {@code max.wait} from an environment
-             * variable.
-             */
             public Map<String, String> propertiesByCanonicalName() {
                 if (properties == null) {
                     return Map.of();
