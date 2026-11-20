@@ -34,6 +34,7 @@ import org.springframework.stereotype.Component;
 public class TaskRunnerConnectionWorkflowPreprocessor implements WorkflowDefinitionPreprocessor {
 
     static final String AUTHORIZATION_REQUIRED = "authorizationRequired";
+    static final String CLUSTER_ELEMENTS = "clusterElements";
     static final String COMPONENT_NAME = "componentName";
     static final String COMPONENT_VERSION = "componentVersion";
     static final String CONNECTIONS = "connections";
@@ -56,7 +57,7 @@ public class TaskRunnerConnectionWorkflowPreprocessor implements WorkflowDefinit
 
         if (node instanceof Map<?, ?> map) {
             if (WorkflowTaskUtils.isWorkflowTaskMap(map)) {
-                changed = processTask((Map<String, Object>) map);
+                return visitTask((Map<String, Object>) map);
             }
 
             for (Object value : map.values()) {
@@ -73,6 +74,26 @@ public class TaskRunnerConnectionWorkflowPreprocessor implements WorkflowDefinit
         }
 
         return changed;
+    }
+
+    private boolean visitTask(Map<String, Object> task) {
+        boolean changed = processTask(task);
+
+        if (visit(task.get(CLUSTER_ELEMENTS))) {
+            changed = true;
+        }
+
+        if (isTaskDispatcher(task) && visit(task.get(PARAMETERS))) {
+            changed = true;
+        }
+
+        return changed;
+    }
+
+    private static boolean isTaskDispatcher(Map<String, Object> task) {
+        String type = (String) task.get(TYPE);
+
+        return type.split("/", -1).length == 2;
     }
 
     @SuppressWarnings("unchecked")
