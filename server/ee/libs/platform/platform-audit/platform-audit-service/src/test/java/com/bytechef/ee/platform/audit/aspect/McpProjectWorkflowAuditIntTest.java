@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.mcp.audit.McpProjectAuditEvents;
+import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
 import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
@@ -23,6 +24,7 @@ import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacadeImpl;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
@@ -82,10 +84,14 @@ class McpProjectWorkflowAuditIntTest {
     private static final long MCP_PROJECT_WORKFLOW_ID = 13L;
     private static final long MCP_SERVER_ID = 2L;
     private static final long MCP_TOOL_ID = 21L;
+    private static final long PROJECT_DEPLOYMENT_ID = 19L;
     private static final long PROJECT_DEPLOYMENT_WORKFLOW_ID = 17L;
 
     @Autowired
     private McpComponentService mcpComponentService;
+
+    @Autowired
+    private McpProjectService mcpProjectService;
 
     @Autowired
     private McpProjectWorkflowFacade mcpProjectWorkflowFacade;
@@ -125,6 +131,14 @@ class McpProjectWorkflowAuditIntTest {
 
     @Test
     void testCreateRecordsTheWorkflowItsProjectAndItsDeploymentWorkflow() {
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+        projectDeploymentWorkflow.setId(PROJECT_DEPLOYMENT_WORKFLOW_ID);
+
+        when(mcpProjectService.fetchMcpProject(MCP_PROJECT_ID))
+            .thenReturn(Optional.of(new McpProject(PROJECT_DEPLOYMENT_ID, MCP_SERVER_ID)));
+        when(projectDeploymentWorkflowService.getProjectDeploymentWorkflows(PROJECT_DEPLOYMENT_ID))
+            .thenReturn(List.of(projectDeploymentWorkflow));
         when(mcpProjectWorkflowService.create(MCP_PROJECT_ID, PROJECT_DEPLOYMENT_WORKFLOW_ID))
             .thenReturn(newMcpProjectWorkflow());
 
