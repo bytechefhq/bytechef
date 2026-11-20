@@ -340,6 +340,20 @@ describe('AutomationProjectConfigurationWorkflowDialog', () => {
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 
+    it('saves when Enter is pressed in an input', async () => {
+        const user = userEvent.setup();
+
+        renderDialog();
+
+        await openInputsTab(user);
+
+        await user.type(screen.getByRole('textbox', {name: /^Slack Channel/}), '#ops{Enter}');
+
+        await waitFor(() => expect(mocks.updateMutate).toHaveBeenCalledTimes(1));
+
+        expect(mocks.updateMutate.mock.calls[0][0]).toMatchObject({providedInputs: {channel: '#ops'}});
+    });
+
     it('clears a provided connection when each user connects again', async () => {
         const user = userEvent.setup();
 
