@@ -43,6 +43,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
+import com.bytechef.ee.embedded.configuration.util.InternalOnlyInputUtils;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
@@ -1052,10 +1053,13 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             .allMatch(componentConnection -> providedConnectionNodeNames.contains(
                 componentConnection.workflowNodeName()));
 
+        boolean internalOnlyInputsProvided =
+            InternalOnlyInputUtils.findMissingRequiredInternalOnlyInput(workflow, inputs) == null;
         boolean sourceEnabled = sourceWorkflow == null || sourceWorkflow.isEnabled();
 
         return new IntegrationInstanceConfigurationWorkflowDTO(
-            connections, null, null, inputs, sourceEnabled && requiredConnectionsProvided, null, null, null, null,
+            connections, null, null, inputs, sourceEnabled && requiredConnectionsProvided && internalOnlyInputsProvided,
+            null, null, null, null,
             null, 0, null, integrationWorkflow.getWorkflowId(), integrationWorkflow.getUuidAsString(), Map.of());
     }
 
@@ -1537,6 +1541,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                     "Not all required connections are set for a workflow with id=%s".formatted(workflow.getId()),
                     IntegrationInstanceConfigurationErrorType.WORKFLOW_CONNECTIONS_NOT_FOUND);
             }
+
+            checkInternalOnlyInputs(workflow, integrationInstanceConfigurationWorkflow.getInputs());
         }
 
         List<IntegrationInstance> integrationInstances = integrationInstanceService.getIntegrationInstances(
@@ -1700,6 +1706,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 .sorted()
                 .toList();
 
+            Set<String> internalOnlyInputNames = InternalOnlyInputUtils.getInternalOnlyInputNames(workflow);
             Set<String> newRequiredInputs = new HashSet<>();
             Set<Long> affectedConnectedUserIds = new HashSet<>();
 
@@ -1716,6 +1723,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                     .stream()
                     .filter(Workflow.Input::required)
                     .map(Workflow.Input::name)
+                    .filter(inputName -> !internalOnlyInputNames.contains(inputName))
                     .filter(inputName -> !providedInputNames.contains(inputName))
                     .toList();
 
@@ -1935,6 +1943,20 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
             validateIntegrationInstanceConfigurationWorkflowConnections(
                 integrationInstanceConfigurationWorkflowConnections, workflow);
+
+            checkInternalOnlyInputs(workflow, integrationInstanceConfigurationWorkflow.getInputs());
+        }
+    }
+
+    private static void checkInternalOnlyInputs(Workflow workflow, Map<String, ?> inputs) {
+        String missingInputName = InternalOnlyInputUtils.findMissingRequiredInternalOnlyInput(workflow, inputs);
+
+        if (missingInputName != null) {
+            String workflowLabel = workflow.getLabel() == null ? workflow.getId() : workflow.getLabel();
+
+            throw new ConfigurationException(
+                "Workflow %s needs a value for the internal-only input %s".formatted(workflowLabel, missingInputName),
+                IntegrationInstanceConfigurationErrorType.INTERNAL_ONLY_INPUT_MISSING);
         }
     }
 
