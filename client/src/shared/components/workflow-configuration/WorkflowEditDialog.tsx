@@ -8,7 +8,7 @@ import {
     DialogHeader,
     DialogMain,
 } from '@/components/Dialog';
-import {ReactNode} from 'react';
+import {FormEvent, ReactNode} from 'react';
 
 interface WorkflowEditDialogProps {
     children: ReactNode;
@@ -19,6 +19,7 @@ interface WorkflowEditDialogProps {
     open?: boolean;
     outsideContent?: ReactNode;
     saveDisabled?: boolean;
+    submitOnEnter?: boolean;
     workflowLabel?: string;
 }
 
@@ -31,29 +32,57 @@ const WorkflowEditDialog = ({
     open = true,
     outsideContent,
     saveDisabled = false,
+    submitOnEnter = false,
     workflowLabel,
-}: WorkflowEditDialogProps) => (
-    <Dialog onOpenChange={(isOpen) => !isOpen && onClose()} open={open}>
-        <DialogContent className="gap-0 p-0" onInteractOutside={(event) => event.preventDefault()}>
-            <DialogMain>
-                <DialogHeader description={description} title={`Edit ${workflowLabel || ''} Workflow`} />
+}: WorkflowEditDialogProps) => {
+    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
 
-                <DialogBody>
-                    <div className="max-h-dialog-height overflow-y-auto">{children}</div>
-                </DialogBody>
+        if (!saveDisabled) {
+            onSave();
+        }
+    };
 
-                <DialogFooter>
-                    {footerStartContent}
+    const dialogContent = (
+        <>
+            <DialogHeader description={description} title={`Edit ${workflowLabel || ''} Workflow`} />
 
-                    <DialogCancelButton />
+            <DialogBody>
+                <div className="max-h-dialog-height overflow-y-auto">{children}</div>
+            </DialogBody>
 
-                    <Button disabled={saveDisabled} label="Save" onClick={onSave} type="button" />
-                </DialogFooter>
-            </DialogMain>
+            <DialogFooter>
+                {footerStartContent}
 
-            {outsideContent}
-        </DialogContent>
-    </Dialog>
-);
+                <DialogCancelButton />
+
+                <Button
+                    disabled={saveDisabled}
+                    label="Save"
+                    onClick={submitOnEnter ? undefined : onSave}
+                    type={submitOnEnter ? 'submit' : 'button'}
+                />
+            </DialogFooter>
+        </>
+    );
+
+    return (
+        <Dialog onOpenChange={(isOpen) => !isOpen && onClose()} open={open}>
+            <DialogContent className="gap-0 p-0" onInteractOutside={(event) => event.preventDefault()}>
+                <DialogMain>
+                    {submitOnEnter ? (
+                        <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit}>
+                            {dialogContent}
+                        </form>
+                    ) : (
+                        dialogContent
+                    )}
+                </DialogMain>
+
+                {outsideContent}
+            </DialogContent>
+        </Dialog>
+    );
+};
 
 export default WorkflowEditDialog;
