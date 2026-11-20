@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.oauth2.authorizationserver.facade;
 
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.oauth2.authorizationserver.annotation.ConditionalOnOauth2AuthorizationServerEnabled;
@@ -24,8 +25,10 @@ import com.bytechef.platform.oauth2.authorizationserver.audit.OAuth2ClientAuditM
 import com.bytechef.platform.oauth2.authorizationserver.domain.OAuth2AuthorizationGrant;
 import com.bytechef.platform.oauth2.authorizationserver.domain.OAuth2ConsentClient;
 import com.bytechef.platform.oauth2.authorizationserver.domain.RegisteredClientInfo;
+import com.bytechef.platform.oauth2.authorizationserver.exception.RegisteredClientErrorType;
 import com.bytechef.platform.oauth2.authorizationserver.service.OAuth2AuthorizationGrantService;
 import com.bytechef.platform.oauth2.authorizationserver.service.RegisteredClientService;
+import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
@@ -41,14 +44,16 @@ public class RegisteredClientFacadeImpl implements RegisteredClientFacade {
 
     private final OAuth2AuthorizationGrantService oAuth2AuthorizationGrantService;
     private final RegisteredClientService registeredClientService;
+    private final TenantService tenantService;
 
     @SuppressFBWarnings("EI2")
     public RegisteredClientFacadeImpl(
         OAuth2AuthorizationGrantService oAuth2AuthorizationGrantService,
-        RegisteredClientService registeredClientService) {
+        RegisteredClientService registeredClientService, TenantService tenantService) {
 
         this.oAuth2AuthorizationGrantService = oAuth2AuthorizationGrantService;
         this.registeredClientService = registeredClientService;
+        this.tenantService = tenantService;
     }
 
     @Override
@@ -58,6 +63,12 @@ public class RegisteredClientFacadeImpl implements RegisteredClientFacade {
         })
     @PreAuthorize("isTenantAdmin()")
     public boolean deleteRegisteredClient(String id) {
+        if (tenantService.isMultiTenantEnabled()) {
+            throw new ConfigurationException(
+                "OAuth2 clients are shared across tenants and cannot be deleted",
+                RegisteredClientErrorType.DELETE_SHARED_REGISTERED_CLIENT);
+        }
+
         return registeredClientService.deleteRegisteredClient(id);
     }
 
@@ -76,7 +87,18 @@ public class RegisteredClientFacadeImpl implements RegisteredClientFacade {
     @Override
     @PreAuthorize("isTenantAdmin()")
     public List<RegisteredClientInfo> getRegisteredClients() {
-        return registeredClientService.getRegisteredClients();
+        boolean multiTenantEnabled = tenantService.isMultiTenantEnabled();
+
+        List<RegisteredClientInfo> registeredClients =
+            registeredClientService.getRegisteredClients(!multiTenantEnabled);
+
+        if (!multiTenantEnabled) {
+            return registeredClients;
+        }
+
+        return registeredClients.stream()
+            .filter(registeredClient -> registeredClient.grantCount() > 0)
+            .toList();
     }
 
     @Override
