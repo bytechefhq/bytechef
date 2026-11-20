@@ -17,11 +17,18 @@ type ConfigurationReferenceType = Pick<AutomationProjectConfigurationType, 'id' 
 
 type TargetConfigurationType = ConfigurationReferenceType & {enabled?: boolean};
 
+export interface AutomationProjectConfigurationMovedI {
+    impactWorkflows: Array<{newRequiredConnections: string[]; newRequiredInputs: string[]; workflowUuid: string}>;
+    result: MoveConnectedUsersResultI;
+    targetId: string;
+}
+
 interface AutomationProjectConfigurationMoveUsersDialogProps {
     configuration: ConfigurationReferenceType;
     connectedUsers?: Array<{connectedUserId: string; email?: string | null; externalId: string; name?: string | null}>;
     initialSelectedConnectedUserIds?: string[];
     onClose: () => void;
+    onMoved?: (moved: AutomationProjectConfigurationMovedI) => void;
     singleConnectedUser?: boolean;
     targetConfigurations: TargetConfigurationType[];
     title?: string;
@@ -38,6 +45,7 @@ const AutomationProjectConfigurationMoveUsersDialog = ({
     connectedUsers: presetConnectedUsers,
     initialSelectedConnectedUserIds,
     onClose,
+    onMoved,
     singleConnectedUser,
     targetConfigurations,
     title = 'Move Users',
@@ -92,9 +100,13 @@ const AutomationProjectConfigurationMoveUsersDialog = ({
                 targetId,
             });
 
-            return response.moveAutomationProjectConfigurationConnectedUsers;
+            const result = response.moveAutomationProjectConfigurationConnectedUsers;
+
+            onMoved?.({impactWorkflows: moveImpact?.workflows ?? [], result, targetId});
+
+            return result;
         },
-        [configuration.id, moveConnectedUsers]
+        [configuration.id, moveConnectedUsers, moveImpact, onMoved]
     );
 
     return (

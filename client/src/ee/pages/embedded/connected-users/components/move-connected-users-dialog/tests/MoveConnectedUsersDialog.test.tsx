@@ -202,7 +202,7 @@ describe('MoveConnectedUsersDialog', () => {
 
         expect(unhandledRejections).toEqual([]);
         expect(onClose).not.toHaveBeenCalled();
-        expect(screen.queryByText(/moved, .* need attention/)).not.toBeInTheDocument();
+        expect(screen.queryByText(/moved, .* needs? attention/)).not.toBeInTheDocument();
     });
 
     it('shows users that would be skipped before moving', () => {
@@ -296,7 +296,7 @@ describe('MoveConnectedUsersDialog', () => {
         await userEvent.click(screen.getByRole('button', {name: 'Move'}));
 
         await waitFor(() => {
-            expect(screen.getByText('1 moved, 1 need attention')).toBeInTheDocument();
+            expect(screen.getByText('1 moved, 1 needs attention')).toBeInTheDocument();
         });
 
         expect(onMove).toHaveBeenCalledWith('10', ['1', '2']);

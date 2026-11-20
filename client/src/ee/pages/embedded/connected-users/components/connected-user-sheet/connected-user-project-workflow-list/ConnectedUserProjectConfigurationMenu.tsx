@@ -6,11 +6,14 @@ import {
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import AutomationProjectConfigurationMoveUsersDialog from '@/ee/pages/embedded/automations/components/automation-project-configuration-list/AutomationProjectConfigurationMoveUsersDialog';
+import AutomationProjectConfigurationMoveUsersDialog, {
+    AutomationProjectConfigurationMovedI,
+} from '@/ee/pages/embedded/automations/components/automation-project-configuration-list/AutomationProjectConfigurationMoveUsersDialog';
 import ConnectedUserChangeVersionDialog, {
     NO_OTHER_VERSION_REASON,
     getOtherVersions,
 } from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/change-version-dialog/ConnectedUserChangeVersionDialog';
+import ConnectedUserProjectWorkflowEditDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectWorkflowEditDialog';
 import {MoveConnectedUsersResultI} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersDialog';
 import {
     CONFIGURATIONS_LOAD_FAILED_REASON,
@@ -32,7 +35,16 @@ export interface ConnectedUserCurrentConfigurationI {
     configurationProjectVersion: number;
 }
 
+interface AttentionWorkflowI {
+    configurationId: string;
+    connectedUserProjectWorkflowId: string;
+    defaultTab: 'connections' | 'inputs';
+    workflowLabel: string;
+    workflowUuid: string;
+}
+
 interface ConnectedUserProjectConfigurationMenuProps {
+    connectedUserProjectWorkflows?: Array<{automationUuid?: string | null; id: string; workflow: {label: string}}>;
     connectedUser: {connectedUserId: string; email?: string | null; externalId: string; name?: string | null};
     currentConfiguration: ConnectedUserCurrentConfigurationI;
     projectId: string;
@@ -40,9 +52,11 @@ interface ConnectedUserProjectConfigurationMenuProps {
 
 const ConnectedUserProjectConfigurationMenu = ({
     connectedUser,
+    connectedUserProjectWorkflows,
     currentConfiguration,
     projectId,
 }: ConnectedUserProjectConfigurationMenuProps) => {
+    const [attentionWorkflow, setAttentionWorkflow] = useState<AttentionWorkflowI>();
     const [showChangeDialog, setShowChangeDialog] = useState(false);
     const [showChangeVersionDialog, setShowChangeVersionDialog] = useState(false);
     const [changeVersionTargetId, setChangeVersionTargetId] = useState<string>();
@@ -149,6 +163,34 @@ const ConnectedUserProjectConfigurationMenu = ({
         setShowChangeVersionDialog(false);
     };
 
+    const handleMoved = ({impactWorkflows, result, targetId}: AutomationProjectConfigurationMovedI) => {
+        const needsAttention = result.needsAttentionConnectedUserIds.some(
+            (needsAttentionConnectedUserId) => String(needsAttentionConnectedUserId) === connectedUser.connectedUserId
+        );
+
+        const impactWorkflow = impactWorkflows.find(
+            (workflow) => workflow.newRequiredConnections.length + workflow.newRequiredInputs.length > 0
+        );
+
+        const connectedUserProjectWorkflow = impactWorkflow
+            ? connectedUserProjectWorkflows?.find((workflow) => workflow.automationUuid === impactWorkflow.workflowUuid)
+            : undefined;
+
+        if (!needsAttention || !impactWorkflow || !connectedUserProjectWorkflow) {
+            return;
+        }
+
+        setShowChangeDialog(false);
+
+        setAttentionWorkflow({
+            configurationId: targetId,
+            connectedUserProjectWorkflowId: connectedUserProjectWorkflow.id,
+            defaultTab: impactWorkflow.newRequiredConnections.length > 0 ? 'connections' : 'inputs',
+            workflowLabel: connectedUserProjectWorkflow.workflow.label,
+            workflowUuid: impactWorkflow.workflowUuid,
+        });
+    };
+
     const connectedUsers = useMemo(() => [connectedUser], [connectedUser]);
 
     const configuration = useMemo(
@@ -217,9 +259,23 @@ const ConnectedUserProjectConfigurationMenu = ({
                     connectedUsers={connectedUsers}
                     initialSelectedConnectedUserIds={[connectedUser.connectedUserId]}
                     onClose={() => setShowChangeDialog(false)}
+                    onMoved={handleMoved}
                     singleConnectedUser
                     targetConfigurations={targetConfigurations}
                     title="Change configuration"
+                />
+            )}
+
+            {attentionWorkflow && (
+                <ConnectedUserProjectWorkflowEditDialog
+                    configurationId={attentionWorkflow.configurationId}
+                    connectedUserId={Number(connectedUser.connectedUserId)}
+                    connectedUserProjectWorkflowId={attentionWorkflow.connectedUserProjectWorkflowId}
+                    defaultTab={attentionWorkflow.defaultTab}
+                    onClose={() => setAttentionWorkflow(undefined)}
+                    projectId={projectId}
+                    workflowLabel={attentionWorkflow.workflowLabel}
+                    workflowUuid={attentionWorkflow.workflowUuid}
                 />
             )}
 
