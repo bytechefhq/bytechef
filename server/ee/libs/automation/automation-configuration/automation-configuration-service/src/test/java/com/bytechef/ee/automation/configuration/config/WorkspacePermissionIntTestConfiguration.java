@@ -23,7 +23,7 @@ import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolver;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
-import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.user.repository.AuthorityRepository;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
@@ -66,7 +66,7 @@ import tools.jackson.databind.ObjectMapper;
     ProjectCallback.class, ProjectPermissionScopeProvider.class, ProjectWorkflowCallback.class,
     WorkflowPermissionScopeProvider.class,
     WorkspacePermissionIntTestConfiguration.WorkspacePermissionJdbcConfiguration.class,
-    WorkspaceScopeCacheService.class, WorkspaceUserAuditMapper.class
+    WorkspaceScopeCache.class, WorkspaceUserAuditMapper.class
 })
 @SpringBootConfiguration
 public class WorkspacePermissionIntTestConfiguration {

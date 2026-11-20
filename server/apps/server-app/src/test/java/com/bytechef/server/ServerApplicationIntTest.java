@@ -29,7 +29,7 @@ import com.bytechef.automation.configuration.web.rest.WorkflowApiController;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
 import com.bytechef.ee.ai.copilot.web.rest.CopilotApiController;
-import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
 import com.bytechef.platform.component.log.JdbcLogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
@@ -216,7 +216,7 @@ class ServerApplicationIntTest {
 
         @Test
         void testContextLoadsInCommunityEdition() {
-            assertThat(communityEditionApplicationContext.getBeanNamesForType(WorkspaceScopeCacheService.class))
+            assertThat(communityEditionApplicationContext.getBeanNamesForType(WorkspaceScopeCache.class))
                 .isEmpty();
             assertThat(communityEditionApplicationContext.getBeanNamesForType(SingleCoordinatorCheck.class))
                 .isNotEmpty();

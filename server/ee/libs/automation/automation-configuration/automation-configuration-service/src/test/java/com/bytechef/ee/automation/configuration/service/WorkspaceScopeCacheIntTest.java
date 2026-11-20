@@ -36,16 +36,16 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * Runs {@link WorkspaceScopeCacheService} through its Spring proxy with the production cache configuration (Caffeine
- * with the tenant key generator) over real {@code workspace_user} rows, so the cache key used by the programmatic
- * eviction is proven against the key {@code @Cacheable} stores under.
+ * Runs {@link WorkspaceScopeCache} through its Spring proxy with the production cache configuration (Caffeine with the
+ * tenant key generator) over real {@code workspace_user} rows, so the cache key used by the programmatic eviction is
+ * proven against the key {@code @Cacheable} stores under.
  *
  * @version ee
  *
  * @author Ivica Cardic
  */
 @SpringBootTest(classes = WorkspacePermissionIntTestConfiguration.class, properties = "bytechef.edition=ee")
-class WorkspaceScopeCacheServiceIntTest {
+class WorkspaceScopeCacheIntTest {
 
     private static final long USER_ID = 2L;
     private static final String WORKSPACE_SCOPES_CACHE = "workspaceScopes";
@@ -66,7 +66,7 @@ class WorkspaceScopeCacheServiceIntTest {
     private WorkspaceRepository workspaceRepository;
 
     @Autowired
-    private WorkspaceScopeCacheService workspaceScopeCacheService;
+    private WorkspaceScopeCache workspaceScopeCache;
 
     @Autowired
     private WorkspaceUserRepository workspaceUserRepository;
@@ -84,7 +84,7 @@ class WorkspaceScopeCacheServiceIntTest {
     void testGetWorkspaceScopesResolvesBuiltInRole() {
         workspaceUserRepository.save(WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.EDITOR));
 
-        Set<String> scopes = workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId);
+        Set<String> scopes = workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId);
 
         assertThat(scopes).isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR))
             .contains("WORKFLOW_VIEW", "WORKFLOW_EDIT");
@@ -95,14 +95,14 @@ class WorkspaceScopeCacheServiceIntTest {
         workspaceUserRepository.save(
             WorkspaceUser.forCustomRole(USER_ID, workspaceId, WorkspacePermissionIntTestConfiguration.CUSTOM_ROLE_ID));
 
-        Set<String> scopes = workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId);
+        Set<String> scopes = workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId);
 
         assertThat(scopes).containsExactly(WorkspacePermissionIntTestConfiguration.CUSTOM_ROLE_SCOPE);
     }
 
     @Test
     void testGetWorkspaceScopesReturnsEmptyForUnknownMembership() {
-        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId)).isEmpty();
+        assertThat(workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId)).isEmpty();
     }
 
     @Test
@@ -115,7 +115,7 @@ class WorkspaceScopeCacheServiceIntTest {
 
         jdbcTemplate.update("UPDATE workspace_user SET workspace_role = 999 WHERE id = ?", workspaceUser.getId());
 
-        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId)).isEmpty();
+        assertThat(workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId)).isEmpty();
     }
 
     @Test
@@ -132,7 +132,7 @@ class WorkspaceScopeCacheServiceIntTest {
                 "UPDATE workspace_user SET workspace_role = NULL, custom_role_id = NULL WHERE id = ?",
                 workspaceUser.getId());
 
-            assertThatThrownBy(() -> workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId))
+            assertThatThrownBy(() -> workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("chk_workspace_user_role_xor");
         } finally {
@@ -152,19 +152,19 @@ class WorkspaceScopeCacheServiceIntTest {
 
         Set<String> viewerScopes = permissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER);
 
-        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId)).isEqualTo(viewerScopes);
+        assertThat(workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId)).isEqualTo(viewerScopes);
         assertThat(getCachedScopes()).isEqualTo(viewerScopes);
 
         changeRole(workspaceUser, WorkspaceRole.EDITOR);
 
         // The role changed in the database, but the @Cacheable entry still serves the old scopes.
-        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId)).isEqualTo(viewerScopes);
+        assertThat(workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId)).isEqualTo(viewerScopes);
 
-        workspaceScopeCacheService.evictWorkspaceScopeCache(USER_ID, workspaceId);
+        workspaceScopeCache.evictWorkspaceScopeCache(USER_ID, workspaceId);
 
         // If the key built by the eviction did not match the @Cacheable key, the stale entry would survive here.
         assertThat(getCachedScopes()).isNull();
-        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId))
+        assertThat(workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId))
             .isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR));
     }
 
@@ -173,14 +173,14 @@ class WorkspaceScopeCacheServiceIntTest {
         WorkspaceUser workspaceUser = workspaceUserRepository.save(
             WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.VIEWER));
 
-        workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId);
+        workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId);
 
         changeRole(workspaceUser, WorkspaceRole.EDITOR);
 
-        workspaceScopeCacheService.evictAllWorkspaceScopeCache();
+        workspaceScopeCache.evictAllWorkspaceScopeCache();
 
         assertThat(getCachedScopes()).isNull();
-        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId))
+        assertThat(workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId))
             .isEqualTo(permissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR));
     }
 
@@ -188,12 +188,12 @@ class WorkspaceScopeCacheServiceIntTest {
     void testEvictIsDeferredToAfterCommitWhenTransactionActive() {
         workspaceUserRepository.save(WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.VIEWER));
 
-        workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId);
+        workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId);
 
         TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
 
         transactionTemplate.executeWithoutResult(transactionStatus -> {
-            workspaceScopeCacheService.evictWorkspaceScopeCache(USER_ID, workspaceId);
+            workspaceScopeCache.evictWorkspaceScopeCache(USER_ID, workspaceId);
 
             // Inside the transaction the eviction is only queued for afterCommit.
             assertThat(getCachedScopes()).isNotNull();
@@ -206,12 +206,12 @@ class WorkspaceScopeCacheServiceIntTest {
     void testEvictIsSkippedWhenTransactionRollsBack() {
         workspaceUserRepository.save(WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.VIEWER));
 
-        workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId);
+        workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId);
 
         TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
 
         transactionTemplate.executeWithoutResult(transactionStatus -> {
-            workspaceScopeCacheService.evictWorkspaceScopeCache(USER_ID, workspaceId);
+            workspaceScopeCache.evictWorkspaceScopeCache(USER_ID, workspaceId);
 
             transactionStatus.setRollbackOnly();
         });
@@ -223,12 +223,12 @@ class WorkspaceScopeCacheServiceIntTest {
     void testEvictAllBundledIntoAfterCommitWhenTransactionActive() {
         workspaceUserRepository.save(WorkspaceUser.forRole(USER_ID, workspaceId, WorkspaceRole.VIEWER));
 
-        workspaceScopeCacheService.getWorkspaceScopes(USER_ID, workspaceId);
+        workspaceScopeCache.getWorkspaceScopes(USER_ID, workspaceId);
 
         TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
 
         transactionTemplate.executeWithoutResult(transactionStatus -> {
-            workspaceScopeCacheService.evictAllWorkspaceScopeCache();
+            workspaceScopeCache.evictAllWorkspaceScopeCache();
 
             assertThat(getCachedScopes()).isNotNull();
         });
@@ -241,22 +241,22 @@ class WorkspaceScopeCacheServiceIntTest {
         // Eviction failures (e.g., Redis unavailable) must not propagate back to the caller - the originating
         // transaction has already committed, so there is nothing to roll back. The cache backend failure is the
         // only fake here: the service reads real rows through the real repository.
-        WorkspaceScopeCacheService failingCacheService = new WorkspaceScopeCacheService(
+        WorkspaceScopeCache failingWorkspaceScopeCache = new WorkspaceScopeCache(
             new FailingCacheManager(), null, permissionScopeRegistry, workspaceUserRepository);
 
-        assertThatCode(() -> failingCacheService.evictWorkspaceScopeCache(USER_ID, workspaceId))
+        assertThatCode(() -> failingWorkspaceScopeCache.evictWorkspaceScopeCache(USER_ID, workspaceId))
             .doesNotThrowAnyException();
-        assertThatCode(() -> failingCacheService.evictWorkspaceScopeCaches(
+        assertThatCode(() -> failingWorkspaceScopeCache.evictWorkspaceScopeCaches(
             Set.of(new UserWorkspacePair(USER_ID, workspaceId))))
                 .doesNotThrowAnyException();
     }
 
     @Test
     void testEvictAllSwallowsExceptionsInsteadOfPropagating() {
-        WorkspaceScopeCacheService failingCacheService = new WorkspaceScopeCacheService(
+        WorkspaceScopeCache failingWorkspaceScopeCache = new WorkspaceScopeCache(
             new FailingCacheManager(), null, permissionScopeRegistry, workspaceUserRepository);
 
-        assertThatCode(failingCacheService::evictAllWorkspaceScopeCache).doesNotThrowAnyException();
+        assertThatCode(failingWorkspaceScopeCache::evictAllWorkspaceScopeCache).doesNotThrowAnyException();
     }
 
     private void changeRole(WorkspaceUser workspaceUser, WorkspaceRole workspaceRole) {

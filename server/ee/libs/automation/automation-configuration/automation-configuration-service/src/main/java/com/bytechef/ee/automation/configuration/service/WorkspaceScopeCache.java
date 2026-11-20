@@ -30,9 +30,9 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
- * Workspace scope caching service. Reads are cached declaratively via {@link Cacheable}; evictions are performed
- * programmatically through the {@link CacheManager} so that internally-invoked eviction is not silently dropped by
- * Spring AOP self-invocation bypass.
+ * Workspace scope cache. Reads are cached declaratively via {@link Cacheable}; evictions are performed programmatically
+ * through the {@link CacheManager} so that internally-invoked eviction is not silently dropped by Spring AOP
+ * self-invocation bypass.
  *
  * @author Ivica Cardic
  * @version ee
@@ -40,9 +40,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @Service
 @ConditionalOnEEVersion
 @Transactional(readOnly = true)
-public class WorkspaceScopeCacheService {
+public class WorkspaceScopeCache {
 
-    private static final Logger log = LoggerFactory.getLogger(WorkspaceScopeCacheService.class);
+    private static final Logger log = LoggerFactory.getLogger(WorkspaceScopeCache.class);
 
     private static final String WORKSPACE_SCOPES_CACHE = "workspaceScopes";
 
@@ -54,7 +54,7 @@ public class WorkspaceScopeCacheService {
     @SuppressFBWarnings({
         "EI", "CT_CONSTRUCTOR_THROW"
     })
-    public WorkspaceScopeCacheService(
+    public WorkspaceScopeCache(
         CacheManager cacheManager, @Nullable CustomRoleScopeResolver customRoleScopeResolver,
         PermissionScopeRegistry permissionScopeRegistry, WorkspaceUserRepository workspaceUserRepository) {
 
