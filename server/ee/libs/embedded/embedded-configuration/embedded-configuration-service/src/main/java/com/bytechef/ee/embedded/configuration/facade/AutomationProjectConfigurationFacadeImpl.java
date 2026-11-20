@@ -1792,7 +1792,9 @@ public class AutomationProjectConfigurationFacadeImpl
             .map(ConnectedUserReferenceAttentionResolver.ReferenceState::attentionReason)
             .anyMatch(attentionReason -> attentionReason != null &&
                 !Objects.equals(
-                    attentionReason, ConnectedUserReferenceAttentionResolver.TURNED_OFF_BY_ADMINISTRATOR));
+                    attentionReason, ConnectedUserReferenceAttentionResolver.TURNED_OFF_BY_ADMINISTRATOR)
+                &&
+                !Objects.equals(attentionReason, ConnectedUserReferenceAttentionResolver.AWAITING_CONFIGURATION));
     }
 
     private void lockConnectedUserProjects(long connectedUserId) {

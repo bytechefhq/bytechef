@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 class ConnectedUserReferenceAttentionResolver {
 
+    static final String AWAITING_CONFIGURATION = "AWAITING_CONFIGURATION";
     static final String INPUT_REQUIRED_PREFIX = "INPUT_REQUIRED:";
     static final String INVALID_WORKFLOW_PREFIX = "INVALID_WORKFLOW:";
     static final String MISSING_CONNECTION_PREFIX = "MISSING_CONNECTION:";
@@ -85,7 +87,7 @@ class ConnectedUserReferenceAttentionResolver {
 
         try {
             return new ReferenceState(inputs, connections, resolveAttentionReason(
-                projectDeployment, reference.getAutomationUuid(), workflowId, row));
+                projectDeployment, reference.getAutomationUuid(), reference.isEnabled(), workflowId, row));
         } catch (RuntimeException exception) {
             log.warn(
                 "Attention reason of reference id={} could not be derived: {}", reference.getId(),
@@ -138,8 +140,8 @@ class ConnectedUserReferenceAttentionResolver {
 
     @Nullable
     private String resolveAttentionReason(
-        ProjectDeployment projectDeployment, String automationUuid, Optional<String> workflowId,
-        Optional<ProjectDeploymentWorkflow> row) {
+        ProjectDeployment projectDeployment, String automationUuid, boolean referenceEnabled,
+        Optional<String> workflowId, Optional<ProjectDeploymentWorkflow> row) {
 
         Optional<Long> connectedUserIdOptional = connectedUserReferenceDeploymentManager.fetchConnectedUserId(
             projectDeployment.getId());
@@ -176,14 +178,30 @@ class ConnectedUserReferenceAttentionResolver {
             return MISSING_CONNECTION_PREFIX + missingComponentName;
         }
 
+        Workflow workflow = connectedUserReferenceDeploymentManager.getWorkflow(workflowId.get());
+
         String missingInputName = connectedUserReferenceDeploymentManager.findMissingRequiredInput(
-            workflowId.get(), projectDeploymentWorkflow.getInputs());
+            workflow, projectDeploymentWorkflow.getInputs());
 
         if (missingInputName != null) {
             return INPUT_REQUIRED_PREFIX + missingInputName;
         }
 
-        return connectedUserWorkflowValidator.getAttentionReason(workflowId.get(), projectDeployment.getEnvironment());
+        String workflowAttentionReason = connectedUserWorkflowValidator.getAttentionReason(
+            workflowId.get(), projectDeployment.getEnvironment());
+
+        if (workflowAttentionReason != null) {
+            return workflowAttentionReason;
+        }
+
+        if (referenceEnabled && !projectDeploymentWorkflow.isEnabled() &&
+            connectedUserReferenceDeploymentManager.isAwaitingConfiguration(
+                connectedUserId, projectDeployment.getProjectId(), automationUuid, workflow)) {
+
+            return AWAITING_CONFIGURATION;
+        }
+
+        return null;
     }
 
     private static boolean isWiredTo(

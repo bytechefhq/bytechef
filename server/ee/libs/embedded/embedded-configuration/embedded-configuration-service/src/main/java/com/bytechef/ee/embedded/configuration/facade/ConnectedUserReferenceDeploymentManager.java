@@ -201,6 +201,18 @@ class ConnectedUserReferenceDeploymentManager {
             configuration, UUID.fromString(automationUuid));
     }
 
+    public Workflow getWorkflow(String workflowId) {
+        return workflowService.getWorkflow(workflowId);
+    }
+
+    public boolean isAwaitingConfiguration(
+        long connectedUserId, long automationProjectId, String automationUuid, Workflow workflow) {
+
+        ProvidedValues providedValues = getProvidedValues(connectedUserId, automationProjectId, automationUuid);
+
+        return InternalOnlyInputUtils.findMissingRequiredInternalOnlyInput(workflow, providedValues.inputs()) != null;
+    }
+
     public boolean isReferenceDeployment(long projectDeploymentId) {
         return connectedUserReferenceDeploymentService.isReferenceDeployment(projectDeploymentId);
     }
@@ -504,7 +516,7 @@ class ConnectedUserReferenceDeploymentManager {
     }
 
     @Nullable
-    private static String findMissingRequiredInput(Workflow workflow, Map<String, ?> inputs) {
+    public String findMissingRequiredInput(Workflow workflow, Map<String, ?> inputs) {
         Set<String> internalOnlyInputNames = InternalOnlyInputUtils.getInternalOnlyInputNames(workflow);
 
         for (Workflow.Input input : workflow.getInputs()) {
