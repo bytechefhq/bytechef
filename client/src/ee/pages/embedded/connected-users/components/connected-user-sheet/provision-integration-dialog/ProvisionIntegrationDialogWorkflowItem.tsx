@@ -1,12 +1,13 @@
-import Switch from '@/components/Switch/Switch';
 import McpToolBadge from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/McpToolBadge';
 import {Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import InputConfigurationList from '@/shared/components/InputConfigurationList';
+import WorkflowConfigurationCard from '@/shared/components/workflow-configuration/WorkflowConfigurationCard';
 import {WorkflowInput} from '@/shared/middleware/platform/configuration';
 import {Control, FieldValues, FormState, useWatch} from 'react-hook-form';
 
 interface ProvisionIntegrationDialogWorkflowItemProps {
+    adminConnectionCount?: number;
     control: Control<FieldValues>;
     formState: FormState<FieldValues>;
     mcpTool?: boolean;
@@ -16,6 +17,7 @@ interface ProvisionIntegrationDialogWorkflowItemProps {
 }
 
 const ProvisionIntegrationDialogWorkflowItem = ({
+    adminConnectionCount = 0,
     control,
     formState,
     mcpTool = false,
@@ -30,18 +32,20 @@ const ProvisionIntegrationDialogWorkflowItem = ({
     const label = workflow.label || workflow.id;
 
     return (
-        <div className="space-y-3 rounded border border-border/50 px-3 py-2">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">{label}</span>
-
-                    {mcpTool && <McpToolBadge />}
-                </div>
-
-                <Switch aria-label={label} checked={!!enabled} onCheckedChange={onEnabledChange} />
-            </div>
-
-            {enabled && inputs.length > 0 && (
+        <WorkflowConfigurationCard
+            badge={mcpTool && <McpToolBadge />}
+            connectionCount={1 + adminConnectionCount}
+            connectionsContent={
+                <p className="text-sm">
+                    {adminConnectionCount > 0
+                        ? `Uses the connection chosen above and ${adminConnectionCount} set by an admin on the configuration.`
+                        : 'Uses the connection chosen above.'}
+                </p>
+            }
+            enabled={!!enabled}
+            forceMountContent
+            inputCount={inputs.length}
+            inputsContent={
                 <WorkflowMockProvider>
                     <InputConfigurationList
                         control={control}
@@ -51,8 +55,12 @@ const ProvisionIntegrationDialogWorkflowItem = ({
                         workflowId={workflow.id}
                     />
                 </WorkflowMockProvider>
-            )}
-        </div>
+            }
+            label={label}
+            onEnabledChange={onEnabledChange}
+            showWorkflowToggle
+            switchId={`provision-integration-workflow-${workflowIndex}`}
+        />
     );
 };
 
