@@ -21,6 +21,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.runner.TaskRunner;
+import com.bytechef.platform.component.runner.TaskRunnerConnection;
+import com.bytechef.platform.component.runner.TaskRunnerNotEnabledException;
+import com.bytechef.platform.component.runner.TaskRunnerRegistry;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.workflow.connection.ComponentConnectionFactory;
@@ -38,8 +42,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 class CommandsComponentConnectionFactoryTest {
 
     private final ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
+    private final TaskRunnerRegistry taskRunnerRegistry = mock(TaskRunnerRegistry.class);
     private final CommandsComponentConnectionFactory commandsComponentConnectionFactory =
-        new CommandsComponentConnectionFactory(componentDefinitionService);
+        new CommandsComponentConnectionFactory(componentDefinitionService, taskRunnerRegistry);
 
     @Test
     void testResolveCommandsComponent() {
@@ -69,10 +74,68 @@ class CommandsComponentConnectionFactoryTest {
             "connections", Map.of("echo", Map.of("componentName", "httpClient", "componentVersion", 1)));
 
         List<ComponentConnection> componentConnections = commandsComponentConnectionFactory.create(
-            "commands_1", extensions, componentDefinition("commands"));
+            "commands_1", Map.of(), extensions, componentDefinition("commands"));
 
         assertThat(componentConnections).containsExactly(
             ComponentConnection.of("commands_1", "echo", "httpClient", 1, false));
+    }
+
+    @Test
+    void testCreateAddsTheConnectionOfTheSelectedTaskRunner() {
+        registerTaskRunner("kubernetes", new TaskRunnerConnection("kubernetes", 1));
+
+        List<ComponentConnection> componentConnections = commandsComponentConnectionFactory.create(
+            "commands_1", taskRunnerParameters("kubernetes"), Map.of(), componentDefinition("commands"));
+
+        assertThat(componentConnections).containsExactly(
+            ComponentConnection.of("commands_1", "taskRunner", "kubernetes", 1, true));
+    }
+
+    @Test
+    void testCreateAddsNoConnectionForATaskRunnerWithoutOne() {
+        registerTaskRunner("process", null);
+
+        assertThat(
+            commandsComponentConnectionFactory.create(
+                "commands_1", taskRunnerParameters("process"), Map.of(), componentDefinition("commands")))
+                    .isEmpty();
+    }
+
+    @Test
+    void testCreateAddsNoConnectionForADisabledTaskRunner() {
+        when(taskRunnerRegistry.getTaskRunner("kubernetes")).thenThrow(new TaskRunnerNotEnabledException("kubernetes"));
+
+        assertThat(
+            commandsComponentConnectionFactory.create(
+                "commands_1", taskRunnerParameters("kubernetes"), Map.of(), componentDefinition("commands")))
+                    .isEmpty();
+    }
+
+    @Test
+    void testCreateIgnoresATaskRunnerEntryStoredInTheDefinition() {
+        registerTaskRunner("process", null);
+
+        Map<String, ?> extensions = Map.of(
+            "connections",
+            Map.of(
+                "taskRunner",
+                Map.of("componentName", "kubernetes", "componentVersion", 1, "authorizationRequired", true)));
+
+        assertThat(
+            commandsComponentConnectionFactory.create(
+                "commands_1", taskRunnerParameters("process"), extensions, componentDefinition("commands")))
+                    .isEmpty();
+    }
+
+    private void registerTaskRunner(String type, TaskRunnerConnection taskRunnerConnection) {
+        TaskRunner taskRunner = mock(TaskRunner.class);
+
+        when(taskRunner.getConnection()).thenReturn(Optional.ofNullable(taskRunnerConnection));
+        when(taskRunnerRegistry.getTaskRunner(type)).thenReturn(taskRunner);
+    }
+
+    private static Map<String, ?> taskRunnerParameters(String type) {
+        return Map.of("taskRunner", Map.of("type", type));
     }
 
     private static ComponentDefinition componentDefinition(String name) {

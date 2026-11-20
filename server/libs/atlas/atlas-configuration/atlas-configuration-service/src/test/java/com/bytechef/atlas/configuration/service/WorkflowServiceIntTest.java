@@ -31,7 +31,6 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.repository.jdbc.JdbcWorkflowRepository;
-import com.bytechef.atlas.configuration.workflow.preprocessor.WorkflowDefinitionPreprocessor;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.jackson.config.JacksonConfiguration;
@@ -143,39 +142,13 @@ public class WorkflowServiceIntTest {
 
     @Test
     public void testUpdate() {
-        String definition = "{\"label\": \"LABEL\",\"tasks\": []}";
+        String definition = "{\"label\": \"Label\",\"tasks\": []}";
         Workflow workflow = workflowCrudRepository.save(getWorkflow());
 
         Workflow updatedWorkflow = workflowService.update(
             Validate.notNull(workflow.getId(), "id"), definition, workflow.getVersion());
 
         Assertions.assertEquals(definition, updatedWorkflow.getDefinition());
-    }
-
-    @Test
-    public void testCreateRunsThePreprocessors() {
-        Workflow workflow = workflowService.create(
-            "{\"label\": \"lower\", \"tasks\": []}", Workflow.Format.JSON, Workflow.SourceType.JDBC);
-
-        Assertions.assertEquals("LOWER", workflow.getLabel());
-    }
-
-    @Test
-    public void testUpdateRunsThePreprocessorsAndLeavesAnUnchangedDefinitionVerbatim() {
-        Workflow workflow = workflowCrudRepository.save(getWorkflow());
-
-        Workflow updatedWorkflow = workflowService.update(
-            Validate.notNull(workflow.getId(), "id"), "{\"label\": \"lower\",\"tasks\": []}",
-            workflow.getVersion());
-
-        Assertions.assertEquals("LOWER", updatedWorkflow.getLabel());
-
-        String verbatimDefinition = "{\"label\": \"ALREADY\",\"tasks\": []}";
-
-        Workflow untouchedWorkflow = workflowService.update(
-            Validate.notNull(workflow.getId(), "id"), verbatimDefinition, updatedWorkflow.getVersion());
-
-        Assertions.assertEquals(verbatimDefinition, untouchedWorkflow.getDefinition());
     }
 
     @Test
@@ -353,14 +326,14 @@ public class WorkflowServiceIntTest {
 
         String workflowId = Validate.notNull(workflow.getId(), "id");
 
-        workflowService.update(workflowId, "{\"label\": \"UPDATED\",\"tasks\": []}", workflow.getVersion());
+        workflowService.update(workflowId, "{\"label\": \"Updated\",\"tasks\": []}", workflow.getVersion());
 
         assertWorkflowEntriesEvicted(workflowId);
 
         Workflow persistedWorkflow = workflowCrudRepository.findById(workflowId)
             .orElseThrow();
 
-        assertThat(persistedWorkflow.getDefinition()).isEqualTo("{\"label\": \"UPDATED\",\"tasks\": []}");
+        assertThat(persistedWorkflow.getDefinition()).isEqualTo("{\"label\": \"Updated\",\"tasks\": []}");
     }
 
     @Test
@@ -493,28 +466,11 @@ public class WorkflowServiceIntTest {
         }
 
         @Bean
-        WorkflowDefinitionPreprocessor labelUpperCasingPreprocessor() {
-            return workflowDefinition -> {
-                Object label = workflowDefinition.get("label");
-
-                if (label instanceof String string && !string.equals(string.toUpperCase())) {
-                    workflowDefinition.put("label", string.toUpperCase());
-
-                    return true;
-                }
-
-                return false;
-            };
-        }
-
-        @Bean
         WorkflowService workflowService(
             CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
-            List<WorkflowRepository> workflowRepositories,
-            WorkflowDefinitionPreprocessor labelUpperCasingPreprocessor) {
+            List<WorkflowRepository> workflowRepositories) {
 
-            return new WorkflowServiceImpl(
-                cacheManager, workflowCrudRepositories, workflowRepositories, List.of(labelUpperCasingPreprocessor));
+            return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
         }
 
         @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")

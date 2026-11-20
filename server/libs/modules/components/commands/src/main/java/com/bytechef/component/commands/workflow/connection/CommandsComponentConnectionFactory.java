@@ -17,12 +17,17 @@
 package com.bytechef.component.commands.workflow.connection;
 
 import static com.bytechef.component.commands.constant.CommandsConstants.COMMANDS;
+import static com.bytechef.platform.component.runner.TaskRunnerConstants.TASK_RUNNER;
 
 import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.runner.TaskRunnerConnection;
+import com.bytechef.platform.component.runner.TaskRunnerConnectionUtils;
+import com.bytechef.platform.component.runner.TaskRunnerRegistry;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.workflow.connection.ComponentConnectionFactory;
 import com.bytechef.platform.configuration.workflow.connection.ComponentConnectionFactoryResolver;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -38,16 +43,21 @@ import org.springframework.stereotype.Component;
 class CommandsComponentConnectionFactory implements ComponentConnectionFactory, ComponentConnectionFactoryResolver {
 
     private final ComponentDefinitionService componentDefinitionService;
+    private final TaskRunnerRegistry taskRunnerRegistry;
 
-    CommandsComponentConnectionFactory(ComponentDefinitionService componentDefinitionService) {
+    CommandsComponentConnectionFactory(
+        ComponentDefinitionService componentDefinitionService, TaskRunnerRegistry taskRunnerRegistry) {
+
         this.componentDefinitionService = componentDefinitionService;
+        this.taskRunnerRegistry = taskRunnerRegistry;
     }
 
     @Override
     public List<ComponentConnection> create(
-        String workflowNodeName, Map<String, ?> extensions, ComponentDefinition componentDefinition) {
+        String workflowNodeName, Map<String, ?> parameters, Map<String, ?> extensions,
+        ComponentDefinition componentDefinition) {
 
-        return ComponentConnection.of(
+        List<ComponentConnection> declaredComponentConnections = ComponentConnection.of(
             extensions, workflowNodeName,
             (name, version) -> {
                 ComponentDefinition connectionComponentDefinition =
@@ -55,6 +65,27 @@ class CommandsComponentConnectionFactory implements ComponentConnectionFactory, 
 
                 return connectionComponentDefinition.isConnectionRequired();
             });
+
+        List<ComponentConnection> componentConnections = new ArrayList<>();
+
+        for (ComponentConnection declaredComponentConnection : declaredComponentConnections) {
+            if (!TASK_RUNNER.equals(declaredComponentConnection.key())) {
+                componentConnections.add(declaredComponentConnection);
+            }
+        }
+
+        Optional<TaskRunnerConnection> taskRunnerConnection = TaskRunnerConnectionUtils.fetchConnection(
+            parameters, taskRunnerRegistry);
+
+        if (taskRunnerConnection.isPresent()) {
+            TaskRunnerConnection connection = taskRunnerConnection.get();
+
+            componentConnections.add(
+                ComponentConnection.of(
+                    workflowNodeName, TASK_RUNNER, connection.componentName(), connection.componentVersion(), true));
+        }
+
+        return componentConnections;
     }
 
     @Override
