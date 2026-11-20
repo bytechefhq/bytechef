@@ -1346,7 +1346,7 @@ export type AutomationProjectConfigurationWorkflowProvidableValuesQueryVariables
 }>;
 
 
-export type AutomationProjectConfigurationWorkflowProvidableValuesQuery = { automationProjectConfigurationWorkflowProvidableValues: { providedConnections: any, providedInputs: any, connectionSlots: Array<{ componentName: string, title: string, required: boolean, providableConnections: Array<{ id: string, name: string }> }>, inputs: Array<{ name: string, label: string | null, type: string | null, required: boolean, componentName: string | null, componentVersion: number | null, groupName: string | null, optionConnections: Array<{ id: string, name: string }> }> } };
+export type AutomationProjectConfigurationWorkflowProvidableValuesQuery = { automationProjectConfigurationWorkflowProvidableValues: { providedConnections: any, providedInputs: any, connectionSlots: Array<{ componentName: string, title: string, required: boolean, providableConnections: Array<{ id: string, name: string }> }>, inputs: Array<{ name: string, label: string | null, type: string | null, required: boolean, internalOnly: boolean, componentName: string | null, componentVersion: number | null, groupName: string | null, optionConnections: Array<{ id: string, name: string }> }> } };
 
 export type AutomationProjectConfigurationsQueryVariables = Exact<{
   projectId: string | number;
@@ -7661,6 +7661,7 @@ export const AutomationProjectConfigurationWorkflowProvidableValuesDocument = ne
       label
       type
       required
+      internalOnly
       componentName
       componentVersion
       groupName
