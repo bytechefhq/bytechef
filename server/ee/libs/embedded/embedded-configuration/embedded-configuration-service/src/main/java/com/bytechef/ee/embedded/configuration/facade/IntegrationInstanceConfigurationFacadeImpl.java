@@ -1574,7 +1574,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
             String workflowId = integrationInstanceConfigurationWorkflowDTO.workflowId();
 
-            if (getRequiredAdminComponentConnections(integration, workflowId).isEmpty()) {
+            if (!needsAdministratorSetup(integration, workflowId, List.of(), Map.of())) {
                 enableIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationId, workflowId, true);
             }
         }
@@ -1650,7 +1650,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             integrationService.getIntegration(integrationInstanceConfiguration.getIntegrationId());
 
         for (String newWorkflowId : newWorkflowIds) {
-            if (getRequiredAdminComponentConnections(integration, newWorkflowId).isEmpty()) {
+            if (!needsAdministratorSetup(integration, newWorkflowId, List.of(), Map.of())) {
                 enableIntegrationInstanceConfigurationWorkflow(
                     integrationInstanceConfigurationId, newWorkflowId, true);
             }
@@ -1746,6 +1746,39 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         return getRequiredComponentConnections(workflowService.getWorkflow(workflowId), integration);
     }
 
+    private boolean needsAdministratorSetup(
+        Integration integration, String workflowId,
+        List<IntegrationInstanceConfigurationWorkflowConnection> connections, Map<String, ?> inputs) {
+
+        List<ComponentConnection> requiredComponentConnections = getRequiredAdminComponentConnections(
+            integration, workflowId);
+
+        if (!hasAllRequiredConnections(requiredComponentConnections, connections)) {
+            return true;
+        }
+
+        String missingInputName = InternalOnlyInputUtils.findMissingRequiredInternalOnlyInput(
+            workflowService.getWorkflow(workflowId), inputs);
+
+        return missingInputName != null;
+    }
+
+    private static boolean hasAllRequiredConnections(
+        List<ComponentConnection> requiredComponentConnections,
+        List<IntegrationInstanceConfigurationWorkflowConnection> connections) {
+
+        List<String> workflowNodeNames = requiredComponentConnections.stream()
+            .map(ComponentConnection::workflowNodeName)
+            .toList();
+
+        long requiredConnectionCount = connections.stream()
+            .filter(connection -> workflowNodeNames.contains(connection.getWorkflowNodeName()))
+            .count();
+
+        return requiredComponentConnections.isEmpty() ||
+            requiredComponentConnections.size() == requiredConnectionCount;
+    }
+
     private IntegrationInstanceConfigurationWorkflow doEnableIntegrationInstanceConfigurationWorkflow(
         long integrationInstanceConfigurationId, String workflowId, boolean enable) {
 
@@ -1760,17 +1793,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             List<ComponentConnection> requiredComponentConnections = getRequiredAdminComponentConnections(
                 integration, workflowId);
 
-            List<String> workflowNodeNames = requiredComponentConnections.stream()
-                .map(ComponentConnection::workflowNodeName)
-                .toList();
+            if (!hasAllRequiredConnections(
+                requiredComponentConnections, integrationInstanceConfigurationWorkflow.getConnections())) {
 
-            List<IntegrationInstanceConfigurationWorkflowConnection> connections =
-                integrationInstanceConfigurationWorkflow.getConnections()
-                    .stream()
-                    .filter(connection -> workflowNodeNames.contains(connection.getWorkflowNodeName()))
-                    .toList();
-
-            if (!requiredComponentConnections.isEmpty() && requiredComponentConnections.size() != connections.size()) {
                 throw new ConfigurationException(
                     "Not all required connections are set for a workflow with id=%s".formatted(workflowId),
                     IntegrationInstanceConfigurationErrorType.WORKFLOW_CONNECTIONS_NOT_FOUND);
