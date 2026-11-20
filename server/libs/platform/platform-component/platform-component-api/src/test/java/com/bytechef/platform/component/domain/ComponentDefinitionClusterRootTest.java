@@ -76,7 +76,7 @@ class ComponentDefinitionClusterRootTest {
         TestClusterRootComponentDefinition(Map<String, List<String>> actionClusterElementTypes) {
             super(component("root").actions(action("load"), action("search")));
 
-            this.actionClusterElementTypes = actionClusterElementTypes;
+            this.actionClusterElementTypes = Map.copyOf(actionClusterElementTypes);
         }
 
         @Override
@@ -86,7 +86,7 @@ class ComponentDefinitionClusterRootTest {
 
         @Override
         public Map<String, List<String>> getActionClusterElementTypes() {
-            return actionClusterElementTypes;
+            return Map.copyOf(actionClusterElementTypes);
         }
     }
 }
