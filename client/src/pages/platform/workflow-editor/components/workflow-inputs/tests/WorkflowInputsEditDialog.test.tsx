@@ -7,8 +7,11 @@ import {useEffect, useRef} from 'react';
 import {useForm} from 'react-hook-form';
 import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {useGetComponentDefinitionQueryMock} = vi.hoisted(() => ({
+const {useGetComponentDefinitionQueryMock, workflowEditorState} = vi.hoisted(() => ({
     useGetComponentDefinitionQueryMock: vi.fn(),
+    workflowEditorState: {
+        componentDefinitions: [] as Array<{inputsCount: number; name: string; version: number}>,
+    },
 }));
 
 vi.mock('@/shared/queries/platform/componentDefinitions.queries', () => ({
@@ -18,12 +21,7 @@ vi.mock('@/shared/queries/platform/componentDefinitions.queries', () => ({
 
 vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () => ({
     useWorkflowEditor: () => ({
-        useGetComponentDefinitionsQuery: () => ({
-            data: [
-                {inputsCount: 1, name: 'googleSheets', version: 1},
-                {inputsCount: 1, name: 'slack', version: 2},
-            ],
-        }),
+        useGetComponentDefinitionsQuery: () => ({data: workflowEditorState.componentDefinitions}),
     }),
 }));
 
@@ -198,6 +196,11 @@ describe('WorkflowInputsEditDialog', () => {
     });
 
     beforeEach(() => {
+        workflowEditorState.componentDefinitions = [
+            {inputsCount: 1, name: 'googleSheets', version: 1},
+            {inputsCount: 1, name: 'slack', version: 2},
+        ];
+
         saveWorkflowInputMock.mockClear();
         useGetComponentDefinitionQueryMock.mockReturnValue({
             data: {
@@ -242,6 +245,22 @@ describe('WorkflowInputsEditDialog', () => {
 
         expect(within(listbox).getByRole('option', {name: 'slack'})).toBeInTheDocument();
         expect(within(listbox).queryByRole('option', {name: 'googleSheets'})).not.toBeInTheDocument();
+    });
+
+    it('explains why the Component select is empty when no workflow component offers inputs', async () => {
+        workflowEditorState.componentDefinitions = [{inputsCount: 0, name: 'slack', version: 2}];
+
+        const user = setupUser();
+
+        render(<Harness />);
+
+        await selectOption(user, 'Select input type', 'Component property');
+        await user.click(await screen.findByText('Select component'));
+
+        const listbox = await screen.findByRole('listbox');
+
+        expect(within(listbox).queryByRole('option')).not.toBeInTheDocument();
+        expect(within(listbox).getByText(/No component in this workflow has inputs to offer/)).toBeInTheDocument();
     });
 
     it('auto-fills name and label and stores the group reference when picking a single-property input', async () => {
