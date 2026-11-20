@@ -1706,6 +1706,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 .sorted()
                 .toList();
 
+            boolean awaitsConfiguration = InternalOnlyInputUtils.findMissingRequiredInternalOnlyInput(
+                workflow, targetWorkflow.getInputs()) != null;
             Set<String> internalOnlyInputNames = InternalOnlyInputUtils.getInternalOnlyInputNames(workflow);
             Set<String> newRequiredInputs = new HashSet<>();
             Set<Long> affectedConnectedUserIds = new HashSet<>();
@@ -1729,7 +1731,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
                 newRequiredInputs.addAll(missingInputNames);
 
-                if (!missingInputNames.isEmpty() || !newRequiredConnections.isEmpty()) {
+                if (!missingInputNames.isEmpty() || !newRequiredConnections.isEmpty() || awaitsConfiguration) {
                     affectedConnectedUserIds.add(workflowMapping.connectedUserId());
                 }
             }
@@ -1742,7 +1744,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                         newRequiredInputs.stream()
                             .sorted()
                             .toList(),
-                        newRequiredConnections, affectedConnectedUserIds.size()));
+                        newRequiredConnections, affectedConnectedUserIds.size(), awaitsConfiguration));
             }
         }
 

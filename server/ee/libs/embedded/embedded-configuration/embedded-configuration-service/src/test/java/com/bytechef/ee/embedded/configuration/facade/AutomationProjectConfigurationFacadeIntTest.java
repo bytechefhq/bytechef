@@ -218,6 +218,12 @@ class AutomationProjectConfigurationFacadeIntTest {
          "triggers":[],"tasks":[]}
         """;
 
+    private static final String REQUIRED_INTERNAL_ONLY_DEFINITION = """
+        {"label":"%s","inputs":[
+         {"name":"accountId","label":"Account","type":"string","required":true,"internalOnly":true}],
+         "triggers":[],"tasks":[]}
+        """;
+
     private static final String NO_INPUT_DEFINITION = """
         {"label":"%s","triggers":[],"tasks":[]}
         """;
@@ -915,7 +921,7 @@ class AutomationProjectConfigurationFacadeIntTest {
 
         assertThat(versionImpact.workflows()).containsExactly(
             new AutomationProjectConfigurationVersionImpactDTO.Workflow(
-                workflowUuid, "Notify Slack", List.of("channel"), List.of(), 2));
+                workflowUuid, "Notify Slack", List.of("channel"), List.of(), 2, false));
     }
 
     @Test
@@ -940,7 +946,7 @@ class AutomationProjectConfigurationFacadeIntTest {
 
         assertThat(versionImpact.workflows()).containsExactly(
             new AutomationProjectConfigurationVersionImpactDTO.Workflow(
-                workflowUuid, "Optional Flow", List.of("channel"), List.of(), 1));
+                workflowUuid, "Optional Flow", List.of("channel"), List.of(), 1, false));
     }
 
     @Test
@@ -1002,7 +1008,7 @@ class AutomationProjectConfigurationFacadeIntTest {
         assertThat(automationProjectConfigurationFacade.getVersionImpact(configurationId, 2)
             .workflows()).containsExactly(
                 new AutomationProjectConfigurationVersionImpactDTO.Workflow(
-                    workflowUuid, "Sync Issues", List.of(), List.of("jira"), 2));
+                    workflowUuid, "Sync Issues", List.of(), List.of("jira"), 2, false));
     }
 
     @Test
@@ -1082,7 +1088,99 @@ class AutomationProjectConfigurationFacadeIntTest {
         assertThat(automationProjectConfigurationFacade.getVersionImpact(configurationId, 2)
             .workflows()).containsExactly(
                 new AutomationProjectConfigurationVersionImpactDTO.Workflow(
-                    workflowUuid, "Sync Accounts", List.of("channel"), List.of(), 0));
+                    workflowUuid, "Sync Accounts", List.of("channel"), List.of(), 1, true));
+    }
+
+    @Test
+    void testGetVersionImpactNamesAWorkflowThatStaysDisabledWithoutItsRequiredInternalOnlyValue() {
+        long projectId = createProject("Impact Awaits Configuration");
+
+        String workflowUuid = addWorkflow(projectId, withLabel(NO_INPUT_DEFINITION, "Sync Accounts"));
+
+        publish(projectId);
+        redefineDraftWorkflow(workflowUuid, withLabel(REQUIRED_INTERNAL_ONLY_DEFINITION, "Sync Accounts"));
+        publish(projectId);
+
+        long configurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
+
+        givenStoredInputs(101L, projectId, 1, workflowUuid, Map.of());
+        givenReferences(configurationId,
+            newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false, 101L));
+
+        assertThat(automationProjectConfigurationFacade.getVersionImpact(configurationId, 2)
+            .workflows()).containsExactly(
+                new AutomationProjectConfigurationVersionImpactDTO.Workflow(
+                    workflowUuid, "Sync Accounts", List.of(), List.of(), 1, true));
+
+        automationProjectConfigurationService.updateWorkflowProvidedValues(
+            configurationId, UUID.fromString(workflowUuid), Map.of(), Map.of("accountId", "account-1"));
+
+        assertThat(automationProjectConfigurationFacade.getVersionImpact(configurationId, 2)
+            .workflows()).isEmpty();
+    }
+
+    @Test
+    void testGetMoveImpactNamesAWorkflowThatStaysDisabledWithoutTheTargetsRequiredInternalOnlyValue() {
+        long projectId = createProject("Move Impact Awaits Configuration");
+
+        String workflowUuid = addWorkflow(projectId, withLabel(NO_INPUT_DEFINITION, "Sync Accounts"));
+
+        publish(projectId);
+        redefineDraftWorkflow(workflowUuid, withLabel(REQUIRED_INTERNAL_ONLY_DEFINITION, "Sync Accounts"));
+        publish(projectId);
+
+        long sourceConfigurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
+        long targetConfigurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, "Version 2", null, 2, false, true);
+
+        automationProjectConfigurationService.updateWorkflowProvidedValues(
+            sourceConfigurationId, UUID.fromString(workflowUuid), Map.of(), Map.of("accountId", "account-1"));
+
+        givenStoredInputs(101L, projectId, 1, workflowUuid, Map.of());
+        givenReferences(sourceConfigurationId,
+            newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false, 101L));
+
+        assertThat(automationProjectConfigurationFacade.getMoveImpact(
+            sourceConfigurationId, targetConfigurationId, List.of(101L))
+            .workflows()).containsExactly(
+                new AutomationProjectConfigurationVersionImpactDTO.Workflow(
+                    workflowUuid, "Sync Accounts", List.of(), List.of(), 1, true));
+
+        automationProjectConfigurationService.updateWorkflowProvidedValues(
+            targetConfigurationId, UUID.fromString(workflowUuid), Map.of(), Map.of("accountId", "account-2"));
+
+        assertThat(automationProjectConfigurationFacade.getMoveImpact(
+            sourceConfigurationId, targetConfigurationId, List.of(101L))
+            .workflows()).isEmpty();
+    }
+
+    @Test
+    void testGetMoveImpactLeavesOutAWorkflowTheTargetTurnedOff() {
+        long projectId = createProject("Move Impact Turned Off Workflow");
+
+        String workflowUuid = addWorkflow(projectId, withLabel(NO_INPUT_DEFINITION, "Sync Accounts"));
+
+        publish(projectId);
+        redefineDraftWorkflow(workflowUuid, withLabel(REQUIRED_INTERNAL_ONLY_DEFINITION, "Sync Accounts"));
+        publish(projectId);
+
+        long sourceConfigurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
+        long targetConfigurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, "Version 2", null, 2, false, true);
+
+        automationProjectConfigurationService.updateWorkflowEnabled(
+            targetConfigurationId, UUID.fromString(workflowUuid), false);
+
+        givenStoredInputs(101L, projectId, 1, workflowUuid, Map.of());
+        givenReferences(sourceConfigurationId,
+            newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false, 101L));
+
+        assertThat(automationProjectConfigurationFacade.getMoveImpact(
+            sourceConfigurationId, targetConfigurationId, List.of(101L))
+            .workflows()).isEmpty();
     }
 
     @Test
@@ -1126,7 +1224,7 @@ class AutomationProjectConfigurationFacadeIntTest {
         assertThat(automationProjectConfigurationFacade.getVersionImpact(configurationId, 2)
             .workflows()).containsExactly(
                 new AutomationProjectConfigurationVersionImpactDTO.Workflow(
-                    workflowUuid, workflowUuid, List.of("channel"), List.of(), 0));
+                    workflowUuid, workflowUuid, List.of("channel"), List.of(), 0, false));
     }
 
     @Test

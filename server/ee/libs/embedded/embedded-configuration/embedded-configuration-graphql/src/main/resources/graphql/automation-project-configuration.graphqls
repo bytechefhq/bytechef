@@ -70,6 +70,7 @@ type AutomationProjectConfigurationVersionImpactWorkflow {
     newRequiredInputs: [String!]!
     newRequiredConnections: [String!]!
     affectedConnectedUserCount: Int!
+    awaitsConfiguration: Boolean!
 }
 
 type AutomationProjectConfigurationDeleteImpact {

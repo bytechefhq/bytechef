@@ -692,7 +692,8 @@ public class AutomationProjectConfigurationFacadeImpl
         }
 
         AutomationProjectConfigurationVersionImpactDTO versionImpact = getVersionImpact(
-            sourceConfiguration, targetConfiguration.getProjectVersion(), sourceConnectedUserIds);
+            sourceConfiguration, targetConfiguration.getProjectVersion(), targetConfiguration,
+            sourceConnectedUserIds);
 
         return new ConfigurationMoveImpactDTO(
             addRemovedProvidedInputs(
@@ -738,6 +739,20 @@ public class AutomationProjectConfigurationFacadeImpl
                 continue;
             }
 
+            Workflow targetWorkflow = workflowService.getWorkflow(targetProjectWorkflow.getWorkflowId());
+
+            Set<String> internalOnlyInputNames = InternalOnlyInputUtils.getInternalOnlyInputNames(targetWorkflow);
+
+            List<String> removedInputNames = entry.getValue()
+                .stream()
+                .filter(inputName -> !internalOnlyInputNames.contains(inputName))
+                .sorted()
+                .toList();
+
+            if (removedInputNames.isEmpty()) {
+                continue;
+            }
+
             int affectedConnectedUserCount = (int) referencesByWorkflowUuid.getOrDefault(workflowUuid, List.of())
                 .stream()
                 .map(ConnectedUserWorkflowReferenceDTO::connectedUserId)
@@ -748,36 +763,28 @@ public class AutomationProjectConfigurationFacadeImpl
                 workflowUuid);
 
             if (impactedWorkflow == null) {
-                Workflow workflow = workflowService.getWorkflow(targetProjectWorkflow.getWorkflowId());
-
-                String label = StringUtils.isBlank(workflow.getLabel()) ? workflowUuid : workflow.getLabel();
+                String label = StringUtils.isBlank(targetWorkflow.getLabel())
+                    ? workflowUuid : targetWorkflow.getLabel();
 
                 workflowsByUuid.put(
                     workflowUuid,
                     new AutomationProjectConfigurationVersionImpactDTO.Workflow(
-                        workflowUuid, label, entry.getValue()
-                            .stream()
-                            .sorted()
-                            .toList(),
-                        List.of(), affectedConnectedUserCount));
+                        workflowUuid, label, removedInputNames, List.of(), affectedConnectedUserCount, false));
 
                 continue;
             }
 
             Set<String> newRequiredInputs = new LinkedHashSet<>(impactedWorkflow.newRequiredInputs());
 
-            newRequiredInputs.addAll(
-                entry.getValue()
-                    .stream()
-                    .sorted()
-                    .toList());
+            newRequiredInputs.addAll(removedInputNames);
 
             workflowsByUuid.put(
                 workflowUuid,
                 new AutomationProjectConfigurationVersionImpactDTO.Workflow(
                     workflowUuid, impactedWorkflow.label(), List.copyOf(newRequiredInputs),
                     impactedWorkflow.newRequiredConnections(),
-                    Math.max(impactedWorkflow.affectedConnectedUserCount(), affectedConnectedUserCount)));
+                    Math.max(impactedWorkflow.affectedConnectedUserCount(), affectedConnectedUserCount),
+                    impactedWorkflow.awaitsConfiguration()));
         }
 
         return workflowsByUuid.values()
@@ -831,7 +838,8 @@ public class AutomationProjectConfigurationFacadeImpl
         AutomationProjectConfiguration configuration =
             automationProjectConfigurationService.getConfiguration(configurationId);
 
-        return getVersionImpact(configuration, projectVersion, getAssignedConnectedUserIds(configurationId));
+        return getVersionImpact(
+            configuration, projectVersion, configuration, getAssignedConnectedUserIds(configurationId));
     }
 
     @Override
@@ -905,7 +913,8 @@ public class AutomationProjectConfigurationFacadeImpl
     }
 
     private AutomationProjectConfigurationVersionImpactDTO getVersionImpact(
-        AutomationProjectConfiguration configuration, int projectVersion, Set<Long> connectedUserIds) {
+        AutomationProjectConfiguration configuration, int projectVersion,
+        AutomationProjectConfiguration providingConfiguration, Set<Long> connectedUserIds) {
 
         Map<String, ProjectWorkflow> currentProjectWorkflows = projectWorkflowService
             .getProjectWorkflows(configuration.getProjectId(), configuration.getProjectVersion())
@@ -934,11 +943,18 @@ public class AutomationProjectConfigurationFacadeImpl
                 workflowService.getWorkflow(currentProjectWorkflow.getWorkflowId()), requestedWorkflow);
             List<String> newRequiredConnections = getNewRequiredConnections(
                 currentProjectWorkflow.getWorkflowId(), requestedProjectWorkflow.getWorkflowId());
+            boolean awaitsConfiguration =
+                providingConfiguration.isWorkflowEnabled(requestedProjectWorkflow.getUuid()) &&
+                    InternalOnlyInputUtils.findMissingRequiredInternalOnlyInput(
+                        requestedWorkflow,
+                        getStoredProvidedInputs(providingConfiguration,
+                            requestedProjectWorkflow.getUuidAsString())) != null;
 
-            if (!newRequiredInputs.isEmpty() || !newRequiredConnections.isEmpty()) {
+            if (!newRequiredInputs.isEmpty() || !newRequiredConnections.isEmpty() || awaitsConfiguration) {
                 workflowChanges.add(
                     new WorkflowChange(
-                        requestedProjectWorkflow.getUuidAsString(), label, newRequiredInputs, newRequiredConnections));
+                        requestedProjectWorkflow.getUuidAsString(), label, newRequiredInputs, newRequiredConnections,
+                        awaitsConfiguration));
             }
         }
 
@@ -959,7 +975,8 @@ public class AutomationProjectConfigurationFacadeImpl
             impactedWorkflows.add(
                 new AutomationProjectConfigurationVersionImpactDTO.Workflow(
                     workflowChange.workflowUuid(), workflowChange.label(), workflowChange.newRequiredInputs(),
-                    workflowChange.newRequiredConnections(), affectedConnectedUserCount));
+                    workflowChange.newRequiredConnections(), affectedConnectedUserCount,
+                    workflowChange.awaitsConfiguration()));
         }
 
         impactedWorkflows.sort(
@@ -1162,7 +1179,8 @@ public class AutomationProjectConfigurationFacadeImpl
         return new AutomationProjectConfigurationVersionImpactDTO.Workflow(
             workflow.workflowUuid(), workflow.label(), List.copyOf(newRequiredInputs),
             List.copyOf(newRequiredConnections),
-            workflow.affectedConnectedUserCount() + otherWorkflow.affectedConnectedUserCount());
+            workflow.affectedConnectedUserCount() + otherWorkflow.affectedConnectedUserCount(),
+            workflow.awaitsConfiguration() || otherWorkflow.awaitsConfiguration());
     }
 
     private static List<ConfigurationMoveResultDTO.Skipped> sortSkipped(
@@ -1435,7 +1453,7 @@ public class AutomationProjectConfigurationFacadeImpl
     private int getAffectedConnectedUserCount(
         WorkflowChange workflowChange, List<ConnectedUserWorkflowReferenceDTO> references) {
 
-        if (!workflowChange.newRequiredConnections()
+        if (workflowChange.awaitsConfiguration() || !workflowChange.newRequiredConnections()
             .isEmpty()) {
 
             return references.size();
@@ -1913,6 +1931,7 @@ public class AutomationProjectConfigurationFacadeImpl
     }
 
     private record WorkflowChange(
-        String workflowUuid, String label, List<String> newRequiredInputs, List<String> newRequiredConnections) {
+        String workflowUuid, String label, List<String> newRequiredInputs, List<String> newRequiredConnections,
+        boolean awaitsConfiguration) {
     }
 }

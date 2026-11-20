@@ -357,7 +357,7 @@ class IntegrationInstanceApiControllerIntTest {
                 new ConfigurationMoveImpactDTO(
                     List.of(
                         new AutomationProjectConfigurationVersionImpactDTO.Workflow(
-                            "uuid-1", "Cron", List.of("cronExpression"), List.of("slack"), 1)),
+                            "uuid-1", "Cron", List.of("cronExpression"), List.of("slack"), 1, true)),
                     List.of(
                         new ConfigurationMoveResultDTO.Skipped(
                             2L, ConfigurationMoveResultDTO.Skipped.CONNECTION_MISMATCH, List.of()))));
@@ -378,6 +378,8 @@ class IntegrationInstanceApiControllerIntTest {
             .isEqualTo("cronExpression")
             .jsonPath("$.workflows[0].newRequiredConnections[0]")
             .isEqualTo("slack")
+            .jsonPath("$.workflows[0].awaitsConfiguration")
+            .isEqualTo(true)
             .jsonPath("$.workflows[0].affectedConnectedUserCount")
             .isEqualTo(1)
             .jsonPath("$.skipped[0].connectedUserId")
@@ -429,7 +431,7 @@ class IntegrationInstanceApiControllerIntTest {
                 new ConfigurationMoveImpactDTO(
                     List.of(
                         new AutomationProjectConfigurationVersionImpactDTO.Workflow(
-                            "uuid-1", "Cron", List.of("cronExpression"), List.of("slack"), 1)),
+                            "uuid-1", "Cron", List.of("cronExpression"), List.of("slack"), 1, false)),
                     List.of(
                         new ConfigurationMoveResultDTO.Skipped(
                             2L, ConfigurationMoveResultDTO.Skipped.CONNECTION_MISMATCH, List.of()))));
