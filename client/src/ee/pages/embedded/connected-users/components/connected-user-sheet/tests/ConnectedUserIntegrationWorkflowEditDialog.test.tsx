@@ -166,12 +166,13 @@ describe('ConnectedUserIntegrationWorkflowEditDialog', () => {
         });
     });
 
-    it('explains where internal-only inputs are set when the workflow has no other inputs', async () => {
+    it('shows the standard empty inputs message when the workflow has only internal-only inputs', async () => {
         renderDialog([{internalOnly: true, name: 'contactPageUrl'}] as Workflow['inputs']);
 
         await userEvent.click(screen.getByRole('tab', {name: /Inputs/}));
 
-        expect(screen.getByText(/Internal-only inputs are set on the integration configuration/)).toBeInTheDocument();
+        expect(screen.getByText('No Inputs yet')).toBeInTheDocument();
+        expect(screen.queryByText('contactPageUrl')).not.toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
     });
 
