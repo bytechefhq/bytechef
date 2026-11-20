@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.server.configuration.service;
+package com.bytechef.ai.mcp.server.configuration.facade;
 
 /**
  * @author Ivica Cardic
  */
-public interface ManagementMcpServerService {
+public interface ManagementMcpServerFacade {
 
     String getManagementMcpServerCanonicalUrl();
 
