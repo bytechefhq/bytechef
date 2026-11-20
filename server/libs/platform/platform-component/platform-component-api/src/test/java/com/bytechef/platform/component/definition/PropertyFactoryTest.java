@@ -26,14 +26,17 @@ import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.StringProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class PropertyFactoryTest {
 
     private static final Map<String, Object> FILE_ENTRY_MAP = Map.of(
