@@ -141,3 +141,9 @@ export const buildProvidedValuesPayload = (
 
     return {providedConnections: connectionsToSave, providedInputs: inputsToSave};
 };
+
+export interface InputOptionsScopeI {
+    configurationId?: string;
+    environmentId?: string;
+    projectId?: string;
+}

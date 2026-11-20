@@ -734,9 +734,13 @@ const AutomationProjectConfigurationDialog = ({
                         ? `Choose which workflows of V${projectVersion} this configuration runs. Connections and inputs set here are used by every connected user and cannot be changed by them.`
                         : undefined
                 }
+                environmentId={environmentId}
                 isLoading={(updateProjectVersionProp || !configuration) && versionWorkflowsLoading}
                 onWorkflowDraftChange={handleWorkflowDraftChange}
-                projectVersion={updateProjectVersionProp && projectVersion ? Number(projectVersion) : undefined}
+                projectId={project?.id}
+                projectVersion={
+                    (updateProjectVersionProp || !configuration) && projectVersion ? Number(projectVersion) : undefined
+                }
                 workflowDrafts={workflowDrafts}
                 workflows={dialogWorkflows}
             />
