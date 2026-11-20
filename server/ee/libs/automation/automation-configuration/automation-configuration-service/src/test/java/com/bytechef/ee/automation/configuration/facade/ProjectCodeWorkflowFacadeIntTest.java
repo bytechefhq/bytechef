@@ -34,6 +34,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacadeImpl;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
@@ -75,6 +76,7 @@ import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
@@ -160,6 +162,9 @@ class ProjectCodeWorkflowFacadeIntTest {
     private ComponentConnectionFacade componentConnectionFacade;
 
     @Autowired
+    private ConnectionService connectionService;
+
+    @Autowired
     private EnvironmentService environmentService;
 
     @Autowired
@@ -199,7 +204,7 @@ class ProjectCodeWorkflowFacadeIntTest {
     void beforeEach() {
         reset(
             codeWorkflowContainerFacade, codeWorkflowContainerService, codeWorkflowFileStorage,
-            componentConnectionFacade,
+            componentConnectionFacade, connectionService,
             environmentService,
             permissionService, projectCodeWorkflowService, projectDeploymentService, projectDeploymentWorkflowService,
             projectFacade, projectService, projectWorkflowService, workflowService);
@@ -420,6 +425,110 @@ class ProjectCodeWorkflowFacadeIntTest {
     }
 
     @Test
+    void testSaveWithEnableCarriesAWorkflowWhoseNewVersionAddsARequiredInputForwardDisabled() {
+        authenticate(AuthorityConstants.ADMIN);
+
+        stubMoveToVersionTwo();
+
+        when(workflowService.getWorkflow("wf-1"))
+            .thenReturn(
+                new Workflow(
+                    "wf-1", "{\"inputs\":[{\"name\":\"name\",\"type\":\"STRING\",\"required\":true}],\"tasks\":[]}",
+                    Workflow.Format.JSON));
+
+        projectCodeWorkflowFacade.save(WORKSPACE_ID, projectBytes(), Language.JAVASCRIPT, Environment.STAGING, true);
+
+        ProjectDeploymentWorkflow carriedProjectDeploymentWorkflow = captureCarriedProjectDeploymentWorkflow();
+
+        assertThat(carriedProjectDeploymentWorkflow.getWorkflowId()).isEqualTo("wf-1");
+        assertThat(carriedProjectDeploymentWorkflow.isEnabled()).isFalse();
+
+        Map<String, ?> carriedInputs = carriedProjectDeploymentWorkflow.getInputs();
+
+        assertThat(carriedInputs.get("channel")).isEqualTo("general");
+
+        verify(projectDeploymentService).updateEnabled(PROJECT_DEPLOYMENT_ID, true);
+    }
+
+    @Test
+    void testSaveWithEnableKeepsACarriedWorkflowEnabledWhenItsRequiredInputIsAlreadySet() {
+        authenticate(AuthorityConstants.ADMIN);
+
+        stubMoveToVersionTwo();
+
+        when(workflowService.getWorkflow("wf-1"))
+            .thenReturn(
+                new Workflow(
+                    "wf-1",
+                    "{\"inputs\":[{\"name\":\"channel\",\"type\":\"STRING\",\"required\":true}],\"tasks\":[]}",
+                    Workflow.Format.JSON));
+
+        projectCodeWorkflowFacade.save(WORKSPACE_ID, projectBytes(), Language.JAVASCRIPT, Environment.STAGING, true);
+
+        ProjectDeploymentWorkflow carriedProjectDeploymentWorkflow = captureCarriedProjectDeploymentWorkflow();
+
+        assertThat(carriedProjectDeploymentWorkflow.getWorkflowId()).isEqualTo("wf-1");
+        assertThat(carriedProjectDeploymentWorkflow.isEnabled()).isTrue();
+    }
+
+    @Test
+    void testSaveWithEnableCarriesAWorkflowWhoseNewVersionAddsARequiredConnectionForwardDisabled() {
+        authenticate(AuthorityConstants.ADMIN);
+
+        stubMoveToVersionTwo();
+
+        when(workflowService.getWorkflow("wf-1"))
+            .thenReturn(
+                new Workflow(
+                    "wf-1", "{\"tasks\":[{\"name\":\"slack_1\",\"type\":\"slack/v1/sendMessage\"}]}",
+                    Workflow.Format.JSON));
+        when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class)))
+            .thenReturn(List.of(new ComponentConnection("slack", 1, "slack_1", "slack", true)));
+
+        projectCodeWorkflowFacade.save(WORKSPACE_ID, projectBytes(), Language.JAVASCRIPT, Environment.STAGING, true);
+
+        ProjectDeploymentWorkflow carriedProjectDeploymentWorkflow = captureCarriedProjectDeploymentWorkflow();
+
+        assertThat(carriedProjectDeploymentWorkflow.getWorkflowId()).isEqualTo("wf-1");
+        assertThat(carriedProjectDeploymentWorkflow.isEnabled()).isFalse();
+    }
+
+    @Test
+    void testSaveWithEnableKeepsACarriedWorkflowEnabledWhenItsRequiredConnectionIsAlreadySet() {
+        authenticate(AuthorityConstants.ADMIN);
+
+        stubMoveToVersionTwo(List.of(new ProjectDeploymentWorkflowConnection(41L, "slack", "slack_1")));
+
+        when(workflowService.getWorkflow("wf-1"))
+            .thenReturn(
+                new Workflow(
+                    "wf-1", "{\"tasks\":[{\"name\":\"slack_1\",\"type\":\"slack/v1/sendMessage\"}]}",
+                    Workflow.Format.JSON));
+
+        ComponentConnection componentConnection = new ComponentConnection("slack", 1, "slack_1", "slack", true);
+
+        when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class)))
+            .thenReturn(List.of(componentConnection));
+        when(componentConnectionFacade.getComponentConnection("wf-1", "slack_1", "slack"))
+            .thenReturn(componentConnection);
+
+        Connection connection = new Connection();
+
+        connection.setComponentName("slack");
+        connection.setEnvironmentId(Environment.STAGING.ordinal());
+        connection.setId(41L);
+
+        when(connectionService.getConnection(41L)).thenReturn(connection);
+
+        projectCodeWorkflowFacade.save(WORKSPACE_ID, projectBytes(), Language.JAVASCRIPT, Environment.STAGING, true);
+
+        ProjectDeploymentWorkflow carriedProjectDeploymentWorkflow = captureCarriedProjectDeploymentWorkflow();
+
+        assertThat(carriedProjectDeploymentWorkflow.getWorkflowId()).isEqualTo("wf-1");
+        assertThat(carriedProjectDeploymentWorkflow.isEnabled()).isTrue();
+    }
+
+    @Test
     void testFirstUploadAddsEveryWorkflowToTheDraftAndPublishesIt() {
         authenticate(AuthorityConstants.ADMIN);
 
@@ -588,6 +697,15 @@ class ProjectCodeWorkflowFacadeIntTest {
         return source.startsWith("({name: \"" + projectName + "\"");
     }
 
+    private ProjectDeploymentWorkflow captureCarriedProjectDeploymentWorkflow() {
+        ArgumentCaptor<ProjectDeploymentWorkflow> projectDeploymentWorkflowArgumentCaptor =
+            ArgumentCaptor.forClass(ProjectDeploymentWorkflow.class);
+
+        verify(projectDeploymentWorkflowService).update(projectDeploymentWorkflowArgumentCaptor.capture());
+
+        return projectDeploymentWorkflowArgumentCaptor.getValue();
+    }
+
     private ProjectDeployment existingProjectDeployment() {
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
@@ -732,6 +850,10 @@ class ProjectCodeWorkflowFacadeIntTest {
     }
 
     private void stubMoveToVersionTwo() {
+        stubMoveToVersionTwo(List.of());
+    }
+
+    private void stubMoveToVersionTwo(List<ProjectDeploymentWorkflowConnection> carriedConnections) {
         Project project = newProject();
 
         project.publish(null);
@@ -769,6 +891,7 @@ class ProjectCodeWorkflowFacadeIntTest {
                 ProjectDeploymentWorkflow carriedProjectDeploymentWorkflow = projectDeploymentWorkflow(
                     21L, "wf-old", true);
 
+                carriedProjectDeploymentWorkflow.setConnections(carriedConnections);
                 carriedProjectDeploymentWorkflow.setInputs(Map.of("channel", "general"));
 
                 return List.of(carriedProjectDeploymentWorkflow);
