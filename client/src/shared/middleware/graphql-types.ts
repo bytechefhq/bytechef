@@ -630,6 +630,7 @@ export type AutomationProjectConfigurationInput = {
   componentName?: Maybe<Scalars['String']['output']>;
   componentVersion?: Maybe<Scalars['Int']['output']>;
   groupName?: Maybe<Scalars['String']['output']>;
+  internalOnly: Scalars['Boolean']['output'];
   label?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   optionConnections: Array<AutomationProjectConfigurationProvidableConnection>;
