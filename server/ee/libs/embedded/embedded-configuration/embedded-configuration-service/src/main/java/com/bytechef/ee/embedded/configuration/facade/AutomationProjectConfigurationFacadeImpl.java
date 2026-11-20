@@ -1921,11 +1921,19 @@ public class AutomationProjectConfigurationFacadeImpl
 
             Map<String, Object> mergedInputs = new HashMap<>(referenceValues.inputs());
 
-            mergedInputs.putAll(inputs);
+            for (Map.Entry<String, Object> inputEntry : inputs.entrySet()) {
+                if (isMissingValue(mergedInputs.get(inputEntry.getKey()))) {
+                    mergedInputs.put(inputEntry.getKey(), inputEntry.getValue());
+                }
+            }
 
             connectedUserWorkflowReferenceFacade.updateReferenceInputs(
                 connectedUser.getExternalId(), automationUuid, mergedInputs, connectedUser.getEnvironment());
         }
+    }
+
+    private static boolean isMissingValue(@Nullable Object value) {
+        return value == null || (value instanceof String stringValue && stringValue.isBlank());
     }
 
     private boolean needsAttention(List<ConnectedUserProjectWorkflow> references) {
