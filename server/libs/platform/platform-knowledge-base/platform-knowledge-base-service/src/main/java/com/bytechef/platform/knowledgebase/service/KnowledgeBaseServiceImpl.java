@@ -64,6 +64,12 @@ public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<KnowledgeBase> getKnowledgeBases(List<Long> ids) {
+        return knowledgeBaseRepository.findAllById(ids);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<KnowledgeBase> getKnowledgeBases(int environment) {
         return knowledgeBaseRepository.findAllByEnvironment(environment);
     }
@@ -83,5 +89,15 @@ public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
         existingKnowledgeBase.setOverlap(knowledgeBase.getOverlap());
 
         return knowledgeBaseRepository.save(existingKnowledgeBase);
+    }
+
+    @Override
+    public void updateKnowledgeBaseTagIds(long id, List<Long> tagIds) {
+        KnowledgeBase knowledgeBase = knowledgeBaseRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("KnowledgeBase with id=" + id + " not found"));
+
+        knowledgeBase.setTagIds(tagIds);
+
+        knowledgeBaseRepository.save(knowledgeBase);
     }
 }

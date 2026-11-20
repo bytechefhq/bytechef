@@ -68,4 +68,8 @@ public interface KnowledgeBaseService {
      * @return the updated KnowledgeBase object after persisting the changes
      */
     KnowledgeBase updateKnowledgeBase(Long id, KnowledgeBase knowledgeBase);
+
+    List<KnowledgeBase> getKnowledgeBases(List<Long> ids);
+
+    void updateKnowledgeBaseTagIds(long id, List<Long> tagIds);
 }
