@@ -216,6 +216,7 @@ describe('AutomationProjectConfigurationMoveUsersDialog', () => {
             connectedUserIds: ['1', '2'],
             sourceId: 'source',
             targetId: 'target',
+            workflowInputs: [],
         });
 
         await waitFor(() => {

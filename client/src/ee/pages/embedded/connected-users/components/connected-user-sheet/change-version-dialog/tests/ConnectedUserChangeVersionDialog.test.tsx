@@ -153,7 +153,7 @@ describe('ConnectedUserChangeVersionDialog', () => {
 
         await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
 
-        expect(onChange).toHaveBeenCalledWith(5, '11');
+        expect(onChange).toHaveBeenCalledWith(5, '11', []);
     });
 
     it('calls onChange without a target when the configuration is to be created', async () => {
@@ -164,7 +164,7 @@ describe('ConnectedUserChangeVersionDialog', () => {
         await chooseVersion('V1 (downgrade)');
         await userEvent.click(screen.getByRole('button', {name: 'Change'}));
 
-        await waitFor(() => expect(onChange).toHaveBeenCalledWith(1, undefined));
+        await waitFor(() => expect(onChange).toHaveBeenCalledWith(1, undefined, []));
     });
 
     it('stays open when onChange rejects', async () => {

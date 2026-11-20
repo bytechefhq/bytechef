@@ -84,7 +84,7 @@ describe('MoveConnectedUsersDialog', () => {
 
         await userEvent.click(screen.getByRole('button', {name: 'Move'}));
 
-        expect(onMove).toHaveBeenCalledWith('10', ['2']);
+        expect(onMove).toHaveBeenCalledWith('10', ['2'], []);
     });
 
     it('shows each impact as a note', () => {
@@ -299,7 +299,7 @@ describe('MoveConnectedUsersDialog', () => {
             expect(screen.getByText('1 moved, 1 needs attention')).toBeInTheDocument();
         });
 
-        expect(onMove).toHaveBeenCalledWith('10', ['1', '2']);
+        expect(onMove).toHaveBeenCalledWith('10', ['1', '2'], []);
         const [janeItem, bobItem] = getSkippedItems();
 
         expect(within(janeItem).getByText('Jane')).toBeInTheDocument();
@@ -347,5 +347,52 @@ describe('MoveConnectedUsersDialog', () => {
         renderDialog({mcpServerCount: 0});
 
         expect(screen.queryByText(/MCP server/)).not.toBeInTheDocument();
+    });
+
+    describe('new required inputs', () => {
+        const impact = [
+            {
+                affectedConnectedUserCount: 2,
+                label: 'Rate Ticket',
+                newRequiredConnections: [],
+                newRequiredInputs: ['contactPageUrl'],
+                workflowUuid: 'wf-rate',
+            },
+        ];
+
+        it('asks for each new required input and moves with the values', async () => {
+            const onMove = vi.fn().mockResolvedValue(defaultResult);
+
+            renderDialog({editableInputs: true, impact, onMove});
+
+            await chooseTarget('Beta · v2');
+
+            expect(screen.getByRole('region', {name: 'Rate Ticket'})).toHaveTextContent('affects 2 users');
+            expect(screen.getByRole('tab', {name: /Inputs\s*\(1\)/})).toHaveAttribute('data-state', 'active');
+            expect(screen.getByRole('button', {name: 'Move'})).toBeDisabled();
+
+            await userEvent.type(screen.getByLabelText(/contactPageUrl/), 'https://example.com/contact');
+
+            expect(screen.getByRole('button', {name: 'Move'})).toBeEnabled();
+
+            await userEvent.click(screen.getByRole('button', {name: 'Move'}));
+
+            expect(onMove).toHaveBeenCalledWith(
+                '10',
+                ['1', '2'],
+                [{inputs: {contactPageUrl: 'https://example.com/contact'}, workflowUuid: 'wf-rate'}]
+            );
+        });
+
+        it('keeps the impact as a note when inputs cannot be set here', async () => {
+            renderDialog({impact});
+
+            await chooseTarget('Beta · v2');
+
+            expect(screen.getByText('Rate Ticket: affects 2 users')).toBeInTheDocument();
+            expect(screen.getByText('New required inputs: contactPageUrl')).toBeInTheDocument();
+            expect(screen.queryByLabelText(/contactPageUrl/)).not.toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Move'})).toBeEnabled();
+        });
     });
 });
