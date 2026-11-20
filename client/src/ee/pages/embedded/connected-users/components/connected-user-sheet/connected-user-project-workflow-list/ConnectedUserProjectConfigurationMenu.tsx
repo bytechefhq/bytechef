@@ -9,6 +9,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AutomationProjectConfigurationMoveUsersDialog from '@/ee/pages/embedded/automations/components/automation-project-configuration-list/AutomationProjectConfigurationMoveUsersDialog';
 import ConnectedUserChangeVersionDialog, {
     NO_OTHER_VERSION_REASON,
+    VERSIONS_LOAD_FAILED_REASON,
     getOtherVersions,
 } from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/change-version-dialog/ConnectedUserChangeVersionDialog';
 import {MoveConnectedUsersResultI} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersDialog';
@@ -52,7 +53,7 @@ const ConnectedUserProjectConfigurationMenu = ({
 
     const {data, isError: configurationsError} = useAutomationProjectConfigurationsQuery({projectId});
 
-    const {data: versionsData} = useAutomationProjectVersionsQuery({id: projectId});
+    const {data: versionsData, isError: versionsError} = useAutomationProjectVersionsQuery({id: projectId});
 
     const targetConfigurations = useMemo(() => {
         const configurations = data?.automationProjectConfigurations ?? [];
@@ -98,6 +99,10 @@ const ConnectedUserProjectConfigurationMenu = ({
     const getChangeVersionDisabledReason = () => {
         if (configurationsError) {
             return CONFIGURATIONS_LOAD_FAILED_REASON;
+        }
+
+        if (versionsError) {
+            return VERSIONS_LOAD_FAILED_REASON;
         }
 
         return versionsData &&

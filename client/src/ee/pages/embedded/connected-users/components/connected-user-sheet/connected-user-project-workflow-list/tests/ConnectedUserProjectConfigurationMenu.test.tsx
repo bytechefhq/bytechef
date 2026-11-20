@@ -13,6 +13,7 @@ const hoisted = vi.hoisted(() => ({
     dialogProps: [] as Array<Record<string, unknown>>,
     moveImpactQueryMock: vi.fn(),
     versions: [] as Array<{status: string; version: number}> | undefined,
+    versionsError: false,
 }));
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
@@ -44,6 +45,7 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     }),
     useAutomationProjectVersionsQuery: () => ({
         data: hoisted.versions ? {automationProjectVersions: hoisted.versions} : undefined,
+        isError: hoisted.versionsError,
     }),
     useChangeAutomationProjectConfigurationConnectedUserVersionMutation: () => ({
         isPending: false,
@@ -112,6 +114,7 @@ describe('ConnectedUserProjectConfigurationMenu', () => {
         hoisted.configurations = [];
         hoisted.configurationsError = false;
         hoisted.dialogProps = [];
+        hoisted.versionsError = false;
         hoisted.versions = [
             {status: 'PUBLISHED', version: 1},
             {status: 'PUBLISHED', version: 3},
@@ -286,6 +289,34 @@ describe('ConnectedUserProjectConfigurationMenu', () => {
             expect(
                 (await screen.findAllByText("Couldn't load the configurations. Try again later.")).length
             ).toBeGreaterThan(0)
+        );
+    });
+
+    it('disables Change version with a reason when the versions fail to load', async () => {
+        hoisted.configurations = [createConfiguration('51'), createConfiguration('52')];
+        hoisted.versions = undefined;
+        hoisted.versionsError = true;
+
+        const user = userEvent.setup();
+
+        renderMenu();
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+
+        const changeVersionItem = await screen.findByRole('menuitem', {name: 'Change version'});
+
+        expect(changeVersionItem).toHaveAttribute('aria-disabled', 'true');
+        expect(screen.getByRole('menuitem', {name: 'Change configuration'})).not.toHaveAttribute(
+            'aria-disabled',
+            'true'
+        );
+
+        await user.hover(changeVersionItem.parentElement as HTMLElement);
+
+        await waitFor(async () =>
+            expect((await screen.findAllByText("Couldn't load the versions. Try again later.")).length).toBeGreaterThan(
+                0
+            )
         );
     });
 

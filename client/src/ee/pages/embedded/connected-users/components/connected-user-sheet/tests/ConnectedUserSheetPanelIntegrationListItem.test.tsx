@@ -13,6 +13,7 @@ const hoisted = vi.hoisted(() => ({
     integrationConfigurationsError: false,
     integrationInstance: undefined as unknown,
     integrationVersions: undefined as unknown[] | undefined,
+    integrationVersionsError: false,
     moveImpactQueryMock: vi.fn(),
     moveMutateAsyncMock: vi.fn(),
     provisionableIntegrations: undefined as unknown[] | undefined,
@@ -51,7 +52,10 @@ vi.mock('@/ee/shared/queries/embedded/provisionableIntegrations.queries', () => 
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrationVersions.queries', () => ({
-    useGetIntegrationVersionsQuery: () => ({data: hoisted.integrationVersions}),
+    useGetIntegrationVersionsQuery: () => ({
+        data: hoisted.integrationVersions,
+        isError: hoisted.integrationVersionsError,
+    }),
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrationWorkflows.queries', () => ({
@@ -132,6 +136,7 @@ describe('ConnectedUserSheetPanelIntegrationListItem', () => {
         hoisted.integrationConfigurationsError = false;
         hoisted.integrationInstance = undefined;
         hoisted.integrationVersions = undefined;
+        hoisted.integrationVersionsError = false;
         hoisted.provisionableIntegrations = undefined;
         hoisted.workflows = [];
     });
@@ -275,6 +280,25 @@ describe('ConnectedUserSheetPanelIntegrationListItem', () => {
             expect(
                 (await screen.findAllByText("Couldn't load the configurations. Try again later.")).length
             ).toBeGreaterThan(0)
+        );
+    });
+
+    it('disables Change version with a tooltip when the versions fail to load', async () => {
+        hoisted.integrationVersions = undefined;
+        hoisted.integrationVersionsError = true;
+
+        await openMenu();
+
+        const item = screen.getByRole('menuitem', {name: 'Change version'});
+
+        expect(item).toHaveAttribute('aria-disabled', 'true');
+
+        await userEvent.hover(item.parentElement as HTMLElement);
+
+        await waitFor(async () =>
+            expect((await screen.findAllByText("Couldn't load the versions. Try again later.")).length).toBeGreaterThan(
+                0
+            )
         );
     });
 

@@ -10,6 +10,7 @@ import ConnectedUserSheetPanelIntegrationWorkflowList from '@/ee/pages/embedded/
 import ConnectedUserVersionBadge from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserVersionBadge';
 import ConnectedUserChangeVersionDialog, {
     NO_OTHER_VERSION_REASON,
+    VERSIONS_LOAD_FAILED_REASON,
     getOtherVersions,
 } from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/change-version-dialog/ConnectedUserChangeVersionDialog';
 import useNewerIntegrationVersionAvailable from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/hooks/useNewerIntegrationVersionAvailable';
@@ -76,7 +77,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
         integrationInstance?.integrationInstanceConfiguration?.integrationVersion
     );
 
-    const {data: integrationVersions} = useGetIntegrationVersionsQuery(
+    const {data: integrationVersions, isError: integrationVersionsError} = useGetIntegrationVersionsQuery(
         connectedUserIntegrationInstance.integrationId ?? 0,
         connectedUserIntegrationInstance.integrationId != null
     );
@@ -135,6 +136,10 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
             return CONFIGURATIONS_LOAD_FAILED_REASON;
         }
 
+        if (integrationVersionsError) {
+            return VERSIONS_LOAD_FAILED_REASON;
+        }
+
         if (!integrationVersions || currentIntegrationVersion == null) {
             return undefined;
         }
@@ -142,7 +147,13 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
         return getOtherVersions(publishedVersions, currentIntegrationVersion).length === 0
             ? NO_OTHER_VERSION_REASON
             : undefined;
-    }, [currentIntegrationVersion, integrationConfigurationsError, integrationVersions, publishedVersions]);
+    }, [
+        currentIntegrationVersion,
+        integrationConfigurationsError,
+        integrationVersions,
+        integrationVersionsError,
+        publishedVersions,
+    ]);
 
     const changeVersionConfigurations = useMemo(
         () =>
