@@ -62,6 +62,13 @@ public interface AutomationProjectConfigurationFacade {
 
     AutomationProjectConfigurationDeleteImpactDTO getDeleteImpact(long id);
 
+    AutomationProjectConfigurationWorkflowProvidableValuesDTO getProjectWorkflowProvidableValues(
+        long projectId, long environmentId, int projectVersion, String workflowUuid);
+
+    List<AutomationProjectConfigurationWorkflowProvidableValuesDTO.InputOption> getProjectWorkflowInputOptions(
+        long projectId, long environmentId, int projectVersion, String workflowUuid, String inputName,
+        String propertyName, long connectionId, Map<String, ?> lookupDependsOnValues, @Nullable String searchText);
+
     ConfigurationMoveImpactDTO getMoveImpact(
         long sourceId, long targetId, List<Long> connectedUserIds);
 

@@ -112,6 +112,8 @@ extend type Query {
     automationProjectConfigurationWorkflowProvidableValues(id: ID!, workflowUuid: ID!, projectVersion: Int): AutomationProjectConfigurationWorkflowProvidableValues!
     automationProjectConfigurationWorkflowInputOptions(id: ID!, workflowUuid: ID!, projectVersion: Int, inputName: String!, propertyName: String!, connectionId: ID!, lookupDependsOnValues: Map, searchText: String): [AutomationProjectConfigurationInputOption!]!
     automationProjectConfigurationVersionImpact(id: ID!, projectVersion: Int!): AutomationProjectConfigurationVersionImpact!
+    automationProjectWorkflowProvidableValues(projectId: ID!, environmentId: ID!, projectVersion: Int!, workflowUuid: ID!): AutomationProjectConfigurationWorkflowProvidableValues!
+    automationProjectWorkflowInputOptions(projectId: ID!, environmentId: ID!, projectVersion: Int!, workflowUuid: ID!, inputName: String!, propertyName: String!, connectionId: ID!, lookupDependsOnValues: Map, searchText: String): [AutomationProjectConfigurationInputOption!]!
     automationProjectConfigurationDeleteImpact(id: ID!): AutomationProjectConfigurationDeleteImpact!
     automationProjectConfigurationConnectedUsers(id: ID!): [AutomationProjectConfigurationConnectedUser!]!
     automationProjectConfigurationMoveImpact(sourceId: ID!, targetId: ID!, connectedUserIds: [ID!]!): AutomationProjectConfigurationMoveImpact!
