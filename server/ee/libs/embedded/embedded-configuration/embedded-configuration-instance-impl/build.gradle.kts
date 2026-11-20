@@ -21,4 +21,5 @@ dependencies {
     testImplementation(project(":server:libs:test:test-int-support"))
 
     testImplementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-service"))
+    testImplementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-service"))
 }
