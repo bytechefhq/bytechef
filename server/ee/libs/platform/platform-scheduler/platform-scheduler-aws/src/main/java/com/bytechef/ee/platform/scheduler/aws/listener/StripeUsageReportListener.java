@@ -11,7 +11,7 @@ import static com.bytechef.ee.platform.scheduler.aws.constant.AwsBillingScheduli
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsBillingSchedulingConstants.STRIPE_USAGE_REPORTING_LISTENER_ID;
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SCHEDULER_SQS_LISTENER_CONTAINER_FACTORY;
 
-import com.bytechef.platform.billing.service.BillingUsageService;
+import com.bytechef.platform.billing.facade.BillingUsageFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import java.time.Instant;
@@ -26,11 +26,11 @@ import org.slf4j.LoggerFactory;
 public class StripeUsageReportListener {
     private static final Logger log = LoggerFactory.getLogger(StripeUsageReportListener.class);
 
-    private final BillingUsageService billingUsageService;
+    private final BillingUsageFacade billingUsageFacade;
 
     @SuppressFBWarnings("EI")
-    public StripeUsageReportListener(BillingUsageService billingUsageService) {
-        this.billingUsageService = billingUsageService;
+    public StripeUsageReportListener(BillingUsageFacade billingUsageFacade) {
+        this.billingUsageFacade = billingUsageFacade;
     }
 
     @SqsListener(
@@ -40,6 +40,6 @@ public class StripeUsageReportListener {
     public void onSchedule(String message) {
         log.info("Stripe usage reporting triggered");
 
-        billingUsageService.reportUsage(Instant.now());
+        billingUsageFacade.reportUsage(Instant.now());
     }
 }

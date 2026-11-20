@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.billing.service;
+package com.bytechef.platform.billing.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -49,7 +49,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @ActiveProfiles("testint")
 @Import(PostgreSQLContainerConfiguration.class)
 @SpringBootTest(classes = BillingIntTestConfiguration.class)
-class BillingUsageServiceIntTest {
+class BillingUsageFacadeIntTest {
 
     private static final int STATUS_STARTED = 1;
     private static final int STATUS_COMPLETED = 2;
@@ -60,7 +60,7 @@ class BillingUsageServiceIntTest {
     private BillingSubscriptionRepository billingSubscriptionRepository;
 
     @Autowired
-    private BillingUsageService billingUsageService;
+    private BillingUsageFacade billingUsageFacade;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -85,7 +85,7 @@ class BillingUsageServiceIntTest {
     void testReportUsageSkipsWhenNoSubscription() {
         seedJobs(3, STATUS_COMPLETED, Instant.now(), true);
 
-        billingUsageService.reportUsage(Instant.now());
+        billingUsageFacade.reportUsage(Instant.now());
 
         verify(stripeClient, never()).reportMeterEvent(anyString(), anyInt(), anyString());
 
@@ -99,7 +99,7 @@ class BillingUsageServiceIntTest {
 
         seedJobs(7, STATUS_COMPLETED, Instant.parse("2026-06-01T00:30:00Z"), true);
 
-        billingUsageService.reportUsage(Instant.parse("2026-06-01T01:00:00Z"));
+        billingUsageFacade.reportUsage(Instant.parse("2026-06-01T01:00:00Z"));
 
         verify(stripeClient, never()).reportMeterEvent(anyString(), anyInt(), anyString());
 
@@ -119,7 +119,7 @@ class BillingUsageServiceIntTest {
 
         Instant scheduledFireTime = Instant.parse("2026-06-01T01:00:00Z");
 
-        billingUsageService.reportUsage(scheduledFireTime);
+        billingUsageFacade.reportUsage(scheduledFireTime);
 
         verify(stripeClient, never()).reportMeterEvent(anyString(), anyInt(), anyString());
 
@@ -140,7 +140,7 @@ class BillingUsageServiceIntTest {
 
         Instant scheduledFireTime = Instant.parse("2026-06-01T01:00:00Z");
 
-        billingUsageService.reportUsage(scheduledFireTime);
+        billingUsageFacade.reportUsage(scheduledFireTime);
 
         verify(stripeClient).reportMeterEvent("cus_123", 42, "sub_abc_" + scheduledFireTime.getEpochSecond());
 
@@ -158,7 +158,7 @@ class BillingUsageServiceIntTest {
 
         Instant scheduledFireTime = Instant.parse("2026-06-01T01:00:00Z");
 
-        billingUsageService.reportUsage(scheduledFireTime);
+        billingUsageFacade.reportUsage(scheduledFireTime);
 
         verify(stripeClient).reportMeterEvent("cus_123", 10, "sub_abc_" + scheduledFireTime.getEpochSecond());
     }
@@ -175,7 +175,7 @@ class BillingUsageServiceIntTest {
 
         Instant scheduledFireTime = Instant.parse("2026-06-01T03:00:00Z");
 
-        billingUsageService.reportUsage(scheduledFireTime);
+        billingUsageFacade.reportUsage(scheduledFireTime);
 
         verify(stripeClient).reportMeterEvent("cus_123", 5, "sub_abc_" + scheduledFireTime.getEpochSecond());
     }

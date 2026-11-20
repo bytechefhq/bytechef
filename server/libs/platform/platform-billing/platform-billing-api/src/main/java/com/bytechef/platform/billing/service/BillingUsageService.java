@@ -23,7 +23,5 @@ import java.time.Instant;
  */
 public interface BillingUsageService {
 
-    void reportUsage(Instant scheduledFireTime);
-
     int countJobExecutionsSince(Instant from, Instant to);
 }
