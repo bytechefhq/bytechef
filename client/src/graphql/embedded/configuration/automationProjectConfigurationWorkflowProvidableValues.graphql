@@ -18,6 +18,7 @@ query automationProjectConfigurationWorkflowProvidableValues($id: ID!, $workflow
             label
             type
             required
+            internalOnly
             componentName
             componentVersion
             groupName
