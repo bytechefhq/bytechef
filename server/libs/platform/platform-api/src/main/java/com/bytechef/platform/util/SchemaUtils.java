@@ -42,10 +42,12 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -279,7 +281,9 @@ public class SchemaUtils {
                 JsonNode propertiesJsonNode = jsonNode.get("properties");
 
                 if (propertiesJsonNode != null) {
-                    walkThroughObjectProperty(propertiesJsonNode, objectProperty, factory);
+                    walkThroughObjectProperty(
+                        propertiesJsonNode, getRequiredPropertyNames(jsonNode.get("required")), objectProperty,
+                        factory);
                 }
 
                 yield objectProperty;
@@ -329,8 +333,25 @@ public class SchemaUtils {
         factory.addChildren(property, children);
     }
 
+    private static Set<String> getRequiredPropertyNames(@Nullable JsonNode requiredJsonNode) {
+        Set<String> requiredPropertyNames = new HashSet<>();
+
+        if (requiredJsonNode == null || !requiredJsonNode.isArray()) {
+            return requiredPropertyNames;
+        }
+
+        for (JsonNode requiredPropertyNameJsonNode : requiredJsonNode) {
+            if (requiredPropertyNameJsonNode.isString()) {
+                requiredPropertyNames.add(requiredPropertyNameJsonNode.stringValue());
+            }
+        }
+
+        return requiredPropertyNames;
+    }
+
     private static void walkThroughObjectProperty(
-        JsonNode jsonNode, BaseValueProperty<?> property, JsonSchemaPropertyFactory factory) {
+        JsonNode jsonNode, Set<String> requiredPropertyNames, BaseValueProperty<?> property,
+        JsonSchemaPropertyFactory factory) {
 
         if (jsonNode == null) {
             return;
@@ -340,9 +361,15 @@ public class SchemaUtils {
             String fieldName = field.getKey();
             JsonNode fieldJsonNode = field.getValue();
 
+            BaseValueProperty<?> childProperty = getJsonSchemaProperty(fieldName, fieldJsonNode, factory);
+
+            if (requiredPropertyNames.contains(fieldName)) {
+                factory.setRequired(childProperty, true);
+            }
+
             List<BaseValueProperty<?>> children = factory.getChildren(property);
 
-            children.add(getJsonSchemaProperty(fieldName, fieldJsonNode, factory));
+            children.add(childProperty);
 
             factory.addChildren(property, children);
         }
@@ -359,6 +386,10 @@ public class SchemaUtils {
 
         @SuppressWarnings("PMD.UnusedFormalParameter")
         default void setDefaultValue(BaseValueProperty<?> property, Object defaultValue) {
+        }
+
+        @SuppressWarnings("PMD.UnusedFormalParameter")
+        default void setRequired(BaseValueProperty<?> property, boolean required) {
         }
     }
 
