@@ -54,6 +54,8 @@ import software.amazon.awssdk.services.batch.model.JobSummary;
 @ExtendWith(ObjectMapperSetupExtension.class)
 class AwsBatchTaskRunnerBackendTest {
 
+    private static final String OUTPUT_OBJECT_PATH = "bytechef-staging/bytechef/100/public-100-7-abcd1234/output.tar";
+
     private static final RemoteJobKey KEY = new RemoteJobKey("public-100-7", 100L);
     private static final Map<String, String> KEY_TAGS = Map.of(
         "bytechef.io/key", "public-100-7", "bytechef.io/prefix", "bytechef/100/public-100-7-abcd1234/");
@@ -362,6 +364,7 @@ class AwsBatchTaskRunnerBackendTest {
     void testFindReturnsACompletedJobWithTheKeySoItsOutputIsCollectedInsteadOfRunningTheScriptAgain() {
         operations.listedJobs = List.of(summary("done", JobStatus.SUCCEEDED, 3L));
         operations.describedById.put("done", jobWithId("done", JobStatus.SUCCEEDED, 3L, KEY_TAGS));
+        operations.objects.put(OUTPUT_OBJECT_PATH, new byte[0]);
 
         Optional<RemoteJobHandle> handle = backend.find(KEY, context(base(), connection()));
 
@@ -369,6 +372,14 @@ class AwsBatchTaskRunnerBackendTest {
             .contains("done");
         assertThat(handle.orElseThrow()
             .attributes()).containsEntry("prefix", "bytechef/100/public-100-7-abcd1234/");
+    }
+
+    @Test
+    void testFindSubmitsAgainWhenACompletedJobOutputWasDeleted() {
+        operations.listedJobs = List.of(summary("cleaned", JobStatus.SUCCEEDED, 3L));
+        operations.describedById.put("cleaned", jobWithId("cleaned", JobStatus.SUCCEEDED, 3L, KEY_TAGS));
+
+        assertThat(backend.find(KEY, context(base(), connection()))).isEmpty();
     }
 
     @Test

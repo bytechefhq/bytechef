@@ -39,6 +39,7 @@ import software.amazon.awssdk.services.s3.S3ClientBuilder;
 import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.utils.SdkAutoCloseable;
@@ -133,6 +134,24 @@ final class SdkAwsBatchOperations implements AwsBatchOperations {
                 .key(key));
         } catch (NoSuchKeyException exception) {
             return null;
+        }
+    }
+
+    @Override
+    public boolean objectExists(String bucket, String key) {
+        try {
+            s3Client.headObject(builder -> builder.bucket(bucket)
+                .key(key));
+
+            return true;
+        } catch (NoSuchKeyException exception) {
+            return false;
+        } catch (S3Exception exception) {
+            if (exception.statusCode() == 404) {
+                return false;
+            }
+
+            throw exception;
         }
     }
 

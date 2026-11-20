@@ -166,7 +166,7 @@ public class AwsBatchTaskRunnerBackend implements RemoteTaskRunnerBackend {
                     return Optional.of(handle(jobDetail, bucket));
                 }
 
-                if (completed == null) {
+                if (completed == null && hasOutput(jobDetail, bucket, operations)) {
                     completed = jobDetail;
                 }
             }
@@ -511,6 +511,18 @@ public class AwsBatchTaskRunnerBackend implements RemoteTaskRunnerBackend {
         }
 
         return clientFailure(phase, exception);
+    }
+
+    private static boolean hasOutput(JobDetail jobDetail, String bucket, AwsBatchOperations operations) {
+        Map<String, String> tags = jobDetail.tags();
+
+        String prefix = tags.get(AwsBatchJobNames.TAG_PREFIX);
+
+        if (prefix == null) {
+            return false;
+        }
+
+        return operations.objectExists(bucket, prefix + AwsBatchJobNames.OUTPUT_OBJECT);
     }
 
     private static RemoteJobHandle handle(JobDetail jobDetail, String bucket) {

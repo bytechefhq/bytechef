@@ -111,6 +111,11 @@ final class FakeAwsBatchOperations implements AwsBatchOperations {
     }
 
     @Override
+    public boolean objectExists(String bucket, String key) {
+        return objects.containsKey(bucket + "/" + key);
+    }
+
+    @Override
     public void deletePrefix(String bucket, String prefix) {
         failIfInterruptedOrBroken();
 
