@@ -68,7 +68,7 @@ const AiProviderForm = ({
 
     return (
         <Form {...form}>
-            <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
+            <form className="max-w-xl space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
                 {!requiresApiKey ? (
                     <>
                         <FormField
