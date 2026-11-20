@@ -22,7 +22,6 @@ import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowDraftServiceImpl;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
@@ -54,7 +53,7 @@ class ProjectCodeWorkflowFacadeUploadDisabledTest {
             applicationProperties(false), mock(CacheManager.class), projectService, projectWorkflowService,
             mock(ProjectFacade.class), projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
             mock(CodeWorkflowFileStorage.class),
-            new ProjectCodeWorkflowDraftServiceImpl(
+            new ProjectCodeWorkflowDraftFacadeImpl(
                 codeWorkflowContainerFacade, mock(CodeWorkflowContainerService.class), projectCodeWorkflowService,
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
@@ -85,7 +84,7 @@ class ProjectCodeWorkflowFacadeUploadDisabledTest {
             applicationProperties(false), mock(CacheManager.class), projectService, projectWorkflowService,
             mock(ProjectFacade.class), projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
             mock(CodeWorkflowFileStorage.class),
-            new ProjectCodeWorkflowDraftServiceImpl(
+            new ProjectCodeWorkflowDraftFacadeImpl(
                 codeWorkflowContainerFacade, mock(CodeWorkflowContainerService.class), projectCodeWorkflowService,
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
@@ -107,7 +106,7 @@ class ProjectCodeWorkflowFacadeUploadDisabledTest {
             applicationProperties(true), mock(CacheManager.class), projectService, projectWorkflowService,
             mock(ProjectFacade.class), projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
             mock(CodeWorkflowFileStorage.class),
-            new ProjectCodeWorkflowDraftServiceImpl(
+            new ProjectCodeWorkflowDraftFacadeImpl(
                 codeWorkflowContainerFacade, mock(CodeWorkflowContainerService.class), projectCodeWorkflowService,
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),

@@ -29,7 +29,6 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
 import com.bytechef.ee.automation.configuration.exception.CodeWorkflowErrorType;
-import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowDraftService;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
@@ -93,7 +92,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
     private final CodeWorkflowFileStorage codeWorkflowFileStorage;
     private final ComponentConnectionFacade componentConnectionFacade;
     private final TagService tagService;
-    private final ProjectCodeWorkflowDraftService projectCodeWorkflowDraftService;
+    private final ProjectCodeWorkflowDraftFacade projectCodeWorkflowDraftFacade;
     private final ProjectDeploymentFacade projectDeploymentFacade;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
@@ -107,7 +106,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         ProjectCodeWorkflowService projectCodeWorkflowService,
         CodeWorkflowContainerService codeWorkflowContainerService,
         CodeWorkflowFileStorage codeWorkflowFileStorage,
-        ProjectCodeWorkflowDraftService projectCodeWorkflowDraftService, TagService tagService,
+        ProjectCodeWorkflowDraftFacade projectCodeWorkflowDraftFacade, TagService tagService,
         ProjectDeploymentFacade projectDeploymentFacade, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService,
@@ -122,7 +121,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         this.codeWorkflowContainerService = codeWorkflowContainerService;
         this.codeWorkflowFileStorage = codeWorkflowFileStorage;
         this.componentConnectionFacade = componentConnectionFacade;
-        this.projectCodeWorkflowDraftService = projectCodeWorkflowDraftService;
+        this.projectCodeWorkflowDraftFacade = projectCodeWorkflowDraftFacade;
         this.tagService = tagService;
         this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectDeploymentService = projectDeploymentService;
@@ -184,7 +183,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
 
         Project project = createProject(workspaceId, projectDefinition, description, categoryId, tags);
 
-        projectCodeWorkflowDraftService.saveDraft(project, projectDefinition, bytes, language);
+        projectCodeWorkflowDraftFacade.saveDraft(project, projectDefinition, bytes, language);
 
         return project;
     }
@@ -274,7 +273,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
             project = renameProject(project, projectDefinition.getName());
         }
 
-        projectCodeWorkflowDraftService.saveDraft(project, projectDefinition, bytes, language);
+        projectCodeWorkflowDraftFacade.saveDraft(project, projectDefinition, bytes, language);
     }
 
     @Override
@@ -335,7 +334,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         if (language == Language.JAVA) {
             byte[] bytes = readCodeWorkflowFileBytes(codeWorkflowContainer);
 
-            projectCodeWorkflowDraftService.saveDraft(
+            projectCodeWorkflowDraftFacade.saveDraft(
                 project, readProjectDefinition(language, bytes), bytes, language);
 
             return;
@@ -370,7 +369,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
             }
         }
 
-        projectCodeWorkflowDraftService.saveDraft(project, projectDefinition, bytes, language);
+        projectCodeWorkflowDraftFacade.saveDraft(project, projectDefinition, bytes, language);
     }
 
     private byte[] readCodeWorkflowFileBytes(CodeWorkflowContainer codeWorkflowContainer) {
@@ -463,7 +462,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
     private int deployInto(Project project, ProjectDefinition projectDefinition, byte[] bytes, Language language) {
         int projectVersion = project.getLastProjectVersion();
 
-        projectCodeWorkflowDraftService.saveDraft(project, projectDefinition, bytes, language);
+        projectCodeWorkflowDraftFacade.saveDraft(project, projectDefinition, bytes, language);
 
         projectFacade.publishProject(Objects.requireNonNull(project.getId()), null, false);
 

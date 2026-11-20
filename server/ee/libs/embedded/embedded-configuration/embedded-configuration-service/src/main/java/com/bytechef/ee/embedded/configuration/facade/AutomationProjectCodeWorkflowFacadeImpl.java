@@ -14,7 +14,7 @@ import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.automation.project.definition.ProjectDefinition;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
-import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowDraftService;
+import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowDraftFacade;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCodeWorkflowSourceDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCodeWorkflowStateDTO;
@@ -71,7 +71,7 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
     private final CodeWorkflowContainerService codeWorkflowContainerService;
     private final CodeWorkflowFileStorage codeWorkflowFileStorage;
     private final boolean javaEnabled;
-    private final ProjectCodeWorkflowDraftService projectCodeWorkflowDraftService;
+    private final ProjectCodeWorkflowDraftFacade projectCodeWorkflowDraftFacade;
     private final ProjectCodeWorkflowService projectCodeWorkflowService;
     private final ProjectService projectService;
 
@@ -82,7 +82,7 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
         AutomationProjectFacade automationProjectFacade, CacheManager cacheManager,
         CodeWorkflowContainerService codeWorkflowContainerService,
         CodeWorkflowFileStorage codeWorkflowFileStorage,
-        ProjectCodeWorkflowDraftService projectCodeWorkflowDraftService,
+        ProjectCodeWorkflowDraftFacade projectCodeWorkflowDraftFacade,
         ProjectCodeWorkflowService projectCodeWorkflowService, ProjectService projectService) {
 
         this.automationProjectConfigurationFacade = automationProjectConfigurationFacade;
@@ -93,7 +93,7 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
         this.javaEnabled = applicationProperties.getWorkflow()
             .getCodeWorkflow()
             .isJavaEnabled();
-        this.projectCodeWorkflowDraftService = projectCodeWorkflowDraftService;
+        this.projectCodeWorkflowDraftFacade = projectCodeWorkflowDraftFacade;
         this.projectCodeWorkflowService = projectCodeWorkflowService;
         this.projectService = projectService;
     }
@@ -123,7 +123,7 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
 
         Project project = projectService.getProject(projectId);
 
-        projectCodeWorkflowDraftService.saveDraft(project, projectDefinition, bytes, language);
+        projectCodeWorkflowDraftFacade.saveDraft(project, projectDefinition, bytes, language);
 
         automationProjectFacade.publishProject(projectId);
 
@@ -168,7 +168,7 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
                 .orElse(null) : description,
             category, tags == null ? List.of() : tags, permissionExpression);
 
-        projectCodeWorkflowDraftService.saveDraft(
+        projectCodeWorkflowDraftFacade.saveDraft(
             projectService.getProject(projectId), projectDefinition, bytes, language);
 
         return projectId;
@@ -228,7 +228,7 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
             project = renameProject(project, projectDefinition.getName());
         }
 
-        projectCodeWorkflowDraftService.saveDraft(project, projectDefinition, bytes, language);
+        projectCodeWorkflowDraftFacade.saveDraft(project, projectDefinition, bytes, language);
     }
 
     private void releaseToEnvironment(long projectId, Environment environment) {
