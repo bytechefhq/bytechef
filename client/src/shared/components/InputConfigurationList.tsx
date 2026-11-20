@@ -695,7 +695,7 @@ const InputConfigurationList = ({
         }
 
         if (!onOpenInputs) {
-            return <p className="p-4 text-center text-sm text-content-neutral-secondary">No Inputs yet</p>;
+            return <p className="text-sm">No Inputs yet</p>;
         }
 
         return (
