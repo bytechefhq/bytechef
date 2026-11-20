@@ -66,7 +66,7 @@ describe('McpComponentToolForm', () => {
         hoisted.loadOptions.mockResolvedValue(null);
     });
 
-    it('renders let ai fill all below tool description', async () => {
+    it('renders let ai fill required below tool description', async () => {
         render(<Harness />);
 
         const propertiesBlocks = screen.getAllByTestId('properties');
@@ -74,7 +74,7 @@ describe('McpComponentToolForm', () => {
         expect(propertiesBlocks[0]).toHaveTextContent('toolName,toolDescription');
         expect(propertiesBlocks[1]).toHaveTextContent('uri,subject');
 
-        const button = await screen.findByRole('button', {name: 'Let AI fill all'});
+        const button = await screen.findByRole('button', {name: 'Let AI fill required'});
 
         expect(propertiesBlocks[0].compareDocumentPosition(button) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
         expect(propertiesBlocks[1].compareDocumentPosition(button) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
@@ -83,7 +83,7 @@ describe('McpComponentToolForm', () => {
     it('fills only empty eligible fields on click', async () => {
         render(<Harness defaultValues={{uri: 'https://example.com'}} />);
 
-        const button = await screen.findByRole('button', {name: 'Let AI fill all'});
+        const button = await screen.findByRole('button', {name: 'Let AI fill required'});
 
         await waitFor(() => expect(button).toBeEnabled());
 
@@ -99,7 +99,7 @@ describe('McpComponentToolForm', () => {
     it('does not overwrite typed values', async () => {
         render(<Harness />);
 
-        const button = await screen.findByRole('button', {name: 'Let AI fill all'});
+        const button = await screen.findByRole('button', {name: 'Let AI fill required'});
 
         await waitFor(() => expect(button).toBeEnabled());
 
@@ -112,10 +112,10 @@ describe('McpComponentToolForm', () => {
         expect(formRef!.getValues('subject')).toBe('typed');
     });
 
-    it('disables let ai fill all when nothing is eligible', async () => {
+    it('disables let ai fill required when nothing is eligible', async () => {
         render(<Harness defaultValues={{subject: 'a', uri: 'b'}} />);
 
-        const button = await screen.findByRole('button', {name: 'Let AI fill all'});
+        const button = await screen.findByRole('button', {name: 'Let AI fill required'});
 
         await waitFor(() => expect(button).toBeDisabled());
     });
@@ -140,7 +140,7 @@ describe('McpComponentToolForm', () => {
             />
         );
 
-        const button = await screen.findByRole('button', {name: 'Let AI fill all'});
+        const button = await screen.findByRole('button', {name: 'Let AI fill required'});
 
         await waitFor(() => expect(button).toBeEnabled());
 
@@ -165,7 +165,7 @@ describe('McpComponentToolForm', () => {
             />
         );
 
-        const button = await screen.findByRole('button', {name: 'Let AI fill all'});
+        const button = await screen.findByRole('button', {name: 'Let AI fill required'});
 
         await waitFor(() => expect(button).toBeEnabled());
 

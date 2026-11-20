@@ -34,14 +34,14 @@ describe('McpWorkflowToolForm', () => {
         formRef = undefined;
     });
 
-    it('renders let ai fill all below tool description', async () => {
+    it('renders let ai fill required below tool description', async () => {
         render(<Harness />);
 
         const propertiesBlocks = screen.getAllByTestId('properties');
 
         expect(propertiesBlocks[0]).toHaveTextContent('toolName,toolDescription');
 
-        const button = await screen.findByRole('button', {name: 'Let AI fill all'});
+        const button = await screen.findByRole('button', {name: 'Let AI fill required'});
 
         expect(propertiesBlocks[0].compareDocumentPosition(button) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     });
@@ -49,7 +49,7 @@ describe('McpWorkflowToolForm', () => {
     it('fills only empty eligible fields on click and leaves dynamic options empty', async () => {
         render(<Harness />);
 
-        const button = await screen.findByRole('button', {name: 'Let AI fill all'});
+        const button = await screen.findByRole('button', {name: 'Let AI fill required'});
 
         await waitFor(() => expect(button).toBeEnabled());
 
@@ -63,7 +63,7 @@ describe('McpWorkflowToolForm', () => {
     it('does not overwrite typed values', async () => {
         render(<Harness defaultValues={{channel: 'general'}} />);
 
-        const button = await screen.findByRole('button', {name: 'Let AI fill all'});
+        const button = await screen.findByRole('button', {name: 'Let AI fill required'});
 
         await waitFor(() => expect(button).toBeDisabled());
     });

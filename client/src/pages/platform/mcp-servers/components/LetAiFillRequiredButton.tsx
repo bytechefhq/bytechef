@@ -1,17 +1,17 @@
 import Button from '@/components/Button/Button';
 import {SparklesIcon} from 'lucide-react';
 
-interface LetAiFillAllButtonProps {
+interface LetAiFillRequiredButtonProps {
     disabled?: boolean;
     onClick: () => void;
 }
 
-const LetAiFillAllButton = ({disabled, onClick}: LetAiFillAllButtonProps) => (
+const LetAiFillRequiredButton = ({disabled, onClick}: LetAiFillRequiredButtonProps) => (
     <div className="flex justify-end">
         <Button
             disabled={disabled}
             icon={<SparklesIcon />}
-            label="Let AI fill all"
+            label="Let AI fill required"
             onClick={onClick}
             size="sm"
             type="button"
@@ -20,4 +20,4 @@ const LetAiFillAllButton = ({disabled, onClick}: LetAiFillAllButtonProps) => (
     </div>
 );
 
-export default LetAiFillAllButton;
+export default LetAiFillRequiredButton;
