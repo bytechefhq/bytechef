@@ -970,6 +970,55 @@ class IntegrationInstanceConfigurationFacadeIntTest {
     }
 
     @Test
+    void testEnableIntegrationVersionMovesAnEnabledWorkflowWhoseNewVersionNeedsAnAdminConnectionLeftDisabled() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration("workflow-a");
+
+        long integrationInstanceConfigurationId = createEnabledConfigurationWithAnEnabledWorkflowAddedToVersion2(
+            integration, "workflow-a", "workflow-a-v2");
+
+        stubWorkflowNeedingAnAdminConnection("workflow-a-v2");
+
+        integrationInstanceConfigurationFacade.enableIntegrationVersion(integration.getId(), 2, Environment.STAGING);
+
+        assertThat(getEnabledByWorkflowId(integrationInstanceConfigurationId))
+            .containsOnly(Map.entry("workflow-a-v2", false));
+    }
+
+    @Test
+    void testEnableIntegrationVersionMovesAnEnabledWorkflowWhoseNewVersionNeedsAnInternalOnlyInputLeftDisabled() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration("workflow-a");
+
+        long integrationInstanceConfigurationId = createEnabledConfigurationWithAnEnabledWorkflowAddedToVersion2(
+            integration, "workflow-a", "workflow-a-v2");
+
+        stubWorkflowNeedingAnInternalOnlyInput("workflow-a-v2");
+
+        integrationInstanceConfigurationFacade.enableIntegrationVersion(integration.getId(), 2, Environment.STAGING);
+
+        assertThat(getEnabledByWorkflowId(integrationInstanceConfigurationId))
+            .containsOnly(Map.entry("workflow-a-v2", false));
+    }
+
+    @Test
+    void testEnableIntegrationVersionMovesAnEnabledWorkflowKeepingItEnabledWhenTheNewVersionNeedsNoSetup() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration("workflow-a");
+
+        long integrationInstanceConfigurationId = createEnabledConfigurationWithAnEnabledWorkflowAddedToVersion2(
+            integration, "workflow-a", "workflow-a-v2");
+
+        integrationInstanceConfigurationFacade.enableIntegrationVersion(integration.getId(), 2, Environment.STAGING);
+
+        assertThat(getEnabledByWorkflowId(integrationInstanceConfigurationId))
+            .containsOnly(Map.entry("workflow-a-v2", true));
+    }
+
+    @Test
     void testEnableIntegrationVersionCreatesWithAnAuthorizationTheConnectedUserCompletes() {
         authenticate(admin());
 
@@ -3077,6 +3126,29 @@ class IntegrationInstanceConfigurationFacadeIntTest {
             integrationInstanceConfigurationWorkflow);
 
         return integrationInstanceConfigurationWorkflow.getId();
+    }
+
+    private long createEnabledConfigurationWithAnEnabledWorkflowAddedToVersion2(
+        Integration integration, String workflowId, String nextWorkflowId) {
+
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(
+            integration.getId(), Environment.STAGING, true);
+
+        long integrationInstanceConfigurationWorkflowId = createIntegrationInstanceConfigurationWorkflow(
+            integrationInstanceConfigurationId, workflowId);
+
+        integrationInstanceConfigurationWorkflowService.updateEnabled(integrationInstanceConfigurationWorkflowId, true);
+
+        IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(
+            workflowId);
+
+        integrationWorkflowRepository.save(
+            new IntegrationWorkflow(
+                integration.getId(), 2, nextWorkflowId, UUID.fromString(integrationWorkflow.getUuidAsString())));
+
+        integrationService.publishIntegration(integration.getId(), null);
+
+        return integrationInstanceConfigurationId;
     }
 
     private Map<String, Boolean> getEnabledByWorkflowId(long integrationInstanceConfigurationId) {
