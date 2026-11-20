@@ -15,8 +15,8 @@ vi.mock('@/pages/platform/workflow-editor/components/properties/Properties', () 
 const properties = [
     {controlType: 'TEXT', name: 'toolName', type: 'STRING'},
     {controlType: 'TEXT_AREA', name: 'toolDescription', type: 'STRING'},
-    {controlType: 'TEXT', name: 'channel', type: 'STRING'},
-    {controlType: 'SELECT', name: 'level', optionsDataSource: {}, type: 'STRING'},
+    {controlType: 'TEXT', name: 'channel', required: true, type: 'STRING'},
+    {controlType: 'SELECT', name: 'level', optionsDataSource: {}, required: true, type: 'STRING'},
 ] as unknown as Array<PropertyAllType>;
 
 let formRef: ReturnType<typeof useForm<Record<string, unknown>>> | undefined;

@@ -29,8 +29,8 @@ vi.mock('@/pages/platform/mcp-servers/hooks/useMcpToolOptionsLoader', () => ({
 const properties = [
     {controlType: 'TEXT', name: 'toolName', type: 'STRING'},
     {controlType: 'TEXT_AREA', name: 'toolDescription', type: 'STRING'},
-    {controlType: 'TEXT', name: 'uri', type: 'STRING'},
-    {controlType: 'TEXT', name: 'subject', type: 'STRING'},
+    {controlType: 'TEXT', name: 'uri', required: true, type: 'STRING'},
+    {controlType: 'TEXT', name: 'subject', required: true, type: 'STRING'},
 ] as Array<PropertyAllType>;
 
 let formRef: ReturnType<typeof useForm<Record<string, unknown>>> | undefined;
@@ -127,8 +127,14 @@ describe('McpComponentToolForm', () => {
             <Harness
                 toolProperties={
                     [
-                        {controlType: 'TEXT', displayCondition: "mode == 'a'", name: 'uri', type: 'STRING'},
-                        {controlType: 'TEXT', name: 'subject', type: 'STRING'},
+                        {
+                            controlType: 'TEXT',
+                            displayCondition: "mode == 'a'",
+                            name: 'uri',
+                            required: true,
+                            type: 'STRING',
+                        },
+                        {controlType: 'TEXT', name: 'subject', required: true, type: 'STRING'},
                     ] as Array<PropertyAllType>
                 }
             />
@@ -153,7 +159,7 @@ describe('McpComponentToolForm', () => {
                 toolProperties={
                     [
                         {controlType: 'TEXT', name: 'toolName', type: 'STRING'},
-                        {controlType: 'SELECT', name: 'channel', optionsDataSource: {}, type: 'STRING'},
+                        {controlType: 'SELECT', name: 'channel', optionsDataSource: {}, required: true, type: 'STRING'},
                     ] as Array<PropertyAllType>
                 }
             />
