@@ -91,7 +91,7 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
                 CustomComponentErrorType.LANGUAGE_NOT_SUPPORTED);
         }
 
-        if (customComponentService.fetchCustomComponent(name, 1)
+        if (customComponentService.fetchLatestCustomComponent(name)
             .isPresent()) {
             throw new ConfigurationException(
                 "A custom component named '" + name + "' already exists",
