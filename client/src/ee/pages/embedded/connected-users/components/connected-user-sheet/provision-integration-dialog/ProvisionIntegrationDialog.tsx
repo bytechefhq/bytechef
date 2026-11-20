@@ -262,6 +262,7 @@ const ProvisionIntegrationDialog = ({connectedUserId, onClose}: ProvisionIntegra
                                     return (
                                         workflow && (
                                             <ProvisionIntegrationDialogWorkflowItem
+                                                adminConnectionCount={configurationWorkflow.connections?.length}
                                                 control={control as unknown as Control<FieldValues>}
                                                 formState={formState as unknown as FormState<FieldValues>}
                                                 key={configurationWorkflow.workflowUuid}
