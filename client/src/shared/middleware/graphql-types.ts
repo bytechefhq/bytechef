@@ -887,6 +887,11 @@ export type ConfigurationMoveSkipped = {
   workflowLabels: Array<Scalars['String']['output']>;
 };
 
+export type ConfigurationMoveWorkflowInputs = {
+  inputs: Scalars['Map']['input'];
+  workflowUuid: Scalars['ID']['input'];
+};
+
 export type ConnectedUser = {
   __typename?: 'ConnectedUser';
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -2356,6 +2361,7 @@ export type MutationChangeAutomationProjectConfigurationConnectedUserVersionArgs
   projectVersion: Scalars['Int']['input'];
   sourceId: Scalars['ID']['input'];
   targetId?: InputMaybe<Scalars['ID']['input']>;
+  workflowInputs?: InputMaybe<Array<ConfigurationMoveWorkflowInputs>>;
 };
 
 
@@ -2968,6 +2974,7 @@ export type MutationMoveAutomationProjectConfigurationConnectedUsersArgs = {
   connectedUserIds: Array<Scalars['ID']['input']>;
   sourceId: Scalars['ID']['input'];
   targetId: Scalars['ID']['input'];
+  workflowInputs?: InputMaybe<Array<ConfigurationMoveWorkflowInputs>>;
 };
 
 
@@ -3471,6 +3478,7 @@ export type MutationUpdateWorkspaceMcpToolEnabledArgs = {
 export type MutationUpgradeAutomationProjectConfigurationConnectedUsersArgs = {
   connectedUserIds: Array<Scalars['ID']['input']>;
   targetId: Scalars['ID']['input'];
+  workflowInputs?: InputMaybe<Array<ConfigurationMoveWorkflowInputs>>;
 };
 
 export type NodeValidationIssue = {
