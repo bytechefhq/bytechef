@@ -41,7 +41,8 @@ class CodeWorkflowComponentConnectionFactory implements ComponentConnectionFacto
 
     @Override
     public List<ComponentConnection> create(
-        String workflowNodeName, Map<String, ?> extensions, ComponentDefinition componentDefinition) {
+        String workflowNodeName, Map<String, ?> parameters, Map<String, ?> extensions,
+        ComponentDefinition componentDefinition) {
 
         return ComponentConnection.of(
             extensions, workflowNodeName,
