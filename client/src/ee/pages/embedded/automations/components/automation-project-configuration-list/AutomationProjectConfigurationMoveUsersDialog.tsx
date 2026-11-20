@@ -22,6 +22,7 @@ interface AutomationProjectConfigurationMoveUsersDialogProps {
     connectedUsers?: Array<{connectedUserId: string; email?: string | null; externalId: string; name?: string | null}>;
     initialSelectedConnectedUserIds?: string[];
     onClose: () => void;
+    singleConnectedUser?: boolean;
     targetConfigurations: TargetConfigurationType[];
     title?: string;
 }
@@ -37,6 +38,7 @@ const AutomationProjectConfigurationMoveUsersDialog = ({
     connectedUsers: presetConnectedUsers,
     initialSelectedConnectedUserIds,
     onClose,
+    singleConnectedUser,
     targetConfigurations,
     title = 'Move Users',
 }: AutomationProjectConfigurationMoveUsersDialogProps) => {
@@ -107,6 +109,7 @@ const AutomationProjectConfigurationMoveUsersDialog = ({
             previewError={moveImpactError}
             previewLoading={moveImpactLoading}
             previewSkipped={moveImpact?.skipped}
+            singleConnectedUser={singleConnectedUser}
             sourceLabel={formatConfigurationLabel(configuration)}
             targets={targets}
             title={title}
