@@ -477,9 +477,7 @@ const ProvidedValuesFields = ({
                         />
                     ))
                 ) : (
-                    <p className="p-4 text-center text-sm text-content-neutral-secondary">
-                        This workflow has no connections to provide.
-                    </p>
+                    <p className="text-sm">No Connections yet</p>
                 )
             }
             enabled={enabled}
@@ -518,9 +516,7 @@ const ProvidedValuesFields = ({
                         })}
                     </div>
                 ) : (
-                    <p className="p-4 text-center text-sm text-content-neutral-secondary">
-                        This workflow has no internal-only inputs to set.
-                    </p>
+                    <p className="text-sm">No Inputs yet</p>
                 )
             }
             label={label}
