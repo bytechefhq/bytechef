@@ -24,6 +24,7 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
@@ -97,6 +98,57 @@ class CustomComponentServiceTest {
         assertEquals(2, saved.getComponentVersion());
         assertNotNull(saved.getComponent());
         assertEquals("Test", saved.getTitle());
+    }
+
+    @Test
+    void testUpdateRejectsStaleVersion() {
+        CustomComponent storedCustomComponent = new CustomComponent();
+
+        storedCustomComponent.setId(1L);
+        storedCustomComponent.setName("test");
+        storedCustomComponent.setStatus(CustomComponent.Status.PUBLISHED);
+        storedCustomComponent.setVersion(2);
+
+        when(customComponentRepository.findById(1L)).thenReturn(Optional.of(storedCustomComponent));
+
+        CustomComponent staleCustomComponent = new CustomComponent();
+
+        staleCustomComponent.setId(1L);
+        staleCustomComponent.setName("test");
+        staleCustomComponent.setStatus(CustomComponent.Status.DRAFT);
+        staleCustomComponent.setVersion(1);
+
+        assertThrows(
+            OptimisticLockingFailureException.class, () -> customComponentService.update(staleCustomComponent));
+
+        verify(customComponentRepository, never()).save(any());
+        assertEquals(CustomComponent.Status.PUBLISHED, storedCustomComponent.getStatus());
+    }
+
+    @Test
+    void testUpdateRejectsDraftChangeOfPublishedRow() {
+        CustomComponent storedCustomComponent = new CustomComponent();
+
+        storedCustomComponent.setId(1L);
+        storedCustomComponent.setName("test");
+        storedCustomComponent.setStatus(CustomComponent.Status.PUBLISHED);
+        storedCustomComponent.setVersion(1);
+
+        when(customComponentRepository.findById(1L)).thenReturn(Optional.of(storedCustomComponent));
+
+        CustomComponent draftCustomComponent = new CustomComponent();
+
+        draftCustomComponent.setId(1L);
+        draftCustomComponent.setName("test");
+        draftCustomComponent.setStatus(CustomComponent.Status.DRAFT);
+        draftCustomComponent.setVersion(1);
+
+        ConfigurationException exception = assertThrows(
+            ConfigurationException.class, () -> customComponentService.update(draftCustomComponent));
+
+        assertEquals(CustomComponentErrorType.COMPONENT_NOT_DRAFT.getErrorKey(), exception.getErrorKey());
+        verify(customComponentRepository, never()).save(any());
+        assertEquals(CustomComponent.Status.PUBLISHED, storedCustomComponent.getStatus());
     }
 
     @Test
