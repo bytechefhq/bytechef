@@ -21,6 +21,7 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -168,27 +169,53 @@ public class AutomationProjectConfigurationGraphQlController {
     @MutationMapping
     public ConfigurationMoveResultDTO changeAutomationProjectConfigurationConnectedUserVersion(
         @Argument String sourceId, @Argument String connectedUserId, @Argument int projectVersion,
-        @Argument @Nullable String targetId) {
+        @Argument @Nullable String targetId, @Argument @Nullable List<ConfigurationMoveWorkflowInputs> workflowInputs) {
 
         return automationProjectConfigurationFacade.changeConnectedUserVersion(
             Long.parseLong(sourceId), Long.parseLong(connectedUserId), projectVersion,
-            targetId == null ? null : Long.valueOf(targetId));
+            targetId == null ? null : Long.valueOf(targetId), toWorkflowInputs(workflowInputs));
     }
 
     @MutationMapping
     public ConfigurationMoveResultDTO moveAutomationProjectConfigurationConnectedUsers(
-        @Argument String sourceId, @Argument String targetId, @Argument List<String> connectedUserIds) {
+        @Argument String sourceId, @Argument String targetId, @Argument List<String> connectedUserIds,
+        @Argument @Nullable List<ConfigurationMoveWorkflowInputs> workflowInputs) {
 
         return automationProjectConfigurationFacade.moveConnectedUsers(
-            Long.parseLong(sourceId), Long.parseLong(targetId), toLongs(connectedUserIds));
+            Long.parseLong(sourceId), Long.parseLong(targetId), toLongs(connectedUserIds),
+            toWorkflowInputs(workflowInputs));
     }
 
     @MutationMapping
     public ConfigurationMoveResultDTO upgradeAutomationProjectConfigurationConnectedUsers(
-        @Argument String targetId, @Argument List<String> connectedUserIds) {
+        @Argument String targetId, @Argument List<String> connectedUserIds,
+        @Argument @Nullable List<ConfigurationMoveWorkflowInputs> workflowInputs) {
 
         return automationProjectConfigurationFacade.upgradeConnectedUsers(
-            Long.parseLong(targetId), toLongs(connectedUserIds));
+            Long.parseLong(targetId), toLongs(connectedUserIds), toWorkflowInputs(workflowInputs));
+    }
+
+    private static Map<String, Map<String, Object>> toWorkflowInputs(
+        @Nullable List<ConfigurationMoveWorkflowInputs> workflowInputs) {
+
+        if (workflowInputs == null) {
+            return Map.of();
+        }
+
+        Map<String, Map<String, Object>> inputsByWorkflowUuid = new LinkedHashMap<>();
+
+        for (ConfigurationMoveWorkflowInputs workflowInput : workflowInputs) {
+            if (inputsByWorkflowUuid.putIfAbsent(workflowInput.workflowUuid(), workflowInput.inputs()) != null) {
+                throw new IllegalArgumentException(
+                    "Workflow %s has more than one set of inputs".formatted(workflowInput.workflowUuid()));
+            }
+        }
+
+        return inputsByWorkflowUuid;
+    }
+
+    @SuppressFBWarnings("EI")
+    public record ConfigurationMoveWorkflowInputs(String workflowUuid, Map<String, Object> inputs) {
     }
 
     @MutationMapping
