@@ -99,7 +99,7 @@ export interface ConnectedUserProjectWorkflow {
      */
     connections?: { [key: string]: number; };
     /**
-     * Why the automation needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input>, UPDATE_PENDING or INVALID_WORKFLOW:<errorCount>. A COPY only reports INVALID_WORKFLOW. Null when healthy.
+     * Why the automation needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input>, UPDATE_PENDING, INVALID_WORKFLOW:<errorCount> or AWAITING_CONFIGURATION (the administrator has not finished the configuration yet). A COPY only reports INVALID_WORKFLOW. Null when healthy.
      */
     attentionReason?: string;
     /**
