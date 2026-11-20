@@ -1,9 +1,9 @@
 import {CustomComponentLanguage, CustomComponentStatus} from '@/shared/middleware/graphql';
-import {fireEvent, render, resetAll, screen} from '@/shared/util/test-utils';
+import {act, fireEvent, render, resetAll, screen} from '@/shared/util/test-utils';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import CustomComponentDetail from './CustomComponentDetail';
+import CustomComponentDetail from '../CustomComponentDetail';
 
 const hoisted = vi.hoisted(() => ({
     mockNavigate: vi.fn(),
@@ -49,6 +49,10 @@ vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
         <div data-language={defaultLanguage} data-testid="monaco-editor-mock">
             <button onClick={() => onChange('edited content')} type="button">
                 Edit
+            </button>
+
+            <button onClick={() => onChange('newer content')} type="button">
+                Edit again
             </button>
 
             {value}
@@ -205,6 +209,73 @@ describe('CustomComponentDetail', () => {
         expect(await screen.findByRole('button', {name: 'Publish'})).toBeDisabled();
     });
 
+    it('keeps edits made while a save is in flight', async () => {
+        hoisted.mockUseCustomComponentQuery.mockReturnValue({
+            data: {
+                customComponent: {
+                    componentVersion: 1,
+                    description: null,
+                    enabled: true,
+                    id: '1',
+                    language: CustomComponentLanguage.Javascript,
+                    name: 'my-component',
+                    status: CustomComponentStatus.Draft,
+                    title: 'My Component',
+                },
+            },
+            error: null,
+            isLoading: false,
+        });
+        hoisted.mockUseCustomComponentSourceQuery.mockReturnValue({
+            data: {customComponentSource: 'console.log("hi");'},
+            error: null,
+            isLoading: false,
+        });
+
+        const mutate = vi.fn();
+        let onSuccess: ((result: unknown, variables: unknown) => void) | undefined;
+
+        hoisted.mockUseUpdateCustomComponentSourceMutation.mockImplementation(
+            (options: {onSuccess?: (result: unknown, variables: unknown) => void}) => {
+                onSuccess = options?.onSuccess;
+
+                return {isPending: false, mutate};
+            }
+        );
+
+        const detailRender = renderDetail('1');
+
+        await screen.findByTestId('monaco-editor-mock');
+
+        fireEvent.click(screen.getByRole('button', {name: 'Edit'}));
+        fireEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(mutate).toHaveBeenCalledWith({content: 'edited content', id: '1'});
+
+        fireEvent.click(screen.getByRole('button', {name: 'Edit again'}));
+
+        act(() => {
+            onSuccess?.({updateCustomComponentSource: {id: '1'}}, {content: 'edited content', id: '1'});
+        });
+
+        hoisted.mockUseCustomComponentSourceQuery.mockReturnValue({
+            data: {customComponentSource: 'edited content'},
+            error: null,
+            isLoading: false,
+        });
+
+        detailRender.rerender(
+            <MemoryRouter initialEntries={['/custom-components/1']}>
+                <Routes>
+                    <Route element={<CustomComponentDetail />} path="/custom-components/:id" />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        expect(screen.getByTestId('monaco-editor-mock')).toHaveTextContent('newer content');
+        expect(screen.getByRole('button', {name: 'Save'})).toBeEnabled();
+    });
+
     it('navigates to the new draft when saving a published component returns a different id', async () => {
         hoisted.mockUseCustomComponentQuery.mockReturnValue({
             data: {
@@ -228,10 +299,10 @@ describe('CustomComponentDetail', () => {
             isLoading: false,
         });
 
-        let onSuccess: ((result: unknown) => void) | undefined;
+        let onSuccess: ((result: unknown, variables: unknown) => void) | undefined;
 
         hoisted.mockUseUpdateCustomComponentSourceMutation.mockImplementation(
-            (options: {onSuccess?: (result: unknown) => void}) => {
+            (options: {onSuccess?: (result: unknown, variables: unknown) => void}) => {
                 onSuccess = options?.onSuccess;
 
                 return {isPending: false, mutate: vi.fn()};
@@ -242,7 +313,7 @@ describe('CustomComponentDetail', () => {
 
         await screen.findByTestId('monaco-editor-mock');
 
-        onSuccess?.({updateCustomComponentSource: {id: '99'}});
+        onSuccess?.({updateCustomComponentSource: {id: '99'}}, {content: 'console.log("hi");', id: '1'});
 
         expect(hoisted.mockNavigate).toHaveBeenCalledWith('/custom-components/99');
     });
