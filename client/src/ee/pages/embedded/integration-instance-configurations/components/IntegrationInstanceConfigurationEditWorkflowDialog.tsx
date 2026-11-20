@@ -1,13 +1,3 @@
-import Button from '@/components/Button/Button';
-import {
-    Dialog,
-    DialogBody,
-    DialogCancelButton,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogMain,
-} from '@/components/Dialog';
 import {Form} from '@/components/ui/form';
 import IntegrationInstanceConfigurationDialogWorkflowsStepItem from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogWorkflowsStepItem';
 import {
@@ -19,6 +9,7 @@ import {
 import {useUpdateIntegrationInstanceConfigurationWorkflowMutation} from '@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
 import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {getEnabledWorkflowTasks} from '@/pages/platform/workflow-editor/utils/getEnabledWorkflowTasks';
+import WorkflowEditDialog from '@/shared/components/workflow-configuration/WorkflowEditDialog';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';
@@ -129,43 +120,26 @@ const IntegrationInstanceConfigurationEditWorkflowDialog = ({
     }, []);
 
     return (
-        <Dialog
-            onOpenChange={(isOpen) => {
-                if (isOpen) {
-                    setIsOpen(isOpen);
-                } else {
-                    closeDialog();
-                }
-            }}
+        <WorkflowEditDialog
+            description="Set the connections and inputs this workflow runs with."
+            onClose={closeDialog}
+            onSave={handleSubmit(updateIntegrationInstanceConfigurationWorkflow)}
             open={isOpen}
+            workflowLabel={workflow?.label}
         >
-            <DialogContent onInteractOutside={(event) => event.preventDefault()}>
-                <DialogMain>
-                    <Form {...form}>
-                        <DialogHeader title={`Edit ${workflow?.label} Workflow`} />
-
-                        <DialogBody>
-                            <IntegrationInstanceConfigurationDialogWorkflowsStepItem
-                                componentName={componentName}
-                                control={control}
-                                formState={formState}
-                                key={workflow.id!}
-                                label="Enable"
-                                setValue={setValue}
-                                workflow={workflow}
-                                workflowIndex={0}
-                            />
-                        </DialogBody>
-
-                        <DialogFooter>
-                            <DialogCancelButton />
-
-                            <Button onClick={handleSubmit(updateIntegrationInstanceConfigurationWorkflow)}>Save</Button>
-                        </DialogFooter>
-                    </Form>
-                </DialogMain>
-            </DialogContent>
-        </Dialog>
+            <Form {...form}>
+                <IntegrationInstanceConfigurationDialogWorkflowsStepItem
+                    componentName={componentName}
+                    control={control}
+                    formState={formState}
+                    key={workflow.id!}
+                    label="Enable"
+                    setValue={setValue}
+                    workflow={workflow}
+                    workflowIndex={0}
+                />
+            </Form>
+        </WorkflowEditDialog>
     );
 };
 

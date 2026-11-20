@@ -1,13 +1,3 @@
-import Button from '@/components/Button/Button';
-import {
-    Dialog,
-    DialogBody,
-    DialogCancelButton,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogMain,
-} from '@/components/Dialog';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import ConnectedUserNewConnectionDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserNewConnectionDialog';
@@ -32,6 +22,7 @@ import {IntegrationInstanceKeys} from '@/ee/shared/queries/embedded/integrationI
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import InputConfigurationList from '@/shared/components/InputConfigurationList';
 import WorkflowConfigurationCard from '@/shared/components/workflow-configuration/WorkflowConfigurationCard';
+import WorkflowEditDialog from '@/shared/components/workflow-configuration/WorkflowEditDialog';
 import {WorkflowInput} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo, useState} from 'react';
@@ -212,99 +203,13 @@ const ConnectedUserIntegrationWorkflowEditDialog = ({
     };
 
     return (
-        <Dialog onOpenChange={(open) => !open && onClose()} open>
-            <DialogContent className="gap-0 p-0" onInteractOutside={(event) => event.preventDefault()}>
-                <DialogMain>
-                    <DialogHeader
-                        description={
-                            provisioned
-                                ? "Set the connection and inputs this connected user's workflow runs with."
-                                : "See the connections and set the inputs this connected user's workflow runs with."
-                        }
-                        title={`Edit ${workflow.label} Workflow`}
-                    />
-
-                    <DialogBody>
-                        <div className="max-h-dialog-height overflow-y-auto">
-                            <WorkflowConfigurationCard
-                                connectionCount={connectionRows.length}
-                                connectionsContent={
-                                    connectionRows.length === 0 ? (
-                                        <p className="text-sm">No Connections yet</p>
-                                    ) : (
-                                        <fieldset className="space-y-3 border-0 p-0">
-                                            {connectionRows.map((connectionRow) => (
-                                                <fieldset className="space-y-1 border-0 p-0" key={connectionRow.id}>
-                                                    {connectionRow.editable ? (
-                                                        <ProvisionProjectWorkflowConnectionField
-                                                            componentTitle={connectionRow.title}
-                                                            connections={integrationConnections}
-                                                            id={`edit-workflow-connection-${connectionRow.id}`}
-                                                            onChange={setChangedConnectionId}
-                                                            onNewConnection={() => setShowNewConnectionDialog(true)}
-                                                            value={changedConnectionId ?? currentConnectionId}
-                                                        />
-                                                    ) : (
-                                                        <>
-                                                            <Label
-                                                                htmlFor={`edit-workflow-connection-${connectionRow.id}`}
-                                                            >
-                                                                {connectionRow.title}
-                                                            </Label>
-
-                                                            <Input
-                                                                id={`edit-workflow-connection-${connectionRow.id}`}
-                                                                readOnly
-                                                                value={connectionRow.connectionName ?? ''}
-                                                            />
-                                                        </>
-                                                    )}
-
-                                                    <p className="text-xs text-content-neutral-secondary">
-                                                        {connectionRow.description}
-                                                    </p>
-                                                </fieldset>
-                                            ))}
-                                        </fieldset>
-                                    )
-                                }
-                                enabled
-                                inputCount={inputs.length}
-                                inputsContent={
-                                    inputs.length > 0 ? (
-                                        <WorkflowMockProvider>
-                                            <InputConfigurationList
-                                                control={control as unknown as Control<FieldValues>}
-                                                controlPath="inputs"
-                                                formState={formState as unknown as FormState<FieldValues>}
-                                                inputs={inputs}
-                                                workflowId={workflow.id}
-                                            />
-                                        </WorkflowMockProvider>
-                                    ) : (
-                                        <p className="text-sm">No Inputs yet</p>
-                                    )
-                                }
-                                onEnabledChange={() => undefined}
-                                showWorkflowToggle={false}
-                                switchId={`edit-workflow-${workflow.id}`}
-                            />
-                        </div>
-                    </DialogBody>
-
-                    <DialogFooter>
-                        <DialogCancelButton />
-
-                        <Button
-                            disabled={(inputs.length === 0 && !connectionChanged) || savePending}
-                            label="Save"
-                            onClick={() => void handleSubmit(handleSave)()}
-                            type="button"
-                        />
-                    </DialogFooter>
-                </DialogMain>
-
-                {showNewConnectionDialog && integrationComponentName && (
+        <WorkflowEditDialog
+            description="Set the connections and inputs for this connected user."
+            onClose={onClose}
+            onSave={() => void handleSubmit(handleSave)()}
+            outsideContent={
+                showNewConnectionDialog &&
+                integrationComponentName && (
                     <ConnectedUserNewConnectionDialog
                         componentName={integrationComponentName}
                         connectedUserId={integrationInstance.connectedUserId!}
@@ -315,9 +220,73 @@ const ConnectedUserIntegrationWorkflowEditDialog = ({
                             setShowNewConnectionDialog(false);
                         }}
                     />
-                )}
-            </DialogContent>
-        </Dialog>
+                )
+            }
+            saveDisabled={(inputs.length === 0 && !connectionChanged) || savePending}
+            workflowLabel={workflow.label}
+        >
+            <WorkflowConfigurationCard
+                connectionCount={connectionRows.length}
+                connectionsContent={
+                    connectionRows.length === 0 ? (
+                        <p className="text-sm">No Connections yet</p>
+                    ) : (
+                        <fieldset className="space-y-3 border-0 p-0">
+                            {connectionRows.map((connectionRow) => (
+                                <fieldset className="space-y-1 border-0 p-0" key={connectionRow.id}>
+                                    {connectionRow.editable ? (
+                                        <ProvisionProjectWorkflowConnectionField
+                                            componentTitle={connectionRow.title}
+                                            connections={integrationConnections}
+                                            id={`edit-workflow-connection-${connectionRow.id}`}
+                                            onChange={setChangedConnectionId}
+                                            onNewConnection={() => setShowNewConnectionDialog(true)}
+                                            value={changedConnectionId ?? currentConnectionId}
+                                        />
+                                    ) : (
+                                        <>
+                                            <Label htmlFor={`edit-workflow-connection-${connectionRow.id}`}>
+                                                {connectionRow.title}
+                                            </Label>
+
+                                            <Input
+                                                id={`edit-workflow-connection-${connectionRow.id}`}
+                                                readOnly
+                                                value={connectionRow.connectionName ?? ''}
+                                            />
+                                        </>
+                                    )}
+
+                                    <p className="text-xs text-content-neutral-secondary">
+                                        {connectionRow.description}
+                                    </p>
+                                </fieldset>
+                            ))}
+                        </fieldset>
+                    )
+                }
+                enabled
+                inputCount={inputs.length}
+                inputsContent={
+                    inputs.length > 0 ? (
+                        <WorkflowMockProvider>
+                            <InputConfigurationList
+                                control={control as unknown as Control<FieldValues>}
+                                controlPath="inputs"
+                                formState={formState as unknown as FormState<FieldValues>}
+                                inputs={inputs}
+                                workflowId={workflow.id}
+                            />
+                        </WorkflowMockProvider>
+                    ) : (
+                        <p className="text-sm">No Inputs yet</p>
+                    )
+                }
+                onEnabledChange={() => undefined}
+                showWorkflowToggle={false}
+                switchId={`edit-workflow-${workflow.id}`}
+            />
+        </WorkflowEditDialog>
     );
 };
 

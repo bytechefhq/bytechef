@@ -215,12 +215,8 @@ describe('AutomationProjectConfigurationWorkflowDialog', () => {
 
         renderDialog();
 
-        expect(screen.getByText('Provided Values')).toBeInTheDocument();
-        expect(
-            screen.getByText(
-                'Connections and inputs set here are used by every connected user and cannot be changed by them.'
-            )
-        ).toBeInTheDocument();
+        expect(screen.getByText('Edit Summarize Email Workflow')).toBeInTheDocument();
+        expect(screen.getByText('Used by every connected user, who cannot change them.')).toBeInTheDocument();
 
         expect(screen.getByRole('tab', {name: /Connections\s*\(2\)/})).toHaveAttribute('data-state', 'active');
         expect(screen.getByRole('tab', {name: /Inputs\s*\(4\)/})).toBeInTheDocument();
