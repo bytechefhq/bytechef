@@ -21,7 +21,6 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.file.storage.domain.FileEntry;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.cache.CacheManager;
 
 /**
  * @version ee
@@ -48,7 +47,7 @@ class CustomComponentFacadeSourceTest {
         when(customComponentFileStorage.readCustomComponentFileContent(componentFile)).thenReturn("({name:'x'})");
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         String source = customComponentFacade.getCustomComponentSource(42L);
@@ -72,7 +71,7 @@ class CustomComponentFacadeSourceTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         assertThatThrownBy(() -> customComponentFacade.getCustomComponentSource(42L))

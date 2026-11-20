@@ -30,7 +30,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.cache.CacheManager;
 
 /**
  * @version ee
@@ -61,7 +60,7 @@ class CustomComponentFacadeUpdateSourceTest {
             .thenReturn(newComponentFile);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         String content = "({name: 'example', title: 'Example', description: 'An example', version: 1, actions: []})";
@@ -99,7 +98,7 @@ class CustomComponentFacadeUpdateSourceTest {
             .thenReturn(newComponentFile);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         String content = "({name: 'example', title: 'Example', description: 'An example', version: 1, actions: []})";
@@ -127,7 +126,7 @@ class CustomComponentFacadeUpdateSourceTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         assertThatThrownBy(() -> customComponentFacade.updateCustomComponentSource(42L, "anything"))
@@ -151,7 +150,7 @@ class CustomComponentFacadeUpdateSourceTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         assertThatThrownBy(() -> customComponentFacade.updateCustomComponentSource(42L, "this is not valid js {{{"))
@@ -176,7 +175,7 @@ class CustomComponentFacadeUpdateSourceTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         String content = "({name: 'renamed', version: 1, actions: []})";
@@ -215,7 +214,7 @@ class CustomComponentFacadeUpdateSourceTest {
             .thenReturn(newComponentFile);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         String content =
@@ -259,7 +258,7 @@ class CustomComponentFacadeUpdateSourceTest {
             .thenReturn(newComponentFile);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         String content =
@@ -300,7 +299,7 @@ class CustomComponentFacadeUpdateSourceTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         String content = "({name: 'example', version: 3, actions: []})";
@@ -342,7 +341,7 @@ class CustomComponentFacadeUpdateSourceTest {
             .thenReturn(newComponentFile);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         String content = "({name: 'example', version: 2, actions: []})";
@@ -383,7 +382,7 @@ class CustomComponentFacadeUpdateSourceTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         String content = "({name: 'example', version: 1, actions: []})";
@@ -424,7 +423,7 @@ class CustomComponentFacadeUpdateSourceTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         String content = "({name: 'example', version: 3, actions: []})";

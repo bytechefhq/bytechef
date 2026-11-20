@@ -31,7 +31,8 @@ class IntegrationHandlerClassLoader extends AbstractHandlerClassLoader<Integrati
     }
 
     private record ContextClassLoaderIntegrationHandler(
-        IntegrationHandler integrationHandler, IsolatingClassLoader<?> classLoader) implements IntegrationHandler {
+        IntegrationHandler integrationHandler, IsolatingClassLoader<?> classLoader)
+        implements IntegrationHandler, IsolatingClassLoader.ClassLoaderOwner {
 
         @Override
         public IntegrationDefinition getDefinition() {

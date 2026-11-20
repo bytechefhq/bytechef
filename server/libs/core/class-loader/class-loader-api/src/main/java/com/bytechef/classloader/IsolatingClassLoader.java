@@ -25,6 +25,7 @@ import java.util.Enumeration;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -82,6 +83,20 @@ public abstract class IsolatingClassLoader<T> extends URLClassLoader {
         return value;
     }
 
+    protected <R> R applyUncached(String key, Function<T, R> function) {
+        try {
+            T value = cacheMappingFunction.apply(key, this);
+
+            if (value == null) {
+                return null;
+            }
+
+            return function.apply(value);
+        } finally {
+            closeClassLoader();
+        }
+    }
+
     @Override
     public URL getResource(String name) {
         Stream<String> stream = Arrays.stream(RESOURCE_PREFIXES);
@@ -133,10 +148,18 @@ public abstract class IsolatingClassLoader<T> extends URLClassLoader {
         }
     }
 
-    protected void invalidateCache(String componentName) {
+    protected void invalidateCache(String key) {
         Cache cache = Objects.requireNonNull(cacheManager.getCache(ISOLATING_CLASS_LOADER_CACHE));
 
-        cache.evict(componentName);
+        Cache.ValueWrapper valueWrapper = cache.get(key);
+
+        cache.evict(key);
+
+        if (valueWrapper != null && valueWrapper.get() instanceof ClassLoaderOwner classLoaderOwner) {
+            IsolatingClassLoader<?> classLoader = classLoaderOwner.classLoader();
+
+            classLoader.closeClassLoader();
+        }
     }
 
     @Override
@@ -160,5 +183,10 @@ public abstract class IsolatingClassLoader<T> extends URLClassLoader {
 
             return clazz;
         }
+    }
+
+    public interface ClassLoaderOwner {
+
+        IsolatingClassLoader<?> classLoader();
     }
 }

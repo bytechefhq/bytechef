@@ -21,7 +21,6 @@ import com.bytechef.ee.platform.customcomponent.file.storage.CustomComponentFile
 import com.bytechef.exception.ConfigurationException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.cache.CacheManager;
 
 /**
  * @version ee
@@ -36,7 +35,7 @@ class CustomComponentFacadeUploadDisabledTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(false), mock(CacheManager.class), customComponentService, customComponentFileStorage,
+            applicationProperties(false), customComponentService, customComponentFileStorage,
             mock(ObjectProvider.class));
 
         assertThatThrownBy(() -> customComponentFacade.save(new byte[0], Language.JAVA))
@@ -57,7 +56,7 @@ class CustomComponentFacadeUploadDisabledTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(false), mock(CacheManager.class), customComponentService, customComponentFileStorage,
+            applicationProperties(false), customComponentService, customComponentFileStorage,
             mock(ObjectProvider.class));
 
         assertThatThrownBy(() -> customComponentFacade.save(new byte[0], Language.JAVASCRIPT))

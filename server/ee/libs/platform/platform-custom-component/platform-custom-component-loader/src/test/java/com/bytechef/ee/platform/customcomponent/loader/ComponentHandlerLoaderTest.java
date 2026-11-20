@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.customcomponent.loader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 import com.bytechef.component.ComponentHandler;
@@ -60,6 +61,29 @@ class ComponentHandlerLoaderTest {
 
         assertSame(firstComponentHandler, secondComponentHandler);
         assertEquals("Hello ByteChef", performGreet(secondComponentHandler));
+    }
+
+    @Test
+    void testLoadComponentDefinitionClosesItsClassLoader() throws Exception {
+        ComponentDefinition componentDefinition = ComponentHandlerLoader.loadComponentDefinition(
+            writeJar(), Language.JAVA);
+
+        List<ActionDefinition> actionDefinitions = componentDefinition.getActions();
+
+        ActionDefinition actionDefinition = actionDefinitions.getFirst();
+
+        PerformFunction performFunction = (PerformFunction) actionDefinition.getPerform()
+            .orElseThrow();
+
+        Class<?> performFunctionClass = performFunction.getClass();
+
+        ClassLoader classLoader = performFunctionClass.getClassLoader();
+
+        String lazyHelperResource = LazyHelper.class.getName()
+            .replace('.', '/') + ".class";
+
+        assertEquals("lazyHelper", componentDefinition.getName());
+        assertNull(classLoader.getResource(lazyHelperResource));
     }
 
     private static Object performGreet(ComponentHandler componentHandler) throws Exception {

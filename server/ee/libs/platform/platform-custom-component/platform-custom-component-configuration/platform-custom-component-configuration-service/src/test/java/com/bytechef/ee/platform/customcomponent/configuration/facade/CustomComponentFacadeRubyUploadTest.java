@@ -20,7 +20,6 @@ import com.bytechef.ee.platform.customcomponent.file.storage.CustomComponentFile
 import com.bytechef.exception.ConfigurationException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.cache.CacheManager;
 
 /**
  * @version ee
@@ -35,7 +34,7 @@ class CustomComponentFacadeRubyUploadTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            new ApplicationProperties(), mock(CacheManager.class), customComponentService, customComponentFileStorage,
+            new ApplicationProperties(), customComponentService, customComponentFileStorage,
             mock(ObjectProvider.class));
 
         assertThatThrownBy(() -> customComponentFacade.save(new byte[0], Language.RUBY))
