@@ -14,6 +14,10 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import MoveConnectedUsersImpact from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersImpact';
 import MoveConnectedUsersResult from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersResult';
 import {formatSkippedReason} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
+import useMoveWorkflowInputs, {
+    MoveImpactWorkflowI,
+    MoveWorkflowInputsI,
+} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/useMoveWorkflowInputs';
 import {useMemo, useState} from 'react';
 
 import type {SkippedUserDisplayI} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersSkippedList';
@@ -42,17 +46,16 @@ export interface MoveConnectedUsersResultI {
 interface MoveConnectedUsersDialogProps {
     connectedUsers?: MoveConnectedUsersDialogConnectedUserI[];
     connectedUsersError?: boolean;
-    impact?: Array<{
-        affectedConnectedUserCount: number;
-        awaitsConfiguration: boolean;
-        label: string;
-        newRequiredConnections: string[];
-        newRequiredInputs: string[];
-    }>;
+    editableInputs?: boolean;
+    impact?: MoveImpactWorkflowI[];
     initialSelectedConnectedUserIds?: string[];
     mcpServerCount?: number;
     onClose: () => void;
-    onMove: (targetId: string, connectedUserIds: string[]) => Promise<MoveConnectedUsersResultI>;
+    onMove: (
+        targetId: string,
+        connectedUserIds: string[],
+        workflowInputs: MoveWorkflowInputsI[]
+    ) => Promise<MoveConnectedUsersResultI>;
     onSelectionChange?: (targetId: string | undefined, connectedUserIds: string[]) => void;
     previewError?: boolean;
     previewLoading?: boolean;
@@ -75,6 +78,7 @@ const getConnectedUserLabel = (connectedUser: MoveConnectedUsersDialogConnectedU
 
 const MoveConnectedUsersDialogContent = ({
     connectedUsers,
+    editableInputs = false,
     impact,
     initialSelectedConnectedUserIds,
     mcpServerCount,
@@ -97,6 +101,8 @@ const MoveConnectedUsersDialogContent = ({
         () => initialSelectedConnectedUserIds || connectedUsers.map((connectedUser) => connectedUser.connectedUserId)
     );
     const [targetId, setTargetId] = useState<string>();
+
+    const {inputValues, missingRequiredInput, setInputValue, workflowInputs} = useMoveWorkflowInputs(impact);
 
     const filteredConnectedUsers = useMemo(() => {
         const term = search.trim().toLowerCase();
@@ -133,7 +139,12 @@ const MoveConnectedUsersDialogContent = ({
         };
     };
 
-    const canMove = !!targetId && selectedConnectedUserIds.length > 0 && !moving && !previewLoading;
+    const canMove =
+        !!targetId &&
+        selectedConnectedUserIds.length > 0 &&
+        !moving &&
+        !previewLoading &&
+        !(editableInputs && missingRequiredInput);
 
     const handleTargetChange = (value: string) => {
         setTargetId(value);
@@ -159,7 +170,7 @@ const MoveConnectedUsersDialogContent = ({
         setMoving(true);
 
         try {
-            setResult(await onMove(targetId, selectedConnectedUserIds));
+            setResult(await onMove(targetId, selectedConnectedUserIds, editableInputs ? workflowInputs : []));
         } catch {
             setResult(undefined);
         } finally {
@@ -204,7 +215,9 @@ const MoveConnectedUsersDialogContent = ({
 
                         <MoveConnectedUsersImpact
                             impact={impact}
+                            inputValues={inputValues}
                             mcpServerCount={mcpServerCount}
+                            onInputChange={editableInputs ? setInputValue : undefined}
                             previewError={previewError}
                             previewSkipped={previewSkipped}
                             toSkippedUser={toSkippedUser}

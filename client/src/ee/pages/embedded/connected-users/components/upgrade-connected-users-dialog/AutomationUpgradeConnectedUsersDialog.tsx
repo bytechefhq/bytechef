@@ -1,3 +1,4 @@
+import {MoveWorkflowInputsI} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/useMoveWorkflowInputs';
 import UpgradeConnectedUsersDialogView, {
     UpgradeOptionI,
 } from '@/ee/pages/embedded/connected-users/components/upgrade-connected-users-dialog/UpgradeConnectedUsersDialogView';
@@ -83,8 +84,8 @@ const AutomationUpgradeConnectedUsersDialog = ({
 
     const {mutateAsync: upgradeConnectedUsers} = useUpgradeAutomationProjectConfigurationConnectedUsersMutation();
 
-    const handleUpgrade = async (): Promise<MoveConnectedUsersResultI> => {
-        const response = await upgradeConnectedUsers({connectedUserIds, targetId: targetId!});
+    const handleUpgrade = async (workflowInputs: MoveWorkflowInputsI[]): Promise<MoveConnectedUsersResultI> => {
+        const response = await upgradeConnectedUsers({connectedUserIds, targetId: targetId!, workflowInputs});
 
         return response.upgradeAutomationProjectConfigurationConnectedUsers;
     };
@@ -92,6 +93,7 @@ const AutomationUpgradeConnectedUsersDialog = ({
     return (
         <UpgradeConnectedUsersDialogView
             connectedUsers={connectedUsers}
+            editableInputs
             emptyParentMessage="No published project has configurations in this environment."
             impact={targetId ? impactData?.automationProjectConfigurationUpgradeImpact : undefined}
             notOnSourceReason="Not provisioned with this project"
