@@ -3892,6 +3892,8 @@ export type Query = {
   automationProjectVersionWorkflowChanges: VersionWorkflowChanges;
   automationProjectVersionWorkflows: Array<AutomationProjectVersionWorkflow>;
   automationProjectVersions: Array<AutomationProjectVersion>;
+  automationProjectWorkflowInputOptions: Array<AutomationProjectConfigurationInputOption>;
+  automationProjectWorkflowProvidableValues: AutomationProjectConfigurationWorkflowProvidableValues;
   automationProjects: Array<AutomationProject>;
   automationSearch: Array<SearchResult>;
   clusterElementComponentConnections: Array<ComponentConnection>;
@@ -4318,6 +4320,27 @@ export type QueryAutomationProjectVersionWorkflowsArgs = {
 
 export type QueryAutomationProjectVersionsArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryAutomationProjectWorkflowInputOptionsArgs = {
+  connectionId: Scalars['ID']['input'];
+  environmentId: Scalars['ID']['input'];
+  inputName: Scalars['String']['input'];
+  lookupDependsOnValues?: InputMaybe<Scalars['Map']['input']>;
+  projectId: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
+  propertyName: Scalars['String']['input'];
+  searchText?: InputMaybe<Scalars['String']['input']>;
+  workflowUuid: Scalars['ID']['input'];
+};
+
+
+export type QueryAutomationProjectWorkflowProvidableValuesArgs = {
+  environmentId: Scalars['ID']['input'];
+  projectId: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
+  workflowUuid: Scalars['ID']['input'];
 };
 
 
