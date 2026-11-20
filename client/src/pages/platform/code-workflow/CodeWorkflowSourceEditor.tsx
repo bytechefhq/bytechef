@@ -103,6 +103,7 @@ const CodeWorkflowSourceEditor = ({
     const [isSourceDirty, setIsSourceDirty] = useState(false);
 
     const latestSourceRef = useRef(source ?? '');
+    const submittedSourceRef = useRef<string | undefined>(undefined);
 
     const {reset, setCodeWorkflowHeaderState} = useCodeWorkflowHeaderStore(
         useShallow((state) => ({
@@ -114,11 +115,21 @@ const CodeWorkflowSourceEditor = ({
     const monacoLanguage = MONACO_LANGUAGE_BY_CODE_WORKFLOW_LANGUAGE[language as CodeWorkflowLanguage];
 
     const handleSave = () => {
-        onSave(latestSourceRef.current)
+        const submittedSource = latestSourceRef.current;
+
+        submittedSourceRef.current = submittedSource;
+
+        onSave(submittedSource)
             .then(() => {
-                setIsSourceDirty(false);
+                if (latestSourceRef.current === submittedSource) {
+                    submittedSourceRef.current = undefined;
+
+                    setIsSourceDirty(false);
+                }
             })
-            .catch(() => {});
+            .catch(() => {
+                submittedSourceRef.current = undefined;
+            });
     };
 
     const handleSourceChange = (value: string | undefined) => {
@@ -127,6 +138,14 @@ const CodeWorkflowSourceEditor = ({
     };
 
     useEffect(() => {
+        const submittedSource = submittedSourceRef.current;
+
+        submittedSourceRef.current = undefined;
+
+        if (submittedSource !== undefined && latestSourceRef.current !== submittedSource) {
+            return;
+        }
+
         latestSourceRef.current = source ?? '';
 
         setIsSourceDirty(false);
