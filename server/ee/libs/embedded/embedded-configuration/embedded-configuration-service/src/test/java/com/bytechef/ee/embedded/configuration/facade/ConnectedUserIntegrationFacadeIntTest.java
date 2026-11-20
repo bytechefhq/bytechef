@@ -1071,7 +1071,7 @@ class ConnectedUserIntegrationFacadeIntTest {
         }
 
         @Test
-        void testMcpWorkflowInputsCarryInternalOnly() {
+        void testMcpWorkflowInputsLeaveOutInternalOnlyInputs() {
             String externalUserId = createConnectedUser(Map.of());
 
             long newIntegrationId = createIntegrationRow(null);
@@ -1099,7 +1099,7 @@ class ConnectedUserIntegrationFacadeIntTest {
                     ConnectedUserIntegrationDTO.WorkflowInputInfo::name,
                     ConnectedUserIntegrationDTO.WorkflowInputInfo::required,
                     ConnectedUserIntegrationDTO.WorkflowInputInfo::internalOnly)
-                .containsExactly(tuple("apiKey", true, true), tuple("channel", false, false));
+                .containsExactly(tuple("channel", false, false));
         }
 
         @Test
