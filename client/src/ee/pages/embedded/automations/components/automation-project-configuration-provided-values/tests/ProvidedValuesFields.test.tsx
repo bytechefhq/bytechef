@@ -114,6 +114,6 @@ describe('ProvidedValuesFields', () => {
 
         expect(screen.queryByLabelText('API Key *')).not.toBeInTheDocument();
         expect(screen.queryByPlaceholderText('Let each user fill it')).not.toBeInTheDocument();
-        expect(screen.getByText('This workflow has no internal-only inputs to set.')).toBeInTheDocument();
+        expect(screen.getByText('No Inputs yet')).toBeInTheDocument();
     });
 });
