@@ -348,14 +348,38 @@ class AwsBatchTaskRunnerBackendTest {
     }
 
     @Test
-    void testFindIgnoresTerminalJobsAndJobsWithAnotherKey() {
+    void testFindIgnoresJobsWithAnotherKey() {
         operations.listedJobs =
-            List.of(summary("done", JobStatus.SUCCEEDED, 3L), summary("other", JobStatus.RUNNING, 2L));
+            List.of(summary("gone", JobStatus.SUCCEEDED, 3L), summary("other", JobStatus.RUNNING, 2L));
         operations.describedById.put(
             "other", jobWithId("other", JobStatus.RUNNING, 2L, Map.of("bytechef.io/key", "other-tenant-100-7")));
 
         assertThat(backend.find(KEY, context(base(), connection()))).isEmpty();
         assertThat(operations.terminated).isEmpty();
+    }
+
+    @Test
+    void testFindReturnsACompletedJobWithTheKeySoItsOutputIsCollectedInsteadOfRunningTheScriptAgain() {
+        operations.listedJobs = List.of(summary("done", JobStatus.SUCCEEDED, 3L));
+        operations.describedById.put("done", jobWithId("done", JobStatus.SUCCEEDED, 3L, KEY_TAGS));
+
+        Optional<RemoteJobHandle> handle = backend.find(KEY, context(base(), connection()));
+
+        assertThat(handle).map(RemoteJobHandle::id)
+            .contains("done");
+        assertThat(handle.orElseThrow()
+            .attributes()).containsEntry("prefix", "bytechef/100/public-100-7-abcd1234/");
+    }
+
+    @Test
+    void testFindPrefersARunningJobOverANewerCompletedOne() {
+        operations.listedJobs =
+            List.of(summary("done", JobStatus.SUCCEEDED, 3L), summary("running", JobStatus.RUNNING, 2L));
+        operations.describedById.put("done", jobWithId("done", JobStatus.SUCCEEDED, 3L, KEY_TAGS));
+        operations.describedById.put("running", jobWithId("running", JobStatus.RUNNING, 2L, KEY_TAGS));
+
+        assertThat(backend.find(KEY, context(base(), connection()))).map(RemoteJobHandle::id)
+            .contains("running");
     }
 
     @Test
