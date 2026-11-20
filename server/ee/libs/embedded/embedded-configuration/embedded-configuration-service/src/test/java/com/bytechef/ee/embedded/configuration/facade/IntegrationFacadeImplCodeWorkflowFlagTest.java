@@ -25,7 +25,6 @@ import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.ee.embedded.configuration.service.IntegrationCodeWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
-import com.bytechef.ee.embedded.configuration.service.IntegrationVersionWorkflowChangeService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
@@ -104,7 +103,7 @@ class IntegrationFacadeImplCodeWorkflowFlagTest {
         integrationFacade = new IntegrationFacadeImpl(
             categoryService, codeWorkflowContainerService, componentDefinitionService,
             integrationCodeWorkflowFacadeProvider, integrationCodeWorkflowService, integrationService,
-            mock(IntegrationVersionWorkflowChangeService.class), integrationWorkflowService,
+            mock(IntegrationVersionWorkflowChangeFacade.class), integrationWorkflowService,
             integrationInstanceConfigurationFacade, integrationInstanceConfigurationService, tagService,
             workflowService, workflowTestConfigurationService, workflowNodeTestOutputService, List.of());
 
