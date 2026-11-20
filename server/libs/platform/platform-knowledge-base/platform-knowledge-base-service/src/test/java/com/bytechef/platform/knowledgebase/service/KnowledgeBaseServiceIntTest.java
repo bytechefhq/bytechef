@@ -91,6 +91,39 @@ class KnowledgeBaseServiceIntTest {
     }
 
     @Test
+    void testGetKnowledgeBasesById() {
+        KnowledgeBase firstKnowledgeBase = knowledgeBaseRepository.save(createKnowledgeBase("KnowledgeBase 1"));
+
+        knowledgeBaseRepository.save(createKnowledgeBase("KnowledgeBase 2"));
+
+        KnowledgeBase thirdKnowledgeBase = knowledgeBaseRepository.save(createKnowledgeBase("KnowledgeBase 3"));
+
+        List<KnowledgeBase> knowledgeBases = knowledgeBaseService.getKnowledgeBases(
+            List.of(firstKnowledgeBase.getId(), thirdKnowledgeBase.getId()));
+
+        assertThat(knowledgeBases)
+            .extracting(KnowledgeBase::getName)
+            .containsExactlyInAnyOrder("KnowledgeBase 1", "KnowledgeBase 3");
+    }
+
+    @Test
+    void testUpdateKnowledgeBaseTagIdsOfAMissingKnowledgeBaseFails() {
+        assertThatThrownBy(() -> knowledgeBaseService.updateKnowledgeBaseTagIds(Long.MAX_VALUE, List.of()))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void testUpdateKnowledgeBaseTagIdsWithNoTagIdsClearsTheTags() {
+        KnowledgeBase knowledgeBase = knowledgeBaseRepository.save(createKnowledgeBase("KnowledgeBase 1"));
+
+        knowledgeBaseService.updateKnowledgeBaseTagIds(knowledgeBase.getId(), List.of());
+
+        KnowledgeBase updatedKnowledgeBase = knowledgeBaseService.getKnowledgeBase(knowledgeBase.getId());
+
+        assertThat(updatedKnowledgeBase.getTagIds()).isEmpty();
+    }
+
+    @Test
     void testGetKnowledgeBases() {
         knowledgeBaseRepository.save(createKnowledgeBase("KnowledgeBase 1"));
         knowledgeBaseRepository.save(createKnowledgeBase("KnowledgeBase 2"));
