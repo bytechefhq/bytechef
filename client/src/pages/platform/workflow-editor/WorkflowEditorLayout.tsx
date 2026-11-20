@@ -161,13 +161,8 @@ const WorkflowEditorLayout = ({
 
     const issues = useWorkflowIssues();
 
-    const {
-        automationProjectId,
-        codeWorkflow,
-        codeWorkflowLanguage,
-        invalidateWorkflowQueries,
-        updateWorkflowMutation,
-    } = useWorkflowEditor();
+    const {automationProjectId, codeWorkflow, codeWorkflowLanguage, invalidateWorkflowQueries, updateWorkflowMutation} =
+        useWorkflowEditor();
     const {handleClusterElementsCanvasOpenChange, isMainRootClusterElement} = useWorkflowEditorLayout();
 
     const queryClient = useQueryClient();

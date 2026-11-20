@@ -48,10 +48,7 @@ const renderPage = (projectId = '7') => {
                     path="/embedded/automations/:workflowUuid/editor"
                 />
 
-                <Route
-                    element={<div data-testid="automations-page" />}
-                    path="/embedded/automations"
-                />
+                <Route element={<div data-testid="automations-page" />} path="/embedded/automations" />
             </Routes>
         </MemoryRouter>,
         {wrapper}
