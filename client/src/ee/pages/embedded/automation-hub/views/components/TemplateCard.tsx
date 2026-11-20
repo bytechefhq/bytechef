@@ -50,7 +50,7 @@ const TemplateCard = ({
     const label = automation?.label || template.label || 'Untitled automation';
     const description = automation?.description || template.description;
     const attentionDescription = describeAttentionReason(automation?.attentionReason);
-    const hasEditableInputs = (automation?.inputs ?? []).some((input) => !input.provided);
+    const hasEditableInputs = (automation?.inputs ?? []).length > 0;
 
     const handleRemove = async () => {
         setRemoving(true);

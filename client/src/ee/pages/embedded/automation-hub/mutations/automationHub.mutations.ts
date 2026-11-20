@@ -39,7 +39,6 @@ export interface ProvisionReferenceRequestI {
     connections: Record<string, number>;
     inputs?: Record<string, unknown>;
     providedComponentNames?: string[];
-    providedInputNames?: string[];
     workflowUuid: string;
 }
 
@@ -47,11 +46,11 @@ export const useProvisionReferenceMutation = () => {
     const queryClient = useQueryClient();
 
     return useMutation<void, Error, ProvisionReferenceRequestI>({
-        mutationFn: ({connections, inputs, providedComponentNames = [], providedInputNames = [], workflowUuid}) =>
+        mutationFn: ({connections, inputs, providedComponentNames = [], workflowUuid}) =>
             new ConnectedUserProjectWorkflowApi().provisionFrontendWorkflowReference({
                 provisionWorkflowReferenceRequest: {
                     connections: omitKeys(connections, providedComponentNames),
-                    inputs: inputs && omitKeys(inputs, providedInputNames),
+                    inputs,
                 },
                 workflowUuid,
             }),

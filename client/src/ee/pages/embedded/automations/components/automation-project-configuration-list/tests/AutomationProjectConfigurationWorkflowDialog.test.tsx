@@ -92,10 +92,32 @@ const providableValues = {
         },
     ],
     inputs: [
-        {label: 'Slack Channel', name: 'channel', optionConnections: [], required: true, type: 'STRING'},
-        {label: 'Tone', name: 'tone', optionConnections: [], required: false, type: 'STRING'},
-        {label: 'Retries', name: 'retries', optionConnections: [], required: false, type: 'INTEGER'},
-        {label: 'Notify', name: 'notify', optionConnections: [], required: false, type: 'BOOLEAN'},
+        {
+            internalOnly: true,
+            label: 'Slack Channel',
+            name: 'channel',
+            optionConnections: [],
+            required: true,
+            type: 'STRING',
+        },
+        {internalOnly: true, label: 'Tone', name: 'tone', optionConnections: [], required: false, type: 'STRING'},
+        {
+            internalOnly: false,
+            label: 'Greeting',
+            name: 'greeting',
+            optionConnections: [],
+            required: false,
+            type: 'STRING',
+        },
+        {
+            internalOnly: true,
+            label: 'Retries',
+            name: 'retries',
+            optionConnections: [],
+            required: false,
+            type: 'INTEGER',
+        },
+        {internalOnly: true, label: 'Notify', name: 'notify', optionConnections: [], required: false, type: 'BOOLEAN'},
     ],
     providedConnections: null,
     providedInputs: null,
@@ -105,6 +127,7 @@ const slackChannelReferenceInput = {
     componentName: 'slack',
     componentVersion: 1,
     groupName: 'channel',
+    internalOnly: true,
     label: 'Slack Channel',
     name: 'channel',
     optionConnections: [
@@ -205,11 +228,11 @@ describe('AutomationProjectConfigurationWorkflowDialog', () => {
         expect(screen.getByRole('combobox', {name: 'OpenAI Connection'})).toHaveTextContent('Let each user connect');
         expect(screen.getByRole('combobox', {name: 'Slack Connection'})).toBeInTheDocument();
         expect(screen.queryByRole('combobox', {name: 'Logger Connection'})).not.toBeInTheDocument();
-        expect(screen.queryByRole('textbox', {name: 'Slack Channel'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('textbox', {name: /^Slack Channel/})).not.toBeInTheDocument();
 
         await openInputsTab(user);
 
-        expect(screen.getByRole('textbox', {name: 'Slack Channel'})).toHaveValue('');
+        expect(screen.getByRole('textbox', {name: /^Slack Channel/})).toHaveValue('');
         expect(screen.getByRole('textbox', {name: 'Tone'})).toHaveValue('');
     });
 
@@ -270,7 +293,25 @@ describe('AutomationProjectConfigurationWorkflowDialog', () => {
 
         await openInputsTab(user);
 
-        expect(screen.getByRole('textbox', {name: 'Slack Channel'})).toHaveValue('#ops');
+        expect(screen.getByRole('textbox', {name: /^Slack Channel/})).toHaveValue('#ops');
+    });
+
+    it('shows only internal-only inputs and drops a leftover value of an input each user fills', async () => {
+        const user = userEvent.setup();
+
+        mocks.updateMutate.mockImplementation((_variables, options: {onSuccess: () => void}) => options.onSuccess());
+
+        renderDialog({provided: {providedInputs: {channel: '#ops', greeting: 'Hello'}}});
+
+        await openInputsTab(user);
+
+        expect(screen.queryByRole('textbox', {name: /^Greeting/})).not.toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() => expect(mocks.updateMutate).toHaveBeenCalledTimes(1));
+
+        expect(mocks.updateMutate.mock.calls[0][0].providedInputs).toEqual({channel: '#ops'});
     });
 
     it('saves the chosen values, leaves out the entries each user decides, and closes', async () => {
@@ -287,7 +328,7 @@ describe('AutomationProjectConfigurationWorkflowDialog', () => {
 
         await openInputsTab(user);
 
-        await user.type(screen.getByRole('textbox', {name: 'Slack Channel'}), '#ops');
+        await user.type(screen.getByRole('textbox', {name: /^Slack Channel/}), '#ops');
 
         await user.click(screen.getByRole('button', {name: 'Save'}));
 
@@ -338,9 +379,9 @@ describe('AutomationProjectConfigurationWorkflowDialog', () => {
 
         await openInputsTab(user);
 
-        await user.click(screen.getByRole('combobox', {name: 'Slack Channel'}));
+        await user.click(screen.getByRole('combobox', {name: /^Slack Channel/}));
 
-        expect(await screen.findByRole('option', {name: 'Let each user fill it'})).toBeInTheDocument();
+        expect(screen.queryByRole('option', {name: 'Let each user fill it'})).not.toBeInTheDocument();
 
         await user.click(screen.getByRole('option', {name: 'Random'}));
         await user.click(screen.getByRole('button', {name: 'Save'}));
@@ -376,7 +417,7 @@ describe('AutomationProjectConfigurationWorkflowDialog', () => {
             {enabled: true}
         );
 
-        await user.click(screen.getByRole('combobox', {name: 'Slack Channel'}));
+        await user.click(screen.getByRole('combobox', {name: /^Slack Channel/}));
         await user.click(await screen.findByRole('option', {name: 'ops'}));
         await user.click(screen.getByRole('button', {name: 'Save'}));
 
@@ -414,7 +455,7 @@ describe('AutomationProjectConfigurationWorkflowDialog', () => {
             {enabled: true}
         );
 
-        await user.click(screen.getByRole('combobox', {name: 'Slack Channel'}));
+        await user.click(screen.getByRole('combobox', {name: /^Slack Channel/}));
         await user.click(await screen.findByRole('option', {name: 'support'}));
         await user.click(screen.getByRole('button', {name: 'Save'}));
 
@@ -440,7 +481,7 @@ describe('AutomationProjectConfigurationWorkflowDialog', () => {
 
         await openInputsTab(user);
 
-        expect(screen.getByRole('combobox', {name: 'Slack Channel'})).toHaveTextContent('C404');
+        expect(screen.getByRole('combobox', {name: /^Slack Channel/})).toHaveTextContent('C404');
     });
 
     it('edits every member of a multi-member component input group and saves them as one map', async () => {
@@ -461,7 +502,7 @@ describe('AutomationProjectConfigurationWorkflowDialog', () => {
 
         await openInputsTab(user);
 
-        expect(screen.getByRole('group', {name: 'Slack Message'})).toBeInTheDocument();
+        expect(screen.getByRole('group', {name: /^Slack Message/})).toBeInTheDocument();
         expect(screen.getByRole('textbox', {name: 'Text'})).toHaveValue('Hi');
         expect(mocks.inputOptionsQuery).toHaveBeenLastCalledWith(
             expect.objectContaining({
@@ -519,7 +560,7 @@ describe('AutomationProjectConfigurationWorkflowDialog', () => {
 
         await openInputsTab(user);
 
-        expect(screen.getByRole('textbox', {name: 'Slack Channel'})).toHaveValue('');
+        expect(screen.getByRole('textbox', {name: /^Slack Channel/})).toHaveValue('');
     });
 
     it('explains why dynamic options are not shown', async () => {
@@ -533,8 +574,8 @@ describe('AutomationProjectConfigurationWorkflowDialog', () => {
 
         await openInputsTab(user);
 
-        expect(screen.getByRole('combobox', {name: 'Slack Channel'})).toHaveTextContent(
-            'Let each user fill it (no connection to load options)'
+        expect(screen.getByRole('combobox', {name: /^Slack Channel/})).toHaveTextContent(
+            'Set a value (no connection to load options)'
         );
         expect(screen.queryByRole('combobox', {name: 'Load Slack Channel options with'})).not.toBeInTheDocument();
 
@@ -548,7 +589,7 @@ describe('AutomationProjectConfigurationWorkflowDialog', () => {
 
         await openInputsTab(user);
 
-        expect(screen.getByRole('combobox', {name: 'Slack Channel'})).toHaveTextContent('Loading options...');
+        expect(screen.getByRole('combobox', {name: /^Slack Channel/})).toHaveTextContent('Loading options...');
 
         unmountLoading();
 
@@ -558,12 +599,12 @@ describe('AutomationProjectConfigurationWorkflowDialog', () => {
 
         await openInputsTab(user);
 
-        expect(screen.getByRole('combobox', {name: 'Slack Channel'})).toHaveTextContent(
-            'Let each user fill it (options could not be loaded)'
+        expect(screen.getByRole('combobox', {name: /^Slack Channel/})).toHaveTextContent(
+            'Set a value (options could not be loaded)'
         );
     });
 
-    it('says when the workflow has no connections or no inputs to provide', async () => {
+    it('says when the workflow has no connections to provide or no internal-only inputs to set', async () => {
         const user = userEvent.setup();
 
         renderDialog({provided: {connectionSlots: [], inputs: []}});
@@ -572,7 +613,7 @@ describe('AutomationProjectConfigurationWorkflowDialog', () => {
 
         await openInputsTab(user);
 
-        expect(screen.getByText('This workflow has no inputs to provide.')).toBeInTheDocument();
+        expect(screen.getByText('This workflow has no internal-only inputs to set.')).toBeInTheDocument();
     });
 
     it('closes without saving when cancelled', async () => {

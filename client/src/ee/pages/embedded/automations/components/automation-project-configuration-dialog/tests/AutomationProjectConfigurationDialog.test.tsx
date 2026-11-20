@@ -10,6 +10,7 @@ const regionInput = {
     componentName: null,
     componentVersion: null,
     groupName: null,
+    internalOnly: true,
     label: 'Region',
     name: 'region',
     optionConnections: [],

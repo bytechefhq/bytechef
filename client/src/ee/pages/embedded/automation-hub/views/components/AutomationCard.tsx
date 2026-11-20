@@ -45,7 +45,7 @@ const AutomationCard = ({
     const navigate = useNavigate();
 
     const inputs = automation.inputs ?? [];
-    const hasEditableInputs = inputs.some((input) => !input.provided);
+    const hasEditableInputs = inputs.length > 0;
 
     const label = automation.label || 'Untitled automation';
 

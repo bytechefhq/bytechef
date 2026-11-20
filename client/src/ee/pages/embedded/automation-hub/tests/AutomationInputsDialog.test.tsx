@@ -14,7 +14,7 @@ vi.mock('@/ee/pages/embedded/automation-hub/mutations/automationHub.mutations', 
 
 const INPUTS: AutomationProjectWorkflowInput[] = [
     {label: 'Spreadsheet name', name: 'sheetName', required: true, type: 'STRING'},
-    {label: 'API region', name: 'region', provided: true, required: true, type: 'STRING'},
+    {label: 'API region', name: 'region', required: true, type: 'STRING'},
 ];
 
 const renderDialog = (onClose = vi.fn()) =>
@@ -35,20 +35,24 @@ describe('AutomationInputsDialog', () => {
         updateInputsMutateAsyncMock.mockResolvedValue(undefined);
     });
 
-    it('shows a provided input as read-only with the administrator label and no field', () => {
+    it('shows every input as an editable field', () => {
         renderDialog();
 
-        expect(screen.getByText('Provided by your administrator')).toBeInTheDocument();
-        expect(screen.queryByLabelText(/API region/)).not.toBeInTheDocument();
+        expect(screen.queryByText('Provided by your administrator')).not.toBeInTheDocument();
+        expect(screen.getByLabelText(/API region/)).toBeInTheDocument();
         expect(screen.getByLabelText(/Spreadsheet name/)).toBeInTheDocument();
     });
 
-    it('does not count a provided required input as missing and never sends it', async () => {
+    it('keeps Save disabled until every required input has a value and then sends every value', async () => {
         const user = userEvent.setup();
 
         renderDialog();
 
         const saveButton = screen.getByRole('button', {name: 'Save'});
+
+        expect(saveButton).toBeDisabled();
+
+        await user.type(screen.getByLabelText(/API region/), 'eu');
 
         expect(saveButton).toBeEnabled();
 
@@ -56,17 +60,17 @@ describe('AutomationInputsDialog', () => {
 
         await waitFor(() =>
             expect(updateInputsMutateAsyncMock).toHaveBeenCalledWith({
-                inputs: {sheetName: 'Leads'},
+                inputs: {region: 'eu', sheetName: 'Leads'},
                 workflowUuid: 'copy-uuid',
             })
         );
     });
 
-    it('disables Save when every input is provided', () => {
+    it('disables Save when the workflow has no inputs', () => {
         render(
             <AutomationInputsDialog
                 inputValues={{}}
-                inputs={[{label: 'API region', name: 'region', provided: true, required: true}]}
+                inputs={[]}
                 label="Sync leads"
                 onClose={vi.fn()}
                 workflowUuid="copy-uuid"
