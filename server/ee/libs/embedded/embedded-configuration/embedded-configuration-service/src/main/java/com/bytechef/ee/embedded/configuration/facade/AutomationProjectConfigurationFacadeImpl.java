@@ -12,6 +12,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -69,6 +70,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -1921,14 +1923,67 @@ public class AutomationProjectConfigurationFacadeImpl
 
             Map<String, Object> mergedInputs = new HashMap<>(referenceValues.inputs());
 
+            Map<String, String> inputTypes = getInputTypes(reference);
+
             for (Map.Entry<String, Object> inputEntry : inputs.entrySet()) {
-                if (isMissingValue(mergedInputs.get(inputEntry.getKey()))) {
-                    mergedInputs.put(inputEntry.getKey(), inputEntry.getValue());
+                String inputName = inputEntry.getKey();
+
+                if (isMissingValue(mergedInputs.get(inputName))) {
+                    mergedInputs.put(inputName, toTypedInputValue(inputTypes.get(inputName), inputEntry.getValue()));
                 }
             }
 
             connectedUserWorkflowReferenceFacade.updateReferenceInputs(
                 connectedUser.getExternalId(), automationUuid, mergedInputs, connectedUser.getEnvironment());
+        }
+    }
+
+    private Map<String, String> getInputTypes(ConnectedUserProjectWorkflow reference) {
+        Optional<ProjectDeploymentWorkflow> rowOptional = connectedUserReferenceDeploymentManager.fetchRow(
+            Objects.requireNonNull(reference.getProjectDeploymentId()),
+            Objects.requireNonNull(reference.getAutomationUuid()));
+
+        if (rowOptional.isEmpty()) {
+            return Map.of();
+        }
+
+        ProjectDeploymentWorkflow row = rowOptional.get();
+
+        Workflow workflow = connectedUserReferenceDeploymentManager.getWorkflow(row.getWorkflowId());
+
+        Map<String, String> inputTypes = new HashMap<>();
+
+        for (Workflow.Input input : workflow.getInputs()) {
+            if (input.type() != null) {
+                inputTypes.put(input.name(), input.type());
+            }
+        }
+
+        return inputTypes;
+    }
+
+    private static Object toTypedInputValue(@Nullable String type, Object value) {
+        if (type == null || !(value instanceof String stringValue)) {
+            return value;
+        }
+
+        String trimmedValue = stringValue.trim();
+
+        try {
+            return switch (type.toLowerCase(Locale.ROOT)) {
+                case "boolean" -> {
+                    if (trimmedValue.equalsIgnoreCase("true") || trimmedValue.equalsIgnoreCase("false")) {
+                        yield Boolean.parseBoolean(trimmedValue);
+                    }
+
+                    yield value;
+                }
+                case "integer" -> Long.parseLong(trimmedValue);
+                case "number" -> Double.parseDouble(trimmedValue);
+                default -> value;
+            };
+        } catch (NumberFormatException numberFormatException) {
+            return value;
         }
     }
 
