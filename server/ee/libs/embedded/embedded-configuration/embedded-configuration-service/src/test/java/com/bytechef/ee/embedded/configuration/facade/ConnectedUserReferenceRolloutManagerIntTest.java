@@ -2589,6 +2589,86 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
+    void testGetMoveImpactLeavesOutANewRequiredInputTheTargetProvides() {
+        long automationProjectId = createAutomationProject("Move Impact Target Provided Input");
+
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationProjectFacade.publishProject(automationProjectId);
+
+        AutomationProjectConfiguration sourceConfiguration = automationProjectConfigurationService
+            .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUser connectedUser = assignNewConnectedUser(automationProjectId, sourceConfiguration);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+
+        String draftWorkflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+        Workflow draftWorkflow = workflowService.getWorkflow(draftWorkflowId);
+
+        workflowService.update(
+            draftWorkflowId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION, draftWorkflow.getVersion());
+
+        automationProjectFacade.publishProject(automationProjectId);
+
+        AutomationProjectConfiguration targetConfiguration = automationProjectConfigurationService
+            .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
+
+        automationProjectConfigurationFacade.updateConfigurationWorkflow(
+            targetConfiguration.getId(), workflowUuid, Map.of(), Map.of("channel", "#target"));
+
+        assertThat(reference.getId()).isNotNull();
+        assertThat(automationProjectConfigurationFacade.getMoveImpact(
+            sourceConfiguration.getId(), targetConfiguration.getId(), List.of(connectedUser.getId()))
+            .workflows()).isEmpty();
+    }
+
+    @Test
+    void testMoveFillsANewRequiredInputWithTheGivenValue() {
+        long automationProjectId = createAutomationProject("Move Fills New Required Input");
+
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationProjectFacade.publishProject(automationProjectId);
+
+        AutomationProjectConfiguration sourceConfiguration = automationProjectConfigurationService
+            .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUser connectedUser = assignNewConnectedUser(automationProjectId, sourceConfiguration);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+
+        String draftWorkflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+        Workflow draftWorkflow = workflowService.getWorkflow(draftWorkflowId);
+
+        workflowService.update(
+            draftWorkflowId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION, draftWorkflow.getVersion());
+
+        automationProjectFacade.publishProject(automationProjectId);
+
+        AutomationProjectConfiguration targetConfiguration = automationProjectConfigurationService
+            .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
+
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.moveConnectedUsers(
+            sourceConfiguration.getId(), targetConfiguration.getId(), List.of(connectedUser.getId()),
+            Map.of(workflowUuid, Map.of("channel", "#mine")));
+
+        assertThat(moveResult.movedConnectedUserIds()).containsExactly(connectedUser.getId());
+        assertThat(moveResult.needsAttentionConnectedUserIds()).isEmpty();
+        assertThat(fetchDeploymentRow(reference))
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isTrue();
+                assertThat(row.getInputs()).isEqualTo(Map.of("channel", "#mine"));
+            });
+    }
+
+    @Test
     void testMoveImpactListsUsersThatWouldBeSkipped() {
         long automationProjectId = createAutomationProject("Move Impact Skipped");
 
