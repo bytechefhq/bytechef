@@ -57,6 +57,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.task.TaskExecutor;
@@ -74,6 +75,7 @@ import tools.jackson.databind.ObjectMapper;
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Configuration
 @Import(JacksonConfiguration.class)
+@PropertySource("classpath:config/component-test-int.properties")
 public class ComponentTestIntConfiguration {
 
     @Bean
