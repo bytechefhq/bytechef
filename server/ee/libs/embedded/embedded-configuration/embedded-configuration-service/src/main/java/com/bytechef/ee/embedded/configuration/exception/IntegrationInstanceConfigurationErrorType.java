@@ -37,6 +37,8 @@ public class IntegrationInstanceConfigurationErrorType extends AbstractErrorType
         new IntegrationInstanceConfigurationErrorType(109);
     public static final IntegrationInstanceConfigurationErrorType BLANK_CONNECTION_PARAMETER =
         new IntegrationInstanceConfigurationErrorType(110);
+    public static final IntegrationInstanceConfigurationErrorType INTERNAL_ONLY_INPUT_MISSING =
+        new IntegrationInstanceConfigurationErrorType(111);
 
     private IntegrationInstanceConfigurationErrorType(int errorKey) {
         super(IntegrationInstanceConfiguration.class, errorKey);

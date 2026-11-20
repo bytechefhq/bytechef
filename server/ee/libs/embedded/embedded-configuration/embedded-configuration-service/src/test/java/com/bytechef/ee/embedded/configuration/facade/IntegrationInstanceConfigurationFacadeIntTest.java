@@ -155,6 +155,27 @@ class IntegrationInstanceConfigurationFacadeIntTest {
             "tasks": []
         }""";
 
+    private static final String INTERNAL_ONLY_OPTIONAL_WORKFLOW_DEFINITION = """
+        {
+            "label": "Optional Internal Only Workflow",
+            "inputs": [
+                {"name": "note", "label": "Note", "type": "string", "required": false, "internalOnly": true}
+            ],
+            "triggers": [],
+            "tasks": []
+        }""";
+
+    private static final String INTERNAL_ONLY_REQUIRED_WORKFLOW_DEFINITION = """
+        {
+            "label": "Required Internal Only Workflow",
+            "inputs": [
+                {"name": "accountId", "label": "Account", "type": "string", "required": true, "internalOnly": true},
+                {"name": "region", "label": "Region", "type": "string", "required": true}
+            ],
+            "triggers": [],
+            "tasks": []
+        }""";
+
     private static final String SLACK_TRIGGER_WORKFLOW_DEFINITION = """
         {
             "label": "Slack Workflow",
@@ -1199,6 +1220,190 @@ class IntegrationInstanceConfigurationFacadeIntTest {
     }
 
     @Test
+    void testEnableIntegrationInstanceConfigurationWorkflowRefusesAnEmptyRequiredInternalOnlyInput() {
+        IntegrationInstanceConfigurationWorkflow configurationWorkflow = createInternalOnlyConfigurationWorkflow(
+            INTERNAL_ONLY_REQUIRED_WORKFLOW_DEFINITION, false, Map.of("region", "eu"));
+
+        authenticate(admin());
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.enableIntegrationInstanceConfigurationWorkflow(
+                configurationWorkflow.getIntegrationInstanceConfigurationId(), configurationWorkflow.getWorkflowId(),
+                true))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("accountId")
+                    .satisfies(throwable -> assertThat(((ConfigurationException) throwable).getErrorKey())
+                        .isEqualTo(
+                            IntegrationInstanceConfigurationErrorType.INTERNAL_ONLY_INPUT_MISSING.getErrorKey()));
+
+        assertThat(
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                configurationWorkflow.getId())
+                .isEnabled()).isFalse();
+    }
+
+    @Test
+    void testEnableIntegrationInstanceConfigurationWorkflowAllowsAnEmptyOptionalInternalOnlyInput() {
+        IntegrationInstanceConfigurationWorkflow configurationWorkflow = createInternalOnlyConfigurationWorkflow(
+            INTERNAL_ONLY_OPTIONAL_WORKFLOW_DEFINITION, false, Map.of());
+
+        authenticate(admin());
+
+        integrationInstanceConfigurationFacade.enableIntegrationInstanceConfigurationWorkflow(
+            configurationWorkflow.getIntegrationInstanceConfigurationId(), configurationWorkflow.getWorkflowId(), true);
+
+        assertThat(
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                configurationWorkflow.getId())
+                .isEnabled()).isTrue();
+    }
+
+    @Test
+    void testUpdateIntegrationInstanceConfigurationWorkflowRefusesClearingARequiredInternalOnlyInputOfAnEnabledWorkflow() {
+        IntegrationInstanceConfigurationWorkflow configurationWorkflow = createInternalOnlyConfigurationWorkflow(
+            INTERNAL_ONLY_REQUIRED_WORKFLOW_DEFINITION, true, Map.of("accountId", "account-1", "region", "eu"));
+
+        authenticate(admin());
+
+        IntegrationInstanceConfigurationWorkflow storedConfigurationWorkflow =
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                configurationWorkflow.getId());
+
+        storedConfigurationWorkflow.setInputs(Map.of("region", "eu"));
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationWorkflow(
+                storedConfigurationWorkflow))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("accountId")
+                    .satisfies(throwable -> assertThat(((ConfigurationException) throwable).getErrorKey())
+                        .isEqualTo(
+                            IntegrationInstanceConfigurationErrorType.INTERNAL_ONLY_INPUT_MISSING.getErrorKey()));
+
+        assertThat(
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                configurationWorkflow.getId())
+                .getInputs()).isEqualTo(Map.of("accountId", "account-1", "region", "eu"));
+    }
+
+    @Test
+    void testUpdateIntegrationInstanceConfigurationWorkflowAllowsAnEmptyRequiredInternalOnlyInputOfADisabledWorkflow() {
+        IntegrationInstanceConfigurationWorkflow configurationWorkflow = createInternalOnlyConfigurationWorkflow(
+            INTERNAL_ONLY_REQUIRED_WORKFLOW_DEFINITION, false, Map.of("accountId", "account-1", "region", "eu"));
+
+        authenticate(admin());
+
+        IntegrationInstanceConfigurationWorkflow storedConfigurationWorkflow =
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                configurationWorkflow.getId());
+
+        storedConfigurationWorkflow.setInputs(Map.of("region", "eu"));
+
+        integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationWorkflow(
+            storedConfigurationWorkflow);
+
+        assertThat(
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                configurationWorkflow.getId())
+                .getInputs()).isEqualTo(Map.of("region", "eu"));
+    }
+
+    @Test
+    void testChangeConnectedUserVersionCopyLeavesAWorkflowWithAnEmptyRequiredInternalOnlyInputDisabled() {
+        ChangeVersionFixture changeVersionFixture = createChangeVersionFixture(1, true);
+
+        UUID internalOnlyWorkflowUuid = UUID.randomUUID();
+
+        String sourceInternalOnlyWorkflowId = addWorkflow(
+            changeVersionFixture.integrationId(), 1, internalOnlyWorkflowUuid,
+            INTERNAL_ONLY_REQUIRED_WORKFLOW_DEFINITION);
+        String targetInternalOnlyWorkflowId = addWorkflow(
+            changeVersionFixture.integrationId(), 2, internalOnlyWorkflowUuid,
+            INTERNAL_ONLY_REQUIRED_WORKFLOW_DEFINITION);
+
+        IntegrationInstanceConfigurationWorkflow sourceInternalOnlyConfigurationWorkflow =
+            new IntegrationInstanceConfigurationWorkflow();
+
+        sourceInternalOnlyConfigurationWorkflow.setEnabled(true);
+        sourceInternalOnlyConfigurationWorkflow.setInputs(Map.of("region", "eu"));
+        sourceInternalOnlyConfigurationWorkflow.setIntegrationInstanceConfigurationId(
+            changeVersionFixture.sourceConfigurationId());
+        sourceInternalOnlyConfigurationWorkflow.setWorkflowId(sourceInternalOnlyWorkflowId);
+
+        integrationInstanceConfigurationWorkflowService.create(sourceInternalOnlyConfigurationWorkflow);
+
+        authenticate(admin());
+
+        ConfigurationMoveResultDTO configurationMoveResultDTO =
+            integrationInstanceConfigurationFacade.changeConnectedUserVersion(
+                changeVersionFixture.sourceConfigurationId(), CONNECTED_USER_ID, 2, null);
+
+        assertThat(configurationMoveResultDTO.movedConnectedUserIds()).containsExactly(CONNECTED_USER_ID);
+
+        IntegrationInstanceConfiguration copyConfiguration = getCopyConfiguration(
+            changeVersionFixture.integrationId(), List.of(changeVersionFixture.sourceConfigurationId()));
+
+        IntegrationInstanceConfigurationWorkflow copiedInternalOnlyConfigurationWorkflow =
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                copyConfiguration.getId(), targetInternalOnlyWorkflowId);
+
+        assertThat(copiedInternalOnlyConfigurationWorkflow.isEnabled()).isFalse();
+
+        IntegrationInstanceConfigurationWorkflow carriedConfigurationWorkflow =
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                copyConfiguration.getId(), changeVersionFixture.otherWorkflowId());
+
+        assertThat(carriedConfigurationWorkflow.isEnabled()).isTrue();
+    }
+
+    @Test
+    void testMoveImpactLeavesOutInternalOnlyInputs() {
+        ConnectedUser connectedUser = new ConnectedUser();
+
+        connectedUser.setEnabled(true);
+
+        when(connectedUserService.getConnectedUser(CONNECTED_USER_ID)).thenReturn(connectedUser);
+
+        Integration integration = createIntegration();
+
+        UUID workflowUuid = UUID.randomUUID();
+
+        String sourceWorkflowId = addWorkflow(
+            integration.getId(), 1, workflowUuid, INTERNAL_ONLY_REQUIRED_WORKFLOW_DEFINITION);
+        String targetWorkflowId = addWorkflow(
+            integration.getId(), 2, workflowUuid, INTERNAL_ONLY_REQUIRED_WORKFLOW_DEFINITION);
+
+        long sourceConfigurationId = createConfiguration(integration.getId(), 1, AuthorizationType.API_KEY);
+        long targetConfigurationId = createConfiguration(integration.getId(), 2, AuthorizationType.API_KEY);
+
+        long sourceConfigurationWorkflowId = createConfigurationWorkflow(
+            sourceConfigurationId, sourceWorkflowId, "unused");
+
+        createConfigurationWorkflow(targetConfigurationId, targetWorkflowId, "unused");
+
+        IntegrationInstance integrationInstance = integrationInstanceService.create(
+            CONNECTED_USER_ID, 41L, sourceConfigurationId);
+
+        IntegrationInstanceWorkflow integrationInstanceWorkflow =
+            integrationInstanceWorkflowService.createIntegrationInstanceWorkflow(
+                integrationInstance.getId(), sourceConfigurationWorkflowId);
+
+        integrationInstanceWorkflow.setEnabled(true);
+
+        integrationInstanceWorkflowService.update(integrationInstanceWorkflow);
+
+        authenticate(admin());
+
+        ConfigurationMoveImpactDTO configurationMoveImpactDTO = integrationInstanceConfigurationFacade.getMoveImpact(
+            sourceConfigurationId, targetConfigurationId, List.of(CONNECTED_USER_ID));
+
+        assertThat(configurationMoveImpactDTO.workflows()).hasSize(1);
+        assertThat(configurationMoveImpactDTO.workflows()
+            .getFirst()
+            .newRequiredInputs()).containsExactly("region");
+    }
+
+    @Test
     void testUpgradeConnectedUsersMovesUsersFromSeveralConfigurations() {
         UpgradeFixture upgradeFixture = createUpgradeFixture();
 
@@ -2103,6 +2308,27 @@ class IntegrationInstanceConfigurationFacadeIntTest {
         integrationInstanceConfigurationService.updateEnabled(integrationInstanceConfiguration.getId(), true);
 
         return integrationInstanceConfiguration.getId();
+    }
+
+    private IntegrationInstanceConfigurationWorkflow createInternalOnlyConfigurationWorkflow(
+        String definition, boolean enabled, Map<String, ?> inputs) {
+
+        Integration integration = createIntegration();
+
+        String workflowId = addWorkflow(integration.getId(), 1, UUID.randomUUID(), definition);
+
+        long integrationInstanceConfigurationId = createEnabledIntegrationInstanceConfiguration(integration.getId());
+
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            new IntegrationInstanceConfigurationWorkflow();
+
+        integrationInstanceConfigurationWorkflow.setEnabled(enabled);
+        integrationInstanceConfigurationWorkflow.setInputs(inputs);
+        integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
+            integrationInstanceConfigurationId);
+        integrationInstanceConfigurationWorkflow.setWorkflowId(workflowId);
+
+        return integrationInstanceConfigurationWorkflowService.create(integrationInstanceConfigurationWorkflow);
     }
 
     private long createConfigurationWorkflow(long configurationId, String workflowId, String cronExpression) {
