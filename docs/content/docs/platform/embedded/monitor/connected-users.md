@@ -176,13 +176,13 @@ Use a batch upgrade to move many connected users to a newer configuration at onc
 
 2. For an integration, click **Upgrade integration**, then pick one of the integrations the selected users have. Next pick the **Configuration** to move them to. Each configuration of the current environment is listed as its name and version, for example "Gmail · V10". Configurations with a version higher than the lowest one the selected users are on are marked **Newer version**. If none of the selected users has an integration in this environment, the dialog says so instead of listing any.
 3. For an automation, click **Upgrade automation**, then pick a project that has configurations in the current environment. Next pick the **Configuration**. When the configurations have different versions, the one with the highest version is marked **Latest version**. If no published project has configurations in this environment, the dialog says so.
-4. Read the impact preview. It shows what changes for the workflows involved, such as new required inputs or connections, and lists the users that would be skipped, each with the reason under their name. When MCP servers use these configurations, a note says how many, because their tools follow the configuration each user lands on.
+4. Read the impact preview. It shows what changes for the workflows involved, such as new required inputs or connections, and lists the users that would be skipped, each with the reason under their name. When MCP servers use these configurations, a note says how many, because their tools follow the configuration each user lands on. For an automation, each workflow with a new required input has a card with a field for it: the value you enter is saved for every upgraded user, and keeps their other input values. Inputs the target configuration provides are left out. For an integration, new inputs are listed as a note and cannot be set here.
 
    ![Upgrade dialog with the impact preview](connected-users/connected-users-upgrade-integration.png)
 
 5. Click **Upgrade**. While the upgrade runs, the dialog stays open and cannot be closed.
 
-**Upgrade** stays unavailable until you pick a configuration and the preview has loaded. It also stays unavailable when none of the selected users would move, because each of them is already on that configuration or doesn't have that integration or project. A warning under the **Configuration** field says so. Pick another configuration or change the selection.
+**Upgrade** stays unavailable until you pick a configuration, the preview has loaded and every new required input field is filled. It also stays unavailable when none of the selected users would move, because each of them is already on that configuration or doesn't have that integration or project. A warning under the **Configuration** field says so. Pick another configuration or change the selection.
 
 ![Warning when none of the selected users would move](connected-users/connected-users-upgrade-nobody-moves.png)
 
