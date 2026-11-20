@@ -38,6 +38,8 @@ public class CustomComponentErrorType extends AbstractErrorType {
 
     public static final CustomComponentErrorType COMPONENT_NOT_DRAFT = new CustomComponentErrorType(109);
 
+    public static final CustomComponentErrorType LANGUAGE_MISMATCH = new CustomComponentErrorType(110);
+
     private CustomComponentErrorType(int errorKey) {
         super(CustomComponent.class, errorKey);
     }
