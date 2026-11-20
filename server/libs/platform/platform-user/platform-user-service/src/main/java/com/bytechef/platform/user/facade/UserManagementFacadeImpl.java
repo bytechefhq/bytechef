@@ -26,7 +26,6 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
 import com.bytechef.platform.user.service.AuthorityService;
-import com.bytechef.platform.user.service.UserInvitationService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -52,17 +51,17 @@ class UserManagementFacadeImpl implements UserManagementFacade {
 
     private final AuthorityService authorityService;
     private final TenantService tenantService;
-    private final UserInvitationService userInvitationService;
+    private final UserInvitationFacade userInvitationFacade;
     private final UserService userService;
 
     @SuppressFBWarnings("EI")
     UserManagementFacadeImpl(
-        AuthorityService authorityService, TenantService tenantService, UserInvitationService userInvitationService,
+        AuthorityService authorityService, TenantService tenantService, UserInvitationFacade userInvitationFacade,
         UserService userService) {
 
         this.authorityService = authorityService;
         this.tenantService = tenantService;
-        this.userInvitationService = userInvitationService;
+        this.userInvitationFacade = userInvitationFacade;
         this.userService = userService;
     }
 
@@ -94,7 +93,7 @@ class UserManagementFacadeImpl implements UserManagementFacade {
             throw new EmailAlreadyUsedException();
         }
 
-        userInvitationService.inviteUser(email, role);
+        userInvitationFacade.inviteUser(email, role);
     }
 
     @Override

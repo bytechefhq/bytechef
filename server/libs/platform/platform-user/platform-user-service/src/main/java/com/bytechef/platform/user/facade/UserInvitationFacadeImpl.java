@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.service;
+package com.bytechef.platform.user.facade;
 
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.exception.ConfigurationException;
@@ -27,6 +27,8 @@ import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
 import com.bytechef.platform.user.exception.InvalidEmailException;
 import com.bytechef.platform.user.exception.LoginAlreadyUsedException;
 import com.bytechef.platform.user.exception.UserErrorType;
+import com.bytechef.platform.user.service.AuthorityService;
+import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Locale;
@@ -44,7 +46,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  */
 @Service
 @Transactional
-public class UserInvitationServiceImpl implements UserInvitationService {
+public class UserInvitationFacadeImpl implements UserInvitationFacade {
 
     private final AuthorityService authorityService;
     private final MailService mailService;
@@ -52,7 +54,7 @@ public class UserInvitationServiceImpl implements UserInvitationService {
     private final UserService userService;
 
     @SuppressFBWarnings("EI")
-    public UserInvitationServiceImpl(
+    public UserInvitationFacadeImpl(
         AuthorityService authorityService, MailService mailService, TenantService tenantService,
         UserService userService) {
 
