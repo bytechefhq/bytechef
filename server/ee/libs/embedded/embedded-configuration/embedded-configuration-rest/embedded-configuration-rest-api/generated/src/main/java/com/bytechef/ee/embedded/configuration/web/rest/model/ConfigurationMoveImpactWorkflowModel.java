@@ -20,15 +20,17 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * A workflow of the target configuration that needs new required inputs or connections.
+ * A workflow of the target configuration that needs new required inputs or connections, or stays disabled until the configuration sets its internal-only inputs.
  */
 
-@Schema(name = "ConfigurationMoveImpactWorkflow", description = "A workflow of the target configuration that needs new required inputs or connections.")
+@Schema(name = "ConfigurationMoveImpactWorkflow", description = "A workflow of the target configuration that needs new required inputs or connections, or stays disabled until the configuration sets its internal-only inputs.")
 @JsonTypeName("ConfigurationMoveImpactWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-13T19:43:07.740396+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-20T18:11:33.751124+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class ConfigurationMoveImpactWorkflowModel {
 
   private Integer affectedConnectedUserCount;
+
+  private Boolean awaitsConfiguration;
 
   private String label;
 
@@ -45,8 +47,9 @@ public class ConfigurationMoveImpactWorkflowModel {
   /**
    * Constructor with only required parameters
    */
-  public ConfigurationMoveImpactWorkflowModel(Integer affectedConnectedUserCount, String label, List<String> newRequiredConnections, List<String> newRequiredInputs, String workflowUuid) {
+  public ConfigurationMoveImpactWorkflowModel(Integer affectedConnectedUserCount, Boolean awaitsConfiguration, String label, List<String> newRequiredConnections, List<String> newRequiredInputs, String workflowUuid) {
     this.affectedConnectedUserCount = affectedConnectedUserCount;
+    this.awaitsConfiguration = awaitsConfiguration;
     this.label = label;
     this.newRequiredConnections = newRequiredConnections;
     this.newRequiredInputs = newRequiredInputs;
@@ -72,6 +75,27 @@ public class ConfigurationMoveImpactWorkflowModel {
   @JsonProperty("affectedConnectedUserCount")
   public void setAffectedConnectedUserCount(Integer affectedConnectedUserCount) {
     this.affectedConnectedUserCount = affectedConnectedUserCount;
+  }
+
+  public ConfigurationMoveImpactWorkflowModel awaitsConfiguration(Boolean awaitsConfiguration) {
+    this.awaitsConfiguration = awaitsConfiguration;
+    return this;
+  }
+
+  /**
+   * Whether the workflow stays disabled until the target configuration sets its required internal-only inputs.
+   * @return awaitsConfiguration
+   */
+  @NotNull 
+  @Schema(name = "awaitsConfiguration", description = "Whether the workflow stays disabled until the target configuration sets its required internal-only inputs.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("awaitsConfiguration")
+  public Boolean getAwaitsConfiguration() {
+    return awaitsConfiguration;
+  }
+
+  @JsonProperty("awaitsConfiguration")
+  public void setAwaitsConfiguration(Boolean awaitsConfiguration) {
+    this.awaitsConfiguration = awaitsConfiguration;
   }
 
   public ConfigurationMoveImpactWorkflowModel label(String label) {
@@ -184,6 +208,7 @@ public class ConfigurationMoveImpactWorkflowModel {
     }
     ConfigurationMoveImpactWorkflowModel configurationMoveImpactWorkflow = (ConfigurationMoveImpactWorkflowModel) o;
     return Objects.equals(this.affectedConnectedUserCount, configurationMoveImpactWorkflow.affectedConnectedUserCount) &&
+        Objects.equals(this.awaitsConfiguration, configurationMoveImpactWorkflow.awaitsConfiguration) &&
         Objects.equals(this.label, configurationMoveImpactWorkflow.label) &&
         Objects.equals(this.newRequiredConnections, configurationMoveImpactWorkflow.newRequiredConnections) &&
         Objects.equals(this.newRequiredInputs, configurationMoveImpactWorkflow.newRequiredInputs) &&
@@ -192,7 +217,7 @@ public class ConfigurationMoveImpactWorkflowModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(affectedConnectedUserCount, label, newRequiredConnections, newRequiredInputs, workflowUuid);
+    return Objects.hash(affectedConnectedUserCount, awaitsConfiguration, label, newRequiredConnections, newRequiredInputs, workflowUuid);
   }
 
   @Override
@@ -200,6 +225,7 @@ public class ConfigurationMoveImpactWorkflowModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class ConfigurationMoveImpactWorkflowModel {\n");
     sb.append("    affectedConnectedUserCount: ").append(toIndentedString(affectedConnectedUserCount)).append("\n");
+    sb.append("    awaitsConfiguration: ").append(toIndentedString(awaitsConfiguration)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    newRequiredConnections: ").append(toIndentedString(newRequiredConnections)).append("\n");
     sb.append("    newRequiredInputs: ").append(toIndentedString(newRequiredInputs)).append("\n");
