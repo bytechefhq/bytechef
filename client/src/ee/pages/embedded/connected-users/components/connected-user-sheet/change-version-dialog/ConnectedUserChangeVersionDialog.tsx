@@ -29,6 +29,8 @@ import type {SkippedUserDisplayI} from '@/ee/pages/embedded/connected-users/comp
 
 export const NO_OTHER_VERSION_REASON = 'No other published version';
 
+export const VERSIONS_LOAD_FAILED_REASON = "Couldn't load the versions. Try again later.";
+
 export interface ConnectedUserChangeVersionConfigurationI {
     enabled: boolean;
     id: string;
