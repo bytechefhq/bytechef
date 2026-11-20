@@ -186,10 +186,7 @@ const ConnectedUserProjectWorkflowEditDialog = ({
                                     connectionCount={components.length}
                                     connectionsContent={
                                         components.length === 0 ? (
-                                            <p className="text-sm text-content-neutral-secondary">
-                                                No connections to set. The configuration provides them or the workflow
-                                                needs none.
-                                            </p>
+                                            <p className="text-sm">No Connections yet</p>
                                         ) : (
                                             <fieldset className="space-y-3 border-0 p-0">
                                                 {components.map((component) => (
@@ -219,10 +216,7 @@ const ConnectedUserProjectWorkflowEditDialog = ({
                                     inputCount={inputs.length}
                                     inputsContent={
                                         inputs.length === 0 ? (
-                                            <p className="text-sm text-content-neutral-secondary">
-                                                No inputs to set. The configuration provides them or the workflow
-                                                defines none.
-                                            </p>
+                                            <p className="text-sm">No Inputs yet</p>
                                         ) : (
                                             <fieldset className="space-y-3 border-0 p-0">
                                                 {inputs.map((input) => (
