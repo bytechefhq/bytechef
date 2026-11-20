@@ -129,9 +129,7 @@ const AutomationProjectUsageSheet = ({
 
                                     <TableBody>
                                         {references.map((reference) => (
-                                            <TableRow
-                                                key={`${reference.automationUuid}-${reference.externalUserId}`}
-                                            >
+                                            <TableRow key={`${reference.automationUuid}-${reference.externalUserId}`}>
                                                 <TableCell>
                                                     {workflowLabelsByUuid.get(reference.automationUuid) ||
                                                         reference.automationUuid}

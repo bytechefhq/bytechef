@@ -14,8 +14,7 @@ vi.mock('@/shared/middleware/graphql', async () => {
 
     return {
         ...actual,
-        useAutomationProjectCodeWorkflowSourceQuery:
-            hoisted.mockUseAutomationProjectCodeWorkflowSourceQuery,
+        useAutomationProjectCodeWorkflowSourceQuery: hoisted.mockUseAutomationProjectCodeWorkflowSourceQuery,
         useUpdateAutomationProjectCodeWorkflowSourceMutation:
             hoisted.mockUseUpdateAutomationProjectCodeWorkflowSourceMutation,
     };
@@ -65,10 +64,7 @@ afterEach(() => {
 describe('AutomationProjectCodeWorkflowDetail', () => {
     it('fetches the source for the given project and renders it in the editor', async () => {
         render(
-            <AutomationProjectCodeWorkflowDetail
-                automationProjectId="7"
-                language={CodeWorkflowLanguage.Javascript}
-            />
+            <AutomationProjectCodeWorkflowDetail automationProjectId="7" language={CodeWorkflowLanguage.Javascript} />
         );
 
         const editor = await screen.findByTestId('monaco-editor-mock');
@@ -90,10 +86,7 @@ describe('AutomationProjectCodeWorkflowDetail', () => {
         });
 
         render(
-            <AutomationProjectCodeWorkflowDetail
-                automationProjectId="7"
-                language={CodeWorkflowLanguage.Javascript}
-            />
+            <AutomationProjectCodeWorkflowDetail automationProjectId="7" language={CodeWorkflowLanguage.Javascript} />
         );
 
         fireEvent.change(await screen.findByTestId('monaco-editor-mock'), {

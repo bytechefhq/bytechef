@@ -386,9 +386,7 @@ describe('Automations', () => {
         await user.type(await screen.findByPlaceholderText('My CRM Project'), 'orders');
         await user.click(screen.getByRole('button', {name: 'Save'}));
 
-        await waitFor(() =>
-            expect(hoisted.navigateMock).toHaveBeenCalledWith('/embedded/automations/projects/7/code')
-        );
+        await waitFor(() => expect(hoisted.navigateMock).toHaveBeenCalledWith('/embedded/automations/projects/7/code'));
     });
 
     it('opens the project dialog from the New Project menu item', async () => {
@@ -736,9 +734,7 @@ describe('Automations', () => {
         await user.click(codeProjectWorkflowCount);
         await user.click(await screen.findByText('Code Flow'));
 
-        expect(hoisted.navigateMock).toHaveBeenLastCalledWith(
-            '/embedded/automations/projects/code-project-1/code'
-        );
+        expect(hoisted.navigateMock).toHaveBeenLastCalledWith('/embedded/automations/projects/code-project-1/code');
 
         await user.click(visualProjectWorkflowCount);
         await user.click(await screen.findByText('Visual Flow'));
