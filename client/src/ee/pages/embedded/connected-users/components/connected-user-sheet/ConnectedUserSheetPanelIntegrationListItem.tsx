@@ -8,19 +8,28 @@ import ConnectedUserOriginBadge from '@/ee/pages/embedded/connected-users/compon
 import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
 import ConnectedUserSheetPanelIntegrationWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationWorkflowList';
 import ConnectedUserVersionBadge from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserVersionBadge';
+import ConnectedUserChangeVersionDialog, {
+    NO_OTHER_VERSION_REASON,
+    getOtherVersions,
+} from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/change-version-dialog/ConnectedUserChangeVersionDialog';
 import useNewerIntegrationVersionAvailable from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/hooks/useNewerIntegrationVersionAvailable';
+import {MoveConnectedUsersResultI} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersDialog';
 import {
     CONFIGURATIONS_LOAD_FAILED_REASON,
     NO_OTHER_CONFIGURATION_REASON,
 } from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
 import IntegrationInstanceConfigurationMoveUsersDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationMoveUsersDialog';
+import {IntegrationStatus} from '@/ee/shared/middleware/embedded/configuration';
 import {ConnectedUser, ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
+import {useChangeIntegrationInstanceConfigurationConnectedUserVersionMutation} from '@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
 import {
     useDeleteIntegrationInstanceMutation,
     useEnableIntegrationInstanceMutation,
 } from '@/ee/shared/mutations/embedded/integrationInstances.mutations';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {
+    IntegrationInstanceConfigurationKeys,
+    useGetIntegrationInstanceConfigurationMoveImpactQuery,
     useGetIntegrationInstanceConfigurationQuery,
     useGetIntegrationInstanceConfigurationsQuery,
 } from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
@@ -28,6 +37,7 @@ import {
     IntegrationInstanceKeys,
     useGetIntegrationInstanceQuery,
 } from '@/ee/shared/queries/embedded/integrationInstances.queries';
+import {useGetIntegrationVersionsQuery} from '@/ee/shared/queries/embedded/integrationVersions.queries';
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {useGetProvisionableIntegrationsQuery} from '@/ee/shared/queries/embedded/provisionableIntegrations.queries';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
@@ -66,7 +76,14 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
         integrationInstance?.integrationInstanceConfiguration?.integrationVersion
     );
 
+    const {data: integrationVersions} = useGetIntegrationVersionsQuery(
+        connectedUserIntegrationInstance.integrationId ?? 0,
+        connectedUserIntegrationInstance.integrationId != null
+    );
+
     const [showChangeConfigurationDialog, setShowChangeConfigurationDialog] = useState(false);
+    const [showChangeVersionDialog, setShowChangeVersionDialog] = useState(false);
+    const [changeVersionTargetId, setChangeVersionTargetId] = useState<string>();
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [open, setOpen] = useState(false);
 
@@ -100,6 +117,43 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
             ? NO_OTHER_CONFIGURATION_REASON
             : undefined;
     }, [integrationConfigurations, integrationConfigurationsError, targetConfigurations.length]);
+
+    const currentIntegrationVersion =
+        integrationInstanceConfiguration?.integrationVersion ?? connectedUserIntegrationInstance.integrationVersion;
+
+    const publishedVersions = useMemo(
+        () =>
+            (integrationVersions ?? [])
+                .filter((integrationVersion) => integrationVersion.status === IntegrationStatus.Published)
+                .map((integrationVersion) => integrationVersion.version)
+                .filter((version): version is number => version != null),
+        [integrationVersions]
+    );
+
+    const changeVersionDisabledReason = useMemo(() => {
+        if (integrationConfigurationsError) {
+            return CONFIGURATIONS_LOAD_FAILED_REASON;
+        }
+
+        if (!integrationVersions || currentIntegrationVersion == null) {
+            return undefined;
+        }
+
+        return getOtherVersions(publishedVersions, currentIntegrationVersion).length === 0
+            ? NO_OTHER_VERSION_REASON
+            : undefined;
+    }, [currentIntegrationVersion, integrationConfigurationsError, integrationVersions, publishedVersions]);
+
+    const changeVersionConfigurations = useMemo(
+        () =>
+            targetConfigurations.map((targetConfiguration) => ({
+                enabled: !!targetConfiguration.enabled,
+                id: String(targetConfiguration.id),
+                name: targetConfiguration.name ?? '',
+                version: targetConfiguration.integrationVersion ?? 0,
+            })),
+        [targetConfigurations]
+    );
 
     const presetConnectedUsers = useMemo(
         () => [
@@ -156,6 +210,50 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
             });
         },
     });
+
+    const changeVersionMutation = useChangeIntegrationInstanceConfigurationConnectedUserVersionMutation({
+        onSuccess: () => {
+            void queryClient.invalidateQueries({
+                queryKey: ConnectedUserKeys.connectedUser(connectedUserId),
+            });
+            void queryClient.invalidateQueries({
+                queryKey: IntegrationInstanceConfigurationKeys.integrationInstanceConfigurations,
+            });
+            void queryClient.invalidateQueries({
+                queryKey: IntegrationInstanceKeys.integrationInstance(connectedUserIntegrationInstance.id!),
+            });
+        },
+    });
+
+    const {mutateAsync: changeConnectedUserVersion} = changeVersionMutation;
+
+    const {
+        data: changeVersionMoveImpact,
+        isError: changeVersionMoveImpactError,
+        isLoading: changeVersionMoveImpactLoading,
+    } = useGetIntegrationInstanceConfigurationMoveImpactQuery(
+        connectedUserIntegrationInstance.integrationInstanceConfigurationId!,
+        {
+            connectedUserIds: [connectedUserId],
+            targetId: Number(changeVersionTargetId),
+        },
+        showChangeVersionDialog && !!changeVersionTargetId
+    );
+
+    const handleChangeVersion = (version: number, targetId?: string): Promise<MoveConnectedUsersResultI> =>
+        changeConnectedUserVersion({
+            configurationChangeVersionRequest: {
+                connectedUserId,
+                targetId: targetId === undefined ? undefined : Number(targetId),
+                version,
+            },
+            id: connectedUserIntegrationInstance.integrationInstanceConfigurationId!,
+        });
+
+    const handleChangeVersionClose = () => {
+        setChangeVersionTargetId(undefined);
+        setShowChangeVersionDialog(false);
+    };
 
     const workflowCount = workflows?.length ?? 0;
 
@@ -283,7 +381,12 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                         <ConnectedUserSheetDeleteDropdownMenu
                             changeConfigurationDisabled={!integrationConfigurations}
                             changeConfigurationDisabledReason={changeConfigurationDisabledReason}
+                            changeVersionDisabled={
+                                !integrationVersions || !integrationConfigurations || currentIntegrationVersion == null
+                            }
+                            changeVersionDisabledReason={changeVersionDisabledReason}
                             onChangeConfigurationClick={() => setShowChangeConfigurationDialog(true)}
+                            onChangeVersionClick={() => setShowChangeVersionDialog(true)}
                             onDeleteClick={() => setShowDeleteDialog(true)}
                         />
                     </div>
@@ -310,6 +413,25 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                     onClose={() => setShowChangeConfigurationDialog(false)}
                     targetConfigurations={targetConfigurations}
                     title="Change configuration"
+                />
+            )}
+
+            {showChangeVersionDialog && currentIntegrationVersion != null && (
+                <ConnectedUserChangeVersionDialog
+                    configurations={changeVersionConfigurations}
+                    connectedUserLabel={connectedUser.name || connectedUser.email || connectedUser.externalId}
+                    currentConfigurationName={configurationName ?? ''}
+                    currentVersion={currentIntegrationVersion}
+                    impact={changeVersionMoveImpact?.workflows}
+                    mcpServerCount={changeVersionMoveImpact?.mcpServerCount}
+                    onChange={handleChangeVersion}
+                    onClose={handleChangeVersionClose}
+                    onTargetChange={setChangeVersionTargetId}
+                    pending={changeVersionMutation.isPending}
+                    previewError={changeVersionMoveImpactError}
+                    previewLoading={changeVersionMoveImpactLoading}
+                    previewSkipped={changeVersionMoveImpact?.skipped}
+                    versions={publishedVersions}
                 />
             )}
 
