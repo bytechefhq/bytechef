@@ -176,6 +176,34 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
     }
 
     @Test
+    void testAutomationProjectWorkflowProvidableValuesReadsTheProjectVersionWithoutAConfiguration() {
+        when(automationProjectConfigurationFacade.getProjectWorkflowProvidableValues(7L, 2L, 3, "uuid-one"))
+            .thenReturn(
+                new AutomationProjectConfigurationWorkflowProvidableValuesDTO(
+                    List.of(),
+                    List.of(
+                        new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
+                            "channel", "Slack Channel", "STRING", true)),
+                    Map.of(), Map.of()));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    automationProjectWorkflowProvidableValues(
+                        projectId: "7", environmentId: "2", projectVersion: 3, workflowUuid: "uuid-one") {
+                        inputs {
+                            name
+                        }
+                    }
+                }
+                """)
+            .execute()
+            .path("automationProjectWorkflowProvidableValues.inputs[0].name")
+            .entity(String.class)
+            .isEqualTo("channel");
+    }
+
+    @Test
     void testAutomationProjectConfigurationWorkflowProvidableValuesReturnsTheComponentReferenceOfAnInput() {
         when(automationProjectConfigurationFacade.getConfigurationWorkflowProvidableValues(5L, "uuid-one", null))
             .thenReturn(

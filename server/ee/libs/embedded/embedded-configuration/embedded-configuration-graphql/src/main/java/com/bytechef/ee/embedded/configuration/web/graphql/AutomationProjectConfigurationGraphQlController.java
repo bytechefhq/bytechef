@@ -84,6 +84,29 @@ public class AutomationProjectConfigurationGraphQlController {
     }
 
     @QueryMapping
+    public AutomationProjectConfigurationWorkflowProvidableValuesDTO automationProjectWorkflowProvidableValues(
+        @Argument String projectId, @Argument String environmentId, @Argument int projectVersion,
+        @Argument String workflowUuid) {
+
+        return automationProjectConfigurationFacade.getProjectWorkflowProvidableValues(
+            Long.parseLong(projectId), Long.parseLong(environmentId), projectVersion, workflowUuid);
+    }
+
+    @QueryMapping
+    public List<AutomationProjectConfigurationWorkflowProvidableValuesDTO.InputOption>
+        automationProjectWorkflowInputOptions(
+            @Argument String projectId, @Argument String environmentId, @Argument int projectVersion,
+            @Argument String workflowUuid, @Argument String inputName, @Argument String propertyName,
+            @Argument String connectionId, @Argument @Nullable Map<String, Object> lookupDependsOnValues,
+            @Argument @Nullable String searchText) {
+
+        return automationProjectConfigurationFacade.getProjectWorkflowInputOptions(
+            Long.parseLong(projectId), Long.parseLong(environmentId), projectVersion, workflowUuid, inputName,
+            propertyName, parseConnectionId(inputName, connectionId),
+            lookupDependsOnValues == null ? Map.of() : lookupDependsOnValues, searchText);
+    }
+
+    @QueryMapping
     public AutomationProjectConfigurationVersionImpactDTO automationProjectConfigurationVersionImpact(
         @Argument String id, @Argument int projectVersion) {
 
