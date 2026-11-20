@@ -111,9 +111,9 @@ reference is enabled, so a workflow with required inputs comes out enabled in on
   section).
 - A requested connection that isn't one of the connected user's connections returns `400`. A catalog
   workflow the connected user can't see returns `404`.
-- A connection or input value that the configuration already provides for every connected user can't be
-  overridden: naming it in `connections` or `inputs` returns `409` with `{"providedComponentName": "slack"}`
-  or `{"providedInputName": "channel"}`.
+- A connection that the configuration already provides for every connected user can't be overridden:
+  naming it in `connections` returns `409` with `{"providedComponentName": "slack"}`. Values sent in
+  `inputs` for an internal-only input are ignored, because only the configuration sets those.
 
 A complete call from your backend, with an API Key, that picks the Slack connection and sets an input:
 
@@ -158,8 +158,7 @@ A reference is addressed by its catalog workflow uuid on the same workflow endpo
 - `PUT /api/embedded/v1/{externalUserId}/automation/workflows/{workflowUuid}/inputs` stores the
   connected user's input values, with an `inputs` object keyed by input name. On an enabled
   reference, a change that leaves a required input without a value is rejected with `409`
-  `{"missingInputName": ...}`, and an input the configuration provides is rejected with `409`
-  `{"providedInputName": ...}`.
+  `{"missingInputName": ...}`. Values for an internal-only input are ignored.
 
 Enabling a dangling reference, or storing inputs on one, fails with an error naming the reference as
 dangling. The frontend routes (without `{externalUserId}`, with the end user's JWT) behave the same.
