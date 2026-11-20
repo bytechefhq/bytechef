@@ -126,7 +126,7 @@ class CustomComponentFacadeCreateEmptyTest {
     void testCreateEmptyCustomComponentRejectsDuplicateName() {
         CustomComponentService customComponentService = mock(CustomComponentService.class);
 
-        when(customComponentService.fetchCustomComponent("acme", 1))
+        when(customComponentService.fetchLatestCustomComponent("acme"))
             .thenReturn(Optional.of(new CustomComponent()));
 
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
@@ -137,6 +137,34 @@ class CustomComponentFacadeCreateEmptyTest {
 
         assertThatThrownBy(() -> customComponentFacade.createEmptyCustomComponent("acme", Language.JAVASCRIPT))
             .isInstanceOf(ConfigurationException.class);
+
+        verify(customComponentService, never()).create(any());
+        verify(customComponentFileStorage, never()).storeCustomComponentFile(anyString(), any());
+    }
+
+    @Test
+    void testCreateEmptyCustomComponentRejectsNameOwnedByAnyVersion() {
+        CustomComponent draftCustomComponent = new CustomComponent();
+
+        draftCustomComponent.setName("acme");
+        draftCustomComponent.setComponentVersion(2);
+        draftCustomComponent.setStatus(CustomComponent.Status.DRAFT);
+
+        CustomComponentService customComponentService = mock(CustomComponentService.class);
+
+        when(customComponentService.fetchCustomComponent("acme", 1)).thenReturn(Optional.empty());
+        when(customComponentService.fetchLatestCustomComponent("acme")).thenReturn(Optional.of(draftCustomComponent));
+
+        CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
+
+        CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
+            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            customComponentFileStorage, mock(ObjectProvider.class));
+
+        assertThatThrownBy(() -> customComponentFacade.createEmptyCustomComponent("acme", Language.JAVASCRIPT))
+            .isInstanceOf(ConfigurationException.class)
+            .extracting(throwable -> ((ConfigurationException) throwable).getErrorKey())
+            .isEqualTo(CustomComponentErrorType.COMPONENT_ALREADY_EXISTS.getErrorKey());
 
         verify(customComponentService, never()).create(any());
         verify(customComponentFileStorage, never()).storeCustomComponentFile(anyString(), any());
