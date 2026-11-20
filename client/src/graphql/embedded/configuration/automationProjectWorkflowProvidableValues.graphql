@@ -1,0 +1,38 @@
+query automationProjectWorkflowProvidableValues(
+    $projectId: ID!
+    $environmentId: ID!
+    $projectVersion: Int!
+    $workflowUuid: ID!
+) {
+    automationProjectWorkflowProvidableValues(
+        projectId: $projectId
+        environmentId: $environmentId
+        projectVersion: $projectVersion
+        workflowUuid: $workflowUuid
+    ) {
+        connectionSlots {
+            componentName
+            title
+            required
+            providableConnections {
+                id
+                name
+            }
+        }
+        inputs {
+            name
+            label
+            type
+            required
+            componentName
+            componentVersion
+            groupName
+            optionConnections {
+                id
+                name
+            }
+        }
+        providedConnections
+        providedInputs
+    }
+}
