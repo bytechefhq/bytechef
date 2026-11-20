@@ -63,7 +63,7 @@ describe('ProjectDeploymentEditWorkflowDialog', () => {
         it('should describe what the dialog configures', () => {
             render(<ProjectDeploymentEditWorkflowDialog {...defaultProps} />);
 
-            expect(screen.getByText('Set workflow input, trigger output values and connections.')).toBeInTheDocument();
+            expect(screen.getByText('Set the connections and inputs this workflow runs with.')).toBeInTheDocument();
         });
 
         it('should render the workflow configuration step', () => {
