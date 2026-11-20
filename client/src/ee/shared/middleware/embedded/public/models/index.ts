@@ -44,7 +44,6 @@ export * from './ProvisionWorkflowReferenceRequest';
 export * from './PublishFrontendProjectWorkflowRequest';
 export * from './ReauthorizeConnectionRequest';
 export * from './UpdateFrontendIntegrationInstanceWorkflowRequest';
-export * from './UpdateFrontendProjectWorkflowInputs409Response';
 export * from './UpdateFrontendWorkflowConfigurationConnectionRequest';
 export * from './UpdateWorkflowInputsRequest';
 export * from './Workflow';

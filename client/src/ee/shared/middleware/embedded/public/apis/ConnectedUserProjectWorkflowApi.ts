@@ -49,6 +49,11 @@ import {
     EnvironmentToJSON,
 } from '../models/Environment';
 import {
+    type MissingInputError,
+    MissingInputErrorFromJSON,
+    MissingInputErrorToJSON,
+} from '../models/MissingInputError';
+import {
     type ProvisionFrontendWorkflowReference409Response,
     ProvisionFrontendWorkflowReference409ResponseFromJSON,
     ProvisionFrontendWorkflowReference409ResponseToJSON,
@@ -63,11 +68,6 @@ import {
     PublishFrontendProjectWorkflowRequestFromJSON,
     PublishFrontendProjectWorkflowRequestToJSON,
 } from '../models/PublishFrontendProjectWorkflowRequest';
-import {
-    type UpdateFrontendProjectWorkflowInputs409Response,
-    UpdateFrontendProjectWorkflowInputs409ResponseFromJSON,
-    UpdateFrontendProjectWorkflowInputs409ResponseToJSON,
-} from '../models/UpdateFrontendProjectWorkflowInputs409Response';
 import {
     type UpdateFrontendWorkflowConfigurationConnectionRequest,
     UpdateFrontendWorkflowConfigurationConnectionRequestFromJSON,
