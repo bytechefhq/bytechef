@@ -7,16 +7,12 @@
 
 package com.bytechef.ee.automation.configuration.service;
 
-import com.bytechef.automation.configuration.service.PermissionService;
-import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditEvents;
-import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditMapper;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.exception.WorkspaceUserErrorType;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.audit.Audited;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -37,19 +33,14 @@ import org.springframework.transaction.annotation.Transactional;
 })
 public class WorkspaceUserServiceImpl implements WorkspaceUserService {
 
-    private final PermissionService permissionService;
     private final WorkspaceUserRepository workspaceUserRepository;
 
     @SuppressFBWarnings("EI")
-    public WorkspaceUserServiceImpl(
-        PermissionService permissionService, WorkspaceUserRepository workspaceUserRepository) {
-
-        this.permissionService = permissionService;
+    public WorkspaceUserServiceImpl(WorkspaceUserRepository workspaceUserRepository) {
         this.workspaceUserRepository = workspaceUserRepository;
     }
 
     @Override
-    @Audited(event = WorkspaceUserAuditEvents.WORKSPACE_USER_ADDED, mapper = WorkspaceUserAuditMapper.class)
     public WorkspaceUser addWorkspaceUser(long userId, long workspaceId, WorkspaceRole workspaceRole) {
         Optional<WorkspaceUser> existing = workspaceUserRepository.findByUserIdAndWorkspaceId(userId, workspaceId);
 
@@ -59,15 +50,7 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
                 WorkspaceUserErrorType.ALREADY_MEMBER);
         }
 
-        WorkspaceUser savedWorkspaceUser = workspaceUserRepository.save(
-            WorkspaceUser.forRole(userId, workspaceId, workspaceRole));
-
-        // The scope cache may already hold an empty-set DENY for (userId, workspaceId) from a pre-membership probe;
-        // evict so the new member's scopes are re-resolved on the next check instead of being pinned to "no access"
-        // until the TTL expires.
-        permissionService.evictWorkspaceScopeCache(userId, workspaceId);
-
-        return savedWorkspaceUser;
+        return workspaceUserRepository.save(WorkspaceUser.forRole(userId, workspaceId, workspaceRole));
     }
 
     @Override
@@ -95,7 +78,6 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
     }
 
     @Override
-    @Audited(event = WorkspaceUserAuditEvents.WORKSPACE_USER_REMOVED, mapper = WorkspaceUserAuditMapper.class)
     public boolean removeWorkspaceUser(long userId, long workspaceId) {
         WorkspaceUser workspaceUser = workspaceUserRepository.findByUserIdAndWorkspaceId(userId, workspaceId)
             .orElseThrow(() -> new ConfigurationException(
@@ -108,20 +90,15 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
 
         workspaceUserRepository.deleteByUserIdAndWorkspaceId(userId, workspaceId);
 
-        permissionService.evictWorkspaceScopeCache(userId, workspaceId);
-
         return true;
     }
 
     @Override
-    @Audited(event = WorkspaceUserAuditEvents.WORKSPACE_USER_ROLE_UPDATED, mapper = WorkspaceUserAuditMapper.class)
     public WorkspaceUser updateWorkspaceUserRole(long userId, long workspaceId, WorkspaceRole workspaceRole) {
         WorkspaceUser workspaceUser = workspaceUserRepository.findByUserIdAndWorkspaceId(userId, workspaceId)
             .orElseThrow(() -> new ConfigurationException(
                 "User " + userId + " is not a member of workspace " + workspaceId,
                 WorkspaceUserErrorType.NOT_MEMBER));
-
-        validateNotSelfDemotion(workspaceId, userId, workspaceUser, workspaceRole);
 
         if (Objects.equals(workspaceUser.getWorkspaceRole(), WorkspaceRole.ADMIN.ordinal())
             && workspaceRole != WorkspaceRole.ADMIN) {
@@ -131,37 +108,7 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
 
         workspaceUser.setWorkspaceRole(workspaceRole.ordinal());
 
-        WorkspaceUser savedWorkspaceUser = workspaceUserRepository.save(workspaceUser);
-
-        // A role change alters the resolved scope set, so the cached (userId, workspaceId) scopes must be evicted or
-        // the old role's scopes would be served until the TTL expires.
-        permissionService.evictWorkspaceScopeCache(userId, workspaceId);
-
-        return savedWorkspaceUser;
-    }
-
-    /**
-     * Refuses to let the current user demote their own workspace ADMIN role. The last-admin guard only blocks the
-     * delete that would leave zero admins; without this check an admin could downgrade themselves to EDITOR while
-     * another admin row exists, instantly losing workspace-management rights and the ability to reverse the change.
-     * Require self-demotion to go through another admin so a human confirms the survivor is real. Tenant admins bypass
-     * the guard (they can always restore themselves).
-     */
-    private void validateNotSelfDemotion(
-        long workspaceId, long userId, WorkspaceUser workspaceUser, WorkspaceRole targetRole) {
-
-        if (permissionService.isTenantAdmin() || !permissionService.isCurrentUser(userId)) {
-            return;
-        }
-
-        if (Objects.equals(workspaceUser.getWorkspaceRole(), WorkspaceRole.ADMIN.ordinal())
-            && targetRole != WorkspaceRole.ADMIN) {
-
-            throw new ConfigurationException(
-                "Cannot demote your own role on workspace " + workspaceId
-                    + ". Ask another admin to change your role, or leave the workspace instead.",
-                WorkspaceUserErrorType.SELF_DEMOTION_FORBIDDEN);
-        }
+        return workspaceUserRepository.save(workspaceUser);
     }
 
     private void validateNotLastAdmin(long workspaceId) {

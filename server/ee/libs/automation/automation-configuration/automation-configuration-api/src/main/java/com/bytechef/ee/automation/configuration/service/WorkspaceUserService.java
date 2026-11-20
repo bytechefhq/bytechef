@@ -38,8 +38,7 @@ public interface WorkspaceUserService {
      *
      * <p>
      * Authorization: caller must hold {@code WorkspaceRole.ADMIN} on the workspace. Refuses to remove the last admin
-     * (would otherwise lock the workspace out). Evicts the impacted {@code (userId, workspaceId)} scope cache entry so
-     * subsequent permission checks miss the cache and re-resolve from the (now-removed) membership.
+     * (would otherwise lock the workspace out).
      *
      * @return {@code true} once the membership row has been removed
      * @throws com.bytechef.exception.ConfigurationException if the user is not a member of the workspace, or if
