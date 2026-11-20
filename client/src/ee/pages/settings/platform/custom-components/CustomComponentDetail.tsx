@@ -245,8 +245,10 @@ const CustomComponentDetail = () => {
     } = useCustomComponentDefinitionQuery({id}, {enabled: !!id && isJavaComponent});
 
     const updateCustomComponentSourceMutation = useUpdateCustomComponentSourceMutation({
-        onSuccess: (result) => {
-            setIsSourceDirty(false);
+        onSuccess: (result, variables) => {
+            if (latestSourceRef.current === variables.content) {
+                setIsSourceDirty(false);
+            }
 
             const updatedId = result.updateCustomComponentSource.id;
 
