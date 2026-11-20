@@ -270,6 +270,30 @@ describe('ConnectedUserProjectWorkflowListItem', () => {
         expect(screen.getByTestId('trigger-and-components-row')).toHaveTextContent('Manual|manual|manual,airtable');
     });
 
+    it('explains that a turned on reference waits for the configuration to set its internal-only inputs', async () => {
+        renderListItem(
+            createConnectedUserProjectWorkflow(null, {
+                attentionReason: 'AWAITING_CONFIGURATION',
+                automationUuid: 'template-uuid',
+            }),
+            'Automation Playground',
+            undefined,
+            {configurationEnabled: true, configurationId: '60', projectId: '20'}
+        );
+
+        const enableSwitch = screen.getByRole('switch', {name: 'Enable WhatsApp Agent - Human reply'});
+
+        expect(enableSwitch).toBeEnabled();
+
+        await userEvent.hover(enableSwitch.parentElement as HTMLElement);
+
+        expect(
+            await screen.findByRole('tooltip', {
+                name: 'Waiting for the configuration to set its required internal-only inputs. This workflow runs once they are set.',
+            })
+        ).toBeInTheDocument();
+    });
+
     it('shows a reference of a disabled configuration as switched off and locked', async () => {
         renderListItem(
             createConnectedUserProjectWorkflow(null, {
