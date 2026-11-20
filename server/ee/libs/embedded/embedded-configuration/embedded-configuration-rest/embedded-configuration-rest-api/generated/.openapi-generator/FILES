@@ -21,6 +21,7 @@ src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ComponentCat
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ComponentConnectionModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ComponentDefinitionBasicModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ComponentInputReferenceModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ConfigurationChangeVersionRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ConfigurationConnectedUserModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ConfigurationMoveImpactModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ConfigurationMoveImpactWorkflowModel.java
