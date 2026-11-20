@@ -189,7 +189,7 @@ Use a batch upgrade to move many connected users to a newer configuration at onc
 When it finishes, the dialog shows how many users were moved and how many need attention, and lists each skipped user with a reason. Closing the dialog refreshes the list and clears the selection. The reasons you may see are:
 
 - **Already on this configuration**: nothing to do for that user.
-- **Doesn't have this integration** or **Doesn't have this project**: the user has no configuration of what you picked in this environment.
+- **Not provisioned with this integration** or **Not provisioned with this project**: the user has no configuration of what you picked in this environment.
 - **The target configuration doesn't have these workflows:** followed by the workflow names: the target lacks a workflow the user relies on.
 - **These workflows aren't enabled on the target configuration:** followed by the workflow names: those workflows exist on the target but are not enabled.
 - **The target configuration uses a different authorization type**: the user's connection cannot be carried over.
