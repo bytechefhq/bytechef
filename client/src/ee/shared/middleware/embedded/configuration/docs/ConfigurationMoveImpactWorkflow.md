@@ -1,13 +1,14 @@
 
 # ConfigurationMoveImpactWorkflow
 
-A workflow of the target configuration that needs new required inputs or connections.
+A workflow of the target configuration that needs new required inputs or connections, or stays disabled until the configuration sets its internal-only inputs.
 
 ## Properties
 
 Name | Type
 ------------ | -------------
 `affectedConnectedUserCount` | number
+`awaitsConfiguration` | boolean
 `label` | string
 `newRequiredConnections` | Array&lt;string&gt;
 `newRequiredInputs` | Array&lt;string&gt;
@@ -21,6 +22,7 @@ import type { ConfigurationMoveImpactWorkflow } from ''
 // TODO: Update the object below with actual values
 const example = {
   "affectedConnectedUserCount": null,
+  "awaitsConfiguration": null,
   "label": null,
   "newRequiredConnections": null,
   "newRequiredInputs": null,

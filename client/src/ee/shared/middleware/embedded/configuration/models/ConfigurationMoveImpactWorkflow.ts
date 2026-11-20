@@ -14,7 +14,7 @@
 
 import { mapValues } from '../runtime';
 /**
- * A workflow of the target configuration that needs new required inputs or connections.
+ * A workflow of the target configuration that needs new required inputs or connections, or stays disabled until the configuration sets its internal-only inputs.
  * @export
  * @interface ConfigurationMoveImpactWorkflow
  */
@@ -23,6 +23,10 @@ export interface ConfigurationMoveImpactWorkflow {
      * The number of the moved connected users affected.
      */
     affectedConnectedUserCount: number;
+    /**
+     * Whether the workflow stays disabled until the target configuration sets its required internal-only inputs.
+     */
+    awaitsConfiguration: boolean;
     /**
      * The label of the workflow.
      */
@@ -46,6 +50,7 @@ export interface ConfigurationMoveImpactWorkflow {
  */
 export function instanceOfConfigurationMoveImpactWorkflow(value: object): value is ConfigurationMoveImpactWorkflow {
     if (!('affectedConnectedUserCount' in value) || value['affectedConnectedUserCount'] === undefined) return false;
+    if (!('awaitsConfiguration' in value) || value['awaitsConfiguration'] === undefined) return false;
     if (!('label' in value) || value['label'] === undefined) return false;
     if (!('newRequiredConnections' in value) || value['newRequiredConnections'] === undefined) return false;
     if (!('newRequiredInputs' in value) || value['newRequiredInputs'] === undefined) return false;
@@ -64,6 +69,7 @@ export function ConfigurationMoveImpactWorkflowFromJSONTyped(json: any, ignoreDi
     return {
         
         'affectedConnectedUserCount': json['affectedConnectedUserCount'],
+        'awaitsConfiguration': json['awaitsConfiguration'],
         'label': json['label'],
         'newRequiredConnections': json['newRequiredConnections'],
         'newRequiredInputs': json['newRequiredInputs'],
@@ -83,6 +89,7 @@ export function ConfigurationMoveImpactWorkflowToJSONTyped(value?: Configuration
     return {
         
         'affectedConnectedUserCount': value['affectedConnectedUserCount'],
+        'awaitsConfiguration': value['awaitsConfiguration'],
         'label': value['label'],
         'newRequiredConnections': value['newRequiredConnections'],
         'newRequiredInputs': value['newRequiredInputs'],
