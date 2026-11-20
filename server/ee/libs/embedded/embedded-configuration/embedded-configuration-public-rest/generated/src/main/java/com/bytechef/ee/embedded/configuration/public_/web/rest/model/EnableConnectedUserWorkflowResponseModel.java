@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "EnableConnectedUserWorkflowResponse", description = "The outcome of enabling a workflow.")
 @JsonTypeName("EnableConnectedUserWorkflowResponse")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-15T19:28:21.317912+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-20T18:24:04.687665+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class EnableConnectedUserWorkflowResponseModel {
 
   private @Nullable String attentionReason;
@@ -46,11 +46,11 @@ public class EnableConnectedUserWorkflowResponseModel {
   }
 
   /**
-   * Why the workflow stays paused: TURNED_OFF_BY_ADMINISTRATOR, UPDATE_PENDING, MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input> or INVALID_WORKFLOW:<errorCount>. Null when nothing blocks it.
+   * Why the workflow stays paused: TURNED_OFF_BY_ADMINISTRATOR, UPDATE_PENDING, MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input>, INVALID_WORKFLOW:<errorCount> or AWAITING_CONFIGURATION (the administrator has not finished the configuration yet). Null when nothing blocks it.
    * @return attentionReason
    */
   
-  @Schema(name = "attentionReason", description = "Why the workflow stays paused: TURNED_OFF_BY_ADMINISTRATOR, UPDATE_PENDING, MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input> or INVALID_WORKFLOW:<errorCount>. Null when nothing blocks it.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "attentionReason", description = "Why the workflow stays paused: TURNED_OFF_BY_ADMINISTRATOR, UPDATE_PENDING, MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input>, INVALID_WORKFLOW:<errorCount> or AWAITING_CONFIGURATION (the administrator has not finished the configuration yet). Null when nothing blocks it.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("attentionReason")
   public @Nullable String getAttentionReason() {
     return attentionReason;
