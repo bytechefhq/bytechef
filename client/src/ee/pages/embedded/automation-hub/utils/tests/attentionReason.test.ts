@@ -45,6 +45,12 @@ describe('describeAttentionReason', () => {
         );
     });
 
+    it('describes a workflow waiting for the administrator to finish the configuration', () => {
+        expect(describeAttentionReason('AWAITING_CONFIGURATION')).toBe(
+            'Waiting for your administrator to finish setting it up; it starts once they do'
+        );
+    });
+
     it('returns undefined when healthy', () => {
         expect(describeAttentionReason(undefined)).toBeUndefined();
     });

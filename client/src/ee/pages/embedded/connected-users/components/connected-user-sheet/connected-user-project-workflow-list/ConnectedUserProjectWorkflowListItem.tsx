@@ -4,7 +4,10 @@ import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {TURNED_OFF_BY_ADMINISTRATOR_REASON} from '@/ee/pages/embedded/automation-hub/utils/attentionReason';
+import {
+    AWAITING_CONFIGURATION_REASON,
+    TURNED_OFF_BY_ADMINISTRATOR_REASON,
+} from '@/ee/pages/embedded/automation-hub/utils/attentionReason';
 import useAutomationExecutionsSheetStore from '@/ee/pages/embedded/automations/stores/useAutomationExecutionsSheetStore';
 import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
 import ConnectedUserProjectWorkflowEditDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectWorkflowEditDialog';
@@ -141,8 +144,18 @@ const ConnectedUserProjectWorkflowListItem = ({
             return 'This workflow is disabled in the configuration. It runs again when it is enabled there.';
         }
 
+        if (connectedUserProjectWorkflow.attentionReason === AWAITING_CONFIGURATION_REASON) {
+            return 'Waiting for the configuration to set its required internal-only inputs. This workflow runs once they are set.';
+        }
+
         return enableDisabled ? 'Publish the workflow before enabling it' : undefined;
-    }, [configuration?.configurationEnabled, configuration?.enabled, enableDisabled, turnedOffByAdministrator]);
+    }, [
+        configuration?.configurationEnabled,
+        configuration?.enabled,
+        connectedUserProjectWorkflow.attentionReason,
+        enableDisabled,
+        turnedOffByAdministrator,
+    ]);
 
     const versionLabel = useMemo(() => {
         if (provisioned) {
