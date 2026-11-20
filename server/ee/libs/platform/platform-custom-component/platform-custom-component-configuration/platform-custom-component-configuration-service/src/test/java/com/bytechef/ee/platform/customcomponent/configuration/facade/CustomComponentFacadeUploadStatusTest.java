@@ -111,6 +111,7 @@ class CustomComponentFacadeUploadStatusTest {
         publishedCustomComponent.setId(7L);
         publishedCustomComponent.setName("example");
         publishedCustomComponent.setComponentVersion(1);
+        publishedCustomComponent.setLanguage(Language.JAVASCRIPT);
         publishedCustomComponent.setStatus(CustomComponent.Status.PUBLISHED);
         publishedCustomComponent.setComponent(new FileEntry("example_1.js", "file:///example_1_old.js"));
 
@@ -141,6 +142,42 @@ class CustomComponentFacadeUploadStatusTest {
 
         assertThat(publishedCustomComponent.getComponent()).isEqualTo(newComponentFile);
         assertThat(publishedCustomComponent.getStatus()).isEqualTo(CustomComponent.Status.PUBLISHED);
+    }
+
+    @Test
+    void testUploadOntoPublishedVersionInAnotherLanguageRejected() {
+        CustomComponent publishedCustomComponent = new CustomComponent();
+
+        publishedCustomComponent.setId(7L);
+        publishedCustomComponent.setName("example");
+        publishedCustomComponent.setComponentVersion(1);
+        publishedCustomComponent.setLanguage(Language.PYTHON);
+        publishedCustomComponent.setStatus(CustomComponent.Status.PUBLISHED);
+        publishedCustomComponent.setComponent(new FileEntry("example_1.py", "file:///example_1.py"));
+
+        CustomComponentService customComponentService = mock(CustomComponentService.class);
+
+        when(customComponentService.fetchCustomComponent("example", 1))
+            .thenReturn(Optional.of(publishedCustomComponent));
+
+        CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
+
+        CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
+            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            customComponentFileStorage, mock(ObjectProvider.class));
+
+        String content =
+            "({name: 'example', title: 'Example', description: 'An example', version: 1, actions: []})";
+
+        assertThatThrownBy(
+            () -> customComponentFacade.save(content.getBytes(StandardCharsets.UTF_8), Language.JAVASCRIPT))
+                .isInstanceOf(ConfigurationException.class)
+                .extracting(throwable -> ((ConfigurationException) throwable).getErrorKey())
+                .isEqualTo(CustomComponentErrorType.LANGUAGE_MISMATCH.getErrorKey());
+
+        verify(customComponentFileStorage, never()).storeCustomComponentFile(anyString(), any());
+        verify(customComponentService, never()).update(any());
+        verify(customComponentService, never()).create(any());
     }
 
     @Test

@@ -215,6 +215,15 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
                         CustomComponentErrorType.VERSION_ALREADY_EXISTS);
                 });
 
+            existingCustomComponent
+                .filter(customComponent -> customComponent.getLanguage() != language)
+                .ifPresent(customComponent -> {
+                    throw new ConfigurationException(
+                        "Version " + version + " of '" + componentDefinition.getName() + "' is written in " +
+                            customComponent.getLanguage() + "; a replacement upload must use the same language",
+                        CustomComponentErrorType.LANGUAGE_MISMATCH);
+                });
+
             FileEntry componentFileEntry = customComponentFileStorage.storeCustomComponentFile(
                 componentDefinition.getName() + "_" + version + "." + language.getExtension(), bytes);
 
