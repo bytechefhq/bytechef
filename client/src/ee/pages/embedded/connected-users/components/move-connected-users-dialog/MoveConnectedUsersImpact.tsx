@@ -57,7 +57,7 @@ const MoveConnectedUsersImpactCard = ({
             connectionCount={impactItem.newRequiredConnections.length}
             connectionsContent={
                 impactItem.newRequiredConnections.length === 0 ? (
-                    <p className="text-sm">No Connections yet</p>
+                    <p className="text-sm">No new connections</p>
                 ) : (
                     <div className="space-y-1 text-sm">
                         <p>{impactItem.newRequiredConnections.join(', ')}</p>
@@ -71,7 +71,7 @@ const MoveConnectedUsersImpactCard = ({
             inputCount={impactItem.newRequiredInputs.length}
             inputsContent={
                 impactItem.newRequiredInputs.length === 0 ? (
-                    <p className="text-sm">No Inputs yet</p>
+                    <p className="text-sm">No new inputs</p>
                 ) : (
                     <fieldset className="space-y-3 border-0 p-0">
                         {impactItem.newRequiredInputs.map((inputName) => {
