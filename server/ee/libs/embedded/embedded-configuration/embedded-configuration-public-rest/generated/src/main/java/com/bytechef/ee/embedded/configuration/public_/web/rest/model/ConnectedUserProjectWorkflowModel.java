@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectedUserProjectWorkflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("ConnectedUserProjectWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-18T07:20:03.362029+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-20T18:24:04.687665+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class ConnectedUserProjectWorkflowModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -486,11 +486,11 @@ public class ConnectedUserProjectWorkflowModel {
   }
 
   /**
-   * Why the automation needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input>, UPDATE_PENDING or INVALID_WORKFLOW:<errorCount>. A COPY only reports INVALID_WORKFLOW. Null when healthy.
+   * Why the automation needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input>, UPDATE_PENDING, INVALID_WORKFLOW:<errorCount> or AWAITING_CONFIGURATION (the administrator has not finished the configuration yet). A COPY only reports INVALID_WORKFLOW. Null when healthy.
    * @return attentionReason
    */
   
-  @Schema(name = "attentionReason", description = "Why the automation needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input>, UPDATE_PENDING or INVALID_WORKFLOW:<errorCount>. A COPY only reports INVALID_WORKFLOW. Null when healthy.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "attentionReason", description = "Why the automation needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input>, UPDATE_PENDING, INVALID_WORKFLOW:<errorCount> or AWAITING_CONFIGURATION (the administrator has not finished the configuration yet). A COPY only reports INVALID_WORKFLOW. Null when healthy.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("attentionReason")
   public @Nullable String getAttentionReason() {
     return attentionReason;
