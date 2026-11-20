@@ -24,6 +24,7 @@ query automationProjectWorkflowProvidableValues(
             label
             type
             required
+            internalOnly
             componentName
             componentVersion
             groupName
