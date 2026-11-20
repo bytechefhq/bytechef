@@ -19,7 +19,7 @@ import com.bytechef.ee.platform.apiconnector.configuration.dto.RequestBodyDefini
 import com.bytechef.ee.platform.apiconnector.configuration.dto.ResponseDefinitionDTO;
 import com.bytechef.ee.platform.apiconnector.configuration.exception.ApiConnectorErrorType;
 import com.bytechef.ee.platform.apiconnector.configuration.facade.ApiConnectorFacade;
-import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorAiService;
+import com.bytechef.ee.platform.apiconnector.configuration.facade.ApiConnectorGenerationJobFacade;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorGenerationJobService;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorService;
 import com.bytechef.ee.platform.apiconnector.configuration.service.OpenApiSpecificationGenerator;
@@ -45,20 +45,21 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class ApiConnectorGraphQlController {
 
-    private final ApiConnectorAiService apiConnectorAiService;
     private final ApiConnectorFacade apiConnectorFacade;
+    private final ApiConnectorGenerationJobFacade apiConnectorGenerationJobFacade;
     private final ApiConnectorGenerationJobService apiConnectorGenerationJobService;
     private final ApiConnectorService apiConnectorService;
     private final OpenApiSpecificationGenerator openApiSpecificationGenerator;
 
     @SuppressFBWarnings("EI")
     public ApiConnectorGraphQlController(
-        Optional<ApiConnectorAiService> apiConnectorAiService, ApiConnectorFacade apiConnectorFacade,
+        ApiConnectorFacade apiConnectorFacade,
+        Optional<ApiConnectorGenerationJobFacade> apiConnectorGenerationJobFacade,
         ApiConnectorGenerationJobService apiConnectorGenerationJobService, ApiConnectorService apiConnectorService,
         OpenApiSpecificationGenerator openApiSpecificationGenerator) {
 
-        this.apiConnectorAiService = apiConnectorAiService.orElse(null);
         this.apiConnectorFacade = apiConnectorFacade;
+        this.apiConnectorGenerationJobFacade = apiConnectorGenerationJobFacade.orElse(null);
         this.apiConnectorGenerationJobService = apiConnectorGenerationJobService;
         this.apiConnectorService = apiConnectorService;
         this.openApiSpecificationGenerator = openApiSpecificationGenerator;
@@ -159,7 +160,7 @@ public class ApiConnectorGraphQlController {
     public GenerationJobStatusRecord startGenerateFromDocumentationPreview(
         @Argument GenerateFromDocumentationInput input) {
 
-        if (apiConnectorAiService == null) {
+        if (apiConnectorGenerationJobFacade == null) {
             throw new ConfigurationException(
                 "AI service is not configured. Please configure bytechef.ai.copilot settings.",
                 ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
@@ -167,8 +168,8 @@ public class ApiConnectorGraphQlController {
 
         ApiConnectorGenerationJob job = apiConnectorGenerationJobService.create(input.documentationUrl());
 
-        apiConnectorAiService.generateOpenApiSpecificationAsync(job.getId(), input.documentationUrl(),
-            input.userPrompt());
+        apiConnectorGenerationJobFacade.generateOpenApiSpecificationAsync(
+            job.getId(), input.documentationUrl(), input.userPrompt());
 
         return toGenerationJobStatusRecord(job);
     }

@@ -19,14 +19,12 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 /**
@@ -42,8 +40,6 @@ import org.springframework.stereotype.Service;
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
 public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
-
-    private static final Logger log = LoggerFactory.getLogger(ApiConnectorAiServiceImpl.class);
 
     private static final String SYSTEM_PROMPT =
         """
@@ -64,15 +60,11 @@ public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
             The output should start with 'openapi: "3.0.0"' or 'openapi: "3.0.1"'.
             """;
 
-    private final ApiConnectorGenerationJobService apiConnectorGenerationJobService;
     private final ChatModel chatModel;
     private final HttpClient httpClient;
 
     @SuppressFBWarnings("EI")
-    public ApiConnectorAiServiceImpl(
-        ApiConnectorGenerationJobService apiConnectorGenerationJobService, ChatModel chatModel) {
-
-        this.apiConnectorGenerationJobService = apiConnectorGenerationJobService;
+    public ApiConnectorAiServiceImpl(ChatModel chatModel) {
         this.chatModel = chatModel;
         this.httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(30))
@@ -84,11 +76,22 @@ public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
     public String generateOpenApiSpecification(String documentationUrl) {
         String documentationContent = fetchDocumentation(documentationUrl);
 
-        String userPrompt = String.format(
+        return generateOpenApiSpecificationFromContent(documentationContent, null);
+    }
+
+    @Override
+    public String generateOpenApiSpecificationFromContent(
+        String documentationContent, @Nullable String userInstructions) {
+
+        String promptMessage = String.format(
             "Analyze the following API documentation and generate an OpenAPI 3.0 specification:\n\n%s",
             documentationContent);
 
-        Prompt prompt = new Prompt(SYSTEM_PROMPT + "\n\nUser: " + userPrompt);
+        if (userInstructions != null && !userInstructions.isBlank()) {
+            promptMessage = promptMessage + "\n\nUser instructions:\n" + userInstructions;
+        }
+
+        Prompt prompt = new Prompt(SYSTEM_PROMPT + "\n\nUser: " + promptMessage);
 
         String response = extractResponseText(chatModel.call(prompt));
 
@@ -110,7 +113,8 @@ public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
         return text;
     }
 
-    private String fetchDocumentation(String documentationUrl) {
+    @Override
+    public String fetchDocumentation(String documentationUrl) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(documentationUrl))
@@ -161,57 +165,5 @@ public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
         }
 
         return cleaned.trim();
-    }
-
-    @Override
-    @Async
-    public void generateOpenApiSpecificationAsync(String jobId, String documentationUrl, String userInstructions) {
-        log.debug("Starting async OpenAPI generation for job {}", jobId);
-
-        apiConnectorGenerationJobService.markAsProcessing(jobId);
-
-        try {
-            if (apiConnectorGenerationJobService.isCancellationRequested(jobId)) {
-                log.debug("Job {} was cancelled before processing started", jobId);
-
-                return;
-            }
-
-            String documentationContent = fetchDocumentation(documentationUrl);
-
-            if (apiConnectorGenerationJobService.isCancellationRequested(jobId)) {
-                log.debug("Job {} was cancelled after fetching documentation", jobId);
-
-                return;
-            }
-
-            String promptMessage = String.format(
-                "Analyze the following API documentation and generate an OpenAPI 3.0 specification:\n\n%s",
-                documentationContent);
-
-            if (userInstructions != null && !userInstructions.isBlank()) {
-                promptMessage = promptMessage + "\n\nUser instructions:\n" + userInstructions;
-            }
-
-            Prompt prompt = new Prompt(SYSTEM_PROMPT + "\n\nUser: " + promptMessage);
-
-            String response = extractResponseText(chatModel.call(prompt));
-
-            if (apiConnectorGenerationJobService.isCancellationRequested(jobId)) {
-                log.debug("Job {} was cancelled after AI generation", jobId);
-
-                return;
-            }
-
-            String specification = cleanOpenApiResponse(response);
-
-            apiConnectorGenerationJobService.markAsCompleted(jobId, specification);
-
-            log.debug("Job {} completed successfully", jobId);
-        } catch (Exception exception) {
-            log.error("Job {} failed", jobId, exception);
-
-            apiConnectorGenerationJobService.markAsFailed(jobId, exception.getMessage());
-        }
     }
 }
