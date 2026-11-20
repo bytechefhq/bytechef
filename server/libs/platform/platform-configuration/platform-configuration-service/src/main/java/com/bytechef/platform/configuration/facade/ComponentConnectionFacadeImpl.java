@@ -143,13 +143,15 @@ public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade 
 
     @Override
     public List<ComponentConnection> getComponentConnections(WorkflowTask workflowTask) {
-        return getComponentConnections(workflowTask.getName(), workflowTask.getType(), workflowTask.getExtensions());
+        return getComponentConnections(
+            workflowTask.getName(), workflowTask.getType(), workflowTask.getParameters(), workflowTask.getExtensions());
     }
 
     @Override
     public List<ComponentConnection> getComponentConnections(WorkflowTrigger workflowTrigger) {
         return getComponentConnections(
-            workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getExtensions());
+            workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getParameters(),
+            workflowTrigger.getExtensions());
     }
 
     @Override
@@ -177,7 +179,7 @@ public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade 
     }
 
     private List<ComponentConnection> getComponentConnections(
-        String workflowNodeName, String type, Map<String, ?> extensions) {
+        String workflowNodeName, String type, Map<String, ?> parameters, Map<String, ?> extensions) {
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
 
@@ -189,7 +191,7 @@ public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade 
             .fetchComponentDefinition(workflowNodeType.name(), workflowNodeType.version())
             .map(componentDefinition -> componentConnectionFactoryResolver.resolve(componentDefinition)
                 .map(workflowConnectionFactory -> workflowConnectionFactory.create(
-                    workflowNodeName, extensions, componentDefinition))
+                    workflowNodeName, parameters, extensions, componentDefinition))
                 .orElse(List.of()))
             .orElse(List.of());
     }

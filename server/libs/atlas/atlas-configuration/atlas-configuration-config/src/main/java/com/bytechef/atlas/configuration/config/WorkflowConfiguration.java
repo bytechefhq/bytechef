@@ -19,9 +19,7 @@ package com.bytechef.atlas.configuration.config;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
-import com.bytechef.atlas.configuration.workflow.preprocessor.WorkflowDefinitionPreprocessor;
 import java.util.List;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,12 +33,8 @@ public class WorkflowConfiguration {
     @Bean
     WorkflowServiceImpl workflowService(
         CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
-        List<WorkflowRepository> workflowRepositories,
-        ObjectProvider<WorkflowDefinitionPreprocessor> workflowDefinitionPreprocessors) {
+        List<WorkflowRepository> workflowRepositories) {
 
-        return new WorkflowServiceImpl(
-            cacheManager, workflowCrudRepositories, workflowRepositories,
-            workflowDefinitionPreprocessors.orderedStream()
-                .toList());
+        return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
     }
 }
