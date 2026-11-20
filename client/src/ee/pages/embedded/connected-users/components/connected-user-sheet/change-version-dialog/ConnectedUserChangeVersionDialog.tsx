@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {Alert, AlertDescription} from '@/components/ui/alert';
 import {
     Dialog,
     DialogContent,
@@ -13,6 +14,7 @@ import MoveConnectedUsersImpact from '@/ee/pages/embedded/connected-users/compon
 import MoveConnectedUsersResult from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersResult';
 import MoveConnectedUsersSkippedList from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersSkippedList';
 import {formatSkippedReason} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
+import {InfoIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 
 import type {
@@ -255,9 +257,13 @@ const ConnectedUserChangeVersionDialog = ({
                         )}
 
                         {selectedVersion !== undefined && matchingConfigurations.length === 0 && (
-                            <p className="text-sm text-content-neutral-secondary">
-                                {`Creates ${currentConfigurationName} · V${selectedVersion} from ${currentConfigurationName}, then moves this connected user to it. New connected users keep landing on ${currentConfigurationName}.`}
-                            </p>
+                            <Alert variant="default">
+                                <InfoIcon />
+
+                                <AlertDescription>
+                                    {`Creates ${currentConfigurationName} · V${selectedVersion} from ${currentConfigurationName}, then moves this connected user to it. New connected users keep landing on ${currentConfigurationName}.`}
+                                </AlertDescription>
+                            </Alert>
                         )}
 
                         {notMovedResult && (
