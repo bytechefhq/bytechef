@@ -3325,6 +3325,32 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
+    void testAGatedReferenceAwaitsTheConfigurationUntilItSetsTheRequiredInternalOnlyInput() {
+        long automationProjectId = createAutomationProject("Internal Only Attention");
+
+        String workflowUuid = addWorkflow(
+            automationProjectId, SLACK_WORKFLOW_WITH_REQUIRED_INTERNAL_ONLY_INPUT_DEFINITION);
+
+        publishAndPinProject(automationProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        assertThat(getStoredReference(reference).isEnabled()).isTrue();
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isFalse();
+        assertThat(connectedUserReferenceAttentionResolver.resolve(getStoredReference(reference))
+            .attentionReason()).isEqualTo(ConnectedUserReferenceAttentionResolver.AWAITING_CONFIGURATION);
+
+        provideValuesAndRollOut(automationProjectId, workflowUuid, Map.of(), Map.of("accountId", "acme"));
+
+        assertThat(fetchDeploymentRow(reference).isEnabled()).isTrue();
+        assertThat(connectedUserReferenceAttentionResolver.resolve(getStoredReference(reference))
+            .attentionReason()).isNull();
+    }
+
+    @Test
     void testAUserValueOfAProvidedInternalOnlyInputIsIgnoredNotRejected() {
         long automationProjectId = createAutomationProject("Internal Only Provided");
 
