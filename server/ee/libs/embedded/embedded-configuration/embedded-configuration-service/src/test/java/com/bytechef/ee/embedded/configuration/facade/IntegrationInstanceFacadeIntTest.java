@@ -523,27 +523,11 @@ class IntegrationInstanceFacadeIntTest {
     }
 
     @Test
-    void testUpdateIntegrationInstanceWorkflowKeepsTheStoredInternalOnlyInputOverAConnectedUsersValue() {
+    void testUpdateIntegrationInstanceWorkflowDiscardsAStoredInternalOnlyInput() {
         String internalOnlyInputWorkflowId = createInternalOnlyInputWorkflow(Map.of());
 
         storeIntegrationInstanceWorkflowInputs(
-            internalOnlyInputWorkflowId, Map.of("accountId", "vendor-account", "region", "eu"));
-
-        authenticate(createConnectedUserAuthentication(Environment.PRODUCTION, connectedUserA));
-
-        integrationInstanceFacade.updateIntegrationInstanceWorkflow(
-            integrationInstanceAId, internalOnlyInputWorkflowId,
-            Map.of("accountId", "user-account", "region", "us"));
-
-        assertThat(
-            integrationInstanceWorkflowService.getIntegrationInstanceWorkflow(
-                integrationInstanceAId, internalOnlyInputWorkflowId)
-                .getInputs()).isEqualTo(Map.of("accountId", "vendor-account", "region", "us"));
-    }
-
-    @Test
-    void testUpdateIntegrationInstanceWorkflowDropsAnInternalOnlyInputSetByAConnectedUser() {
-        String internalOnlyInputWorkflowId = createInternalOnlyInputWorkflow(Map.of());
+            internalOnlyInputWorkflowId, Map.of("accountId", "legacy-account", "region", "eu"));
 
         authenticate(createConnectedUserAuthentication(Environment.PRODUCTION, connectedUserA));
 
@@ -558,22 +542,30 @@ class IntegrationInstanceFacadeIntTest {
     }
 
     @Test
-    void testUpdateIntegrationInstanceWorkflowLetsTheApiKeyAuthenticatedVendorSetAnInternalOnlyInput() {
+    void testUpdateIntegrationInstanceWorkflowIgnoresAnInternalOnlyInputFromAnyCaller() {
         String internalOnlyInputWorkflowId = createInternalOnlyInputWorkflow(Map.of());
 
-        authenticate(
-            new EmbeddedApiKeyAuthenticationToken(
-                Environment.PRODUCTION.ordinal(), connectedUserA.getId(), new User(externalUserAId, "", List.of()),
-                true));
+        authenticate(createConnectedUserAuthentication(Environment.PRODUCTION, connectedUserA));
 
         integrationInstanceFacade.updateIntegrationInstanceWorkflow(
             integrationInstanceAId, internalOnlyInputWorkflowId,
-            Map.of("accountId", "vendor-account", "region", "us"));
+            Map.of("accountId", "x", "channel", "c"));
 
         assertThat(
             integrationInstanceWorkflowService.getIntegrationInstanceWorkflow(
                 integrationInstanceAId, internalOnlyInputWorkflowId)
-                .getInputs()).isEqualTo(Map.of("accountId", "vendor-account", "region", "us"));
+                .getInputs()).isEqualTo(Map.of("channel", "c"));
+
+        authenticate(createTenantAdminAuthentication());
+
+        integrationInstanceFacade.updateIntegrationInstanceWorkflow(
+            integrationInstanceAId, internalOnlyInputWorkflowId,
+            Map.of("accountId", "x", "channel", "c"));
+
+        assertThat(
+            integrationInstanceWorkflowService.getIntegrationInstanceWorkflow(
+                integrationInstanceAId, internalOnlyInputWorkflowId)
+                .getInputs()).isEqualTo(Map.of("channel", "c"));
     }
 
     @Test

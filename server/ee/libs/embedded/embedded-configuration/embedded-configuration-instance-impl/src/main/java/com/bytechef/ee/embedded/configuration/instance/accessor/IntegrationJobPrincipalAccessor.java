@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.instance.accessor;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
@@ -21,6 +22,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflo
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.embedded.configuration.util.IntegrationWorkflowInputUtils;
+import com.bytechef.ee.embedded.configuration.util.InternalOnlyInputUtils;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
@@ -32,6 +34,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -42,6 +46,8 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnEEVersion
 public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
+
+    private static final Logger log = LoggerFactory.getLogger(IntegrationJobPrincipalAccessor.class);
 
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
@@ -137,9 +143,21 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
             .<Map<String, ?>>map(IntegrationInstanceWorkflow::getInputs)
             .orElse(Map.of());
 
-        return IntegrationWorkflowInputUtils.mergeInputs(
-            workflowService.getWorkflow(workflowId), integrationInstanceConfigurationWorkflow.getInputs(),
-            connectedUserInputs);
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        Map<String, ?> configurationInputs = integrationInstanceConfigurationWorkflow.getInputs();
+
+        String missingInputName = InternalOnlyInputUtils.findMissingRequiredInternalOnlyInput(
+            workflow, configurationInputs);
+
+        if (missingInputName != null) {
+            log.warn(
+                "Integration instance configuration {} has no value for the required internal-only input '{}' of " +
+                    "workflow {}",
+                integrationInstance.getIntegrationInstanceConfigurationId(), missingInputName, workflowId);
+        }
+
+        return IntegrationWorkflowInputUtils.mergeInputs(workflow, configurationInputs, connectedUserInputs);
     }
 
     @Override
