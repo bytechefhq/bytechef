@@ -107,7 +107,7 @@ class WorkflowFacadeIntTest {
 
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
 
-        when(componentDefinition.isClusterRoot()).thenReturn(true);
+        when(componentDefinition.isClusterRoot("testOperation")).thenReturn(true);
         when(componentDefinitionService.fetchComponentDefinition("testComponent", 1))
             .thenReturn(Optional.of(componentDefinition));
 
