@@ -1447,6 +1447,31 @@ export type AutomationProjectVersionsQueryVariables = Exact<{
 
 export type AutomationProjectVersionsQuery = { automationProjectVersions: Array<{ version: number, status: string, publishedDate: string | null, description: string | null }> };
 
+export type AutomationProjectWorkflowInputOptionsQueryVariables = Exact<{
+  projectId: string | number;
+  environmentId: string | number;
+  projectVersion: number;
+  workflowUuid: string | number;
+  inputName: string;
+  propertyName: string;
+  connectionId: string | number;
+  lookupDependsOnValues?: any;
+  searchText?: string | null | undefined;
+}>;
+
+
+export type AutomationProjectWorkflowInputOptionsQuery = { automationProjectWorkflowInputOptions: Array<{ label: string | null, value: string, description: string | null }> };
+
+export type AutomationProjectWorkflowProvidableValuesQueryVariables = Exact<{
+  projectId: string | number;
+  environmentId: string | number;
+  projectVersion: number;
+  workflowUuid: string | number;
+}>;
+
+
+export type AutomationProjectWorkflowProvidableValuesQuery = { automationProjectWorkflowProvidableValues: { providedConnections: any, providedInputs: any, connectionSlots: Array<{ componentName: string, title: string, required: boolean, providableConnections: Array<{ id: string, name: string }> }>, inputs: Array<{ name: string, label: string | null, type: string | null, required: boolean, componentName: string | null, componentVersion: number | null, groupName: string | null, optionConnections: Array<{ id: string, name: string }> }> } };
+
 export type AutomationProjectsQueryVariables = Exact<{
   environmentId?: string | number | null | undefined;
 }>;
@@ -8176,6 +8201,94 @@ export const useAutomationProjectVersionsQuery = <
       {
     queryKey: ['automationProjectVersions', variables],
     queryFn: fetcher<AutomationProjectVersionsQuery, AutomationProjectVersionsQueryVariables>(AutomationProjectVersionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AutomationProjectWorkflowInputOptionsDocument = new TypedDocumentString(`
+    query automationProjectWorkflowInputOptions($projectId: ID!, $environmentId: ID!, $projectVersion: Int!, $workflowUuid: ID!, $inputName: String!, $propertyName: String!, $connectionId: ID!, $lookupDependsOnValues: Map, $searchText: String) {
+  automationProjectWorkflowInputOptions(
+    projectId: $projectId
+    environmentId: $environmentId
+    projectVersion: $projectVersion
+    workflowUuid: $workflowUuid
+    inputName: $inputName
+    propertyName: $propertyName
+    connectionId: $connectionId
+    lookupDependsOnValues: $lookupDependsOnValues
+    searchText: $searchText
+  ) {
+    label
+    value
+    description
+  }
+}
+    `);
+
+export const useAutomationProjectWorkflowInputOptionsQuery = <
+      TData = AutomationProjectWorkflowInputOptionsQuery,
+      TError = unknown
+    >(
+      variables: AutomationProjectWorkflowInputOptionsQueryVariables,
+      options?: Omit<UseQueryOptions<AutomationProjectWorkflowInputOptionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationProjectWorkflowInputOptionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AutomationProjectWorkflowInputOptionsQuery, TError, TData>(
+      {
+    queryKey: ['automationProjectWorkflowInputOptions', variables],
+    queryFn: fetcher<AutomationProjectWorkflowInputOptionsQuery, AutomationProjectWorkflowInputOptionsQueryVariables>(AutomationProjectWorkflowInputOptionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AutomationProjectWorkflowProvidableValuesDocument = new TypedDocumentString(`
+    query automationProjectWorkflowProvidableValues($projectId: ID!, $environmentId: ID!, $projectVersion: Int!, $workflowUuid: ID!) {
+  automationProjectWorkflowProvidableValues(
+    projectId: $projectId
+    environmentId: $environmentId
+    projectVersion: $projectVersion
+    workflowUuid: $workflowUuid
+  ) {
+    connectionSlots {
+      componentName
+      title
+      required
+      providableConnections {
+        id
+        name
+      }
+    }
+    inputs {
+      name
+      label
+      type
+      required
+      componentName
+      componentVersion
+      groupName
+      optionConnections {
+        id
+        name
+      }
+    }
+    providedConnections
+    providedInputs
+  }
+}
+    `);
+
+export const useAutomationProjectWorkflowProvidableValuesQuery = <
+      TData = AutomationProjectWorkflowProvidableValuesQuery,
+      TError = unknown
+    >(
+      variables: AutomationProjectWorkflowProvidableValuesQueryVariables,
+      options?: Omit<UseQueryOptions<AutomationProjectWorkflowProvidableValuesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationProjectWorkflowProvidableValuesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AutomationProjectWorkflowProvidableValuesQuery, TError, TData>(
+      {
+    queryKey: ['automationProjectWorkflowProvidableValues', variables],
+    queryFn: fetcher<AutomationProjectWorkflowProvidableValuesQuery, AutomationProjectWorkflowProvidableValuesQueryVariables>(AutomationProjectWorkflowProvidableValuesDocument, variables),
     ...options
   }
     )};
