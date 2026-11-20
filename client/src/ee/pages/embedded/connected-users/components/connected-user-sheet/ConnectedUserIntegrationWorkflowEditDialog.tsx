@@ -230,9 +230,7 @@ const ConnectedUserIntegrationWorkflowEditDialog = ({
                                 connectionCount={connectionRows.length}
                                 connectionsContent={
                                     connectionRows.length === 0 ? (
-                                        <p className="text-sm text-content-neutral-secondary">
-                                            This workflow uses no connections.
-                                        </p>
+                                        <p className="text-sm">No Connections yet</p>
                                     ) : (
                                         <fieldset className="space-y-3 border-0 p-0">
                                             {connectionRows.map((connectionRow) => (
@@ -284,10 +282,7 @@ const ConnectedUserIntegrationWorkflowEditDialog = ({
                                             />
                                         </WorkflowMockProvider>
                                     ) : (
-                                        <p className="text-sm text-content-neutral-secondary">
-                                            No inputs to set. Internal-only inputs are set on the integration
-                                            configuration.
-                                        </p>
+                                        <p className="text-sm">No Inputs yet</p>
                                     )
                                 }
                                 onEnabledChange={() => undefined}
