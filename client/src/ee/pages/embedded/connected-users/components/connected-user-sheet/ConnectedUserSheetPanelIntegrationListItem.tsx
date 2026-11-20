@@ -411,6 +411,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                     connectedUsers={presetConnectedUsers}
                     initialSelectedConnectedUserIds={initialSelectedConnectedUserIds}
                     onClose={() => setShowChangeConfigurationDialog(false)}
+                    singleConnectedUser
                     targetConfigurations={targetConfigurations}
                     title="Change configuration"
                 />

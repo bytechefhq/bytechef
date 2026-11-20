@@ -71,6 +71,22 @@ describe('MoveConnectedUsersDialog', () => {
         expect(screen.getByRole('button', {name: 'Move'})).toBeEnabled();
     });
 
+    it('moves only the preselected user without a user picker for a single connected user', async () => {
+        const onMove = vi.fn().mockResolvedValue(defaultResult);
+
+        renderDialog({initialSelectedConnectedUserIds: ['2'], onMove, singleConnectedUser: true});
+
+        expect(screen.getByText('Moving Bob from Alpha · v1')).toBeInTheDocument();
+        expect(screen.queryByLabelText('Search users')).not.toBeInTheDocument();
+        expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+
+        await chooseTarget('Beta · v2');
+
+        await userEvent.click(screen.getByRole('button', {name: 'Move'}));
+
+        expect(onMove).toHaveBeenCalledWith('10', ['2']);
+    });
+
     it('shows each impact as a note', () => {
         renderDialog({
             impact: [
