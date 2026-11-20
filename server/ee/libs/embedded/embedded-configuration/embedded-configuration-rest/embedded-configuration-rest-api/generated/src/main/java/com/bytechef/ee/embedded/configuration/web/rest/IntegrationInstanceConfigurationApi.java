@@ -5,6 +5,7 @@
  */
 package com.bytechef.ee.embedded.configuration.web.rest;
 
+import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationChangeVersionRequestModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationConnectedUserModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationMoveImpactModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationMoveRequestModel;
@@ -42,7 +43,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-13T19:43:07.740396+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-20T07:40:29.877920+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 @Validated
 @Tag(name = "integration-instance-configuration", description = "the integration-instance-configuration API")
 public interface IntegrationInstanceConfigurationApi {
@@ -50,6 +51,50 @@ public interface IntegrationInstanceConfigurationApi {
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
+
+    String PATH_CHANGE_INTEGRATION_INSTANCE_CONFIGURATION_CONNECTED_USER_VERSION = "/integration-instance-configurations/{id}/change-version";
+    /**
+     * POST /integration-instance-configurations/{id}/change-version : Change the integration version of one connected user
+     * Put one connected user on another published version of the integration, moving it to a configuration on that version or copying its current configuration to that version when none exists.
+     *
+     * @param id The id of the source integration instance configuration. (required)
+     * @param configurationChangeVersionRequestModel  (required)
+     * @return The outcome of the move. (status code 200)
+     */
+    @Operation(
+        operationId = "changeIntegrationInstanceConfigurationConnectedUserVersion",
+        summary = "Change the integration version of one connected user",
+        description = "Put one connected user on another published version of the integration, moving it to a configuration on that version or copying its current configuration to that version when none exists.",
+        tags = { "integration-instance-configuration" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The outcome of the move.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ConfigurationMoveResultModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = IntegrationInstanceConfigurationApi.PATH_CHANGE_INTEGRATION_INSTANCE_CONFIGURATION_CONNECTED_USER_VERSION,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<ConfigurationMoveResultModel> changeIntegrationInstanceConfigurationConnectedUserVersion(
+        @Parameter(name = "id", description = "The id of the source integration instance configuration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "ConfigurationChangeVersionRequestModel", description = "", required = true) @Valid @RequestBody ConfigurationChangeVersionRequestModel configurationChangeVersionRequestModel
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"movedConnectedUserIds\" : [ 0, 0 ], \"needsAttentionConnectedUserIds\" : [ 6, 6 ], \"skipped\" : [ { \"connectedUserId\" : 6, \"reason\" : \"reason\", \"workflowLabels\" : [ \"workflowLabels\", \"workflowLabels\" ] }, { \"connectedUserId\" : 6, \"reason\" : \"reason\", \"workflowLabels\" : [ \"workflowLabels\", \"workflowLabels\" ] } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
 
     String PATH_CREATE_INTEGRATION_INSTANCE_CONFIGURATION = "/integration-instance-configurations";
     /**
