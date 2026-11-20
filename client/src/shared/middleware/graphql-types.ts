@@ -2122,6 +2122,7 @@ export type Mutation = {
   addDataTableColumn: Scalars['Boolean']['output'];
   cancelAiAgentEvalRun: AiAgentEvalRun;
   cancelGenerationJob: Scalars['Boolean']['output'];
+  changeAutomationProjectConfigurationConnectedUserVersion: ConfigurationMoveResult;
   createA2aProject?: Maybe<A2aProject>;
   createA2aServer?: Maybe<A2aServer>;
   createAdditionalFilesInSkill: AiSkill;
@@ -2347,6 +2348,14 @@ export type MutationCancelAiAgentEvalRunArgs = {
 
 export type MutationCancelGenerationJobArgs = {
   jobId: Scalars['String']['input'];
+};
+
+
+export type MutationChangeAutomationProjectConfigurationConnectedUserVersionArgs = {
+  connectedUserId: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
+  sourceId: Scalars['ID']['input'];
+  targetId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 

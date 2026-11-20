@@ -1525,6 +1525,16 @@ export type PublishAutomationProjectMutationVariables = Exact<{
 
 export type PublishAutomationProjectMutation = { publishAutomationProject: boolean };
 
+export type ChangeAutomationProjectConfigurationConnectedUserVersionMutationVariables = Exact<{
+  sourceId: string | number;
+  connectedUserId: string | number;
+  projectVersion: number;
+  targetId?: string | number | null | undefined;
+}>;
+
+
+export type ChangeAutomationProjectConfigurationConnectedUserVersionMutation = { changeAutomationProjectConfigurationConnectedUserVersion: { movedConnectedUserIds: Array<string>, needsAttentionConnectedUserIds: Array<string>, skipped: Array<{ connectedUserId: string, reason: string, workflowLabels: Array<string> }> } };
+
 export type ConnectedUserCatalogWorkflowCopiesQueryVariables = Exact<{
   automationUuids: Array<string | number> | string | number;
   environmentId: string | number;
@@ -8395,6 +8405,38 @@ export const usePublishAutomationProjectMutation = <
       {
     mutationKey: ['publishAutomationProject'],
     mutationFn: (variables?: PublishAutomationProjectMutationVariables) => fetcher<PublishAutomationProjectMutation, PublishAutomationProjectMutationVariables>(PublishAutomationProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const ChangeAutomationProjectConfigurationConnectedUserVersionDocument = new TypedDocumentString(`
+    mutation changeAutomationProjectConfigurationConnectedUserVersion($sourceId: ID!, $connectedUserId: ID!, $projectVersion: Int!, $targetId: ID) {
+  changeAutomationProjectConfigurationConnectedUserVersion(
+    sourceId: $sourceId
+    connectedUserId: $connectedUserId
+    projectVersion: $projectVersion
+    targetId: $targetId
+  ) {
+    movedConnectedUserIds
+    needsAttentionConnectedUserIds
+    skipped {
+      connectedUserId
+      reason
+      workflowLabels
+    }
+  }
+}
+    `);
+
+export const useChangeAutomationProjectConfigurationConnectedUserVersionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<ChangeAutomationProjectConfigurationConnectedUserVersionMutation, TError, ChangeAutomationProjectConfigurationConnectedUserVersionMutationVariables, TContext>) => {
+    
+    return useMutation<ChangeAutomationProjectConfigurationConnectedUserVersionMutation, TError, ChangeAutomationProjectConfigurationConnectedUserVersionMutationVariables, TContext>(
+      {
+    mutationKey: ['changeAutomationProjectConfigurationConnectedUserVersion'],
+    mutationFn: (variables?: ChangeAutomationProjectConfigurationConnectedUserVersionMutationVariables) => fetcher<ChangeAutomationProjectConfigurationConnectedUserVersionMutation, ChangeAutomationProjectConfigurationConnectedUserVersionMutationVariables>(ChangeAutomationProjectConfigurationConnectedUserVersionDocument, variables)(),
     ...options
   }
     )};
