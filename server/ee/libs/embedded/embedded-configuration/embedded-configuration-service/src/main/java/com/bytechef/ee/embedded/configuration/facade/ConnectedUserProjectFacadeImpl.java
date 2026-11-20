@@ -52,7 +52,6 @@ import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWork
 import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceAttentionResolver.ReferenceState;
-import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ProvidedNames;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
@@ -963,13 +962,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     private static ProvisionableAutomationProjectDTO.Workflow toProvisionableWorkflow(
         ConnectedUserWorkflowTemplateDTO template, @Nullable ConnectedUserProjectWorkflow reference) {
 
-        List<ConnectedUserWorkflowTemplateDTO.Input> inputs = template.inputs()
-            .stream()
-            .filter(input -> !input.provided())
-            .toList();
-
         return new ProvisionableAutomationProjectDTO.Workflow(
-            template.workflowUuid(), template.label(), inputs, reference != null,
+            template.workflowUuid(), template.label(), template.inputs(), reference != null,
             reference != null && reference.isDangling(), getConnectionComponents(template));
     }
 
@@ -1183,8 +1177,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                         connectedUser.getId(), reference,
                         new WorkflowDTO(workflow, List.of(), getReferenceWorkflowTriggers(reference)), components,
                         inputs,
-                        withoutProvidedInputValues(
-                            referenceState.inputs(), inputs, getReferenceInternalOnlyInputNames(reference)),
+                        withoutInternalOnlyInputValues(
+                            referenceState.inputs(), getReferenceInternalOnlyInputNames(reference)),
                         withoutProvidedConnections(referenceState.connections(), connectionComponents),
                         referenceState.attentionReason());
 
@@ -1263,7 +1257,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         ProjectDeployment projectDeployment = projectDeploymentOptional.get();
 
-        ProvidedNames providedNames = connectedUserReferenceDeploymentManager.getProvidedNames(
+        Set<String> providedComponentNames = connectedUserReferenceDeploymentManager.getProvidedComponentNames(
             connectedUserId, projectDeployment.getProjectId(), automationUuid);
 
         return projectWorkflowService.fetchProjectWorkflowWorkflowId(projectDeploymentId, automationUuid)
@@ -1272,7 +1266,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                 automationUuid, workflow.getLabel(), workflow.getDescription(), null,
                 workflowComponentResolver.getTriggerComponents(workflow),
                 workflowComponentResolver.getTaskComponents(workflow), toInputs(workflow), null))
-            .map(template -> template.withProvided(providedNames.componentNames(), providedNames.inputNames()));
+            .map(template -> template.withProvided(providedComponentNames));
     }
 
     private static Map<String, Long> withoutProvidedConnections(
@@ -1289,17 +1283,10 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         return userConnections;
     }
 
-    private static Map<String, ?> withoutProvidedInputValues(
-        Map<String, ?> inputValues, List<ConnectedUserWorkflowTemplateDTO.Input> inputs,
-        Set<String> internalOnlyInputNames) {
+    private static Map<String, ?> withoutInternalOnlyInputValues(
+        Map<String, ?> inputValues, Set<String> internalOnlyInputNames) {
 
         Map<String, Object> userInputValues = new LinkedHashMap<>(inputValues);
-
-        for (ConnectedUserWorkflowTemplateDTO.Input input : inputs) {
-            if (input.provided()) {
-                userInputValues.remove(input.name());
-            }
-        }
 
         for (String internalOnlyInputName : internalOnlyInputNames) {
             userInputValues.remove(internalOnlyInputName);

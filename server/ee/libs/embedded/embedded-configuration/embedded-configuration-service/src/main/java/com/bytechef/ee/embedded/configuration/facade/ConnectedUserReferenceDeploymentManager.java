@@ -36,7 +36,6 @@ import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -357,60 +356,32 @@ class ConnectedUserReferenceDeploymentManager {
         putWorkflow(projectDeployment, automationUuid, rowSpec);
     }
 
-    public ProvidedNames getProvidedNames(
+    public Set<String> getProvidedComponentNames(
         long connectedUserId, long automationProjectId, String automationUuid) {
 
-        return toProvidedNames(getProvidedValues(connectedUserId, automationProjectId, automationUuid));
+        return toProvidedComponentNames(getProvidedValues(connectedUserId, automationProjectId, automationUuid));
     }
 
-    public ProvidedNames getProvidedNames(
+    public Set<String> getProvidedComponentNames(
         AutomationProjectConfiguration configuration, String automationUuid) {
 
-        return toProvidedNames(getProvidedValues(configuration, automationUuid));
+        return toProvidedComponentNames(getProvidedValues(configuration, automationUuid));
     }
 
-    public void checkProvidedValuesNotRequested(
-        long connectedUserId, long automationProjectId, String automationUuid, String workflowId,
-        Map<String, Long> requestedConnectionIds, @Nullable Map<String, ?> userInputs) {
+    public void checkProvidedConnectionsNotRequested(
+        long connectedUserId, long automationProjectId, String automationUuid,
+        Map<String, Long> requestedConnectionIds) {
 
-        if (requestedConnectionIds.isEmpty() && (userInputs == null || userInputs.isEmpty())) {
+        if (requestedConnectionIds.isEmpty()) {
             return;
         }
 
-        checkProvidedValuesNotRequested(
-            workflowService.getWorkflow(workflowId),
-            toProvidedNames(getProvidedValues(connectedUserId, automationProjectId, automationUuid)),
-            requestedConnectionIds, userInputs);
-    }
-
-    private static void checkProvidedValuesNotRequested(
-        Workflow workflow, ProvidedNames providedNames, Map<String, Long> requestedConnectionIds,
-        @Nullable Map<String, ?> userInputs) {
-
-        Set<String> providedComponentNames = providedNames.componentNames();
+        Set<String> providedComponentNames = getProvidedComponentNames(
+            connectedUserId, automationProjectId, automationUuid);
 
         for (String componentName : requestedConnectionIds.keySet()) {
             if (providedComponentNames.contains(componentName)) {
-                throw new ProvidedValueLockedException(componentName, ProvidedValueLockedException.Kind.CONNECTION);
-            }
-        }
-
-        if (userInputs == null) {
-            return;
-        }
-
-        Set<String> internalOnlyInputNames = InternalOnlyInputUtils.getInternalOnlyInputNames(workflow);
-        Set<String> providedInputNames = providedNames.inputNames();
-
-        for (Map.Entry<String, ?> entry : userInputs.entrySet()) {
-            String inputName = entry.getKey();
-
-            if (internalOnlyInputNames.contains(inputName)) {
-                continue;
-            }
-
-            if (entry.getValue() != null && providedInputNames.contains(inputName)) {
-                throw new ProvidedValueLockedException(inputName, ProvidedValueLockedException.Kind.INPUT);
+                throw new ProvidedValueLockedException(componentName);
             }
         }
     }
@@ -461,8 +432,6 @@ class ConnectedUserReferenceDeploymentManager {
             .orElse(ProvidedValues.NONE);
 
         Workflow workflow = workflowService.getWorkflow(row.getWorkflowId());
-
-        checkProvidedValuesNotRequested(workflow, toProvidedNames(providedValues), Map.of(), userInputs);
 
         Map<String, Object> inputs = mergeInputs(workflow, userInputs, providedValues.inputs());
 
@@ -653,30 +622,19 @@ class ConnectedUserReferenceDeploymentManager {
 
         Map<String, Object> inputs = InternalOnlyInputUtils.removeInternalOnlyInputs(workflow, userInputs);
 
-        for (Workflow.Input input : workflow.getInputs()) {
-            Object providedValue = providedInputs.get(input.name());
+        for (String internalOnlyInputName : InternalOnlyInputUtils.getInternalOnlyInputNames(workflow)) {
+            Object providedValue = providedInputs.get(internalOnlyInputName);
 
             if (providedValue != null) {
-                inputs.put(input.name(), providedValue);
+                inputs.put(internalOnlyInputName, providedValue);
             }
         }
 
         return inputs;
     }
 
-    private ProvidedNames toProvidedNames(ProvidedValues providedValues) {
-        Set<String> providedInputNames = new LinkedHashSet<>();
-        Map<String, Object> providedInputs = providedValues.inputs();
-
-        for (Map.Entry<String, Object> entry : providedInputs.entrySet()) {
-            if (entry.getValue() != null) {
-                providedInputNames.add(entry.getKey());
-            }
-        }
-
-        return new ProvidedNames(
-            connectedUserWorkflowConnectionResolver.getProvidedComponentNames(providedValues.connectionIds()),
-            providedInputNames);
+    private Set<String> toProvidedComponentNames(ProvidedValues providedValues) {
+        return connectedUserWorkflowConnectionResolver.getProvidedComponentNames(providedValues.connectionIds());
     }
 
     private static boolean isUnchanged(ProjectDeploymentWorkflow row, RowSpec rowSpec) {
@@ -692,10 +650,6 @@ class ConnectedUserReferenceDeploymentManager {
     public record ReferenceResolution(
         RowSpec rowSpec, @Nullable String missingComponentName, @Nullable String missingInputName,
         int workflowErrorCount, boolean awaitingConfiguration) {
-    }
-
-    @SuppressFBWarnings("EI")
-    public record ProvidedNames(Set<String> componentNames, Set<String> inputNames) {
     }
 
     @SuppressFBWarnings("EI")

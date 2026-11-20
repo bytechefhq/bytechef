@@ -27,12 +27,12 @@ import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWork
 import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
-import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ProvidedNames;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ReferenceResolution;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.RowSpec;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
+import com.bytechef.ee.embedded.configuration.util.InternalOnlyInputUtils;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
@@ -256,19 +256,17 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
         ProjectDeployment projectDeployment = connectedUserReferenceDeploymentManager.getDeployment(
             projectDeploymentId);
 
-        ProvidedNames providedNames = connectedUserReferenceDeploymentManager.getProvidedNames(
+        Set<String> providedComponentNames = connectedUserReferenceDeploymentManager.getProvidedComponentNames(
             connectedUserProject.getConnectedUserId(), projectDeployment.getProjectId(), automationUuid);
 
         Map<String, Long> connectionIds = new LinkedHashMap<>(
             connectedUserReferenceDeploymentManager.getConnectionIdsByComponentName(row));
 
         connectionIds.keySet()
-            .removeAll(providedNames.componentNames());
+            .removeAll(providedComponentNames);
 
-        Map<String, Object> inputs = new LinkedHashMap<>(row.getInputs());
-
-        inputs.keySet()
-            .removeAll(providedNames.inputNames());
+        Map<String, Object> inputs = InternalOnlyInputUtils.removeInternalOnlyInputs(
+            connectedUserReferenceDeploymentManager.getWorkflow(row.getWorkflowId()), row.getInputs());
 
         return new ConnectedUserWorkflowReferenceValuesDTO(connectionIds, inputs);
     }
@@ -362,9 +360,8 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
         String workflowId = connectedUserReferenceDeploymentManager.getWorkflowId(
             projectDeployment.getProjectId(), projectVersion, automationUuid);
 
-        connectedUserReferenceDeploymentManager.checkProvidedValuesNotRequested(
-            connectedUser.getId(), projectDeployment.getProjectId(), automationUuid, workflowId,
-            requestedConnectionIds, inputs);
+        connectedUserReferenceDeploymentManager.checkProvidedConnectionsNotRequested(
+            connectedUser.getId(), projectDeployment.getProjectId(), automationUuid, requestedConnectionIds);
 
         Optional<ProjectDeploymentWorkflow> currentRow = connectedUserReferenceDeploymentManager.fetchWorkflowRow(
             reference.getProjectDeploymentId(), workflowId);

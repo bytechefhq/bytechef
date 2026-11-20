@@ -14,28 +14,15 @@ package com.bytechef.ee.embedded.configuration.exception;
  */
 public class ProvidedValueLockedException extends RuntimeException {
 
-    private final Kind kind;
-    private final String name;
+    private final String componentName;
 
-    public ProvidedValueLockedException(String name, Kind kind) {
-        super(
-            (kind == Kind.CONNECTION
-                ? "The connection of component %s is provided by the configuration"
-                : "The value of input %s is provided by the configuration").formatted(name));
+    public ProvidedValueLockedException(String componentName) {
+        super("The connection of component %s is provided by the configuration".formatted(componentName));
 
-        this.kind = kind;
-        this.name = name;
+        this.componentName = componentName;
     }
 
-    public Kind getKind() {
-        return kind;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public enum Kind {
-        CONNECTION, INPUT
+    public String getComponentName() {
+        return componentName;
     }
 }

@@ -788,7 +788,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     void testFrontendProvisionConnectionForAProvidedComponentReturns409() {
         when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
             eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(), eq(Map.of("slack", 12L)), any()))
-                .thenThrow(new ProvidedValueLockedException("slack", ProvidedValueLockedException.Kind.CONNECTION));
+                .thenThrow(new ProvidedValueLockedException("slack"));
 
         webTestClient
             .post()
@@ -800,77 +800,12 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
             .isEqualTo(409)
             .expectBody()
             .jsonPath("$.providedComponentName")
-            .isEqualTo("slack")
-            .jsonPath("$.providedInputName")
-            .doesNotExist();
+            .isEqualTo("slack");
     }
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
-    void testExplicitProvisionInputForAProvidedInputReturns409() {
-        when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
-            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(), any(), eq(Map.of("channel", "#mine"))))
-                .thenThrow(new ProvidedValueLockedException("channel", ProvidedValueLockedException.Kind.INPUT));
-
-        webTestClient
-            .post()
-            .uri("/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision", EXTERNAL_USER_ID,
-                WORKFLOW_UUID)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(Map.of("inputs", Map.of("channel", "#mine")))
-            .exchange()
-            .expectStatus()
-            .isEqualTo(409)
-            .expectBody()
-            .jsonPath("$.providedInputName")
-            .isEqualTo("channel")
-            .jsonPath("$.providedComponentName")
-            .doesNotExist();
-    }
-
-    @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
-    void testUpdateFrontendProjectWorkflowInputsForAProvidedInputReturns409() {
-        doThrow(new ProvidedValueLockedException("channel", ProvidedValueLockedException.Kind.INPUT))
-            .when(connectedUserProjectFacade)
-            .updateProjectWorkflowInputs(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(), any());
-
-        webTestClient
-            .put()
-            .uri("/v1/automation/workflows/{workflowUuid}/inputs", WORKFLOW_UUID)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue("{\"inputs\":{\"channel\":\"#mine\"}}")
-            .exchange()
-            .expectStatus()
-            .isEqualTo(409)
-            .expectBody()
-            .jsonPath("$.providedInputName")
-            .isEqualTo("channel");
-    }
-
-    @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
-    void testUpdateProjectWorkflowInputsForAProvidedInputReturns409() {
-        doThrow(new ProvidedValueLockedException("channel", ProvidedValueLockedException.Kind.INPUT))
-            .when(connectedUserProjectFacade)
-            .updateProjectWorkflowInputs(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(), any());
-
-        webTestClient
-            .put()
-            .uri("/v1/{externalUserId}/automation/workflows/{workflowUuid}/inputs", EXTERNAL_USER_ID, WORKFLOW_UUID)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue("{\"inputs\":{\"channel\":\"#mine\"}}")
-            .exchange()
-            .expectStatus()
-            .isEqualTo(409)
-            .expectBody()
-            .jsonPath("$.providedInputName")
-            .isEqualTo("channel");
-    }
-
-    @Test
-    @WithMockUser(username = EXTERNAL_USER_ID)
-    void testListingMarksTheComponentsAndInputsTheConfigurationProvides() {
+    void testListingMarksTheComponentsTheConfigurationProvides() {
         ConnectedUserProjectWorkflow reference = new ConnectedUserProjectWorkflow();
 
         reference.setId(1L);
@@ -883,8 +818,8 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
         ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflowDTO = ConnectedUserProjectWorkflowDTO.ofReference(
             7L, reference, new WorkflowDTO(workflow, List.of(), List.of()),
             List.of(new ConnectedUserWorkflowTemplateDTO.Component("openAi", "OpenAI", null, true, null, true)),
-            List.of(new ConnectedUserWorkflowTemplateDTO.Input("model", "Model", "STRING", true, true)), Map.of(),
-            Map.of(), null);
+            List.of(new ConnectedUserWorkflowTemplateDTO.Input("model", "Model", "STRING", true)),
+            Map.of("model", "gpt-4o"), Map.of(), null);
 
         when(connectedUserProjectFacade.getConnectedUserProjectWorkflows(eq(EXTERNAL_USER_ID), any()))
             .thenReturn(List.of(connectedUserProjectWorkflowDTO));
@@ -905,9 +840,9 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
             .jsonPath("$[0].inputs[0].name")
             .isEqualTo("model")
             .jsonPath("$[0].inputs[0].provided")
-            .isEqualTo(true)
+            .doesNotExist()
             .jsonPath("$[0].inputValues.model")
-            .doesNotExist();
+            .isEqualTo("gpt-4o");
     }
 
     private void expectCopyNotFoundWithoutBody(String workflowUuid) {

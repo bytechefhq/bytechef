@@ -529,11 +529,8 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     public ResponseEntity<Object> handleProvidedValueLockedException(
         ProvidedValueLockedException providedValueLockedException) {
 
-        String propertyName = providedValueLockedException.getKind() == ProvidedValueLockedException.Kind.CONNECTION
-            ? "providedComponentName" : "providedInputName";
-
         return ResponseEntity.status(HttpStatus.CONFLICT)
-            .body(Map.of(propertyName, providedValueLockedException.getName()));
+            .body(Map.of("providedComponentName", providedValueLockedException.getComponentName()));
     }
 
     @InitBinder
