@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.server.configuration.service;
+package com.bytechef.platform.billing.facade;
+
+import java.time.Instant;
 
 /**
- * @author Ivica Cardic
+ * @author Matija Petanjek
  */
-public interface ManagementMcpServerService {
+public interface BillingUsageFacade {
 
-    String getManagementMcpServerCanonicalUrl();
-
-    String getManagementMcpServerUrl();
-
-    String updateManagementMcpServerUrl();
+    void reportUsage(Instant scheduledFireTime);
 }

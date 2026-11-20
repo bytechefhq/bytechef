@@ -24,6 +24,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigur
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectConfigurationVersionImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveImpactDTO;
@@ -104,6 +105,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     private static final Logger log = LoggerFactory.getLogger(IntegrationInstanceConfigurationFacadeImpl.class);
 
     private static final String INITIAL_VERSION_DESCRIPTION = "Initial version";
+    private static final String VERSION_COPY_PERMISSION_EXPRESSION = "false";
 
     private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
@@ -175,6 +177,71 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 
         this.requiresNewTransactionTemplate = transactionTemplate;
+    }
+
+    @Override
+    @Audited(
+        event = IntegrationAuditEvents.INTEGRATION_INSTANCE_CONFIGURATION_CONNECTED_USER_VERSION_CHANGED, data = {
+            @AuditData(key = "sourceIntegrationInstanceConfigurationId", value = "#sourceId"),
+            @AuditData(key = "connectedUserId", value = "#connectedUserId"),
+            @AuditData(key = "integrationVersion", value = "#integrationVersion"),
+            @AuditData(
+                key = "targetIntegrationInstanceConfigurationId", value = "#result?.targetConfigurationId"),
+            @AuditData(key = "movedConnectedUserIds", value = "#result?.movedConnectedUserIds")
+        })
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public ConfigurationMoveResultDTO changeConnectedUserVersion(
+        long sourceId, long connectedUserId, int integrationVersion, @Nullable Long targetId) {
+
+        IntegrationInstanceConfiguration sourceConfiguration =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(sourceId);
+
+        validateChangeVersion(sourceConfiguration, integrationVersion);
+
+        Long resolvedTargetId = targetId;
+
+        if (resolvedTargetId == null) {
+            resolvedTargetId = findVersionConfigurationId(sourceConfiguration, integrationVersion);
+        } else {
+            IntegrationInstanceConfiguration targetConfiguration =
+                integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(resolvedTargetId);
+
+            validateChangeVersionTarget(sourceConfiguration, targetConfiguration, integrationVersion);
+        }
+
+        if (resolvedTargetId != null) {
+            return getVersionChangeResult(
+                moveConnectedUsers(sourceId, resolvedTargetId, List.of(connectedUserId)), connectedUserId);
+        }
+
+        Long createdConfigurationId = requiresNewTransactionTemplate.execute(
+            status -> copyIntegrationInstanceConfiguration(sourceConfiguration, integrationVersion));
+
+        long copyConfigurationId = Validate.notNull(createdConfigurationId, "copyConfigurationId");
+
+        ConfigurationMoveResultDTO configurationMoveResultDTO;
+
+        try {
+            configurationMoveResultDTO = moveConnectedUsers(sourceId, copyConfigurationId, List.of(connectedUserId));
+        } catch (RuntimeException exception) {
+            try {
+                deleteCopyConfiguration(copyConfigurationId);
+            } catch (RuntimeException deleteException) {
+                exception.addSuppressed(deleteException);
+            }
+
+            throw exception;
+        }
+
+        ConfigurationMoveResultDTO versionChangeResult = getVersionChangeResult(
+            configurationMoveResultDTO, connectedUserId);
+
+        if (versionChangeResult.targetConfigurationId() == null) {
+            deleteCopyConfiguration(copyConfigurationId);
+        }
+
+        return versionChangeResult;
     }
 
     @Override
@@ -796,7 +863,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         }
 
         return new ConfigurationMoveResultDTO(
-            List.copyOf(movedConnectedUserIds), mergedSkipped, List.copyOf(needsAttentionConnectedUserIds));
+            List.copyOf(movedConnectedUserIds), mergedSkipped, List.copyOf(needsAttentionConnectedUserIds),
+            targetConfiguration.getId());
     }
 
     private void addConfigurationsOfExistingInstances(
@@ -832,6 +900,244 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                     integrationInstanceConfiguration.getIntegrationId(),
                     Optional.of(integrationInstanceConfiguration));
             }
+        }
+    }
+
+    private long copyIntegrationInstanceConfiguration(
+        IntegrationInstanceConfiguration sourceConfiguration, int integrationVersion) {
+
+        long integrationId = sourceConfiguration.getIntegrationId();
+
+        Integration integration = integrationService.getIntegration(integrationId);
+        List<IntegrationWorkflow> integrationWorkflows = integrationWorkflowService.getIntegrationWorkflows(
+            integrationId);
+
+        Map<String, String> workflowUuidsByWorkflowId = getWorkflowUuidsByWorkflowId(integrationWorkflows);
+        Map<String, IntegrationInstanceConfigurationWorkflow> sourceWorkflowsByUuid = new HashMap<>();
+
+        for (IntegrationInstanceConfigurationWorkflow sourceWorkflow : integrationInstanceConfigurationWorkflowService
+            .getIntegrationInstanceConfigurationWorkflows(sourceConfiguration.getId())) {
+
+            String workflowUuid = workflowUuidsByWorkflowId.get(sourceWorkflow.getWorkflowId());
+
+            if (workflowUuid != null) {
+                sourceWorkflowsByUuid.put(workflowUuid, sourceWorkflow);
+            }
+        }
+
+        List<IntegrationInstanceConfigurationWorkflowDTO> copyWorkflowDTOs = new ArrayList<>();
+
+        for (IntegrationWorkflow integrationWorkflow : integrationWorkflows) {
+            if (integrationWorkflow.getIntegrationVersion() != integrationVersion) {
+                continue;
+            }
+
+            copyWorkflowDTOs.add(
+                getCopyWorkflowDTO(
+                    integrationWorkflow, sourceWorkflowsByUuid.get(integrationWorkflow.getUuidAsString()),
+                    integration));
+        }
+
+        List<Long> tagIds = sourceConfiguration.getTagIds();
+
+        IntegrationInstanceConfigurationDTO copyConfigurationDTO = IntegrationInstanceConfigurationDTO.builder()
+            .authorizationType(sourceConfiguration.getAuthorizationType())
+            .connectionParameters(sourceConfiguration.getConnectionParameters())
+            .description(sourceConfiguration.getDescription())
+            .enabled(false)
+            .environment(sourceConfiguration.getEnvironment())
+            .integrationId(integrationId)
+            .integrationInstanceConfigurationWorkflows(copyWorkflowDTOs)
+            .integrationVersion(integrationVersion)
+            .name(getCopyConfigurationName(sourceConfiguration, integrationVersion))
+            .permissionExpression(VERSION_COPY_PERMISSION_EXPRESSION)
+            .tags(tagIds.isEmpty() ? List.of() : tagService.getTags(tagIds))
+            .build();
+
+        long copyConfigurationId = createIntegrationInstanceConfiguration(copyConfigurationDTO);
+
+        enableIntegrationInstanceConfiguration(copyConfigurationId, true);
+
+        return copyConfigurationId;
+    }
+
+    private void deleteCopyConfiguration(long copyConfigurationId) {
+        requiresNewTransactionTemplate.executeWithoutResult(
+            status -> deleteIntegrationInstanceConfiguration(copyConfigurationId));
+    }
+
+    private @Nullable Long findVersionConfigurationId(
+        IntegrationInstanceConfiguration sourceConfiguration, int integrationVersion) {
+
+        List<IntegrationInstanceConfiguration> versionConfigurations = integrationInstanceConfigurationService
+            .getEnabledIntegrationInstanceConfigurations(
+                sourceConfiguration.getIntegrationId(), sourceConfiguration.getEnvironment())
+            .stream()
+            .filter(configuration -> Objects.equals(configuration.getIntegrationVersion(), integrationVersion))
+            .sorted(Comparator.comparing(IntegrationInstanceConfiguration::getId))
+            .toList();
+
+        return versionConfigurations.stream()
+            .filter(configuration -> Objects.equals(configuration.getName(), sourceConfiguration.getName()))
+            .findFirst()
+            .or(() -> versionConfigurations.stream()
+                .findFirst())
+            .map(IntegrationInstanceConfiguration::getId)
+            .orElse(null);
+    }
+
+    private List<IntegrationInstanceConfigurationWorkflowConnection> getCarriedConnections(
+        List<IntegrationInstanceConfigurationWorkflowConnection> sourceConnections, Workflow workflow) {
+
+        if (sourceConnections.isEmpty()) {
+            return List.of();
+        }
+
+        List<ComponentConnection> componentConnections = CollectionUtils.concat(
+            WorkflowTrigger.of(workflow)
+                .stream()
+                .flatMap(workflowTrigger -> CollectionUtils.stream(
+                    componentConnectionFacade.getComponentConnections(workflowTrigger)))
+                .toList(),
+            workflow.getTasks(true)
+                .stream()
+                .flatMap(workflowTask -> CollectionUtils.stream(
+                    componentConnectionFacade.getComponentConnections(workflowTask)))
+                .toList());
+
+        return sourceConnections.stream()
+            .filter(sourceConnection -> isCarriedConnection(sourceConnection, componentConnections))
+            .toList();
+    }
+
+    private String getCopyConfigurationName(
+        IntegrationInstanceConfiguration sourceConfiguration, int integrationVersion) {
+
+        Set<String> existingNames = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfigurations(
+                sourceConfiguration.getEnvironment(), sourceConfiguration.getIntegrationId(), null)
+            .stream()
+            .map(IntegrationInstanceConfiguration::getName)
+            .filter(Objects::nonNull)
+            .map(StringUtils::lowerCase)
+            .collect(Collectors.toSet());
+
+        String baseName = sourceConfiguration.getName() + " · V" + integrationVersion;
+        String copyName = baseName;
+
+        for (int suffix = 2; existingNames.contains(StringUtils.lowerCase(copyName)); suffix++) {
+            copyName = baseName + " (" + suffix + ")";
+        }
+
+        return copyName;
+    }
+
+    private IntegrationInstanceConfigurationWorkflowDTO getCopyWorkflowDTO(
+        IntegrationWorkflow integrationWorkflow, @Nullable IntegrationInstanceConfigurationWorkflow sourceWorkflow,
+        Integration integration) {
+
+        Map<String, ?> inputs = sourceWorkflow == null ? Map.of() : sourceWorkflow.getInputs();
+
+        Workflow workflow = workflowService.getWorkflow(integrationWorkflow.getWorkflowId());
+
+        List<IntegrationInstanceConfigurationWorkflowConnection> connections =
+            sourceWorkflow == null ? List.of() : getCarriedConnections(sourceWorkflow.getConnections(), workflow);
+
+        Set<String> providedConnectionNodeNames = connections.stream()
+            .map(IntegrationInstanceConfigurationWorkflowConnection::getWorkflowNodeName)
+            .collect(Collectors.toSet());
+
+        boolean requiredConnectionsProvided = getRequiredComponentConnections(workflow, integration)
+            .stream()
+            .allMatch(componentConnection -> providedConnectionNodeNames.contains(
+                componentConnection.workflowNodeName()));
+
+        boolean sourceEnabled = sourceWorkflow == null || sourceWorkflow.isEnabled();
+
+        return new IntegrationInstanceConfigurationWorkflowDTO(
+            connections, null, null, inputs, sourceEnabled && requiredConnectionsProvided, null, null, null, null,
+            null, 0, null, integrationWorkflow.getWorkflowId(), integrationWorkflow.getUuidAsString(), Map.of());
+    }
+
+    private static ConfigurationMoveResultDTO getVersionChangeResult(
+        ConfigurationMoveResultDTO moveResult, long connectedUserId) {
+
+        List<Long> movedConnectedUserIds = moveResult.movedConnectedUserIds();
+
+        if (movedConnectedUserIds.contains(connectedUserId)) {
+            return moveResult;
+        }
+
+        return new ConfigurationMoveResultDTO(
+            movedConnectedUserIds, moveResult.skipped(), moveResult.needsAttentionConnectedUserIds(), null);
+    }
+
+    private static Map<String, String> getWorkflowUuidsByWorkflowId(List<IntegrationWorkflow> integrationWorkflows) {
+        Map<String, String> workflowUuidsByWorkflowId = new HashMap<>();
+
+        for (IntegrationWorkflow integrationWorkflow : integrationWorkflows) {
+            workflowUuidsByWorkflowId.put(integrationWorkflow.getWorkflowId(), integrationWorkflow.getUuidAsString());
+        }
+
+        return workflowUuidsByWorkflowId;
+    }
+
+    private boolean isCarriedConnection(
+        IntegrationInstanceConfigurationWorkflowConnection sourceConnection,
+        List<ComponentConnection> componentConnections) {
+
+        Optional<Connection> connectionOptional = connectionService.fetchConnection(
+            sourceConnection.getConnectionId());
+
+        if (connectionOptional.isEmpty()) {
+            return false;
+        }
+
+        Connection connection = connectionOptional.get();
+
+        return componentConnections.stream()
+            .anyMatch(componentConnection -> Objects.equals(
+                componentConnection.workflowNodeName(), sourceConnection.getWorkflowNodeName()) &&
+                Objects.equals(componentConnection.key(), sourceConnection.getWorkflowConnectionKey()) &&
+                Objects.equals(componentConnection.componentName(), connection.getComponentName()));
+    }
+
+    private void validateChangeVersion(IntegrationInstanceConfiguration sourceConfiguration, int integrationVersion) {
+        if (Objects.equals(sourceConfiguration.getIntegrationVersion(), integrationVersion)) {
+            throw new IllegalArgumentException(
+                "Integration instance configuration id=%s is already on integration version %s".formatted(
+                    sourceConfiguration.getId(), integrationVersion));
+        }
+
+        Integration integration = integrationService.getIntegration(sourceConfiguration.getIntegrationId());
+
+        Optional<IntegrationVersion> integrationVersionOptional = integration.fetchIntegrationVersion(
+            integrationVersion);
+
+        boolean published = integrationVersionOptional
+            .map(curIntegrationVersion -> curIntegrationVersion.getStatus() == IntegrationVersion.Status.PUBLISHED)
+            .orElse(false);
+
+        if (!published) {
+            throw new IllegalArgumentException(
+                "Integration id=%s has no published version %s".formatted(integration.getId(), integrationVersion));
+        }
+    }
+
+    private static void validateChangeVersionTarget(
+        IntegrationInstanceConfiguration sourceConfiguration, IntegrationInstanceConfiguration targetConfiguration,
+        int integrationVersion) {
+
+        if (!Objects.equals(sourceConfiguration.getIntegrationId(), targetConfiguration.getIntegrationId()) ||
+            sourceConfiguration.getEnvironment() != targetConfiguration.getEnvironment() ||
+            !targetConfiguration.isEnabled() ||
+            !Objects.equals(targetConfiguration.getIntegrationVersion(), integrationVersion)) {
+
+            throw new IllegalArgumentException(
+                ("Integration instance configuration id=%s is not an enabled configuration of integration id=%s " +
+                    "version %s in environment=%s").formatted(
+                        targetConfiguration.getId(), sourceConfiguration.getIntegrationId(), integrationVersion,
+                        sourceConfiguration.getEnvironment()));
         }
     }
 
@@ -946,7 +1252,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             }
         }
 
-        return new ConfigurationMoveResultDTO(movedConnectedUserIds, skipped, needsAttentionConnectedUserIds);
+        return new ConfigurationMoveResultDTO(
+            movedConnectedUserIds, skipped, needsAttentionConnectedUserIds, targetConfiguration.getId());
     }
 
     private List<UpgradeSource> getUpgradeSources(
@@ -1275,13 +1582,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     private MoveContext getMoveContext(
         IntegrationInstanceConfiguration sourceConfiguration, IntegrationInstanceConfiguration targetConfiguration) {
 
-        Map<String, String> workflowUuidsByWorkflowId = new HashMap<>();
-
-        for (IntegrationWorkflow integrationWorkflow : integrationWorkflowService.getIntegrationWorkflows(
-            sourceConfiguration.getIntegrationId())) {
-
-            workflowUuidsByWorkflowId.put(integrationWorkflow.getWorkflowId(), integrationWorkflow.getUuidAsString());
-        }
+        Map<String, String> workflowUuidsByWorkflowId = getWorkflowUuidsByWorkflowId(
+            integrationWorkflowService.getIntegrationWorkflows(sourceConfiguration.getIntegrationId()));
 
         Map<String, IntegrationInstanceConfigurationWorkflow> targetWorkflowsByUuid = new HashMap<>();
 

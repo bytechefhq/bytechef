@@ -29,17 +29,17 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 /**
  * @author Matija Petanjek
  */
-class BillingSubscriptionCacheServiceTest {
+class BillingSubscriptionCacheTest {
 
     private CacheManager cacheManager;
     private Cache trialStatusCache;
-    private BillingSubscriptionCacheService billingSubscriptionCacheService;
+    private BillingSubscriptionCache billingSubscriptionCache;
 
     @BeforeEach
     void setUp() {
-        cacheManager = new ConcurrentMapCacheManager(TrialServiceImpl.TRIAL_STATUS_CACHE);
-        trialStatusCache = cacheManager.getCache(TrialServiceImpl.TRIAL_STATUS_CACHE);
-        billingSubscriptionCacheService = new BillingSubscriptionCacheService(cacheManager);
+        cacheManager = new ConcurrentMapCacheManager(BillingSubscriptionCache.TRIAL_STATUS_CACHE);
+        trialStatusCache = cacheManager.getCache(BillingSubscriptionCache.TRIAL_STATUS_CACHE);
+        billingSubscriptionCache = new BillingSubscriptionCache(cacheManager);
     }
 
     @Test
@@ -49,7 +49,7 @@ class BillingSubscriptionCacheServiceTest {
         TransactionSynchronizationManager.initSynchronization();
 
         try {
-            billingSubscriptionCacheService.evictTrialStatusCacheAfterCommit();
+            billingSubscriptionCache.evictTrialStatusCacheAfterCommit();
 
             assertThat(trialStatusCache.get("cachedTrialStatus")).isNotNull();
 
@@ -67,7 +67,7 @@ class BillingSubscriptionCacheServiceTest {
     void testEvictTrialStatusCacheAfterCommitEvictsImmediatelyWhenNoTransactionIsActive() {
         trialStatusCache.put("cachedTrialStatus", "stale");
 
-        billingSubscriptionCacheService.evictTrialStatusCacheAfterCommit();
+        billingSubscriptionCache.evictTrialStatusCacheAfterCommit();
 
         assertThat(trialStatusCache.get("cachedTrialStatus")).isNull();
     }

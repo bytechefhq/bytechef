@@ -27,7 +27,7 @@ import com.bytechef.ee.platform.scheduler.aws.listener.PollingTriggerListener;
 import com.bytechef.ee.platform.scheduler.aws.listener.ScheduleTriggerListener;
 import com.bytechef.ee.platform.scheduler.aws.listener.StripeUsageReportListener;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.billing.service.BillingUsageService;
+import com.bytechef.platform.billing.facade.BillingUsageFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
@@ -156,8 +156,8 @@ public class AwsSchedulerConfiguration {
 
     @Bean
     @ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
-    StripeUsageReportListener stripeUsageReportListener(BillingUsageService billingUsageService) {
-        return new StripeUsageReportListener(billingUsageService);
+    StripeUsageReportListener stripeUsageReportListener(BillingUsageFacade billingUsageFacade) {
+        return new StripeUsageReportListener(billingUsageFacade);
     }
 
     @Bean(name = SCHEDULER_SQS_LISTENER_CONTAINER_FACTORY, autowireCandidate = false)

@@ -22,6 +22,7 @@ docs/ComponentConnection.md
 docs/ComponentDefinitionApi.md
 docs/ComponentDefinitionBasic.md
 docs/ComponentInputReference.md
+docs/ConfigurationChangeVersionRequest.md
 docs/ConfigurationConnectedUser.md
 docs/ConfigurationMoveImpact.md
 docs/ConfigurationMoveImpactWorkflow.md
@@ -66,6 +67,7 @@ docs/StartWebhookTriggerTest200Response.md
 docs/Tag.md
 docs/UpdateConnectionCredentialsRequest.md
 docs/UpdateConnectionRequest.md
+docs/UpdateIntegrationInstanceConnectionRequest.md
 docs/UpdateTagsRequest.md
 docs/WebhookTriggerTestApi.md
 docs/Workflow.md
@@ -86,6 +88,7 @@ models/ComponentCategory.ts
 models/ComponentConnection.ts
 models/ComponentDefinitionBasic.ts
 models/ComponentInputReference.ts
+models/ConfigurationChangeVersionRequest.ts
 models/ConfigurationConnectedUser.ts
 models/ConfigurationMoveImpact.ts
 models/ConfigurationMoveImpactWorkflow.ts
@@ -122,6 +125,7 @@ models/StartWebhookTriggerTest200Response.ts
 models/Tag.ts
 models/UpdateConnectionCredentialsRequest.ts
 models/UpdateConnectionRequest.ts
+models/UpdateIntegrationInstanceConnectionRequest.ts
 models/UpdateTagsRequest.ts
 models/Workflow.ts
 models/Workflow1.ts

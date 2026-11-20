@@ -15,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveResultDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationConnectedUserDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
+import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationChangeVersionRequestModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationConnectedUserModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationMoveImpactModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationMoveRequestModel;
@@ -55,6 +56,22 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
 
         this.conversionService = conversionService;
         this.integrationInstanceConfigurationFacade = integrationInstanceConfigurationFacade;
+    }
+
+    @Override
+    public ResponseEntity<ConfigurationMoveResultModel> changeIntegrationInstanceConfigurationConnectedUserVersion(
+        Long id, ConfigurationChangeVersionRequestModel configurationChangeVersionRequestModel) {
+
+        ConfigurationMoveResultDTO configurationMoveResultDTO = integrationInstanceConfigurationFacade
+            .changeConnectedUserVersion(
+                id, configurationChangeVersionRequestModel.getConnectedUserId(),
+                configurationChangeVersionRequestModel.getVersion(),
+                configurationChangeVersionRequestModel.getTargetId());
+
+        return ResponseEntity.ok(
+            Validate.notNull(
+                conversionService.convert(configurationMoveResultDTO, ConfigurationMoveResultModel.class),
+                "configurationMoveResultModel"));
     }
 
     @Override

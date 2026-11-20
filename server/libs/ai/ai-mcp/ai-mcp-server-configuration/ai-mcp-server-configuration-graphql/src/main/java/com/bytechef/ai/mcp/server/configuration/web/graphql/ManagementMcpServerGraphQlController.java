@@ -16,14 +16,14 @@
 
 package com.bytechef.ai.mcp.server.configuration.web.graphql;
 
-import com.bytechef.ai.mcp.server.configuration.service.ManagementMcpServerService;
+import com.bytechef.ai.mcp.server.configuration.facade.ManagementMcpServerFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 /**
- * GraphQL controller for managing MCP Server configuration. Delegates to {@link ManagementMcpServerService}, where the
+ * GraphQL controller for managing MCP Server configuration. Delegates to {@link ManagementMcpServerFacade}, where the
  * tenant-admin authorization for the secret-exposing platform MCP URL lives.
  *
  * @author Ivica Cardic
@@ -31,25 +31,25 @@ import org.springframework.stereotype.Controller;
 @Controller
 class ManagementMcpServerGraphQlController {
 
-    private final ManagementMcpServerService managementMcpServerService;
+    private final ManagementMcpServerFacade managementMcpServerFacade;
 
     @SuppressFBWarnings("EI")
-    ManagementMcpServerGraphQlController(ManagementMcpServerService managementMcpServerService) {
-        this.managementMcpServerService = managementMcpServerService;
+    ManagementMcpServerGraphQlController(ManagementMcpServerFacade managementMcpServerFacade) {
+        this.managementMcpServerFacade = managementMcpServerFacade;
     }
 
     @QueryMapping
     String managementMcpServerCanonicalUrl() {
-        return managementMcpServerService.getManagementMcpServerCanonicalUrl();
+        return managementMcpServerFacade.getManagementMcpServerCanonicalUrl();
     }
 
     @QueryMapping
     String managementMcpServerUrl() {
-        return managementMcpServerService.getManagementMcpServerUrl();
+        return managementMcpServerFacade.getManagementMcpServerUrl();
     }
 
     @MutationMapping
     String updateManagementMcpServerUrl() {
-        return managementMcpServerService.updateManagementMcpServerUrl();
+        return managementMcpServerFacade.updateManagementMcpServerUrl();
     }
 }

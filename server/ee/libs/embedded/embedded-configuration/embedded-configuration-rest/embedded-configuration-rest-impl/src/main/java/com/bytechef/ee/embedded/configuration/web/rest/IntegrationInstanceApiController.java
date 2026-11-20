@@ -20,6 +20,7 @@ import com.bytechef.ee.embedded.configuration.web.rest.model.ProvisionIntegratio
 import com.bytechef.ee.embedded.configuration.web.rest.model.ProvisionableIntegrationInstanceConfigurationModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ProvisionableIntegrationModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionCredentialsRequestModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateIntegrationInstanceConnectionRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -128,6 +129,17 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
             integrationInstanceFacade.provisionIntegrationInstance(
                 connectedUserId, provisionIntegrationInstanceRequestModel.getIntegrationInstanceConfigurationId(),
                 connectionParameters, workflows));
+    }
+
+    @Override
+    public ResponseEntity<Void> updateIntegrationInstanceConnection(
+        Long id, UpdateIntegrationInstanceConnectionRequestModel updateIntegrationInstanceConnectionRequestModel) {
+
+        integrationInstanceFacade.updateIntegrationInstanceConnection(
+            id, Objects.requireNonNull(updateIntegrationInstanceConnectionRequestModel.getConnectionId()));
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @Override

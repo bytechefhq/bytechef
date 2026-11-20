@@ -26,6 +26,9 @@ import org.jspecify.annotations.Nullable;
  */
 public interface IntegrationInstanceConfigurationFacade {
 
+    ConfigurationMoveResultDTO changeConnectedUserVersion(
+        long sourceId, long connectedUserId, int integrationVersion, @Nullable Long targetId);
+
     long createIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO);
 

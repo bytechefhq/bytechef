@@ -14,6 +14,11 @@
 
 import * as runtime from '../runtime';
 import {
+    type ConfigurationChangeVersionRequest,
+    ConfigurationChangeVersionRequestFromJSON,
+    ConfigurationChangeVersionRequestToJSON,
+} from '../models/ConfigurationChangeVersionRequest';
+import {
     type ConfigurationConnectedUser,
     ConfigurationConnectedUserFromJSON,
     ConfigurationConnectedUserToJSON,
@@ -58,6 +63,17 @@ import {
     UpdateConnectionCredentialsRequestFromJSON,
     UpdateConnectionCredentialsRequestToJSON,
 } from '../models/UpdateConnectionCredentialsRequest';
+
+export interface ChangeIntegrationInstanceConfigurationConnectedUserVersionRequest {
+    /**
+     * The id of the source integration instance configuration.
+     */
+    id: number;
+    /**
+     * 
+     */
+    configurationChangeVersionRequest: ConfigurationChangeVersionRequest;
+}
 
 export interface CreateIntegrationInstanceConfigurationRequest {
     /**
@@ -228,6 +244,63 @@ export interface UpgradeIntegrationInstanceConfigurationConnectedUsersRequest {
  * 
  */
 export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
+
+    /**
+     * Creates request options for changeIntegrationInstanceConfigurationConnectedUserVersion without sending the request
+     */
+    async changeIntegrationInstanceConfigurationConnectedUserVersionRequestOpts(requestParameters: ChangeIntegrationInstanceConfigurationConnectedUserVersionRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling changeIntegrationInstanceConfigurationConnectedUserVersion().'
+            );
+        }
+
+        if (requestParameters['configurationChangeVersionRequest'] == null) {
+            throw new runtime.RequiredError(
+                'configurationChangeVersionRequest',
+                'Required parameter "configurationChangeVersionRequest" was null or undefined when calling changeIntegrationInstanceConfigurationConnectedUserVersion().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/integration-instance-configurations/{id}/change-version`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ConfigurationChangeVersionRequestToJSON(requestParameters['configurationChangeVersionRequest']),
+        };
+    }
+
+    /**
+     * Put one connected user on another published version of the integration, moving it to a configuration on that version or copying its current configuration to that version when none exists.
+     * Change the integration version of one connected user
+     */
+    async changeIntegrationInstanceConfigurationConnectedUserVersionRaw(requestParameters: ChangeIntegrationInstanceConfigurationConnectedUserVersionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConfigurationMoveResult>> {
+        const requestOptions = await this.changeIntegrationInstanceConfigurationConnectedUserVersionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ConfigurationMoveResultFromJSON(jsonValue));
+    }
+
+    /**
+     * Put one connected user on another published version of the integration, moving it to a configuration on that version or copying its current configuration to that version when none exists.
+     * Change the integration version of one connected user
+     */
+    async changeIntegrationInstanceConfigurationConnectedUserVersion(requestParameters: ChangeIntegrationInstanceConfigurationConnectedUserVersionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConfigurationMoveResult> {
+        const response = await this.changeIntegrationInstanceConfigurationConnectedUserVersionRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Creates request options for createIntegrationInstanceConfiguration without sending the request

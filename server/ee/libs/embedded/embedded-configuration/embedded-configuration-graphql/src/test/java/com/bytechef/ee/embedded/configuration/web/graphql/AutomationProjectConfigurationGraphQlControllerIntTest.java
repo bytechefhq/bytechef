@@ -536,6 +536,67 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
     }
 
     @Test
+    void testChangeAutomationProjectConfigurationConnectedUserVersionReturnsTheResult() {
+        when(automationProjectConfigurationFacade.changeConnectedUserVersion(5L, 21L, 3, null))
+            .thenReturn(new ConfigurationMoveResultDTO(List.of(21L), List.of(), List.of(), 7L));
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    changeAutomationProjectConfigurationConnectedUserVersion(
+                        sourceId: "5", connectedUserId: "21", projectVersion: 3) {
+                        movedConnectedUserIds
+                        needsAttentionConnectedUserIds
+                    }
+                }
+                """)
+            .execute()
+            .path("changeAutomationProjectConfigurationConnectedUserVersion.movedConnectedUserIds")
+            .entityList(String.class)
+            .containsExactly("21")
+            .path("changeAutomationProjectConfigurationConnectedUserVersion.needsAttentionConnectedUserIds")
+            .entityList(String.class)
+            .hasSize(0);
+    }
+
+    @Test
+    void testChangeAutomationProjectConfigurationConnectedUserVersionPassesTheTarget() {
+        when(automationProjectConfigurationFacade.changeConnectedUserVersion(5L, 21L, 1, 7L))
+            .thenReturn(
+                new ConfigurationMoveResultDTO(
+                    List.of(),
+                    List.of(
+                        new ConfigurationMoveResultDTO.Skipped(
+                            21L, ConfigurationMoveResultDTO.Skipped.TARGET_LACKS_REFERENCED_WORKFLOWS,
+                            List.of("Sync"))),
+                    List.of(), 9L));
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    changeAutomationProjectConfigurationConnectedUserVersion(
+                        sourceId: "5", connectedUserId: "21", projectVersion: 1, targetId: "7") {
+                        skipped {
+                            connectedUserId
+                            reason
+                            workflowLabels
+                        }
+                    }
+                }
+                """)
+            .execute()
+            .path("changeAutomationProjectConfigurationConnectedUserVersion.skipped[0].connectedUserId")
+            .entity(String.class)
+            .isEqualTo("21")
+            .path("changeAutomationProjectConfigurationConnectedUserVersion.skipped[0].reason")
+            .entity(String.class)
+            .isEqualTo("TARGET_LACKS_REFERENCED_WORKFLOWS")
+            .path("changeAutomationProjectConfigurationConnectedUserVersion.skipped[0].workflowLabels")
+            .entityList(String.class)
+            .containsExactly("Sync");
+    }
+
+    @Test
     void testMoveAutomationProjectConfigurationConnectedUsersReturnsTheResult() {
         when(automationProjectConfigurationFacade.moveConnectedUsers(5L, 6L, List.of(21L, 22L, 23L)))
             .thenReturn(
@@ -544,7 +605,7 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
                     List.of(
                         new ConfigurationMoveResultDTO.Skipped(
                             22L, ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE, List.of())),
-                    List.of(23L)));
+                    List.of(23L), 9L));
 
         this.graphQlTester
             .document("""
@@ -647,7 +708,7 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
                     List.of(
                         new ConfigurationMoveResultDTO.Skipped(
                             22L, ConfigurationMoveResultDTO.Skipped.NOT_ON_SOURCE, List.of())),
-                    List.of(23L)));
+                    List.of(23L), 9L));
 
         this.graphQlTester
             .document("""

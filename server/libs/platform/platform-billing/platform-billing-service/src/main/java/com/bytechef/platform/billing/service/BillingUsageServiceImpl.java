@@ -16,16 +16,9 @@
 
 package com.bytechef.platform.billing.service;
 
-import com.bytechef.platform.billing.client.StripeClient;
-import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.repository.BillingSubscriptionRepository;
-import com.bytechef.tenant.TenantContext;
-import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
-import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -36,68 +29,11 @@ import org.springframework.stereotype.Service;
 @ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
 public class BillingUsageServiceImpl implements BillingUsageService {
 
-    private static final Logger log = LoggerFactory.getLogger(BillingUsageServiceImpl.class);
-
     private final BillingSubscriptionRepository billingSubscriptionRepository;
-    private final BillingSubscriptionService billingSubscriptionService;
-    private final StripeClient stripeClient;
-    private final TenantService tenantService;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public BillingUsageServiceImpl(
-        BillingSubscriptionRepository billingSubscriptionRepository,
-        BillingSubscriptionService billingSubscriptionService,
-        StripeClient stripeClient, TenantService tenantService) {
-
+    public BillingUsageServiceImpl(BillingSubscriptionRepository billingSubscriptionRepository) {
         this.billingSubscriptionRepository = billingSubscriptionRepository;
-        this.billingSubscriptionService = billingSubscriptionService;
-        this.stripeClient = stripeClient;
-        this.tenantService = tenantService;
-    }
-
-    @Override
-    public void reportUsage(Instant scheduledFireTime) {
-        log.info("Tenant usage report START");
-
-        for (String tenantId : tenantService.getTenantIds()) {
-            TenantContext.runWithTenantId(tenantId, () -> doReportUsage(scheduledFireTime));
-        }
-
-        log.info("Tenant usage report END");
-    }
-
-    private void doReportUsage(Instant scheduledFireTime) {
-        Optional<BillingSubscription> subscriptionOptional = billingSubscriptionService.fetchCurrentSubscription();
-
-        if (subscriptionOptional.isEmpty()) {
-            return;
-        }
-
-        BillingSubscription subscription = subscriptionOptional.get();
-
-        if ("TRIAL".equals(subscription.getPlanName())) {
-            return;
-        }
-
-        if (subscription.getSubscriptionModel() != BillingSubscription.SubscriptionModel.METERED) {
-            return;
-        }
-
-        Instant lowerBound = subscription.getLastReportedAt() != null
-            ? subscription.getLastReportedAt()
-            : subscription.getCurrentPeriodStart();
-
-        int count = countJobExecutionsSince(lowerBound, scheduledFireTime);
-
-        if (count > 0) {
-            String idempotencyKey = subscription.getSubscriptionId() + "_" + scheduledFireTime.getEpochSecond();
-
-            stripeClient.reportMeterEvent(subscription.getCustomerId(), count, idempotencyKey);
-        }
-
-        subscription.setLastReportedAt(scheduledFireTime);
-
-        billingSubscriptionService.save(subscription);
     }
 
     @Override

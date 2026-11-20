@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.billing.web.security.config;
 
-import com.bytechef.platform.billing.service.TrialService;
+import com.bytechef.platform.billing.facade.TrialFacade;
 import com.bytechef.platform.billing.web.filter.TrialFilter;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -37,30 +37,30 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
 public class TrialFilterSecurityConfigurerContributor implements SecurityConfigurerContributor {
 
-    private final TrialService trialService;
+    private final TrialFacade trialFacade;
 
-    public TrialFilterSecurityConfigurerContributor(TrialService trialService) {
-        this.trialService = trialService;
+    public TrialFilterSecurityConfigurerContributor(TrialFacade trialFacade) {
+        this.trialFacade = trialFacade;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>>
         T getSecurityConfigurerAdapter() {
-        return (T) new TrialFilterConfigurer(trialService);
+        return (T) new TrialFilterConfigurer(trialFacade);
     }
 
     static class TrialFilterConfigurer extends AbstractHttpConfigurer<TrialFilterConfigurer, HttpSecurity> {
 
-        private final TrialService trialService;
+        private final TrialFacade trialFacade;
 
-        TrialFilterConfigurer(TrialService trialService) {
-            this.trialService = trialService;
+        TrialFilterConfigurer(TrialFacade trialFacade) {
+            this.trialFacade = trialFacade;
         }
 
         @Override
         public void init(HttpSecurity http) {
-            http.addFilterAfter(new TrialFilter(trialService), BasicAuthenticationFilter.class);
+            http.addFilterAfter(new TrialFilter(trialFacade), BasicAuthenticationFilter.class);
         }
     }
 }

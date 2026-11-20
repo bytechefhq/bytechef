@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.server.configuration.service;
+package com.bytechef.ai.mcp.server.configuration.facade;
 
 import com.bytechef.ai.mcp.server.configuration.audit.ManagementMcpServerAuditEvents;
 import com.bytechef.config.ApplicationProperties;
@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service;
  * @author Ivica Cardic
  */
 @Service
-public class ManagementMcpServerServiceImpl implements ManagementMcpServerService {
+public class ManagementMcpServerFacadeImpl implements ManagementMcpServerFacade {
 
     private static final String MCP_SERVER_PROPERTY_KEY = "mcp.server";
 
@@ -41,7 +41,7 @@ public class ManagementMcpServerServiceImpl implements ManagementMcpServerServic
     private final String publicUrl;
 
     @SuppressFBWarnings("EI")
-    public ManagementMcpServerServiceImpl(
+    public ManagementMcpServerFacadeImpl(
         ApplicationProperties applicationProperties, PropertyService propertyService) {
 
         this.propertyService = propertyService;

@@ -4,6 +4,7 @@ All URIs are relative to */api/embedded/internal*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
+| [**changeIntegrationInstanceConfigurationConnectedUserVersion**](IntegrationInstanceConfigurationApi.md#changeintegrationinstanceconfigurationconnecteduserversion) | **POST** /integration-instance-configurations/{id}/change-version | Change the integration version of one connected user |
 | [**createIntegrationInstanceConfiguration**](IntegrationInstanceConfigurationApi.md#createintegrationinstanceconfiguration) | **POST** /integration-instance-configurations | Create a new integration instance configuration |
 | [**createIntegrationInstanceConfigurationWorkflowJob**](IntegrationInstanceConfigurationApi.md#createintegrationinstanceconfigurationworkflowjob) | **POST** /integration-instance-configurations/{id}/workflows/{workflowId}/jobs | Create a request for running a new job |
 | [**deleteIntegrationInstanceConfiguration**](IntegrationInstanceConfigurationApi.md#deleteintegrationinstanceconfiguration) | **DELETE** /integration-instance-configurations/{id} | Delete an integration instance configuration |
@@ -20,6 +21,76 @@ All URIs are relative to */api/embedded/internal*
 | [**updateIntegrationInstanceConfigurationWorkflow**](IntegrationInstanceConfigurationApi.md#updateintegrationinstanceconfigurationworkflow) | **PUT** /integration-instance-configurations/{id}/workflows/{workflowId} | Update an existing integration instance configuration workflow |
 | [**upgradeIntegrationInstanceConfigurationConnectedUsers**](IntegrationInstanceConfigurationApi.md#upgradeintegrationinstanceconfigurationconnectedusers) | **POST** /integration-instance-configurations/{id}/upgrade | Upgrade connected users to an integration instance configuration |
 
+
+
+## changeIntegrationInstanceConfigurationConnectedUserVersion
+
+> ConfigurationMoveResult changeIntegrationInstanceConfigurationConnectedUserVersion(id, configurationChangeVersionRequest)
+
+Change the integration version of one connected user
+
+Put one connected user on another published version of the integration, moving it to a configuration on that version or copying its current configuration to that version when none exists.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  IntegrationInstanceConfigurationApi,
+} from '';
+import type { ChangeIntegrationInstanceConfigurationConnectedUserVersionRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new IntegrationInstanceConfigurationApi();
+
+  const body = {
+    // number | The id of the source integration instance configuration.
+    id: 789,
+    // ConfigurationChangeVersionRequest
+    configurationChangeVersionRequest: ...,
+  } satisfies ChangeIntegrationInstanceConfigurationConnectedUserVersionRequest;
+
+  try {
+    const data = await api.changeIntegrationInstanceConfigurationConnectedUserVersion(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of the source integration instance configuration. | [Defaults to `undefined`] |
+| **configurationChangeVersionRequest** | [ConfigurationChangeVersionRequest](ConfigurationChangeVersionRequest.md) |  | |
+
+### Return type
+
+[**ConfigurationMoveResult**](ConfigurationMoveResult.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The outcome of the move. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
 ## createIntegrationInstanceConfiguration

@@ -166,6 +166,16 @@ public class AutomationProjectConfigurationGraphQlController {
     }
 
     @MutationMapping
+    public ConfigurationMoveResultDTO changeAutomationProjectConfigurationConnectedUserVersion(
+        @Argument String sourceId, @Argument String connectedUserId, @Argument int projectVersion,
+        @Argument @Nullable String targetId) {
+
+        return automationProjectConfigurationFacade.changeConnectedUserVersion(
+            Long.parseLong(sourceId), Long.parseLong(connectedUserId), projectVersion,
+            targetId == null ? null : Long.valueOf(targetId));
+    }
+
+    @MutationMapping
     public ConfigurationMoveResultDTO moveAutomationProjectConfigurationConnectedUsers(
         @Argument String sourceId, @Argument String targetId, @Argument List<String> connectedUserIds) {
 

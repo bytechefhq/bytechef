@@ -233,6 +233,15 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     }
 
     @Override
+    public void updateConnectionId(long id, long connectionId) {
+        IntegrationInstance integrationInstance = getIntegrationInstance(id);
+
+        integrationInstance.setConnectionId(connectionId);
+
+        integrationInstanceRepository.save(integrationInstance);
+    }
+
+    @Override
     public void updateEnabled(long id, boolean enable) {
         IntegrationInstance integrationInstance = getIntegrationInstance(id);
 

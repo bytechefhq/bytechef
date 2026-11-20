@@ -10,9 +10,12 @@ package com.bytechef.ee.embedded.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.Answers.RETURNS_DEFAULTS;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,6 +32,9 @@ import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -40,11 +46,13 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurati
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectConfigurationVersionImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectConfigurationWorkflowProvidableValuesDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveResultDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
 import com.bytechef.ee.embedded.configuration.event.AutomationProjectConfigurationDeletedEvent;
 import com.bytechef.ee.embedded.configuration.event.AutomationProjectConfigurationUpdatedEvent;
@@ -53,7 +61,9 @@ import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluat
 import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
+import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -82,8 +92,11 @@ import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.facade.ApiKeyFacade;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
@@ -93,17 +106,36 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.event.ApplicationEvents;
@@ -115,7 +147,10 @@ import org.springframework.test.context.event.RecordApplicationEvents;
  * @author Ivica Cardic
  */
 @SpringBootTest(
-    classes = AutomationProjectFacadeIntTestConfiguration.class,
+    classes = {
+        AutomationProjectFacadeIntTestConfiguration.class,
+        AutomationProjectConfigurationFacadeIntTest.MethodSecurityConfiguration.class
+    },
     properties = {
         "bytechef.edition=EE",
         "bytechef.workflow.repository.jdbc.enabled=true",
@@ -216,7 +251,16 @@ class AutomationProjectConfigurationFacadeIntTest {
     private ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService;
 
     @Autowired
+    private ConnectedUserService connectedUserService;
+
+    @Autowired
     private ConnectionService connectionService;
+
+    @Autowired
+    private EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private ProjectDeploymentService projectDeploymentService;
@@ -231,10 +275,23 @@ class AutomationProjectConfigurationFacadeIntTest {
     private AutomationProjectFacade automationProjectFacade;
 
     @Autowired
+    private AutomationProjectConfigurationResolver automationProjectConfigurationResolver;
+
+    @MockitoSpyBean
     private AutomationProjectConfigurationService automationProjectConfigurationService;
 
     @Autowired
     private ProjectWorkflowService projectWorkflowService;
+
+    @BeforeEach
+    void beforeEach() {
+        authenticate(admin());
+    }
+
+    @AfterEach
+    void afterEach() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     void testCreateConfigurationWithUnpublishedVersionThrows() {
@@ -1315,6 +1372,459 @@ class AutomationProjectConfigurationFacadeIntTest {
             "Workflow uuid=%s is not part of version 1".formatted(unpinnedWorkflowUuid));
     }
 
+    @Test
+    void testChangeConnectedUserVersionMovesToAnEnabledConfigurationOnTheVersion() {
+        VersionedProjectFixture fixture = createVersionedProjectFixture("Change Version Existing", 1);
+
+        long otherConfigurationId = automationProjectConfigurationFacade.createConfiguration(
+            fixture.projectId(), ENVIRONMENT_ID, "Other", null, 2, true, true);
+
+        long connectedUserId = createConnectedUser(fixture.projectId(), fixture.sourceConfigurationId());
+
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.changeConnectedUserVersion(
+            fixture.sourceConfigurationId(), connectedUserId, 2, null);
+
+        assertThat(moveResult.movedConnectedUserIds()).containsExactly(connectedUserId);
+        assertThat(moveResult.targetConfigurationId()).isEqualTo(otherConfigurationId);
+        assertThat(getAssignedConfigurationId(connectedUserId, fixture.projectId()))
+            .isEqualTo(otherConfigurationId);
+        assertThat(automationProjectConfigurationService.getConfigurations(fixture.projectId()))
+            .extracting(AutomationProjectConfiguration::getId)
+            .containsExactlyInAnyOrder(fixture.sourceConfigurationId(), otherConfigurationId);
+    }
+
+    @Test
+    void testChangeConnectedUserVersionPicksTheLowestIdWhenNoConfigurationSharesTheName() {
+        VersionedProjectFixture fixture = createVersionedProjectFixture("Change Version Lowest Id", 1);
+
+        long firstConfigurationId = automationProjectConfigurationFacade.createConfiguration(
+            fixture.projectId(), ENVIRONMENT_ID, "First", null, 2, true, true);
+
+        automationProjectConfigurationFacade.createConfiguration(
+            fixture.projectId(), ENVIRONMENT_ID, "Second", null, 2, true, true);
+
+        long connectedUserId = createConnectedUser(fixture.projectId(), fixture.sourceConfigurationId());
+
+        automationProjectConfigurationFacade.changeConnectedUserVersion(
+            fixture.sourceConfigurationId(), connectedUserId, 2, null);
+
+        assertThat(getAssignedConfigurationId(connectedUserId, fixture.projectId())).isEqualTo(firstConfigurationId);
+    }
+
+    @Test
+    void testChangeConnectedUserVersionMovesToTheGivenTarget() {
+        VersionedProjectFixture fixture = createVersionedProjectFixture("Change Version Given Target", 1);
+
+        automationProjectConfigurationFacade.createConfiguration(
+            fixture.projectId(), ENVIRONMENT_ID, "First", null, 2, true, true);
+
+        long targetConfigurationId = automationProjectConfigurationFacade.createConfiguration(
+            fixture.projectId(), ENVIRONMENT_ID, "Second", null, 2, true, true);
+
+        long connectedUserId = createConnectedUser(fixture.projectId(), fixture.sourceConfigurationId());
+
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.changeConnectedUserVersion(
+            fixture.sourceConfigurationId(), connectedUserId, 2, targetConfigurationId);
+
+        assertThat(moveResult.movedConnectedUserIds()).containsExactly(connectedUserId);
+        assertThat(getAssignedConfigurationId(connectedUserId, fixture.projectId()))
+            .isEqualTo(targetConfigurationId);
+    }
+
+    @Test
+    void testChangeConnectedUserVersionCopiesTheSourceWhenNoConfigurationIsOnTheVersion() {
+        VersionedProjectFixture fixture = createVersionedProjectFixture("Change Version Copy", 1);
+
+        automationProjectConfigurationService.update(
+            fixture.sourceConfigurationId(), CONFIGURATION_NAME, "hasRole('ADMIN')", 1, true, false);
+        automationProjectConfigurationService.updateWorkflowProvidedValues(
+            fixture.sourceConfigurationId(), UUID.fromString(fixture.firstWorkflowUuid()), Map.of("slack", 11L),
+            Map.of("channel", "general"));
+        automationProjectConfigurationService.updateWorkflowEnabled(
+            fixture.sourceConfigurationId(), UUID.fromString(fixture.firstWorkflowUuid()), false);
+
+        automationProjectConfigurationFacade.createConfiguration(
+            fixture.projectId(), ENVIRONMENT_ID, "Disabled On Version 2", null, 2, false, true);
+
+        long connectedUserId = createConnectedUser(fixture.projectId(), fixture.sourceConfigurationId());
+        long otherConnectedUserId = createConnectedUser(fixture.projectId(), fixture.sourceConfigurationId());
+
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.changeConnectedUserVersion(
+            fixture.sourceConfigurationId(), connectedUserId, 2, null);
+
+        assertThat(moveResult.movedConnectedUserIds()).containsExactly(connectedUserId);
+
+        long copyConfigurationId = getAssignedConfigurationId(connectedUserId, fixture.projectId());
+
+        assertThat(copyConfigurationId).isNotEqualTo(fixture.sourceConfigurationId());
+        assertThat(moveResult.targetConfigurationId()).isEqualTo(copyConfigurationId);
+        assertThat(getAssignedConfigurationId(otherConnectedUserId, fixture.projectId()))
+            .isEqualTo(fixture.sourceConfigurationId());
+
+        AutomationProjectConfiguration copyConfiguration =
+            automationProjectConfigurationService.getConfiguration(copyConfigurationId);
+
+        assertThat(copyConfiguration.getName()).isEqualTo(CONFIGURATION_NAME + " · V2");
+        assertThat(copyConfiguration.getProjectVersion()).isEqualTo(2);
+        assertThat(copyConfiguration.getEnvironmentId()).isEqualTo(ENVIRONMENT_ID);
+        assertThat(copyConfiguration.isEnabled()).isTrue();
+        assertThat(copyConfiguration.getPermissionExpression()).isEqualTo("false");
+        assertThat(copyConfiguration.isAutomationHubVisible()).isFalse();
+        assertThat(copyConfiguration.fetchWorkflow(UUID.fromString(fixture.firstWorkflowUuid())))
+            .hasValueSatisfying(copyWorkflow -> {
+                assertThat(copyWorkflow.getProvidedConnections()).isEqualTo(Map.of("slack", 11L));
+                assertThat(copyWorkflow.getProvidedInputs()).isEqualTo(Map.of("channel", "general"));
+                assertThat(copyWorkflow.isEnabled()).isFalse();
+            });
+    }
+
+    @Test
+    void testChangeConnectedUserVersionKeepsTheCopyOutOfSelfServe() {
+        VersionedProjectFixture fixture = createVersionedProjectFixture("Change Version Self Serve", 1);
+
+        EmbeddedPermissionEvaluator realEmbeddedPermissionEvaluator =
+            new EmbeddedPermissionEvaluator(SpelEvaluator.create());
+
+        when(embeddedPermissionEvaluator.evaluate(any(), any()))
+            .thenAnswer(invocation -> realEmbeddedPermissionEvaluator.evaluate(
+                invocation.getArgument(0), invocation.getArgument(1)));
+
+        long movedConnectedUserId = createConnectedUser(fixture.projectId(), fixture.sourceConfigurationId());
+
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.changeConnectedUserVersion(
+            fixture.sourceConfigurationId(), movedConnectedUserId, 2, null);
+
+        long copyConfigurationId = Objects.requireNonNull(moveResult.targetConfigurationId());
+
+        AutomationProjectConfiguration copyConfiguration =
+            automationProjectConfigurationService.getConfiguration(copyConfigurationId);
+
+        assertThat(copyConfiguration.isEnabled()).isTrue();
+        assertThat(copyConfiguration.getPermissionExpression()).isEqualTo("false");
+
+        ConnectedUser unassignedConnectedUser = createUnassignedConnectedUser();
+
+        Optional<AutomationProjectConfiguration> selfServeConfigurationOptional =
+            automationProjectConfigurationResolver.resolveAndAssign(unassignedConnectedUser, fixture.projectId());
+
+        assertThat(selfServeConfigurationOptional)
+            .map(AutomationProjectConfiguration::getId)
+            .hasValue(fixture.sourceConfigurationId());
+        assertThat(getAssignedConfigurationId(unassignedConnectedUser.getId(), fixture.projectId()))
+            .isEqualTo(fixture.sourceConfigurationId());
+
+        ConnectedUser movedConnectedUser = new ConnectedUser(
+            Map.of(), null, true, "moved-user", movedConnectedUserId, null, 0);
+
+        movedConnectedUser.setEnvironment(Environment.values()[(int) ENVIRONMENT_ID]);
+
+        Optional<AutomationProjectConfiguration> movedConfigurationOptional =
+            automationProjectConfigurationResolver.resolve(movedConnectedUser, fixture.projectId());
+
+        assertThat(movedConfigurationOptional)
+            .map(AutomationProjectConfiguration::getId)
+            .hasValue(copyConfigurationId);
+        assertThat(getAssignedConfigurationId(movedConnectedUserId, fixture.projectId()))
+            .isEqualTo(copyConfigurationId);
+    }
+
+    @Test
+    void testChangeConnectedUserVersionDowngradesAndCopiesOnlyTheWorkflowsOfTheOlderVersion() {
+        VersionedProjectFixture fixture = createVersionedProjectFixture("Change Version Downgrade", 2);
+
+        automationProjectConfigurationService.updateWorkflowProvidedValues(
+            fixture.sourceConfigurationId(), UUID.fromString(fixture.firstWorkflowUuid()), Map.of(),
+            Map.of("channel", "first"));
+        automationProjectConfigurationService.updateWorkflowProvidedValues(
+            fixture.sourceConfigurationId(), UUID.fromString(fixture.secondWorkflowUuid()), Map.of(),
+            Map.of("channel", "second"));
+
+        long connectedUserId = createConnectedUser(fixture.projectId(), fixture.sourceConfigurationId());
+
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.changeConnectedUserVersion(
+            fixture.sourceConfigurationId(), connectedUserId, 1, null);
+
+        assertThat(moveResult.movedConnectedUserIds()).containsExactly(connectedUserId);
+
+        AutomationProjectConfiguration copyConfiguration = automationProjectConfigurationService.getConfiguration(
+            getAssignedConfigurationId(connectedUserId, fixture.projectId()));
+
+        assertThat(copyConfiguration.getName()).isEqualTo(CONFIGURATION_NAME + " · V1");
+        assertThat(copyConfiguration.getProjectVersion()).isEqualTo(1);
+        assertThat(copyConfiguration.getWorkflows())
+            .extracting(
+                configurationWorkflow -> String.valueOf(configurationWorkflow.getWorkflowUuid()),
+                AutomationProjectConfigurationWorkflow::getProvidedInputs)
+            .containsExactly(tuple(fixture.firstWorkflowUuid(), Map.of("channel", "first")));
+    }
+
+    @Test
+    void testChangeConnectedUserVersionSuffixesACollidingCopyName() {
+        VersionedProjectFixture fixture = createVersionedProjectFixture("Change Version Colliding Name", 1);
+
+        automationProjectConfigurationFacade.createConfiguration(
+            fixture.projectId(), ENVIRONMENT_ID, "default · v2", null, 2, false, true);
+
+        long connectedUserId = createConnectedUser(fixture.projectId(), fixture.sourceConfigurationId());
+
+        automationProjectConfigurationFacade.changeConnectedUserVersion(
+            fixture.sourceConfigurationId(), connectedUserId, 2, null);
+
+        AutomationProjectConfiguration copyConfiguration = automationProjectConfigurationService.getConfiguration(
+            getAssignedConfigurationId(connectedUserId, fixture.projectId()));
+
+        assertThat(copyConfiguration.getName()).isEqualTo(CONFIGURATION_NAME + " · V2 (2)");
+    }
+
+    @Test
+    void testChangeConnectedUserVersionDeletesTheCopyWhenTheMoveSkipsTheUser() {
+        VersionedProjectFixture fixture = createVersionedProjectFixture("Change Version Skipped", 2);
+
+        long connectedUserId = createConnectedUser(fixture.projectId(), fixture.sourceConfigurationId());
+
+        when(connectedUserWorkflowReferenceFacade.getReferences(anySet()))
+            .thenReturn(List.of(
+                new ConnectedUserWorkflowReferenceDTO(
+                    fixture.secondWorkflowUuid(), connectedUserId, "user-" + connectedUserId,
+                    Environment.values()[(int) ENVIRONMENT_ID].name(), true, false, null, null, null)));
+
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.changeConnectedUserVersion(
+            fixture.sourceConfigurationId(), connectedUserId, 1, null);
+
+        assertThat(moveResult.movedConnectedUserIds()).isEmpty();
+        assertThat(moveResult.targetConfigurationId()).isNull();
+        assertThat(moveResult.skipped())
+            .extracting(ConfigurationMoveResultDTO.Skipped::connectedUserId, ConfigurationMoveResultDTO.Skipped::reason)
+            .containsExactly(
+                tuple(connectedUserId, ConfigurationMoveResultDTO.Skipped.TARGET_LACKS_REFERENCED_WORKFLOWS));
+        assertThat(getAssignedConfigurationId(connectedUserId, fixture.projectId()))
+            .isEqualTo(fixture.sourceConfigurationId());
+        assertThat(automationProjectConfigurationService.getConfigurations(fixture.projectId()))
+            .extracting(AutomationProjectConfiguration::getId)
+            .containsExactly(fixture.sourceConfigurationId());
+    }
+
+    @Test
+    void testChangeConnectedUserVersionRejectsTheCurrentVersion() {
+        VersionedProjectFixture fixture = createVersionedProjectFixture("Change Version Current", 1);
+
+        long connectedUserId = createConnectedUser(fixture.projectId(), fixture.sourceConfigurationId());
+
+        List<Long> configurationIdsBefore = getConfigurationIds(fixture.projectId());
+
+        assertThatThrownBy(() -> automationProjectConfigurationFacade.changeConnectedUserVersion(
+            fixture.sourceConfigurationId(), connectedUserId, 1, null))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(getConfigurationIds(fixture.projectId())).isEqualTo(configurationIdsBefore);
+        assertThat(getAssignedConfigurationId(connectedUserId, fixture.projectId()))
+            .isEqualTo(fixture.sourceConfigurationId());
+    }
+
+    @Test
+    void testChangeConnectedUserVersionRejectsAnUnpublishedVersion() {
+        VersionedProjectFixture fixture = createVersionedProjectFixture("Change Version Unpublished", 1);
+
+        long connectedUserId = createConnectedUser(fixture.projectId(), fixture.sourceConfigurationId());
+
+        List<Long> configurationIdsBefore = getConfigurationIds(fixture.projectId());
+
+        assertThatThrownBy(() -> automationProjectConfigurationFacade.changeConnectedUserVersion(
+            fixture.sourceConfigurationId(), connectedUserId, 3, null))
+                .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
+                    configurationException.getErrorKey()).isEqualTo(
+                        AutomationProjectConfigurationErrorType.PROJECT_VERSION_NOT_PUBLISHED.getErrorKey()));
+
+        assertThat(getConfigurationIds(fixture.projectId())).isEqualTo(configurationIdsBefore);
+        assertThat(getAssignedConfigurationId(connectedUserId, fixture.projectId()))
+            .isEqualTo(fixture.sourceConfigurationId());
+    }
+
+    @Test
+    void testChangeConnectedUserVersionRejectsADisabledTarget() {
+        VersionedProjectFixture fixture = createVersionedProjectFixture("Change Version Disabled Target", 1);
+
+        long targetConfigurationId = automationProjectConfigurationFacade.createConfiguration(
+            fixture.projectId(), ENVIRONMENT_ID, "Disabled", null, 2, false, true);
+
+        long connectedUserId = createConnectedUser(fixture.projectId(), fixture.sourceConfigurationId());
+
+        List<Long> configurationIdsBefore = getConfigurationIds(fixture.projectId());
+
+        assertThatThrownBy(() -> automationProjectConfigurationFacade.changeConnectedUserVersion(
+            fixture.sourceConfigurationId(), connectedUserId, 2, targetConfigurationId))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(getConfigurationIds(fixture.projectId())).isEqualTo(configurationIdsBefore);
+        assertThat(getAssignedConfigurationId(connectedUserId, fixture.projectId()))
+            .isEqualTo(fixture.sourceConfigurationId());
+    }
+
+    @Test
+    void testChangeConnectedUserVersionRejectsATargetOnAnotherVersion() {
+        VersionedProjectFixture fixture = createVersionedProjectFixture("Change Version Target Version", 1);
+
+        long targetConfigurationId = automationProjectConfigurationFacade.createConfiguration(
+            fixture.projectId(), ENVIRONMENT_ID, "Same Version", null, 1, true, true);
+
+        long connectedUserId = createConnectedUser(fixture.projectId(), fixture.sourceConfigurationId());
+
+        List<Long> configurationIdsBefore = getConfigurationIds(fixture.projectId());
+
+        assertThatThrownBy(() -> automationProjectConfigurationFacade.changeConnectedUserVersion(
+            fixture.sourceConfigurationId(), connectedUserId, 2, targetConfigurationId))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(getConfigurationIds(fixture.projectId())).isEqualTo(configurationIdsBefore);
+        assertThat(getAssignedConfigurationId(connectedUserId, fixture.projectId()))
+            .isEqualTo(fixture.sourceConfigurationId());
+    }
+
+    @Test
+    void testChangeConnectedUserVersionRejectsATargetOfAnotherEnvironment() {
+        VersionedProjectFixture fixture = createVersionedProjectFixture("Change Version Other Environment", 1);
+
+        long targetConfigurationId = automationProjectConfigurationFacade.createConfiguration(
+            fixture.projectId(), STAGING_ENVIRONMENT_ID, "Staging", null, 2, true, true);
+
+        long connectedUserId = createConnectedUser(fixture.projectId(), fixture.sourceConfigurationId());
+
+        List<Long> configurationIdsBefore = getConfigurationIds(fixture.projectId());
+
+        assertThatThrownBy(() -> automationProjectConfigurationFacade.changeConnectedUserVersion(
+            fixture.sourceConfigurationId(), connectedUserId, 2, targetConfigurationId))
+                .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
+                    configurationException.getErrorKey()).isEqualTo(
+                        AutomationProjectConfigurationErrorType.CONFIGURATION_PROJECT_MISMATCH.getErrorKey()));
+
+        assertThat(getConfigurationIds(fixture.projectId())).isEqualTo(configurationIdsBefore);
+    }
+
+    @Test
+    void testChangeConnectedUserVersionDeletesTheCopyWhenTheMoveThrows() {
+        VersionedProjectFixture fixture = createVersionedProjectFixture("Change Version Move Throws", 1);
+
+        long connectedUserId = createConnectedUser(fixture.projectId(), fixture.sourceConfigurationId());
+
+        IllegalStateException moveFailure = new IllegalStateException("move failed");
+        AtomicBoolean moveFailed = new AtomicBoolean();
+        List<List<Long>> configurationIdsAtFailure = new ArrayList<>();
+
+        doAnswer(invocation -> {
+            AutomationProjectConfiguration configuration = (AutomationProjectConfiguration) invocation
+                .callRealMethod();
+
+            boolean copyFetchedForMove = configuration.isEnabled() &&
+                !Objects.equals(configuration.getId(), fixture.sourceConfigurationId());
+
+            if (copyFetchedForMove && moveFailed.compareAndSet(false, true)) {
+                configurationIdsAtFailure.add(getConfigurationIds(fixture.projectId()));
+
+                throw moveFailure;
+            }
+
+            return configuration;
+        }).when(automationProjectConfigurationService)
+            .getConfiguration(anyLong());
+
+        assertThatThrownBy(() -> automationProjectConfigurationFacade.changeConnectedUserVersion(
+            fixture.sourceConfigurationId(), connectedUserId, 2, null))
+                .isSameAs(moveFailure);
+
+        assertThat(configurationIdsAtFailure).hasSize(1);
+        assertThat(configurationIdsAtFailure.getFirst()).hasSize(2);
+        assertThat(getConfigurationIds(fixture.projectId())).containsExactly(fixture.sourceConfigurationId());
+        assertThat(getAssignedConfigurationId(connectedUserId, fixture.projectId()))
+            .isEqualTo(fixture.sourceConfigurationId());
+    }
+
+    @Test
+    void testChangeConnectedUserVersionIsDeniedToNonAdmins() {
+        VersionedProjectFixture fixture = createVersionedProjectFixture("Change Version Non Admin", 1);
+
+        long connectedUserId = createConnectedUser(fixture.projectId(), fixture.sourceConfigurationId());
+
+        List<Long> configurationIdsBefore = getConfigurationIds(fixture.projectId());
+
+        authenticate(nonAdmin());
+
+        assertThatThrownBy(() -> automationProjectConfigurationFacade.changeConnectedUserVersion(
+            fixture.sourceConfigurationId(), connectedUserId, 2, null))
+                .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(getConfigurationIds(fixture.projectId())).isEqualTo(configurationIdsBefore);
+        assertThat(getAssignedConfigurationId(connectedUserId, fixture.projectId()))
+            .isEqualTo(fixture.sourceConfigurationId());
+    }
+
+    private VersionedProjectFixture createVersionedProjectFixture(String name, int sourceProjectVersion) {
+        long projectId = createProject(name);
+
+        String firstWorkflowUuid = addWorkflow(projectId, withLabel(CHANNEL_OPTIONAL_DEFINITION, name + " First"));
+
+        publish(projectId);
+
+        String secondWorkflowUuid = addWorkflow(projectId, withLabel(CHANNEL_OPTIONAL_DEFINITION, name + " Second"));
+
+        publish(projectId);
+
+        long sourceConfigurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, sourceProjectVersion, true, true);
+
+        return new VersionedProjectFixture(projectId, sourceConfigurationId, firstWorkflowUuid, secondWorkflowUuid);
+    }
+
+    private long createConnectedUser(long projectId, long configurationId) {
+        ConnectedUser connectedUser = createUnassignedConnectedUser();
+
+        long connectedUserId = Objects.requireNonNull(connectedUser.getId());
+
+        connectedUserProjectConfigurationService.assign(connectedUserId, projectId, configurationId);
+
+        return connectedUserId;
+    }
+
+    private ConnectedUser createUnassignedConnectedUser() {
+        String externalId = "user-" + UUID.randomUUID();
+        Environment environment = Environment.values()[(int) ENVIRONMENT_ID];
+
+        Long connectedUserId = jdbcTemplate.queryForObject(
+            """
+                INSERT INTO connected_user (external_id, enabled, environment, created_date, created_by,
+                    last_modified_date, last_modified_by, version)
+                VALUES (?, true, ?, now(), 'test', now(), 'test', 0)
+                RETURNING id
+                """,
+            Long.class, externalId, environment.ordinal());
+
+        Objects.requireNonNull(connectedUserId);
+
+        ConnectedUser connectedUser = new ConnectedUser(Map.of(), null, true, externalId, connectedUserId, null, 0);
+
+        connectedUser.setEnvironment(environment);
+
+        when(connectedUserService.fetchConnectedUser(connectedUserId.longValue()))
+            .thenReturn(Optional.of(connectedUser));
+
+        return connectedUser;
+    }
+
+    private long getAssignedConfigurationId(long connectedUserId, long projectId) {
+        Optional<ConnectedUserProjectConfiguration> assignmentOptional =
+            connectedUserProjectConfigurationService.fetchAssignment(connectedUserId, projectId);
+
+        ConnectedUserProjectConfiguration assignment = assignmentOptional.orElseThrow();
+
+        return assignment.getConfigurationId();
+    }
+
+    private List<Long> getConfigurationIds(long projectId) {
+        return automationProjectConfigurationService.getConfigurations(projectId)
+            .stream()
+            .map(AutomationProjectConfiguration::getId)
+            .toList();
+    }
+
     private void assertInvalidProvidedValue(
         ProvidedValuesFixture fixture, Map<String, Long> providedConnections, Map<String, Object> providedInputs,
         String expectedMessage) {
@@ -1534,5 +2044,59 @@ class AutomationProjectConfigurationFacadeIntTest {
     }
 
     private record ProvidedValuesFixture(long projectId, long configurationId, String workflowUuid) {
+    }
+
+    private record VersionedProjectFixture(
+        long projectId, long sourceConfigurationId, String firstWorkflowUuid, String secondWorkflowUuid) {
+    }
+
+    private static Authentication admin() {
+        return new UsernamePasswordAuthenticationToken(
+            "admin", "n/a",
+            List.of(
+                new SimpleGrantedAuthority(AuthorityConstants.ADMIN),
+                new SimpleGrantedAuthority(AuthorityConstants.USER)));
+    }
+
+    private static void authenticate(Authentication authentication) {
+        SecurityContextHolder.setContext(new SecurityContextImpl(authentication));
+    }
+
+    private static Authentication nonAdmin() {
+        return new UsernamePasswordAuthenticationToken(
+            "user", "n/a", List.of(new SimpleGrantedAuthority(AuthorityConstants.USER)));
+    }
+
+    @Configuration
+    @EnableMethodSecurity
+    static class MethodSecurityConfiguration {
+
+        @Bean
+        static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+            @Lazy PermissionService permissionService,
+            ObjectProvider<MethodSecurityExpressionContributor> methodSecurityExpressionContributorProvider) {
+
+            AutomationMethodSecurityExpressionHandler methodSecurityExpressionHandler =
+                new AutomationMethodSecurityExpressionHandler(
+                    permissionService, methodSecurityExpressionContributorProvider);
+
+            methodSecurityExpressionHandler.setPermissionEvaluator(
+                new AutomationPermissionEvaluator(permissionService));
+
+            return methodSecurityExpressionHandler;
+        }
+
+        @Bean("permissionService")
+        PermissionService permissionService() {
+            return mock(PermissionService.class, invocation -> {
+                Method method = invocation.getMethod();
+
+                if (method.getReturnType() == boolean.class) {
+                    return SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN);
+                }
+
+                return RETURNS_DEFAULTS.answer(invocation);
+            });
+        }
     }
 }

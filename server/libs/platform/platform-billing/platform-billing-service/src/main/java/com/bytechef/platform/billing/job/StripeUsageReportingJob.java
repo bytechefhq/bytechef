@@ -17,7 +17,7 @@
 package com.bytechef.platform.billing.job;
 
 import com.bytechef.platform.billing.exception.PaymentClientException;
-import com.bytechef.platform.billing.service.BillingUsageService;
+import com.bytechef.platform.billing.facade.BillingUsageFacade;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
@@ -31,14 +31,14 @@ public class StripeUsageReportingJob implements Job {
 
     private static final Logger log = LoggerFactory.getLogger(StripeUsageReportingJob.class);
 
-    private BillingUsageService billingUsageService;
+    private BillingUsageFacade billingUsageFacade;
 
     @Override
     public void execute(JobExecutionContext context) {
         log.info("Start Stripe usage report");
 
         try {
-            billingUsageService.reportUsage(context.getScheduledFireTime()
+            billingUsageFacade.reportUsage(context.getScheduledFireTime()
                 .toInstant());
         } catch (PaymentClientException paymentClientException) {
             log.error("Failed to report Stripe usage", paymentClientException);
@@ -46,7 +46,7 @@ public class StripeUsageReportingJob implements Job {
     }
 
     @Autowired
-    public void setBillingUsageService(BillingUsageService billingUsageService) {
-        this.billingUsageService = billingUsageService;
+    public void setBillingUsageFacade(BillingUsageFacade billingUsageFacade) {
+        this.billingUsageFacade = billingUsageFacade;
     }
 }

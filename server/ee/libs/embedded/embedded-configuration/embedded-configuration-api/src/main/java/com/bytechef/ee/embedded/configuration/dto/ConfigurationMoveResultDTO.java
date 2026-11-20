@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.dto;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The outcome of moving connected users from one configuration to another.
@@ -17,6 +18,7 @@ import java.util.List;
  * @param skipped                        the connected users left where they were, with the reason
  * @param needsAttentionConnectedUserIds the moved connected users whose turned-on workflows need attention on the
  *                                       target
+ * @param targetConfigurationId          the configuration the move targeted; null when a version change moved nobody
  *
  * @version ee
  *
@@ -24,7 +26,8 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record ConfigurationMoveResultDTO(
-    List<Long> movedConnectedUserIds, List<Skipped> skipped, List<Long> needsAttentionConnectedUserIds) {
+    List<Long> movedConnectedUserIds, List<Skipped> skipped, List<Long> needsAttentionConnectedUserIds,
+    @Nullable Long targetConfigurationId) {
 
     /**
      * A connected user the move left in place.

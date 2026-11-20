@@ -875,6 +875,34 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConfigurationMoveImpact"
+  /integration-instance-configurations/{id}/change-version:
+    post:
+      description: "Put one connected user on another published version of the integration, moving it to a configuration on that version or copying its current configuration to that version when none exists."
+      summary: "Change the integration version of one connected user"
+      tags:
+        - "integration-instance-configuration"
+      operationId: "changeIntegrationInstanceConfigurationConnectedUserVersion"
+      parameters:
+        - name: "id"
+          description: "The id of the source integration instance configuration."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfigurationChangeVersionRequest"
+        required: true
+      responses:
+        "200":
+          description: "The outcome of the move."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfigurationMoveResult"
   /integration-instance-configurations/{id}/move:
     post:
       description: "Move connected users from an integration instance configuration to another one."
@@ -1193,6 +1221,29 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Connection"
+    put:
+      description: "Switches an integration instance provisioned by a tenant admin to another connection of its connected user."
+      summary: "Switch the connection of a provisioned integration instance"
+      tags:
+        - "integration-instance"
+      operationId: "updateIntegrationInstanceConnection"
+      parameters:
+        - name: "id"
+          description: "The id of an integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateIntegrationInstanceConnectionRequest"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
   /integration-instances/{id}/connection/credentials:
     put:
       description: "Replaces the credentials of the connection of an integration instance provisioned by a tenant admin."
@@ -2328,6 +2379,25 @@ components:
         workflowNodeName:
           description: "The action/trigger name to which a connection belongs."
           type: "string"
+    ConfigurationChangeVersionRequest:
+      description: "Which connected user moves to which version, and optionally to which configuration."
+      type: "object"
+      required:
+        - "connectedUserId"
+        - "version"
+      properties:
+        connectedUserId:
+          description: "The id of the connected user to move."
+          type: "integer"
+          format: "int64"
+        targetId:
+          description: "The id of an enabled configuration already on that version. When absent, one is chosen or a copy of the source is created."
+          type: "integer"
+          format: "int64"
+        version:
+          description: "The published version to move the connected user to."
+          type: "integer"
+          format: "int32"
     ConfigurationConnectedUser:
       description: "A connected user with an integration instance on a configuration."
       type: "object"
@@ -2556,6 +2626,16 @@ components:
       $ref: "../../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/page.yaml"
     Tag:
       $ref: "../../../../../../libs/platform/platform-tag/platform-tag-rest/openapi/components/schemas/objects/tag.yaml"
+    UpdateIntegrationInstanceConnectionRequest:
+      description: "Contains the connection an integration instance switches to."
+      type: "object"
+      required:
+        - "connectionId"
+      properties:
+        connectionId:
+          description: "The id of a connection of the integration instance's connected user."
+          type: "integer"
+          format: "int64"
     UpdateTagsRequest:
       description: "The request object that contains the array of tags."
       type: "object"

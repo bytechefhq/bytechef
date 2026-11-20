@@ -16,17 +16,12 @@
 
 package com.bytechef.automation.ai.mcp.service;
 
-import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
-import com.bytechef.automation.ai.mcp.repository.McpProjectRepository;
 import com.bytechef.automation.ai.mcp.repository.McpProjectWorkflowRepository;
-import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
-import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -41,29 +36,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService {
 
-    private static final String INVALID_PROJECT_DEPLOYMENT_WORKFLOW =
-        "Invalid projectDeploymentWorkflowId for the given MCP project";
-
-    private final McpProjectRepository mcpProjectRepository;
     private final McpProjectWorkflowRepository mcpProjectWorkflowRepository;
-    private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
 
     @SuppressFBWarnings("EI")
-    public McpProjectWorkflowServiceImpl(
-        McpProjectRepository mcpProjectRepository, McpProjectWorkflowRepository mcpProjectWorkflowRepository,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
-
-        this.mcpProjectRepository = mcpProjectRepository;
+    public McpProjectWorkflowServiceImpl(McpProjectWorkflowRepository mcpProjectWorkflowRepository) {
         this.mcpProjectWorkflowRepository = mcpProjectWorkflowRepository;
-        this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
     }
 
     @Override
     @PreAuthorize("hasPermission(#mcpProjectWorkflow.mcpProjectId, 'McpProject', 'MCP_EDIT')")
     public McpProjectWorkflow create(McpProjectWorkflow mcpProjectWorkflow) {
-        validateProjectDeploymentWorkflow(
-            mcpProjectWorkflow.getMcpProjectId(), mcpProjectWorkflow.getProjectDeploymentWorkflowId());
-
         return mcpProjectWorkflowRepository.save(mcpProjectWorkflow);
     }
 
@@ -109,9 +91,6 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
     @PreAuthorize("hasPermission(#mcpProjectWorkflow.id, 'McpProjectWorkflow', 'MCP_EDIT') and " +
         "hasPermission(#mcpProjectWorkflow.mcpProjectId, 'McpProject', 'MCP_EDIT')")
     public McpProjectWorkflow update(McpProjectWorkflow mcpProjectWorkflow) {
-        validateProjectDeploymentWorkflow(
-            mcpProjectWorkflow.getMcpProjectId(), mcpProjectWorkflow.getProjectDeploymentWorkflowId());
-
         McpProjectWorkflow currentMcpProjectWorkflow =
             OptionalUtils.get(mcpProjectWorkflowRepository.findById(mcpProjectWorkflow.getId()));
 
@@ -160,32 +139,5 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
         existingMcpProjectWorkflow.setEnabled(enabled);
 
         return mcpProjectWorkflowRepository.save(existingMcpProjectWorkflow);
-    }
-
-    private void validateProjectDeploymentWorkflow(Long mcpProjectId, Long projectDeploymentWorkflowId) {
-        if (mcpProjectId == null || projectDeploymentWorkflowId == null) {
-            throw new IllegalArgumentException(INVALID_PROJECT_DEPLOYMENT_WORKFLOW);
-        }
-
-        McpProject mcpProject = mcpProjectRepository.findById(mcpProjectId)
-            .orElseThrow(() -> new IllegalArgumentException(INVALID_PROJECT_DEPLOYMENT_WORKFLOW));
-
-        Long projectDeploymentId = mcpProject.getProjectDeploymentId();
-
-        if (projectDeploymentId == null) {
-            throw new IllegalArgumentException(INVALID_PROJECT_DEPLOYMENT_WORKFLOW);
-        }
-
-        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows =
-            projectDeploymentWorkflowService.getProjectDeploymentWorkflows(projectDeploymentId);
-
-        boolean owned = projectDeploymentWorkflows.stream()
-            .anyMatch(
-                projectDeploymentWorkflow -> Objects.equals(
-                    projectDeploymentWorkflow.getId(), projectDeploymentWorkflowId));
-
-        if (!owned) {
-            throw new IllegalArgumentException(INVALID_PROJECT_DEPLOYMENT_WORKFLOW);
-        }
     }
 }

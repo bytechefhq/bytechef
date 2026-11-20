@@ -25,6 +25,9 @@ import org.jspecify.annotations.Nullable;
  */
 public interface AutomationProjectConfigurationFacade {
 
+    ConfigurationMoveResultDTO changeConnectedUserVersion(
+        long sourceId, long connectedUserId, int projectVersion, @Nullable Long targetId);
+
     long createConfiguration(
         long projectId, long environmentId, String name, @Nullable String permissionExpression, int projectVersion,
         boolean enabled, boolean automationHubVisible);

@@ -258,6 +258,14 @@ const WorkflowInputsEditDialog = ({
                                                             </SelectTrigger>
 
                                                             <SelectContent>
+                                                                {componentNames.length === 0 && (
+                                                                    <p className="px-2 py-1.5 text-sm text-muted-foreground">
+                                                                        No component in this workflow has inputs to
+                                                                        offer. Add a step that uses a component with
+                                                                        inputs, then pick it here.
+                                                                    </p>
+                                                                )}
+
                                                                 {componentNames.map((currentComponentName) => (
                                                                     <SelectItem
                                                                         key={currentComponentName}
