@@ -83,11 +83,6 @@ public class MultiTenantInternalFilter implements Filter {
         }
     }
 
-    /**
-     * A custom component's icon is stored in its tenant's schema, so an icon request runs as the session's tenant. The
-     * icon endpoint is public, so a request without one runs as the default tenant, which serves only the built-in
-     * icons, and no session is created for it.
-     */
     private void doFilterIconRequest(
         HttpServletRequest request, ServletResponse servletResponse, FilterChain filterChain)
         throws IOException, ServletException {
