@@ -32,10 +32,7 @@ const templates = [
     {
         components: [{connectionRequired: true, integrationId: 5, name: 'slack', provided: true, title: 'Slack'}],
         id: 'wf-provided',
-        inputs: [
-            {label: 'Region', name: 'region', provided: true, required: true},
-            {label: 'Note', name: 'note'},
-        ],
+        inputs: [{label: 'Note', name: 'note'}],
         label: 'Provided automation',
     },
     {
@@ -269,13 +266,12 @@ describe('ActivationDialog', () => {
         expect(screen.getByRole('button', {name: 'Next'})).toBeDisabled();
     });
 
-    it('does not require, show a picker for or send what the administrator provides', async () => {
+    it('does not require, show a picker for or send the connection the administrator provides', async () => {
         const onActivated = vi.fn();
 
         renderDialog({onActivated, workflowTemplateId: 'wf-provided'});
 
-        expect(await screen.findByText('Provided by your administrator')).toBeInTheDocument();
-        expect(screen.queryByLabelText(/Region/)).not.toBeInTheDocument();
+        expect(await screen.findByLabelText(/Note/)).toBeInTheDocument();
         expect(screen.queryByTestId('connect-row-slack')).not.toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Next'})).toBeEnabled();
 
@@ -329,12 +325,12 @@ describe('ActivationDialog', () => {
         ).toBe(true);
     });
 
-    it('explains a locked provided value instead of the generic failure', async () => {
-        provisionResponse = {body: {providedInputName: 'region'}, status: 409};
+    it('explains a locked provided connection instead of the generic failure', async () => {
+        provisionResponse = {body: {providedComponentName: 'slack'}, status: 409};
 
         renderDialog({workflowTemplateId: 'wf-provided'});
 
-        await screen.findByText('Provided by your administrator');
+        await screen.findByLabelText(/Note/);
         await userEvent.click(screen.getByRole('button', {name: 'Next'}));
         await userEvent.click(screen.getByRole('button', {name: 'Activate'}));
 

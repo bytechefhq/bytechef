@@ -10,7 +10,6 @@ export interface TemplateComponentType {
 export interface TemplateInputType {
     label?: string;
     name: string;
-    provided?: boolean;
     required?: boolean;
     type?: string;
 }
@@ -52,5 +51,4 @@ export interface MissingConnectionErrorType {
 
 export interface ProvidedValueLockedErrorType {
     providedComponentName?: string;
-    providedInputName?: string;
 }
