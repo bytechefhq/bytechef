@@ -39,6 +39,7 @@ import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerRef
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
 import com.bytechef.automation.configuration.service.ConnectedUserWorkflowCopyResolver;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
@@ -115,6 +116,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     private final PrincipalJobService principalJobService;
     private final ProjectFacade projectFacade;
     private final ProjectDeploymentService projectDeploymentService;
+    private final ProjectOwnershipService projectOwnershipService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
@@ -134,7 +136,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         JobService jobService,
         PrincipalJobService principalJobService,
         ProjectFacade projectFacade, ProjectDeploymentService projectDeploymentService,
-        ProjectService projectService, ProjectWorkflowService projectWorkflowService,
+        ProjectOwnershipService projectOwnershipService, ProjectService projectService,
+        ProjectWorkflowService projectWorkflowService,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage, TriggerExecutionService triggerExecutionService,
         TriggerFileStorage triggerFileStorage, WorkflowService workflowService) {
@@ -150,6 +153,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         this.principalJobService = principalJobService;
         this.projectFacade = projectFacade;
         this.projectDeploymentService = projectDeploymentService;
+        this.projectOwnershipService = projectOwnershipService;
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
@@ -622,7 +626,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                     deployment -> Validate.notNull(deployment.getId(), "id"), Function.identity()));
 
         Map<Long, ProjectDeploymentOwnerReference> projectDeploymentOwnerReferenceMap =
-            projectDeploymentService.getProjectDeploymentOwnerReferences(principalIds);
+            projectOwnershipService.getProjectDeploymentOwnerReferences(principalIds);
 
         List<TriggerExecution> triggerExecutions =
             triggerExecutionService.getJobTriggerExecutions(jobIds);
@@ -812,7 +816,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         Map<Long, WorkflowExecutionDTO> workflowExecutionDTOMap = new HashMap<>();
 
         Map<Long, ProjectDeploymentOwnerReference> projectDeploymentOwnerReferenceMap =
-            projectDeploymentService.getProjectDeploymentOwnerReferences(
+            projectOwnershipService.getProjectDeploymentOwnerReferences(
                 triggerExecutions.stream()
                     .map(triggerExecution -> triggerExecution.getWorkflowExecutionId()
                         .getJobPrincipalId())
