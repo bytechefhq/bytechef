@@ -21,9 +21,10 @@ import com.bytechef.automation.configuration.security.AutomationMethodSecurityCo
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
+import com.bytechef.ee.automation.configuration.facade.WorkspaceUserFacade;
+import com.bytechef.ee.automation.configuration.facade.WorkspaceUserFacadeImpl;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
-import com.bytechef.ee.automation.configuration.service.WorkspaceUserService;
 import com.bytechef.ee.automation.configuration.service.WorkspaceUserServiceImpl;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
@@ -73,7 +74,7 @@ class WorkspaceUserAuditIntTest {
     private WorkspaceUserRepository workspaceUserRepository;
 
     @Autowired
-    private WorkspaceUserService workspaceUserService;
+    private WorkspaceUserFacade workspaceUserFacade;
 
     @BeforeEach
     void beforeEach() {
@@ -97,7 +98,7 @@ class WorkspaceUserAuditIntTest {
         when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER)));
 
-        workspaceUserService.updateWorkspaceUserRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR);
+        workspaceUserFacade.updateWorkspaceUserRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR);
 
         PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
 
@@ -115,7 +116,7 @@ class WorkspaceUserAuditIntTest {
     void testAddRecordsExactlyOneRow() {
         when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(Optional.empty());
 
-        workspaceUserService.addWorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER);
+        workspaceUserFacade.addWorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER);
 
         PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
 
@@ -131,7 +132,7 @@ class WorkspaceUserAuditIntTest {
         when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER)));
 
-        assertThat(workspaceUserService.removeWorkspaceUser(USER_ID, WORKSPACE_ID)).isTrue();
+        assertThat(workspaceUserFacade.removeWorkspaceUser(USER_ID, WORKSPACE_ID)).isTrue();
 
         PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
 
@@ -150,7 +151,7 @@ class WorkspaceUserAuditIntTest {
         when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER)));
 
-        assertThatThrownBy(() -> workspaceUserService.addWorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR))
+        assertThatThrownBy(() -> workspaceUserFacade.addWorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR))
             .isInstanceOf(ConfigurationException.class);
 
         PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
@@ -172,7 +173,7 @@ class WorkspaceUserAuditIntTest {
         when(workspaceUserRepository.countByWorkspaceIdAndWorkspaceRole(WORKSPACE_ID, WorkspaceRole.ADMIN.ordinal()))
             .thenReturn(1L);
 
-        assertThatThrownBy(() -> workspaceUserService.removeWorkspaceUser(USER_ID, WORKSPACE_ID))
+        assertThatThrownBy(() -> workspaceUserFacade.removeWorkspaceUser(USER_ID, WORKSPACE_ID))
             .isInstanceOf(ConfigurationException.class);
 
         PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
@@ -192,7 +193,7 @@ class WorkspaceUserAuditIntTest {
 
         when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(Optional.empty());
 
-        workspaceUserService.addWorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER);
+        workspaceUserFacade.addWorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER);
 
         PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
 
@@ -220,7 +221,7 @@ class WorkspaceUserAuditIntTest {
     @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
     @Import({
         AuditAspect.class, AuditCaptureAspect.class, AuditMapperResolver.class,
-        WorkspaceUserAuditMapper.class, WorkspaceUserServiceImpl.class
+        WorkspaceUserAuditMapper.class, WorkspaceUserFacadeImpl.class, WorkspaceUserServiceImpl.class
     })
     static class Config {
 
