@@ -218,7 +218,7 @@ describe('ConnectedUserChangeVersionDialog', () => {
         expect(
             await screen.findByText('Jane moved to V5, but some turned-on workflows need attention.')
         ).toBeInTheDocument();
-        expect(screen.getByText('1 moved, 1 need attention')).toBeInTheDocument();
+        expect(screen.getByText('1 moved, 1 needs attention')).toBeInTheDocument();
         expect(onClose).not.toHaveBeenCalled();
 
         expect(screen.queryByRole('button', {name: 'Change'})).not.toBeInTheDocument();
