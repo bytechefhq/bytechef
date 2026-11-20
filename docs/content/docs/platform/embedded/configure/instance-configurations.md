@@ -68,10 +68,12 @@ The **Workflow Inputs** table shows the setting in its **Internal only** column.
 }
 ```
 
-- **`internalOnly: true`** - the connect dialog filters the input out, so it is never shown to the connected user. Use it for values you set yourself (an account ID, a default that should not be end-user editable).
-- **`internalOnly` absent or `false`** *(default)* - the input is collected from the connected user in the [connect dialog](/platform/embedded/get-started/quick-start#7-render-the-connect-dialog).
+- **`internalOnly: true`** - the input belongs to the configuration. Only you set its value, in the configuration, and connected users never see it: the connect dialog does not show it, and an automation's per-user settings do not offer it. Use it for values you set yourself (an account ID, a default that should not be end-user editable).
+- **`internalOnly` absent or `false`** *(default)* - the input is collected from the connected user in the [connect dialog](/platform/embedded/get-started/quick-start#7-render-the-connect-dialog). Existing inputs carry no flag and so are end-user-facing.
 
-The flag is enforced by the React SDK, which drops internal-only inputs from the forms it renders. Existing inputs carry no flag and so are end-user-facing.
+In the configuration dialog, an internal-only input has no **Let each user fill it** option, because only the configuration can supply it. If the input is required and still empty, the dialog shows **Required before this workflow can be enabled**, and you cannot enable the workflow in that configuration until you set a value. An optional internal-only input may stay empty.
+
+The same applies to automations, with one difference: an automation configuration sets only internal-only inputs. Every other input of an automation workflow belongs to the connected user, so the configuration cannot fill it in for them. An automation workflow stays disabled for a connected user until the configuration has a value for every required internal-only input. Values a connected user sends for an internal-only input are ignored.
 
 ## Managing Configurations
 

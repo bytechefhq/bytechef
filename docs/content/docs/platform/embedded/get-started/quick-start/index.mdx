@@ -148,7 +148,7 @@ When the user clicks the button, the SDK opens the Connect dialog, runs the auth
 
     The dialog can also collect a **[Field Mapping](/platform/embedded/build/workflows/field-mapping)** - let the user pick a remote object type and map your application's fields to the connected integration's fields, with the option lists fetched live against their connection.
 
-    An input declared `internalOnly` in the workflow definition is filtered out of the connect dialog - see [internal-only workflow inputs](/platform/embedded/configure/instance-configurations#internal-only-workflow-inputs). Inputs are end-user-facing by default.
+    An input declared `internalOnly` in the workflow definition belongs to the configuration: only you set its value, a required one must be set before the workflow can be enabled, and connected users never see it in the connect dialog - see [internal-only workflow inputs](/platform/embedded/configure/instance-configurations#internal-only-workflow-inputs). Inputs are end-user-facing by default.
 </Callout>
 
 ---

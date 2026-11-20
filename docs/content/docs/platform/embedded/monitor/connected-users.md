@@ -133,7 +133,7 @@ Provisioning gives a connected user workflows from one of your automation projec
 6. Fill in the workflow's **inputs**. Required inputs are marked with an asterisk and must be filled before you can save.
 7. Click **Save**.
 
-Connections and inputs that the configuration provides are not listed, because the configuration's values always apply.
+Connections that the configuration provides and internal-only inputs are not listed, because the configuration's values always apply.
 
 ## Editing a Workflow's Connections and Inputs
 
@@ -144,7 +144,7 @@ You can change the connections and inputs a provisioned workflow runs with. This
 3. On the **Inputs** tab, change the input values. The current values are prefilled.
 4. Click **Save**.
 
-The workflow keeps its enabled state. As when provisioning, connections and inputs the configuration provides are not listed. **Save** is unavailable when the configuration provides all of them, when the workflow's configuration is not released to the user's environment, or when the workflow needs attention, for example because its project was deleted (see [Dangling references](/platform/embedded/build/automations/automation-code-workflows#dangling-references)).
+The workflow keeps its enabled state. As when provisioning, connections the configuration provides and internal-only inputs are not listed. **Save** is unavailable when nothing is left to edit, when the workflow's configuration is not released to the user's environment, or when the workflow needs attention, for example because its project was deleted (see [Dangling references](/platform/embedded/build/automations/automation-code-workflows#dangling-references)).
 
 ## Credentials of provisioned integrations
 
