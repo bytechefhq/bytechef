@@ -1,4 +1,5 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
+import {GraphQLResponseError} from '@/shared/middleware/graphqlFetcher';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -532,6 +533,58 @@ describe('AutomationProjectConfigurationDialog', () => {
             });
             expect(mocks.updateWorkflowMutateAsync).not.toHaveBeenCalled();
             expect(mocks.providableValuesQuery).not.toHaveBeenCalledWith(expect.anything(), {enabled: true});
+        });
+
+        it('shows the reason the server gives for refusing a workflow change', async () => {
+            const user = userEvent.setup();
+
+            mocks.enableWorkflowMutateAsync.mockRejectedValueOnce(
+                new GraphQLResponseError('Workflow Notify account needs a value for the internal-only input accountId')
+            );
+
+            render(
+                <TooltipProvider>
+                    <AutomationProjectConfigurationDialog onClose={vi.fn()} project={project} />
+                </TooltipProvider>
+            );
+
+            await user.click(screen.getByRole('button', {name: 'Next'}));
+            await user.click(await screen.findByRole('switch', {name: 'Send Digest'}));
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            const alert = await screen.findByRole('alert');
+
+            expect(alert).toHaveTextContent(
+                'The configuration was created, but some workflow settings could not be saved.'
+            );
+            expect(alert).toHaveTextContent(
+                'Workflow Notify account needs a value for the internal-only input accountId'
+            );
+        });
+
+        it('lists no reason for a workflow change that failed before reaching the server', async () => {
+            const user = userEvent.setup();
+
+            mocks.enableWorkflowMutateAsync.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+
+            render(
+                <TooltipProvider>
+                    <AutomationProjectConfigurationDialog onClose={vi.fn()} project={project} />
+                </TooltipProvider>
+            );
+
+            await user.click(screen.getByRole('button', {name: 'Next'}));
+            await user.click(await screen.findByRole('switch', {name: 'Send Digest'}));
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            const alert = await screen.findByRole('alert');
+
+            expect(alert).toHaveTextContent(
+                'The configuration was created, but some workflow settings could not be saved.'
+            );
+            expect(alert).not.toHaveTextContent('Failed to fetch');
         });
 
         it('keeps the dialog open when a workflow change fails and retries without creating again', async () => {

@@ -33,6 +33,7 @@ import {
     useUpdateAutomationProjectConfigurationMutation,
     useUpdateAutomationProjectConfigurationWorkflowMutation,
 } from '@/shared/middleware/graphql';
+import {GraphQLResponseError} from '@/shared/middleware/graphqlFetcher';
 import {useGetEnvironmentsQuery} from '@/shared/queries/platform/environments.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
@@ -123,6 +124,7 @@ const AutomationProjectConfigurationDialog = ({
         fixedProject?.id ?? configurationProp?.projectId
     );
     const [workflowChangesFailed, setWorkflowChangesFailed] = useState(false);
+    const [workflowChangeErrorMessages, setWorkflowChangeErrorMessages] = useState<string[]>([]);
     const [workflowDrafts, setWorkflowDrafts] = useState<Record<string, WorkflowDraftI>>({});
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -416,7 +418,17 @@ const AutomationProjectConfigurationDialog = ({
             });
         }
 
-        return results.every((result) => result.status === 'fulfilled');
+        const errorMessages = results
+            .filter((result): result is PromiseRejectedResult => result.status === 'rejected')
+            .map((rejectedResult) =>
+                rejectedResult.reason instanceof GraphQLResponseError ? rejectedResult.reason.message : ''
+            )
+            .filter((errorMessage) => !!errorMessage.trim());
+
+        return {
+            errorMessages: [...new Set(errorMessages)],
+            saved: results.every((result) => result.status === 'fulfilled'),
+        };
     };
 
     const saveConfiguration = async (): Promise<string | undefined> => {
@@ -472,12 +484,13 @@ const AutomationProjectConfigurationDialog = ({
                 return;
             }
 
-            const workflowChangesSaved = await saveWorkflowChanges(configurationId);
+            const {errorMessages, saved: workflowChangesSaved} = await saveWorkflowChanges(configurationId);
 
             void queryClient.invalidateQueries({queryKey: ['automationProjectConfigurations']});
             void queryClient.invalidateQueries({queryKey: ['automationProjects']});
 
             setWorkflowChangesFailed(!workflowChangesSaved);
+            setWorkflowChangeErrorMessages(errorMessages);
 
             if (workflowChangesSaved) {
                 onSuccess?.(configurationId);
@@ -486,6 +499,7 @@ const AutomationProjectConfigurationDialog = ({
             }
         } catch {
             setWorkflowChangesFailed(false);
+            setWorkflowChangeErrorMessages([]);
         } finally {
             setIsSaving(false);
         }
@@ -645,11 +659,21 @@ const AutomationProjectConfigurationDialog = ({
     );
 
     const workflowChangesFailedMessage = workflowChangesFailed && (
-        <p className="text-sm text-content-destructive-primary" role="alert">
-            {configuration
-                ? 'The configuration was saved, but some workflow settings could not be saved. Save to retry them.'
-                : 'The configuration was created, but some workflow settings could not be saved. Save to retry them, or Cancel to keep the configuration with the remaining workflow defaults.'}
-        </p>
+        <div className="text-sm text-content-destructive-primary" role="alert">
+            <p>
+                {configuration
+                    ? 'The configuration was saved, but some workflow settings could not be saved. Save to retry them.'
+                    : 'The configuration was created, but some workflow settings could not be saved. Save to retry them, or Cancel to keep the configuration with the remaining workflow defaults.'}
+            </p>
+
+            {workflowChangeErrorMessages.length > 0 && (
+                <ul className="mt-1 list-disc pl-5">
+                    {workflowChangeErrorMessages.map((workflowChangeErrorMessage) => (
+                        <li key={workflowChangeErrorMessage}>{workflowChangeErrorMessage}</li>
+                    ))}
+                </ul>
+            )}
+        </div>
     );
 
     const newConfigurationContent = (
