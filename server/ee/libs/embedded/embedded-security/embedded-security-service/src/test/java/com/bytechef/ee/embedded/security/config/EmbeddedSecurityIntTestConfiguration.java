@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.embedded.security.config;
 
-import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
 import com.bytechef.ee.embedded.security.facade.SigningKeyFacadeImpl;
 import com.bytechef.ee.embedded.security.service.SigningKeyServiceImpl;

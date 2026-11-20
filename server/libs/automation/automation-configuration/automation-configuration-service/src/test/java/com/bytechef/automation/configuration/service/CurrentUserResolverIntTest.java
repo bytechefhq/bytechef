@@ -1,15 +1,23 @@
 /*
  * Copyright 2025 ByteChef
  *
- * Licensed under the ByteChef Enterprise license (the "Enterprise License");
- * you may not use this file except in compliance with the Enterprise License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-package com.bytechef.ee.automation.configuration.service;
+package com.bytechef.automation.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.ee.automation.configuration.config.EmbeddedOwnerContributorsTestConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.user.callback.UserCallback;
 import com.bytechef.platform.user.repository.AuthorityRepository;
@@ -24,7 +32,6 @@ import java.util.OptionalLong;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
@@ -43,11 +50,10 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
- * @version ee
- *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = CurrentUserResolverIntTest.Config.class, properties = "bytechef.edition=ee")
+@SpringBootTest(
+    classes = CurrentUserResolverIntTest.Config.class, properties = "spring.liquibase.contexts=mono,dev")
 @Import(PostgreSQLContainerConfiguration.class)
 class CurrentUserResolverIntTest {
 
@@ -108,10 +114,9 @@ class CurrentUserResolverIntTest {
 
     @EnableAutoConfiguration
     @Import({
-        EmbeddedOwnerContributorsTestConfiguration.class, LiquibaseConfiguration.class, UserCallback.class,
+        LiquibaseConfiguration.class, UserCallback.class,
         CurrentUserResolverIntTest.Config.UserJdbcConfiguration.class
     })
-    @SpringBootConfiguration
     static class Config {
 
         @Bean

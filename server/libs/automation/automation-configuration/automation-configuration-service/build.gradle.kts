@@ -31,6 +31,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-api"))
 
+    testImplementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
@@ -48,6 +49,7 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-api"))
     testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
+    testImplementation(project(":server:libs:platform:platform-user:platform-user-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
     testImplementation(testFixtures(project(":server:libs:platform:platform-security-web:platform-security-web-api")))

@@ -21,7 +21,6 @@ import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.
 import com.bytechef.platform.annotation.ConditionalOnCEVersion;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
-import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
 import java.util.Collections;
@@ -49,14 +48,14 @@ import org.springframework.stereotype.Service;
 @ConditionalOnCEVersion
 public class PermissionServiceImpl implements PermissionService {
 
-    private final UserService userService;
+    private final CurrentUserResolver currentUserResolver;
     private final Map<String, ResourceOwnershipResolver> resourceOwnershipResolvers;
 
     @SuppressFBWarnings("EI")
     public PermissionServiceImpl(
-        UserService userService, List<ResourceOwnershipResolver> resourceOwnershipResolvers) {
+        CurrentUserResolver currentUserResolver, List<ResourceOwnershipResolver> resourceOwnershipResolvers) {
 
-        this.userService = userService;
+        this.currentUserResolver = currentUserResolver;
         this.resourceOwnershipResolvers = resourceOwnershipResolvers.stream()
             .collect(Collectors.toMap(ResourceOwnershipResolver::resourceType, Function.identity()));
     }
@@ -68,9 +67,9 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean isCurrentUser(long userId) {
-        return userService.fetchCurrentUser()
-            .map(user -> user.getId() != null && user.getId() == userId)
-            .orElse(false);
+        OptionalLong currentUserId = currentUserResolver.fetchCurrentUserId();
+
+        return currentUserId.isPresent() && currentUserId.getAsLong() == userId;
     }
 
     @Override
