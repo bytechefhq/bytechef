@@ -22,8 +22,8 @@ import com.bytechef.automation.configuration.ownership.ProjectOwnerContributor;
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectOwnershipServiceImpl;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowDraftFacade;
 import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowFacade;
-import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowDraftService;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade;
@@ -106,8 +106,8 @@ public class AutomationProjectFacadeIntTestConfiguration {
     }
 
     @Bean
-    ProjectCodeWorkflowDraftService projectCodeWorkflowDraftService() {
-        return mock(ProjectCodeWorkflowDraftService.class);
+    ProjectCodeWorkflowDraftFacade projectCodeWorkflowDraftFacade() {
+        return mock(ProjectCodeWorkflowDraftFacade.class);
     }
 
     @Bean

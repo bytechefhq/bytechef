@@ -17,7 +17,7 @@ import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowDraftService;
+import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowDraftFacade;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentServiceImpl;
@@ -72,8 +72,8 @@ public class ConnectedUserIntegrationFacadeMcpToolsIntTestConfiguration {
     }
 
     @Bean
-    ProjectCodeWorkflowDraftService projectCodeWorkflowDraftService() {
-        return mock(ProjectCodeWorkflowDraftService.class);
+    ProjectCodeWorkflowDraftFacade projectCodeWorkflowDraftFacade() {
+        return mock(ProjectCodeWorkflowDraftFacade.class);
     }
 
     @Bean

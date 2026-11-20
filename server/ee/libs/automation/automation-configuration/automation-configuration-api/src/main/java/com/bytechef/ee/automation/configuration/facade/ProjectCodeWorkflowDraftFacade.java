@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.automation.configuration.service;
+package com.bytechef.ee.automation.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.project.definition.ProjectDefinition;
@@ -15,7 +15,7 @@ import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowCo
  * @version ee
  * @author Ivica Cardic
  */
-public interface ProjectCodeWorkflowDraftService {
+public interface ProjectCodeWorkflowDraftFacade {
 
     void saveDraft(Project project, ProjectDefinition projectDefinition, byte[] bytes, Language language);
 }

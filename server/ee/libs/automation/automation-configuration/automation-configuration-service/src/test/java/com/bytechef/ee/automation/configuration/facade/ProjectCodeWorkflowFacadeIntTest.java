@@ -52,7 +52,6 @@ import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.automation.project.definition.ProjectDefinition;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
-import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowDraftServiceImpl;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.automation.configuration.service.WorkspaceService;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
@@ -821,7 +820,7 @@ class ProjectCodeWorkflowFacadeIntTest {
     @EnableMethodSecurity(proxyTargetClass = true)
     @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
     @Import({
-        ProjectCodeWorkflowDraftServiceImpl.class, ProjectCodeWorkflowFacadeImpl.class,
+        ProjectCodeWorkflowDraftFacadeImpl.class, ProjectCodeWorkflowFacadeImpl.class,
         ProjectDeploymentFacadeImpl.class
     })
     static class Config {

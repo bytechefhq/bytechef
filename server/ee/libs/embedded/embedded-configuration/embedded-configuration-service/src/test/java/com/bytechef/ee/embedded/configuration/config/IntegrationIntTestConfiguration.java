@@ -29,8 +29,8 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowDraftFacade;
 import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowFacade;
-import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowDraftService;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.embedded.connected.user.security.ConnectedUserSecurity;
 import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade;
@@ -101,8 +101,8 @@ public class IntegrationIntTestConfiguration {
     }
 
     @Bean
-    ProjectCodeWorkflowDraftService projectCodeWorkflowDraftService() {
-        return mock(ProjectCodeWorkflowDraftService.class);
+    ProjectCodeWorkflowDraftFacade projectCodeWorkflowDraftFacade() {
+        return mock(ProjectCodeWorkflowDraftFacade.class);
     }
 
     @Bean

@@ -39,10 +39,10 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
+import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowDraftFacade;
+import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowDraftFacadeImpl;
 import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowFacade;
 import com.bytechef.ee.automation.configuration.repository.ProjectCodeWorkflowRepository;
-import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowDraftService;
-import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowDraftServiceImpl;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRowFacade;
@@ -2053,13 +2053,13 @@ class AutomationProjectFacadeIntTest {
             }
 
             @Bean
-            ProjectCodeWorkflowDraftService projectCodeWorkflowDraftService(
+            ProjectCodeWorkflowDraftFacade projectCodeWorkflowDraftFacade(
                 CodeWorkflowContainerFacade codeWorkflowContainerFacade,
                 CodeWorkflowContainerService codeWorkflowContainerService,
                 ProjectCodeWorkflowService projectCodeWorkflowService, ProjectWorkflowService projectWorkflowService,
                 WorkflowService workflowService, ObjectProvider<WorkflowPreDeleteListener> workflowPreDeleteListeners) {
 
-                return new ProjectCodeWorkflowDraftServiceImpl(
+                return new ProjectCodeWorkflowDraftFacadeImpl(
                     codeWorkflowContainerFacade, codeWorkflowContainerService, projectCodeWorkflowService,
                     projectWorkflowService, workflowService,
                     workflowPreDeleteListeners.orderedStream()
