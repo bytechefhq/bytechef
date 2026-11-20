@@ -17,6 +17,7 @@ import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -113,13 +114,24 @@ public class CustomComponentServiceImpl implements CustomComponentService {
 
         CustomComponent curCustomComponent = getCustomComponent(customComponent.getId());
 
+        if (curCustomComponent.getVersion() != customComponent.getVersion()) {
+            throw new OptimisticLockingFailureException(
+                "Custom component " + customComponent.getId() + " was modified concurrently");
+        }
+
+        if (customComponent.getStatus() == CustomComponent.Status.DRAFT &&
+            curCustomComponent.getStatus() != CustomComponent.Status.DRAFT) {
+
+            throw new ConfigurationException(
+                "Custom component " + customComponent.getId() + " is no longer a draft",
+                CustomComponentErrorType.COMPONENT_NOT_DRAFT);
+        }
+
         curCustomComponent.setDescription(customComponent.getDescription());
         curCustomComponent.setIcon(customComponent.getIcon());
         curCustomComponent.setTitle(customComponent.getTitle());
         curCustomComponent.setComponent(customComponent.getComponent());
         curCustomComponent.setComponentVersion(customComponent.getComponentVersion());
-        curCustomComponent.setPublishedDate(customComponent.getPublishedDate());
-        curCustomComponent.setStatus(customComponent.getStatus());
 
         return customComponentRepository.save(curCustomComponent);
     }
