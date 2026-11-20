@@ -787,43 +787,9 @@ public class AutomationProjectConfigurationFacadeImpl
             sourceConnectedUserIds);
 
         return new ConfigurationMoveImpactDTO(
-            removeTargetProvidedInputs(
-                addRemovedProvidedInputs(
-                    versionImpact.workflows(), sourceConfiguration, targetConfiguration, sourceConnectedUserIds),
-                targetConfiguration),
+            addRemovedProvidedInputs(
+                versionImpact.workflows(), sourceConfiguration, targetConfiguration, sourceConnectedUserIds),
             skipped);
-    }
-
-    private static List<AutomationProjectConfigurationVersionImpactDTO.Workflow> removeTargetProvidedInputs(
-        List<AutomationProjectConfigurationVersionImpactDTO.Workflow> impactedWorkflows,
-        AutomationProjectConfiguration targetConfiguration) {
-
-        List<AutomationProjectConfigurationVersionImpactDTO.Workflow> workflows = new ArrayList<>();
-
-        for (AutomationProjectConfigurationVersionImpactDTO.Workflow impactedWorkflow : impactedWorkflows) {
-            Set<String> providedInputNames = targetConfiguration
-                .fetchWorkflow(UUID.fromString(impactedWorkflow.workflowUuid()))
-                .map(configurationWorkflow -> getProvidedInputNames(configurationWorkflow.getProvidedInputs()))
-                .orElse(Set.of());
-
-            List<String> newRequiredInputs = impactedWorkflow.newRequiredInputs()
-                .stream()
-                .filter(inputName -> !providedInputNames.contains(inputName))
-                .toList();
-
-            if (newRequiredInputs.isEmpty() && impactedWorkflow.newRequiredConnections()
-                .isEmpty()) {
-
-                continue;
-            }
-
-            workflows.add(
-                new AutomationProjectConfigurationVersionImpactDTO.Workflow(
-                    impactedWorkflow.workflowUuid(), impactedWorkflow.label(), newRequiredInputs,
-                    impactedWorkflow.newRequiredConnections(), impactedWorkflow.affectedConnectedUserCount()));
-        }
-
-        return workflows;
     }
 
     private List<AutomationProjectConfigurationVersionImpactDTO.Workflow> addRemovedProvidedInputs(
