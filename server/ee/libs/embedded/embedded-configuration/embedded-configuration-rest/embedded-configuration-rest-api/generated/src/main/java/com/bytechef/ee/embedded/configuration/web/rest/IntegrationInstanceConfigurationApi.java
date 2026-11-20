@@ -43,7 +43,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-20T07:40:29.877920+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-20T18:11:33.751124+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 @Validated
 @Tag(name = "integration-instance-configuration", description = "the integration-instance-configuration API")
 public interface IntegrationInstanceConfigurationApi {
@@ -380,7 +380,7 @@ public interface IntegrationInstanceConfigurationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"mcpServerCount\" : 0, \"skipped\" : [ { \"connectedUserId\" : 6, \"reason\" : \"reason\", \"workflowLabels\" : [ \"workflowLabels\", \"workflowLabels\" ] }, { \"connectedUserId\" : 6, \"reason\" : \"reason\", \"workflowLabels\" : [ \"workflowLabels\", \"workflowLabels\" ] } ], \"workflows\" : [ { \"affectedConnectedUserCount\" : 1, \"label\" : \"label\", \"newRequiredConnections\" : [ \"newRequiredConnections\", \"newRequiredConnections\" ], \"newRequiredInputs\" : [ \"newRequiredInputs\", \"newRequiredInputs\" ], \"workflowUuid\" : \"workflowUuid\" }, { \"affectedConnectedUserCount\" : 1, \"label\" : \"label\", \"newRequiredConnections\" : [ \"newRequiredConnections\", \"newRequiredConnections\" ], \"newRequiredInputs\" : [ \"newRequiredInputs\", \"newRequiredInputs\" ], \"workflowUuid\" : \"workflowUuid\" } ] }";
+                    String exampleString = "{ \"mcpServerCount\" : 0, \"skipped\" : [ { \"connectedUserId\" : 6, \"reason\" : \"reason\", \"workflowLabels\" : [ \"workflowLabels\", \"workflowLabels\" ] }, { \"connectedUserId\" : 6, \"reason\" : \"reason\", \"workflowLabels\" : [ \"workflowLabels\", \"workflowLabels\" ] } ], \"workflows\" : [ { \"affectedConnectedUserCount\" : 1, \"awaitsConfiguration\" : true, \"label\" : \"label\", \"newRequiredConnections\" : [ \"newRequiredConnections\", \"newRequiredConnections\" ], \"newRequiredInputs\" : [ \"newRequiredInputs\", \"newRequiredInputs\" ], \"workflowUuid\" : \"workflowUuid\" }, { \"affectedConnectedUserCount\" : 1, \"awaitsConfiguration\" : true, \"label\" : \"label\", \"newRequiredConnections\" : [ \"newRequiredConnections\", \"newRequiredConnections\" ], \"newRequiredInputs\" : [ \"newRequiredInputs\", \"newRequiredInputs\" ], \"workflowUuid\" : \"workflowUuid\" } ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -424,7 +424,7 @@ public interface IntegrationInstanceConfigurationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"mcpServerCount\" : 0, \"skipped\" : [ { \"connectedUserId\" : 6, \"reason\" : \"reason\", \"workflowLabels\" : [ \"workflowLabels\", \"workflowLabels\" ] }, { \"connectedUserId\" : 6, \"reason\" : \"reason\", \"workflowLabels\" : [ \"workflowLabels\", \"workflowLabels\" ] } ], \"workflows\" : [ { \"affectedConnectedUserCount\" : 1, \"label\" : \"label\", \"newRequiredConnections\" : [ \"newRequiredConnections\", \"newRequiredConnections\" ], \"newRequiredInputs\" : [ \"newRequiredInputs\", \"newRequiredInputs\" ], \"workflowUuid\" : \"workflowUuid\" }, { \"affectedConnectedUserCount\" : 1, \"label\" : \"label\", \"newRequiredConnections\" : [ \"newRequiredConnections\", \"newRequiredConnections\" ], \"newRequiredInputs\" : [ \"newRequiredInputs\", \"newRequiredInputs\" ], \"workflowUuid\" : \"workflowUuid\" } ] }";
+                    String exampleString = "{ \"mcpServerCount\" : 0, \"skipped\" : [ { \"connectedUserId\" : 6, \"reason\" : \"reason\", \"workflowLabels\" : [ \"workflowLabels\", \"workflowLabels\" ] }, { \"connectedUserId\" : 6, \"reason\" : \"reason\", \"workflowLabels\" : [ \"workflowLabels\", \"workflowLabels\" ] } ], \"workflows\" : [ { \"affectedConnectedUserCount\" : 1, \"awaitsConfiguration\" : true, \"label\" : \"label\", \"newRequiredConnections\" : [ \"newRequiredConnections\", \"newRequiredConnections\" ], \"newRequiredInputs\" : [ \"newRequiredInputs\", \"newRequiredInputs\" ], \"workflowUuid\" : \"workflowUuid\" }, { \"affectedConnectedUserCount\" : 1, \"awaitsConfiguration\" : true, \"label\" : \"label\", \"newRequiredConnections\" : [ \"newRequiredConnections\", \"newRequiredConnections\" ], \"newRequiredInputs\" : [ \"newRequiredInputs\", \"newRequiredInputs\" ], \"workflowUuid\" : \"workflowUuid\" } ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
