@@ -79,6 +79,13 @@ public record PropertyFactory() implements SchemaPropertyFactory {
                     ((ModifiableObjectProperty) property).getProperties());
             }
         }
+
+        @Override
+        public void setRequired(BaseProperty.BaseValueProperty<?> property, boolean required) {
+            if (property instanceof ModifiableValueProperty<?, ?> modifiableValueProperty) {
+                modifiableValueProperty.required(required);
+            }
+        }
     };
 
     public static final SchemaUtils.OutputFactoryFunction OUTPUT_FACTORY_FUNCTION =
