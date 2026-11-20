@@ -183,7 +183,7 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
                     List.of(),
                     List.of(
                         new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
-                            "channel", "Slack Channel", "STRING", true, "slack", 1, "channel",
+                            "channel", "Slack Channel", "STRING", true, false, "slack", 1, "channel",
                             List.of(
                                 new AutomationProjectConfigurationWorkflowProvidableValuesDTO.ProvidableConnection(
                                     31L, "Company Slack")))),
@@ -295,7 +295,7 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
                                     42L, "Company OpenAI")))),
                     List.of(
                         new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
-                            "channel", "Channel", "STRING", true)),
+                            "channel", "Channel", "STRING", true, true)),
                     Map.of("openai", 42L), Map.of("channel", "general")));
 
         this.graphQlTester
@@ -316,6 +316,7 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
                             label
                             type
                             required
+                            internalOnly
                         }
                         providedConnections
                         providedInputs
@@ -344,6 +345,9 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("channel")
             .path("automationProjectConfigurationWorkflowProvidableValues.inputs[0].required")
+            .entity(Boolean.class)
+            .isEqualTo(true)
+            .path("automationProjectConfigurationWorkflowProvidableValues.inputs[0].internalOnly")
             .entity(Boolean.class)
             .isEqualTo(true)
             .path("automationProjectConfigurationWorkflowProvidableValues.providedConnections.openai")

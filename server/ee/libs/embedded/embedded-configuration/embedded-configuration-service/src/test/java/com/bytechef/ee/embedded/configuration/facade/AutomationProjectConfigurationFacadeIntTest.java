@@ -117,6 +117,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -202,6 +203,18 @@ class AutomationProjectConfigurationFacadeIntTest {
 
     private static final String CHANNEL_OPTIONAL_DEFINITION = """
         {"label":"%s","inputs":[{"name":"channel","label":"Channel","type":"string","required":false}],
+         "triggers":[],"tasks":[]}
+        """;
+
+    private static final String CHANNEL_AND_OPTIONAL_INTERNAL_ONLY_DEFINITION = """
+        {"label":"%s","inputs":[{"name":"channel","label":"Channel","type":"string","required":true},
+         {"name":"accountId","label":"Account","type":"string","required":false,"internalOnly":true}],
+         "triggers":[],"tasks":[]}
+        """;
+
+    private static final String CHANNEL_AND_REQUIRED_INTERNAL_ONLY_DEFINITION = """
+        {"label":"%s","inputs":[{"name":"channel","label":"Channel","type":"string","required":true},
+         {"name":"accountId","label":"Account","type":"string","required":true,"internalOnly":true}],
          "triggers":[],"tasks":[]}
         """;
 
@@ -536,6 +549,138 @@ class AutomationProjectConfigurationFacadeIntTest {
                 .containsExactly(
                     new AutomationProjectConfigurationUpdatedEvent(projectId, ENVIRONMENT_ID, configurationId),
                     new AutomationProjectConfigurationUpdatedEvent(projectId, ENVIRONMENT_ID, configurationId));
+    }
+
+    @Test
+    void testEnableConfigurationWorkflowRefusesAnEmptyRequiredInternalOnlyInput() {
+        long projectId = createProject("Enable Internal Only");
+
+        String workflowUuid = addWorkflow(
+            projectId, withLabel(CHANNEL_AND_REQUIRED_INTERNAL_ONLY_DEFINITION, "Sync Accounts"));
+
+        publish(projectId);
+
+        long configurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
+
+        automationProjectConfigurationFacade.enableConfigurationWorkflow(configurationId, workflowUuid, false);
+
+        automationProjectConfigurationFacade.updateConfigurationWorkflow(
+            configurationId, workflowUuid, Map.of(), Map.of("accountId", " "));
+
+        assertInternalOnlyInputMissing(
+            () -> automationProjectConfigurationFacade.enableConfigurationWorkflow(
+                configurationId, workflowUuid, true),
+            "Workflow Sync Accounts needs a value for the internal-only input accountId");
+
+        assertThat(automationProjectConfigurationService.getConfiguration(configurationId)
+            .isWorkflowEnabled(UUID.fromString(workflowUuid))).isFalse();
+    }
+
+    @Test
+    void testEnableConfigurationRefusesAnEnabledWorkflowWithAnEmptyRequiredInternalOnlyInput() {
+        long projectId = createProject("Enable Configuration Internal Only");
+
+        String workflowUuid = addWorkflow(
+            projectId, withLabel(CHANNEL_AND_REQUIRED_INTERNAL_ONLY_DEFINITION, "Sync Accounts"));
+
+        publish(projectId);
+
+        long configurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
+
+        automationProjectConfigurationFacade.enableConfiguration(configurationId, false);
+
+        assertInternalOnlyInputMissing(
+            () -> automationProjectConfigurationFacade.enableConfiguration(configurationId, true),
+            "Workflow Sync Accounts needs a value for the internal-only input accountId");
+
+        assertThat(automationProjectConfigurationService.getConfiguration(configurationId)
+            .isEnabled()).isFalse();
+
+        automationProjectConfigurationFacade.enableConfigurationWorkflow(configurationId, workflowUuid, false);
+
+        automationProjectConfigurationFacade.enableConfiguration(configurationId, true);
+
+        assertThat(automationProjectConfigurationService.getConfiguration(configurationId)
+            .isEnabled()).isTrue();
+    }
+
+    @Test
+    void testUpdateConfigurationRefusesEnablingAnEnabledWorkflowWithAnEmptyRequiredInternalOnlyInput() {
+        long projectId = createProject("Update Configuration Internal Only");
+
+        String workflowUuid = addWorkflow(
+            projectId, withLabel(CHANNEL_AND_REQUIRED_INTERNAL_ONLY_DEFINITION, "Sync Accounts"));
+
+        publish(projectId);
+
+        long configurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
+
+        automationProjectConfigurationFacade.enableConfiguration(configurationId, false);
+
+        assertInternalOnlyInputMissing(
+            () -> automationProjectConfigurationFacade.updateConfiguration(
+                configurationId, CONFIGURATION_NAME, null, 1, true, true),
+            "Workflow Sync Accounts needs a value for the internal-only input accountId");
+
+        assertThat(automationProjectConfigurationService.getConfiguration(configurationId)
+            .isEnabled()).isFalse();
+
+        automationProjectConfigurationFacade.enableConfigurationWorkflow(configurationId, workflowUuid, false);
+
+        automationProjectConfigurationFacade.updateConfiguration(
+            configurationId, CONFIGURATION_NAME, null, 1, true, true);
+
+        assertThat(automationProjectConfigurationService.getConfiguration(configurationId)
+            .isEnabled()).isTrue();
+    }
+
+    @Test
+    void testEnableConfigurationWorkflowAllowsAnEmptyOptionalInternalOnlyInput() {
+        long projectId = createProject("Enable Optional Internal Only");
+
+        String workflowUuid = addWorkflow(
+            projectId, withLabel(CHANNEL_AND_OPTIONAL_INTERNAL_ONLY_DEFINITION, "Sync Accounts"));
+
+        publish(projectId);
+
+        long configurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
+
+        automationProjectConfigurationFacade.enableConfigurationWorkflow(configurationId, workflowUuid, false);
+
+        automationProjectConfigurationFacade.enableConfigurationWorkflow(configurationId, workflowUuid, true);
+
+        assertThat(automationProjectConfigurationService.getConfiguration(configurationId)
+            .isWorkflowEnabled(UUID.fromString(workflowUuid))).isTrue();
+    }
+
+    @Test
+    void testUpdateConfigurationWorkflowRefusesClearingARequiredInternalOnlyInputOfAnEnabledWorkflow() {
+        long projectId = createProject("Clear Internal Only");
+
+        String workflowUuid = addWorkflow(
+            projectId, withLabel(CHANNEL_AND_REQUIRED_INTERNAL_ONLY_DEFINITION, "Sync Accounts"));
+
+        publish(projectId);
+
+        long configurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
+
+        automationProjectConfigurationFacade.updateConfigurationWorkflow(
+            configurationId, workflowUuid, Map.of(), Map.of("accountId", "account-1"));
+
+        assertInternalOnlyInputMissing(
+            () -> automationProjectConfigurationFacade.updateConfigurationWorkflow(
+                configurationId, workflowUuid, Map.of(), Map.of("channel", "general")),
+            "Workflow Sync Accounts needs a value for the internal-only input accountId");
+
+        assertThat(automationProjectConfigurationService.getConfiguration(configurationId)
+            .fetchWorkflow(UUID.fromString(workflowUuid))
+            .orElseThrow()
+            .getProvidedInputs()).isEqualTo(Map.of("accountId", "account-1"));
     }
 
     @Test
@@ -918,6 +1063,52 @@ class AutomationProjectConfigurationFacadeIntTest {
     }
 
     @Test
+    void testGetVersionImpactLeavesOutInternalOnlyInputs() {
+        long projectId = createProject("Impact Internal Only");
+
+        String workflowUuid = addWorkflow(projectId, withLabel(NO_INPUT_DEFINITION, "Sync Accounts"));
+
+        publish(projectId);
+        redefineDraftWorkflow(workflowUuid, withLabel(CHANNEL_AND_REQUIRED_INTERNAL_ONLY_DEFINITION, "Sync Accounts"));
+        publish(projectId);
+
+        long configurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
+
+        givenStoredInputs(101L, projectId, 1, workflowUuid, Map.of("channel", "general"));
+        givenReferences(configurationId,
+            newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false, 101L));
+
+        assertThat(automationProjectConfigurationFacade.getVersionImpact(configurationId, 2)
+            .workflows()).containsExactly(
+                new AutomationProjectConfigurationVersionImpactDTO.Workflow(
+                    workflowUuid, "Sync Accounts", List.of("channel"), List.of(), 0));
+    }
+
+    @Test
+    void testProvidableValuesMarkInternalOnlyInputs() {
+        long projectId = createProject("Providable Internal Only");
+
+        String workflowUuid = addWorkflow(
+            projectId, withLabel(CHANNEL_AND_OPTIONAL_INTERNAL_ONLY_DEFINITION, "Sync Accounts"));
+
+        publish(projectId);
+
+        givenSlots();
+
+        long configurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
+
+        assertThat(automationProjectConfigurationFacade
+            .getConfigurationWorkflowProvidableValues(configurationId, workflowUuid, null)
+            .inputs()).containsExactly(
+                new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
+                    "channel", "Channel", "string", true, false),
+                new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
+                    "accountId", "Account", "string", false, true));
+    }
+
+    @Test
     void testGetVersionImpactLabelsAWorkflowWithoutALabelByItsUuid() {
         long projectId = createProject("Impact Without Label");
 
@@ -961,7 +1152,7 @@ class AutomationProjectConfigurationFacadeIntTest {
             .containsExactly("slack");
         assertThat(providableValues.inputs()).containsExactly(
             new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
-                "channel", "Channel", "string", true));
+                "channel", "Channel", "string", true, false));
     }
 
     @Test
@@ -1082,12 +1273,12 @@ class AutomationProjectConfigurationFacadeIntTest {
                     .inputs())
                         .containsExactly(
                             new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
-                                "channel", "Slack Channel", "STRING", true, "slack", 1, "channel",
+                                "channel", "Slack Channel", "STRING", true, false, "slack", 1, "channel",
                                 List.of(
                                     new AutomationProjectConfigurationWorkflowProvidableValuesDTO.ProvidableConnection(
                                         31L, "Company Slack"))),
                             new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
-                                "topic", "Topic", "string", false));
+                                "topic", "Topic", "string", false, false));
         } finally {
             connectedUserConnectionService.deleteByConnectionId(32L);
         }
@@ -1479,6 +1670,57 @@ class AutomationProjectConfigurationFacadeIntTest {
     }
 
     @Test
+    void testChangeConnectedUserVersionLeavesAWorkflowWithANewRequiredInternalOnlyInputDisabled() {
+        long projectId = createProject("Change Version Internal Only");
+
+        String syncWorkflowUuid = addWorkflow(projectId, withLabel(NO_INPUT_DEFINITION, "Sync Accounts"));
+        String notifyWorkflowUuid = addWorkflow(projectId, withLabel(CHANNEL_OPTIONAL_DEFINITION, "Notify"));
+        String reportWorkflowUuid = addWorkflow(projectId, withLabel(CHANNEL_OPTIONAL_DEFINITION, "Report"));
+
+        publish(projectId);
+        redefineDraftWorkflow(
+            syncWorkflowUuid, withLabel(CHANNEL_AND_REQUIRED_INTERNAL_ONLY_DEFINITION, "Sync Accounts"));
+
+        String auditWorkflowUuid = addWorkflow(
+            projectId, withLabel(CHANNEL_AND_REQUIRED_INTERNAL_ONLY_DEFINITION, "Audit"));
+
+        publish(projectId);
+
+        long sourceConfigurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
+
+        automationProjectConfigurationService.updateWorkflowProvidedValues(
+            sourceConfigurationId, UUID.fromString(syncWorkflowUuid), Map.of(), Map.of("channel", "general"));
+        automationProjectConfigurationService.updateWorkflowEnabled(
+            sourceConfigurationId, UUID.fromString(notifyWorkflowUuid), false);
+        automationProjectConfigurationService.updateWorkflowEnabled(
+            sourceConfigurationId, UUID.fromString(reportWorkflowUuid), true);
+
+        long connectedUserId = createConnectedUser(projectId, sourceConfigurationId);
+
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.changeConnectedUserVersion(
+            sourceConfigurationId, connectedUserId, 2, null);
+
+        assertThat(moveResult.movedConnectedUserIds()).containsExactly(connectedUserId);
+
+        long copyConfigurationId = getAssignedConfigurationId(connectedUserId, projectId);
+
+        assertThat(copyConfigurationId).isNotEqualTo(sourceConfigurationId);
+
+        AutomationProjectConfiguration copyConfiguration =
+            automationProjectConfigurationService.getConfiguration(copyConfigurationId);
+
+        assertThat(copyConfiguration.isEnabled()).isTrue();
+        assertThat(copyConfiguration.isWorkflowEnabled(UUID.fromString(syncWorkflowUuid))).isFalse();
+        assertThat(copyConfiguration.isWorkflowEnabled(UUID.fromString(auditWorkflowUuid))).isFalse();
+        assertThat(copyConfiguration.isWorkflowEnabled(UUID.fromString(notifyWorkflowUuid))).isFalse();
+        assertThat(copyConfiguration.isWorkflowEnabled(UUID.fromString(reportWorkflowUuid))).isTrue();
+        assertThat(copyConfiguration.fetchWorkflow(UUID.fromString(syncWorkflowUuid)))
+            .hasValueSatisfying(copyWorkflow -> assertThat(copyWorkflow.getProvidedInputs())
+                .isEqualTo(Map.of("channel", "general")));
+    }
+
+    @Test
     void testChangeConnectedUserVersionKeepsTheCopyOutOfSelfServe() {
         VersionedProjectFixture fixture = createVersionedProjectFixture("Change Version Self Serve", 1);
 
@@ -1852,6 +2094,15 @@ class AutomationProjectConfigurationFacadeIntTest {
             .fetchWorkflow(UUID.fromString(fixture.workflowUuid()))).isEmpty();
         assertThat(applicationEvents.stream(AutomationProjectConfigurationUpdatedEvent.class)
             .count()).isZero();
+    }
+
+    private static void assertInternalOnlyInputMissing(ThrowingCallable throwingCallable, String expectedMessage) {
+        assertThatThrownBy(throwingCallable)
+            .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> {
+                assertThat(configurationException.getMessage()).isEqualTo(expectedMessage);
+                assertThat(configurationException.getErrorKey()).isEqualTo(
+                    AutomationProjectConfigurationErrorType.INTERNAL_ONLY_INPUT_MISSING.getErrorKey());
+            });
     }
 
     private InputOptionsFixture createInputOptionsFixture(String name) {

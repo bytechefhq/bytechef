@@ -1724,6 +1724,37 @@ class IntegrationInstanceConfigurationFacadeIntTest {
     }
 
     @Test
+    void testChangeConnectedUserVersionLeavesANewWorkflowWithARequiredInternalOnlyInputDisabled() {
+        ChangeVersionFixture changeVersionFixture = createChangeVersionFixture(1, true);
+
+        String internalOnlyWorkflowId = addWorkflow(
+            changeVersionFixture.integrationId(), 2, UUID.randomUUID(), INTERNAL_ONLY_REQUIRED_WORKFLOW_DEFINITION);
+
+        authenticate(admin());
+
+        ConfigurationMoveResultDTO configurationMoveResultDTO =
+            integrationInstanceConfigurationFacade.changeConnectedUserVersion(
+                changeVersionFixture.sourceConfigurationId(), CONNECTED_USER_ID, 2, null);
+
+        assertThat(configurationMoveResultDTO.movedConnectedUserIds()).containsExactly(CONNECTED_USER_ID);
+
+        IntegrationInstanceConfiguration copyConfiguration = getCopyConfiguration(
+            changeVersionFixture.integrationId(), List.of(changeVersionFixture.sourceConfigurationId()));
+
+        IntegrationInstanceConfigurationWorkflow internalOnlyConfigurationWorkflow =
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                copyConfiguration.getId(), internalOnlyWorkflowId);
+
+        assertThat(internalOnlyConfigurationWorkflow.isEnabled()).isFalse();
+
+        IntegrationInstanceConfigurationWorkflow carriedConfigurationWorkflow =
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                copyConfiguration.getId(), changeVersionFixture.otherWorkflowId());
+
+        assertThat(carriedConfigurationWorkflow.isEnabled()).isTrue();
+    }
+
+    @Test
     void testChangeConnectedUserVersionKeepsTheCopyOutOfSelfServe() {
         ChangeVersionFixture changeVersionFixture = createChangeVersionFixture(1, true);
 

@@ -47,6 +47,7 @@ type AutomationProjectConfigurationInput {
     label: String
     type: String
     required: Boolean!
+    internalOnly: Boolean!
     componentName: String
     componentVersion: Int
     groupName: String
