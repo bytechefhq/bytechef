@@ -1530,6 +1530,7 @@ export type ChangeAutomationProjectConfigurationConnectedUserVersionMutationVari
   connectedUserId: string | number;
   projectVersion: number;
   targetId?: string | number | null | undefined;
+  workflowInputs?: Array<Types.ConfigurationMoveWorkflowInputs> | Types.ConfigurationMoveWorkflowInputs | null | undefined;
 }>;
 
 
@@ -1937,6 +1938,7 @@ export type MoveAutomationProjectConfigurationConnectedUsersMutationVariables = 
   sourceId: string | number;
   targetId: string | number;
   connectedUserIds: Array<string | number> | string | number;
+  workflowInputs?: Array<Types.ConfigurationMoveWorkflowInputs> | Types.ConfigurationMoveWorkflowInputs | null | undefined;
 }>;
 
 
@@ -2211,6 +2213,7 @@ export type UpdateMcpIntegrationInstanceConfigurationWorkflowMutation = { update
 export type UpgradeAutomationProjectConfigurationConnectedUsersMutationVariables = Exact<{
   targetId: string | number;
   connectedUserIds: Array<string | number> | string | number;
+  workflowInputs?: Array<Types.ConfigurationMoveWorkflowInputs> | Types.ConfigurationMoveWorkflowInputs | null | undefined;
 }>;
 
 
@@ -8410,12 +8413,13 @@ export const usePublishAutomationProjectMutation = <
     )};
 
 export const ChangeAutomationProjectConfigurationConnectedUserVersionDocument = new TypedDocumentString(`
-    mutation changeAutomationProjectConfigurationConnectedUserVersion($sourceId: ID!, $connectedUserId: ID!, $projectVersion: Int!, $targetId: ID) {
+    mutation changeAutomationProjectConfigurationConnectedUserVersion($sourceId: ID!, $connectedUserId: ID!, $projectVersion: Int!, $targetId: ID, $workflowInputs: [ConfigurationMoveWorkflowInputs!]) {
   changeAutomationProjectConfigurationConnectedUserVersion(
     sourceId: $sourceId
     connectedUserId: $connectedUserId
     projectVersion: $projectVersion
     targetId: $targetId
+    workflowInputs: $workflowInputs
   ) {
     movedConnectedUserIds
     needsAttentionConnectedUserIds
@@ -10016,11 +10020,12 @@ export const useMcpIntegrationInstanceConfigurationsByServerIdQuery = <
     )};
 
 export const MoveAutomationProjectConfigurationConnectedUsersDocument = new TypedDocumentString(`
-    mutation moveAutomationProjectConfigurationConnectedUsers($sourceId: ID!, $targetId: ID!, $connectedUserIds: [ID!]!) {
+    mutation moveAutomationProjectConfigurationConnectedUsers($sourceId: ID!, $targetId: ID!, $connectedUserIds: [ID!]!, $workflowInputs: [ConfigurationMoveWorkflowInputs!]) {
   moveAutomationProjectConfigurationConnectedUsers(
     sourceId: $sourceId
     targetId: $targetId
     connectedUserIds: $connectedUserIds
+    workflowInputs: $workflowInputs
   ) {
     movedConnectedUserIds
     needsAttentionConnectedUserIds
@@ -10948,10 +10953,11 @@ export const useUpdateMcpIntegrationInstanceConfigurationWorkflowMutation = <
     )};
 
 export const UpgradeAutomationProjectConfigurationConnectedUsersDocument = new TypedDocumentString(`
-    mutation upgradeAutomationProjectConfigurationConnectedUsers($targetId: ID!, $connectedUserIds: [ID!]!) {
+    mutation upgradeAutomationProjectConfigurationConnectedUsers($targetId: ID!, $connectedUserIds: [ID!]!, $workflowInputs: [ConfigurationMoveWorkflowInputs!]) {
   upgradeAutomationProjectConfigurationConnectedUsers(
     targetId: $targetId
     connectedUserIds: $connectedUserIds
+    workflowInputs: $workflowInputs
   ) {
     movedConnectedUserIds
     needsAttentionConnectedUserIds
