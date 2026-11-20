@@ -132,11 +132,6 @@ class PropertyUtils {
         return getPropertyRecursive(outputInfo, splitPropertyPath(propertyName));
     }
 
-    /**
-     * Splits a property path into its segments. A dot inside a quoted key does not split it, and a quoted key such as
-     * {@code outputFiles['report.csv']} becomes a segment of its own, named by the key, since it names an object
-     * property. A numeric index such as {@code items[0]} stays attached to its name.
-     */
     static String[] splitPropertyPath(String propertyPath) {
         List<String> segments = new ArrayList<>();
         StringBuilder segment = new StringBuilder();
@@ -174,10 +169,6 @@ class PropertyUtils {
         return segments.toArray(String[]::new);
     }
 
-    /**
-     * An object that declares no properties, such as a task's {@code outputFiles} keyed by the file paths an execution
-     * keeps, can hold any key, so no path below it can be ruled out.
-     */
     private static boolean isOpenObject(PropertyInfo propertyInfo) {
         List<PropertyInfo> nestedPropertyInfos = propertyInfo.nestedProperties();
 

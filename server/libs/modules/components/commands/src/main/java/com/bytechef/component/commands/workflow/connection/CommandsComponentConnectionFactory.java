@@ -31,8 +31,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * Resolves the connections a Commands task declares in its workflow definition, the same way Script tasks do.
- *
  * @author Ivica Cardic
  */
 @Component
