@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.automation.configuration.service;
+package com.bytechef.ee.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -24,6 +24,7 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.project.definition.ProjectDefinition;
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
+import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade;
@@ -42,7 +43,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Ivica Cardic
  */
-class ProjectCodeWorkflowDraftServiceTest {
+class ProjectCodeWorkflowDraftFacadeTest {
 
     private static final byte[] BYTES = "source".getBytes(StandardCharsets.UTF_8);
 
@@ -52,8 +53,8 @@ class ProjectCodeWorkflowDraftServiceTest {
     private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
     private final WorkflowService workflowService = mock(WorkflowService.class);
 
-    private final ProjectCodeWorkflowDraftServiceImpl projectCodeWorkflowDraftService =
-        new ProjectCodeWorkflowDraftServiceImpl(
+    private final ProjectCodeWorkflowDraftFacadeImpl projectCodeWorkflowDraftFacade =
+        new ProjectCodeWorkflowDraftFacadeImpl(
             codeWorkflowContainerFacade, codeWorkflowContainerService, projectCodeWorkflowService,
             projectWorkflowService, workflowService, List.of());
 
@@ -68,7 +69,7 @@ class ProjectCodeWorkflowDraftServiceTest {
         when(codeWorkflowContainerFacade.update(eq(draftContainer), any(), any(), any(), eq(PlatformType.AUTOMATION)))
             .thenReturn(new CodeWorkflowReconciliation(draftContainer, Map.of(), Map.of()));
 
-        projectCodeWorkflowDraftService.saveDraft(project, definition(), BYTES, Language.JAVASCRIPT);
+        projectCodeWorkflowDraftFacade.saveDraft(project, definition(), BYTES, Language.JAVASCRIPT);
 
         verify(codeWorkflowContainerFacade).update(eq(draftContainer), any(), any(), eq(BYTES), any());
         verify(projectCodeWorkflowService, never()).create(any(), any());
@@ -91,7 +92,7 @@ class ProjectCodeWorkflowDraftServiceTest {
         when(codeWorkflowContainerFacade.create(any(), any(), any(), any(), any(), any(), any()))
             .thenReturn(new CodeWorkflowReconciliation(newContainer, Map.of(), Map.of()));
 
-        projectCodeWorkflowDraftService.saveDraft(project, definition(), BYTES, Language.JAVASCRIPT);
+        projectCodeWorkflowDraftFacade.saveDraft(project, definition(), BYTES, Language.JAVASCRIPT);
 
         verify(codeWorkflowContainerFacade).create(
             any(), any(), any(), eq(Language.JAVASCRIPT), eq(BYTES), eq(PlatformType.AUTOMATION),
@@ -113,7 +114,7 @@ class ProjectCodeWorkflowDraftServiceTest {
         when(projectWorkflowService.addWorkflow(1L, 2, "id-new"))
             .thenReturn(new ProjectWorkflow(1L, 2, "id-new", UUID.randomUUID()));
 
-        projectCodeWorkflowDraftService.saveDraft(project, definition(), BYTES, Language.JAVASCRIPT);
+        projectCodeWorkflowDraftFacade.saveDraft(project, definition(), BYTES, Language.JAVASCRIPT);
 
         verify(projectWorkflowService).addWorkflow(1L, 2, "id-new");
         verify(projectWorkflowService).delete(1L, 2, "id-old");
@@ -140,7 +141,7 @@ class ProjectCodeWorkflowDraftServiceTest {
             .thenReturn(new CodeWorkflowReconciliation(newContainer, Map.of("wf-a", "new-a"), Map.of()));
         when(projectWorkflowService.addWorkflow(1L, 2, "new-a")).thenReturn(addedRow);
 
-        projectCodeWorkflowDraftService.saveDraft(project, definition(), BYTES, Language.JAVASCRIPT);
+        projectCodeWorkflowDraftFacade.saveDraft(project, definition(), BYTES, Language.JAVASCRIPT);
 
         assertThat(addedRow.getUuid()).isEqualTo(publishedUuid);
 
@@ -168,7 +169,7 @@ class ProjectCodeWorkflowDraftServiceTest {
             .thenReturn(new CodeWorkflowReconciliation(draftContainer, Map.of("wf-a", "new-a"), Map.of()));
         when(projectWorkflowService.addWorkflow(1L, 2, "new-a")).thenReturn(addedRow);
 
-        projectCodeWorkflowDraftService.saveDraft(project, definition(), BYTES, Language.JAVASCRIPT);
+        projectCodeWorkflowDraftFacade.saveDraft(project, definition(), BYTES, Language.JAVASCRIPT);
 
         assertThat(addedRow.getUuid()).isEqualTo(publishedUuid);
 
@@ -193,7 +194,7 @@ class ProjectCodeWorkflowDraftServiceTest {
         when(projectWorkflowService.addWorkflow(1L, 2, "new-b"))
             .thenReturn(new ProjectWorkflow(1L, 2, "new-b", UUID.randomUUID()));
 
-        projectCodeWorkflowDraftService.saveDraft(project, definition(), BYTES, Language.JAVASCRIPT);
+        projectCodeWorkflowDraftFacade.saveDraft(project, definition(), BYTES, Language.JAVASCRIPT);
 
         verify(projectWorkflowService, never()).update(any());
     }
@@ -209,7 +210,7 @@ class ProjectCodeWorkflowDraftServiceTest {
         when(codeWorkflowContainerFacade.update(eq(draftContainer), any(), any(), any(), eq(PlatformType.AUTOMATION)))
             .thenReturn(new CodeWorkflowReconciliation(draftContainer, Map.of(), Map.of()));
 
-        projectCodeWorkflowDraftService.saveDraft(project, definition(), BYTES, Language.PYTHON);
+        projectCodeWorkflowDraftFacade.saveDraft(project, definition(), BYTES, Language.PYTHON);
 
         verify(draftContainer).setLanguage(Language.PYTHON);
         verify(codeWorkflowContainerFacade).update(

@@ -32,7 +32,6 @@ import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.automation.project.definition.ProjectDefinition;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.exception.CodeWorkflowErrorType;
-import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowDraftServiceImpl;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
@@ -119,7 +118,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
             applicationProperties(true), mock(CacheManager.class), projectService, projectWorkflowService,
             mock(ProjectFacade.class), projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
             mock(CodeWorkflowFileStorage.class),
-            new ProjectCodeWorkflowDraftServiceImpl(
+            new ProjectCodeWorkflowDraftFacadeImpl(
                 codeWorkflowContainerFacade, mock(CodeWorkflowContainerService.class), projectCodeWorkflowService,
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
@@ -156,7 +155,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
             applicationProperties(true), mock(CacheManager.class), projectService, projectWorkflowService,
             mock(ProjectFacade.class), projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
             mock(CodeWorkflowFileStorage.class),
-            new ProjectCodeWorkflowDraftServiceImpl(
+            new ProjectCodeWorkflowDraftFacadeImpl(
                 codeWorkflowContainerFacade, mock(CodeWorkflowContainerService.class), projectCodeWorkflowService,
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
@@ -190,7 +189,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
             applicationProperties(true), mock(CacheManager.class), projectService, projectWorkflowService,
             mock(ProjectFacade.class), projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
             mock(CodeWorkflowFileStorage.class),
-            new ProjectCodeWorkflowDraftServiceImpl(
+            new ProjectCodeWorkflowDraftFacadeImpl(
                 codeWorkflowContainerFacade, mock(CodeWorkflowContainerService.class), projectCodeWorkflowService,
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
@@ -247,7 +246,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
             applicationProperties(true), mock(CacheManager.class), projectService, projectWorkflowService,
             mock(ProjectFacade.class), projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
             mock(CodeWorkflowFileStorage.class),
-            new ProjectCodeWorkflowDraftServiceImpl(
+            new ProjectCodeWorkflowDraftFacadeImpl(
                 codeWorkflowContainerFacade, mock(CodeWorkflowContainerService.class), projectCodeWorkflowService,
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),

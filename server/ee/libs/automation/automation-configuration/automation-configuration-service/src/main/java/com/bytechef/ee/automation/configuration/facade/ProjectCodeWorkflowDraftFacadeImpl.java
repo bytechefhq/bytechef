@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.automation.configuration.service;
+package com.bytechef.ee.automation.configuration.facade;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
@@ -13,6 +13,7 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.project.definition.ProjectDefinition;
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
+import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade;
@@ -40,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @ConditionalOnEEVersion
-public class ProjectCodeWorkflowDraftServiceImpl implements ProjectCodeWorkflowDraftService {
+public class ProjectCodeWorkflowDraftFacadeImpl implements ProjectCodeWorkflowDraftFacade {
 
     private final CodeWorkflowContainerFacade codeWorkflowContainerFacade;
     private final CodeWorkflowContainerService codeWorkflowContainerService;
@@ -50,7 +51,7 @@ public class ProjectCodeWorkflowDraftServiceImpl implements ProjectCodeWorkflowD
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public ProjectCodeWorkflowDraftServiceImpl(
+    public ProjectCodeWorkflowDraftFacadeImpl(
         CodeWorkflowContainerFacade codeWorkflowContainerFacade,
         CodeWorkflowContainerService codeWorkflowContainerService,
         ProjectCodeWorkflowService projectCodeWorkflowService, ProjectWorkflowService projectWorkflowService,

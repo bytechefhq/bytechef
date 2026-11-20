@@ -30,7 +30,6 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
-import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowDraftServiceImpl;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
@@ -304,7 +303,7 @@ class ProjectCodeWorkflowFacadeDraftTest {
             applicationProperties(true), mock(CacheManager.class), projectService, projectWorkflowService,
             mock(ProjectFacade.class), projectCodeWorkflowService, codeWorkflowContainerService,
             codeWorkflowFileStorage,
-            new ProjectCodeWorkflowDraftServiceImpl(
+            new ProjectCodeWorkflowDraftFacadeImpl(
                 codeWorkflowContainerFacade, codeWorkflowContainerService, projectCodeWorkflowService,
                 projectWorkflowService, workflowService, List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),

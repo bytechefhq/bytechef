@@ -27,7 +27,7 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.project.definition.ProjectDefinition;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
-import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowDraftService;
+import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowDraftFacade;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCodeWorkflowSourceDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCodeWorkflowStateDTO;
@@ -79,7 +79,7 @@ class AutomationProjectCodeWorkflowFacadeTest {
     private CodeWorkflowFileStorage codeWorkflowFileStorage;
 
     @Mock
-    private ProjectCodeWorkflowDraftService projectCodeWorkflowDraftService;
+    private ProjectCodeWorkflowDraftFacade projectCodeWorkflowDraftFacade;
 
     @Mock
     private ProjectCodeWorkflowService projectCodeWorkflowService;
@@ -100,9 +100,9 @@ class AutomationProjectCodeWorkflowFacadeTest {
         List<String> warnings =
             facade().save(jsProject("my-project"), Language.JAVASCRIPT, Environment.PRODUCTION, false);
 
-        InOrder inOrder = inOrder(projectCodeWorkflowDraftService, automationProjectFacade);
+        InOrder inOrder = inOrder(projectCodeWorkflowDraftFacade, automationProjectFacade);
 
-        inOrder.verify(projectCodeWorkflowDraftService)
+        inOrder.verify(projectCodeWorkflowDraftFacade)
             .saveDraft(eq(project), any(ProjectDefinition.class), any(), eq(Language.JAVASCRIPT));
         inOrder.verify(automationProjectFacade)
             .publishProject(7L);
@@ -124,7 +124,7 @@ class AutomationProjectCodeWorkflowFacadeTest {
 
         facade().save(jsProject("acme-billing"), Language.JAVASCRIPT, Environment.PRODUCTION, false);
 
-        verify(projectCodeWorkflowDraftService)
+        verify(projectCodeWorkflowDraftFacade)
             .saveDraft(eq(project), any(ProjectDefinition.class), any(), eq(Language.JAVASCRIPT));
         verify(automationProjectFacade).publishProject(100L);
         verify(projectService, never()).publishProject(anyLong(), any(), anyBoolean());
@@ -173,7 +173,7 @@ class AutomationProjectCodeWorkflowFacadeTest {
 
         assertThat(id).isEqualTo(7L);
 
-        verify(projectCodeWorkflowDraftService)
+        verify(projectCodeWorkflowDraftFacade)
             .saveDraft(eq(project), any(ProjectDefinition.class), any(), eq(Language.JAVASCRIPT));
         verify(automationProjectFacade, never()).publishProject(anyLong());
     }
@@ -208,7 +208,7 @@ class AutomationProjectCodeWorkflowFacadeTest {
 
         facade().updateCodeWorkflowSource(7L, jsSource("orders"));
 
-        verify(projectCodeWorkflowDraftService)
+        verify(projectCodeWorkflowDraftFacade)
             .saveDraft(any(Project.class), any(ProjectDefinition.class), any(), eq(Language.JAVASCRIPT));
         verify(automationProjectFacade, never()).publishProject(anyLong());
     }
@@ -230,7 +230,7 @@ class AutomationProjectCodeWorkflowFacadeTest {
 
         assertThat(renamedProject.getName()).isEqualTo("renamed");
 
-        verify(projectCodeWorkflowDraftService)
+        verify(projectCodeWorkflowDraftFacade)
             .saveDraft(eq(renamedProject), any(ProjectDefinition.class), any(), eq(Language.JAVASCRIPT));
     }
 
@@ -245,7 +245,7 @@ class AutomationProjectCodeWorkflowFacadeTest {
             CodeWorkflowErrorType.CODE_WORKFLOW_ALREADY_EXISTS);
 
         verify(projectService, never()).update(any(Project.class));
-        verify(projectCodeWorkflowDraftService, never()).saveDraft(any(), any(), any(), any());
+        verify(projectCodeWorkflowDraftFacade, never()).saveDraft(any(), any(), any(), any());
     }
 
     @Test
@@ -377,7 +377,7 @@ class AutomationProjectCodeWorkflowFacadeTest {
         return new AutomationProjectCodeWorkflowFacadeImpl(
             new ApplicationProperties(), automationProjectConfigurationFacade,
             automationProjectFacade, mock(CacheManager.class),
-            codeWorkflowContainerService, codeWorkflowFileStorage, projectCodeWorkflowDraftService,
+            codeWorkflowContainerService, codeWorkflowFileStorage, projectCodeWorkflowDraftFacade,
             projectCodeWorkflowService, projectService);
     }
 
