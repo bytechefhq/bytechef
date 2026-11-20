@@ -17,7 +17,7 @@
 package com.bytechef.platform.billing.web.filter;
 
 import com.bytechef.platform.billing.dto.TrialDTO;
-import com.bytechef.platform.billing.service.TrialService;
+import com.bytechef.platform.billing.facade.TrialFacade;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.constant.TenantConstants;
 import jakarta.servlet.FilterChain;
@@ -36,7 +36,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * Enforces trial limits on every authenticated request. Caching is handled at the service layer via
- * {@link TrialService#validateTrial()} ()}, which is tenant-scoped and invalidated on subscription changes.
+ * {@link TrialFacade#validateTrial()} ()}, which is tenant-scoped and invalidated on subscription changes.
  *
  * @author Matija Petanjek
  */
@@ -44,10 +44,10 @@ public class TrialFilter extends OncePerRequestFilter {
 
     private static final Logger log = LoggerFactory.getLogger(TrialFilter.class);
 
-    private final TrialService trialService;
+    private final TrialFacade trialFacade;
 
-    public TrialFilter(TrialService trialService) {
-        this.trialService = trialService;
+    public TrialFilter(TrialFacade trialFacade) {
+        this.trialFacade = trialFacade;
     }
 
     @Override
@@ -81,7 +81,7 @@ public class TrialFilter extends OncePerRequestFilter {
         HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, String tenantId)
         throws Exception {
 
-        TrialDTO trial = trialService.validateTrial();
+        TrialDTO trial = trialFacade.validateTrial();
 
         if (trial.expired()) {
 

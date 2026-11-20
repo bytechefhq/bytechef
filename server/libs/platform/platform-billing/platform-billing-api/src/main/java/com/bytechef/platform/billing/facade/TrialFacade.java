@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.billing.service;
+package com.bytechef.platform.billing.facade;
 
 import com.bytechef.platform.billing.dto.TrialDTO;
 
 /**
  * @author Matija Petanjek
  */
-public interface TrialService {
+public interface TrialFacade {
 
     TrialDTO validateTrial();
-
 }
