@@ -68,6 +68,7 @@ import org.testcontainers.utility.DockerImageName;
 @Timeout(value = 15, unit = TimeUnit.MINUTES)
 class KubernetesTaskRunnerBackendIntTest {
 
+    private static final String NON_ROOT_SHELL_IMAGE = "nginxinc/nginx-unprivileged:1.27-alpine";
     private static final String SHELL_IMAGE = "busybox:1.36";
 
     private static K3sContainer k3sContainer;
@@ -138,6 +139,24 @@ class KubernetesTaskRunnerBackendIntTest {
 
         assertThat(result.exitCode()).isZero();
         assertThat(result.stdout()).contains("collected");
+        assertThat(new String(storedFiles.get("echoed.txt"), StandardCharsets.UTF_8)).isEqualTo("hello from the host");
+    }
+
+    @Test
+    void testAnImageWithANonRootUserReadsItsInputsAndWritesItsOutputs() {
+        Map<String, byte[]> storedFiles = new LinkedHashMap<>();
+
+        TaskRunnerResult result = runner(() -> "non-root-key").run(
+            commandsRequest(
+                List.of(
+                    "test \"$(id -u)\" != 0",
+                    "cat \"$BYTECHEF_WORKING_DIR/greeting.txt\" > \"$BYTECHEF_OUTPUT_DIR/echoed.txt\"",
+                    "echo written by a non-root user"),
+                Map.of("greeting.txt", "hello from the host"), List.of("*.txt"),
+                Map.of("image", NON_ROOT_SHELL_IMAGE), actionContext(null, storedFiles)));
+
+        assertThat(result.exitCode()).isZero();
+        assertThat(result.stdout()).contains("written by a non-root user");
         assertThat(new String(storedFiles.get("echoed.txt"), StandardCharsets.UTF_8)).isEqualTo("hello from the host");
     }
 
