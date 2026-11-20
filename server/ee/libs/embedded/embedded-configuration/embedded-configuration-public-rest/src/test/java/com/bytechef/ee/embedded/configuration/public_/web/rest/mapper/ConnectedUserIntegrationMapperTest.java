@@ -331,6 +331,94 @@ class ConnectedUserIntegrationMapperTest {
     }
 
     @Test
+    void testMapperLeavesOutStoredInternalOnlyInstanceValuesInBasicMapper() {
+        IntegrationInstance integrationInstance = new IntegrationInstance();
+
+        integrationInstance.setId(5L);
+        integrationInstance.setConnectionId(77L);
+        integrationInstance.setEnabled(true);
+
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
+            IntegrationInstanceConfigurationDTO.builder()
+                .id(77L)
+                .integrationInstanceConfigurationWorkflows(List.of(getInternalOnlyWorkflowDTO("u-1")))
+                .build();
+
+        ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstanceWorkflow instanceWorkflow =
+            new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstanceWorkflow(
+                new IntegrationInstanceWorkflow(1L, Map.of("accountId", "a", "channel", "c"), true), "u-1");
+
+        ConnectedUserIntegrationMapper.ConnectedUserIntegrationToIntegrationBasicMapper generatedBasicMapper =
+            new ConnectedUserIntegrationMapper$ConnectedUserIntegrationToIntegrationBasicMapperImpl();
+
+        IntegrationInstanceModel integrationInstanceModel = generatedBasicMapper.map(
+            new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance(
+                new Connection(), integrationInstance, List.of(instanceWorkflow), List.of(),
+                List.of(instanceWorkflow), integrationInstanceConfigurationDTO, null));
+
+        assertEquals(
+            Map.of("channel", "c"), integrationInstanceModel.getWorkflows()
+                .getFirst()
+                .getInputs());
+        assertEquals(
+            Map.of("channel", "c"), integrationInstanceModel.getMcpWorkflows()
+                .getFirst()
+                .getInputs());
+    }
+
+    @Test
+    void testMapperReturnsNoStoredInstanceValuesWhenTheDefinitionIsUnknown() {
+        IntegrationInstance integrationInstance = new IntegrationInstance();
+
+        integrationInstance.setId(5L);
+        integrationInstance.setConnectionId(77L);
+        integrationInstance.setEnabled(true);
+
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
+            IntegrationInstanceConfigurationDTO.builder()
+                .id(77L)
+                .integrationInstanceConfigurationWorkflows(List.of(getInternalOnlyWorkflowDTO("u-1")))
+                .build();
+
+        ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstanceWorkflow unknownInstanceWorkflow =
+            new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstanceWorkflow(
+                new IntegrationInstanceWorkflow(1L, Map.of("accountId", "a", "channel", "c"), true), "u-unknown");
+
+        ConnectedUserIntegrationMapper.ConnectedUserIntegrationToIntegrationMapper generatedMapper =
+            new ConnectedUserIntegrationMapper$ConnectedUserIntegrationToIntegrationMapperImpl();
+
+        IntegrationInstanceModel withConfiguration = generatedMapper.map(
+            new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance(
+                new Connection(), integrationInstance, List.of(unknownInstanceWorkflow), List.of(), List.of(),
+                integrationInstanceConfigurationDTO, null));
+
+        IntegrationInstanceModel withoutConfiguration = generatedMapper.map(
+            new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance(
+                new Connection(), integrationInstance, List.of(unknownInstanceWorkflow), List.of(), List.of(), null,
+                null));
+
+        assertEquals(
+            Map.of(), withConfiguration.getWorkflows()
+                .getFirst()
+                .getInputs());
+        assertEquals(
+            Map.of(), withoutConfiguration.getWorkflows()
+                .getFirst()
+                .getInputs());
+    }
+
+    @Test
+    void testMcpInstanceWorkflowMapperReturnsNoStoredInputs() {
+        McpIntegrationInstanceWorkflowMapper.IntegrationInstanceWorkflowToIntegrationInstanceWorkflowModelMapper generatedMapper =
+            new McpIntegrationInstanceWorkflowMapper$IntegrationInstanceWorkflowToIntegrationInstanceWorkflowModelMapperImpl();
+
+        IntegrationInstanceWorkflowModel integrationInstanceWorkflowModel = generatedMapper.convert(
+            new IntegrationInstanceWorkflow(1L, Map.of("accountId", "a", "channel", "c"), true));
+
+        assertEquals(Map.of(), integrationInstanceWorkflowModel.getInputs());
+    }
+
+    @Test
     void testPlainInputHasNoComponentReference() {
         WorkflowInput input = new WorkflowInput(new Workflow.Input("text", "Text", "string", false));
 

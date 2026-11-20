@@ -38,6 +38,7 @@ import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.PropertyGroup;
 import com.bytechef.platform.component.domain.ValueProperty;
 import com.bytechef.platform.configuration.domain.WorkflowInput;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -339,30 +340,43 @@ public interface ConnectedUserIntegrationMapper {
         ConnectedUserIntegrationInstance integrationInstance,
         List<IntegrationInstanceWorkflowModel> integrationInstanceWorkflowModels) {
 
-        IntegrationInstanceConfigurationDTO integrationInstanceConfiguration =
-            integrationInstance.integrationInstanceConfiguration();
-
-        if (integrationInstanceConfiguration == null || integrationInstanceWorkflowModels == null) {
+        if (integrationInstanceWorkflowModels == null) {
             return;
         }
 
+        IntegrationInstanceConfigurationDTO integrationInstanceConfiguration =
+            integrationInstance.integrationInstanceConfiguration();
+
         for (IntegrationInstanceWorkflowModel integrationInstanceWorkflowModel : integrationInstanceWorkflowModels) {
-            for (IntegrationInstanceConfigurationWorkflowDTO integrationInstanceConfigurationWorkflowDTO : integrationInstanceConfiguration
-                .integrationInstanceConfigurationWorkflows()) {
+            Workflow workflow = integrationInstanceConfiguration == null
+                ? null : findWorkflow(integrationInstanceConfiguration, integrationInstanceWorkflowModel);
 
-                Workflow workflow = integrationInstanceConfigurationWorkflowDTO.workflow();
+            Map<String, Object> inputs = integrationInstanceWorkflowModel.getInputs();
 
-                if (workflow != null && Objects.equals(
-                    integrationInstanceConfigurationWorkflowDTO.workflowUuid(),
-                    integrationInstanceWorkflowModel.getWorkflowUuid())) {
-
-                    integrationInstanceWorkflowModel.setInputs(
-                        InternalOnlyInputUtils.removeInternalOnlyInputs(
-                            workflow, integrationInstanceWorkflowModel.getInputs()));
-
-                    break;
-                }
+            if (workflow == null || inputs == null) {
+                integrationInstanceWorkflowModel.setInputs(new HashMap<>());
+            } else {
+                integrationInstanceWorkflowModel.setInputs(
+                    new HashMap<>(InternalOnlyInputUtils.removeInternalOnlyInputs(workflow, inputs)));
             }
         }
+    }
+
+    private static Workflow findWorkflow(
+        IntegrationInstanceConfigurationDTO integrationInstanceConfiguration,
+        IntegrationInstanceWorkflowModel integrationInstanceWorkflowModel) {
+
+        for (IntegrationInstanceConfigurationWorkflowDTO integrationInstanceConfigurationWorkflowDTO : integrationInstanceConfiguration
+            .integrationInstanceConfigurationWorkflows()) {
+
+            if (Objects.equals(
+                integrationInstanceConfigurationWorkflowDTO.workflowUuid(),
+                integrationInstanceWorkflowModel.getWorkflowUuid())) {
+
+                return integrationInstanceConfigurationWorkflowDTO.workflow();
+            }
+        }
+
+        return null;
     }
 }
