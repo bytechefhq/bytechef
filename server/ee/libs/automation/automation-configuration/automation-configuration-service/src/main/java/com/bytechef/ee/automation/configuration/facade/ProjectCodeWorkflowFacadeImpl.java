@@ -12,6 +12,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
@@ -51,12 +52,14 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.cache.CacheManager;
@@ -461,7 +464,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
             projectId, environment);
 
         if (projectDeployment.isPresent()) {
-            moveProjectDeployment(projectDeployment.get(), projectVersion, environment);
+            moveProjectDeployment(projectDeployment.get(), projectVersion);
         } else {
             createEnabledProjectDeployment(project, projectVersion, environment);
         }
@@ -490,7 +493,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
             projectDeployment, projectDeploymentWorkflows, List.of());
 
         for (String workflowId : workflowIds) {
-            if (!requiresConfiguration(workflowId)) {
+            if (!requiresConfiguration(workflowId, Map.of(), List.of())) {
                 projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentId, workflowId, true);
             }
         }
@@ -498,9 +501,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
     }
 
-    private void moveProjectDeployment(
-        ProjectDeployment projectDeployment, int projectVersion, Environment environment) {
-
+    private void moveProjectDeployment(ProjectDeployment projectDeployment, int projectVersion) {
         long projectDeploymentId = Objects.requireNonNull(projectDeployment.getId());
         long projectId = Objects.requireNonNull(projectDeployment.getProjectId());
 
@@ -512,24 +513,46 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
                     ProjectWorkflow::getWorkflowId, ProjectWorkflow::getUuidAsString,
                     (firstUuid, secondUuid) -> firstUuid));
 
-        Set<String> deployedWorkflowUuids = projectDeploymentWorkflowService
-            .getProjectDeploymentWorkflows(projectDeploymentId)
-            .stream()
-            .map(projectDeploymentWorkflow -> workflowIdUuids.get(projectDeploymentWorkflow.getWorkflowId()))
-            .filter(Objects::nonNull)
-            .collect(Collectors.toSet());
+        Map<String, ProjectDeploymentWorkflow> deployedWorkflowUuidProjectDeploymentWorkflows =
+            projectDeploymentWorkflowService.getProjectDeploymentWorkflows(projectDeploymentId)
+                .stream()
+                .filter(projectDeploymentWorkflow -> workflowIdUuids.containsKey(
+                    projectDeploymentWorkflow.getWorkflowId()))
+                .collect(
+                    Collectors.toMap(
+                        projectDeploymentWorkflow -> workflowIdUuids.get(projectDeploymentWorkflow.getWorkflowId()),
+                        Function.identity(), (firstWorkflow, secondWorkflow) -> firstWorkflow));
 
-        List<String> newWorkflowIds = allProjectWorkflows.stream()
+        List<ProjectWorkflow> versionProjectWorkflows = allProjectWorkflows.stream()
             .filter(projectWorkflow -> projectWorkflow.getProjectVersion() == projectVersion)
-            .filter(projectWorkflow -> !deployedWorkflowUuids.contains(projectWorkflow.getUuidAsString()))
-            .map(ProjectWorkflow::getWorkflowId)
             .toList();
 
-        projectDeploymentFacade.updateProjectDeployment(
-            projectId, projectVersion, null, List.of(), (long) environment.ordinal());
+        List<String> newWorkflowIds = new ArrayList<>();
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = new ArrayList<>();
+
+        for (ProjectWorkflow projectWorkflow : versionProjectWorkflows) {
+            String workflowId = projectWorkflow.getWorkflowId();
+            ProjectDeploymentWorkflow deployedProjectDeploymentWorkflow =
+                deployedWorkflowUuidProjectDeploymentWorkflows.get(projectWorkflow.getUuidAsString());
+
+            if (deployedProjectDeploymentWorkflow == null) {
+                newWorkflowIds.add(workflowId);
+
+                projectDeploymentWorkflows.add(toProjectDeploymentWorkflow(workflowId));
+
+                continue;
+            }
+
+            projectDeploymentWorkflows.add(
+                toCarriedProjectDeploymentWorkflow(workflowId, deployedProjectDeploymentWorkflow));
+        }
+
+        projectDeployment.setProjectVersion(projectVersion);
+
+        projectDeploymentFacade.updateProjectDeployment(projectDeployment, projectDeploymentWorkflows, List.of());
 
         for (String newWorkflowId : newWorkflowIds) {
-            if (!requiresConfiguration(newWorkflowId)) {
+            if (!requiresConfiguration(newWorkflowId, Map.of(), List.of())) {
                 projectDeploymentFacade.enableProjectDeploymentWorkflow(projectDeploymentId, newWorkflowId, true);
             }
         }
@@ -539,12 +562,32 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         }
     }
 
-    private boolean requiresConfiguration(String workflowId) {
+    private ProjectDeploymentWorkflow toCarriedProjectDeploymentWorkflow(
+        String workflowId, ProjectDeploymentWorkflow deployedProjectDeploymentWorkflow) {
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+        Map<String, ?> inputs = deployedProjectDeploymentWorkflow.getInputs();
+        List<ProjectDeploymentWorkflowConnection> connections = deployedProjectDeploymentWorkflow.getConnections();
+
+        projectDeploymentWorkflow.setConnections(connections);
+        projectDeploymentWorkflow.setEnabled(
+            deployedProjectDeploymentWorkflow.isEnabled() && !requiresConfiguration(workflowId, inputs, connections));
+        projectDeploymentWorkflow.setInputs(inputs);
+        projectDeploymentWorkflow.setWorkflowId(workflowId);
+
+        return projectDeploymentWorkflow;
+    }
+
+    private boolean requiresConfiguration(
+        String workflowId, Map<String, ?> inputs, List<ProjectDeploymentWorkflowConnection> connections) {
+
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         boolean requiresInput = workflow.getInputs()
             .stream()
-            .anyMatch(Workflow.Input::required);
+            .filter(Workflow.Input::required)
+            .anyMatch(input -> isBlank(inputs.get(input.name())));
 
         if (requiresInput) {
             return true;
@@ -554,7 +597,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
             .stream()
             .flatMap(workflowTrigger -> CollectionUtils.stream(
                 componentConnectionFacade.getComponentConnections(workflowTrigger)))
-            .anyMatch(ComponentConnection::required);
+            .anyMatch(componentConnection -> isUnsetRequiredConnection(componentConnection, connections));
 
         if (triggerRequiresConnection) {
             return true;
@@ -564,7 +607,28 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
             .stream()
             .flatMap(
                 workflowTask -> CollectionUtils.stream(componentConnectionFacade.getComponentConnections(workflowTask)))
-            .anyMatch(ComponentConnection::required);
+            .anyMatch(componentConnection -> isUnsetRequiredConnection(componentConnection, connections));
+    }
+
+    private static boolean isBlank(Object value) {
+        if (value instanceof String string) {
+            return string.isBlank();
+        }
+
+        return value == null;
+    }
+
+    private static boolean isUnsetRequiredConnection(
+        ComponentConnection componentConnection, List<ProjectDeploymentWorkflowConnection> connections) {
+
+        if (!componentConnection.required()) {
+            return false;
+        }
+
+        return connections.stream()
+            .noneMatch(connection -> Objects.equals(
+                connection.getWorkflowNodeName(), componentConnection.workflowNodeName()) &&
+                Objects.equals(connection.getWorkflowConnectionKey(), componentConnection.key()));
     }
 
     private static ProjectDeploymentWorkflow toProjectDeploymentWorkflow(String workflowId) {
