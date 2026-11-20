@@ -68,7 +68,7 @@ export function initialActivationState(
         }
 
         for (const input of inputs) {
-            if (!input.provided && input.name in existingReference.inputValues) {
+            if (input.name in existingReference.inputValues) {
                 inputValues[input.name] = existingReference.inputValues[input.name];
             }
         }
@@ -85,7 +85,7 @@ export function initialActivationState(
 }
 
 export function hasEditableInputs(inputs: TemplateInputType[]): boolean {
-    return inputs.some((input) => !input.provided);
+    return inputs.length > 0;
 }
 
 function getFirstStep(requiredComponents: string[], inputs: TemplateInputType[]): ActivationStepType {
@@ -102,8 +102,7 @@ export function canProceed(state: ActivationStateI): boolean {
             return true;
         case 'configure':
             return state.inputs.every(
-                (input) =>
-                    input.provided || !input.required || toInputValueText(state.inputValues[input.name]).trim() !== ''
+                (input) => !input.required || toInputValueText(state.inputValues[input.name]).trim() !== ''
             );
         case 'connect':
             return (

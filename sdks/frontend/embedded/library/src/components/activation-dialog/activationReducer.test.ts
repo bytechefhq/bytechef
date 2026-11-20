@@ -23,7 +23,7 @@ describe('initialActivationState', () => {
     it('prefills the connections and inputs of an automation the user already activated', () => {
         const state = initialActivationState(
             [slack, providedSlack, gmailNotSetUp],
-            [{name: 'channel', required: true}, {name: 'region', provided: true}, {name: 'note'}],
+            [{name: 'channel', required: true}, {name: 'note'}],
             {connections: {gmail: 3, slack: 9, unknown: 4}, inputValues: {channel: '#general', region: 'eu'}}
         );
 
@@ -47,22 +47,13 @@ describe('initialActivationState', () => {
     });
 });
 
-describe('provided values', () => {
+describe('provided connections', () => {
     it('leaves provided components out of the required components and the connect step', () => {
         const state = initialActivationState([providedSlack, gmailNotSetUp], []);
 
         expect(state.requiredComponents).toEqual(['gmail']);
         expect(initialActivationState([providedSlack], []).step).toBe('activate');
         expect(initialActivationState([providedSlack], []).unavailableComponents).toEqual([]);
-    });
-
-    it('skips configure when every input is provided and ignores them when proceeding', () => {
-        expect(initialActivationState([], [{name: 'region', provided: true, required: true}]).step).toBe('activate');
-
-        const state = initialActivationState([], [{name: 'region', provided: true, required: true}, {name: 'note'}]);
-
-        expect(state.step).toBe('configure');
-        expect(canProceed(state)).toBe(true);
     });
 });
 
