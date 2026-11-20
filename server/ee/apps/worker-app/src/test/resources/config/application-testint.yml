@@ -13,6 +13,12 @@ bytechef:
     provider: JDBC
   message-broker:
     provider: MEMORY
+  script:
+    sandbox:
+      enabled: true
+      max-concurrent-executions: 16
+      max-cpu-time: 5m
+      max-heap-memory: 512MB
   workflow:
     execution:
       agent:
