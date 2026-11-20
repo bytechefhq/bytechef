@@ -374,8 +374,10 @@ public class AutomationProjectConfigurationFacadeImpl
 
         Workflow sourceWorkflow = workflowService.getWorkflow(sourceProjectWorkflow.getWorkflowId());
 
-        return CarriedInputUtils.retainInputsOfUnchangedType(
+        Map<String, Object> carriedInputs = CarriedInputUtils.retainInputsOfUnchangedType(
             sourceWorkflow, targetWorkflow, sourceConfigurationWorkflow.getProvidedInputs());
+
+        return InternalOnlyInputUtils.retainInternalOnlyInputs(targetWorkflow, carriedInputs);
     }
 
     private String getCopyConfigurationName(AutomationProjectConfiguration sourceConfiguration, int projectVersion) {
@@ -463,7 +465,8 @@ public class AutomationProjectConfigurationFacadeImpl
         Map<String, Set<String>> providedInputNames = new HashMap<>();
 
         for (AutomationProjectConfigurationWorkflow configurationWorkflow : configuration.getWorkflows()) {
-            Set<String> workflowProvidedInputNames = getProvidedInputNames(configurationWorkflow.getProvidedInputs());
+            Set<String> workflowProvidedInputNames = getProvidedInputNames(
+                getInternalOnlyProvidedInputs(configuration, configurationWorkflow));
 
             if (!workflowProvidedInputNames.isEmpty()) {
                 providedInputNames.put(
@@ -635,14 +638,16 @@ public class AutomationProjectConfigurationFacadeImpl
         Optional<AutomationProjectConfigurationWorkflow> configurationWorkflowOptional =
             configuration.fetchWorkflow(projectWorkflow.getUuid());
 
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
         return new AutomationProjectConfigurationWorkflowProvidableValuesDTO(
-            toConnectionSlotDTOs(configuration, workflowId),
-            toInputDTOs(configuration, workflowService.getWorkflow(workflowId)),
+            toConnectionSlotDTOs(configuration, workflowId), toInputDTOs(configuration, workflow),
             configurationWorkflowOptional
                 .map(AutomationProjectConfigurationWorkflow::getProvidedConnections)
                 .orElse(Map.of()),
             configurationWorkflowOptional
-                .map(AutomationProjectConfigurationWorkflow::getProvidedInputs)
+                .map(configurationWorkflow -> InternalOnlyInputUtils.retainInternalOnlyInputs(
+                    workflow, configurationWorkflow.getProvidedInputs()))
                 .orElse(Map.of()));
     }
 
@@ -1105,14 +1110,18 @@ public class AutomationProjectConfigurationFacadeImpl
 
         validateProvidedConnections(
             configuration, projectWorkflow.getWorkflowId(), validatedProvidedConnections);
-        validateProvidedInputs(projectWorkflow.getWorkflowId(), validatedProvidedInputs);
+
+        Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
+
+        validateProvidedInputs(workflow, validatedProvidedInputs);
 
         if (automationProjectConfigurationService.isWorkflowEnabled(configuration, projectWorkflow.getUuid())) {
             checkRequiredInternalOnlyInputs(configuration, workflowUuid, validatedProvidedInputs);
         }
 
         Set<String> previouslyProvidedInputNames = configuration.fetchWorkflow(projectWorkflow.getUuid())
-            .map(configurationWorkflow -> getProvidedInputNames(configurationWorkflow.getProvidedInputs()))
+            .map(configurationWorkflow -> getProvidedInputNames(
+                InternalOnlyInputUtils.retainInternalOnlyInputs(workflow, configurationWorkflow.getProvidedInputs())))
             .orElse(Set.of());
 
         Set<String> removedProvidedInputNames = new HashSet<>(previouslyProvidedInputNames);
@@ -1313,6 +1322,10 @@ public class AutomationProjectConfigurationFacadeImpl
         List<AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input> inputs = new ArrayList<>();
 
         for (WorkflowInput workflowInput : WorkflowInput.of(workflow)) {
+            if (!workflowInput.isInternalOnly()) {
+                continue;
+            }
+
             WorkflowInput.ComponentInputReference componentInputReference = getComponentInputReference(workflowInput);
 
             if (componentInputReference == null) {
@@ -1398,6 +1411,30 @@ public class AutomationProjectConfigurationFacadeImpl
         } catch (IllegalArgumentException illegalArgumentException) {
             return null;
         }
+    }
+
+    private Map<String, Object> getInternalOnlyProvidedInputs(
+        AutomationProjectConfiguration configuration, AutomationProjectConfigurationWorkflow configurationWorkflow) {
+
+        Map<String, Object> providedInputs = configurationWorkflow.getProvidedInputs();
+
+        if (providedInputs.isEmpty()) {
+            return Map.of();
+        }
+
+        Optional<ProjectWorkflow> projectWorkflowOptional = projectWorkflowService.fetchProjectWorkflow(
+            configuration.getProjectId(), configuration.getProjectVersion(),
+            String.valueOf(configurationWorkflow.getWorkflowUuid()));
+
+        if (projectWorkflowOptional.isEmpty()) {
+            return Map.of();
+        }
+
+        ProjectWorkflow projectWorkflow = projectWorkflowOptional.get();
+
+        Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
+
+        return InternalOnlyInputUtils.retainInternalOnlyInputs(workflow, providedInputs);
     }
 
     private static Set<String> getProvidedInputNames(Map<String, ?> providedInputs) {
@@ -1672,7 +1709,8 @@ public class AutomationProjectConfigurationFacadeImpl
                 .map(AutomationProjectConfigurationWorkflow::getProvidedConnections)
                 .orElse(Map.of()),
             configurationWorkflowOptional
-                .map(AutomationProjectConfigurationWorkflow::getProvidedInputs)
+                .map(configurationWorkflow -> InternalOnlyInputUtils.retainInternalOnlyInputs(
+                    workflow, configurationWorkflow.getProvidedInputs()))
                 .orElse(Map.of()));
     }
 
@@ -1810,7 +1848,7 @@ public class AutomationProjectConfigurationFacadeImpl
         }
     }
 
-    private static Map<String, Set<String>> getRemovedProvidedInputNames(
+    private Map<String, Set<String>> getRemovedProvidedInputNames(
         AutomationProjectConfiguration sourceConfiguration,
         AutomationProjectConfiguration targetConfiguration) {
 
@@ -1820,11 +1858,12 @@ public class AutomationProjectConfigurationFacadeImpl
             .getWorkflows()) {
 
             Set<String> inputNames = new HashSet<>(
-                getProvidedInputNames(sourceConfigurationWorkflow.getProvidedInputs()));
+                getProvidedInputNames(getInternalOnlyProvidedInputs(sourceConfiguration, sourceConfigurationWorkflow)));
 
             targetConfiguration.fetchWorkflow(sourceConfigurationWorkflow.getWorkflowUuid())
                 .ifPresent(targetConfigurationWorkflow -> inputNames.removeAll(
-                    getProvidedInputNames(targetConfigurationWorkflow.getProvidedInputs())));
+                    getProvidedInputNames(
+                        getInternalOnlyProvidedInputs(targetConfiguration, targetConfigurationWorkflow))));
 
             if (!inputNames.isEmpty()) {
                 removedProvidedInputNames.put(
@@ -1936,22 +1975,27 @@ public class AutomationProjectConfigurationFacadeImpl
         }
     }
 
-    private void validateProvidedInputs(String workflowId, Map<String, Object> providedInputs) {
+    private static void validateProvidedInputs(Workflow workflow, Map<String, Object> providedInputs) {
         if (providedInputs.isEmpty()) {
             return;
         }
-
-        Workflow workflow = workflowService.getWorkflow(workflowId);
 
         Set<String> inputNames = workflow.getInputs()
             .stream()
             .map(Workflow.Input::name)
             .collect(Collectors.toSet());
 
+        Set<String> internalOnlyInputNames = InternalOnlyInputUtils.getInternalOnlyInputNames(workflow);
+
         for (String inputName : providedInputs.keySet()) {
             if (!inputNames.contains(inputName)) {
                 throw newInvalidProvidedValueException(
                     "Input %s is not an input of the workflow".formatted(inputName));
+            }
+
+            if (!internalOnlyInputNames.contains(inputName)) {
+                throw newInvalidProvidedValueException(
+                    "Input %s is not an internal-only input".formatted(inputName));
             }
         }
     }

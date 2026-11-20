@@ -41,16 +41,10 @@ public record ConnectedUserWorkflowTemplateDTO(
             workflowId);
     }
 
-    public ConnectedUserWorkflowTemplateDTO withProvided(
-        Set<String> providedComponentNames, Set<String> providedInputNames) {
-
+    public ConnectedUserWorkflowTemplateDTO withProvided(Set<String> providedComponentNames) {
         return new ConnectedUserWorkflowTemplateDTO(
             workflowUuid, label, description, lastModifiedDate, markProvided(triggers, providedComponentNames),
-            markProvided(components, providedComponentNames),
-            inputs.stream()
-                .map(input -> input.withProvided(providedInputNames.contains(input.name())))
-                .toList(),
-            permissionExpression, workflowId);
+            markProvided(components, providedComponentNames), inputs, permissionExpression, workflowId);
     }
 
     private static List<Component> markProvided(List<Component> components, Set<String> providedComponentNames) {
@@ -110,14 +104,6 @@ public record ConnectedUserWorkflowTemplateDTO(
         }
     }
 
-    public record Input(String name, String label, String type, boolean required, boolean provided) {
-
-        public Input(String name, String label, String type, boolean required) {
-            this(name, label, type, required, false);
-        }
-
-        public Input withProvided(boolean provided) {
-            return new Input(name, label, type, required, provided);
-        }
+    public record Input(String name, String label, String type, boolean required) {
     }
 }

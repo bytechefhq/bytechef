@@ -192,6 +192,12 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
          "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
         """;
 
+    private static final String SLACK_WORKFLOW_WITH_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION = """
+        {"label":"Post","inputs":[
+         {"name":"channel","label":"Channel","type":"string","required":true,"internalOnly":true}],
+         "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
+        """;
+
     @Autowired
     private AutomationProjectConfigurationService automationProjectConfigurationService;
 
@@ -1433,11 +1439,11 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
     }
 
     @Test
-    void testEnableReferenceIsSatisfiedByAnInputTheConfigurationProvides() {
+    void testEnableReferenceIsSatisfiedByAnInternalOnlyInputTheConfigurationProvides() {
         long automationProjectId = createAutomationProject("Provided Input Enable");
 
         String workflowUuid =
-            addAutomation(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+            addAutomation(automationProjectId, SLACK_WORKFLOW_WITH_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION);
 
         publishAndPinProject(automationProjectId);
 
@@ -1448,7 +1454,10 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
 
-        assertThat(reference.isEnabled()).isFalse();
+        assertThat(reference.isEnabled()).isTrue();
+        assertThat(fetchRow(reference))
+            .get()
+            .satisfies(row -> assertThat(row.isEnabled()).isFalse());
 
         provideValues(automationProjectId, workflowUuid, Map.of(), Map.of("channel", "#administrator"));
 

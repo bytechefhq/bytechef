@@ -212,8 +212,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
          "tasks":[]}
         """;
 
-    private static final String SLACK_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION = """
-        {"label":"Post","inputs":[{"name":"channel","label":"Channel","type":"string","required":true}],
+    private static final String SLACK_TRIGGER_WORKFLOW_WITH_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION = """
+        {"label":"Post","inputs":[
+         {"name":"channel","label":"Channel","type":"string","required":true,"internalOnly":true}],
          "triggers":[{"name":"newMessage1","type":"slack/v1/newMessage","parameters":{}}],
          "tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
         """;
@@ -224,6 +225,23 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
     private static final String SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION = """
         {"label":"Post","inputs":[{"name":"channel","label":"Channel","type":"string","required":true}],
+         "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
+        """;
+
+    private static final String SLACK_WORKFLOW_WITH_OPTIONAL_CHANNEL_INPUT_DEFINITION = """
+        {"label":"Post","inputs":[{"name":"channel","label":"Channel","type":"string","required":false}],
+         "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
+        """;
+
+    private static final String SLACK_WORKFLOW_WITH_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION = """
+        {"label":"Post","inputs":[
+         {"name":"channel","label":"Channel","type":"string","required":true,"internalOnly":true}],
+         "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
+        """;
+
+    private static final String SLACK_WORKFLOW_WITH_OPTIONAL_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION = """
+        {"label":"Post","inputs":[
+         {"name":"channel","label":"Channel","type":"string","required":false,"internalOnly":true}],
          "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
         """;
 
@@ -1947,7 +1965,8 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     void testRemovingProvidedInputOnOneConfigurationKeepsItOnAnother() {
         long automationProjectId = createAutomationProject("Provided Input Per Configuration");
 
-        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+        String workflowUuid =
+            addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_OPTIONAL_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION);
 
         automationProjectFacade.publishProject(automationProjectId);
 
@@ -1960,6 +1979,8 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         automationProjectConfigurationFacade.updateConfigurationWorkflow(
             configurationA.getId(), workflowUuid, Map.of(), Map.of("channel", "#administrator"));
+        automationProjectConfigurationFacade.updateConfigurationWorkflow(
+            configurationB.getId(), workflowUuid, Map.of(), Map.of("channel", "#other"));
 
         String providedExternalUserId = createConnectedUser();
         String ownValueExternalUserId = createConnectedUser();
@@ -1974,10 +1995,10 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         ConnectedUserProjectWorkflow providedReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             providedExternalUserId, workflowUuid, Environment.PRODUCTION);
         ConnectedUserProjectWorkflow ownValueReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
-            ownValueExternalUserId, workflowUuid, Environment.PRODUCTION, Map.of(), Map.of("channel", "#mine"));
+            ownValueExternalUserId, workflowUuid, Environment.PRODUCTION);
 
         assertThat(fetchDeploymentRow(providedReference).getInputs()).isEqualTo(Map.of("channel", "#administrator"));
-        assertThat(fetchDeploymentRow(ownValueReference).getInputs()).isEqualTo(Map.of("channel", "#mine"));
+        assertThat(fetchDeploymentRow(ownValueReference).getInputs()).isEqualTo(Map.of("channel", "#other"));
 
         automationProjectConfigurationFacade.updateConfigurationWorkflow(
             configurationA.getId(), workflowUuid, Map.of(), Map.of());
@@ -1986,13 +2007,13 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         assertThat(fetchDeploymentRow(providedReference))
             .satisfies(row -> {
-                assertThat(row.isEnabled()).isFalse();
+                assertThat(row.isEnabled()).isTrue();
                 assertThat(row.getInputs()).isEmpty();
             });
         assertThat(fetchDeploymentRow(ownValueReference))
             .satisfies(row -> {
                 assertThat(row.isEnabled()).isTrue();
-                assertThat(row.getInputs()).isEqualTo(Map.of("channel", "#mine"));
+                assertThat(row.getInputs()).isEqualTo(Map.of("channel", "#other"));
             });
     }
 
@@ -2216,7 +2237,8 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     void testMoveAppliesTheTargetsProvidedInputs() {
         long automationProjectId = createAutomationProject("Move Target Provided Inputs");
 
-        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+        String workflowUuid =
+            addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION);
 
         automationProjectFacade.publishProject(automationProjectId);
 
@@ -2252,10 +2274,11 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
-    void testMoveImpactListsAnInputOnlyTheSourceProvides() {
+    void testMoveImpactMarksAWorkflowAwaitingAnInternalOnlyInputOnlyTheSourceProvides() {
         long automationProjectId = createAutomationProject("Move Impact Source Provided Input");
 
-        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+        String workflowUuid =
+            addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION);
 
         automationProjectFacade.publishProject(automationProjectId);
 
@@ -2285,17 +2308,19 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             .satisfies(workflow -> {
                 assertThat(workflow.workflowUuid()).isEqualTo(workflowUuid);
                 assertThat(workflow.label()).isEqualTo("Post");
-                assertThat(workflow.newRequiredInputs()).containsExactly("channel");
+                assertThat(workflow.newRequiredInputs()).isEmpty();
                 assertThat(workflow.newRequiredConnections()).isEmpty();
                 assertThat(workflow.affectedConnectedUserCount()).isEqualTo(1);
+                assertThat(workflow.awaitsConfiguration()).isTrue();
             });
     }
 
     @Test
-    void testMoveTakesOffAnInputOnlyTheSourceProvidesAndReportsAttention() {
+    void testMoveTakesOffAnInternalOnlyInputOnlyTheSourceProvidesAndAwaitsTheConfiguration() {
         long automationProjectId = createAutomationProject("Move Source Provided Input");
 
-        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+        String workflowUuid =
+            addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION);
 
         automationProjectFacade.publishProject(automationProjectId);
 
@@ -2318,13 +2343,75 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             sourceConfiguration.getId(), targetConfiguration.getId(), List.of(connectedUser.getId()));
 
         assertThat(moveResult.movedConnectedUserIds()).containsExactly(connectedUser.getId());
-        assertThat(moveResult.needsAttentionConnectedUserIds()).containsExactly(connectedUser.getId());
+        assertThat(moveResult.needsAttentionConnectedUserIds()).isEmpty();
         assertThat(fetchDeploymentRow(reference))
             .satisfies(row -> {
                 assertThat(row.isEnabled()).isFalse();
                 assertThat(row.getInputs()).isEmpty();
             });
         assertThat(getStoredReference(reference).isEnabled()).isTrue();
+        assertThat(connectedUserReferenceAttentionResolver.resolve(getStoredReference(reference))
+            .attentionReason()).isEqualTo("AWAITING_CONFIGURATION");
+    }
+
+    @Test
+    void testMoveTakesOffAnInternalOnlyValueOfAnInputTheTargetVersionHandsToTheUser() {
+        InputFlipFixture fixture = createInputFlipFixture("Move Input Flip");
+
+        ConfigurationMoveImpactDTO moveImpact = automationProjectConfigurationFacade.getMoveImpact(
+            fixture.sourceConfigurationId(),
+            fixture.targetConfigurationId(),
+            List.of(fixture.connectedUserId()));
+
+        assertThat(moveImpact.workflows())
+            .singleElement()
+            .satisfies(workflow -> {
+                assertThat(workflow.workflowUuid()).isEqualTo(fixture.workflowUuid());
+                assertThat(workflow.newRequiredInputs()).containsExactly("channel");
+                assertThat(workflow.affectedConnectedUserCount()).isEqualTo(1);
+            });
+
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.moveConnectedUsers(
+            fixture.sourceConfigurationId(),
+            fixture.targetConfigurationId(),
+            List.of(fixture.connectedUserId()));
+
+        assertThat(moveResult.movedConnectedUserIds()).containsExactly(
+            fixture.connectedUserId());
+        assertThat(fetchDeploymentRow(fixture.reference()))
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isTrue();
+                assertThat(row.getInputs()).isEmpty();
+            });
+    }
+
+    @Test
+    void testUpgradeTakesOffAnInternalOnlyValueOfAnInputTheTargetVersionHandsToTheUser() {
+        InputFlipFixture fixture = createInputFlipFixture("Upgrade Input Flip");
+
+        ConfigurationMoveImpactDTO upgradeImpact = automationProjectConfigurationFacade.getUpgradeImpact(
+            fixture.targetConfigurationId(),
+            List.of(fixture.connectedUserId()));
+
+        assertThat(upgradeImpact.workflows())
+            .singleElement()
+            .satisfies(workflow -> {
+                assertThat(workflow.workflowUuid()).isEqualTo(fixture.workflowUuid());
+                assertThat(workflow.newRequiredInputs()).containsExactly("channel");
+                assertThat(workflow.affectedConnectedUserCount()).isEqualTo(1);
+            });
+
+        ConfigurationMoveResultDTO upgradeResult = automationProjectConfigurationFacade.upgradeConnectedUsers(
+            fixture.targetConfigurationId(),
+            List.of(fixture.connectedUserId()));
+
+        assertThat(upgradeResult.movedConnectedUserIds()).containsExactly(
+            fixture.connectedUserId());
+        assertThat(fetchDeploymentRow(fixture.reference()))
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isTrue();
+                assertThat(row.getInputs()).isEmpty();
+            });
     }
 
     @Test
@@ -2768,7 +2855,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     void testUpgradeConnectedUsersReportsUsersNeedingAttention() {
         long automationProjectId = createAutomationProject("Upgrade Attention");
 
-        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
         automationProjectFacade.publishProject(automationProjectId);
 
@@ -2781,9 +2868,11 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 1, true, true);
 
         stubEntitledSlackConnection(777L);
+        stubNoEntitledSlackConnection();
+        stubAdministratorSlackConnection(ADMINISTRATOR_CONNECTION_ID);
 
         automationProjectConfigurationFacade.updateConfigurationWorkflow(
-            firstSourceConfiguration.getId(), workflowUuid, Map.of(), Map.of("channel", "#source"));
+            firstSourceConfiguration.getId(), workflowUuid, Map.of("slack", ADMINISTRATOR_CONNECTION_ID), Map.of());
 
         ConnectedUser firstConnectedUser = assignNewConnectedUser(
             automationProjectId, firstSourceConfiguration);
@@ -3226,10 +3315,11 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
-    void testProvidedInputsOverrideTheUsersValueAndNeverCountAsMissing() {
+    void testProvidedInternalOnlyInputsReachEveryRowAndNeverCountAsMissing() {
         long automationProjectId = createAutomationProject("Provided Inputs");
 
-        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+        String workflowUuid =
+            addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION);
 
         publishAndPinProject(automationProjectId);
 
@@ -3273,16 +3363,17 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     void testChangingProvidedInputsReachesExistingReferencesWithoutAVersionChange() {
         long automationProjectId = createAutomationProject("Provided Inputs Change");
 
-        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+        String workflowUuid =
+            addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION);
 
         publishAndPinProject(automationProjectId);
 
         stubEntitledSlackConnection(777L);
 
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
-            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION, Map.of(), Map.of("channel", "#mine"));
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
 
-        assertThat(fetchDeploymentRow(reference).getInputs()).isEqualTo(Map.of("channel", "#mine"));
+        assertThat(fetchDeploymentRow(reference).getInputs()).isEmpty();
 
         provideValuesAndRollOut(automationProjectId, workflowUuid, Map.of(), Map.of("channel", "#first"));
 
@@ -3410,7 +3501,8 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     void testProvidedKeysThatAreNotSlotsOrInputsOfTheVersionAreIgnored() {
         long automationProjectId = createAutomationProject("Provided Unknown Keys");
 
-        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+        String workflowUuid =
+            addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION);
 
         publishAndPinProject(automationProjectId);
 
@@ -3460,10 +3552,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.getOrCreateReference(
             externalUserId, workflowUuid, Environment.PRODUCTION, Map.of("slack", 777L)))
-                .isInstanceOfSatisfying(ProvidedValueLockedException.class, exception -> {
-                    assertThat(exception.getKind()).isEqualTo(ProvidedValueLockedException.Kind.CONNECTION);
-                    assertThat(exception.getName()).isEqualTo("slack");
-                });
+                .isInstanceOfSatisfying(
+                    ProvidedValueLockedException.class,
+                    exception -> assertThat(exception.getComponentName()).isEqualTo("slack"));
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, Environment.PRODUCTION);
 
@@ -3478,14 +3569,31 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             externalUserId, workflowUuid, Environment.PRODUCTION, Map.of("slack", 777L)))
                 .isInstanceOfSatisfying(
                     ProvidedValueLockedException.class,
-                    exception -> assertThat(exception.getName()).isEqualTo("slack"));
+                    exception -> assertThat(exception.getComponentName()).isEqualTo("slack"));
 
         assertThat(getRowConnectionIds(reference)).containsExactly(ADMINISTRATOR_CONNECTION_ID);
     }
 
     @Test
-    void testSettingAProvidedInputIsRejectedOnProvisioningAndOnTheInputsUpdate() {
-        long automationProjectId = createAutomationProject("Provided Input Locked");
+    void testProvidingAValueForAnOrdinaryInputIsRejected() {
+        long automationProjectId = createAutomationProject("Ordinary Input Not Providable");
+
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+
+        publishAndPinProject(automationProjectId);
+
+        assertThatThrownBy(
+            () -> provideValues(automationProjectId, workflowUuid, Map.of(), Map.of("channel", "#administrator")))
+                .isInstanceOfSatisfying(ConfigurationException.class, exception -> {
+                    assertThat(exception.getMessage()).contains("Input channel is not an internal-only input");
+                    assertThat(exception.getErrorKey()).isEqualTo(
+                        AutomationProjectConfigurationErrorType.INVALID_PROVIDED_VALUE.getErrorKey());
+                });
+    }
+
+    @Test
+    void testTheConnectedUserSetsAnOrdinaryInputOnProvisioningAndOnTheInputsUpdate() {
+        long automationProjectId = createAutomationProject("Ordinary Input Owned By The User");
 
         String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
@@ -3493,51 +3601,73 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         stubEntitledSlackConnection(777L);
 
-        provideValues(automationProjectId, workflowUuid, Map.of(), Map.of("channel", "#administrator"));
-
         String externalUserId = createConnectedUser();
 
-        assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.getOrCreateReference(
-            externalUserId, workflowUuid, Environment.PRODUCTION, Map.of(), Map.of("channel", "#mine")))
-                .isInstanceOfSatisfying(ProvidedValueLockedException.class, exception -> {
-                    assertThat(exception.getKind()).isEqualTo(ProvidedValueLockedException.Kind.INPUT);
-                    assertThat(exception.getName()).isEqualTo("channel");
-                });
-
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
-            externalUserId, workflowUuid, Environment.PRODUCTION, Map.of(), Map.of("note", "kept"));
+            externalUserId, workflowUuid, Environment.PRODUCTION, Map.of(), Map.of("channel", "#mine"));
 
         assertThat(fetchDeploymentRow(reference))
             .satisfies(row -> {
                 assertThat(row.isEnabled()).isTrue();
-                assertThat(row.getInputs()).isEqualTo(Map.of("channel", "#administrator", "note", "kept"));
+                assertThat(row.getInputs()).isEqualTo(Map.of("channel", "#mine"));
             });
-
-        assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.updateReferenceInputs(
-            externalUserId, workflowUuid, Map.of("channel", "#mine", "note", "changed"), Environment.PRODUCTION))
-                .isInstanceOfSatisfying(ProvidedValueLockedException.class, exception -> {
-                    assertThat(exception.getKind()).isEqualTo(ProvidedValueLockedException.Kind.INPUT);
-                    assertThat(exception.getName()).isEqualTo("channel");
-                });
-
-        assertThat(fetchDeploymentRow(reference).getInputs())
-            .isEqualTo(Map.of("channel", "#administrator", "note", "kept"));
 
         connectedUserWorkflowReferenceFacade.updateReferenceInputs(
-            externalUserId, workflowUuid, Map.of("note", "changed"), Environment.PRODUCTION);
+            externalUserId, workflowUuid, Map.of("channel", "#changed"), Environment.PRODUCTION);
 
-        assertThat(fetchDeploymentRow(reference))
-            .satisfies(row -> {
-                assertThat(row.isEnabled()).isTrue();
-                assertThat(row.getInputs()).isEqualTo(Map.of("channel", "#administrator", "note", "changed"));
-            });
+        assertThat(fetchDeploymentRow(reference).getInputs()).isEqualTo(Map.of("channel", "#changed"));
     }
 
     @Test
-    void testTemplateAndWorkflowReadsMarkProvidedValuesAndLeaveOutProvidedInputValues() {
-        long automationProjectId = createAutomationProject("Provided Reads");
+    void testALeftoverValueOfAnOrdinaryInputIsNotAppliedToTheRowOfAConnectedUser() {
+        long automationProjectId = createAutomationProject("Leftover Ordinary Input");
 
         String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+
+        publishAndPinProject(automationProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        AutomationProjectConfiguration configuration = automationProjectConfigurationService
+            .getConfigurations(automationProjectId, PRODUCTION_ENVIRONMENT_ID)
+            .stream()
+            .findFirst()
+            .orElseThrow();
+
+        automationProjectConfigurationService.updateWorkflowProvidedValues(
+            configuration.getId(), UUID.fromString(workflowUuid), Map.of(), Map.of("channel", "#administrator"));
+
+        String externalUserId = createConnectedUser();
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            externalUserId, workflowUuid, Environment.PRODUCTION, Map.of(), Map.of("channel", "#mine"));
+
+        assertThat(fetchDeploymentRow(reference))
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isTrue();
+                assertThat(row.getInputs()).isEqualTo(Map.of("channel", "#mine"));
+            });
+
+        String otherExternalUserId = createConnectedUser();
+
+        ConnectedUserProjectWorkflow otherReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            otherExternalUserId, workflowUuid, Environment.PRODUCTION);
+
+        assertThat(fetchDeploymentRow(otherReference))
+            .satisfies(row -> {
+                assertThat(row.isEnabled()).isFalse();
+                assertThat(row.getInputs()).isEmpty();
+            });
+        assertThat(connectedUserReferenceAttentionResolver.resolve(getStoredReference(otherReference))
+            .attentionReason()).isEqualTo("INPUT_REQUIRED:channel");
+    }
+
+    @Test
+    void testTemplateAndWorkflowReadsMarkProvidedConnectionsAndLeaveOutInternalOnlyInputValues() {
+        long automationProjectId = createAutomationProject("Provided Reads");
+
+        String workflowUuid =
+            addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION);
 
         publishAndPinProject(automationProjectId);
 
@@ -3554,10 +3684,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
                         ConnectedUserWorkflowTemplateDTO.Component::name,
                         ConnectedUserWorkflowTemplateDTO.Component::provided)
                     .containsExactly(tuple("slack", false));
-                assertThat(template.inputs())
-                    .extracting(ConnectedUserWorkflowTemplateDTO.Input::name,
-                        ConnectedUserWorkflowTemplateDTO.Input::provided)
-                    .containsExactly(tuple("channel", false));
+                assertThat(template.inputs()).isEmpty();
             });
 
         provideValues(
@@ -3574,10 +3701,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
                         ConnectedUserWorkflowTemplateDTO.Component::name,
                         ConnectedUserWorkflowTemplateDTO.Component::provided)
                     .containsExactly(tuple("slack", true));
-                assertThat(template.inputs())
-                    .extracting(ConnectedUserWorkflowTemplateDTO.Input::name,
-                        ConnectedUserWorkflowTemplateDTO.Input::provided)
-                    .containsExactly(tuple("channel", true));
+                assertThat(template.inputs()).isEmpty();
             });
 
         assertThat(connectedUserProjectFacade.getConnectedUserProjectWorkflows(externalUserId, Environment.PRODUCTION))
@@ -3589,10 +3713,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
                         ConnectedUserWorkflowTemplateDTO.Component::name,
                         ConnectedUserWorkflowTemplateDTO.Component::provided)
                     .containsExactly(tuple("slack", true));
-                assertThat(workflow.inputs())
-                    .extracting(ConnectedUserWorkflowTemplateDTO.Input::name,
-                        ConnectedUserWorkflowTemplateDTO.Input::provided)
-                    .containsExactly(tuple("channel", true));
+                assertThat(workflow.inputs()).isEmpty();
                 assertThat(workflow.inputValues()).isEqualTo(Map.of("note", "kept"));
                 assertThat(workflow.connections()).doesNotContainKey("slack");
             });
@@ -3635,10 +3756,11 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
-    void testRemovingAProvidedInputTakesTheAdministratorsValueOffEveryRowAndPausesTheWorkflow() {
+    void testRemovingAProvidedInternalOnlyInputTakesTheAdministratorsValueOffEveryRow() {
         long automationProjectId = createAutomationProject("Provided Input Removed");
 
-        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+        String workflowUuid =
+            addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_OPTIONAL_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION);
 
         publishAndPinProject(automationProjectId);
 
@@ -3668,12 +3790,12 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
         assertThat(fetchDeploymentRow(runningReference))
             .satisfies(row -> {
-                assertThat(row.isEnabled()).isFalse();
+                assertThat(row.isEnabled()).isTrue();
                 assertThat(row.getInputs()).isEqualTo(Map.of("note", "kept"));
             });
         assertThat(getStoredReference(runningReference).isEnabled()).isTrue();
         assertThat(connectedUserReferenceAttentionResolver.resolve(getStoredReference(runningReference))
-            .attentionReason()).isEqualTo("INPUT_REQUIRED:channel");
+            .attentionReason()).isNull();
         assertThat(getInputValues(runningExternalUserId, workflowUuid)).isEqualTo(Map.of("note", "kept"));
 
         assertThat(fetchDeploymentRow(stoppedReference))
@@ -3690,7 +3812,7 @@ class ConnectedUserReferenceRolloutManagerIntTest {
         long automationProjectId = createAutomationProject("Unchanged Save");
 
         String workflowUuid = addWorkflow(
-            automationProjectId, SLACK_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+            automationProjectId, SLACK_TRIGGER_WORKFLOW_WITH_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION);
 
         publishAndPinProject(automationProjectId);
 
@@ -4039,6 +4161,44 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             .orElseThrow();
     }
 
+    private InputFlipFixture createInputFlipFixture(String projectName) {
+        long automationProjectId = createAutomationProject(projectName);
+
+        String workflowUuid = addWorkflow(
+            automationProjectId, SLACK_WORKFLOW_WITH_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION);
+
+        automationProjectFacade.publishProject(automationProjectId);
+
+        AutomationProjectConfiguration sourceConfiguration = automationProjectConfigurationService
+            .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
+
+        stubEntitledSlackConnection(777L);
+
+        automationProjectConfigurationFacade.updateConfigurationWorkflow(
+            sourceConfiguration.getId(), workflowUuid, Map.of(), Map.of("channel", "#administrator"));
+
+        ConnectedUser connectedUser = assignNewConnectedUser(automationProjectId, sourceConfiguration);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+
+        assertThat(fetchDeploymentRow(reference).getInputs()).isEqualTo(Map.of("channel", "#administrator"));
+
+        String draftWorkflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+        Workflow draftWorkflow = workflowService.getWorkflow(draftWorkflowId);
+
+        workflowService.update(
+            draftWorkflowId, SLACK_WORKFLOW_WITH_OPTIONAL_CHANNEL_INPUT_DEFINITION, draftWorkflow.getVersion());
+
+        automationProjectFacade.publishProject(automationProjectId);
+
+        AutomationProjectConfiguration targetConfiguration = automationProjectConfigurationService
+            .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
+
+        return new InputFlipFixture(
+            workflowUuid, sourceConfiguration.getId(), targetConfiguration.getId(), connectedUser.getId(), reference);
+    }
+
     private void publishWithRequiredChannelInput(long automationProjectId, String workflowUuid) {
         String draftWorkflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
         Workflow draftWorkflow = workflowService.getWorkflow(draftWorkflowId);
@@ -4315,5 +4475,10 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     private void publishAndPinProject(long projectId) {
         AutomationProjectConfigurationTestSupport.publishAndPinProject(
             automationProjectFacade, automationProjectConfigurationService, projectId);
+    }
+
+    private record InputFlipFixture(
+        String workflowUuid, long sourceConfigurationId, long targetConfigurationId, long connectedUserId,
+        ConnectedUserProjectWorkflow reference) {
     }
 }

@@ -225,16 +225,18 @@ class AutomationProjectConfigurationFacadeIntTest {
         """;
 
     private static final String STRING_TYPED_INPUTS_DEFINITION = """
-        {"label":"%s","inputs":[{"name":"channel","label":"Channel","type":"string","required":false},
-         {"name":"region","label":"Region","type":"string","required":false},
-         {"name":"removed","label":"Removed","type":"string","required":false},
+        {"label":"%s","inputs":[
+         {"name":"channel","label":"Channel","type":"string","required":false,"internalOnly":true},
+         {"name":"region","label":"Region","type":"string","required":false,"internalOnly":true},
+         {"name":"removed","label":"Removed","type":"string","required":false,"internalOnly":true},
          {"name":"accountId","label":"Account","type":"string","required":true,"internalOnly":true}],
          "triggers":[],"tasks":[]}
         """;
 
     private static final String RETYPED_INPUTS_DEFINITION = """
-        {"label":"%s","inputs":[{"name":"channel","label":"Channel","type":"integer","required":false},
-         {"name":"region","label":"Region","type":"STRING","required":false},
+        {"label":"%s","inputs":[
+         {"name":"channel","label":"Channel","type":"integer","required":false,"internalOnly":true},
+         {"name":"region","label":"Region","type":"STRING","required":false,"internalOnly":true},
          {"name":"accountId","label":"Account","type":"integer","required":true,"internalOnly":true}],
          "triggers":[],"tasks":[]}
         """;
@@ -252,9 +254,22 @@ class AutomationProjectConfigurationFacadeIntTest {
          "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
         """;
 
+    private static final String SLACK_WITH_INTERNAL_ONLY_CHANNEL_DEFINITION = """
+        {"label":"%s","inputs":[
+         {"name":"channel","label":"Channel","type":"string","required":false,"internalOnly":true},
+         {"name":"topic","label":"Topic","type":"string","required":false}],
+         "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
+        """;
+
+    private static final String INTERNAL_ONLY_CHANNEL_OPTIONAL_DEFINITION = """
+        {"label":"%s","inputs":[
+         {"name":"channel","label":"Channel","type":"string","required":false,"internalOnly":true}],
+         "triggers":[],"tasks":[]}
+        """;
+
     private static final String SLACK_CHANNEL_REFERENCE_DEFINITION = """
         {"label":"%s","inputs":[{"name":"channel","label":"Slack Channel","type":"STRING","required":true,
-         "componentName":"slack","componentVersion":1,"groupName":"channel"},
+         "componentName":"slack","componentVersion":1,"groupName":"channel","internalOnly":true},
          {"name":"topic","label":"Topic","type":"string","required":false}],"triggers":[],"tasks":[]}
         """;
 
@@ -695,7 +710,7 @@ class AutomationProjectConfigurationFacadeIntTest {
 
         assertInternalOnlyInputMissing(
             () -> automationProjectConfigurationFacade.updateConfigurationWorkflow(
-                configurationId, workflowUuid, Map.of(), Map.of("channel", "general")),
+                configurationId, workflowUuid, Map.of(), Map.of()),
             "Workflow Sync Accounts needs a value for the internal-only input accountId");
 
         assertThat(automationProjectConfigurationService.getConfiguration(configurationId)
@@ -1199,7 +1214,7 @@ class AutomationProjectConfigurationFacadeIntTest {
     }
 
     @Test
-    void testProvidableValuesMarkInternalOnlyInputs() {
+    void testProvidableValuesListOnlyInternalOnlyInputs() {
         long projectId = createProject("Providable Internal Only");
 
         String workflowUuid = addWorkflow(
@@ -1215,8 +1230,6 @@ class AutomationProjectConfigurationFacadeIntTest {
         assertThat(automationProjectConfigurationFacade
             .getConfigurationWorkflowProvidableValues(configurationId, workflowUuid, null)
             .inputs()).containsExactly(
-                new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
-                    "channel", "Channel", "string", true, false),
                 new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
                     "accountId", "Account", "string", false, true));
     }
@@ -1246,7 +1259,8 @@ class AutomationProjectConfigurationFacadeIntTest {
     void testGetProvidableValuesExposesTheSlotsAndInputsOfThePinnedVersionNotTheDraft() {
         long projectId = createProject("Pinned Slots");
 
-        String workflowUuid = addWorkflow(projectId, withLabel(SLACK_WITH_CHANNEL_DEFINITION, "Pinned Slots"));
+        String workflowUuid =
+            addWorkflow(projectId, withLabel(SLACK_WITH_INTERNAL_ONLY_CHANNEL_DEFINITION, "Pinned Slots"));
 
         publish(projectId);
         redefineDraftWorkflow(workflowUuid, withLabel(NO_INPUT_DEFINITION, "Pinned Slots"));
@@ -1265,7 +1279,7 @@ class AutomationProjectConfigurationFacadeIntTest {
             .containsExactly("slack");
         assertThat(providableValues.inputs()).containsExactly(
             new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
-                "channel", "Channel", "string", true, false));
+                "channel", "Channel", "string", false, true));
     }
 
     @Test
@@ -1276,7 +1290,8 @@ class AutomationProjectConfigurationFacadeIntTest {
 
         publish(projectId);
 
-        String addedWorkflowUuid = addWorkflow(projectId, withLabel(SLACK_WITH_CHANNEL_DEFINITION, "Added"));
+        String addedWorkflowUuid =
+            addWorkflow(projectId, withLabel(SLACK_WITH_INTERNAL_ONLY_CHANNEL_DEFINITION, "Added"));
 
         publish(projectId);
 
@@ -1386,12 +1401,10 @@ class AutomationProjectConfigurationFacadeIntTest {
                     .inputs())
                         .containsExactly(
                             new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
-                                "channel", "Slack Channel", "STRING", true, false, "slack", 1, "channel",
+                                "channel", "Slack Channel", "STRING", true, true, "slack", 1, "channel",
                                 List.of(
                                     new AutomationProjectConfigurationWorkflowProvidableValuesDTO.ProvidableConnection(
-                                        31L, "Company Slack"))),
-                            new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
-                                "topic", "Topic", "string", false, false));
+                                        31L, "Company Slack"))));
         } finally {
             connectedUserConnectionService.deleteByConnectionId(32L);
         }
@@ -1614,10 +1627,42 @@ class AutomationProjectConfigurationFacadeIntTest {
     }
 
     @Test
+    void testUpdateConfigurationWorkflowRejectsAnInputThatIsNotInternalOnly() {
+        ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Ordinary Input");
+
+        assertInvalidProvidedValue(
+            fixture, Map.of(), Map.of("topic", "news"), "Input topic is not an internal-only input");
+    }
+
+    @Test
+    void testGetProvidableValuesListsOnlyInternalOnlyInputsAndLeavesOutAStoredValueOfAnOrdinaryInput() {
+        ProvidedValuesFixture fixture = createProvidedValuesFixture("Providable Leftover Value");
+
+        automationProjectConfigurationService.updateWorkflowProvidedValues(
+            fixture.configurationId(), UUID.fromString(fixture.workflowUuid()), Map.of(),
+            Map.of("channel", "general", "topic", "news"));
+
+        AutomationProjectConfigurationWorkflowProvidableValuesDTO providableValues =
+            automationProjectConfigurationFacade.getConfigurationWorkflowProvidableValues(
+                fixture.configurationId(), fixture.workflowUuid(), null);
+
+        assertThat(providableValues.inputs())
+            .extracting(AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input::name)
+            .containsExactly("channel");
+        assertThat(providableValues.providedInputs()).isEqualTo(Map.of("channel", "general"));
+        assertThat(automationProjectConfigurationFacade.getConfigurations(fixture.projectId())
+            .getFirst()
+            .workflows()
+            .getFirst()
+            .providedInputs()).isEqualTo(Map.of("channel", "general"));
+    }
+
+    @Test
     void testUpdateConfigurationWorkflowRejectsAnUnknownInput() {
         ProvidedValuesFixture fixture = createProvidedValuesFixture("Provided Unknown Input");
 
-        assertInvalidProvidedValue(fixture, Map.of(), Map.of("topic", "news"), "Input topic");
+        assertInvalidProvidedValue(
+            fixture, Map.of(), Map.of("unknown", "news"), "Input unknown is not an input of the workflow");
     }
 
     @Test
@@ -1829,8 +1874,7 @@ class AutomationProjectConfigurationFacadeIntTest {
         assertThat(copyConfiguration.isWorkflowEnabled(UUID.fromString(notifyWorkflowUuid))).isFalse();
         assertThat(copyConfiguration.isWorkflowEnabled(UUID.fromString(reportWorkflowUuid))).isTrue();
         assertThat(copyConfiguration.fetchWorkflow(UUID.fromString(syncWorkflowUuid)))
-            .hasValueSatisfying(copyWorkflow -> assertThat(copyWorkflow.getProvidedInputs())
-                .isEqualTo(Map.of("channel", "general")));
+            .hasValueSatisfying(copyWorkflow -> assertThat(copyWorkflow.getProvidedInputs()).isEmpty());
     }
 
     @Test
@@ -2178,11 +2222,13 @@ class AutomationProjectConfigurationFacadeIntTest {
     private VersionedProjectFixture createVersionedProjectFixture(String name, int sourceProjectVersion) {
         long projectId = createProject(name);
 
-        String firstWorkflowUuid = addWorkflow(projectId, withLabel(CHANNEL_OPTIONAL_DEFINITION, name + " First"));
+        String firstWorkflowUuid = addWorkflow(
+            projectId, withLabel(INTERNAL_ONLY_CHANNEL_OPTIONAL_DEFINITION, name + " First"));
 
         publish(projectId);
 
-        String secondWorkflowUuid = addWorkflow(projectId, withLabel(CHANNEL_OPTIONAL_DEFINITION, name + " Second"));
+        String secondWorkflowUuid = addWorkflow(
+            projectId, withLabel(INTERNAL_ONLY_CHANNEL_OPTIONAL_DEFINITION, name + " Second"));
 
         publish(projectId);
 
@@ -2299,7 +2345,7 @@ class AutomationProjectConfigurationFacadeIntTest {
     private ProvidedValuesFixture createProvidedValuesFixture(String name) {
         long projectId = createProject(name);
 
-        String workflowUuid = addWorkflow(projectId, withLabel(SLACK_WITH_CHANNEL_DEFINITION, name));
+        String workflowUuid = addWorkflow(projectId, withLabel(SLACK_WITH_INTERNAL_ONLY_CHANNEL_DEFINITION, name));
 
         publish(projectId);
 

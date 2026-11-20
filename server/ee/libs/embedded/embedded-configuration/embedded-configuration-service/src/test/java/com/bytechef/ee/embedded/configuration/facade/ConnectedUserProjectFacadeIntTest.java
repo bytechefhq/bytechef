@@ -1827,7 +1827,7 @@ class ConnectedUserProjectFacadeIntTest {
         }
 
         @Test
-        void testGetProvisionableProjectsOmitsTheConnectionsAndInputsTheConfigurationProvides() {
+        void testGetProvisionableProjectsOmitsTheConnectionsTheConfigurationProvidesAndKeepsOrdinaryInputs() {
             givenSlackAutomationEnvironment();
 
             ComponentDefinition slackComponentDefinition = mock(ComponentDefinition.class);
@@ -1838,7 +1838,8 @@ class ConnectedUserProjectFacadeIntTest {
             when(componentDefinitionService.fetchComponentDefinition(eq("slack"), anyInt()))
                 .thenReturn(Optional.of(slackComponentDefinition));
 
-            long projectId = createProjectWithDefinition("Provisionable Provided", CHANNEL_INPUT_WORKFLOW_DEFINITION);
+            long projectId = createProjectWithDefinition("Provisionable Provided",
+                CHANNEL_AND_REQUIRED_INTERNAL_ONLY_INPUTS_WORKFLOW_DEFINITION);
 
             publishAndPinProject(projectId);
 
@@ -1861,7 +1862,7 @@ class ConnectedUserProjectFacadeIntTest {
 
             automationProjectConfigurationFacade.updateConfigurationWorkflow(
                 getConfigurationId(projectId), workflowUuid, Map.of("slack", administratorConnectionId),
-                Map.of("channel", "#provided"));
+                Map.of("accountId", "acme"));
 
             ProvisionableAutomationProjectDTO provisionableProject = findProvisionableProject(
                 connectedUserProjectFacade.getProvisionableProjects(connectedUser.getId()), projectId);
@@ -1870,7 +1871,9 @@ class ConnectedUserProjectFacadeIntTest {
                 .singleElement()
                 .satisfies(workflow -> {
                     assertThat(workflow.components()).isEmpty();
-                    assertThat(workflow.inputs()).isEmpty();
+                    assertThat(workflow.inputs())
+                        .extracting(ConnectedUserWorkflowTemplateDTO.Input::name)
+                        .containsExactly("channel");
                 });
         }
 
@@ -1981,11 +1984,12 @@ class ConnectedUserProjectFacadeIntTest {
         }
 
         @Test
-        void testGetProjectWorkflowReferenceValuesLeavesOutTheConnectionsAndInputsTheConfigurationProvides() {
+        void testGetProjectWorkflowReferenceValuesLeavesOutTheConnectionsAndInternalOnlyInputsTheConfigurationProvides() {
             givenSlackAutomationEnvironment();
 
             long projectId =
-                createProjectWithDefinition("Reference Provided Values", CHANNEL_INPUT_WORKFLOW_DEFINITION);
+                createProjectWithDefinition("Reference Provided Values",
+                    CHANNEL_AND_REQUIRED_INTERNAL_ONLY_INPUTS_WORKFLOW_DEFINITION);
 
             publishAndPinProject(projectId);
 
@@ -2009,7 +2013,7 @@ class ConnectedUserProjectFacadeIntTest {
 
             automationProjectConfigurationFacade.updateConfigurationWorkflow(
                 getConfigurationId(projectId), workflowUuid, Map.of("slack", administratorConnectionId),
-                Map.of("channel", "#provided"));
+                Map.of("accountId", "acme"));
 
             connectedUserProjectFacade.provisionProjectWorkflows(
                 connectedUserId, getConfigurationId(projectId),

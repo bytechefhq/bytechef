@@ -114,7 +114,7 @@ class AutomationProjectApiControllerIntTest {
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
-    void testGetFrontendProjectsMarksTheComponentsAndInputsTheConfigurationProvides() {
+    void testGetFrontendProjectsMarksTheComponentsTheConfigurationProvides() {
         ConnectedUserWorkflowTemplateDTO.Component openAiComponent =
             new ConnectedUserWorkflowTemplateDTO.Component("openAi", "OpenAI", "openai-icon-svg", true, null, true);
         ConnectedUserWorkflowTemplateDTO.Component slackComponent =
@@ -123,8 +123,8 @@ class AutomationProjectApiControllerIntTest {
         ConnectedUserWorkflowTemplateDTO workflowDTO = new ConnectedUserWorkflowTemplateDTO(
             WORKFLOW_UUID, "Summarize Email", null, null, List.of(), List.of(openAiComponent, slackComponent),
             List.of(
-                new ConnectedUserWorkflowTemplateDTO.Input("model", "Model", "STRING", true, true),
-                new ConnectedUserWorkflowTemplateDTO.Input("channel", "Channel", "STRING", true, false)),
+                new ConnectedUserWorkflowTemplateDTO.Input("model", "Model", "STRING", true),
+                new ConnectedUserWorkflowTemplateDTO.Input("channel", "Channel", "STRING", true)),
             null);
 
         AutomationProjectDTO projectDTO = new AutomationProjectDTO(
@@ -153,11 +153,9 @@ class AutomationProjectApiControllerIntTest {
             .jsonPath("$[0].workflowTemplates[0].inputs[0].name")
             .isEqualTo("model")
             .jsonPath("$[0].workflowTemplates[0].inputs[0].provided")
-            .isEqualTo(true)
+            .doesNotExist()
             .jsonPath("$[0].workflowTemplates[0].inputs[1].name")
-            .isEqualTo("channel")
-            .jsonPath("$[0].workflowTemplates[0].inputs[1].provided")
-            .isEqualTo(false);
+            .isEqualTo("channel");
     }
 
     @Test
@@ -328,7 +326,7 @@ class AutomationProjectApiControllerIntTest {
             .jsonPath("$.inputs[0].name")
             .isEqualTo("model")
             .jsonPath("$.inputs[0].provided")
-            .isEqualTo(true);
+            .doesNotExist();
     }
 
     @Test
@@ -347,9 +345,7 @@ class AutomationProjectApiControllerIntTest {
             .jsonPath("$.id")
             .isEqualTo(WORKFLOW_UUID)
             .jsonPath("$.inputs[1].name")
-            .isEqualTo("channel")
-            .jsonPath("$.inputs[1].provided")
-            .isEqualTo(false);
+            .isEqualTo("channel");
     }
 
     @Test
@@ -381,8 +377,8 @@ class AutomationProjectApiControllerIntTest {
         ConnectedUserWorkflowTemplateDTO workflowDTO = new ConnectedUserWorkflowTemplateDTO(
             WORKFLOW_UUID, "Summarize Email", null, null, List.of(), List.of(openAiComponent),
             List.of(
-                new ConnectedUserWorkflowTemplateDTO.Input("model", "Model", "STRING", true, true),
-                new ConnectedUserWorkflowTemplateDTO.Input("channel", "Channel", "STRING", true, false)),
+                new ConnectedUserWorkflowTemplateDTO.Input("model", "Model", "STRING", true),
+                new ConnectedUserWorkflowTemplateDTO.Input("channel", "Channel", "STRING", true)),
             null);
 
         AutomationProjectDTO projectDTO = new AutomationProjectDTO(

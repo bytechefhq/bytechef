@@ -32,7 +32,6 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
-import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ProvidedNames;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.AutomationProjectService;
@@ -752,10 +751,10 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
     private ConnectedUserWorkflowTemplateDTO markProvided(
         ConnectedUserWorkflowTemplateDTO template, AutomationProjectConfiguration configuration) {
 
-        ProvidedNames providedNames = connectedUserReferenceDeploymentManager.getProvidedNames(
+        Set<String> providedComponentNames = connectedUserReferenceDeploymentManager.getProvidedComponentNames(
             configuration, template.workflowUuid());
 
-        return template.withProvided(providedNames.componentNames(), providedNames.inputNames());
+        return template.withProvided(providedComponentNames);
     }
 
     private void deleteDraftWorkflow(String workflowId) {

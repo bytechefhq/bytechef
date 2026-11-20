@@ -55,6 +55,20 @@ public final class InternalOnlyInputUtils {
         return remainingInputs;
     }
 
+    public static Map<String, Object> retainInternalOnlyInputs(Workflow workflow, Map<String, ?> inputs) {
+        Set<String> internalOnlyInputNames = getInternalOnlyInputNames(workflow);
+
+        Map<String, Object> internalOnlyInputs = new LinkedHashMap<>();
+
+        for (Map.Entry<String, ?> entry : inputs.entrySet()) {
+            if (internalOnlyInputNames.contains(entry.getKey())) {
+                internalOnlyInputs.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        return internalOnlyInputs;
+    }
+
     public static @Nullable String findMissingRequiredInternalOnlyInput(
         Workflow workflow, Map<String, ?> configurationInputs) {
 
