@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.customcomponent.loader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,6 +24,7 @@ import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableDynamicPropertiesProperty;
 import com.bytechef.component.definition.ConnectionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextConsumer;
@@ -45,6 +47,7 @@ import com.bytechef.platform.component.polyglot.PolyglotSandboxSettings;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.graalvm.polyglot.PolyglotException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -992,6 +995,56 @@ class ComponentHandlerPolyglotEngineTest {
             .getName());
 
         verify(log).info("properties");
+    }
+
+    @Test
+    void testDynamicPropertiesKeepSharedPropertySettings() throws Exception {
+        String script = """
+            ({
+                name: 'test-component',
+                version: 1,
+                actions: [
+                    {
+                        name: 'fields',
+                        properties: [
+                            {
+                                name: 'custom',
+                                type: 'DYNAMIC_PROPERTIES',
+                                description: 'Custom fields',
+                                displayCondition: 'mode == "advanced"',
+                                hidden: true,
+                                required: true,
+                                advancedOption: true,
+                                expressionEnabled: false,
+                                properties: function (input, connection, context) {
+                                    return [{name: 'field1', type: 'STRING'}];
+                                }
+                            }
+                        ],
+                        perform: function(input, connection, context) { return {}; }
+                    }
+                ]
+            })
+            """;
+
+        ComponentHandler componentHandler = ComponentHandlerPolyglotEngine.load("js", script);
+
+        ComponentDefinition componentDefinition = componentHandler.getDefinition();
+
+        List<? extends ActionDefinition> actionDefinitions = componentDefinition.getActions();
+
+        ActionDefinition actionDefinition = actionDefinitions.getFirst();
+
+        List<? extends Property> properties = actionDefinition.getProperties();
+
+        ModifiableDynamicPropertiesProperty property = (ModifiableDynamicPropertiesProperty) properties.getFirst();
+
+        assertEquals(Optional.of("Custom fields"), property.getDescription());
+        assertEquals(Optional.of("mode == \"advanced\""), property.getDisplayCondition());
+        assertTrue(property.getHidden());
+        assertTrue(property.getRequired());
+        assertTrue(property.getAdvancedOption());
+        assertFalse(property.getExpressionEnabled());
     }
 
     @Test
