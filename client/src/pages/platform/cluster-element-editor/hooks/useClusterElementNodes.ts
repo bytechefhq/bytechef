@@ -108,6 +108,19 @@ export default function useClusterElementNodes(
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [clusterElementsSignature]);
 
+    const operationNameByRootId = useMemo(() => {
+        const operationNameMap: Record<string, string | undefined> = {};
+
+        for (const clusterRootId of clusterRootIds) {
+            const task = getTask({tasks: workflowDefinitionTasks, workflowNodeName: clusterRootId});
+
+            operationNameMap[clusterRootId] = task?.type?.split('/')[2] || undefined;
+        }
+
+        return operationNameMap;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [clusterElementsSignature]);
+
     const getClusterRootQueryParameters = useCallback(
         (elements: ClusterElementsType): Array<{componentName: string; componentVersion: number}> =>
             Object.values(elements).flatMap((value) => {
@@ -238,6 +251,8 @@ export default function useClusterElementNodes(
 
             const rootNodes: Node[] = [];
 
+            const operationName = operationNameByRootId[clusterRootId];
+
             if (
                 clusterElementsViewMode === 'dialog' &&
                 rootClusterElementNodeData?.workflowNodeName === clusterRootId
@@ -245,7 +260,7 @@ export default function useClusterElementNodes(
                 const rootFilteredTypes = getFilteredClusterElementTypes({
                     clusterRootComponentDefinition: currentRootComponentDefinition,
                     isNestedClusterRoot: false,
-                    operationName: rootClusterElementNodeData.operationName,
+                    operationName,
                 });
 
                 rootNodes.push({
@@ -264,7 +279,7 @@ export default function useClusterElementNodes(
                 clusterRootId,
                 currentRootComponentDefinition,
                 nestedClusterRootsDefinitions: nestedClusterRootsComponentDefinitions || {},
-                operationName: rootClusterElementNodeData?.operationName,
+                operationName,
             });
 
             const rootAndElementNodes = [...rootNodes, ...clusterElementNodes];
@@ -287,6 +302,7 @@ export default function useClusterElementNodes(
         clusterRootComponentDefinitions,
         clusterRootIdsKey,
         nestedClusterRootsComponentDefinitions,
+        operationNameByRootId,
         rootClusterElementNodeData,
     ]);
 
