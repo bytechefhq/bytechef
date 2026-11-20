@@ -41,6 +41,7 @@ import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigura
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
+import com.bytechef.ee.embedded.configuration.util.CarriedInputUtils;
 import com.bytechef.ee.embedded.configuration.util.InternalOnlyInputUtils;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -296,11 +297,12 @@ public class AutomationProjectConfigurationFacadeImpl
             Optional<AutomationProjectConfigurationWorkflow> sourceConfigurationWorkflowOptional =
                 sourceConfiguration.fetchWorkflow(workflowUuid);
 
-            Map<String, Object> providedInputs = sourceConfigurationWorkflowOptional
-                .map(AutomationProjectConfigurationWorkflow::getProvidedInputs)
-                .orElse(Map.of());
-
             Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
+
+            Map<String, Object> providedInputs = sourceConfigurationWorkflowOptional
+                .map(sourceConfigurationWorkflow -> getCarriedProvidedInputs(
+                    sourceConfiguration, sourceConfigurationWorkflow, workflow))
+                .orElse(Map.of());
 
             boolean internalOnlyInputsProvided =
                 InternalOnlyInputUtils.findMissingRequiredInternalOnlyInput(workflow, providedInputs) == null;
@@ -324,6 +326,56 @@ public class AutomationProjectConfigurationFacadeImpl
                 copyConfigurationId, workflowUuid,
                 sourceConfigurationWorkflow.isEnabled() && internalOnlyInputsProvided);
         }
+    }
+
+    private AutomationProjectConfiguration retainCarriedProvidedInputs(
+        AutomationProjectConfiguration previousConfiguration, AutomationProjectConfiguration configuration) {
+
+        for (AutomationProjectConfigurationWorkflow configurationWorkflow : previousConfiguration.getWorkflows()) {
+            Optional<ProjectWorkflow> projectWorkflowOptional = projectWorkflowService.fetchProjectWorkflow(
+                configuration.getProjectId(), configuration.getProjectVersion(),
+                String.valueOf(configurationWorkflow.getWorkflowUuid()));
+
+            if (projectWorkflowOptional.isEmpty()) {
+                continue;
+            }
+
+            ProjectWorkflow projectWorkflow = projectWorkflowOptional.get();
+
+            Map<String, Object> carriedProvidedInputs = getCarriedProvidedInputs(
+                previousConfiguration, configurationWorkflow,
+                workflowService.getWorkflow(projectWorkflow.getWorkflowId()));
+
+            if (carriedProvidedInputs.equals(configurationWorkflow.getProvidedInputs())) {
+                continue;
+            }
+
+            configuration = automationProjectConfigurationService.updateWorkflowProvidedValues(
+                Objects.requireNonNull(configuration.getId()), configurationWorkflow.getWorkflowUuid(),
+                new HashMap<>(configurationWorkflow.getProvidedConnections()), new HashMap<>(carriedProvidedInputs));
+        }
+
+        return configuration;
+    }
+
+    private Map<String, Object> getCarriedProvidedInputs(
+        AutomationProjectConfiguration sourceConfiguration,
+        AutomationProjectConfigurationWorkflow sourceConfigurationWorkflow, Workflow targetWorkflow) {
+
+        Optional<ProjectWorkflow> sourceProjectWorkflowOptional = projectWorkflowService.fetchProjectWorkflow(
+            sourceConfiguration.getProjectId(), sourceConfiguration.getProjectVersion(),
+            String.valueOf(sourceConfigurationWorkflow.getWorkflowUuid()));
+
+        if (sourceProjectWorkflowOptional.isEmpty()) {
+            return Map.of();
+        }
+
+        ProjectWorkflow sourceProjectWorkflow = sourceProjectWorkflowOptional.get();
+
+        Workflow sourceWorkflow = workflowService.getWorkflow(sourceProjectWorkflow.getWorkflowId());
+
+        return CarriedInputUtils.retainInputsOfUnchangedType(
+            sourceWorkflow, targetWorkflow, sourceConfigurationWorkflow.getProvidedInputs());
     }
 
     private String getCopyConfigurationName(AutomationProjectConfiguration sourceConfiguration, int projectVersion) {
@@ -1013,6 +1065,8 @@ public class AutomationProjectConfigurationFacadeImpl
 
         boolean turnsEnabled = enabled && !configuration.isEnabled();
 
+        AutomationProjectConfiguration previousConfiguration = configuration;
+
         try {
             configuration = automationProjectConfigurationService.update(
                 id, configurationName, StringUtils.trimToNull(permissionExpression), projectVersion, enabled,
@@ -1020,6 +1074,10 @@ public class AutomationProjectConfigurationFacadeImpl
         } catch (DataIntegrityViolationException dataIntegrityViolationException) {
             throw newConfigurationNameExistsException(
                 configuration.getProjectId(), configuration.getEnvironmentId(), configurationName);
+        }
+
+        if (previousConfiguration.getProjectVersion() != projectVersion) {
+            configuration = retainCarriedProvidedInputs(previousConfiguration, configuration);
         }
 
         if (turnsEnabled) {
