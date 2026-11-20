@@ -14,6 +14,10 @@ import MoveConnectedUsersImpact from '@/ee/pages/embedded/connected-users/compon
 import MoveConnectedUsersResult from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersResult';
 import MoveConnectedUsersSkippedList from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersSkippedList';
 import {formatSkippedReason} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
+import useMoveWorkflowInputs, {
+    MoveImpactWorkflowI,
+    MoveWorkflowInputsI,
+} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/useMoveWorkflowInputs';
 import {InfoIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 
@@ -37,14 +41,14 @@ interface ConnectedUserChangeVersionDialogProps {
     connectedUserLabel: string;
     currentConfigurationName: string;
     currentVersion: number;
-    impact?: Array<{
-        affectedConnectedUserCount: number;
-        label: string;
-        newRequiredConnections: string[];
-        newRequiredInputs: string[];
-    }>;
+    editableInputs?: boolean;
+    impact?: MoveImpactWorkflowI[];
     mcpServerCount?: number;
-    onChange: (version: number, targetId?: string) => Promise<MoveConnectedUsersResultI>;
+    onChange: (
+        version: number,
+        targetId: string | undefined,
+        workflowInputs: MoveWorkflowInputsI[]
+    ) => Promise<MoveConnectedUsersResultI>;
     onClose: () => void;
     onTargetChange?: (targetId: string | undefined) => void;
     pending?: boolean;
@@ -77,6 +81,7 @@ const ConnectedUserChangeVersionDialog = ({
     connectedUserLabel,
     currentConfigurationName,
     currentVersion,
+    editableInputs = false,
     impact,
     mcpServerCount,
     onChange,
@@ -94,6 +99,8 @@ const ConnectedUserChangeVersionDialog = ({
     const [notMovedResult, setNotMovedResult] = useState<MoveConnectedUsersResultI>();
     const [selectedTargetId, setSelectedTargetId] = useState<string>();
     const [selectedVersion, setSelectedVersion] = useState<number>();
+
+    const {inputValues, missingRequiredInput, setInputValue, workflowInputs} = useMoveWorkflowInputs(impact);
 
     const otherVersions = useMemo(() => getOtherVersions(versions, currentVersion), [currentVersion, versions]);
 
@@ -150,7 +157,11 @@ const ConnectedUserChangeVersionDialog = ({
         let result: MoveConnectedUsersResultI;
 
         try {
-            result = await onChange(selectedVersion, selectedTarget?.id);
+            result = await onChange(
+                selectedVersion,
+                selectedTarget?.id,
+                editableInputs && selectedTarget ? workflowInputs : []
+            );
         } catch {
             setChanging(false);
 
@@ -173,7 +184,8 @@ const ConnectedUserChangeVersionDialog = ({
         (matchingConfigurations.length === 0 || !!selectedTarget) &&
         !changing &&
         !pending &&
-        !(selectedTarget && previewLoading);
+        !(selectedTarget && previewLoading) &&
+        !(editableInputs && selectedTarget && missingRequiredInput);
 
     return (
         <Dialog onOpenChange={(open) => !open && onClose()} open>
@@ -249,7 +261,9 @@ const ConnectedUserChangeVersionDialog = ({
                         {selectedTarget && (
                             <MoveConnectedUsersImpact
                                 impact={impact}
+                                inputValues={inputValues}
                                 mcpServerCount={mcpServerCount}
+                                onInputChange={editableInputs ? setInputValue : undefined}
                                 previewError={previewError}
                                 previewSkipped={previewSkipped}
                                 toSkippedUser={toSkippedUser}

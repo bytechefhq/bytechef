@@ -18,7 +18,6 @@ interface ConnectedUserProjectWorkflowEditDialogProps {
     configurationId: string;
     connectedUserId: number;
     connectedUserProjectWorkflowId: string;
-    defaultTab?: 'connections' | 'inputs';
     onClose: () => void;
     projectId: string;
     workflowLabel: string;
@@ -29,7 +28,6 @@ const ConnectedUserProjectWorkflowEditDialog = ({
     configurationId,
     connectedUserId,
     connectedUserProjectWorkflowId,
-    defaultTab,
     onClose,
     projectId,
     workflowLabel,
@@ -215,7 +213,6 @@ const ConnectedUserProjectWorkflowEditDialog = ({
                             </fieldset>
                         )
                     }
-                    defaultTab={defaultTab}
                     enabled
                     inputCount={inputs.length}
                     inputsContent={

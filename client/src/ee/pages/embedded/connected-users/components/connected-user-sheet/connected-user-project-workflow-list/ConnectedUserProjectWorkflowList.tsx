@@ -250,7 +250,6 @@ const ConnectedUserProjectWorkflowList = ({
                                     {group.configuration && connectedUser ? (
                                         <ConnectedUserProjectConfigurationMenu
                                             connectedUser={connectedUser}
-                                            connectedUserProjectWorkflows={group.connectedUserProjectWorkflows}
                                             currentConfiguration={group.configuration}
                                             projectId={group.configuration.projectId}
                                         />

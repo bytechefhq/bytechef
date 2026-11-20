@@ -520,6 +520,7 @@ describe('UpgradeConnectedUsersDialog', () => {
                 expect(mocks.automationMutateAsync).toHaveBeenCalledWith({
                     connectedUserIds: ['1', '2'],
                     targetId: '201',
+                    workflowInputs: [],
                 })
             );
 

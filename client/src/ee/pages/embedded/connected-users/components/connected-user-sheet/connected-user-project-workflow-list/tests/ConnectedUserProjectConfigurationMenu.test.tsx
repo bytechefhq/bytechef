@@ -11,7 +11,6 @@ const hoisted = vi.hoisted(() => ({
     configurations: [] as Array<Record<string, unknown>> | undefined,
     configurationsError: false,
     dialogProps: [] as Array<Record<string, unknown>>,
-    editDialogProps: [] as Array<Record<string, unknown>>,
     moveImpactQueryMock: vi.fn(),
     versions: [] as Array<{status: string; version: number}> | undefined,
 }));
@@ -77,17 +76,6 @@ vi.mock(
     })
 );
 
-vi.mock(
-    '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectWorkflowEditDialog',
-    () => ({
-        default: (props: Record<string, unknown>) => {
-            hoisted.editDialogProps.push(props);
-
-            return <div>{`edit dialog ${props.workflowLabel}`}</div>;
-        },
-    })
-);
-
 const currentConfiguration = {
     configurationId: '51',
     configurationName: 'Default',
@@ -103,17 +91,11 @@ const createConfiguration = (id: string, overrides: Record<string, unknown> = {}
     ...overrides,
 });
 
-const connectedUserProjectWorkflows = [
-    {automationUuid: 'wf-sync', id: '901', workflow: {label: 'Sync'}},
-    {automationUuid: 'wf-rate', id: '902', workflow: {label: 'Rate Ticket'}},
-];
-
 const renderMenu = () =>
     render(
         <TooltipProvider>
             <ConnectedUserProjectConfigurationMenu
                 connectedUser={{connectedUserId: '7', externalId: 'ext-7'}}
-                connectedUserProjectWorkflows={connectedUserProjectWorkflows}
                 currentConfiguration={currentConfiguration}
                 projectId="10"
             />
@@ -130,7 +112,6 @@ describe('ConnectedUserProjectConfigurationMenu', () => {
         hoisted.configurations = [];
         hoisted.configurationsError = false;
         hoisted.dialogProps = [];
-        hoisted.editDialogProps = [];
         hoisted.versions = [
             {status: 'PUBLISHED', version: 1},
             {status: 'PUBLISHED', version: 3},
@@ -346,63 +327,5 @@ describe('ConnectedUserProjectConfigurationMenu', () => {
             'true'
         );
         expect(screen.getByRole('menuitem', {name: 'Change version'})).toHaveAttribute('aria-disabled', 'true');
-    });
-
-    const openChangeConfiguration = async () => {
-        hoisted.configurations = [createConfiguration('51'), createConfiguration('52')];
-
-        const user = userEvent.setup();
-
-        renderMenu();
-
-        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
-        await user.click(await screen.findByRole('menuitem', {name: 'Change configuration'}));
-
-        await screen.findByText('dialog Change configuration');
-
-        return hoisted.dialogProps.at(-1)?.onMoved as (moved: Record<string, unknown>) => void;
-    };
-
-    const impactWorkflows = [
-        {newRequiredConnections: [], newRequiredInputs: [], workflowUuid: 'wf-sync'},
-        {newRequiredConnections: [], newRequiredInputs: ['contactPageUrl'], workflowUuid: 'wf-rate'},
-    ];
-
-    it('opens the edit dialog on the Inputs tab for the workflow that needs new inputs after the user moves', async () => {
-        const onMoved = await openChangeConfiguration();
-
-        act(() =>
-            onMoved({
-                impactWorkflows,
-                result: {movedConnectedUserIds: ['7'], needsAttentionConnectedUserIds: ['7'], skipped: []},
-                targetId: '52',
-            })
-        );
-
-        expect(await screen.findByText('edit dialog Rate Ticket')).toBeInTheDocument();
-        expect(screen.queryByText('dialog Change configuration')).not.toBeInTheDocument();
-        expect(hoisted.editDialogProps.at(-1)).toMatchObject({
-            configurationId: '52',
-            connectedUserId: 7,
-            connectedUserProjectWorkflowId: '902',
-            defaultTab: 'inputs',
-            projectId: '10',
-            workflowUuid: 'wf-rate',
-        });
-    });
-
-    it('keeps the move result open when the moved user needs no attention', async () => {
-        const onMoved = await openChangeConfiguration();
-
-        act(() =>
-            onMoved({
-                impactWorkflows,
-                result: {movedConnectedUserIds: ['7'], needsAttentionConnectedUserIds: [], skipped: []},
-                targetId: '52',
-            })
-        );
-
-        expect(screen.getByText('dialog Change configuration')).toBeInTheDocument();
-        expect(hoisted.editDialogProps).toHaveLength(0);
     });
 });
