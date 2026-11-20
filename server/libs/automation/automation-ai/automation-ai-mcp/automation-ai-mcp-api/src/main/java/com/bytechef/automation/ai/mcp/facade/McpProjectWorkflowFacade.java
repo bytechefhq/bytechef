@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Facade for managing MCP Project Workflow operations that involve multiple services.
@@ -50,4 +51,16 @@ public interface McpProjectWorkflowFacade {
     List<ProjectWorkflow> getToolEligibleProjectVersionWorkflows(long projectId, int projectVersion);
 
     McpProjectWorkflow updateMcpProjectWorkflowEnabled(long mcpProjectWorkflowId, boolean enabled);
+
+    /**
+     * Updates an existing MCP project workflow, rejecting a project deployment workflow that does not belong to the
+     * deployment of the target MCP project.
+     *
+     * @param mcpProjectWorkflowId        the ID of the MCP project workflow to update
+     * @param mcpProjectId                the ID of the MCP project (can be null if not updating)
+     * @param projectDeploymentWorkflowId the ID of the project deployment workflow (can be null if not updating)
+     * @return the updated MCP project workflow
+     */
+    McpProjectWorkflow updateMcpProjectWorkflow(
+        long mcpProjectWorkflowId, @Nullable Long mcpProjectId, @Nullable Long projectDeploymentWorkflowId);
 }

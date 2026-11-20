@@ -175,7 +175,7 @@ public class McpProjectWorkflowGraphQlController {
             projectDeploymentWorkflowId = Long.valueOf(String.valueOf(input.get("projectDeploymentWorkflowId")));
         }
 
-        McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowService.update(
+        McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowFacade.updateMcpProjectWorkflow(
             id, mcpProjectId, projectDeploymentWorkflowId);
 
         if (input.containsKey("parameters")) {

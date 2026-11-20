@@ -234,7 +234,8 @@ class McpProjectWorkflowGraphQlControllerIntTest {
         Long workflowId = 1L;
         McpProjectWorkflow mockWorkflow = createMockMcpProjectWorkflow(workflowId, 2L, 456L);
 
-        when(mcpProjectWorkflowService.update(anyLong(), anyLong(), anyLong())).thenReturn(mockWorkflow);
+        when(mcpProjectWorkflowFacade.updateMcpProjectWorkflow(anyLong(), anyLong(), anyLong()))
+            .thenReturn(mockWorkflow);
 
         // When & Then
         this.graphQlTester
@@ -258,7 +259,7 @@ class McpProjectWorkflowGraphQlControllerIntTest {
             .entity(Long.class)
             .isEqualTo(2L);
 
-        verify(mcpProjectWorkflowService).update(workflowId, 2L, 456L);
+        verify(mcpProjectWorkflowFacade).updateMcpProjectWorkflow(workflowId, 2L, 456L);
     }
 
     @Test
@@ -297,7 +298,8 @@ class McpProjectWorkflowGraphQlControllerIntTest {
         long workflowId = 1L;
         McpProjectWorkflow mockWorkflow = createMockMcpProjectWorkflow(workflowId, 2L, 456L);
 
-        when(mcpProjectWorkflowService.update(anyLong(), anyLong(), anyLong())).thenReturn(mockWorkflow);
+        when(mcpProjectWorkflowFacade.updateMcpProjectWorkflow(anyLong(), anyLong(), anyLong()))
+            .thenReturn(mockWorkflow);
 
         this.graphQlTester
             .document("""
