@@ -112,6 +112,7 @@ extend type Query {
 }
 
 extend type Mutation {
+    changeAutomationProjectConfigurationConnectedUserVersion(sourceId: ID!, connectedUserId: ID!, projectVersion: Int!, targetId: ID): ConfigurationMoveResult!
     createAutomationProjectConfiguration(projectId: ID!, environmentId: ID!, name: String!, permissionExpression: String, projectVersion: Int!, enabled: Boolean!, automationHubVisible: Boolean!): ID!
     updateAutomationProjectConfiguration(id: ID!, name: String!, permissionExpression: String, projectVersion: Int!, enabled: Boolean!, automationHubVisible: Boolean!): Boolean!
     deleteAutomationProjectConfiguration(id: ID!): Boolean!
