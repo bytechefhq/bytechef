@@ -14,4 +14,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
+
+    testImplementation(project(":server:libs:test:test-support"))
 }
