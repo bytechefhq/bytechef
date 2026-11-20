@@ -7,7 +7,7 @@ import {act, renderHook, waitFor} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import useClusterElementNodes from './useClusterElementNodes';
+import useClusterElementNodes from '../useClusterElementNodes';
 
 const {AI_AGENT_DEFINITION, getComponentDefinitionCallsMock} = vi.hoisted(() => {
     const AI_AGENT_DEFINITION: ComponentDefinition = {
@@ -386,5 +386,48 @@ describe('useClusterElementNodes', () => {
 
         expect(getComponentDefinitionCallsMock.mock.calls.length).toBe(definitionFetchCountBeforeSave);
         expect(result.current.nodesByRootId).toBe(nodesByRootIdBeforeSave);
+    });
+
+    it("filters each box-mode root's placeholders by its own operation, not the selected root's", async () => {
+        const vectorStoreDefinition: ComponentDefinition = {
+            actionClusterElementTypes: {search: ['EMBEDDING']},
+            clusterElement: false,
+            clusterElementTypes: [
+                {label: 'Document Reader', multipleElements: false, name: 'DOCUMENT_READER'},
+                {label: 'Embedding', multipleElements: false, name: 'EMBEDDING'},
+                {label: 'Loader', multipleElements: false, name: 'LOADER'},
+            ],
+            clusterRoot: true,
+            connectionRequired: false,
+            name: 'pinecone',
+            version: 1,
+        };
+
+        useClusterElementsViewModeStore.setState({clusterElementsViewMode: 'box'});
+        useWorkflowDataStore.setState({
+            workflow: {
+                definition: JSON.stringify({
+                    tasks: [{clusterElements: {}, label: 'Pinecone', name: 'pinecone_1', type: 'pinecone/v1/search'}],
+                }),
+                id: 'workflow_1',
+            },
+        } as Parameters<typeof useWorkflowDataStore.setState>[0]);
+        useWorkflowEditorStore.setState({
+            clusterRootComponentDefinitions: {pinecone_1: vectorStoreDefinition},
+            rootClusterElementNodeData: undefined,
+        });
+
+        const {result} = renderHook(() => useClusterElementNodes(['pinecone_1']), {wrapper});
+
+        await waitFor(() => {
+            expect(result.current.definitionsReady).toBe(true);
+        });
+
+        const placeholderTypes = result.current.nodesByRootId.pinecone_1
+            .filter((node) => node.type === 'placeholder')
+            .map((node) => node.data.clusterElementType);
+
+        expect(placeholderTypes).toEqual(['embedding']);
+        expect(result.current.edgesByRootId.pinecone_1.map((edge) => edge.sourceHandle)).toEqual(['embedding-handle']);
     });
 });
