@@ -16,6 +16,9 @@
 
 package com.bytechef.platform.component.runner;
 
+import static com.bytechef.atlas.configuration.constant.WorkflowConstants.FINALIZE;
+import static com.bytechef.atlas.configuration.constant.WorkflowConstants.POST;
+import static com.bytechef.atlas.configuration.constant.WorkflowConstants.PRE;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.TASK_RUNNER;
 import static com.bytechef.platform.component.runner.TaskRunnerConstants.TYPE;
 
@@ -85,6 +88,12 @@ public class TaskRunnerConnectionWorkflowPreprocessor implements WorkflowDefinit
 
         if (isTaskDispatcher(task) && visit(task.get(PARAMETERS))) {
             changed = true;
+        }
+
+        for (String key : List.of(PRE, POST, FINALIZE)) {
+            if (visit(task.get(key))) {
+                changed = true;
+            }
         }
 
         return changed;

@@ -155,6 +155,26 @@ public class TaskRunnerConnectionWorkflowPreprocessorTest {
     }
 
     @Test
+    public void testTasksInPrePostAndFinalizeGetTheEntry() {
+        registerRunner("kubernetes", new TaskRunnerConnection("kubernetes", 1));
+
+        Map<String, Object> preTask = task("kubernetes");
+        Map<String, Object> postTask = task("kubernetes");
+        Map<String, Object> finalizeTask = task("kubernetes");
+
+        Map<String, Object> task = new LinkedHashMap<>(Map.of("name", "t", "type", "slack/v1/send"));
+
+        task.put("pre", new ArrayList<>(List.of(preTask)));
+        task.put("post", new ArrayList<>(List.of(postTask)));
+        task.put("finalize", new ArrayList<>(List.of(finalizeTask)));
+
+        assertThat(preprocessor.process(definition(task))).isTrue();
+        assertThat(connections(preTask)).containsKey("taskRunner");
+        assertThat(connections(postTask)).containsKey("taskRunner");
+        assertThat(connections(finalizeTask)).containsKey("taskRunner");
+    }
+
+    @Test
     public void testAColumnDefinitionThatLooksLikeATaskIsNotATask() {
         registerRunner("kubernetes", new TaskRunnerConnection("kubernetes", 1));
 
