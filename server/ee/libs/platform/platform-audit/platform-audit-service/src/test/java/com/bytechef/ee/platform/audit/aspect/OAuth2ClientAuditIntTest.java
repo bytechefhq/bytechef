@@ -21,6 +21,7 @@ import com.bytechef.platform.oauth2.authorizationserver.facade.RegisteredClientF
 import com.bytechef.platform.oauth2.authorizationserver.facade.RegisteredClientFacadeImpl;
 import com.bytechef.platform.oauth2.authorizationserver.service.OAuth2AuthorizationGrantService;
 import com.bytechef.platform.oauth2.authorizationserver.service.RegisteredClientService;
+import com.bytechef.tenant.service.TenantService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -162,9 +163,10 @@ class OAuth2ClientAuditIntTest {
         @Bean
         RegisteredClientFacade registeredClientFacade(
             OAuth2AuthorizationGrantService oAuth2AuthorizationGrantService,
-            RegisteredClientService registeredClientService) {
+            RegisteredClientService registeredClientService, TenantService tenantService) {
 
-            return new RegisteredClientFacadeImpl(oAuth2AuthorizationGrantService, registeredClientService);
+            return new RegisteredClientFacadeImpl(
+                oAuth2AuthorizationGrantService, registeredClientService, tenantService);
         }
     }
 }

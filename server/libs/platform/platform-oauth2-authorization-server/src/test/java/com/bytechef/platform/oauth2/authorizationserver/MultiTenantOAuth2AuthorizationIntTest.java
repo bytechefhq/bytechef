@@ -239,16 +239,14 @@ class MultiTenantOAuth2AuthorizationIntTest {
         });
 
         List<RegisteredClientInfo> acmeRegisteredClients = TenantScope.call(
-            ACME_TENANT_ID, registeredClientService::getRegisteredClients);
+            ACME_TENANT_ID, () -> registeredClientService.getRegisteredClients(false));
 
-        assertThat(acmeRegisteredClients).singleElement()
-            .satisfies(registeredClientInfo -> {
-                assertThat(registeredClientInfo.id()).isEqualTo(CLIENT_ID);
-                assertThat(registeredClientInfo.grantCount()).isEqualTo(1);
-            });
+        assertThat(acmeRegisteredClients)
+            .extracting(RegisteredClientInfo::id, RegisteredClientInfo::grantCount)
+            .containsExactlyInAnyOrder(tuple(CLIENT_ID, 1), tuple(OTHER_CLIENT_ID, 0));
 
         List<RegisteredClientInfo> globexRegisteredClients = TenantScope.call(
-            GLOBEX_TENANT_ID, registeredClientService::getRegisteredClients);
+            GLOBEX_TENANT_ID, () -> registeredClientService.getRegisteredClients(false));
 
         assertThat(globexRegisteredClients)
             .extracting(RegisteredClientInfo::id, RegisteredClientInfo::grantCount)

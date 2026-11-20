@@ -18,15 +18,11 @@ package com.bytechef.platform.oauth2.authorizationserver.service;
 
 import static com.bytechef.platform.oauth2.authorizationserver.config.RegisteredClientIntTestFixtures.MANAGEMENT_URL;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.mockito.Mockito.when;
 
-import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.oauth2.authorizationserver.config.RegisteredClientIntTestConfiguration;
 import com.bytechef.platform.oauth2.authorizationserver.config.RegisteredClientIntTestFixtures;
 import com.bytechef.platform.oauth2.authorizationserver.domain.RegisteredClientInfo;
-import com.bytechef.platform.oauth2.authorizationserver.exception.RegisteredClientErrorType;
 import com.bytechef.tenant.service.TenantService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.Instant;
@@ -88,8 +84,6 @@ class RegisteredClientServiceIntTest {
 
     @Test
     void testSingleTenantListsAllClientsWithActiveGrantCounts() {
-        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
-
         fixtures.saveClient("client-1");
         fixtures.saveClient("client-2");
         fixtures.saveAuthorization("client-1", "alice", MANAGEMENT_URL, Instant.now());
@@ -97,18 +91,16 @@ class RegisteredClientServiceIntTest {
         fixtures.saveExpiredAuthorization("client-1", "bob");
         fixtures.saveExpiredAuthorization("client-2", "carol");
 
-        assertThat(registeredClientService.getRegisteredClients())
+        assertThat(registeredClientService.getRegisteredClients(true))
             .extracting(RegisteredClientInfo::id, RegisteredClientInfo::grantCount, RegisteredClientInfo::deletable)
             .containsExactlyInAnyOrder(tuple("client-1", 1, true), tuple("client-2", 0, true));
     }
 
     @Test
     void testRegisteredClientFieldsAreMapped() {
-        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
-
         fixtures.saveClient("client-1");
 
-        List<RegisteredClientInfo> registeredClients = registeredClientService.getRegisteredClients();
+        List<RegisteredClientInfo> registeredClients = registeredClientService.getRegisteredClients(true);
 
         assertThat(registeredClients).singleElement()
             .satisfies(registeredClient -> {
@@ -123,28 +115,19 @@ class RegisteredClientServiceIntTest {
     }
 
     @Test
-    void testMultiTenantListsOnlyClientsWithActiveGrantsAndForbidsDelete() {
-        when(tenantService.isMultiTenantEnabled()).thenReturn(true);
-
+    void testRegisteredClientsListEveryClientWithTheGivenDeletableFlag() {
         fixtures.saveClient("client-1");
         fixtures.saveClient("client-2");
         fixtures.saveAuthorization("client-1", "alice", MANAGEMENT_URL, Instant.now());
         fixtures.saveExpiredAuthorization("client-2", "bob");
 
-        assertThat(registeredClientService.getRegisteredClients())
-            .extracting(RegisteredClientInfo::id, RegisteredClientInfo::deletable)
-            .containsExactly(tuple("client-1", false));
-        assertThatThrownBy(() -> registeredClientService.deleteRegisteredClient("client-1"))
-            .isInstanceOf(ConfigurationException.class)
-            .satisfies(exception -> assertThat(((ConfigurationException) exception).getErrorKey())
-                .isEqualTo(RegisteredClientErrorType.DELETE_SHARED_REGISTERED_CLIENT.getErrorKey()));
-        assertThat(registeredClientRepository.findById("client-1")).isNotNull();
+        assertThat(registeredClientService.getRegisteredClients(false))
+            .extracting(RegisteredClientInfo::id, RegisteredClientInfo::grantCount, RegisteredClientInfo::deletable)
+            .containsExactlyInAnyOrder(tuple("client-1", 1, false), tuple("client-2", 0, false));
     }
 
     @Test
     void testDeleteRemovesClientAuthorizationsAndConsents() {
-        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
-
         fixtures.saveClient("client-1");
         fixtures.saveAuthorization("client-1", "alice", MANAGEMENT_URL, Instant.now());
         fixtures.saveConsent("client-1", "alice");
@@ -158,8 +141,6 @@ class RegisteredClientServiceIntTest {
 
     @Test
     void testDeleteOfAMissingClientReportsThatNothingWasDeleted() {
-        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
-
         assertThat(registeredClientService.deleteRegisteredClient("missing-client")).isFalse();
     }
 

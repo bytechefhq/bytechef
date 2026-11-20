@@ -16,14 +16,11 @@
 
 package com.bytechef.platform.oauth2.authorizationserver.service;
 
-import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.oauth2.authorizationserver.annotation.ConditionalOnOauth2AuthorizationServerEnabled;
 import com.bytechef.platform.oauth2.authorizationserver.domain.OAuth2ConsentClient;
 import com.bytechef.platform.oauth2.authorizationserver.domain.RegisteredClientInfo;
-import com.bytechef.platform.oauth2.authorizationserver.exception.RegisteredClientErrorType;
 import com.bytechef.platform.oauth2.authorizationserver.tenant.TenantScope;
 import com.bytechef.tenant.TenantContext;
-import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -64,23 +61,15 @@ public class RegisteredClientServiceImpl implements RegisteredClientService {
             ORDER BY client_id_issued_at DESC""";
 
     private final JdbcOperations jdbcOperations;
-    private final TenantService tenantService;
 
     @SuppressFBWarnings("EI2")
-    public RegisteredClientServiceImpl(JdbcOperations jdbcOperations, TenantService tenantService) {
+    public RegisteredClientServiceImpl(JdbcOperations jdbcOperations) {
         this.jdbcOperations = jdbcOperations;
-        this.tenantService = tenantService;
     }
 
     @Override
     @Transactional
     public boolean deleteRegisteredClient(String id) {
-        if (tenantService.isMultiTenantEnabled()) {
-            throw new ConfigurationException(
-                "OAuth2 clients are shared across tenants and cannot be deleted",
-                RegisteredClientErrorType.DELETE_SHARED_REGISTERED_CLIENT);
-        }
-
         jdbcOperations.update("DELETE FROM oauth2_authorization WHERE registered_client_id = ?", id);
         jdbcOperations.update("DELETE FROM oauth2_authorization_consent WHERE registered_client_id = ?", id);
 
@@ -103,23 +92,14 @@ public class RegisteredClientServiceImpl implements RegisteredClientService {
     }
 
     @Override
-    public List<RegisteredClientInfo> getRegisteredClients() {
-        boolean multiTenantEnabled = tenantService.isMultiTenantEnabled();
+    public List<RegisteredClientInfo> getRegisteredClients(boolean deletable) {
         Map<String, Integer> grantCounts = getGrantCounts();
 
-        List<RegisteredClientInfo> registeredClients = TenantScope.call(
+        return TenantScope.call(
             TenantContext.DEFAULT_TENANT_ID,
             () -> jdbcOperations.query(
                 SELECT_REGISTERED_CLIENTS,
-                (resultSet, rowNum) -> mapRegisteredClient(resultSet, grantCounts, !multiTenantEnabled)));
-
-        if (!multiTenantEnabled) {
-            return registeredClients;
-        }
-
-        return registeredClients.stream()
-            .filter(registeredClient -> registeredClient.grantCount() > 0)
-            .toList();
+                (resultSet, rowNum) -> mapRegisteredClient(resultSet, grantCounts, deletable)));
     }
 
     private Map<String, Integer> getGrantCounts() {

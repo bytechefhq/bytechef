@@ -31,8 +31,6 @@ public interface RegisteredClientService {
     /**
      * Deletes a registered client with its authorizations and consents.
      *
-     * @throws com.bytechef.exception.ConfigurationException when multi-tenancy is enabled, because registered clients
-     *                                                       are shared by every tenant
      * @return whether a registered client was deleted
      */
     boolean deleteRegisteredClient(String id);
@@ -42,5 +40,5 @@ public interface RegisteredClientService {
      */
     Optional<OAuth2ConsentClient> fetchConsentClient(String clientId);
 
-    List<RegisteredClientInfo> getRegisteredClients();
+    List<RegisteredClientInfo> getRegisteredClients(boolean deletable);
 }

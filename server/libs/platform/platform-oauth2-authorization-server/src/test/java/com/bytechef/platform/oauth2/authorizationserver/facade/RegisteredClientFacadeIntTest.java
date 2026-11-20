@@ -18,18 +18,22 @@ package com.bytechef.platform.oauth2.authorizationserver.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.oauth2.authorizationserver.config.RegisteredClientMethodSecurityTestConfiguration;
 import com.bytechef.platform.oauth2.authorizationserver.config.RegisteredClientMethodSecurityTestConfiguration.TenantAdminCheck;
 import com.bytechef.platform.oauth2.authorizationserver.domain.OAuth2AuthorizationGrant;
 import com.bytechef.platform.oauth2.authorizationserver.domain.OAuth2ConsentClient;
 import com.bytechef.platform.oauth2.authorizationserver.domain.RegisteredClientInfo;
+import com.bytechef.platform.oauth2.authorizationserver.exception.RegisteredClientErrorType;
 import com.bytechef.platform.oauth2.authorizationserver.service.OAuth2AuthorizationGrantService;
 import com.bytechef.platform.oauth2.authorizationserver.service.RegisteredClientService;
+import com.bytechef.tenant.service.TenantService;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -64,6 +68,9 @@ class RegisteredClientFacadeIntTest {
 
     @Autowired
     private TenantAdminCheck tenantAdminCheck;
+
+    @MockitoBean
+    private TenantService tenantService;
 
     @AfterEach
     void afterEach() {
@@ -135,7 +142,7 @@ class RegisteredClientFacadeIntTest {
         OAuth2AuthorizationGrant grant = new OAuth2AuthorizationGrant(
             "alice", List.of(), List.of("Management"), Instant.EPOCH, Instant.EPOCH, null);
 
-        when(registeredClientService.getRegisteredClients()).thenReturn(List.of(registeredClientInfo));
+        when(registeredClientService.getRegisteredClients(true)).thenReturn(List.of(registeredClientInfo));
         when(oAuth2AuthorizationGrantService.getGrants("client-1")).thenReturn(List.of(grant));
 
         assertThat(registeredClientFacade.getRegisteredClients()).containsExactly(registeredClientInfo);
@@ -148,5 +155,53 @@ class RegisteredClientFacadeIntTest {
         verify(registeredClientService).deleteRegisteredClient("client-1");
         verify(oAuth2AuthorizationGrantService).revokeGrant("client-1", "alice");
         verify(oAuth2AuthorizationGrantService).revokeGrants("client-1");
+    }
+
+    @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
+    void testSingleTenantListsEveryClientAsDeletable() {
+        when(tenantAdminCheck.isTenantAdmin()).thenReturn(true);
+        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
+
+        RegisteredClientInfo grantedClient = createRegisteredClientInfo("client-1", 1, true);
+        RegisteredClientInfo ungrantedClient = createRegisteredClientInfo("client-2", 0, true);
+
+        when(registeredClientService.getRegisteredClients(true)).thenReturn(List.of(grantedClient, ungrantedClient));
+
+        assertThat(registeredClientFacade.getRegisteredClients()).containsExactly(grantedClient, ungrantedClient);
+    }
+
+    @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
+    void testMultiTenantListsOnlyClientsWithActiveGrantsAsNotDeletable() {
+        when(tenantAdminCheck.isTenantAdmin()).thenReturn(true);
+        when(tenantService.isMultiTenantEnabled()).thenReturn(true);
+
+        RegisteredClientInfo grantedClient = createRegisteredClientInfo("client-1", 1, false);
+        RegisteredClientInfo ungrantedClient = createRegisteredClientInfo("client-2", 0, false);
+
+        when(registeredClientService.getRegisteredClients(false)).thenReturn(List.of(grantedClient, ungrantedClient));
+
+        assertThat(registeredClientFacade.getRegisteredClients()).containsExactly(grantedClient);
+    }
+
+    @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
+    void testMultiTenantForbidsDeletingASharedClient() {
+        when(tenantAdminCheck.isTenantAdmin()).thenReturn(true);
+        when(tenantService.isMultiTenantEnabled()).thenReturn(true);
+
+        assertThatThrownBy(() -> registeredClientFacade.deleteRegisteredClient("client-1"))
+            .isInstanceOf(ConfigurationException.class)
+            .satisfies(exception -> assertThat(((ConfigurationException) exception).getErrorKey())
+                .isEqualTo(RegisteredClientErrorType.DELETE_SHARED_REGISTERED_CLIENT.getErrorKey()));
+
+        verify(registeredClientService, never()).deleteRegisteredClient("client-1");
+    }
+
+    private static RegisteredClientInfo createRegisteredClientInfo(String id, int grantCount, boolean deletable) {
+        return new RegisteredClientInfo(
+            id, id + "-client-id", id + " name", Instant.EPOCH, List.of(), List.of(), List.of(), grantCount,
+            deletable);
     }
 }
