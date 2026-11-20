@@ -183,7 +183,7 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
                     List.of(),
                     List.of(
                         new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
-                            "channel", "Slack Channel", "STRING", true)),
+                            "channel", "Slack Channel", "STRING", true, true)),
                     Map.of(), Map.of()));
 
         this.graphQlTester

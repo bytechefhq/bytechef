@@ -1286,7 +1286,8 @@ class AutomationProjectConfigurationFacadeIntTest {
     void testGetProjectWorkflowProvidableValuesNeedsNoConfiguration() {
         long projectId = createProject("Before Configuration");
 
-        String workflowUuid = addWorkflow(projectId, withLabel(SLACK_WITH_CHANNEL_DEFINITION, "Before Configuration"));
+        String workflowUuid = addWorkflow(
+            projectId, withLabel(SLACK_WITH_INTERNAL_ONLY_CHANNEL_DEFINITION, "Before Configuration"));
 
         publish(projectId);
         redefineDraftWorkflow(workflowUuid, withLabel(NO_INPUT_DEFINITION, "Before Configuration"));
@@ -1302,7 +1303,7 @@ class AutomationProjectConfigurationFacadeIntTest {
             .containsExactly("slack");
         assertThat(providableValues.inputs()).containsExactly(
             new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
-                "channel", "Channel", "string", true));
+                "channel", "Channel", "string", false, true));
         assertThat(providableValues.providedConnections()).isEmpty();
         assertThat(providableValues.providedInputs()).isEmpty();
     }
