@@ -21,6 +21,7 @@ import com.bytechef.platform.knowledgebase.dto.DocumentStatusUpdate;
 import com.bytechef.platform.knowledgebase.exception.KnowledgeBaseDocumentNotFoundException;
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseDocumentRepository;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,19 +32,20 @@ import org.springframework.transaction.annotation.Transactional;
 class KnowledgeBaseDocumentServiceImpl implements KnowledgeBaseDocumentService {
 
     private final KnowledgeBaseDocumentRepository knowledgeBaseDocumentRepository;
-    private final KnowledgeBaseStorageService knowledgeBaseStorageService;
 
-    KnowledgeBaseDocumentServiceImpl(
-        KnowledgeBaseDocumentRepository knowledgeBaseDocumentRepository,
-        KnowledgeBaseStorageService knowledgeBaseStorageService) {
-
+    KnowledgeBaseDocumentServiceImpl(KnowledgeBaseDocumentRepository knowledgeBaseDocumentRepository) {
         this.knowledgeBaseDocumentRepository = knowledgeBaseDocumentRepository;
-        this.knowledgeBaseStorageService = knowledgeBaseStorageService;
     }
 
     @Override
     public void delete(long id) {
         knowledgeBaseDocumentRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<KnowledgeBaseDocument> fetchKnowledgeBaseDocument(long id) {
+        return knowledgeBaseDocumentRepository.findById(id);
     }
 
     @Override
@@ -69,26 +71,6 @@ class KnowledgeBaseDocumentServiceImpl implements KnowledgeBaseDocumentService {
 
     @Override
     public KnowledgeBaseDocument saveKnowledgeBaseDocument(KnowledgeBaseDocument knowledgeBaseDocument) {
-        Long documentSize = knowledgeBaseDocument.getDocumentSize();
-
-        if (documentSize != null) {
-            long incomingBytes = documentSize - getStoredDocumentSize(knowledgeBaseDocument.getId());
-
-            if (incomingBytes > 0) {
-                knowledgeBaseStorageService.checkLimit(incomingBytes);
-            }
-        }
-
         return knowledgeBaseDocumentRepository.save(knowledgeBaseDocument);
-    }
-
-    private long getStoredDocumentSize(Long id) {
-        if (id == null) {
-            return 0;
-        }
-
-        return knowledgeBaseDocumentRepository.findById(id)
-            .map(KnowledgeBaseDocument::getDocumentSize)
-            .orElse(0L);
     }
 }

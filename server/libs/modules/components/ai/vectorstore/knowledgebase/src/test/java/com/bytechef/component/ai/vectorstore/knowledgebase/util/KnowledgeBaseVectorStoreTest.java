@@ -23,7 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,6 +33,7 @@ import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
@@ -58,6 +58,7 @@ class KnowledgeBaseVectorStoreTest {
 
     private final KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService =
         mock(KnowledgeBaseDocumentChunkService.class);
+    private final KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade = mock(KnowledgeBaseDocumentFacade.class);
     private final KnowledgeBaseDocumentService knowledgeBaseDocumentService = mock(KnowledgeBaseDocumentService.class);
     private final KnowledgeBaseFileStorage knowledgeBaseFileStorage = mock(KnowledgeBaseFileStorage.class);
     private final KnowledgeBaseService knowledgeBaseService = mock(KnowledgeBaseService.class);
@@ -69,7 +70,7 @@ class KnowledgeBaseVectorStoreTest {
     @BeforeEach
     void beforeEach() {
         when(knowledgeBaseService.getKnowledgeBase(anyLong())).thenReturn(new KnowledgeBase());
-        when(knowledgeBaseDocumentService.saveKnowledgeBaseDocument(any())).thenAnswer(invocation -> {
+        when(knowledgeBaseDocumentFacade.saveKnowledgeBaseDocument(any())).thenAnswer(invocation -> {
             KnowledgeBaseDocument knowledgeBaseDocument = invocation.getArgument(0);
 
             if (knowledgeBaseDocument.getId() == null) {
@@ -78,6 +79,8 @@ class KnowledgeBaseVectorStoreTest {
 
             return knowledgeBaseDocument;
         });
+        when(knowledgeBaseDocumentService.saveKnowledgeBaseDocument(any())).thenAnswer(
+            invocation -> invocation.getArgument(0));
         when(knowledgeBaseDocumentChunkService.saveKnowledgeBaseDocumentChunk(any())).thenAnswer(invocation -> {
             KnowledgeBaseDocumentChunk knowledgeBaseDocumentChunk = invocation.getArgument(0);
 
@@ -88,7 +91,8 @@ class KnowledgeBaseVectorStoreTest {
         when(knowledgeBaseFileStorage.storeChunkContent(anyLong(), anyString())).thenReturn(mock(FileEntry.class));
 
         vectorStore = KnowledgeBaseVectorStore.createVectorStore(
-            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
+            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentFacade, knowledgeBaseDocumentService,
+            knowledgeBaseFileStorage,
             knowledgeBaseService, springVectorStore);
     }
 
@@ -139,7 +143,7 @@ class KnowledgeBaseVectorStoreTest {
     private KnowledgeBaseDocument getFirstSavedDocument() {
         ArgumentCaptor<KnowledgeBaseDocument> captor = ArgumentCaptor.forClass(KnowledgeBaseDocument.class);
 
-        verify(knowledgeBaseDocumentService, atLeastOnce()).saveKnowledgeBaseDocument(captor.capture());
+        verify(knowledgeBaseDocumentFacade).saveKnowledgeBaseDocument(captor.capture());
 
         return captor.getAllValues()
             .getFirst();
