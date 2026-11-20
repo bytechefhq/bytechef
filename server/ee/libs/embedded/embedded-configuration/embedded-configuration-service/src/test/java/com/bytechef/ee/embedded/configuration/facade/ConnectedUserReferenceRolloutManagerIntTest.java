@@ -2669,6 +2669,53 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     }
 
     @Test
+    void testMoveKeepsTheInputValueAUserAlreadyHasAndFillsOnlyTheMissingOne() {
+        long automationProjectId = createAutomationProject("Move Keeps Existing Input");
+
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_OPTIONAL_CHANNEL_INPUT_DEFINITION);
+
+        automationProjectFacade.publishProject(automationProjectId);
+
+        AutomationProjectConfiguration sourceConfiguration = automationProjectConfigurationService
+            .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUser ownValueConnectedUser = assignNewConnectedUser(automationProjectId, sourceConfiguration);
+        ConnectedUser missingValueConnectedUser = assignNewConnectedUser(automationProjectId, sourceConfiguration);
+
+        ConnectedUserProjectWorkflow ownValueReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            ownValueConnectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+        ConnectedUserProjectWorkflow missingValueReference =
+            connectedUserWorkflowReferenceFacade.getOrCreateReference(
+                missingValueConnectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+
+        connectedUserWorkflowReferenceFacade.updateReferenceInputs(
+            ownValueConnectedUser.getExternalId(), workflowUuid, Map.of("channel", "#own"), Environment.PRODUCTION);
+
+        String draftWorkflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+        Workflow draftWorkflow = workflowService.getWorkflow(draftWorkflowId);
+
+        workflowService.update(
+            draftWorkflowId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION, draftWorkflow.getVersion());
+
+        automationProjectFacade.publishProject(automationProjectId);
+
+        AutomationProjectConfiguration targetConfiguration = automationProjectConfigurationService
+            .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 2, true, true);
+
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.moveConnectedUsers(
+            sourceConfiguration.getId(), targetConfiguration.getId(),
+            List.of(ownValueConnectedUser.getId(), missingValueConnectedUser.getId()),
+            Map.of(workflowUuid, Map.of("channel", "#batch")));
+
+        assertThat(moveResult.movedConnectedUserIds())
+            .containsExactlyInAnyOrder(ownValueConnectedUser.getId(), missingValueConnectedUser.getId());
+        assertThat(fetchDeploymentRow(ownValueReference).getInputs()).isEqualTo(Map.of("channel", "#own"));
+        assertThat(fetchDeploymentRow(missingValueReference).getInputs()).isEqualTo(Map.of("channel", "#batch"));
+    }
+
+    @Test
     void testMoveImpactListsUsersThatWouldBeSkipped() {
         long automationProjectId = createAutomationProject("Move Impact Skipped");
 
