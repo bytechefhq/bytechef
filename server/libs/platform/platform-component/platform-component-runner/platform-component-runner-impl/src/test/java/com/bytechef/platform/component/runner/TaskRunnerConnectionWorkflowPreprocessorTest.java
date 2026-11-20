@@ -125,6 +125,36 @@ public class TaskRunnerConnectionWorkflowPreprocessorTest {
     }
 
     @Test
+    public void testAWorkflowDefinitionPassedAsTaskInputIsLeftUnchanged() {
+        registerRunner("kubernetes", new TaskRunnerConnection("kubernetes", 1));
+
+        Map<String, Object> taskInInput = task("kubernetes");
+        Map<String, Object> task = task("kubernetes");
+
+        parameters(task).put("input", new LinkedHashMap<>(Map.of("tasks", new ArrayList<>(List.of(taskInInput)))));
+
+        assertThat(preprocessor.process(definition(task))).isTrue();
+        assertThat(connections(task)).containsKey("taskRunner");
+        assertThat(taskInInput).doesNotContainKey("connections");
+    }
+
+    @Test
+    public void testAClusterElementWithARunnerGetsTheEntry() {
+        registerRunner("kubernetes", new TaskRunnerConnection("kubernetes", 1));
+
+        Map<String, Object> tool = task("kubernetes");
+
+        Map<String, Object> agent = new LinkedHashMap<>();
+
+        agent.put("name", "agent");
+        agent.put("type", "aiAgent/v1/chat");
+        agent.put("clusterElements", new LinkedHashMap<>(Map.of("tools", new ArrayList<>(List.of(tool)))));
+
+        assertThat(preprocessor.process(definition(agent))).isTrue();
+        assertThat(connections(tool)).containsKey("taskRunner");
+    }
+
+    @Test
     public void testAColumnDefinitionThatLooksLikeATaskIsNotATask() {
         registerRunner("kubernetes", new TaskRunnerConnection("kubernetes", 1));
 
@@ -143,6 +173,11 @@ public class TaskRunnerConnectionWorkflowPreprocessorTest {
         when(taskRunner.getType()).thenReturn(type);
         when(taskRunner.getConnection()).thenReturn(Optional.ofNullable(connection));
         when(taskRunnerRegistry.getTaskRunner(type)).thenReturn(taskRunner);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> parameters(Map<String, Object> task) {
+        return (Map<String, Object>) task.get("parameters");
     }
 
     @SuppressWarnings("unchecked")
