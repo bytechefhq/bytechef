@@ -73,9 +73,9 @@ const ProvidedValuesForm = ({
             workflowLabel={workflowLabel}
         >
             <ProvidedValuesFields
-                configurationId={configuration.id}
                 onProvidedConnectionsChange={setProvidedConnections}
                 onProvidedInputsChange={setProvidedInputs}
+                optionsScope={{configurationId: configuration.id}}
                 providableValues={providableValues}
                 providedConnections={providedConnections}
                 providedInputs={providedInputs}

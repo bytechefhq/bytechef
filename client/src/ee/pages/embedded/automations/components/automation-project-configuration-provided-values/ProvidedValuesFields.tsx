@@ -2,7 +2,10 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {Input} from '@/components/ui/input';
 import {REQUIRED_INTERNAL_ONLY_INPUT_HINT} from '@/ee/pages/embedded/shared/internalOnlyInputs';
 import WorkflowConfigurationCard from '@/shared/components/workflow-configuration/WorkflowConfigurationCard';
-import {useAutomationProjectConfigurationWorkflowInputOptionsQuery} from '@/shared/middleware/graphql';
+import {
+    useAutomationProjectConfigurationWorkflowInputOptionsQuery,
+    useAutomationProjectWorkflowInputOptionsQuery,
+} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useMemo, useState} from 'react';
 
@@ -10,6 +13,7 @@ import {
     BOOLEAN_OPTIONS,
     type ConnectionSlotType,
     type GroupValuesType,
+    type InputOptionsScopeI,
     LET_EACH_USER_CONNECT,
     NUMERIC_INPUT_TYPES,
     type ProvidableInputPropertyI,
@@ -157,7 +161,7 @@ const PlainInput = ({input, onValueChange, value}: PlainInputProps) => {
 };
 
 interface DynamicOptionsSelectProps {
-    configurationId: string;
+    optionsScope: InputOptionsScopeI;
     input: ProvidableInputType;
     label: string;
     lookupDependsOnValues: Record<string, string>;
@@ -170,11 +174,11 @@ interface DynamicOptionsSelectProps {
 }
 
 const DynamicOptionsSelect = ({
-    configurationId,
     input,
     label,
     lookupDependsOnValues,
     onValueChange,
+    optionsScope,
     projectVersion,
     property,
     providedConnectionId,
@@ -187,26 +191,55 @@ const DynamicOptionsSelect = ({
 
     const connectionId = providedConnectionId || optionConnectionId;
 
-    const {data, isError, isLoading} = useAutomationProjectConfigurationWorkflowInputOptionsQuery(
+    const optionsQueryEnabled = !!connectionId && !!property.name;
+
+    const configurationOptionsQuery = useAutomationProjectConfigurationWorkflowInputOptionsQuery(
         {
             connectionId: connectionId ?? '',
-            id: configurationId,
+            id: optionsScope.configurationId ?? '',
             inputName: input.name,
             lookupDependsOnValues,
             projectVersion,
             propertyName: property.name ?? '',
             workflowUuid,
         },
-        {enabled: !!connectionId && !!property.name}
+        {enabled: optionsQueryEnabled && !!optionsScope.configurationId}
     );
+
+    const projectOptionsQuery = useAutomationProjectWorkflowInputOptionsQuery(
+        {
+            connectionId: connectionId ?? '',
+            environmentId: optionsScope.environmentId ?? '',
+            inputName: input.name,
+            lookupDependsOnValues,
+            projectId: optionsScope.projectId ?? '',
+            projectVersion: projectVersion ?? 0,
+            propertyName: property.name ?? '',
+            workflowUuid,
+        },
+        {
+            enabled:
+                optionsQueryEnabled &&
+                !optionsScope.configurationId &&
+                !!optionsScope.projectId &&
+                !!optionsScope.environmentId &&
+                !!projectVersion,
+        }
+    );
+
+    const {isError, isLoading} = optionsScope.configurationId ? configurationOptionsQuery : projectOptionsQuery;
 
     const options = useMemo(
         () =>
-            (data?.automationProjectConfigurationWorkflowInputOptions ?? []).map((option) => ({
+            (
+                configurationOptionsQuery.data?.automationProjectConfigurationWorkflowInputOptions ??
+                projectOptionsQuery.data?.automationProjectWorkflowInputOptions ??
+                []
+            ).map((option) => ({
                 label: option.label || option.value,
                 value: option.value,
             })),
-        [data]
+        [configurationOptionsQuery.data, projectOptionsQuery.data]
     );
 
     const optionsConnectionLabel = `Load ${label} options with`;
@@ -255,7 +288,7 @@ const DynamicOptionsSelect = ({
 };
 
 interface ComponentReferenceMemberProps {
-    configurationId: string;
+    optionsScope: InputOptionsScopeI;
     input: ProvidableInputType;
     label: string;
     lookupDependsOnValues: Record<string, string>;
@@ -268,11 +301,11 @@ interface ComponentReferenceMemberProps {
 }
 
 const ComponentReferenceMember = ({
-    configurationId,
     input,
     label,
     lookupDependsOnValues,
     onValueChange,
+    optionsScope,
     projectVersion,
     property,
     providedConnectionId,
@@ -290,11 +323,11 @@ const ComponentReferenceMember = ({
     if (property.optionsDataSource) {
         return (
             <DynamicOptionsSelect
-                configurationId={configurationId}
                 input={input}
                 label={label}
                 lookupDependsOnValues={lookupDependsOnValues}
                 onValueChange={onValueChange}
+                optionsScope={optionsScope}
                 projectVersion={projectVersion}
                 property={property}
                 providedConnectionId={providedConnectionId}
@@ -323,7 +356,7 @@ const ComponentReferenceMember = ({
 };
 
 interface ComponentReferenceInputProps {
-    configurationId: string;
+    optionsScope: InputOptionsScopeI;
     input: ProvidableInputType;
     onValueChange: (value: ProvidedInputValueType) => void;
     projectVersion?: number;
@@ -333,9 +366,9 @@ interface ComponentReferenceInputProps {
 }
 
 const ComponentReferenceInput = ({
-    configurationId,
     input,
     onValueChange,
+    optionsScope,
     projectVersion,
     providedConnectionId,
     value,
@@ -367,11 +400,11 @@ const ComponentReferenceInput = ({
                 <span className="text-sm font-medium">{getInputLabelText(input)}</span>
 
                 <ComponentReferenceMember
-                    configurationId={configurationId}
                     input={input}
                     label={inputLabel}
                     lookupDependsOnValues={{}}
                     onValueChange={onValueChange}
+                    optionsScope={optionsScope}
                     projectVersion={projectVersion}
                     property={members[0]}
                     providedConnectionId={providedConnectionId}
@@ -407,11 +440,11 @@ const ComponentReferenceInput = ({
                         <span className="text-sm">{memberLabel}</span>
 
                         <ComponentReferenceMember
-                            configurationId={configurationId}
                             input={input}
                             label={memberLabel}
                             lookupDependsOnValues={lookupDependsOnValues}
                             onValueChange={(memberValue) => onValueChange({...groupValues, [memberName]: memberValue})}
+                            optionsScope={optionsScope}
                             projectVersion={projectVersion}
                             property={member}
                             providedConnectionId={providedConnectionId}
@@ -428,7 +461,7 @@ const ComponentReferenceInput = ({
 };
 
 interface ProvidedValuesFieldsProps {
-    configurationId: string;
+    optionsScope: InputOptionsScopeI;
     enabled?: boolean;
     label?: string;
     onEnabledChange?: (enabled: boolean) => void;
@@ -443,12 +476,12 @@ interface ProvidedValuesFieldsProps {
 }
 
 const ProvidedValuesFields = ({
-    configurationId,
     enabled = true,
     label,
     onEnabledChange = () => undefined,
     onProvidedConnectionsChange,
     onProvidedInputsChange,
+    optionsScope,
     projectVersion,
     providableValues,
     providedConnections,
@@ -493,10 +526,10 @@ const ProvidedValuesFields = ({
 
                             return isComponentReferenceInput(input) ? (
                                 <ComponentReferenceInput
-                                    configurationId={configurationId}
                                     input={input}
                                     key={input.name}
                                     onValueChange={handleInputValueChange}
+                                    optionsScope={optionsScope}
                                     projectVersion={projectVersion}
                                     providedConnectionId={getProvidedConnectionId(
                                         providedConnections,

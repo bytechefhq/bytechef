@@ -1,7 +1,10 @@
 import Switch from '@/components/Switch/Switch';
 import {Label} from '@/components/ui/label';
 import {isEmptyInternalOnlyInputValue} from '@/ee/pages/embedded/shared/internalOnlyInputs';
-import {useAutomationProjectConfigurationWorkflowProvidableValuesQuery} from '@/shared/middleware/graphql';
+import {
+    useAutomationProjectConfigurationWorkflowProvidableValuesQuery,
+    useAutomationProjectWorkflowProvidableValuesQuery,
+} from '@/shared/middleware/graphql';
 import {WorkflowIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
@@ -54,7 +57,9 @@ const WorkflowToggleRow = ({enabled, label, onEnabledChange, switchId}: Workflow
 
 interface AutomationProjectConfigurationDialogWorkflowsStepItemProps {
     configurationId?: string;
+    environmentId?: string;
     onWorkflowDraftChange: (workflowUuid: string, workflowDraft: WorkflowDraftI) => void;
+    projectId?: string;
     projectVersion?: number;
     workflow: ConfigurationDialogWorkflowI;
     workflowDraft?: WorkflowDraftI;
@@ -62,19 +67,33 @@ interface AutomationProjectConfigurationDialogWorkflowsStepItemProps {
 
 const AutomationProjectConfigurationDialogWorkflowsStepItem = ({
     configurationId,
+    environmentId,
     onWorkflowDraftChange,
+    projectId,
     projectVersion,
     workflow,
     workflowDraft = {},
 }: AutomationProjectConfigurationDialogWorkflowsStepItemProps) => {
-    const {data: providableValuesData} = useAutomationProjectConfigurationWorkflowProvidableValuesQuery(
+    const {data: configurationProvidableValuesData} = useAutomationProjectConfigurationWorkflowProvidableValuesQuery(
         {id: configurationId ?? '', projectVersion, workflowUuid: workflow.workflowUuid},
         {enabled: !!configurationId}
     );
 
+    const {data: projectProvidableValuesData} = useAutomationProjectWorkflowProvidableValuesQuery(
+        {
+            environmentId: environmentId ?? '',
+            projectId: projectId ?? '',
+            projectVersion: projectVersion ?? 0,
+            workflowUuid: workflow.workflowUuid,
+        },
+        {enabled: !configurationId && !!projectId && !!environmentId && !!projectVersion}
+    );
+
     const providableValues = configurationId
-        ? providableValuesData?.automationProjectConfigurationWorkflowProvidableValues
-        : undefined;
+        ? configurationProvidableValuesData?.automationProjectConfigurationWorkflowProvidableValues
+        : projectProvidableValuesData?.automationProjectWorkflowProvidableValues;
+
+    const optionsScope = configurationId ? {configurationId} : {environmentId, projectId};
 
     const enabled = workflowDraft.enabled ?? workflow.enabled;
     const switchId = `configuration-workflow-${workflow.workflowUuid}`;
@@ -116,7 +135,6 @@ const AutomationProjectConfigurationDialogWorkflowsStepItem = ({
 
     return (
         <ProvidedValuesFields
-            configurationId={configurationId!}
             enabled={enabled}
             label={workflow.label}
             onEnabledChange={handleEnabledChange}
@@ -126,6 +144,7 @@ const AutomationProjectConfigurationDialogWorkflowsStepItem = ({
             onProvidedInputsChange={(changedProvidedInputs) =>
                 handleProvidedValuesChange(providedConnections, changedProvidedInputs)
             }
+            optionsScope={optionsScope}
             projectVersion={projectVersion}
             providableValues={providableValues}
             providedConnections={providedConnections}
