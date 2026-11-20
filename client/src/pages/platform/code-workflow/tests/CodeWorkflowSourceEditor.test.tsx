@@ -1,9 +1,9 @@
 import useCodeWorkflowHeaderStore from '@/pages/platform/code-workflow/stores/useCodeWorkflowHeaderStore';
 import {CodeWorkflowLanguage} from '@/shared/middleware/graphql';
-import {fireEvent, render, resetAll, screen, waitFor} from '@/shared/util/test-utils';
+import {act, fireEvent, render, resetAll, screen, waitFor} from '@/shared/util/test-utils';
 import {afterEach, describe, expect, it, vi} from 'vitest';
 
-import CodeWorkflowSourceEditor from './CodeWorkflowSourceEditor';
+import CodeWorkflowSourceEditor from '../CodeWorkflowSourceEditor';
 
 vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
     default: ({
@@ -246,6 +246,100 @@ describe('CodeWorkflowSourceEditor', () => {
         await waitFor(() => expect(onSaveMock).toHaveBeenCalled());
 
         expect(saveButton).not.toBeDisabled();
+    });
+
+    it('keeps text typed during a pending save dirty when the save and the source refresh complete', async () => {
+        let resolveSave: (value: unknown) => void = () => {};
+
+        const onSaveMock = vi.fn(
+            () =>
+                new Promise((resolve) => {
+                    resolveSave = resolve;
+                })
+        );
+
+        const {rerender} = render(
+            <CodeWorkflowSourceEditor
+                isLoading={false}
+                isSaving={false}
+                language={CodeWorkflowLanguage.Javascript}
+                onSave={onSaveMock}
+                source="console.log('hi');"
+            />
+        );
+
+        const editor = await screen.findByTestId('monaco-editor-mock');
+
+        fireEvent.change(editor, {target: {value: "console.log('submitted');"}});
+
+        fireEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        expect(onSaveMock).toHaveBeenCalledWith("console.log('submitted');");
+
+        fireEvent.change(editor, {target: {value: "console.log('newer');"}});
+
+        await act(async () => {
+            resolveSave(undefined);
+        });
+
+        expect(screen.getByRole('button', {name: 'Save'})).not.toBeDisabled();
+
+        rerender(
+            <CodeWorkflowSourceEditor
+                isLoading={false}
+                isSaving={false}
+                language={CodeWorkflowLanguage.Javascript}
+                onSave={onSaveMock}
+                source="console.log('submitted');"
+            />
+        );
+
+        expect(screen.getByTestId('monaco-editor-mock')).toHaveValue("console.log('newer');");
+
+        const saveButton = screen.getByRole('button', {name: 'Save'});
+
+        expect(saveButton).not.toBeDisabled();
+
+        fireEvent.click(saveButton);
+
+        expect(onSaveMock).toHaveBeenLastCalledWith("console.log('newer');");
+    });
+
+    it('adopts the refreshed source after a save when nothing was typed during the save', async () => {
+        const onSaveMock = vi.fn().mockResolvedValue(undefined);
+
+        const {rerender} = render(
+            <CodeWorkflowSourceEditor
+                isLoading={false}
+                isSaving={false}
+                language={CodeWorkflowLanguage.Javascript}
+                onSave={onSaveMock}
+                source="console.log('hi');"
+            />
+        );
+
+        const editor = await screen.findByTestId('monaco-editor-mock');
+
+        fireEvent.change(editor, {target: {value: "console.log('submitted');"}});
+
+        const saveButton = screen.getByRole('button', {name: 'Save'});
+
+        fireEvent.click(saveButton);
+
+        await waitFor(() => expect(saveButton).toBeDisabled());
+
+        rerender(
+            <CodeWorkflowSourceEditor
+                isLoading={false}
+                isSaving={false}
+                language={CodeWorkflowLanguage.Javascript}
+                onSave={onSaveMock}
+                source="console.log('submitted');"
+            />
+        );
+
+        expect(screen.getByTestId('monaco-editor-mock')).toHaveValue("console.log('submitted');");
+        expect(saveButton).toBeDisabled();
     });
 
     it('publishes its test configuration handler so the project header can render it', async () => {
