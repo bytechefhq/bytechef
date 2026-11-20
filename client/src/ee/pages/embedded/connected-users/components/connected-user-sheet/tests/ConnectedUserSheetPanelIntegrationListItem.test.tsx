@@ -7,10 +7,12 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import ConnectedUserSheetPanelIntegrationListItem from '../ConnectedUserSheetPanelIntegrationListItem';
 
 const hoisted = vi.hoisted(() => ({
+    changeVersionMutateAsyncMock: vi.fn(),
     configurationsQueryMock: vi.fn(),
     integrationConfigurations: [] as unknown[] | undefined,
     integrationConfigurationsError: false,
     integrationInstance: undefined as unknown,
+    integrationVersions: undefined as unknown[] | undefined,
     moveImpactQueryMock: vi.fn(),
     moveMutateAsyncMock: vi.fn(),
     provisionableIntegrations: undefined as unknown[] | undefined,
@@ -48,6 +50,10 @@ vi.mock('@/ee/shared/queries/embedded/provisionableIntegrations.queries', () => 
     useGetProvisionableIntegrationsQuery: () => ({data: hoisted.provisionableIntegrations}),
 }));
 
+vi.mock('@/ee/shared/queries/embedded/integrationVersions.queries', () => ({
+    useGetIntegrationVersionsQuery: () => ({data: hoisted.integrationVersions}),
+}));
+
 vi.mock('@/ee/shared/queries/embedded/integrationWorkflows.queries', () => ({
     useGetIntegrationVersionWorkflowsQuery: () => ({data: hoisted.workflows}),
 }));
@@ -59,6 +65,10 @@ vi.mock('@/ee/shared/mutations/embedded/integrationInstances.mutations', () => (
 }));
 
 vi.mock('@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations', () => ({
+    useChangeIntegrationInstanceConfigurationConnectedUserVersionMutation: () => ({
+        isPending: false,
+        mutateAsync: hoisted.changeVersionMutateAsyncMock,
+    }),
     useMoveIntegrationInstanceConfigurationConnectedUsersMutation: () => ({mutateAsync: hoisted.moveMutateAsyncMock}),
 }));
 
@@ -121,6 +131,7 @@ describe('ConnectedUserSheetPanelIntegrationListItem', () => {
         hoisted.integrationConfigurations = [];
         hoisted.integrationConfigurationsError = false;
         hoisted.integrationInstance = undefined;
+        hoisted.integrationVersions = undefined;
         hoisted.provisionableIntegrations = undefined;
         hoisted.workflows = [];
     });
@@ -164,9 +175,107 @@ describe('ConnectedUserSheetPanelIntegrationListItem', () => {
 
         expect(screen.getAllByRole('menuitem').map((item) => item.textContent)).toEqual([
             'Change configuration…',
+            'Change version…',
             'Delete',
         ]);
         expect(hoisted.configurationsQueryMock).toHaveBeenCalledWith({environmentId: 1, integrationId: 7}, true);
+    });
+
+    it('opens the change version dialog with the published versions and calls the change endpoint', async () => {
+        hoisted.changeVersionMutateAsyncMock.mockResolvedValue({
+            movedConnectedUserIds: [9],
+            needsAttentionConnectedUserIds: [],
+            skipped: [],
+        });
+        hoisted.integrationVersions = [
+            {status: 'PUBLISHED', version: 1},
+            {status: 'PUBLISHED', version: 3},
+            {status: 'DRAFT', version: 4},
+        ];
+
+        await openMenu();
+
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Change version'}));
+
+        expect(await screen.findByRole('heading', {name: 'Change version'})).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('combobox', {name: 'Version'}));
+
+        expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual(['V3 (latest)']);
+
+        await userEvent.click(screen.getByRole('option', {name: 'V3 (latest)'}));
+
+        expect(screen.getByText('Moves this connected user to Other Configuration · V3.')).toBeInTheDocument();
+        expect(hoisted.moveImpactQueryMock).toHaveBeenLastCalledWith(1, {connectedUserIds: [9], targetId: 5}, true);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Change'}));
+
+        await waitFor(() =>
+            expect(hoisted.changeVersionMutateAsyncMock).toHaveBeenCalledWith({
+                configurationChangeVersionRequest: {connectedUserId: 9, targetId: 5, version: 3},
+                id: 1,
+            })
+        );
+    });
+
+    it('disables Change version with a tooltip when no other published version exists', async () => {
+        hoisted.integrationVersions = [
+            {status: 'PUBLISHED', version: 1},
+            {status: 'DRAFT', version: 2},
+        ];
+
+        await openMenu();
+
+        const item = screen.getByRole('menuitem', {name: 'Change version'});
+
+        expect(item).toHaveAttribute('aria-disabled', 'true');
+
+        await userEvent.hover(item.parentElement as HTMLElement);
+
+        await waitFor(async () =>
+            expect((await screen.findAllByText('No other published version')).length).toBeGreaterThan(0)
+        );
+    });
+
+    it('disables Change version without a tooltip while the configurations load', async () => {
+        hoisted.integrationConfigurations = undefined;
+        hoisted.integrationVersions = [
+            {status: 'PUBLISHED', version: 1},
+            {status: 'PUBLISHED', version: 3},
+        ];
+
+        await openMenu();
+
+        const item = screen.getByRole('menuitem', {name: 'Change version'});
+
+        expect(item).toHaveAttribute('aria-disabled', 'true');
+
+        await userEvent.hover(item.parentElement as HTMLElement);
+
+        await expect(screen.findByText('No other published version', {}, {timeout: 1500})).rejects.toThrow();
+    });
+
+    it('disables Change version with a tooltip when the configurations fail to load', async () => {
+        hoisted.integrationConfigurations = undefined;
+        hoisted.integrationConfigurationsError = true;
+        hoisted.integrationVersions = [
+            {status: 'PUBLISHED', version: 1},
+            {status: 'PUBLISHED', version: 3},
+        ];
+
+        await openMenu();
+
+        const item = screen.getByRole('menuitem', {name: 'Change version'});
+
+        expect(item).toHaveAttribute('aria-disabled', 'true');
+
+        await userEvent.hover(item.parentElement as HTMLElement);
+
+        await waitFor(async () =>
+            expect(
+                (await screen.findAllByText("Couldn't load the configurations. Try again later.")).length
+            ).toBeGreaterThan(0)
+        );
     });
 
     it('changes this user to another configuration, labelled by name rather than external id', async () => {

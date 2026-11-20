@@ -1,4 +1,5 @@
 import {
+    ChangeIntegrationInstanceConfigurationConnectedUserVersionRequest,
     ConfigurationMoveResult,
     EnableIntegrationInstanceConfigurationRequest,
     EnableIntegrationInstanceConfigurationWorkflowRequest,
@@ -148,6 +149,27 @@ export const useUpdateIntegrationInstanceConfigurationTagsMutation = (
     useMutation({
         mutationFn: (request: UpdateIntegrationTagsRequest) => {
             return new IntegrationInstanceConfigurationTagApi().updateIntegrationInstanceConfigurationTags(request);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+interface ChangeIntegrationInstanceConfigurationConnectedUserVersionMutationProps {
+    onSuccess?: (
+        result: ConfigurationMoveResult,
+        variables: ChangeIntegrationInstanceConfigurationConnectedUserVersionRequest
+    ) => void;
+    onError?: (error: Error, variables: ChangeIntegrationInstanceConfigurationConnectedUserVersionRequest) => void;
+}
+
+export const useChangeIntegrationInstanceConfigurationConnectedUserVersionMutation = (
+    mutationProps?: ChangeIntegrationInstanceConfigurationConnectedUserVersionMutationProps
+) =>
+    useMutation({
+        mutationFn: (request: ChangeIntegrationInstanceConfigurationConnectedUserVersionRequest) => {
+            return new IntegrationInstanceConfigurationApi().changeIntegrationInstanceConfigurationConnectedUserVersion(
+                request
+            );
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,

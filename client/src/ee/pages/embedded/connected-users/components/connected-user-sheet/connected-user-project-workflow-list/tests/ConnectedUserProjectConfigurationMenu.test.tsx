@@ -1,22 +1,69 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
-import {resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
-import {render} from '@testing-library/react';
+import {act, render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ConnectedUserProjectConfigurationMenu from '../ConnectedUserProjectConfigurationMenu';
 
 const hoisted = vi.hoisted(() => ({
+    changeVersionDialogProps: [] as Array<Record<string, unknown>>,
+    changeVersionMutateAsyncMock: vi.fn(),
     configurations: [] as Array<Record<string, unknown>> | undefined,
+    configurationsError: false,
     dialogProps: [] as Array<Record<string, unknown>>,
+    moveImpactQueryMock: vi.fn(),
+    versions: [] as Array<{status: string; version: number}> | undefined,
 }));
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
+    useAutomationProjectConfigurationMoveImpactQuery: (...args: unknown[]) => {
+        hoisted.moveImpactQueryMock(...args);
+
+        return {
+            data: {
+                automationProjectConfigurationMoveImpact: {
+                    skipped: [],
+                    workflows: [
+                        {
+                            affectedConnectedUserCount: 1,
+                            label: 'Sync',
+                            newRequiredConnections: [],
+                            newRequiredInputs: [],
+                        },
+                    ],
+                },
+            },
+            isError: false,
+            isLoading: false,
+        };
+    },
     useAutomationProjectConfigurationsQuery: () => ({
         data: hoisted.configurations ? {automationProjectConfigurations: hoisted.configurations} : undefined,
+        isError: hoisted.configurationsError,
+    }),
+    useAutomationProjectVersionsQuery: () => ({
+        data: hoisted.versions ? {automationProjectVersions: hoisted.versions} : undefined,
+    }),
+    useChangeAutomationProjectConfigurationConnectedUserVersionMutation: () => ({
+        isPending: false,
+        mutateAsync: hoisted.changeVersionMutateAsyncMock,
     }),
 }));
+
+vi.mock(
+    '@/ee/pages/embedded/connected-users/components/connected-user-sheet/change-version-dialog/ConnectedUserChangeVersionDialog',
+    async (importOriginal) => ({
+        ...(await importOriginal<
+            typeof import('@/ee/pages/embedded/connected-users/components/connected-user-sheet/change-version-dialog/ConnectedUserChangeVersionDialog')
+        >()),
+        default: (props: Record<string, unknown>) => {
+            hoisted.changeVersionDialogProps.push(props);
+
+            return <div>change version dialog</div>;
+        },
+    })
+);
 
 vi.mock(
     '@/ee/pages/embedded/automations/components/automation-project-configuration-list/AutomationProjectConfigurationMoveUsersDialog',
@@ -61,12 +108,21 @@ describe('ConnectedUserProjectConfigurationMenu', () => {
 
         environmentStore.setState({currentEnvironmentId: 2});
 
+        hoisted.changeVersionDialogProps = [];
         hoisted.configurations = [];
+        hoisted.configurationsError = false;
         hoisted.dialogProps = [];
+        hoisted.versions = [
+            {status: 'PUBLISHED', version: 1},
+            {status: 'PUBLISHED', version: 3},
+            {status: 'PUBLISHED', version: 4},
+            {status: 'DRAFT', version: 5},
+        ];
     });
 
     afterEach(() => {
         resetAll();
+        vi.clearAllMocks();
     });
 
     it("opens the dialog for this user with the other configurations of the current configuration's environment", async () => {
@@ -120,19 +176,156 @@ describe('ConnectedUserProjectConfigurationMenu', () => {
         ]);
     });
 
-    it('shows no configuration actions when there is no other configuration in the environment', () => {
+    it('disables Change configuration with a reason and still offers Change version when there is no other configuration in the environment', async () => {
         hoisted.configurations = [createConfiguration('51'), createConfiguration('54', {environmentId: '1'})];
 
+        const user = userEvent.setup();
+
         renderMenu();
 
-        expect(screen.queryByRole('button', {name: 'Configuration Actions'})).not.toBeInTheDocument();
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+
+        const changeConfigurationItem = await screen.findByRole('menuitem', {name: 'Change configuration'});
+
+        expect(changeConfigurationItem).toHaveAttribute('aria-disabled', 'true');
+        expect(screen.getByRole('menuitem', {name: 'Change version'})).not.toHaveAttribute('aria-disabled', 'true');
+
+        await user.hover(changeConfigurationItem.parentElement as HTMLElement);
+
+        await waitFor(async () =>
+            expect((await screen.findAllByText('No other configuration in this environment')).length).toBeGreaterThan(0)
+        );
     });
 
-    it('shows no configuration actions while the configurations load', () => {
-        hoisted.configurations = undefined;
+    it('opens the change version dialog with the published versions and the configurations of the environment', async () => {
+        const changeResult = {movedConnectedUserIds: ['7'], needsAttentionConnectedUserIds: [], skipped: []};
+
+        hoisted.changeVersionMutateAsyncMock.mockResolvedValue({
+            changeAutomationProjectConfigurationConnectedUserVersion: changeResult,
+        });
+        hoisted.configurations = [
+            createConfiguration('51', {projectVersion: 3}),
+            createConfiguration('52', {name: 'Default', projectVersion: 4}),
+            createConfiguration('54', {environmentId: '1', projectVersion: 4}),
+        ];
+
+        const user = userEvent.setup();
 
         renderMenu();
 
-        expect(screen.queryByRole('button', {name: 'Configuration Actions'})).not.toBeInTheDocument();
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+        await user.click(await screen.findByRole('menuitem', {name: 'Change version'}));
+
+        expect(await screen.findByText('change version dialog')).toBeInTheDocument();
+
+        const props = hoisted.changeVersionDialogProps.at(-1);
+
+        expect(props).toMatchObject({
+            configurations: [{enabled: true, id: '52', name: 'Default', version: 4}],
+            currentConfigurationName: 'Default',
+            currentVersion: 3,
+            versions: [1, 3, 4],
+        });
+
+        await expect(
+            (props?.onChange as (version: number, targetId?: string) => Promise<unknown>)(4, '52')
+        ).resolves.toBe(changeResult);
+
+        expect(hoisted.changeVersionMutateAsyncMock).toHaveBeenCalledWith({
+            connectedUserId: '7',
+            projectVersion: 4,
+            sourceId: '51',
+            targetId: '52',
+        });
+    });
+
+    it('loads the move-impact preview for the target the change version dialog reports', async () => {
+        hoisted.configurations = [
+            createConfiguration('51', {projectVersion: 3}),
+            createConfiguration('52', {projectVersion: 4}),
+        ];
+
+        const user = userEvent.setup();
+
+        renderMenu();
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+        await user.click(await screen.findByRole('menuitem', {name: 'Change version'}));
+
+        expect(await screen.findByText('change version dialog')).toBeInTheDocument();
+
+        act(() => (hoisted.changeVersionDialogProps.at(-1)?.onTargetChange as (targetId?: string) => void)('52'));
+
+        expect(hoisted.moveImpactQueryMock).toHaveBeenLastCalledWith(
+            {connectedUserIds: ['7'], sourceId: '51', targetId: '52'},
+            {enabled: true}
+        );
+        expect(hoisted.changeVersionDialogProps.at(-1)?.impact).toEqual([
+            expect.objectContaining({affectedConnectedUserCount: 1, label: 'Sync'}),
+        ]);
+    });
+
+    it('disables both actions with a reason when the configurations fail to load', async () => {
+        hoisted.configurations = undefined;
+        hoisted.configurationsError = true;
+
+        const user = userEvent.setup();
+
+        renderMenu();
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+
+        const changeVersionItem = await screen.findByRole('menuitem', {name: 'Change version'});
+
+        expect(changeVersionItem).toHaveAttribute('aria-disabled', 'true');
+        expect(screen.getByRole('menuitem', {name: 'Change configuration'})).toHaveAttribute('aria-disabled', 'true');
+
+        await user.hover(changeVersionItem.parentElement as HTMLElement);
+
+        await waitFor(async () =>
+            expect(
+                (await screen.findAllByText("Couldn't load the configurations. Try again later.")).length
+            ).toBeGreaterThan(0)
+        );
+    });
+
+    it('disables Change version with a reason when no other version is published', async () => {
+        hoisted.configurations = [createConfiguration('51'), createConfiguration('52')];
+        hoisted.versions = [
+            {status: 'PUBLISHED', version: 3},
+            {status: 'DRAFT', version: 4},
+        ];
+
+        const user = userEvent.setup();
+
+        renderMenu();
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+
+        const changeVersionItem = await screen.findByRole('menuitem', {name: 'Change version'});
+
+        expect(changeVersionItem).toHaveAttribute('aria-disabled', 'true');
+
+        await user.hover(changeVersionItem.parentElement as HTMLElement);
+
+        await waitFor(async () =>
+            expect((await screen.findAllByText('No other published version')).length).toBeGreaterThan(0)
+        );
+    });
+
+    it('disables both actions while the configurations load', async () => {
+        hoisted.configurations = undefined;
+
+        const user = userEvent.setup();
+
+        renderMenu();
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+
+        expect(await screen.findByRole('menuitem', {name: 'Change configuration'})).toHaveAttribute(
+            'aria-disabled',
+            'true'
+        );
+        expect(screen.getByRole('menuitem', {name: 'Change version'})).toHaveAttribute('aria-disabled', 'true');
     });
 });
