@@ -33,6 +33,8 @@ interface AwsBatchOperations extends AutoCloseable {
     @Nullable
     InputStream getObject(String bucket, String key);
 
+    boolean objectExists(String bucket, String key);
+
     void deletePrefix(String bucket, String prefix);
 
     String registerJobDefinition(RegisterJobDefinitionRequest request);

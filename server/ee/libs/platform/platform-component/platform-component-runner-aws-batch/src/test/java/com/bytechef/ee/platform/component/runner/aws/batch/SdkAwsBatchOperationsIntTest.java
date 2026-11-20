@@ -123,6 +123,22 @@ class SdkAwsBatchOperationsIntTest {
     }
 
     @Test
+    void testObjectExistsTellsAnUploadedOutputFromAMissingOne() throws Exception {
+        try (SdkAwsBatchOperations operations = operations()) {
+            URL url = operations.presignPut(BUCKET, "bytechef/1/k-3/output.tar", Duration.ofMinutes(10));
+
+            HttpResponse<String> response = HttpClient.newHttpClient()
+                .send(HttpRequest.newBuilder(url.toURI())
+                    .PUT(HttpRequest.BodyPublishers.ofString("output-bytes"))
+                    .build(), HttpResponse.BodyHandlers.ofString());
+
+            assertThat(response.statusCode()).isEqualTo(200);
+            assertThat(operations.objectExists(BUCKET, "bytechef/1/k-3/output.tar")).isTrue();
+            assertThat(operations.objectExists(BUCKET, "bytechef/1/missing/output.tar")).isFalse();
+        }
+    }
+
+    @Test
     void testAMissingOutputReadsAsNull() {
         try (SdkAwsBatchOperations operations = operations()) {
             assertThat(operations.getObject(BUCKET, "bytechef/1/missing/output.tar")).isNull();
