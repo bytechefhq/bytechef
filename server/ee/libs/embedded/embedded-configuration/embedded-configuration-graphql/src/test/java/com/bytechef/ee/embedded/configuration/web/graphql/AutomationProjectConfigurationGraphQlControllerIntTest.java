@@ -386,7 +386,7 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
                 new AutomationProjectConfigurationVersionImpactDTO(
                     List.of(
                         new AutomationProjectConfigurationVersionImpactDTO.Workflow(
-                            "uuid-one", "Notify Slack", List.of("channel"), List.of("jira"), 12))));
+                            "uuid-one", "Notify Slack", List.of("channel"), List.of("jira"), 12, true))));
 
         this.graphQlTester
             .document("""
@@ -398,6 +398,7 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
                             newRequiredInputs
                             newRequiredConnections
                             affectedConnectedUserCount
+                            awaitsConfiguration
                         }
                     }
                 }
@@ -417,7 +418,10 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
             .containsExactly("jira")
             .path("automationProjectConfigurationVersionImpact.workflows[0].affectedConnectedUserCount")
             .entity(Integer.class)
-            .isEqualTo(12);
+            .isEqualTo(12)
+            .path("automationProjectConfigurationVersionImpact.workflows[0].awaitsConfiguration")
+            .entity(Boolean.class)
+            .isEqualTo(true);
     }
 
     @Test
@@ -489,7 +493,7 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
                 new ConfigurationMoveImpactDTO(
                     List.of(
                         new AutomationProjectConfigurationVersionImpactDTO.Workflow(
-                            "uuid-one", "Notify Slack", List.of("channel"), List.of("jira"), 1)),
+                            "uuid-one", "Notify Slack", List.of("channel"), List.of("jira"), 1, false)),
                     List.of(
                         new ConfigurationMoveResultDTO.Skipped(
                             22L, ConfigurationMoveResultDTO.Skipped.TARGET_LACKS_REFERENCED_WORKFLOWS,
@@ -651,7 +655,7 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
                 new ConfigurationMoveImpactDTO(
                     List.of(
                         new AutomationProjectConfigurationVersionImpactDTO.Workflow(
-                            "uuid-one", "Notify Slack", List.of("channel"), List.of("jira"), 1)),
+                            "uuid-one", "Notify Slack", List.of("channel"), List.of("jira"), 1, false)),
                     List.of(
                         new ConfigurationMoveResultDTO.Skipped(
                             22L, ConfigurationMoveResultDTO.Skipped.TARGET_LACKS_REFERENCED_WORKFLOWS,

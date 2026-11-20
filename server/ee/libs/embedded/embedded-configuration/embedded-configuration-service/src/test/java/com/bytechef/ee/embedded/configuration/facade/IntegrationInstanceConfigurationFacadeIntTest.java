@@ -1401,6 +1401,117 @@ class IntegrationInstanceConfigurationFacadeIntTest {
         assertThat(configurationMoveImpactDTO.workflows()
             .getFirst()
             .newRequiredInputs()).containsExactly("region");
+        assertThat(configurationMoveImpactDTO.workflows()
+            .getFirst()
+            .awaitsConfiguration()).isTrue();
+    }
+
+    @Test
+    void testMoveImpactLeavesOutAWorkflowWhoseRequiredInternalOnlyValueTheTargetSets() {
+        ConnectedUser connectedUser = new ConnectedUser();
+
+        connectedUser.setEnabled(true);
+
+        when(connectedUserService.getConnectedUser(CONNECTED_USER_ID)).thenReturn(connectedUser);
+
+        Integration integration = createIntegration();
+
+        UUID workflowUuid = UUID.randomUUID();
+
+        String sourceWorkflowId = addWorkflow(
+            integration.getId(), 1, workflowUuid, INTERNAL_ONLY_REQUIRED_WORKFLOW_DEFINITION);
+        String targetWorkflowId = addWorkflow(
+            integration.getId(), 2, workflowUuid, INTERNAL_ONLY_REQUIRED_WORKFLOW_DEFINITION);
+
+        long sourceConfigurationId = createConfiguration(integration.getId(), 1, AuthorizationType.API_KEY);
+        long targetConfigurationId = createConfiguration(integration.getId(), 2, AuthorizationType.API_KEY);
+
+        long sourceConfigurationWorkflowId = createConfigurationWorkflow(
+            sourceConfigurationId, sourceWorkflowId, "unused");
+
+        IntegrationInstanceConfigurationWorkflow targetConfigurationWorkflow =
+            new IntegrationInstanceConfigurationWorkflow();
+
+        targetConfigurationWorkflow.setEnabled(true);
+        targetConfigurationWorkflow.setInputs(Map.of("accountId", "account-1"));
+        targetConfigurationWorkflow.setIntegrationInstanceConfigurationId(targetConfigurationId);
+        targetConfigurationWorkflow.setWorkflowId(targetWorkflowId);
+
+        integrationInstanceConfigurationWorkflowService.create(targetConfigurationWorkflow);
+
+        IntegrationInstance integrationInstance = integrationInstanceService.create(
+            CONNECTED_USER_ID, 41L, sourceConfigurationId);
+
+        IntegrationInstanceWorkflow integrationInstanceWorkflow =
+            integrationInstanceWorkflowService.createIntegrationInstanceWorkflow(
+                integrationInstance.getId(), sourceConfigurationWorkflowId);
+
+        integrationInstanceWorkflow.setEnabled(true);
+        integrationInstanceWorkflow.setInputs(Map.of("region", "eu"));
+
+        integrationInstanceWorkflowService.update(integrationInstanceWorkflow);
+
+        authenticate(admin());
+
+        ConfigurationMoveImpactDTO configurationMoveImpactDTO = integrationInstanceConfigurationFacade.getMoveImpact(
+            sourceConfigurationId, targetConfigurationId, List.of(CONNECTED_USER_ID));
+
+        assertThat(configurationMoveImpactDTO.workflows()).isEmpty();
+    }
+
+    @Test
+    void testMoveImpactSkipsAUserWhoseWorkflowTheTargetTurnedOff() {
+        ConnectedUser connectedUser = new ConnectedUser();
+
+        connectedUser.setEnabled(true);
+
+        when(connectedUserService.getConnectedUser(CONNECTED_USER_ID)).thenReturn(connectedUser);
+
+        Integration integration = createIntegration();
+
+        UUID workflowUuid = UUID.randomUUID();
+
+        String sourceWorkflowId = addWorkflow(
+            integration.getId(), 1, workflowUuid, INTERNAL_ONLY_REQUIRED_WORKFLOW_DEFINITION);
+        String targetWorkflowId = addWorkflow(
+            integration.getId(), 2, workflowUuid, INTERNAL_ONLY_REQUIRED_WORKFLOW_DEFINITION);
+
+        long sourceConfigurationId = createConfiguration(integration.getId(), 1, AuthorizationType.API_KEY);
+        long targetConfigurationId = createConfiguration(integration.getId(), 2, AuthorizationType.API_KEY);
+
+        long sourceConfigurationWorkflowId = createConfigurationWorkflow(
+            sourceConfigurationId, sourceWorkflowId, "unused");
+
+        IntegrationInstanceConfigurationWorkflow targetConfigurationWorkflow =
+            new IntegrationInstanceConfigurationWorkflow();
+
+        targetConfigurationWorkflow.setEnabled(false);
+        targetConfigurationWorkflow.setIntegrationInstanceConfigurationId(targetConfigurationId);
+        targetConfigurationWorkflow.setWorkflowId(targetWorkflowId);
+
+        integrationInstanceConfigurationWorkflowService.create(targetConfigurationWorkflow);
+
+        IntegrationInstance integrationInstance = integrationInstanceService.create(
+            CONNECTED_USER_ID, 41L, sourceConfigurationId);
+
+        IntegrationInstanceWorkflow integrationInstanceWorkflow =
+            integrationInstanceWorkflowService.createIntegrationInstanceWorkflow(
+                integrationInstance.getId(), sourceConfigurationWorkflowId);
+
+        integrationInstanceWorkflow.setEnabled(true);
+        integrationInstanceWorkflow.setInputs(Map.of("region", "eu"));
+
+        integrationInstanceWorkflowService.update(integrationInstanceWorkflow);
+
+        authenticate(admin());
+
+        ConfigurationMoveImpactDTO configurationMoveImpactDTO = integrationInstanceConfigurationFacade.getMoveImpact(
+            sourceConfigurationId, targetConfigurationId, List.of(CONNECTED_USER_ID));
+
+        assertThat(configurationMoveImpactDTO.workflows()).isEmpty();
+        assertThat(configurationMoveImpactDTO.skipped())
+            .extracting(ConfigurationMoveResultDTO.Skipped::reason)
+            .containsExactly(ConfigurationMoveResultDTO.Skipped.TARGET_LACKS_ENABLED_WORKFLOWS);
     }
 
     @Test

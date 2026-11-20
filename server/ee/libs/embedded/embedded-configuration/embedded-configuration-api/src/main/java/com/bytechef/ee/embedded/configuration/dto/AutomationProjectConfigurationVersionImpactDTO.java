@@ -21,6 +21,6 @@ public record AutomationProjectConfigurationVersionImpactDTO(List<Workflow> work
     @SuppressFBWarnings("EI")
     public record Workflow(
         String workflowUuid, String label, List<String> newRequiredInputs, List<String> newRequiredConnections,
-        int affectedConnectedUserCount) {
+        int affectedConnectedUserCount, boolean awaitsConfiguration) {
     }
 }
