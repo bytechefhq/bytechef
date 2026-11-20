@@ -1952,7 +1952,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         String missingInputName = InternalOnlyInputUtils.findMissingRequiredInternalOnlyInput(workflow, inputs);
 
         if (missingInputName != null) {
-            String workflowLabel = workflow.getLabel() == null ? workflow.getId() : workflow.getLabel();
+            String workflowLabel = StringUtils.isBlank(workflow.getLabel()) ? workflow.getId() : workflow.getLabel();
 
             throw new ConfigurationException(
                 "Workflow %s needs a value for the internal-only input %s".formatted(workflowLabel, missingInputName),

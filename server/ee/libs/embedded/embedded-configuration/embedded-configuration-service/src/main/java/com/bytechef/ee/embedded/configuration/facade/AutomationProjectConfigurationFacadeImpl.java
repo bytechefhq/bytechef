@@ -41,6 +41,7 @@ import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigura
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
+import com.bytechef.ee.embedded.configuration.util.InternalOnlyInputUtils;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
@@ -287,21 +288,41 @@ public class AutomationProjectConfigurationFacadeImpl
     private void copyConfigurationWorkflows(
         AutomationProjectConfiguration sourceConfiguration, long copyConfigurationId, int projectVersion) {
 
-        for (AutomationProjectConfigurationWorkflow sourceConfigurationWorkflow : sourceConfiguration.getWorkflows()) {
-            UUID workflowUuid = sourceConfigurationWorkflow.getWorkflowUuid();
+        for (ProjectWorkflow projectWorkflow : projectWorkflowService.getProjectWorkflows(
+            sourceConfiguration.getProjectId(), projectVersion)) {
 
-            Optional<ProjectWorkflow> projectWorkflowOptional = projectWorkflowService.fetchProjectWorkflow(
-                sourceConfiguration.getProjectId(), projectVersion, String.valueOf(workflowUuid));
+            UUID workflowUuid = projectWorkflow.getUuid();
 
-            if (projectWorkflowOptional.isEmpty()) {
+            Optional<AutomationProjectConfigurationWorkflow> sourceConfigurationWorkflowOptional =
+                sourceConfiguration.fetchWorkflow(workflowUuid);
+
+            Map<String, Object> providedInputs = sourceConfigurationWorkflowOptional
+                .map(AutomationProjectConfigurationWorkflow::getProvidedInputs)
+                .orElse(Map.of());
+
+            Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
+
+            boolean internalOnlyInputsProvided =
+                InternalOnlyInputUtils.findMissingRequiredInternalOnlyInput(workflow, providedInputs) == null;
+
+            if (sourceConfigurationWorkflowOptional.isEmpty()) {
+                if (!internalOnlyInputsProvided) {
+                    automationProjectConfigurationService.updateWorkflowEnabled(
+                        copyConfigurationId, workflowUuid, false);
+                }
+
                 continue;
             }
 
+            AutomationProjectConfigurationWorkflow sourceConfigurationWorkflow =
+                sourceConfigurationWorkflowOptional.get();
+
             automationProjectConfigurationService.updateWorkflowProvidedValues(
                 copyConfigurationId, workflowUuid, new HashMap<>(sourceConfigurationWorkflow.getProvidedConnections()),
-                new HashMap<>(sourceConfigurationWorkflow.getProvidedInputs()));
+                new HashMap<>(providedInputs));
             automationProjectConfigurationService.updateWorkflowEnabled(
-                copyConfigurationId, workflowUuid, sourceConfigurationWorkflow.isEnabled());
+                copyConfigurationId, workflowUuid,
+                sourceConfigurationWorkflow.isEnabled() && internalOnlyInputsProvided);
         }
     }
 
@@ -427,6 +448,13 @@ public class AutomationProjectConfigurationFacadeImpl
             @AuditData(key = "enabled", value = "#enable")
         })
     public void enableConfiguration(long id, boolean enable) {
+        if (enable) {
+            AutomationProjectConfiguration currentConfiguration =
+                automationProjectConfigurationService.getConfiguration(id);
+
+            checkRequiredInternalOnlyInputsOfEnabledWorkflows(currentConfiguration);
+        }
+
         AutomationProjectConfiguration configuration =
             automationProjectConfigurationService.updateEnabled(id, enable);
 
@@ -442,6 +470,14 @@ public class AutomationProjectConfigurationFacadeImpl
             @AuditData(key = "enabled", value = "#enable")
         })
     public void enableConfigurationWorkflow(long id, String workflowUuid, boolean enable) {
+        if (enable) {
+            AutomationProjectConfiguration currentConfiguration =
+                automationProjectConfigurationService.getConfiguration(id);
+
+            checkRequiredInternalOnlyInputs(
+                currentConfiguration, workflowUuid, getStoredProvidedInputs(currentConfiguration, workflowUuid));
+        }
+
         AutomationProjectConfiguration configuration =
             automationProjectConfigurationService.updateWorkflowEnabled(
                 id, UUID.fromString(workflowUuid), enable);
@@ -958,6 +994,8 @@ public class AutomationProjectConfigurationFacadeImpl
             validateReferencedWorkflowsExistInVersion(configuration, projectVersion);
         }
 
+        boolean turnsEnabled = enabled && !configuration.isEnabled();
+
         try {
             configuration = automationProjectConfigurationService.update(
                 id, configurationName, StringUtils.trimToNull(permissionExpression), projectVersion, enabled,
@@ -965,6 +1003,10 @@ public class AutomationProjectConfigurationFacadeImpl
         } catch (DataIntegrityViolationException dataIntegrityViolationException) {
             throw newConfigurationNameExistsException(
                 configuration.getProjectId(), configuration.getEnvironmentId(), configurationName);
+        }
+
+        if (turnsEnabled) {
+            checkRequiredInternalOnlyInputsOfEnabledWorkflows(configuration);
         }
 
         publishUpdatedEvent(configuration);
@@ -989,6 +1031,10 @@ public class AutomationProjectConfigurationFacadeImpl
         validateProvidedConnections(
             configuration, projectWorkflow.getWorkflowId(), validatedProvidedConnections);
         validateProvidedInputs(projectWorkflow.getWorkflowId(), validatedProvidedInputs);
+
+        if (automationProjectConfigurationService.isWorkflowEnabled(configuration, projectWorkflow.getUuid())) {
+            checkRequiredInternalOnlyInputs(configuration, workflowUuid, validatedProvidedInputs);
+        }
 
         Set<String> previouslyProvidedInputNames = configuration.fetchWorkflow(projectWorkflow.getUuid())
             .map(configurationWorkflow -> getProvidedInputNames(configurationWorkflow.getProvidedInputs()))
@@ -1197,7 +1243,7 @@ public class AutomationProjectConfigurationFacadeImpl
                 inputs.add(
                     new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
                         workflowInput.getName(), workflowInput.getLabel(), workflowInput.getType(),
-                        workflowInput.isRequired()));
+                        workflowInput.isRequired(), workflowInput.isInternalOnly()));
 
                 continue;
             }
@@ -1211,11 +1257,61 @@ public class AutomationProjectConfigurationFacadeImpl
             inputs.add(
                 new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
                     workflowInput.getName(), workflowInput.getLabel(), workflowInput.getType(),
-                    workflowInput.isRequired(), componentName, componentInputReference.componentVersion(),
+                    workflowInput.isRequired(), workflowInput.isInternalOnly(), componentName,
+                    componentInputReference.componentVersion(),
                     componentInputReference.groupName(), optionConnections));
         }
 
         return inputs;
+    }
+
+    private void checkRequiredInternalOnlyInputsOfEnabledWorkflows(AutomationProjectConfiguration configuration) {
+        for (ProjectWorkflow projectWorkflow : projectWorkflowService.getProjectWorkflows(
+            configuration.getProjectId(), configuration.getProjectVersion())) {
+
+            if (!automationProjectConfigurationService.isWorkflowEnabled(configuration, projectWorkflow.getUuid())) {
+                continue;
+            }
+
+            String workflowUuid = projectWorkflow.getUuidAsString();
+
+            checkRequiredInternalOnlyInputs(
+                configuration, workflowUuid, getStoredProvidedInputs(configuration, workflowUuid));
+        }
+    }
+
+    private void checkRequiredInternalOnlyInputs(
+        AutomationProjectConfiguration configuration, String workflowUuid, Map<String, Object> providedInputs) {
+
+        Optional<ProjectWorkflow> projectWorkflowOptional = projectWorkflowService.fetchProjectWorkflow(
+            configuration.getProjectId(), configuration.getProjectVersion(), workflowUuid);
+
+        if (projectWorkflowOptional.isEmpty()) {
+            return;
+        }
+
+        ProjectWorkflow projectWorkflow = projectWorkflowOptional.get();
+
+        Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
+
+        String missingInputName = InternalOnlyInputUtils.findMissingRequiredInternalOnlyInput(
+            workflow, providedInputs);
+
+        if (missingInputName != null) {
+            String workflowLabel = StringUtils.isBlank(workflow.getLabel()) ? workflowUuid : workflow.getLabel();
+
+            throw new ConfigurationException(
+                "Workflow %s needs a value for the internal-only input %s".formatted(workflowLabel, missingInputName),
+                AutomationProjectConfigurationErrorType.INTERNAL_ONLY_INPUT_MISSING);
+        }
+    }
+
+    private static Map<String, Object> getStoredProvidedInputs(
+        AutomationProjectConfiguration configuration, String workflowUuid) {
+
+        return configuration.fetchWorkflow(UUID.fromString(workflowUuid))
+            .map(AutomationProjectConfigurationWorkflow::getProvidedInputs)
+            .orElse(Map.of());
     }
 
     private static WorkflowInput.@Nullable ComponentInputReference getComponentInputReference(
@@ -1418,6 +1514,7 @@ public class AutomationProjectConfigurationFacadeImpl
     }
 
     private static List<String> getNewRequiredInputs(Workflow currentWorkflow, Workflow requestedWorkflow) {
+        Set<String> internalOnlyInputNames = InternalOnlyInputUtils.getInternalOnlyInputNames(requestedWorkflow);
         Set<String> currentRequiredInputNames = currentWorkflow.getInputs()
             .stream()
             .filter(Workflow.Input::required)
@@ -1428,6 +1525,7 @@ public class AutomationProjectConfigurationFacadeImpl
             .stream()
             .filter(Workflow.Input::required)
             .map(Workflow.Input::name)
+            .filter(inputName -> !internalOnlyInputNames.contains(inputName))
             .filter(inputName -> !currentRequiredInputNames.contains(inputName))
             .toList();
     }

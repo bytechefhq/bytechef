@@ -75,7 +75,7 @@ class InternalOnlyInputUtilsTest {
 
     @Test
     void testRemoveInternalOnlyInputsFromDefinition() {
-        String rewrittenDefinition = InternalOnlyInputUtils.removeInternalOnlyInputs(DEFINITION);
+        String rewrittenDefinition = InternalOnlyInputUtils.removeInternalOnlyInputs(workflow());
 
         List<?> inputs = JsonUtils.readList(rewrittenDefinition, "inputs");
 
@@ -90,7 +90,90 @@ class InternalOnlyInputUtilsTest {
     void testRemoveInternalOnlyInputsFromDefinitionWithoutInputsReturnsItUnchanged() {
         String definition = "{\"label\": \"Workflow\", \"tasks\": []}";
 
-        assertEquals(definition, InternalOnlyInputUtils.removeInternalOnlyInputs(definition));
+        assertEquals(
+            definition,
+            InternalOnlyInputUtils.removeInternalOnlyInputs(new Workflow(definition, Workflow.Format.JSON)));
+    }
+
+    @Test
+    void testRemoveInternalOnlyInputsFromDefinitionWithoutInternalOnlyInputsReturnsItUnchanged() {
+        String definition = """
+            {
+              "label": "Workflow",
+              "inputs": [{"name": "channel", "type": "string", "required": true, "internalOnly": false}],
+              "tasks": []
+            }
+            """;
+
+        assertEquals(
+            definition,
+            InternalOnlyInputUtils.removeInternalOnlyInputs(new Workflow(definition, Workflow.Format.JSON)));
+    }
+
+    @Test
+    void testRemoveInternalOnlyInputsFromDefinitionMatchesAStringFlag() {
+        String definition = """
+            {
+              "label": "Workflow",
+              "inputs": [
+                {"name": "accountId", "type": "string", "internalOnly": "true"},
+                {"name": "channel", "type": "string"}
+              ],
+              "tasks": []
+            }
+            """;
+
+        String rewrittenDefinition = InternalOnlyInputUtils.removeInternalOnlyInputs(
+            new Workflow(definition, Workflow.Format.JSON));
+
+        assertEquals(List.of("channel"), inputNames(rewrittenDefinition));
+    }
+
+    @Test
+    void testRemoveInternalOnlyInputsFromYamlDefinition() {
+        String definition = """
+            label: Workflow
+            inputs:
+              - name: accountId
+                type: string
+                internalOnly: true
+              - name: channel
+                type: string
+            tasks:
+              - name: postMessage1
+                type: slack/v1/postMessage
+            """;
+
+        String rewrittenDefinition = InternalOnlyInputUtils.removeInternalOnlyInputs(
+            new Workflow(definition, Workflow.Format.YAML));
+
+        assertEquals(List.of("channel"), inputNames(rewrittenDefinition));
+
+        List<?> tasks = JsonUtils.readList(rewrittenDefinition, "tasks");
+
+        assertEquals(List.of(Map.of("name", "postMessage1", "type", "slack/v1/postMessage")), tasks);
+    }
+
+    @Test
+    void testRemoveInternalOnlyInputsFromYamlDefinitionWithoutInternalOnlyInputsReturnsItUnchanged() {
+        String definition = """
+            label: Workflow
+            inputs:
+              - name: channel
+                type: string
+            tasks: []
+            """;
+
+        assertEquals(
+            definition,
+            InternalOnlyInputUtils.removeInternalOnlyInputs(new Workflow(definition, Workflow.Format.YAML)));
+    }
+
+    private static List<?> inputNames(String definition) {
+        return JsonUtils.readList(definition, "inputs")
+            .stream()
+            .map(input -> ((Map<?, ?>) input).get("name"))
+            .toList();
     }
 
     private static Workflow workflow() {

@@ -268,7 +268,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         Workflow workflow = workflowService.getWorkflow(publishedWorkflowId);
 
         return connectedUserProjectWorkflowManager.createProjectWorkflow(
-            externalUserId, workflow.getDefinition(), environment, workflowUuid);
+            externalUserId, InternalOnlyInputUtils.removeInternalOnlyInputs(workflow), environment,
+            workflowUuid);
     }
 
     @Override
@@ -1027,7 +1028,9 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                     getWorkflowLastExecutionDate(latestProjectWorkflow), latestProjectWorkflow,
                     new WorkflowDTO(publishedWorkflow, List.of(), List.of()), toComponents(publishedWorkflow),
                     toInputs(workflow),
-                    fetchInputValues(connectedUserProject.getProjectId(), latestProjectWorkflow, environment));
+                    InternalOnlyInputUtils.removeInternalOnlyInputs(
+                        publishedWorkflow,
+                        fetchInputValues(connectedUserProject.getProjectId(), latestProjectWorkflow, environment)));
 
                 return connectedUserProjectWorkflowDTO
                     .withAttentionReason(
@@ -1180,7 +1183,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                         connectedUser.getId(), reference,
                         new WorkflowDTO(workflow, List.of(), getReferenceWorkflowTriggers(reference)), components,
                         inputs,
-                        withoutProvidedInputValues(referenceState.inputs(), inputs),
+                        withoutProvidedInputValues(
+                            referenceState.inputs(), inputs, getReferenceInternalOnlyInputNames(reference)),
                         withoutProvidedConnections(referenceState.connections(), connectionComponents),
                         referenceState.attentionReason());
 
@@ -1286,7 +1290,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     }
 
     private static Map<String, ?> withoutProvidedInputValues(
-        Map<String, ?> inputValues, List<ConnectedUserWorkflowTemplateDTO.Input> inputs) {
+        Map<String, ?> inputValues, List<ConnectedUserWorkflowTemplateDTO.Input> inputs,
+        Set<String> internalOnlyInputNames) {
 
         Map<String, Object> userInputValues = new LinkedHashMap<>(inputValues);
 
@@ -1296,13 +1301,32 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             }
         }
 
+        for (String internalOnlyInputName : internalOnlyInputNames) {
+            userInputValues.remove(internalOnlyInputName);
+        }
+
         return userInputValues;
+    }
+
+    private Set<String> getReferenceInternalOnlyInputNames(ConnectedUserProjectWorkflow reference) {
+        Long projectDeploymentId = reference.getProjectDeploymentId();
+
+        if (reference.isDangling() || projectDeploymentId == null) {
+            return Set.of();
+        }
+
+        return projectWorkflowService.fetchProjectWorkflowWorkflowId(projectDeploymentId, reference.getAutomationUuid())
+            .map(workflowService::getWorkflow)
+            .map(InternalOnlyInputUtils::getInternalOnlyInputNames)
+            .orElse(Set.of());
     }
 
     private static List<ConnectedUserWorkflowTemplateDTO.Input> toInputs(Workflow workflow) {
         List<Workflow.Input> inputs = workflow.getInputs();
+        Set<String> internalOnlyInputNames = InternalOnlyInputUtils.getInternalOnlyInputNames(workflow);
 
         return inputs.stream()
+            .filter(input -> !internalOnlyInputNames.contains(input.name()))
             .map(input -> new ConnectedUserWorkflowTemplateDTO.Input(
                 input.name(), input.label(), input.type(), input.required()))
             .toList();

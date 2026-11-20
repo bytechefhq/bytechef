@@ -7,9 +7,13 @@
 
 package com.bytechef.ee.embedded.configuration.util;
 
+import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.workflow.mapper.WorkflowReader;
+import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.configuration.domain.WorkflowInput;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
+import org.springframework.core.io.ByteArrayResource;
 
 /**
  * @version ee
@@ -24,9 +29,6 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 public final class InternalOnlyInputUtils {
-
-    private static final String INPUTS = "inputs";
-    private static final String INTERNAL_ONLY = "internalOnly";
 
     private InternalOnlyInputUtils() {
     }
@@ -71,12 +73,17 @@ public final class InternalOnlyInputUtils {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    public static String removeInternalOnlyInputs(String workflowDefinition) {
-        Map<String, Object> definition =
-            new LinkedHashMap<>((Map<String, Object>) JsonUtils.readMap(workflowDefinition));
+    public static String removeInternalOnlyInputs(Workflow workflow) {
+        Set<String> internalOnlyInputNames = getInternalOnlyInputNames(workflow);
+        String workflowDefinition = workflow.getDefinition();
 
-        Object inputs = definition.get(INPUTS);
+        if (internalOnlyInputNames.isEmpty()) {
+            return workflowDefinition;
+        }
+
+        Map<String, Object> definition = new LinkedHashMap<>(readDefinition(workflow));
+
+        Object inputs = definition.get(WorkflowConstants.INPUTS);
 
         if (!(inputs instanceof List<?> inputList)) {
             return workflowDefinition;
@@ -85,15 +92,48 @@ public final class InternalOnlyInputUtils {
         List<Object> remainingInputs = new ArrayList<>();
 
         for (Object input : inputList) {
-            if (input instanceof Map<?, ?> inputMap && Boolean.TRUE.equals(inputMap.get(INTERNAL_ONLY))) {
+            if (input instanceof Map<?, ?> inputMap &&
+                internalOnlyInputNames.contains(inputMap.get(WorkflowConstants.NAME))) {
                 continue;
             }
 
             remainingInputs.add(input);
         }
 
-        definition.put(INPUTS, remainingInputs);
+        definition.put(WorkflowConstants.INPUTS, remainingInputs);
 
         return JsonUtils.write(definition);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, ?> readDefinition(Workflow workflow) {
+        String workflowDefinition = workflow.getDefinition();
+
+        if (workflow.getFormat() == Workflow.Format.JSON) {
+            return JsonUtils.readMap(workflowDefinition);
+        }
+
+        Map<String, Object> definition;
+
+        try {
+            definition = WorkflowReader.readWorkflowMap(
+                new WorkflowResource(
+                    workflow.getId(), Map.of(),
+                    new ByteArrayResource(workflowDefinition.getBytes(StandardCharsets.UTF_8)), workflow.getFormat()));
+        } catch (Exception exception) {
+            throw new IllegalArgumentException("Workflow definition could not be read", exception);
+        }
+
+        Object tasks = definition.get(WorkflowConstants.TASKS);
+
+        if (tasks instanceof List<?> taskList) {
+            for (Object task : taskList) {
+                if (task instanceof Map<?, ?> taskMap) {
+                    ((Map<String, Object>) taskMap).remove(WorkflowConstants.TASK_NUMBER);
+                }
+            }
+        }
+
+        return definition;
     }
 }

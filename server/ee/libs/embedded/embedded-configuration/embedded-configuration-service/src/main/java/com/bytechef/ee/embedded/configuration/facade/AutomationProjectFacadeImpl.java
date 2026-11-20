@@ -38,6 +38,7 @@ import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigura
 import com.bytechef.ee.embedded.configuration.service.AutomationProjectService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
+import com.bytechef.ee.embedded.configuration.util.InternalOnlyInputUtils;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -769,8 +770,10 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
 
     private static List<ConnectedUserWorkflowTemplateDTO.Input> toInputs(Workflow workflow) {
         List<Workflow.Input> inputs = workflow.getInputs();
+        Set<String> internalOnlyInputNames = InternalOnlyInputUtils.getInternalOnlyInputNames(workflow);
 
         return inputs.stream()
+            .filter(input -> !internalOnlyInputNames.contains(input.name()))
             .map(input -> new ConnectedUserWorkflowTemplateDTO.Input(
                 input.name(), input.label(), input.type(), input.required()))
             .toList();

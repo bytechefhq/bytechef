@@ -39,11 +39,13 @@ public record AutomationProjectConfigurationWorkflowProvidableValuesDTO(
      *                          options
      */
     public record Input(
-        String name, @Nullable String label, @Nullable String type, boolean required, @Nullable String componentName,
-        @Nullable Integer componentVersion, @Nullable String groupName, List<ProvidableConnection> optionConnections) {
+        String name, @Nullable String label, @Nullable String type, boolean required, boolean internalOnly,
+        @Nullable String componentName, @Nullable Integer componentVersion, @Nullable String groupName,
+        List<ProvidableConnection> optionConnections) {
 
-        public Input(String name, @Nullable String label, @Nullable String type, boolean required) {
-            this(name, label, type, required, null, null, null, List.of());
+        public Input(String name, @Nullable String label, @Nullable String type, boolean required,
+            boolean internalOnly) {
+            this(name, label, type, required, internalOnly, null, null, null, List.of());
         }
     }
 

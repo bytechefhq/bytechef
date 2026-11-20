@@ -29,6 +29,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.service.CopilotWorkflowGenerator;
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
@@ -89,6 +90,7 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowInput;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
@@ -205,6 +207,12 @@ class ConnectedUserProjectFacadeIntTest {
         {"label":"Leads","inputs":[{"name":"sheetName","label":"Sheet","type":"string","required":false},
          {"name":"accountId","label":"Account","type":"string","required":false,"internalOnly":true}],
          "triggers":[],"tasks":[]}
+        """;
+
+    private static final String SLACK_WORKFLOW_WITH_CHANNEL_AND_INTERNAL_ONLY_INPUTS_DEFINITION = """
+        {"label":"Post","inputs":[{"name":"channel","label":"Channel","type":"string","required":true},
+         {"name":"accountId","label":"Account","type":"string","required":false,"internalOnly":true}],
+         "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
         """;
 
     private static final String MANUAL_SLACK_WORKFLOW_DEFINITION = """
@@ -1184,6 +1192,64 @@ class ConnectedUserProjectFacadeIntTest {
     }
 
     @Test
+    void testWorkflowTemplateInputsLeaveOutInternalOnlyInputs() {
+        long automationProjectId = createAutomationProject("Internal Only Template");
+
+        String automationUuid =
+            addAutomation(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_AND_INTERNAL_ONLY_INPUTS_DEFINITION);
+
+        publishAndPinProject(automationProjectId);
+
+        String copyWorkflowUuid = createPublishedCopy(
+            externalUserId, COPY_WORKFLOW_WITH_SHEET_AND_INTERNAL_ONLY_INPUTS_DEFINITION);
+
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            externalUserId, automationUuid, Environment.PRODUCTION);
+
+        assertThat(automationProjectFacade.getPublishedProjects(externalUserId, Environment.PRODUCTION))
+            .filteredOn(project -> project.id() == automationProjectId)
+            .singleElement()
+            .satisfies(project -> assertThat(project.workflowTemplates())
+                .singleElement()
+                .satisfies(template -> assertThat(template.inputs()).extracting("name")
+                    .containsExactly("channel")));
+
+        List<ConnectedUserProjectWorkflowDTO> connectedUserProjectWorkflowDTOs =
+            connectedUserProjectFacade.getConnectedUserProjectWorkflows(externalUserId, Environment.PRODUCTION);
+
+        assertThat(connectedUserProjectWorkflowDTOs)
+            .filteredOn(connectedUserProjectWorkflowDTO -> Objects.equals(
+                connectedUserProjectWorkflowDTO.workflowUuid(), automationUuid))
+            .singleElement()
+            .satisfies(referenceDTO -> assertThat(referenceDTO.inputs()).extracting("name")
+                .containsExactly("channel"));
+        assertThat(connectedUserProjectWorkflowDTOs)
+            .filteredOn(connectedUserProjectWorkflowDTO -> Objects.equals(
+                connectedUserProjectWorkflowDTO.workflowUuid(), copyWorkflowUuid))
+            .singleElement()
+            .satisfies(copyDTO -> assertThat(copyDTO.inputs()).extracting("name")
+                .containsExactly("sheetName"));
+    }
+
+    @Test
+    void testCopyWorkflowTemplateDropsInternalOnlyInputs() {
+        long automationProjectId = createAutomationProject("Internal Only Copy");
+
+        String templateUuid =
+            addAutomation(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_AND_INTERNAL_ONLY_INPUTS_DEFINITION);
+
+        publishAndPinProject(automationProjectId);
+
+        String copyWorkflowUuid = connectedUserProjectFacade.copyWorkflowTemplate(
+            externalUserId, templateUuid, Environment.PRODUCTION);
+
+        Workflow copyWorkflow = workflowService.getWorkflow(projectWorkflowService.getLastWorkflowId(copyWorkflowUuid));
+
+        assertThat(WorkflowInput.of(copyWorkflow)).extracting(WorkflowInput::getName)
+            .containsExactly("channel");
+    }
+
+    @Test
     void testCopyWorkflowTemplateRejectsATemplateHiddenByThePermissionExpression() {
         long automationProjectId = createAutomationProject("Hidden Template");
 
@@ -1406,6 +1472,12 @@ class ConnectedUserProjectFacadeIntTest {
 
         private static final String CHANNEL_INPUT_WORKFLOW_DEFINITION = """
             {"label":"Post","inputs":[{"name":"channel","label":"Channel","type":"string","required":true}],
+             "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
+            """;
+
+        private static final String CHANNEL_AND_REQUIRED_INTERNAL_ONLY_INPUTS_WORKFLOW_DEFINITION = """
+            {"label":"Post","inputs":[{"name":"channel","label":"Channel","type":"string","required":true},
+             {"name":"accountId","label":"Account","type":"string","required":true,"internalOnly":true}],
              "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
             """;
 
@@ -1949,6 +2021,42 @@ class ConnectedUserProjectFacadeIntTest {
 
             assertThat(referenceValues.connectionIds()).isEmpty();
             assertThat(referenceValues.inputs()).isEmpty();
+        }
+
+        @Test
+        void testGetConnectedUserProjectWorkflowsLeavesOutTheInternalOnlyValueTheConfigurationProvides() {
+            givenSlackAutomationEnvironment();
+
+            long projectId = createProjectWithDefinition(
+                "Reference Internal Only Value", CHANNEL_AND_REQUIRED_INTERNAL_ONLY_INPUTS_WORKFLOW_DEFINITION);
+
+            publishAndPinProject(projectId);
+
+            ConnectedUser connectedUser = createConnectedUserWithConnection();
+
+            long connectedUserId = Objects.requireNonNull(connectedUser.getId());
+            long chosenConnectionId = connectedUserConnectionService.getConnectionIds(connectedUserId)
+                .getFirst();
+
+            String workflowUuid = findPublishedProject(connectedUser, projectId).workflowTemplates()
+                .getFirst()
+                .workflowUuid();
+
+            automationProjectConfigurationFacade.updateConfigurationWorkflow(
+                getConfigurationId(projectId), workflowUuid, Map.of(), Map.of("accountId", "configuration-account"));
+
+            connectedUserProjectFacade.provisionProjectWorkflows(
+                connectedUserId, getConfigurationId(projectId),
+                List.of(
+                    new ProvisionConnectedUserProjectWorkflowDTO(
+                        workflowUuid, Map.of("channel", "#alerts"), Map.of("slack", chosenConnectionId))));
+
+            assertThat(
+                connectedUserProjectFacade.getConnectedUserProjectWorkflows(
+                    connectedUser.getExternalId(), Environment.PRODUCTION))
+                        .singleElement()
+                        .satisfies(referenceDTO -> assertThat(referenceDTO.inputValues())
+                            .isEqualTo(Map.of("channel", "#alerts")));
         }
 
         @Test

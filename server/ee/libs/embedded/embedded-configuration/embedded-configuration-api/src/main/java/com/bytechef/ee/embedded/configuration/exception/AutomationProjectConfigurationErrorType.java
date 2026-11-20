@@ -38,6 +38,9 @@ public class AutomationProjectConfigurationErrorType extends AbstractErrorType {
     public static final AutomationProjectConfigurationErrorType CONFIGURATION_IN_USE =
         new AutomationProjectConfigurationErrorType(107);
 
+    public static final AutomationProjectConfigurationErrorType INTERNAL_ONLY_INPUT_MISSING =
+        new AutomationProjectConfigurationErrorType(108);
+
     private AutomationProjectConfigurationErrorType(int errorKey) {
         super(AutomationProjectConfiguration.class, errorKey);
     }
