@@ -143,28 +143,39 @@ public class AwsBatchTaskRunnerBackend implements RemoteTaskRunnerBackend {
             List<JobSummary> candidates = operations
                 .listJobs(AwsBatchRunnerSettings.jobQueue(runnerParameters), AwsBatchJobNames.jobName(key))
                 .stream()
-                .filter(summary -> !TERMINAL.contains(summary.status()))
                 .sorted(Comparator.comparing(JobSummary::createdAt, Comparator.nullsFirst(Comparator.naturalOrder()))
                     .reversed())
                 .toList();
 
+            JobDetail completed = null;
+
             for (JobSummary candidate : candidates) {
                 JobDetail jobDetail = operations.describeJob(candidate.jobId());
 
-                if (jobDetail == null || TERMINAL.contains(jobDetail.status())) {
+                if (jobDetail == null) {
                     continue;
                 }
 
                 Map<String, String> tags = jobDetail.tags();
 
-                if (Objects.equals(tags.get(AwsBatchJobNames.TAG_KEY), key.value())) {
-                    return Optional.of(
-                        handle(jobDetail.jobId(), bucket, tags.get(AwsBatchJobNames.TAG_PREFIX),
-                            jobDetail.jobDefinition()));
+                if (!Objects.equals(tags.get(AwsBatchJobNames.TAG_KEY), key.value())) {
+                    continue;
+                }
+
+                if (!TERMINAL.contains(jobDetail.status())) {
+                    return Optional.of(handle(jobDetail, bucket));
+                }
+
+                if (completed == null) {
+                    completed = jobDetail;
                 }
             }
 
-            return Optional.empty();
+            if (completed == null) {
+                return Optional.empty();
+            }
+
+            return Optional.of(handle(completed, bucket));
         } catch (SdkException exception) {
             if (isInterrupt(exception)) {
                 Thread.currentThread()
@@ -500,6 +511,12 @@ public class AwsBatchTaskRunnerBackend implements RemoteTaskRunnerBackend {
         }
 
         return clientFailure(phase, exception);
+    }
+
+    private static RemoteJobHandle handle(JobDetail jobDetail, String bucket) {
+        Map<String, String> tags = jobDetail.tags();
+
+        return handle(jobDetail.jobId(), bucket, tags.get(AwsBatchJobNames.TAG_PREFIX), jobDetail.jobDefinition());
     }
 
     private static RemoteJobHandle handle(
