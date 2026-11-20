@@ -9,6 +9,7 @@ import type {MoveConnectedUsersSkippedI} from '@/ee/pages/embedded/connected-use
 interface MoveConnectedUsersImpactProps {
     impact?: Array<{
         affectedConnectedUserCount: number;
+        awaitsConfiguration: boolean;
         label: string;
         newRequiredConnections: string[];
         newRequiredInputs: string[];
@@ -39,6 +40,10 @@ const MoveConnectedUsersImpact = ({
 
                 {impactItem.newRequiredInputs.length > 0 && (
                     <p>{`New required inputs: ${impactItem.newRequiredInputs.join(', ')}`}</p>
+                )}
+
+                {impactItem.awaitsConfiguration && (
+                    <p>Stays disabled until the configuration sets its internal-only inputs</p>
                 )}
             </div>
         ))}

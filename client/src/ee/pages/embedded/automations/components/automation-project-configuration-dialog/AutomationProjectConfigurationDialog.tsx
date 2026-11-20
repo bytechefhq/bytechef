@@ -302,10 +302,20 @@ const AutomationProjectConfigurationDialog = ({
                     text: `Version ${projectVersion} adds a required ${componentTitle} connection to ${impactWorkflow.label}: connected users without a ${componentTitle} integration will pause.`,
                 });
             }
+
+            if (
+                impactWorkflow.awaitsConfiguration &&
+                !workflowDrafts[impactWorkflow.workflowUuid]?.requiredInternalOnlyInputsProvided
+            ) {
+                warnings.push({
+                    key: `${impactWorkflow.workflowUuid}-awaits-configuration`,
+                    text: `Version ${projectVersion} leaves ${impactWorkflow.label} disabled until this configuration sets its internal-only inputs: ${impactWorkflow.affectedConnectedUserCount} connected users will pause.`,
+                });
+            }
         }
 
         return warnings;
-    }, [changesVersion, componentDefinitions, impactData, projectVersion]);
+    }, [changesVersion, componentDefinitions, impactData, projectVersion, workflowDrafts]);
 
     const projectItems = useMemo<ComboBoxItemType[]>(
         () =>

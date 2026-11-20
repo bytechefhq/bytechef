@@ -44,6 +44,7 @@ interface MoveConnectedUsersDialogProps {
     connectedUsersError?: boolean;
     impact?: Array<{
         affectedConnectedUserCount: number;
+        awaitsConfiguration: boolean;
         label: string;
         newRequiredConnections: string[];
         newRequiredInputs: string[];
