@@ -17,6 +17,7 @@
 package com.bytechef.automation.data.table.configuration.facade;
 
 import com.bytechef.automation.data.table.configuration.domain.DataTableLinkOption;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.data.table.audit.DataTableAuditEvents;
@@ -45,11 +46,16 @@ import com.bytechef.platform.data.table.execution.facade.DataTableRowFacade;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import com.bytechef.platform.data.table.execution.service.DataTableStorageService;
 import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -78,12 +84,14 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     private final DataTableStorageService dataTableStorageService;
     private final DataTableTagService dataTableTagService;
     private final DataTableWebhookService dataTableWebhookService;
+    private final TagService tagService;
 
     @SuppressFBWarnings("EI")
     public WorkspaceDataTableFacadeImpl(
         DataTableRowFacade dataTableRowFacade, DataTableRowService dataTableRowService,
         DataTableService dataTableService, DataTableStorageService dataTableStorageService,
-        DataTableTagService dataTableTagService, DataTableWebhookService dataTableWebhookService) {
+        DataTableTagService dataTableTagService, DataTableWebhookService dataTableWebhookService,
+        TagService tagService) {
 
         this.dataTableRowFacade = dataTableRowFacade;
         this.dataTableRowService = dataTableRowService;
@@ -91,6 +99,7 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
         this.dataTableStorageService = dataTableStorageService;
         this.dataTableTagService = dataTableTagService;
         this.dataTableWebhookService = dataTableWebhookService;
+        this.tagService = tagService;
     }
 
     @Override
@@ -148,7 +157,13 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
             .map(DataTable::getId)
             .toList();
 
-        return dataTableTagService.getTags(dataTableIds);
+        List<Long> tagIds = dataTableTagService.getTagIds(dataTableIds);
+
+        if (tagIds.isEmpty()) {
+            return List.of();
+        }
+
+        return tagService.getTags(tagIds);
     }
 
     @Override
@@ -312,7 +327,9 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     @Override
     @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
     public void updateTags(long dataTableId, List<Tag> tags) {
-        dataTableTagService.updateTags(dataTableId, tags);
+        List<Tag> resolvedTags = resolveTags(tags);
+
+        dataTableTagService.updateTagIds(dataTableId, CollectionUtils.map(resolvedTags, Tag::getId));
     }
 
     @Override
@@ -476,12 +493,32 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     @Transactional(readOnly = true)
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'DATA_TABLE_VIEW')")
     public Map<Long, List<Tag>> getTagsByTableId(long workspaceId) {
-        Map<Long, List<Tag>> tagsByTableId = dataTableTagService.getTagsByTableId();
+        Map<Long, List<Long>> tagIdsByTableId = dataTableTagService.getTagIdsByTableId();
 
-        return dataTableService.getWorkspaceDataTables(workspaceId)
-            .stream()
+        List<DataTable> workspaceDataTables = dataTableService.getWorkspaceDataTables(workspaceId);
+
+        Set<Long> workspaceTagIds = new LinkedHashSet<>();
+
+        for (DataTable workspaceDataTable : workspaceDataTables) {
+            workspaceTagIds.addAll(tagIdsByTableId.getOrDefault(workspaceDataTable.getId(), List.of()));
+        }
+
+        Map<Long, Tag> tagsById = new HashMap<>();
+
+        if (!workspaceTagIds.isEmpty()) {
+            for (Tag tag : tagService.getTags(new ArrayList<>(workspaceTagIds))) {
+                tagsById.put(tag.getId(), tag);
+            }
+        }
+
+        return workspaceDataTables.stream()
             .collect(Collectors.toMap(
-                DataTable::getId, dataTable -> tagsByTableId.getOrDefault(dataTable.getId(), List.of())));
+                DataTable::getId,
+                dataTable -> tagIdsByTableId.getOrDefault(dataTable.getId(), List.of())
+                    .stream()
+                    .map(tagsById::get)
+                    .filter(Objects::nonNull)
+                    .toList()));
     }
 
     @Override
@@ -519,5 +556,34 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
         }
 
         return false;
+    }
+
+    private List<Tag> resolveTags(@Nullable List<Tag> tags) {
+        if (tags == null || tags.isEmpty()) {
+            return List.of();
+        }
+
+        List<Tag> tagsToSave = tags.stream()
+            .filter(tag -> tag.getId() == null)
+            .toList();
+
+        if (tagsToSave.isEmpty()) {
+            return tags;
+        }
+
+        List<Tag> savedTags = tagService.save(tagsToSave);
+
+        List<Tag> resolvedTags = new ArrayList<>(tags.size());
+        int savedTagIndex = 0;
+
+        for (Tag tag : tags) {
+            if (tag.getId() == null) {
+                resolvedTags.add(savedTags.get(savedTagIndex++));
+            } else {
+                resolvedTags.add(tag);
+            }
+        }
+
+        return resolvedTags;
     }
 }
