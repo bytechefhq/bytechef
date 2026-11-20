@@ -1,6 +1,5 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import {Checkbox} from '@/components/ui/checkbox';
 import {
     Dialog,
     DialogContent,
@@ -17,6 +16,7 @@ import ProvisionProjectWorkflowConnectionField from '@/ee/pages/embedded/connect
 import {Connection} from '@/ee/shared/middleware/embedded/configuration';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {useGetAllConnectedUserConnectionsQuery} from '@/ee/shared/queries/embedded/connections.queries';
+import WorkflowConfigurationCard from '@/shared/components/workflow-configuration/WorkflowConfigurationCard';
 import {
     useProvisionConnectedUserProjectWorkflowsMutation,
     useProvisionableConnectedUserProjectsQuery,
@@ -257,7 +257,7 @@ const ProvisionProjectWorkflowDialog = ({
 
                                 {provisionableProjects?.map((project) => (
                                     <option key={project.projectId} value={project.projectId}>
-                                        {`${project.name} V${project.projectVersion}`}
+                                        {project.name}
                                     </option>
                                 ))}
                             </select>
@@ -318,29 +318,12 @@ const ProvisionProjectWorkflowDialog = ({
                         const workflowState = formWorkflows[workflow.workflowUuid];
                         const selected = !!workflowState?.selected;
 
+                        const components = workflow.components ?? [];
+
                         return (
-                            <fieldset
-                                aria-label={label}
-                                className="space-y-3 rounded border border-border/50 px-3 py-2"
-                                key={workflow.workflowUuid}
-                            >
-                                <div className="flex items-center justify-between gap-2">
-                                    <div className="flex items-center gap-2">
-                                        <Checkbox
-                                            aria-label={label}
-                                            checked={locked || selected}
-                                            disabled={locked}
-                                            onCheckedChange={(checked) =>
-                                                handleWorkflowChange(workflow.workflowUuid, {
-                                                    selected: checked === true,
-                                                })
-                                            }
-                                        />
-
-                                        <span className="text-sm font-medium">{label}</span>
-                                    </div>
-
-                                    {workflow.dangling ? (
+                            <WorkflowConfigurationCard
+                                badge={
+                                    workflow.dangling ? (
                                         <Badge label="Needs attention" styleType="warning-filled" />
                                     ) : (
                                         workflow.provisioned && (
@@ -351,74 +334,90 @@ const ProvisionProjectWorkflowDialog = ({
                                                 weight="semibold"
                                             />
                                         )
-                                    )}
-                                </div>
-
-                                {selected && !locked && (workflow.components ?? []).length > 0 && (
-                                    <fieldset className="space-y-3 border-0 p-0">
-                                        <legend className="mb-2 text-xs font-semibold tracking-wide text-content-neutral-secondary uppercase">
-                                            Connections
-                                        </legend>
-
-                                        {(workflow.components ?? []).map((component) => (
-                                            <ProvisionProjectWorkflowConnectionField
-                                                componentTitle={component.title || component.name}
-                                                connections={connectionsByComponentName.get(component.name) ?? []}
-                                                id={`provision-connection-${workflow.workflowUuid}-${component.name}`}
-                                                key={component.name}
-                                                onChange={(connectionId) =>
-                                                    handleWorkflowChange(workflow.workflowUuid, {
-                                                        connections: {
-                                                            ...workflowState?.connections,
-                                                            [component.name]: connectionId,
-                                                        },
-                                                    })
-                                                }
-                                                onNewConnection={() =>
-                                                    setNewConnectionTarget({
-                                                        componentName: component.name,
-                                                        workflowUuid: workflow.workflowUuid,
-                                                    })
-                                                }
-                                                value={getSelectedConnectionId(workflow.workflowUuid, component.name)}
-                                            />
-                                        ))}
-                                    </fieldset>
-                                )}
-
-                                {selected && !locked && workflow.inputs.length > 0 && (
-                                    <fieldset className="space-y-3 border-0 p-0">
-                                        <legend className="mb-2 text-xs font-semibold tracking-wide text-content-neutral-secondary uppercase">
-                                            Inputs
-                                        </legend>
-
-                                        {workflow.inputs.map((input) => (
-                                            <fieldset className="space-y-1 border-0 p-0" key={input.name}>
-                                                <Label
-                                                    htmlFor={`provision-workflow-${workflow.workflowUuid}-${input.name}`}
-                                                >
-                                                    {input.label || input.name}
-
-                                                    {input.required && ' *'}
-                                                </Label>
-
-                                                <Input
-                                                    id={`provision-workflow-${workflow.workflowUuid}-${input.name}`}
-                                                    onChange={(event) =>
+                                    )
+                                }
+                                connectionCount={components.length}
+                                connectionsContent={
+                                    components.length === 0 ? (
+                                        <p className="text-sm">No Connections yet</p>
+                                    ) : (
+                                        <fieldset className="space-y-3 border-0 p-0">
+                                            {components.map((component) => (
+                                                <ProvisionProjectWorkflowConnectionField
+                                                    componentTitle={component.title || component.name}
+                                                    connections={connectionsByComponentName.get(component.name) ?? []}
+                                                    id={`provision-connection-${workflow.workflowUuid}-${component.name}`}
+                                                    key={component.name}
+                                                    onChange={(connectionId) =>
                                                         handleWorkflowChange(workflow.workflowUuid, {
-                                                            inputs: {
-                                                                ...workflowState?.inputs,
-                                                                [input.name]: event.target.value,
+                                                            connections: {
+                                                                ...workflowState?.connections,
+                                                                [component.name]: connectionId,
                                                             },
                                                         })
                                                     }
-                                                    value={workflowState?.inputs[input.name] || ''}
+                                                    onNewConnection={() =>
+                                                        setNewConnectionTarget({
+                                                            componentName: component.name,
+                                                            workflowUuid: workflow.workflowUuid,
+                                                        })
+                                                    }
+                                                    value={getSelectedConnectionId(
+                                                        workflow.workflowUuid,
+                                                        component.name
+                                                    )}
                                                 />
-                                            </fieldset>
-                                        ))}
-                                    </fieldset>
+                                            ))}
+                                        </fieldset>
+                                    )
+                                }
+                                connectionsWarning={components.some(
+                                    (component) => !connectionsByComponentName.get(component.name)?.length
                                 )}
-                            </fieldset>
+                                disabled={locked}
+                                enabled={locked || selected}
+                                inputCount={workflow.inputs.length}
+                                inputsContent={
+                                    workflow.inputs.length === 0 ? (
+                                        <p className="text-sm">No Inputs yet</p>
+                                    ) : (
+                                        <fieldset className="space-y-3 border-0 p-0">
+                                            {workflow.inputs.map((input) => (
+                                                <fieldset className="space-y-1 border-0 p-0" key={input.name}>
+                                                    <Label
+                                                        htmlFor={`provision-workflow-${workflow.workflowUuid}-${input.name}`}
+                                                    >
+                                                        {input.label || input.name}
+
+                                                        {input.required && ' *'}
+                                                    </Label>
+
+                                                    <Input
+                                                        id={`provision-workflow-${workflow.workflowUuid}-${input.name}`}
+                                                        onChange={(event) =>
+                                                            handleWorkflowChange(workflow.workflowUuid, {
+                                                                inputs: {
+                                                                    ...workflowState?.inputs,
+                                                                    [input.name]: event.target.value,
+                                                                },
+                                                            })
+                                                        }
+                                                        value={workflowState?.inputs[input.name] || ''}
+                                                    />
+                                                </fieldset>
+                                            ))}
+                                        </fieldset>
+                                    )
+                                }
+                                key={workflow.workflowUuid}
+                                label={label}
+                                onEnabledChange={(enabled) =>
+                                    handleWorkflowChange(workflow.workflowUuid, {selected: enabled})
+                                }
+                                showTabs={!locked}
+                                showWorkflowToggle
+                                switchId={`provision-workflow-${workflow.workflowUuid}`}
+                            />
                         );
                     })}
                 </div>
