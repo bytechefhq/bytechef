@@ -306,12 +306,6 @@ bytechef:
     timeout: 60000
   resources:
     web: file:///opt/bytechef/client/
-  script:
-    sandbox:
-      enabled: true
-      max-concurrent-executions: 16
-      max-cpu-time: 5m
-      max-heap-memory: 512MB
   scheduler:
     # Trigger scheduler provider (AWS(EE) | QUARTZ) default: QUARTZ
     provider: QUARTZ
@@ -335,6 +329,11 @@ bytechef:
     # Gives script and commands tasks on the process, docker, kubernetes and aws-batch runners the parameters of the
     # connections they declare, in the JSON file BYTECHEF_CONNECTIONS_FILE names, masked in the captured output.
     inject-connections: true
+    sandbox:
+      enabled: true
+      max-concurrent-executions: 16
+      max-cpu-time: 5m
+      max-heap-memory: 512MB
     # Ceilings on what a remote task runner may cost this server: a held worker permit, captured log bytes, and
     # bytes moved in or out of the execution. A runner may override them under its own properties.
     runner-limits:

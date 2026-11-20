@@ -124,13 +124,12 @@ bytechef:
     # Gives script and commands tasks on the process, docker, kubernetes and aws-batch runners the parameters of the
     # connections they declare, in the JSON file BYTECHEF_CONNECTIONS_FILE names, masked in the captured output.
     inject-connections: true
-  # Tenant support mode (SINGLE | MULTI - EE only) default: SINGLE
-  script:
     sandbox:
       enabled: true
       max-concurrent-executions: 16
       max-cpu-time: 5m
       max-heap-memory: 512MB
+  # Tenant support mode (SINGLE | MULTI - EE only) default: SINGLE
   tenant:
     mode: SINGLE
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
