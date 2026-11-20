@@ -70,6 +70,7 @@ const ProvidedValuesForm = ({
             onClose={onClose}
             onSave={handleSubmit}
             saveDisabled={updateWorkflowMutation.isPending}
+            submitOnEnter
             workflowLabel={workflowLabel}
         >
             <ProvidedValuesFields
