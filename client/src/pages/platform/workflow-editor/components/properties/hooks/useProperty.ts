@@ -1693,6 +1693,35 @@ export const useProperty = ({
         }
     }, [formState, name, path]);
 
+    useEffect(() => {
+        if (!control || property.type === 'STRING' || property.controlType === 'FORMULA_MODE') {
+            return;
+        }
+
+        const formulaModeParams = {
+            control,
+            controlPath,
+            controlType: property.controlType,
+            propertyName: property.name?.replace(/\s/g, '_'),
+            propertyType: property.type,
+        };
+
+        let previousFormulaMode = getInitialFormulaMode(formulaModeParams);
+
+        return control._subscribe({
+            callback: () => {
+                const nextFormulaMode = getInitialFormulaMode(formulaModeParams);
+
+                if (nextFormulaMode && !previousFormulaMode) {
+                    setFormulaModeState(true);
+                }
+
+                previousFormulaMode = nextFormulaMode;
+            },
+            formState: {values: true},
+        });
+    }, [control, controlPath, property.controlType, property.name, property.type]);
+
     // set propertyParameterValue on initial render
     useEffect(() => {
         if (control) {
