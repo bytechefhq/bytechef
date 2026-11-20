@@ -15,6 +15,7 @@ export interface WorkflowDraftI {
     providedConnections?: ProvidedConnectionsType;
     providedInputs?: ProvidedInputsType;
     providedValuesPayload?: ProvidedValuesPayloadI;
+    requiredInternalOnlyInputsProvided?: boolean;
 }
 
 export interface WorkflowEnableChangeI {

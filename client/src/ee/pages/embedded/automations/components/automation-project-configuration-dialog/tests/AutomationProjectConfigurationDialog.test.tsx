@@ -5,12 +5,24 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AutomationProjectConfigurationDialog from '../AutomationProjectConfigurationDialog';
 
+const regionInput = {
+    componentName: null,
+    componentVersion: null,
+    groupName: null,
+    label: 'Region',
+    name: 'region',
+    optionConnections: [],
+    required: false,
+    type: 'STRING',
+};
+
 const mocks = vi.hoisted(() => ({
     configurations: {current: [] as unknown[]},
     createMutateAsync: vi.fn(),
     enableWorkflowMutateAsync: vi.fn(),
     impactData: {current: {automationProjectConfigurationVersionImpact: {workflows: []}} as unknown},
     impactQuery: vi.fn(),
+    providableInputs: {current: undefined as unknown[] | undefined},
     providableValuesQuery: vi.fn(),
     updateMutateAsync: vi.fn(),
     updateWorkflowMutateAsync: vi.fn(),
@@ -50,18 +62,7 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
                 ? {
                       automationProjectConfigurationWorkflowProvidableValues: {
                           connectionSlots: [],
-                          inputs: [
-                              {
-                                  componentName: null,
-                                  componentVersion: null,
-                                  groupName: null,
-                                  label: 'Region',
-                                  name: 'region',
-                                  optionConnections: [],
-                                  required: false,
-                                  type: 'STRING',
-                              },
-                          ],
+                          inputs: mocks.providableInputs.current ?? [regionInput],
                           providedConnections: null,
                           providedInputs: null,
                       },
@@ -207,6 +208,7 @@ describe('AutomationProjectConfigurationDialog', () => {
     afterEach(() => {
         mocks.configurations.current = [];
         mocks.impactData.current = {automationProjectConfigurationVersionImpact: {workflows: []}};
+        mocks.providableInputs.current = undefined;
 
         resetAll();
         vi.clearAllMocks();
@@ -912,6 +914,7 @@ describe('AutomationProjectConfigurationDialog', () => {
         const impactWorkflows = [
             {
                 affectedConnectedUserCount: 4,
+                awaitsConfiguration: false,
                 label: 'Sync Contacts',
                 newRequiredConnections: ['slack'],
                 newRequiredInputs: ['apiKey', 'region'],
@@ -955,6 +958,97 @@ describe('AutomationProjectConfigurationDialog', () => {
                     'Version 3 adds a required Slack connection to Sync Contacts: connected users without a Slack integration will pause.'
                 )
             ).toBeInTheDocument();
+        });
+
+        it('names a workflow that stays disabled until this configuration sets its internal-only inputs', async () => {
+            const user = userEvent.setup();
+
+            mocks.impactData.current = {
+                automationProjectConfigurationVersionImpact: {
+                    workflows: [
+                        {
+                            affectedConnectedUserCount: 2,
+                            awaitsConfiguration: true,
+                            label: 'Sync Accounts',
+                            newRequiredConnections: [],
+                            newRequiredInputs: [],
+                            workflowUuid: 'workflow-2',
+                        },
+                    ],
+                },
+            };
+
+            render(
+                <TooltipProvider>
+                    <AutomationProjectConfigurationDialog
+                        configuration={{...existingConfiguration, projectVersion: 1}}
+                        onClose={vi.fn()}
+                        project={project}
+                        updateProjectVersion
+                    />
+                </TooltipProvider>
+            );
+
+            await user.click(screen.getByRole('combobox', {name: 'Version'}));
+            await user.click(await screen.findByRole('option', {name: 'V3'}));
+
+            expect(
+                await screen.findByText(
+                    'Version 3 leaves Sync Accounts disabled until this configuration sets its internal-only inputs: 2 connected users will pause.'
+                )
+            ).toBeInTheDocument();
+        });
+
+        it('drops the internal-only warning of a workflow once its missing value is filled in the workflows step', async () => {
+            const user = userEvent.setup();
+
+            mocks.providableInputs.current = [
+                {
+                    ...regionInput,
+                    internalOnly: true,
+                    label: 'Account',
+                    name: 'accountId',
+                    required: true,
+                },
+            ];
+            mocks.impactData.current = {
+                automationProjectConfigurationVersionImpact: {
+                    workflows: [
+                        {
+                            affectedConnectedUserCount: 2,
+                            awaitsConfiguration: true,
+                            label: 'Sync Contacts',
+                            newRequiredConnections: [],
+                            newRequiredInputs: [],
+                            workflowUuid: 'workflow-1',
+                        },
+                    ],
+                },
+            };
+
+            render(
+                <TooltipProvider>
+                    <AutomationProjectConfigurationDialog
+                        configuration={{...existingConfigurationWithWorkflows, projectVersion: 1}}
+                        onClose={vi.fn()}
+                        project={project}
+                        updateProjectVersion
+                    />
+                </TooltipProvider>
+            );
+
+            const warningText =
+                'Version 3 leaves Sync Contacts disabled until this configuration sets its internal-only inputs: 2 connected users will pause.';
+
+            expect(await screen.findByText(warningText)).toBeInTheDocument();
+
+            await user.click(screen.getByRole('button', {name: 'Next'}));
+            await user.click(await screen.findByRole('tab', {name: /Inputs/}));
+            await user.type(await screen.findByLabelText(/Account/), 'account-1');
+            await user.click(screen.getByRole('button', {name: /^Basic/}));
+
+            expect(screen.getByLabelText('Version')).toBeInTheDocument();
+            expect(screen.queryByText(warningText)).not.toBeInTheDocument();
         });
 
         it('renders nothing when the impact list is empty', async () => {

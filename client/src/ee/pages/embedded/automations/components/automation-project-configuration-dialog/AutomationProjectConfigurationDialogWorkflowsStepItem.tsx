@@ -1,5 +1,6 @@
 import Switch from '@/components/Switch/Switch';
 import {Label} from '@/components/ui/label';
+import {isEmptyInternalOnlyInputValue} from '@/ee/pages/embedded/shared/internalOnlyInputs';
 import {useAutomationProjectConfigurationWorkflowProvidableValuesQuery} from '@/shared/middleware/graphql';
 import {WorkflowIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
@@ -108,6 +109,9 @@ const AutomationProjectConfigurationDialogWorkflowsStepItem = ({
                 changedProvidedConnections,
                 changedProvidedInputs
             ),
+            requiredInternalOnlyInputsProvided: providableValues.inputs
+                .filter((input) => input.internalOnly && input.required)
+                .every((input) => !isEmptyInternalOnlyInputValue(changedProvidedInputs[input.name])),
         });
 
     return (

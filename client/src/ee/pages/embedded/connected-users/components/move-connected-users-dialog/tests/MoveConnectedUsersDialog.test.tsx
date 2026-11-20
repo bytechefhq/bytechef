@@ -76,6 +76,7 @@ describe('MoveConnectedUsersDialog', () => {
             impact: [
                 {
                     affectedConnectedUserCount: 2,
+                    awaitsConfiguration: false,
                     label: 'Sync contacts',
                     newRequiredConnections: ['Slack'],
                     newRequiredInputs: ['channel'],
@@ -88,11 +89,47 @@ describe('MoveConnectedUsersDialog', () => {
         expect(screen.getByText('New required inputs: channel')).toBeInTheDocument();
     });
 
+    it('names a workflow that stays disabled until the configuration sets its internal-only inputs', () => {
+        renderDialog({
+            impact: [
+                {
+                    affectedConnectedUserCount: 3,
+                    awaitsConfiguration: true,
+                    label: 'Sync accounts',
+                    newRequiredConnections: [],
+                    newRequiredInputs: [],
+                },
+            ],
+        });
+
+        expect(screen.getByText('Sync accounts: affects 3 users')).toBeInTheDocument();
+        expect(
+            screen.getByText('Stays disabled until the configuration sets its internal-only inputs')
+        ).toBeInTheDocument();
+    });
+
+    it('does not mention internal-only inputs for a workflow the configuration has set up', () => {
+        renderDialog({
+            impact: [
+                {
+                    affectedConnectedUserCount: 2,
+                    awaitsConfiguration: false,
+                    label: 'Sync contacts',
+                    newRequiredConnections: [],
+                    newRequiredInputs: ['channel'],
+                },
+            ],
+        });
+
+        expect(screen.queryByText(/internal-only inputs/)).not.toBeInTheDocument();
+    });
+
     it('says "1 user" when the impact affects a single user', () => {
         renderDialog({
             impact: [
                 {
                     affectedConnectedUserCount: 1,
+                    awaitsConfiguration: false,
                     label: 'Sync contacts',
                     newRequiredConnections: [],
                     newRequiredInputs: [],
