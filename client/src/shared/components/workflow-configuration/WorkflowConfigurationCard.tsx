@@ -10,6 +10,7 @@ interface WorkflowConfigurationCardProps {
     connectionCount: number;
     connectionsContent: ReactNode;
     connectionsWarning?: boolean;
+    defaultTab?: 'connections' | 'inputs';
     disabled?: boolean;
     disabledMessage?: string;
     enabled: boolean;
@@ -29,6 +30,7 @@ const WorkflowConfigurationCard = ({
     connectionCount,
     connectionsContent,
     connectionsWarning = false,
+    defaultTab = 'connections',
     disabled = false,
     disabledMessage,
     enabled,
@@ -103,7 +105,7 @@ const WorkflowConfigurationCard = ({
         )}
 
         {showTabs && (enabled || !showWorkflowToggle) && (
-            <Tabs className="flex flex-col gap-2.5" defaultValue="connections">
+            <Tabs className="flex flex-col gap-2.5" defaultValue={defaultTab}>
                 <TabsList className="flex w-full">
                     <TabsTrigger className="flex w-full data-[state=active]:shadow-none" value="connections">
                         <Link2Icon className="mr-2 size-4" />

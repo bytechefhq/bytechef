@@ -92,6 +92,7 @@ const MoveConnectedUsersDialogContent = ({
     const [moving, setMoving] = useState(false);
     const [result, setResult] = useState<MoveConnectedUsersResultI>();
     const [search, setSearch] = useState('');
+    const [initialSourceLabel] = useState(sourceLabel);
     const [selectedConnectedUserIds, setSelectedConnectedUserIds] = useState<string[]>(
         () => initialSelectedConnectedUserIds || connectedUsers.map((connectedUser) => connectedUser.connectedUserId)
     );
@@ -174,8 +175,8 @@ const MoveConnectedUsersDialogContent = ({
 
                     <DialogDescription>
                         {singleConnectedUser
-                            ? `Moving ${labelByConnectedUserId.get(selectedConnectedUserIds[0]) || 'this connected user'} from ${sourceLabel}`
-                            : `Moving users from ${sourceLabel}`}
+                            ? `Moving ${labelByConnectedUserId.get(selectedConnectedUserIds[0]) || 'this connected user'} from ${initialSourceLabel}`
+                            : `Moving users from ${initialSourceLabel}`}
                     </DialogDescription>
                 </DialogHeader>
 
