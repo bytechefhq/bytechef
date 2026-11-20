@@ -1,4 +1,4 @@
-import LetAiFillAllButton from '@/pages/platform/mcp-servers/components/LetAiFillAllButton';
+import LetAiFillRequiredButton from '@/pages/platform/mcp-servers/components/LetAiFillRequiredButton';
 import {
     LoadPropertyOptionsType,
     collectHiddenToolPaths,
@@ -140,7 +140,7 @@ const McpToolFormFields = ({displayConditions, form, loadOptions, properties, va
             )}
 
             {bodyProperties.length > 0 && (
-                <LetAiFillAllButton disabled={!hasEligibleFields || isFilling} onClick={handleClick} />
+                <LetAiFillRequiredButton disabled={!hasEligibleFields || isFilling} onClick={handleClick} />
             )}
 
             {bodyProperties.length > 0 && (

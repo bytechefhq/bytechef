@@ -51,7 +51,7 @@ describe('McpToolFormFields', () => {
     it('leaves advanced fields empty while the advanced properties are collapsed', async () => {
         render(<Harness />);
 
-        await userEvent.click(await screen.findByRole('button', {name: 'Let AI fill all'}));
+        await userEvent.click(await screen.findByRole('button', {name: 'Let AI fill required'}));
 
         await waitFor(() => expect(formRef!.getValues('subject')).toMatch(/^=fromAi\(/));
 
@@ -63,14 +63,14 @@ describe('McpToolFormFields', () => {
 
         await userEvent.click(screen.getByRole('button', {name: 'Show Advanced Properties'}));
 
-        await userEvent.click(await screen.findByRole('button', {name: 'Let AI fill all'}));
+        await userEvent.click(await screen.findByRole('button', {name: 'Let AI fill required'}));
 
         await waitFor(() => expect(formRef!.getValues('replyTo')).toMatch(/^=fromAi\(/));
 
         expect(formRef!.getValues('subject')).toMatch(/^=fromAi\(/);
     });
 
-    it('enables let ai fill all when only an advanced field is empty and the advanced properties are expanded', async () => {
+    it('enables let ai fill required when only an advanced field is empty and the advanced properties are expanded', async () => {
         const Prefilled = () => {
             const form = useForm<Record<string, unknown>>({defaultValues: {subject: 'Hello'}});
 
@@ -81,7 +81,7 @@ describe('McpToolFormFields', () => {
 
         render(<Prefilled />);
 
-        const button = await screen.findByRole('button', {name: 'Let AI fill all'});
+        const button = await screen.findByRole('button', {name: 'Let AI fill required'});
 
         await waitFor(() => expect(button).toBeDisabled());
 
@@ -122,7 +122,7 @@ describe('McpToolFormFields', () => {
 
         render(<WithOptions />);
 
-        await userEvent.click(await screen.findByRole('button', {name: 'Let AI fill all'}));
+        await userEvent.click(await screen.findByRole('button', {name: 'Let AI fill required'}));
 
         await waitFor(() => expect(loadOptions).toHaveBeenCalled());
 
@@ -135,7 +135,7 @@ describe('McpToolFormFields', () => {
         expect(formRef!.getValues('subject')).toBe('Typed meanwhile');
     });
 
-    it('disables let ai fill all when the options of the only empty field do not load', async () => {
+    it('disables let ai fill required when the options of the only empty field do not load', async () => {
         const loadOptions = vi.fn(async () => null);
 
         const selectProperties = [
@@ -159,10 +159,10 @@ describe('McpToolFormFields', () => {
 
         await waitFor(() => expect(loadOptions).toHaveBeenCalled());
 
-        expect(screen.getByRole('button', {name: 'Let AI fill all'})).toBeDisabled();
+        expect(screen.getByRole('button', {name: 'Let AI fill required'})).toBeDisabled();
     });
 
-    it('enables let ai fill all once the options of the only empty field load', async () => {
+    it('enables let ai fill required once the options of the only empty field load', async () => {
         const loadOptions = vi.fn(async () => [{value: 'high'}, {value: 'low'}]);
 
         const selectProperties = [
@@ -186,7 +186,7 @@ describe('McpToolFormFields', () => {
 
         render(<OnlyOptions />);
 
-        const button = screen.getByRole('button', {name: 'Let AI fill all'});
+        const button = screen.getByRole('button', {name: 'Let AI fill required'});
 
         await waitFor(() => expect(button).toBeEnabled());
 

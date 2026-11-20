@@ -365,7 +365,7 @@ describe('McpProjectWorkflowDialog', () => {
         expect(await within(toolPanel).findByLabelText('toolName')).toBeInTheDocument();
         expect(within(toolPanel).getByLabelText('toolDescription')).toBeInTheDocument();
         expect(within(toolPanel).getByLabelText('channel')).toBeInTheDocument();
-        expect(within(toolPanel).getByRole('button', {name: 'Let AI fill all'})).toBeInTheDocument();
+        expect(within(toolPanel).getByRole('button', {name: 'Let AI fill required'})).toBeInTheDocument();
 
         await waitFor(() =>
             expect((within(toolPanel).getByLabelText('channel') as HTMLInputElement).value).toMatch(
@@ -390,7 +390,7 @@ describe('McpProjectWorkflowDialog', () => {
         await user.click(screen.getByRole('tab', {name: /Inputs/}));
 
         expect(screen.getByTestId('input-configuration-list')).toBeInTheDocument();
-        expect(screen.queryByRole('button', {name: 'Let AI fill all'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Let AI fill required'})).not.toBeInTheDocument();
         expect(screen.queryByText(/fromAi/)).not.toBeInTheDocument();
     });
 

@@ -279,7 +279,7 @@ describe('McpIntegrationInstanceConfigurationWorkflowDialog', () => {
         expect(await within(toolPanel).findByLabelText('toolName')).toBeInTheDocument();
         expect(within(toolPanel).getByLabelText('toolDescription')).toBeInTheDocument();
         expect(within(toolPanel).getByLabelText('channel')).toBeInTheDocument();
-        expect(within(toolPanel).getByRole('button', {name: 'Let AI fill all'})).toBeInTheDocument();
+        expect(within(toolPanel).getByRole('button', {name: 'Let AI fill required'})).toBeInTheDocument();
 
         await waitFor(() =>
             expect((within(toolPanel).getByLabelText('channel') as HTMLInputElement).value).toMatch(
