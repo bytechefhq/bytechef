@@ -125,6 +125,20 @@ public final class ComponentDefinition {
         return clusterRoot;
     }
 
+    public boolean isClusterRoot(@Nullable String actionName) {
+        if (!clusterRoot) {
+            return false;
+        }
+
+        if (actionName == null || actionClusterElementTypes == null) {
+            return true;
+        }
+
+        List<String> clusterElementTypeNames = actionClusterElementTypes.get(actionName);
+
+        return clusterElementTypeNames == null || !clusterElementTypeNames.isEmpty();
+    }
+
     public boolean isConnectionRequired() {
         return connectionRequired;
     }
