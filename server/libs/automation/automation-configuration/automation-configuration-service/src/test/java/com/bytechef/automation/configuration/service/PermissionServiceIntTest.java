@@ -235,7 +235,7 @@ class PermissionServiceIntTest {
 
         user.setId(userId);
 
-        when(userService.fetchCurrentUser()).thenReturn(Optional.of(user));
+        when(userService.fetchUserByLogin("user")).thenReturn(Optional.of(user));
     }
 
     private static void setAuthentication(String username, String authority) {

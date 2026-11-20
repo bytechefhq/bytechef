@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.configuration.config;
 
 import com.bytechef.automation.configuration.callback.ProjectCallback;
 import com.bytechef.automation.configuration.callback.ProjectWorkflowCallback;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.cache.config.CacheConfiguration;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
@@ -19,7 +20,6 @@ import com.bytechef.ee.automation.configuration.security.scope.DeploymentPermiss
 import com.bytechef.ee.automation.configuration.security.scope.McpPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ProjectPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.WorkflowPermissionScopeProvider;
-import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolver;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
