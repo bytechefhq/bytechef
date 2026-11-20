@@ -2493,10 +2493,11 @@ components:
           items:
             $ref: "#/components/schemas/ConfigurationMoveSkipped"
     ConfigurationMoveImpactWorkflow:
-      description: "A workflow of the target configuration that needs new required inputs or connections."
+      description: "A workflow of the target configuration that needs new required inputs or connections, or stays disabled until the configuration sets its internal-only inputs."
       type: "object"
       required:
         - "affectedConnectedUserCount"
+        - "awaitsConfiguration"
         - "label"
         - "newRequiredConnections"
         - "newRequiredInputs"
@@ -2505,6 +2506,9 @@ components:
         affectedConnectedUserCount:
           description: "The number of the moved connected users affected."
           type: "integer"
+        awaitsConfiguration:
+          description: "Whether the workflow stays disabled until the target configuration sets its required internal-only inputs."
+          type: "boolean"
         label:
           description: "The label of the workflow."
           type: "string"
