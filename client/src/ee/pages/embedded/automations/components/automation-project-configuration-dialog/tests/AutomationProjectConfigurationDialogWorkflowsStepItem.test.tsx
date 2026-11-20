@@ -10,7 +10,7 @@ const {configurationQueryMock, projectQueryMock} = vi.hoisted(() => ({
 
 const providableValues = {
     connectionSlots: [],
-    inputs: [{label: 'Contact page URL', name: 'contactPageUrl', required: true, type: 'string'}],
+    inputs: [{internalOnly: true, label: 'Contact page URL', name: 'contactPageUrl', required: true, type: 'string'}],
     providedConnections: {},
     providedInputs: {},
 };

@@ -92,6 +92,7 @@ describe('MoveConnectedUsersDialog', () => {
             impact: [
                 {
                     affectedConnectedUserCount: 1,
+                    awaitsConfiguration: false,
                     label: 'Rate ticket',
                     newRequiredConnections: [],
                     newRequiredInputs: ['contactPageUrl'],
@@ -353,6 +354,7 @@ describe('MoveConnectedUsersDialog', () => {
         const impact = [
             {
                 affectedConnectedUserCount: 2,
+                awaitsConfiguration: false,
                 label: 'Rate Ticket',
                 newRequiredConnections: [],
                 newRequiredInputs: ['contactPageUrl'],
