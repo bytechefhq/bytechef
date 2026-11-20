@@ -1589,6 +1589,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
         long integrationInstanceConfigurationId = Objects.requireNonNull(integrationInstanceConfiguration.getId());
 
+        Integration integration =
+            integrationService.getIntegration(integrationInstanceConfiguration.getIntegrationId());
         List<IntegrationWorkflow> allIntegrationWorkflows = integrationWorkflowService.getIntegrationWorkflows(
             integrationInstanceConfiguration.getIntegrationId());
         List<IntegrationInstanceConfigurationWorkflow> oldIntegrationInstanceConfigurationWorkflows =
@@ -1621,12 +1623,17 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 IntegrationInstanceConfigurationWorkflow curIntegrationInstanceConfigurationWorkflow =
                     oldIntegrationInstanceConfigurationWorkflow.get();
 
+                boolean enabled = curIntegrationInstanceConfigurationWorkflow.isEnabled() &&
+                    !needsAdministratorSetup(
+                        integration, integrationWorkflow.getWorkflowId(),
+                        curIntegrationInstanceConfigurationWorkflow.getConnections(),
+                        curIntegrationInstanceConfigurationWorkflow.getInputs());
+
                 integrationInstanceConfigurationWorkflowDTOs.add(
                     toIntegrationInstanceConfigurationWorkflowDTO(
                         integrationWorkflow.getWorkflowId(),
                         curIntegrationInstanceConfigurationWorkflow.getConnections(),
-                        curIntegrationInstanceConfigurationWorkflow.getInputs(),
-                        curIntegrationInstanceConfigurationWorkflow.isEnabled()));
+                        curIntegrationInstanceConfigurationWorkflow.getInputs(), enabled));
             } else {
                 integrationInstanceConfigurationWorkflowDTOs.add(
                     toIntegrationInstanceConfigurationWorkflowDTO(
@@ -1645,9 +1652,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 .build();
 
         updateIntegrationInstanceConfiguration(integrationInstanceConfigurationDTO);
-
-        Integration integration =
-            integrationService.getIntegration(integrationInstanceConfiguration.getIntegrationId());
 
         for (String newWorkflowId : newWorkflowIds) {
             if (!needsAdministratorSetup(integration, newWorkflowId, List.of(), Map.of())) {
