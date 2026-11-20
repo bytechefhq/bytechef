@@ -380,23 +380,12 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
     }
 
     @Test
-    void testUpdateMcpIntegrationInstanceWorkflowKeepsTheStoredInternalOnlyInputOverAConnectedUsersValue() {
+    void testUpdateMcpIntegrationInstanceWorkflowDiscardsAStoredInternalOnlyInput() {
         IntegrationInstanceWorkflow integrationInstanceWorkflow = getIntegrationInstanceWorkflow(integrationInstanceId);
 
-        integrationInstanceWorkflow.setInputs(Map.of("accountId", "vendor-account", "region", "eu"));
+        integrationInstanceWorkflow.setInputs(Map.of("accountId", "legacy-account", "region", "eu"));
 
         integrationInstanceWorkflowService.update(integrationInstanceWorkflow);
-
-        mcpIntegrationInstanceWorkflowFacade.updateMcpIntegrationInstanceWorkflow(
-            integrationInstanceId, WORKFLOW_UUID, Map.of("accountId", "user-account", "region", "us"));
-
-        assertThat(getIntegrationInstanceWorkflow(integrationInstanceId).getInputs())
-            .isEqualTo(Map.of("accountId", "vendor-account", "region", "us"));
-    }
-
-    @Test
-    void testUpdateMcpIntegrationInstanceWorkflowDropsAnInternalOnlyInputSetByAConnectedUser() {
-        deleteOwnIntegrationInstanceWorkflow();
 
         mcpIntegrationInstanceWorkflowFacade.updateMcpIntegrationInstanceWorkflow(
             integrationInstanceId, WORKFLOW_UUID, Map.of("accountId", "user-account", "region", "us"));
@@ -406,7 +395,15 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
     }
 
     @Test
-    void testUpdateMcpIntegrationInstanceWorkflowLetsTheApiKeyAuthenticatedVendorSetAnInternalOnlyInput() {
+    void testUpdateMcpIntegrationInstanceWorkflowIgnoresAnInternalOnlyInputFromAnyCaller() {
+        deleteOwnIntegrationInstanceWorkflow();
+
+        mcpIntegrationInstanceWorkflowFacade.updateMcpIntegrationInstanceWorkflow(
+            integrationInstanceId, WORKFLOW_UUID, Map.of("accountId", "x", "channel", "c"));
+
+        assertThat(getIntegrationInstanceWorkflow(integrationInstanceId).getInputs())
+            .isEqualTo(Map.of("channel", "c"));
+
         SecurityContextHolder.getContext()
             .setAuthentication(
                 new EmbeddedApiKeyAuthenticationToken(
@@ -414,10 +411,10 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
                     new User(OWN_EXTERNAL_USER_ID, "", List.of()), true));
 
         mcpIntegrationInstanceWorkflowFacade.updateMcpIntegrationInstanceWorkflow(
-            integrationInstanceId, WORKFLOW_UUID, Map.of("accountId", "vendor-account", "region", "us"));
+            integrationInstanceId, WORKFLOW_UUID, Map.of("accountId", "x", "channel", "c"));
 
         assertThat(getIntegrationInstanceWorkflow(integrationInstanceId).getInputs())
-            .isEqualTo(Map.of("accountId", "vendor-account", "region", "us"));
+            .isEqualTo(Map.of("channel", "c"));
     }
 
     private void deleteOwnIntegrationInstanceWorkflow() {

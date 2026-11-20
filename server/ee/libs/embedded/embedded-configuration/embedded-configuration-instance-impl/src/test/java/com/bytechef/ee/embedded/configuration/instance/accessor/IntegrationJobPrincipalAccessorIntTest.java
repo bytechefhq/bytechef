@@ -191,18 +191,18 @@ class IntegrationJobPrincipalAccessorIntTest {
     }
 
     @Test
-    void testGetInputMapUsesTheInstanceValueOfAnInternalOnlyInputTheConfigurationLeavesUnset() {
+    void testGetInputMapIgnoresAStoredInstanceValueOfAnInternalOnlyInput() {
         long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(
             true, true, Map.of("region", "eu"));
 
         long integrationInstanceId = createIntegrationInstance(integrationInstanceConfigurationId);
 
         createIntegrationInstanceWorkflow(
-            integrationInstanceConfigurationId, integrationInstanceId, Map.of("accountId", "vendor-set-account"));
+            integrationInstanceConfigurationId, integrationInstanceId, Map.of("accountId", "legacy"));
 
         Map<String, ?> inputMap = integrationJobPrincipalAccessor.getInputMap(integrationInstanceId, workflowUuid);
 
-        assertThat(inputMap).isEqualTo(Map.of("accountId", "vendor-set-account", "region", "eu"));
+        assertThat(inputMap).isEqualTo(Map.of("region", "eu"));
     }
 
     @Test

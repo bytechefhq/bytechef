@@ -33,8 +33,8 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflo
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.embedded.configuration.util.IntegrationWorkflowInputUtils;
+import com.bytechef.ee.embedded.configuration.util.InternalOnlyInputUtils;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
-import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -453,14 +453,9 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 //        Workflow workflow = workflowService.getWorkflow(workflowId);
 //        validateInputs(inputs, workflow);
 
-        if (ConnectedUserAuthentications.isConnectedUserTokenAuthenticated()) {
-            integrationInstanceWorkflow.setInputs(
-                IntegrationWorkflowInputUtils.preserveInternalOnlyInputs(
-                    workflowService.getWorkflow(workflowId), inputs == null ? Map.of() : inputs,
-                    integrationInstanceWorkflow.getInputs()));
-        } else {
-            integrationInstanceWorkflow.setInputs(inputs);
-        }
+        integrationInstanceWorkflow.setInputs(
+            InternalOnlyInputUtils.removeInternalOnlyInputs(
+                workflowService.getWorkflow(workflowId), inputs == null ? Map.of() : inputs));
 
         integrationInstanceWorkflowService.update(integrationInstanceWorkflow);
     }

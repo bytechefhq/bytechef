@@ -19,8 +19,7 @@ import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationIns
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
-import com.bytechef.ee.embedded.configuration.util.IntegrationWorkflowInputUtils;
-import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications;
+import com.bytechef.ee.embedded.configuration.util.InternalOnlyInputUtils;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
@@ -140,7 +139,7 @@ class McpIntegrationInstanceWorkflowFacadeImpl implements McpIntegrationInstance
             .ifPresentOrElse(
                 integrationInstanceWorkflow -> {
                     integrationInstanceWorkflow.setInputs(
-                        getAllowedInputs(workflowId, inputs, integrationInstanceWorkflow.getInputs()));
+                        getAllowedInputs(workflowId, inputs));
 
                     integrationInstanceWorkflowService.update(integrationInstanceWorkflow);
                 },
@@ -150,21 +149,15 @@ class McpIntegrationInstanceWorkflowFacadeImpl implements McpIntegrationInstance
                             integrationInstanceId, integrationInstanceConfigurationWorkflowId);
 
                     integrationInstanceWorkflow.setInputs(
-                        getAllowedInputs(workflowId, inputs, Map.of()));
+                        getAllowedInputs(workflowId, inputs));
 
                     integrationInstanceWorkflowService.update(integrationInstanceWorkflow);
                 });
     }
 
-    private Map<String, ?> getAllowedInputs(
-        String workflowId, Map<String, Object> inputs, Map<String, ?> storedInputs) {
-
-        if (!ConnectedUserAuthentications.isConnectedUserTokenAuthenticated()) {
-            return inputs;
-        }
-
-        return IntegrationWorkflowInputUtils.preserveInternalOnlyInputs(
-            workflowService.getWorkflow(workflowId), inputs == null ? Map.of() : inputs, storedInputs);
+    private Map<String, ?> getAllowedInputs(String workflowId, Map<String, Object> inputs) {
+        return InternalOnlyInputUtils.removeInternalOnlyInputs(
+            workflowService.getWorkflow(workflowId), inputs == null ? Map.of() : inputs);
     }
 
     private List<McpIntegrationInstanceConfigurationWorkflow> getMcpIntegrationInstanceConfigurationWorkflows(
