@@ -48,6 +48,7 @@ vi.mock(
 );
 
 vi.mock('@/shared/middleware/graphql', () => ({
+    AutomationProjectCodeWorkflowSourceDocument: 'AutomationProjectCodeWorkflowSourceDocument',
     useAutomationProjectCategoriesQuery: () => ({data: {automationProjectCategories: []}}),
     useAutomationProjectTagsQuery: () => ({data: {automationProjectTags: []}}),
     useAutomationProjectsQuery: () => hoisted.projectsQuery(),
@@ -58,6 +59,10 @@ vi.mock('@/shared/middleware/graphql', () => ({
             options?.onSuccess?.({createAutomationProject: 'project-2'});
         },
     }),
+}));
+
+vi.mock('@/shared/middleware/graphqlFetcher', () => ({
+    fetcher: () => () => Promise.resolve({automationProjectCodeWorkflowSource: ''}),
 }));
 
 vi.mock('@/ee/pages/embedded/automation/hooks/useCreateAutomationProjectWorkflow', () => ({
@@ -249,6 +254,20 @@ it('creates a workflow in the current project from the New Workflow button', asy
 
     expect(hoisted.createWorkflow).toHaveBeenCalledWith({description: '', label: 'New workflow'});
     expect(screen.queryByText('Workflow dialog')).not.toBeInTheDocument();
+});
+
+it('hides the New Workflow button for a code workflow project', () => {
+    hoisted.projectsQuery.mockReturnValue({
+        data: {
+            automationProjects: [{...mockProjects[0], codeWorkflowProject: true}, mockProjects[1]],
+        },
+        isLoading: false,
+    });
+
+    renderLeftSidebar();
+
+    expect(screen.queryByRole('button', {name: 'New Workflow'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'More workflow options'})).not.toBeInTheDocument();
 });
 
 it('creates workflows in the selected project', async () => {
