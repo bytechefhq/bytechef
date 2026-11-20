@@ -31,14 +31,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class BillingSubscriptionServiceImpl implements BillingSubscriptionService {
 
-    private final BillingSubscriptionCacheService billingSubscriptionCacheService;
+    private final BillingSubscriptionCache billingSubscriptionCache;
     private final BillingSubscriptionRepository billingSubscriptionRepository;
 
     BillingSubscriptionServiceImpl(
-        BillingSubscriptionCacheService billingSubscriptionCacheService,
+        BillingSubscriptionCache billingSubscriptionCache,
         BillingSubscriptionRepository billingSubscriptionRepository) {
 
-        this.billingSubscriptionCacheService = billingSubscriptionCacheService;
+        this.billingSubscriptionCache = billingSubscriptionCache;
         this.billingSubscriptionRepository = billingSubscriptionRepository;
     }
 
@@ -67,7 +67,7 @@ class BillingSubscriptionServiceImpl implements BillingSubscriptionService {
     public BillingSubscription save(BillingSubscription subscription) {
         BillingSubscription savedSubscription = billingSubscriptionRepository.save(subscription);
 
-        billingSubscriptionCacheService.evictTrialStatusCacheAfterCommit();
+        billingSubscriptionCache.evictTrialStatusCacheAfterCommit();
 
         return savedSubscription;
     }

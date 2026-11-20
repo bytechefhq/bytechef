@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -34,15 +34,15 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  *
  * @author Matija Petanjek
  */
-@Service
+@Component
 @ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
-class BillingSubscriptionCacheService {
+class BillingSubscriptionCache {
 
-    private static final Logger log = LoggerFactory.getLogger(BillingSubscriptionCacheService.class);
+    private static final Logger log = LoggerFactory.getLogger(BillingSubscriptionCache.class);
 
     private final CacheManager cacheManager;
 
-    BillingSubscriptionCacheService(CacheManager cacheManager) {
+    BillingSubscriptionCache(CacheManager cacheManager) {
         this.cacheManager = cacheManager;
     }
 
