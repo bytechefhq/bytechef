@@ -24,7 +24,6 @@ import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.service.AuthorityService;
-import com.bytechef.platform.user.service.UserInvitationService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.service.TenantService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -70,7 +69,7 @@ class UserManagementFacadeAuditIntTest {
     private AuthorityService authorityService;
 
     @MockitoBean
-    private UserInvitationService userInvitationService;
+    private UserInvitationFacade userInvitationFacade;
 
     @MockitoBean
     private UserService userService;
@@ -97,7 +96,7 @@ class UserManagementFacadeAuditIntTest {
 
         userManagementFacade.inviteUser("carol@localhost.com", "ROLE_USER");
 
-        verify(userInvitationService).inviteUser("carol@localhost.com", "ROLE_USER");
+        verify(userInvitationFacade).inviteUser("carol@localhost.com", "ROLE_USER");
 
         PersistentAuditEvent persistentAuditEvent = findSingle();
 
@@ -191,9 +190,9 @@ class UserManagementFacadeAuditIntTest {
         @Bean
         UserManagementFacade userManagementFacade(
             AuthorityService authorityService, TenantService tenantService,
-            UserInvitationService userInvitationService, UserService userService) {
+            UserInvitationFacade userInvitationFacade, UserService userService) {
 
-            return new UserManagementFacadeImpl(authorityService, tenantService, userInvitationService, userService);
+            return new UserManagementFacadeImpl(authorityService, tenantService, userInvitationFacade, userService);
         }
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.service;
+package com.bytechef.platform.user.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -35,6 +35,8 @@ import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
 import com.bytechef.platform.user.exception.InvalidEmailException;
 import com.bytechef.platform.user.exception.LoginAlreadyUsedException;
 import com.bytechef.platform.user.exception.UserErrorType;
+import com.bytechef.platform.user.service.AuthorityService;
+import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.service.TenantService;
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +51,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 /**
  * @author Ivica Cardic
  */
-class UserInvitationServiceTest {
+class UserInvitationFacadeTest {
 
     private static final String ACTIVATION_KEY = "invitation-key";
     private static final String EMAIL = "newuser@example.com";
@@ -59,7 +61,7 @@ class UserInvitationServiceTest {
     private MailService mailService;
     private TenantService tenantService;
     private UserService userService;
-    private UserInvitationServiceImpl userInvitationService;
+    private UserInvitationFacadeImpl userInvitationFacade;
 
     @BeforeEach
     void setUp() {
@@ -70,7 +72,7 @@ class UserInvitationServiceTest {
 
         when(mailService.isMailConfigured()).thenReturn(true);
 
-        userInvitationService = new UserInvitationServiceImpl(
+        userInvitationFacade = new UserInvitationFacadeImpl(
             authorityService, mailService, tenantService, userService);
     }
 
@@ -85,7 +87,7 @@ class UserInvitationServiceTest {
     void testInviteUserMailsTheInvitationLink() {
         User user = givenRegisterableUser();
 
-        userInvitationService.inviteUser(EMAIL, ROLE);
+        userInvitationFacade.inviteUser(EMAIL, ROLE);
 
         verify(mailService).sendCreationEmail(user);
     }
@@ -94,7 +96,7 @@ class UserInvitationServiceTest {
     void testInviteUserStoresAGeneratedPasswordNobodySupplied() {
         givenRegisterableUser();
 
-        userInvitationService.inviteUser(EMAIL, ROLE);
+        userInvitationFacade.inviteUser(EMAIL, ROLE);
 
         ArgumentCaptor<String> passwordCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -107,7 +109,7 @@ class UserInvitationServiceTest {
     void testInviteUserLeavesTheAccountInactiveUntilTheInviteeSetsAPassword() {
         User user = givenRegisterableUser();
 
-        userInvitationService.inviteUser(EMAIL, ROLE);
+        userInvitationFacade.inviteUser(EMAIL, ROLE);
 
         assertThat(user.isActivated()).isFalse();
         assertThat(user.isInvited()).isTrue();
@@ -121,7 +123,7 @@ class UserInvitationServiceTest {
         String email = "NewUser@Example.com";
         givenRegisterableUser();
 
-        userInvitationService.inviteUser(email, ROLE);
+        userInvitationFacade.inviteUser(email, ROLE);
 
         assertThat(captureRegisteredLogin()).isEqualTo(EMAIL);
     }
@@ -132,7 +134,7 @@ class UserInvitationServiceTest {
         when(tenantService.isMultiTenantEnabled()).thenReturn(true);
         when(tenantService.tenantIdsByUserLoginExist(EMAIL)).thenReturn(true);
 
-        assertThatThrownBy(() -> userInvitationService.inviteUser(EMAIL, ROLE))
+        assertThatThrownBy(() -> userInvitationFacade.inviteUser(EMAIL, ROLE))
             .isInstanceOf(LoginAlreadyUsedException.class);
 
         verify(userService, never()).registerUser(any(), anyString());
@@ -143,7 +145,7 @@ class UserInvitationServiceTest {
         when(authorityService.getAuthorities()).thenReturn(List.of(createAuthority(ROLE)));
         when(userService.fetchUserByLogin(EMAIL)).thenReturn(Optional.of(new User()));
 
-        assertThatThrownBy(() -> userInvitationService.inviteUser(EMAIL, ROLE))
+        assertThatThrownBy(() -> userInvitationFacade.inviteUser(EMAIL, ROLE))
             .isInstanceOf(LoginAlreadyUsedException.class);
 
         verify(userService, never()).registerUser(any(), anyString());
@@ -155,7 +157,7 @@ class UserInvitationServiceTest {
 
         when(authorityService.getAuthorities()).thenReturn(List.of(createAuthority(ROLE)));
 
-        assertThatThrownBy(() -> userInvitationService.inviteUser(email, ROLE))
+        assertThatThrownBy(() -> userInvitationFacade.inviteUser(email, ROLE))
             .isInstanceOf(InvalidEmailException.class);
 
         verify(userService, never()).registerUser(any(), anyString());
@@ -165,7 +167,7 @@ class UserInvitationServiceTest {
     void testInviteUserRejectsUnknownRoleBeforeProvisioning() {
         when(authorityService.getAuthorities()).thenReturn(List.of(createAuthority(ROLE)));
 
-        assertThatThrownBy(() -> userInvitationService.inviteUser(EMAIL, "ROLE_NONSENSE"))
+        assertThatThrownBy(() -> userInvitationFacade.inviteUser(EMAIL, "ROLE_NONSENSE"))
             .isInstanceOf(ConfigurationException.class)
             .hasMessageContaining("Invalid role");
 
@@ -177,7 +179,7 @@ class UserInvitationServiceTest {
         when(authorityService.getAuthorities()).thenReturn(List.of(createAuthority(ROLE)));
         when(mailService.isMailConfigured()).thenReturn(false);
 
-        assertThatThrownBy(() -> userInvitationService.inviteUser(EMAIL, ROLE))
+        assertThatThrownBy(() -> userInvitationFacade.inviteUser(EMAIL, ROLE))
             .isInstanceOf(ConfigurationException.class)
             .hasMessageContaining("No mail server is configured");
 
@@ -190,7 +192,7 @@ class UserInvitationServiceTest {
         when(tenantService.isMultiTenantEnabled()).thenReturn(true);
         when(tenantService.tenantIdsByUserEmailExist(EMAIL)).thenReturn(true);
 
-        assertThatThrownBy(() -> userInvitationService.inviteUser(EMAIL, ROLE))
+        assertThatThrownBy(() -> userInvitationFacade.inviteUser(EMAIL, ROLE))
             .isInstanceOf(EmailAlreadyUsedException.class);
 
         verify(userService, never()).registerUser(any(), anyString());
@@ -203,7 +205,7 @@ class UserInvitationServiceTest {
         TransactionSynchronizationManager.initSynchronization();
 
         try {
-            userInvitationService.inviteUser(EMAIL, ROLE);
+            userInvitationFacade.inviteUser(EMAIL, ROLE);
 
             verify(mailService, never()).sendCreationEmail(user);
 
@@ -222,7 +224,7 @@ class UserInvitationServiceTest {
         TransactionSynchronizationManager.initSynchronization();
 
         try {
-            userInvitationService.inviteUser(EMAIL, ROLE);
+            userInvitationFacade.inviteUser(EMAIL, ROLE);
 
             runAfterCompletionRolledBack();
 
@@ -239,7 +241,7 @@ class UserInvitationServiceTest {
         doThrow(new MailSendException("SMTP server unavailable")).when(mailService)
             .sendCreationEmail(user);
 
-        assertThatThrownBy(() -> userInvitationService.inviteUser(EMAIL, ROLE))
+        assertThatThrownBy(() -> userInvitationFacade.inviteUser(EMAIL, ROLE))
             .isInstanceOf(ConfigurationException.class)
             .hasMessageContaining("could not be sent")
             .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
@@ -256,7 +258,7 @@ class UserInvitationServiceTest {
         TransactionSynchronizationManager.initSynchronization();
 
         try {
-            userInvitationService.inviteUser(EMAIL, ROLE);
+            userInvitationFacade.inviteUser(EMAIL, ROLE);
 
             verify(mailService, never()).sendCreationEmail(user);
 

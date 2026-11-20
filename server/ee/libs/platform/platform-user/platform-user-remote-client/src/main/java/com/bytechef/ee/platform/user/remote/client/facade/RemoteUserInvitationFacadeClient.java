@@ -5,10 +5,10 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.platform.user.remote.client.service;
+package com.bytechef.ee.platform.user.remote.client.facade;
 
 import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.service.UserInvitationService;
+import com.bytechef.platform.user.facade.UserInvitationFacade;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteUserInvitationServiceClient implements UserInvitationService {
+public class RemoteUserInvitationFacadeClient implements UserInvitationFacade {
 
     @Override
     public User inviteUser(String email, String role) {

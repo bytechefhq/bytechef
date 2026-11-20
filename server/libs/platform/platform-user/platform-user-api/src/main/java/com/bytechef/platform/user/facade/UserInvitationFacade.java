@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.service;
+package com.bytechef.platform.user.facade;
 
 import com.bytechef.platform.user.domain.User;
 
 /**
  * @author Ivica Cardic
  */
-public interface UserInvitationService {
+public interface UserInvitationFacade {
 
     /**
      * Creates an inactive account for {@code email} holding the tenant authority {@code role}, with a random password
