@@ -7,6 +7,8 @@
 
 package com.bytechef.ee.platform.apiconnector.configuration.service;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Service for generating OpenAPI specifications from API documentation using AI.
  *
@@ -25,11 +27,19 @@ public interface ApiConnectorAiService {
     String generateOpenApiSpecification(String documentationUrl);
 
     /**
-     * Asynchronously generates an OpenAPI specification from API documentation URL.
+     * Fetches the API documentation page and returns its readable text content.
      *
-     * @param jobId            the job ID to track progress
      * @param documentationUrl the URL to the API documentation
-     * @param userPrompt       optional user instructions for endpoint selection
+     * @return the text content of the documentation page
      */
-    void generateOpenApiSpecificationAsync(String jobId, String documentationUrl, String userPrompt);
+    String fetchDocumentation(String documentationUrl);
+
+    /**
+     * Generates an OpenAPI specification from already fetched API documentation content.
+     *
+     * @param documentationContent the text content of the API documentation
+     * @param userInstructions     optional user instructions for endpoint selection
+     * @return the generated OpenAPI specification in YAML format
+     */
+    String generateOpenApiSpecificationFromContent(String documentationContent, @Nullable String userInstructions);
 }
