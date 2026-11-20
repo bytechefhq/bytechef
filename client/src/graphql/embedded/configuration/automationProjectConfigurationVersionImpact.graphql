@@ -6,6 +6,7 @@ query automationProjectConfigurationVersionImpact($id: ID!, $projectVersion: Int
             newRequiredInputs
             newRequiredConnections
             affectedConnectedUserCount
+            awaitsConfiguration
         }
     }
 }
