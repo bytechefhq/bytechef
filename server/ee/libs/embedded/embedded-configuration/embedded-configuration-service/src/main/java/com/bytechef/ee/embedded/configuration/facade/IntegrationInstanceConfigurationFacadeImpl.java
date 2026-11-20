@@ -1776,7 +1776,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                     IntegrationInstanceConfigurationErrorType.WORKFLOW_CONNECTIONS_NOT_FOUND);
             }
 
-            checkInternalOnlyInputs(workflow, integrationInstanceConfigurationWorkflow.getInputs());
+            checkInternalOnlyInputs(
+                workflowService.getWorkflow(workflowId), integrationInstanceConfigurationWorkflow.getInputs());
         }
 
         List<IntegrationInstance> integrationInstances = integrationInstanceService.getIntegrationInstances(
