@@ -37,6 +37,7 @@ import com.bytechef.platform.component.definition.AbstractComponentDefinitionWra
 import com.bytechef.platform.component.definition.VectorStoreComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
@@ -64,6 +65,7 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
         ClusterElementDefinitionService clusterElementDefinitionService,
         KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade,
         KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
+        KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
         KnowledgeBaseDocumentService knowledgeBaseDocumentService,
         KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
         KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
@@ -72,7 +74,8 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
         this.componentDefinition =
             new KnowledgeBaseVectorStoreComponentDefinitionImpl(
                 clusterElementDefinitionService, knowledgeBaseDocumentChunkFacade, knowledgeBaseDocumentChunkService,
-                knowledgeBaseDocumentService, knowledgeBaseDocumentTagService, knowledgeBaseFileStorage,
+                knowledgeBaseDocumentFacade, knowledgeBaseDocumentService, knowledgeBaseDocumentTagService,
+                knowledgeBaseFileStorage,
                 knowledgeBaseService, vectorStore);
     }
 
@@ -88,6 +91,7 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
             ClusterElementDefinitionService clusterElementDefinitionService,
             KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade,
             KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
+            KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
             KnowledgeBaseDocumentService knowledgeBaseDocumentService,
             KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
             KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
@@ -105,24 +109,29 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
                         KnowledgeBaseDeleteAction.of(vectorStore, knowledgeBaseService),
                         KnowledgeBaseLoadAction.of(
                             vectorStore, clusterElementDefinitionService, knowledgeBaseDocumentChunkService,
-                            knowledgeBaseDocumentService, knowledgeBaseFileStorage, knowledgeBaseService),
+                            knowledgeBaseDocumentFacade, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
+                            knowledgeBaseService),
                         KnowledgeBaseSearchAction.of(
                             vectorStore, knowledgeBaseService, knowledgeBaseDocumentTagService),
                         KnowledgeBaseUpdateAction.of(
                             vectorStore, clusterElementDefinitionService, knowledgeBaseDocumentChunkFacade,
-                            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
+                            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentFacade,
+                            knowledgeBaseDocumentService, knowledgeBaseFileStorage,
                             knowledgeBaseService))
                     .clusterElements(
                         KnowledgeBaseLoadTool.of(
-                            vectorStore, knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService,
+                            vectorStore, knowledgeBaseDocumentChunkService, knowledgeBaseDocumentFacade,
+                            knowledgeBaseDocumentService,
                             knowledgeBaseFileStorage, knowledgeBaseService),
                         KnowledgeBaseSearchTool.of(
                             vectorStore, knowledgeBaseService, knowledgeBaseDocumentTagService),
                         KnowledgeBaseUpdateTool.of(
                             vectorStore, knowledgeBaseDocumentChunkFacade, knowledgeBaseDocumentChunkService,
-                            knowledgeBaseDocumentService, knowledgeBaseFileStorage, knowledgeBaseService),
+                            knowledgeBaseDocumentFacade, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
+                            knowledgeBaseService),
                         KnowledgeBaseVectorStore.of(
-                            vectorStore, knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService,
+                            vectorStore, knowledgeBaseDocumentChunkService, knowledgeBaseDocumentFacade,
+                            knowledgeBaseDocumentService,
                             knowledgeBaseFileStorage, knowledgeBaseService, knowledgeBaseDocumentTagService)));
         }
 

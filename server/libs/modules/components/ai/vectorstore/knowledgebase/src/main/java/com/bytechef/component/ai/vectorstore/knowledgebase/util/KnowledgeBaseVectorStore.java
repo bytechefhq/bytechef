@@ -44,6 +44,7 @@ import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
@@ -76,12 +77,14 @@ public final class KnowledgeBaseVectorStore {
     public static ClusterElementDefinition<VectorStoreFunction> of(
         org.springframework.ai.vectorstore.VectorStore vectorStore,
         KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
+        KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
         KnowledgeBaseDocumentService knowledgeBaseDocumentService,
         KnowledgeBaseFileStorage knowledgeBaseFileStorage,
         KnowledgeBaseService knowledgeBaseService, KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService) {
 
         VectorStore kbVectorStore = createVectorStore(
-            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
+            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentFacade, knowledgeBaseDocumentService,
+            knowledgeBaseFileStorage,
             knowledgeBaseService, vectorStore);
 
         return ComponentDsl.<VectorStoreFunction>clusterElement(VECTOR_STORE)
@@ -110,16 +113,18 @@ public final class KnowledgeBaseVectorStore {
     }
 
     public static VectorStore createVectorStore(org.springframework.ai.vectorstore.VectorStore vectorStore) {
-        return new VectorStoreImpl(null, null, null, null, vectorStore);
+        return new VectorStoreImpl(null, null, null, null, null, vectorStore);
     }
 
     public static VectorStore createVectorStore(
         KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
+        KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
         KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseFileStorage knowledgeBaseFileStorage,
         KnowledgeBaseService knowledgeBaseService, org.springframework.ai.vectorstore.VectorStore vectorStore) {
 
         return new VectorStoreImpl(
-            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
+            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentFacade, knowledgeBaseDocumentService,
+            knowledgeBaseFileStorage,
             knowledgeBaseService, vectorStore);
     }
 
@@ -168,17 +173,20 @@ public final class KnowledgeBaseVectorStore {
 
         private final org.springframework.ai.vectorstore.VectorStore vectorStore;
         private final KnowledgeBaseService knowledgeBaseService;
+        private final KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade;
         private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
         private final KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService;
         private final KnowledgeBaseFileStorage knowledgeBaseFileStorage;
 
         public VectorStoreImpl(
             KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
+            KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
             KnowledgeBaseDocumentService knowledgeBaseDocumentService,
             KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
             org.springframework.ai.vectorstore.VectorStore vectorStore) {
 
             this.knowledgeBaseDocumentChunkService = knowledgeBaseDocumentChunkService;
+            this.knowledgeBaseDocumentFacade = knowledgeBaseDocumentFacade;
             this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
             this.knowledgeBaseFileStorage = knowledgeBaseFileStorage;
             this.knowledgeBaseService = knowledgeBaseService;
@@ -251,7 +259,7 @@ public final class KnowledgeBaseVectorStore {
                 knowledgeBaseDocument.setStatus(KnowledgeBaseDocument.STATUS_PROCESSING);
             }
 
-            knowledgeBaseDocument = knowledgeBaseDocumentService.saveKnowledgeBaseDocument(knowledgeBaseDocument);
+            knowledgeBaseDocument = knowledgeBaseDocumentFacade.saveKnowledgeBaseDocument(knowledgeBaseDocument);
 
             long knowledgeBaseDocumentId = knowledgeBaseDocument.getId();
 

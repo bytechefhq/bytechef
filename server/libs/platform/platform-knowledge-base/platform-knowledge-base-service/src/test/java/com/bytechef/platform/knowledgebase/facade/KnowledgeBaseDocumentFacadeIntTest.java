@@ -17,6 +17,7 @@
 package com.bytechef.platform.knowledgebase.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -288,6 +289,67 @@ class KnowledgeBaseDocumentFacadeIntTest {
             knowledgeBaseDocumentRepository.findAllByKnowledgeBaseId(knowledgeBase.getId());
 
         assertThat(documents).hasSize(2);
+    }
+
+    @Test
+    void testSaveNewDocumentOverTheLimitIsRejected() {
+        knowledgeBaseDocumentRepository.save(createDocument("Existing", 600L));
+
+        getKnowledgeBaseProperties().setMaxSizeBytes(1_000L);
+
+        assertThatThrownBy(
+            () -> knowledgeBaseDocumentFacade.saveKnowledgeBaseDocument(createDocument("New", 500L)))
+                .isInstanceOf(KnowledgeBaseStorageLimitExceededException.class);
+
+        assertThat(knowledgeBaseDocumentRepository.count()).isEqualTo(1);
+    }
+
+    @Test
+    void testSaveGrowingDocumentChecksOnlyTheGrowth() {
+        KnowledgeBaseDocument document = knowledgeBaseDocumentRepository.save(createDocument("Growing", 300L));
+
+        getKnowledgeBaseProperties().setMaxSizeBytes(600L);
+
+        document.setDocumentSize(500L);
+
+        KnowledgeBaseDocument savedDocument = knowledgeBaseDocumentFacade.saveKnowledgeBaseDocument(document);
+
+        assertThat(savedDocument.getDocumentSize()).isEqualTo(500L);
+    }
+
+    @Test
+    void testSaveShrinkingDocumentSkipsTheCheck() {
+        KnowledgeBaseDocument document = knowledgeBaseDocumentRepository.save(createDocument("Shrinking", 800L));
+
+        getKnowledgeBaseProperties().setMaxSizeBytes(100L);
+
+        document.setDocumentSize(500L);
+
+        assertThatCode(() -> knowledgeBaseDocumentFacade.saveKnowledgeBaseDocument(document))
+            .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testSaveDocumentWithoutSizeSkipsTheCheck() {
+        knowledgeBaseDocumentRepository.save(createDocument("Existing", 800L));
+
+        getKnowledgeBaseProperties().setMaxSizeBytes(100L);
+
+        assertThatCode(
+            () -> knowledgeBaseDocumentFacade.saveKnowledgeBaseDocument(createDocument("Unsized", null)))
+                .doesNotThrowAnyException();
+    }
+
+    private KnowledgeBaseDocument createDocument(String name, Long documentSize) {
+        KnowledgeBaseDocument document = new KnowledgeBaseDocument();
+
+        document.setKnowledgeBaseId(knowledgeBase.getId());
+        document.setName(name);
+        document.setDocument(new FileEntry(name + ".txt", "file://test/" + name + ".txt"));
+        document.setDocumentSize(documentSize);
+        document.setStatus(KnowledgeBaseDocument.STATUS_UPLOADED);
+
+        return document;
     }
 
     private ApplicationProperties.Ai.KnowledgeBase getKnowledgeBaseProperties() {

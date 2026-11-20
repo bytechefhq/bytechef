@@ -158,6 +158,21 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
     }
 
     @Override
+    public KnowledgeBaseDocument saveKnowledgeBaseDocument(KnowledgeBaseDocument knowledgeBaseDocument) {
+        Long documentSize = knowledgeBaseDocument.getDocumentSize();
+
+        if (documentSize != null) {
+            long incomingBytes = documentSize - getStoredDocumentSize(knowledgeBaseDocument.getId());
+
+            if (incomingBytes > 0) {
+                knowledgeBaseStorageService.checkLimit(incomingBytes);
+            }
+        }
+
+        return knowledgeBaseDocumentService.saveKnowledgeBaseDocument(knowledgeBaseDocument);
+    }
+
+    @Override
     public void updateKnowledgeBaseDocumentTags(long knowledgeBaseDocumentId, List<String> tagNames) {
         knowledgeBaseDocumentTagService.updateTagNames(knowledgeBaseDocumentId, tagNames);
 
@@ -177,5 +192,15 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
 
             knowledgeBaseVectorStoreMetadataService.updateTagNames(vectorStoreId, updatedTagNames);
         }
+    }
+
+    private long getStoredDocumentSize(Long id) {
+        if (id == null) {
+            return 0;
+        }
+
+        return knowledgeBaseDocumentService.fetchKnowledgeBaseDocument(id)
+            .map(KnowledgeBaseDocument::getDocumentSize)
+            .orElse(0L);
     }
 }
