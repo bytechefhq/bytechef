@@ -127,11 +127,9 @@ describe('ConnectedUserChangeVersionDialog', () => {
         await chooseVersion('V2 (downgrade)');
 
         expect(screen.queryByRole('combobox', {name: 'Configuration'})).not.toBeInTheDocument();
-        expect(
-            screen.getByText(
-                'Creates Default · V2 from Default, then moves this connected user to it. New connected users keep landing on Default.'
-            )
-        ).toBeInTheDocument();
+        expect(screen.getByRole('alert')).toHaveTextContent(
+            'Creates Default · V2 from Default, then moves this connected user to it. New connected users keep landing on Default.'
+        );
     });
 
     it('calls onChange with the version and the chosen target, then closes on a clean move', async () => {
