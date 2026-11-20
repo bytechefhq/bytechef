@@ -2220,7 +2220,7 @@ components:
       type: "object"
       properties:
         attentionReason:
-          description: "Why the workflow stays paused: TURNED_OFF_BY_ADMINISTRATOR, UPDATE_PENDING, MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input> or INVALID_WORKFLOW:<errorCount>. Null when nothing blocks it."
+          description: "Why the workflow stays paused: TURNED_OFF_BY_ADMINISTRATOR, UPDATE_PENDING, MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input>, INVALID_WORKFLOW:<errorCount> or AWAITING_CONFIGURATION (the administrator has not finished the configuration yet). Null when nothing blocks it."
           type: "string"
         enabled:
           description: "Whether the workflow is enabled for the connected user."
@@ -2300,7 +2300,8 @@ components:
             format: "int64"
         attentionReason:
           description: "Why the automation needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input>,\
-            \ UPDATE_PENDING or INVALID_WORKFLOW:<errorCount>. A COPY only reports INVALID_WORKFLOW. Null when healthy."
+            \ UPDATE_PENDING, INVALID_WORKFLOW:<errorCount> or AWAITING_CONFIGURATION (the administrator has not finished\
+            \ the configuration yet). A COPY only reports INVALID_WORKFLOW. Null when healthy."
           type: "string"
         mcpEnabled:
           description: "Whether the workflow is available to AI agents. Null when no MCP server offers it to the user,\
