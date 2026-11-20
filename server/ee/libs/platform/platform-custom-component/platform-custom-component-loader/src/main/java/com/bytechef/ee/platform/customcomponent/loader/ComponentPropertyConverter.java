@@ -13,6 +13,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableBooleanProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableNumberProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Option;
@@ -151,8 +152,22 @@ final class ComponentPropertyConverter {
         };
 
         applyIfPresent(propertyMap, "label", label -> property.label((String) label));
-        applyIfPresent(propertyMap, "description", description -> property.description((String) description));
         applyIfPresent(propertyMap, "placeholder", placeholder -> property.placeholder((String) placeholder));
+
+        applySharedSettings(property, propertyMap);
+
+        applyIfPresent(
+            propertyMap, "controlType", controlType -> applyControlType(property, (String) controlType));
+
+        applyIfPresent(
+            propertyMap, "optionsLookupDependsOn",
+            optionsLookupDependsOn -> applyOptionsLookupDependsOn(property, optionsLookupDependsOn));
+
+        return property;
+    }
+
+    static void applySharedSettings(ModifiableProperty<?> property, Map<String, ?> propertyMap) {
+        applyIfPresent(propertyMap, "description", description -> property.description((String) description));
         applyIfPresent(propertyMap, "required", required -> property.required((Boolean) required));
         applyIfPresent(
             propertyMap, "advancedOption", advancedOption -> property.advancedOption((Boolean) advancedOption));
@@ -163,15 +178,6 @@ final class ComponentPropertyConverter {
         applyIfPresent(
             propertyMap, "expressionEnabled",
             expressionEnabled -> property.expressionEnabled((Boolean) expressionEnabled));
-
-        applyIfPresent(
-            propertyMap, "controlType", controlType -> applyControlType(property, (String) controlType));
-
-        applyIfPresent(
-            propertyMap, "optionsLookupDependsOn",
-            optionsLookupDependsOn -> applyOptionsLookupDependsOn(property, optionsLookupDependsOn));
-
-        return property;
     }
 
     private static void applyControlType(ModifiableValueProperty<?, ?> property, String controlType) {

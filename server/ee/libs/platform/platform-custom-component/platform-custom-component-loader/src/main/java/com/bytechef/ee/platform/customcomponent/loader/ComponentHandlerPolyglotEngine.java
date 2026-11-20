@@ -731,6 +731,8 @@ class ComponentHandlerPolyglotEngine {
                     .toArray(String[]::new));
         }
 
+        ComponentPropertyConverter.applySharedSettings(property, propertyMap);
+
         return property;
     }
 
