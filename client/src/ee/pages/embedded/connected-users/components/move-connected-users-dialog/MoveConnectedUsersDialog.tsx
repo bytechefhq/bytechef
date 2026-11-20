@@ -57,6 +57,7 @@ interface MoveConnectedUsersDialogProps {
     previewError?: boolean;
     previewLoading?: boolean;
     previewSkipped?: MoveConnectedUsersSkippedI[];
+    singleConnectedUser?: boolean;
     sourceLabel: string;
     targets: Array<{id: string; label: string}>;
     title: string;
@@ -83,6 +84,7 @@ const MoveConnectedUsersDialogContent = ({
     previewError,
     previewLoading,
     previewSkipped,
+    singleConnectedUser = false,
     sourceLabel,
     targets,
     title,
@@ -170,7 +172,11 @@ const MoveConnectedUsersDialogContent = ({
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
 
-                    <DialogDescription>{`Moving users from ${sourceLabel}`}</DialogDescription>
+                    <DialogDescription>
+                        {singleConnectedUser
+                            ? `Moving ${labelByConnectedUserId.get(selectedConnectedUserIds[0]) || 'this connected user'} from ${sourceLabel}`
+                            : `Moving users from ${sourceLabel}`}
+                    </DialogDescription>
                 </DialogHeader>
 
                 {result ? (
@@ -203,38 +209,44 @@ const MoveConnectedUsersDialogContent = ({
                             toSkippedUser={toSkippedUser}
                         />
 
-                        <Input
-                            aria-label="Search users"
-                            onChange={(event) => setSearch(event.target.value)}
-                            placeholder="Search users"
-                            value={search}
-                        />
+                        {!singleConnectedUser && (
+                            <>
+                                <Input
+                                    aria-label="Search users"
+                                    onChange={(event) => setSearch(event.target.value)}
+                                    placeholder="Search users"
+                                    value={search}
+                                />
 
-                        <ul className="flex max-h-64 flex-col gap-2 overflow-y-auto">
-                            {filteredConnectedUsers.map((connectedUser) => {
-                                const label = getConnectedUserLabel(connectedUser);
+                                <ul className="flex max-h-64 flex-col gap-2 overflow-y-auto">
+                                    {filteredConnectedUsers.map((connectedUser) => {
+                                        const label = getConnectedUserLabel(connectedUser);
 
-                                return (
-                                    <li className="flex items-center gap-2" key={connectedUser.connectedUserId}>
-                                        <Checkbox
-                                            aria-label={label}
-                                            checked={selectedConnectedUserIds.includes(connectedUser.connectedUserId)}
-                                            onCheckedChange={(checked) =>
-                                                handleToggle(connectedUser.connectedUserId, checked === true)
-                                            }
-                                        />
+                                        return (
+                                            <li className="flex items-center gap-2" key={connectedUser.connectedUserId}>
+                                                <Checkbox
+                                                    aria-label={label}
+                                                    checked={selectedConnectedUserIds.includes(
+                                                        connectedUser.connectedUserId
+                                                    )}
+                                                    onCheckedChange={(checked) =>
+                                                        handleToggle(connectedUser.connectedUserId, checked === true)
+                                                    }
+                                                />
 
-                                        <span className="text-sm">{label}</span>
+                                                <span className="text-sm">{label}</span>
 
-                                        {connectedUser.email && connectedUser.email !== label && (
-                                            <span className="text-xs text-content-neutral-secondary">
-                                                {connectedUser.email}
-                                            </span>
-                                        )}
-                                    </li>
-                                );
-                            })}
-                        </ul>
+                                                {connectedUser.email && connectedUser.email !== label && (
+                                                    <span className="text-xs text-content-neutral-secondary">
+                                                        {connectedUser.email}
+                                                    </span>
+                                                )}
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </>
+                        )}
                     </div>
                 )}
 

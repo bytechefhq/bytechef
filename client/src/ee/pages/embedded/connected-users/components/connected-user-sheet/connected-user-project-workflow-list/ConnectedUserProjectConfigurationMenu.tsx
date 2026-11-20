@@ -217,6 +217,7 @@ const ConnectedUserProjectConfigurationMenu = ({
                     connectedUsers={connectedUsers}
                     initialSelectedConnectedUserIds={[connectedUser.connectedUserId]}
                     onClose={() => setShowChangeDialog(false)}
+                    singleConnectedUser
                     targetConfigurations={targetConfigurations}
                     title="Change configuration"
                 />

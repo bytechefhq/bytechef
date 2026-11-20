@@ -24,6 +24,7 @@ interface IntegrationInstanceConfigurationMoveUsersDialogProps {
     connectedUsers?: ConfigurationConnectedUser[];
     initialSelectedConnectedUserIds?: number[];
     onClose: () => void;
+    singleConnectedUser?: boolean;
     targetConfigurations: TargetConfigurationType[];
     title?: string;
 }
@@ -39,6 +40,7 @@ const IntegrationInstanceConfigurationMoveUsersDialog = ({
     connectedUsers: presetConnectedUsers,
     initialSelectedConnectedUserIds,
     onClose,
+    singleConnectedUser,
     targetConfigurations,
     title = 'Move Users',
 }: IntegrationInstanceConfigurationMoveUsersDialogProps) => {
@@ -118,6 +120,7 @@ const IntegrationInstanceConfigurationMoveUsersDialog = ({
             previewError={moveImpactError}
             previewLoading={moveImpactLoading}
             previewSkipped={moveImpact?.skipped}
+            singleConnectedUser={singleConnectedUser}
             sourceLabel={formatConfigurationLabel(configuration)}
             targets={targets}
             title={title}

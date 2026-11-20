@@ -292,7 +292,8 @@ describe('ConnectedUserSheetPanelIntegrationListItem', () => {
         await userEvent.click(screen.getByRole('menuitem', {name: 'Change configuration'}));
 
         expect(await screen.findByRole('heading', {name: 'Change configuration'})).toBeInTheDocument();
-        expect(screen.getByText('Jane')).toBeInTheDocument();
+        expect(screen.getByText(/^Moving Jane from /)).toBeInTheDocument();
+        expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
 
         await userEvent.click(screen.getByRole('combobox', {name: 'Target'}));
 
