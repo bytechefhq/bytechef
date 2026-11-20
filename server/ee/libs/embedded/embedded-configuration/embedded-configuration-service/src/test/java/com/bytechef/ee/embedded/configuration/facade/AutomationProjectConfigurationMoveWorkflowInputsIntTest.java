@@ -141,6 +141,12 @@ class AutomationProjectConfigurationMoveWorkflowInputsIntTest {
          "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
         """;
 
+    private static final String SLACK_WORKFLOW_WITH_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION = """
+        {"label":"Post","inputs":[
+         {"name":"channel","label":"Channel","type":"string","required":true,"internalOnly":true}],
+         "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
+        """;
+
     private static final String SLACK_WORKFLOW_WITH_OPTIONAL_CHANNEL_INPUT_DEFINITION = """
         {"label":"Post","inputs":[{"name":"channel","label":"Channel","type":"string","required":false}],
          "triggers":[],"tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
@@ -240,7 +246,7 @@ class AutomationProjectConfigurationMoveWorkflowInputsIntTest {
         Workflow draftWorkflow = workflowService.getWorkflow(draftWorkflowId);
 
         workflowService.update(
-            draftWorkflowId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION, draftWorkflow.getVersion());
+            draftWorkflowId, SLACK_WORKFLOW_WITH_INTERNAL_ONLY_CHANNEL_INPUT_DEFINITION, draftWorkflow.getVersion());
 
         automationProjectFacade.publishProject(automationProjectId);
 
