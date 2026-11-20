@@ -66,8 +66,28 @@ describe('registerStaleChunkReload', () => {
 
         registerStaleChunkReload();
 
-        window.dispatchEvent(new Event('vite:preloadError', {cancelable: true}));
+        const event = new Event('vite:preloadError', {cancelable: true});
+
+        window.dispatchEvent(event);
 
         expect(reload).toHaveBeenCalledTimes(1);
+        expect(event.defaultPrevented).toBe(true);
+    });
+
+    it('lets Vite throw the error when the chunk is still missing right after a reload', () => {
+        const reload = vi.fn();
+
+        vi.spyOn(window, 'location', 'get').mockReturnValue({...window.location, reload});
+
+        registerStaleChunkReload();
+
+        window.sessionStorage.setItem('bytechef.stale-chunk-reload-at', String(Date.now()));
+
+        const event = new Event('vite:preloadError', {cancelable: true});
+
+        window.dispatchEvent(event);
+
+        expect(reload).not.toHaveBeenCalled();
+        expect(event.defaultPrevented).toBe(false);
     });
 });

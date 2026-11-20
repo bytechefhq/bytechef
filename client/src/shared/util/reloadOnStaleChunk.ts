@@ -40,10 +40,15 @@ export const reloadOnStaleChunk = ({getStorage, now = Date.now, reload}: ReloadO
 };
 
 export const registerStaleChunkReload = () => {
-    window.addEventListener('vite:preloadError', () => {
-        reloadOnStaleChunk({
+    window.addEventListener('vite:preloadError', (event) => {
+        const reloaded = reloadOnStaleChunk({
             getStorage: () => window.sessionStorage,
             reload: () => window.location.reload(),
         });
+
+        // Vite throws the error unless the event is prevented. Throw only when no reload recovers from it.
+        if (reloaded) {
+            event.preventDefault();
+        }
     });
 };
