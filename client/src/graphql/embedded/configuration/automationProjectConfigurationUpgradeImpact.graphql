@@ -6,6 +6,7 @@ query automationProjectConfigurationUpgradeImpact($targetId: ID!, $connectedUser
             newRequiredInputs
             newRequiredConnections
             affectedConnectedUserCount
+            awaitsConfiguration
         }
         skipped {
             connectedUserId
