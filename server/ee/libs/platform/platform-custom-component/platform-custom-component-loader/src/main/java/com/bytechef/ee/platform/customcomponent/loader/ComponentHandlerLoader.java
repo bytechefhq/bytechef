@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.customcomponent.loader;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent.Language;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -41,6 +42,32 @@ public class ComponentHandlerLoader {
         }
     }
 
+    public static ComponentDefinition loadComponentDefinition(URL url, Language language) {
+        ComponentDefinition componentDefinition;
+
+        try {
+            componentDefinition = switch (language) {
+                case JAVA -> loadJavaComponentDefinition(url);
+                case JAVASCRIPT, PYTHON, RUBY -> loadPolyglotComponentDefinition(url, language);
+            };
+        } catch (Exception exception) {
+            throw new RuntimeException(exception);
+        }
+
+        if (componentDefinition == null) {
+            throw new IllegalArgumentException("No component handler found in " + url);
+        }
+
+        return componentDefinition;
+    }
+
+    private static ComponentDefinition loadJavaComponentDefinition(URL url) {
+        ComponentHandlerClassLoader componentHandlerClassLoader = ComponentHandlerClassLoader.of(
+            url, url.toString(), null);
+
+        return componentHandlerClassLoader.loadComponentDefinition();
+    }
+
     private static ComponentHandler loadJavaComponentHandler(
         URL url, String cacheKey, CacheManager cacheManager) {
         ComponentHandlerClassLoader componentHandlerClassLoader =
@@ -58,6 +85,14 @@ public class ComponentHandlerLoader {
         throws URISyntaxException, IOException {
 
         return ComponentHandlerPolyglotEngine.load(getLanguageId(language), Files.readString(Paths.get(url.toURI())));
+    }
+
+    private static ComponentDefinition loadPolyglotComponentDefinition(URL url, Language language)
+        throws URISyntaxException, IOException {
+
+        ComponentHandler componentHandler = loadPolyglotComponentHandler(url, language);
+
+        return componentHandler.getDefinition();
     }
 
     private static String getLanguageId(Language language) {

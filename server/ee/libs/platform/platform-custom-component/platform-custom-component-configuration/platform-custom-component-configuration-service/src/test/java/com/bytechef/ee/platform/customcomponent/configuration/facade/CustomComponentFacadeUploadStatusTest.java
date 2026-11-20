@@ -30,7 +30,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.cache.CacheManager;
 
 /**
  * @version ee
@@ -52,7 +51,7 @@ class CustomComponentFacadeUploadStatusTest {
             .thenReturn(new FileEntry("example_1.js", "file:///example_1.js"));
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         String content =
@@ -87,7 +86,7 @@ class CustomComponentFacadeUploadStatusTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         String content =
@@ -129,7 +128,7 @@ class CustomComponentFacadeUploadStatusTest {
             .thenReturn(newComponentFile);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         String content =
@@ -163,7 +162,7 @@ class CustomComponentFacadeUploadStatusTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         String content =
@@ -186,7 +185,7 @@ class CustomComponentFacadeUploadStatusTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         String content = "({name: 'acme-tasks', version: 1, actions: []})";
@@ -207,7 +206,7 @@ class CustomComponentFacadeUploadStatusTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         String content =
@@ -238,7 +237,7 @@ class CustomComponentFacadeUploadStatusTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, componentDefinitionServiceProvider);
 
         byte[] content = "({name: 'example', version: 2, actions: []})".getBytes(StandardCharsets.UTF_8);

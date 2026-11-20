@@ -69,6 +69,10 @@ class ComponentHandlerClassLoader extends IsolatingClassLoader<ComponentHandler>
         return get(cacheKey);
     }
 
+    ComponentDefinition loadComponentDefinition() {
+        return applyUncached(cacheKey, ComponentHandler::getDefinition);
+    }
+
     static String readIcon(ComponentDefinition componentDefinition, ClassLoader classLoader) {
         String icon = componentDefinition.getIcon()
             .orElse(null);
@@ -117,7 +121,7 @@ class ComponentHandlerClassLoader extends IsolatingClassLoader<ComponentHandler>
      */
     private record ContextClassLoaderComponentHandler(
         ComponentHandler componentHandler, String icon, IsolatingClassLoader<?> classLoader)
-        implements ComponentHandler {
+        implements ComponentHandler, IsolatingClassLoader.ClassLoaderOwner {
 
         @Override
         public ComponentDefinition getDefinition() {

@@ -32,7 +32,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.cache.CacheManager;
 
 /**
  * @version ee
@@ -56,7 +55,7 @@ class CustomComponentFacadeCreateEmptyTest {
             .thenReturn(new FileEntry("acme_1.js", "file:///acme_1.js"));
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         CustomComponent customComponent = customComponentFacade.createEmptyCustomComponent(
@@ -90,7 +89,7 @@ class CustomComponentFacadeCreateEmptyTest {
             .thenReturn(new FileEntry("acme_1.js", "file:///acme_1.js"));
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         customComponentFacade.createEmptyCustomComponent("acme", Language.JAVASCRIPT);
@@ -113,7 +112,7 @@ class CustomComponentFacadeCreateEmptyTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         assertThatThrownBy(() -> customComponentFacade.createEmptyCustomComponent("acme", language))
@@ -132,7 +131,7 @@ class CustomComponentFacadeCreateEmptyTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         assertThatThrownBy(() -> customComponentFacade.createEmptyCustomComponent("acme", Language.JAVASCRIPT))
@@ -158,7 +157,7 @@ class CustomComponentFacadeCreateEmptyTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         assertThatThrownBy(() -> customComponentFacade.createEmptyCustomComponent("acme", Language.JAVASCRIPT))
@@ -177,7 +176,7 @@ class CustomComponentFacadeCreateEmptyTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         assertThatThrownBy(
@@ -197,7 +196,7 @@ class CustomComponentFacadeCreateEmptyTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         assertThatThrownBy(() -> customComponentFacade.createEmptyCustomComponent("   ", Language.JAVASCRIPT))
@@ -219,7 +218,7 @@ class CustomComponentFacadeCreateEmptyTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, mock(ObjectProvider.class));
 
         assertThatThrownBy(() -> customComponentFacade.createEmptyCustomComponent(name, Language.JAVASCRIPT))
@@ -250,7 +249,7 @@ class CustomComponentFacadeCreateEmptyTest {
         CustomComponentFileStorage customComponentFileStorage = mock(CustomComponentFileStorage.class);
 
         CustomComponentFacadeImpl customComponentFacade = new CustomComponentFacadeImpl(
-            applicationProperties(true), mock(CacheManager.class), customComponentService,
+            applicationProperties(true), customComponentService,
             customComponentFileStorage, componentDefinitionServiceProvider);
 
         assertThatThrownBy(() -> customComponentFacade.createEmptyCustomComponent("slack", Language.JAVASCRIPT))

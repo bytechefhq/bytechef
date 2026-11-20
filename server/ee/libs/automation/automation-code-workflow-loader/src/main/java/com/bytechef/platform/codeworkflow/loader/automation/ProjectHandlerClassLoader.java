@@ -31,7 +31,8 @@ class ProjectHandlerClassLoader extends AbstractHandlerClassLoader<ProjectHandle
     }
 
     private record ContextClassLoaderProjectHandler(
-        ProjectHandler projectHandler, IsolatingClassLoader<?> classLoader) implements ProjectHandler {
+        ProjectHandler projectHandler, IsolatingClassLoader<?> classLoader)
+        implements ProjectHandler, IsolatingClassLoader.ClassLoaderOwner {
 
         @Override
         public ProjectDefinition getDefinition() {

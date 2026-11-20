@@ -8,7 +8,6 @@
 package com.bytechef.ee.platform.customcomponent.configuration.facade;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.TriggerDefinition;
@@ -39,10 +38,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.cache.CacheManager;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,7 +56,6 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
 
     private static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9]{0,127}$");
 
-    private final CacheManager cacheManager;
     private final ObjectProvider<ComponentDefinitionService> componentDefinitionServiceProvider;
     private final CustomComponentService customComponentService;
     private final CustomComponentFileStorage customComponentFileStorage;
@@ -67,11 +63,10 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
 
     @SuppressFBWarnings("EI")
     public CustomComponentFacadeImpl(
-        ApplicationProperties applicationProperties, CacheManager cacheManager,
-        CustomComponentService customComponentService, CustomComponentFileStorage customComponentFileStorage,
+        ApplicationProperties applicationProperties, CustomComponentService customComponentService,
+        CustomComponentFileStorage customComponentFileStorage,
         ObjectProvider<ComponentDefinitionService> componentDefinitionServiceProvider) {
 
-        this.cacheManager = cacheManager;
         this.componentDefinitionServiceProvider = componentDefinitionServiceProvider;
         this.customComponentService = customComponentService;
         this.customComponentFileStorage = customComponentFileStorage;
@@ -136,11 +131,8 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
 
         URL componentUrl = customComponentFileStorage.getCustomComponentFileURL(customComponent.getComponent());
 
-        ComponentHandler componentHandler = ComponentHandlerLoader.loadComponentHandler(
-            componentUrl, customComponent.getLanguage(),
-            componentUrl.toString() + UUID.randomUUID(), cacheManager);
-
-        ComponentDefinition componentDefinition = componentHandler.getDefinition();
+        ComponentDefinition componentDefinition = ComponentHandlerLoader.loadComponentDefinition(
+            componentUrl, customComponent.getLanguage());
 
         List<ActionDefinitionRecord> actions = componentDefinition.getActions()
             .stream()
@@ -384,10 +376,7 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
         URI uri = path.toUri();
 
         try {
-            ComponentHandler componentHandler = ComponentHandlerLoader.loadComponentHandler(
-                uri.toURL(), language, uri.toString() + UUID.randomUUID(), cacheManager);
-
-            return componentHandler.getDefinition();
+            return ComponentHandlerLoader.loadComponentDefinition(uri.toURL(), language);
         } finally {
             Files.delete(path);
         }
