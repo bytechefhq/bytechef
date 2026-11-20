@@ -604,16 +604,16 @@ describe('AutomationProjectConfigurationWorkflowDialog', () => {
         );
     });
 
-    it('says when the workflow has no connections to provide or no internal-only inputs to set', async () => {
+    it('shows the standard empty messages when the workflow has no connections or no internal-only inputs', async () => {
         const user = userEvent.setup();
 
         renderDialog({provided: {connectionSlots: [], inputs: []}});
 
-        expect(screen.getByText('This workflow has no connections to provide.')).toBeInTheDocument();
+        expect(screen.getByText('No Connections yet')).toBeInTheDocument();
 
         await openInputsTab(user);
 
-        expect(screen.getByText('This workflow has no internal-only inputs to set.')).toBeInTheDocument();
+        expect(screen.getByText('No Inputs yet')).toBeInTheDocument();
     });
 
     it('closes without saving when cancelled', async () => {
