@@ -1055,6 +1055,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
                 List<ConnectedUserIntegrationDTO.WorkflowInputInfo> inputs = WorkflowInput.of(workflow)
                     .stream()
+                    .filter(workflowInput -> !workflowInput.isInternalOnly())
                     .map(workflowInput -> new ConnectedUserIntegrationDTO.WorkflowInputInfo(
                         workflowInput.getName(), workflowInput.getLabel(), workflowInput.isRequired(),
                         workflowInput.getType(), workflowInput.isInternalOnly()))
