@@ -362,7 +362,7 @@ class IntegrationInstanceApiControllerIntTest {
                         new ConfigurationMoveResultDTO.Skipped(
                             2L, ConfigurationMoveResultDTO.Skipped.TARGET_LACKS_ENABLED_WORKFLOWS,
                             List.of("Cron"))),
-                    List.of(1L)));
+                    List.of(1L), 2L));
 
         this.webTestClient
             .post()
@@ -434,7 +434,7 @@ class IntegrationInstanceApiControllerIntTest {
                         new ConfigurationMoveResultDTO.Skipped(
                             2L, ConfigurationMoveResultDTO.Skipped.TARGET_LACKS_ENABLED_WORKFLOWS,
                             List.of("Cron"))),
-                    List.of(1L)));
+                    List.of(1L), 2L));
 
         this.webTestClient
             .post()

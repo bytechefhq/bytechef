@@ -102,6 +102,8 @@ public class AutomationProjectConfigurationFacadeImpl
     private static final Logger log = LoggerFactory.getLogger(
         AutomationProjectConfigurationFacadeImpl.class);
 
+    private static final String VERSION_COPY_PERMISSION_EXPRESSION = "false";
+
     private final ApplicationEventPublisher applicationEventPublisher;
     private final AutomationProjectConfigurationResolver automationProjectConfigurationResolver;
     private final AutomationProjectConfigurationService automationProjectConfigurationService;
@@ -172,6 +174,172 @@ public class AutomationProjectConfigurationFacadeImpl
         transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 
         this.requiresNewTransactionTemplate = transactionTemplate;
+    }
+
+    @Override
+    @Audited(
+        event = AutomationProjectAuditEvents.AUTOMATION_PROJECT_CONFIGURATION_CONNECTED_USER_VERSION_CHANGED,
+        data = {
+            @AuditData(key = "sourceConfigurationId", value = "#sourceId"),
+            @AuditData(key = "connectedUserId", value = "#connectedUserId"),
+            @AuditData(key = "projectVersion", value = "#projectVersion"),
+            @AuditData(key = "targetConfigurationId", value = "#result?.targetConfigurationId"),
+            @AuditData(key = "movedConnectedUserIds", value = "#result?.movedConnectedUserIds")
+        })
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public ConfigurationMoveResultDTO changeConnectedUserVersion(
+        long sourceId, long connectedUserId, int projectVersion, @Nullable Long targetId) {
+
+        AutomationProjectConfiguration sourceConfiguration =
+            automationProjectConfigurationService.getConfiguration(sourceId);
+
+        if (sourceConfiguration.getProjectVersion() == projectVersion) {
+            throw new IllegalArgumentException(
+                "Configuration id=%s is already on version %s".formatted(sourceId, projectVersion));
+        }
+
+        validatePublishedProjectVersion(sourceConfiguration.getProjectId(), projectVersion);
+
+        if (targetId != null) {
+            validateVersionTargetConfiguration(sourceConfiguration, targetId, projectVersion);
+
+            return getVersionChangeResult(
+                moveConnectedUsers(sourceId, targetId, List.of(connectedUserId)), connectedUserId);
+        }
+
+        Optional<AutomationProjectConfiguration> targetConfigurationOptional = fetchVersionTargetConfiguration(
+            sourceConfiguration, projectVersion);
+
+        if (targetConfigurationOptional.isPresent()) {
+            AutomationProjectConfiguration targetConfiguration = targetConfigurationOptional.get();
+
+            return getVersionChangeResult(
+                moveConnectedUsers(sourceId, targetConfiguration.getId(), List.of(connectedUserId)), connectedUserId);
+        }
+
+        long copyConfigurationId = createConfiguration(
+            sourceConfiguration.getProjectId(), sourceConfiguration.getEnvironmentId(),
+            getCopyConfigurationName(sourceConfiguration, projectVersion), VERSION_COPY_PERMISSION_EXPRESSION,
+            projectVersion, false,
+            sourceConfiguration.isAutomationHubVisible());
+
+        ConfigurationMoveResultDTO moveResult;
+
+        try {
+            copyConfigurationWorkflows(sourceConfiguration, copyConfigurationId, projectVersion);
+
+            enableConfiguration(copyConfigurationId, true);
+
+            moveResult = moveConnectedUsers(sourceId, copyConfigurationId, List.of(connectedUserId));
+        } catch (RuntimeException exception) {
+            try {
+                deleteConfiguration(copyConfigurationId);
+            } catch (RuntimeException deleteException) {
+                exception.addSuppressed(deleteException);
+            }
+
+            throw exception;
+        }
+
+        ConfigurationMoveResultDTO versionChangeResult = getVersionChangeResult(moveResult, connectedUserId);
+
+        if (versionChangeResult.targetConfigurationId() == null) {
+            deleteConfiguration(copyConfigurationId);
+        }
+
+        return versionChangeResult;
+    }
+
+    private void validateVersionTargetConfiguration(
+        AutomationProjectConfiguration sourceConfiguration, long targetId, int projectVersion) {
+
+        AutomationProjectConfiguration targetConfiguration =
+            automationProjectConfigurationService.getConfiguration(targetId);
+
+        validateSameProjectAndEnvironment(sourceConfiguration, targetConfiguration);
+
+        if (!targetConfiguration.isEnabled()) {
+            throw new IllegalArgumentException("Configuration id=%s is disabled".formatted(targetId));
+        }
+
+        if (targetConfiguration.getProjectVersion() != projectVersion) {
+            throw new IllegalArgumentException(
+                "Configuration id=%s is not on version %s".formatted(targetId, projectVersion));
+        }
+    }
+
+    private Optional<AutomationProjectConfiguration> fetchVersionTargetConfiguration(
+        AutomationProjectConfiguration sourceConfiguration, int projectVersion) {
+
+        String sourceName = StringUtils.trim(sourceConfiguration.getName());
+
+        return automationProjectConfigurationService
+            .getConfigurations(sourceConfiguration.getProjectId(), sourceConfiguration.getEnvironmentId())
+            .stream()
+            .filter(configuration -> configuration.isEnabled() && configuration.getProjectVersion() == projectVersion)
+            .min(
+                Comparator
+                    .comparing((AutomationProjectConfiguration configuration) -> !StringUtils.equalsIgnoreCase(
+                        StringUtils.trim(configuration.getName()), sourceName))
+                    .thenComparing(AutomationProjectConfiguration::getId));
+    }
+
+    private void copyConfigurationWorkflows(
+        AutomationProjectConfiguration sourceConfiguration, long copyConfigurationId, int projectVersion) {
+
+        for (AutomationProjectConfigurationWorkflow sourceConfigurationWorkflow : sourceConfiguration.getWorkflows()) {
+            UUID workflowUuid = sourceConfigurationWorkflow.getWorkflowUuid();
+
+            Optional<ProjectWorkflow> projectWorkflowOptional = projectWorkflowService.fetchProjectWorkflow(
+                sourceConfiguration.getProjectId(), projectVersion, String.valueOf(workflowUuid));
+
+            if (projectWorkflowOptional.isEmpty()) {
+                continue;
+            }
+
+            automationProjectConfigurationService.updateWorkflowProvidedValues(
+                copyConfigurationId, workflowUuid, new HashMap<>(sourceConfigurationWorkflow.getProvidedConnections()),
+                new HashMap<>(sourceConfigurationWorkflow.getProvidedInputs()));
+            automationProjectConfigurationService.updateWorkflowEnabled(
+                copyConfigurationId, workflowUuid, sourceConfigurationWorkflow.isEnabled());
+        }
+    }
+
+    private String getCopyConfigurationName(AutomationProjectConfiguration sourceConfiguration, int projectVersion) {
+        long projectId = sourceConfiguration.getProjectId();
+        long environmentId = sourceConfiguration.getEnvironmentId();
+
+        String baseName = "%s · V%d".formatted(StringUtils.trim(sourceConfiguration.getName()), projectVersion);
+
+        String copyConfigurationName = baseName;
+        int suffix = 2;
+
+        while (isConfigurationNameTaken(projectId, environmentId, copyConfigurationName)) {
+            copyConfigurationName = "%s (%d)".formatted(baseName, suffix);
+
+            suffix++;
+        }
+
+        return copyConfigurationName;
+    }
+
+    private boolean isConfigurationNameTaken(long projectId, long environmentId, String name) {
+        return automationProjectConfigurationService.getConfigurations(projectId, environmentId)
+            .stream()
+            .anyMatch(configuration -> StringUtils.equalsIgnoreCase(StringUtils.trim(configuration.getName()), name));
+    }
+
+    private static ConfigurationMoveResultDTO getVersionChangeResult(
+        ConfigurationMoveResultDTO moveResult, long connectedUserId) {
+
+        List<Long> movedConnectedUserIds = moveResult.movedConnectedUserIds();
+
+        if (movedConnectedUserIds.contains(connectedUserId)) {
+            return moveResult;
+        }
+
+        return new ConfigurationMoveResultDTO(
+            movedConnectedUserIds, moveResult.skipped(), moveResult.needsAttentionConnectedUserIds(), null);
     }
 
     @Override
@@ -696,7 +864,8 @@ public class AutomationProjectConfigurationFacadeImpl
             }
         }
 
-        return new ConfigurationMoveResultDTO(movedConnectedUserIds, skipped, needsAttentionConnectedUserIds);
+        return new ConfigurationMoveResultDTO(
+            movedConnectedUserIds, skipped, needsAttentionConnectedUserIds, targetConfiguration.getId());
     }
 
     private AutomationProjectConfigurationVersionImpactDTO getVersionImpact(
@@ -871,7 +1040,8 @@ public class AutomationProjectConfigurationFacadeImpl
         }
 
         return new ConfigurationMoveResultDTO(
-            List.copyOf(movedConnectedUserIds), sortSkipped(skipped), List.copyOf(needsAttentionConnectedUserIds));
+            List.copyOf(movedConnectedUserIds), sortSkipped(skipped), List.copyOf(needsAttentionConnectedUserIds),
+            targetConfiguration.getId());
     }
 
     private List<UpgradeSource> getUpgradeSources(
