@@ -8,7 +8,7 @@ import {ReactNode} from 'react';
 import {useForm} from 'react-hook-form';
 import {describe, expect, it, vi} from 'vitest';
 
-import IntegrationInstanceConfigurationDialogWorkflowsStepItem from './IntegrationInstanceConfigurationDialogWorkflowsStepItem';
+import IntegrationInstanceConfigurationDialogWorkflowsStepItem from '../IntegrationInstanceConfigurationDialogWorkflowsStepItem';
 
 const googleSheetsComponentDefinition = {
     inputs: [
@@ -198,6 +198,40 @@ const TestFormWithInternalOnlyInputs = () => {
     );
 };
 
+const workflowWithRequiredInternalOnlyInputs = {
+    id: 'wf3',
+    inputs: [
+        {internalOnly: true, label: 'Account', name: 'accountId', required: true, type: 'string'},
+        {internalOnly: true, label: 'Region', name: 'region', required: true, type: 'string'},
+        {internalOnly: true, label: 'Note', name: 'note', required: false, type: 'string'},
+    ],
+    tasks: [],
+    triggers: [],
+} as unknown as Workflow;
+
+const TestFormWithRequiredInternalOnlyInputs = () => {
+    const {control, formState, setValue} = useForm<IntegrationInstanceConfiguration>({
+        defaultValues: {
+            integrationInstanceConfigurationWorkflows: [
+                {connections: [], inputs: {region: 'eu'}},
+            ] as IntegrationInstanceConfiguration['integrationInstanceConfigurationWorkflows'],
+        },
+    });
+
+    return (
+        <IntegrationInstanceConfigurationDialogWorkflowsStepItem
+            componentName="someApp"
+            control={control}
+            formState={formState}
+            label="Workflow"
+            setValue={setValue}
+            showWorkflowToggle={false}
+            workflow={workflowWithRequiredInternalOnlyInputs}
+            workflowIndex={0}
+        />
+    );
+};
+
 describe('IntegrationInstanceConfigurationDialogWorkflowsStepItem', () => {
     it('opens on the Connections tab and counts the connections and inputs of the workflow', () => {
         render(
@@ -224,7 +258,7 @@ describe('IntegrationInstanceConfigurationDialogWorkflowsStepItem', () => {
         await waitFor(() => expect(screen.getByText('Spreadsheet')).toBeInTheDocument());
     });
 
-    it('excludes inputs that reference the integration component', async () => {
+    it('shows an internal-only input that references the integration component as a plain field', async () => {
         render(
             <QueryWrapper>
                 <TestForm componentName="slack" />
@@ -235,7 +269,22 @@ describe('IntegrationInstanceConfigurationDialogWorkflowsStepItem', () => {
 
         await waitFor(() => expect(screen.getByText('Spreadsheet')).toBeInTheDocument());
 
-        expect(screen.queryByText('Channel')).not.toBeInTheDocument();
+        expect(screen.getByText('Channel')).toBeInTheDocument();
+        expect(screen.queryByText('Channel ID')).not.toBeInTheDocument();
+    });
+
+    it('marks an empty required internal-only input as required before the workflow can be enabled', async () => {
+        render(
+            <QueryWrapper>
+                <TestFormWithRequiredInternalOnlyInputs />
+            </QueryWrapper>
+        );
+
+        await userEvent.click(screen.getByRole('tab', {name: /Inputs/}));
+
+        expect(await screen.findByText('Account: Required before this workflow can be enabled')).toBeInTheDocument();
+        expect(screen.queryByText('Region: Required before this workflow can be enabled')).not.toBeInTheDocument();
+        expect(screen.queryByText('Note: Required before this workflow can be enabled')).not.toBeInTheDocument();
     });
 
     it('passes only internalOnly inputs to the inputs list', async () => {

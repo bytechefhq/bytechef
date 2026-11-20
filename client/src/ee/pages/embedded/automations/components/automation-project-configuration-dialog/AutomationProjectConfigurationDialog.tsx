@@ -43,6 +43,7 @@ import AutomationProjectConfigurationDialogWorkflowsStep from './AutomationProje
 import {
     ConfigurationDialogWorkflowI,
     WorkflowDraftI,
+    WorkflowEnableChangeI,
     getWorkflowChanges,
 } from './automationProjectConfigurationDialog-utils';
 
@@ -372,22 +373,32 @@ const AutomationProjectConfigurationDialog = ({
     const saveWorkflowChanges = async (configurationId: string) => {
         const {enableChanges, providedValuesChanges} = getWorkflowChanges(dialogWorkflows, workflowDrafts);
 
-        const results = await Promise.allSettled([
-            ...enableChanges.map((enableChange) =>
-                enableWorkflowMutation.mutateAsync({
-                    enable: enableChange.enable,
-                    id: configurationId,
-                    workflowUuid: enableChange.workflowUuid,
-                })
-            ),
-            ...providedValuesChanges.map((providedValuesChange) =>
+        const saveEnableChanges = (workflowEnableChanges: WorkflowEnableChangeI[]) =>
+            Promise.allSettled(
+                workflowEnableChanges.map((enableChange) =>
+                    enableWorkflowMutation.mutateAsync({
+                        enable: enableChange.enable,
+                        id: configurationId,
+                        workflowUuid: enableChange.workflowUuid,
+                    })
+                )
+            );
+
+        const disableResults = await saveEnableChanges(enableChanges.filter((enableChange) => !enableChange.enable));
+
+        const providedValuesResults = await Promise.allSettled(
+            providedValuesChanges.map((providedValuesChange) =>
                 updateWorkflowMutation.mutateAsync({
                     id: configurationId,
                     ...providedValuesChange.providedValuesPayload,
                     workflowUuid: providedValuesChange.workflowUuid,
                 })
-            ),
-        ]);
+            )
+        );
+
+        const enableResults = await saveEnableChanges(enableChanges.filter((enableChange) => enableChange.enable));
+
+        const results = [...disableResults, ...providedValuesResults, ...enableResults];
 
         if (providedValuesChanges.length > 0) {
             void queryClient.invalidateQueries({

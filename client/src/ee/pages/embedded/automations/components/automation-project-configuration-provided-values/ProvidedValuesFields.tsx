@@ -1,5 +1,6 @@
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Input} from '@/components/ui/input';
+import {REQUIRED_INTERNAL_ONLY_INPUT_HINT} from '@/ee/pages/embedded/shared/internalOnlyInputs';
 import WorkflowConfigurationCard from '@/shared/components/workflow-configuration/WorkflowConfigurationCard';
 import {useAutomationProjectConfigurationWorkflowInputOptionsQuery} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
@@ -23,7 +24,40 @@ import {
     isComponentReferenceInput,
 } from './providedValues-utils';
 
+const SET_A_VALUE_PLACEHOLDER = 'Set a value';
+const LET_EACH_USER_FILL_PLACEHOLDER = 'Let each user fill it';
+
+const isBlankText = (text?: string): boolean => !text || text.trim() === '';
+
+const isEmptyInputValue = (value?: ProvidedInputValueType): boolean => {
+    if (value === undefined || typeof value === 'string') {
+        return isBlankText(value);
+    }
+
+    return Object.values(value).every((memberValue) => isBlankText(memberValue));
+};
+
+interface RequiredInternalOnlyHintProps {
+    input: ProvidableInputType;
+    value?: ProvidedInputValueType;
+}
+
+const RequiredInternalOnlyHint = ({input, value}: RequiredInternalOnlyHintProps) => {
+    if (!input.internalOnly || !input.required || !isEmptyInputValue(value)) {
+        return null;
+    }
+
+    return <span className="text-xs text-content-destructive-primary">{REQUIRED_INTERNAL_ONLY_INPUT_HINT}</span>;
+};
+
+const getInputLabelText = (input: ProvidableInputType): string => {
+    const inputLabel = input.label || input.name;
+
+    return input.internalOnly && input.required ? `${inputLabel} *` : inputLabel;
+};
+
 interface ValueSelectProps {
+    internalOnly?: boolean;
     label: string;
     onValueChange: (value: string) => void;
     options: ValueOptionI[];
@@ -31,20 +65,22 @@ interface ValueSelectProps {
     value: string;
 }
 
-const ValueSelect = ({label, onValueChange, options, placeholder, value}: ValueSelectProps) => {
+const ValueSelect = ({internalOnly = false, label, onValueChange, options, placeholder, value}: ValueSelectProps) => {
     const isCurrentValueMissing = !!value && !options.some((option) => option.value === value);
 
     return (
         <Select
             onValueChange={(selectedValue) => onValueChange(selectedValue === LET_EACH_USER_FILL ? '' : selectedValue)}
-            value={value || LET_EACH_USER_FILL}
+            value={value || (internalOnly ? '' : LET_EACH_USER_FILL)}
         >
             <SelectTrigger aria-label={label}>
-                <SelectValue />
+                <SelectValue placeholder={internalOnly ? placeholder || SET_A_VALUE_PLACEHOLDER : undefined} />
             </SelectTrigger>
 
             <SelectContent>
-                <SelectItem value={LET_EACH_USER_FILL}>{placeholder || 'Let each user fill it'}</SelectItem>
+                {!internalOnly && (
+                    <SelectItem value={LET_EACH_USER_FILL}>{placeholder || LET_EACH_USER_FILL_PLACEHOLDER}</SelectItem>
+                )}
 
                 {isCurrentValueMissing && <SelectItem value={value}>{value}</SelectItem>}
 
@@ -109,20 +145,28 @@ const PlainInput = ({input, onValueChange, value}: PlainInputProps) => {
     return (
         <fieldset className="flex flex-col gap-2 border-0 p-0">
             <label className="text-sm font-medium" htmlFor={`provided-input-${input.name}`}>
-                {inputLabel}
+                {getInputLabelText(input)}
             </label>
 
             {normalizedType === 'BOOLEAN' ? (
-                <ValueSelect label={inputLabel} onValueChange={onValueChange} options={BOOLEAN_OPTIONS} value={value} />
+                <ValueSelect
+                    internalOnly={input.internalOnly}
+                    label={inputLabel}
+                    onValueChange={onValueChange}
+                    options={BOOLEAN_OPTIONS}
+                    value={value}
+                />
             ) : (
                 <Input
                     id={`provided-input-${input.name}`}
                     inputMode={normalizedType && NUMERIC_INPUT_TYPES.has(normalizedType) ? 'decimal' : undefined}
                     onChange={(event) => onValueChange(event.target.value)}
-                    placeholder="Let each user fill it"
+                    placeholder={input.internalOnly ? SET_A_VALUE_PLACEHOLDER : LET_EACH_USER_FILL_PLACEHOLDER}
                     value={value}
                 />
             )}
+
+            <RequiredInternalOnlyHint input={input} value={value} />
         </fieldset>
     );
 };
@@ -182,14 +226,16 @@ const DynamicOptionsSelect = ({
 
     const optionsConnectionLabel = `Load ${label} options with`;
 
-    let placeholder = 'Let each user fill it';
+    const basePlaceholder = input.internalOnly ? SET_A_VALUE_PLACEHOLDER : LET_EACH_USER_FILL_PLACEHOLDER;
+
+    let placeholder = basePlaceholder;
 
     if (!connectionId) {
-        placeholder = 'Let each user fill it (no connection to load options)';
+        placeholder = `${basePlaceholder} (no connection to load options)`;
     } else if (isLoading) {
         placeholder = 'Loading options...';
     } else if (isError) {
-        placeholder = 'Let each user fill it (options could not be loaded)';
+        placeholder = `${basePlaceholder} (options could not be loaded)`;
     }
 
     return (
@@ -215,6 +261,7 @@ const DynamicOptionsSelect = ({
             )}
 
             <ValueSelect
+                internalOnly={input.internalOnly}
                 label={label}
                 onValueChange={onValueChange}
                 options={options}
@@ -276,18 +323,34 @@ const ComponentReferenceMember = ({
     }
 
     if (staticOptions.length > 0) {
-        return <ValueSelect label={label} onValueChange={onValueChange} options={staticOptions} value={value} />;
+        return (
+            <ValueSelect
+                internalOnly={input.internalOnly}
+                label={label}
+                onValueChange={onValueChange}
+                options={staticOptions}
+                value={value}
+            />
+        );
     }
 
     if (property.type === 'BOOLEAN') {
-        return <ValueSelect label={label} onValueChange={onValueChange} options={BOOLEAN_OPTIONS} value={value} />;
+        return (
+            <ValueSelect
+                internalOnly={input.internalOnly}
+                label={label}
+                onValueChange={onValueChange}
+                options={BOOLEAN_OPTIONS}
+                value={value}
+            />
+        );
     }
 
     return (
         <Input
             aria-label={label}
             onChange={(event) => onValueChange(event.target.value)}
-            placeholder="Let each user fill it"
+            placeholder={input.internalOnly ? SET_A_VALUE_PLACEHOLDER : LET_EACH_USER_FILL_PLACEHOLDER}
             value={value}
         />
     );
@@ -335,7 +398,7 @@ const ComponentReferenceInput = ({
     if (members.length === 1) {
         return (
             <fieldset className="flex flex-col gap-2 border-0 p-0">
-                <span className="text-sm font-medium">{inputLabel}</span>
+                <span className="text-sm font-medium">{getInputLabelText(input)}</span>
 
                 <ComponentReferenceMember
                     configurationId={configurationId}
@@ -349,6 +412,8 @@ const ComponentReferenceInput = ({
                     value={typeof value === 'string' ? value : ''}
                     workflowUuid={workflowUuid}
                 />
+
+                <RequiredInternalOnlyHint input={input} value={value} />
             </fieldset>
         );
     }
@@ -357,7 +422,7 @@ const ComponentReferenceInput = ({
 
     return (
         <fieldset className="flex flex-col gap-3 rounded-md border border-stroke-neutral-secondary p-3">
-            <legend className="px-1 text-sm font-medium">{inputLabel}</legend>
+            <legend className="px-1 text-sm font-medium">{getInputLabelText(input)}</legend>
 
             {members.map((member) => {
                 const memberName = member.name ?? '';
@@ -390,6 +455,8 @@ const ComponentReferenceInput = ({
                     </fieldset>
                 );
             })}
+
+            <RequiredInternalOnlyHint input={input} value={value} />
         </fieldset>
     );
 };
