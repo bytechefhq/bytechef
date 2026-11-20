@@ -4,11 +4,18 @@ import {describe, expect, it} from 'vitest';
 import useMcpWorkflowToolSeeding from '../useMcpWorkflowToolSeeding';
 
 describe('useMcpWorkflowToolSeeding', () => {
-    it('seeds conditional schema fields, which the workflow tool form always shows', async () => {
+    it('seeds required conditional schema fields, which the workflow tool form always shows, and skips optional ones', async () => {
         const loadWorkflowProperties = async () =>
             [
-                {controlType: 'TEXT', name: 'customer', type: 'STRING'},
-                {controlType: 'TEXT', displayCondition: "customer != ''", name: 'note', type: 'STRING'},
+                {controlType: 'TEXT', name: 'customer', required: true, type: 'STRING'},
+                {controlType: 'TEXT', name: 'comment', type: 'STRING'},
+                {
+                    controlType: 'TEXT',
+                    displayCondition: "customer != ''",
+                    name: 'note',
+                    required: true,
+                    type: 'STRING',
+                },
             ] as never;
 
         const {result} = renderHook(() =>

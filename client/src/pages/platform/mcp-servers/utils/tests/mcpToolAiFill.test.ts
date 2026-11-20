@@ -13,7 +13,13 @@ import {
 const loadOptionsNone = vi.fn().mockResolvedValue(null);
 
 function stringProperty(overrides: Record<string, unknown> = {}): PropertyAllType {
-    return {controlType: 'TEXT', name: 'subject', type: 'STRING', ...overrides} as unknown as PropertyAllType;
+    return {
+        controlType: 'TEXT',
+        name: 'subject',
+        required: true,
+        type: 'STRING',
+        ...overrides,
+    } as unknown as PropertyAllType;
 }
 
 function compute(
@@ -82,6 +88,15 @@ describe('computeAiFillValues', () => {
         });
     });
 
+    it('skips optional field', async () => {
+        const result = await compute([
+            stringProperty({name: 'optional', required: false}),
+            stringProperty({name: 'unmarked', required: undefined}),
+        ]);
+
+        expect(result).toEqual({});
+    });
+
     it('skips field holding its default value', async () => {
         const result = await compute([stringProperty({defaultValue: 'Hello'})], {subject: 'Hello'});
 
@@ -138,6 +153,7 @@ describe('computeAiFillValues', () => {
                 controlType: 'MULTI_SELECT',
                 name: 'labels',
                 options: [{value: 'a'}, {value: 'b'}],
+                required: true,
                 type: 'ARRAY',
             } as unknown as PropertyAllType,
         ]);

@@ -29,8 +29,8 @@ vi.mock('@/pages/platform/workflow-editor/components/properties/Properties', () 
 const properties = [
     {controlType: 'TEXT', name: 'toolName', type: 'STRING'},
     {controlType: 'TEXT_AREA', name: 'toolDescription', type: 'STRING'},
-    {controlType: 'TEXT', name: 'subject', type: 'STRING'},
-    {advancedOption: true, controlType: 'TEXT', name: 'replyTo', type: 'STRING'},
+    {controlType: 'TEXT', name: 'subject', required: true, type: 'STRING'},
+    {advancedOption: true, controlType: 'TEXT', name: 'replyTo', required: true, type: 'STRING'},
 ] as Array<PropertyAllType>;
 
 let formRef: ReturnType<typeof useForm<Record<string, unknown>>> | undefined;
@@ -101,8 +101,8 @@ describe('McpToolFormFields', () => {
         );
 
         const selectProperties = [
-            {controlType: 'SELECT', name: 'priority', optionsDataSource: {}, type: 'STRING'},
-            {controlType: 'TEXT', name: 'subject', type: 'STRING'},
+            {controlType: 'SELECT', name: 'priority', optionsDataSource: {}, required: true, type: 'STRING'},
+            {controlType: 'TEXT', name: 'subject', required: true, type: 'STRING'},
         ] as Array<PropertyAllType>;
 
         const WithOptions = () => {
@@ -139,7 +139,7 @@ describe('McpToolFormFields', () => {
         const loadOptions = vi.fn(async () => null);
 
         const selectProperties = [
-            {controlType: 'SELECT', name: 'priority', optionsDataSource: {}, type: 'STRING'},
+            {controlType: 'SELECT', name: 'priority', optionsDataSource: {}, required: true, type: 'STRING'},
         ] as Array<PropertyAllType>;
 
         const OnlyOptions = () => {
@@ -166,7 +166,7 @@ describe('McpToolFormFields', () => {
         const loadOptions = vi.fn(async () => [{value: 'high'}, {value: 'low'}]);
 
         const selectProperties = [
-            {controlType: 'SELECT', name: 'priority', optionsDataSource: {}, type: 'STRING'},
+            {controlType: 'SELECT', name: 'priority', optionsDataSource: {}, required: true, type: 'STRING'},
         ] as Array<PropertyAllType>;
 
         const OnlyOptions = () => {

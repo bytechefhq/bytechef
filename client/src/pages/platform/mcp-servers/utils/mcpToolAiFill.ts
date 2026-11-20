@@ -178,6 +178,7 @@ function collectAiFillCandidates({
             }
 
             if (
+                property.required &&
                 isFromAiEligibleProperty(property) &&
                 isEmptyToolValue(readValue(values, path)) &&
                 (optionsLoadable || !property.optionsDataSource)

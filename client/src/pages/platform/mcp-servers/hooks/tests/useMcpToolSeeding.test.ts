@@ -161,6 +161,7 @@ describe('useMcpToolSeeding', () => {
                     controlType: 'SELECT',
                     name: 'priority',
                     options: [{value: 'high'}, {value: 'low'}],
+                    required: true,
                     type: 'STRING',
                 },
             ],
@@ -181,8 +182,20 @@ describe('useMcpToolSeeding', () => {
         hoisted.definitionsByTool = {
             sendMessage: [
                 {controlType: 'SELECT', defaultValue: 'a', name: 'mode', options: [{value: 'a'}], type: 'STRING'},
-                {controlType: 'TEXT', displayCondition: "mode == 'a'", name: 'shownField', type: 'STRING'},
-                {controlType: 'TEXT', displayCondition: "mode == 'b'", name: 'hiddenField', type: 'STRING'},
+                {
+                    controlType: 'TEXT',
+                    displayCondition: "mode == 'a'",
+                    name: 'shownField',
+                    required: true,
+                    type: 'STRING',
+                },
+                {
+                    controlType: 'TEXT',
+                    displayCondition: "mode == 'b'",
+                    name: 'hiddenField',
+                    required: true,
+                    type: 'STRING',
+                },
             ],
         };
         hoisted.displayConditions = {"mode == 'a'": true, "mode == 'b'": false};
@@ -245,8 +258,8 @@ describe('useMcpToolSeeding', () => {
                 {
                     name: 'body',
                     properties: [
-                        {controlType: 'TEXT', defaultValue: 'JSON', name: 'format', type: 'STRING'},
-                        {controlType: 'TEXT', name: 'content', type: 'STRING'},
+                        {controlType: 'TEXT', defaultValue: 'JSON', name: 'format', required: true, type: 'STRING'},
+                        {controlType: 'TEXT', name: 'content', required: true, type: 'STRING'},
                     ],
                     type: 'OBJECT',
                 },
