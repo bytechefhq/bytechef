@@ -24,6 +24,7 @@ const renderDialog = ({
     configurations?: ConnectedUserChangeVersionConfigurationI[];
     impact?: Array<{
         affectedConnectedUserCount: number;
+        awaitsConfiguration: boolean;
         label: string;
         newRequiredConnections: string[];
         newRequiredInputs: string[];
@@ -49,7 +50,13 @@ const renderDialog = ({
     );
 
 const syncImpact = [
-    {affectedConnectedUserCount: 1, label: 'Sync', newRequiredConnections: ['Slack'], newRequiredInputs: []},
+    {
+        affectedConnectedUserCount: 1,
+        awaitsConfiguration: false,
+        label: 'Sync',
+        newRequiredConnections: ['Slack'],
+        newRequiredInputs: [],
+    },
 ];
 
 const chooseVersion = async (label: string) => {

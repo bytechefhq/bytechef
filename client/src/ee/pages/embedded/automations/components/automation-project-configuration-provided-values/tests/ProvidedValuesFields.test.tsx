@@ -46,10 +46,10 @@ const renderFields = (
     render(
         <QueryWrapper>
             <ProvidedValuesFields
-                configurationId="1"
                 enabled
                 onProvidedConnectionsChange={vi.fn()}
                 onProvidedInputsChange={vi.fn()}
+                optionsScope={{configurationId: '1'}}
                 providableValues={createProvidableValues(input)}
                 providedConnections={{}}
                 providedInputs={providedInputs}
