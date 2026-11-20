@@ -23,7 +23,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.platform.billing.service.TrialService;
+import com.bytechef.platform.billing.facade.TrialFacade;
 import com.bytechef.platform.billing.web.filter.TrialFilter;
 import jakarta.servlet.Filter;
 import org.junit.jupiter.api.Test;
@@ -36,10 +36,10 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
  */
 class TrialFilterSecurityConfigurerContributorTest {
 
-    private final TrialService trialService = mock(TrialService.class);
+    private final TrialFacade trialFacade = mock(TrialFacade.class);
 
     private final TrialFilterSecurityConfigurerContributor contributor =
-        new TrialFilterSecurityConfigurerContributor(trialService);
+        new TrialFilterSecurityConfigurerContributor(trialFacade);
 
     @Test
     void testGetSecurityConfigurerAdapterRegistersTrialFilterAfterBasicAuthenticationFilter() throws Exception {

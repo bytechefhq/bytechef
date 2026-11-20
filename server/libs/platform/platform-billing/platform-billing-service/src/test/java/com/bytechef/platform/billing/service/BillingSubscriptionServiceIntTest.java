@@ -131,7 +131,7 @@ class BillingSubscriptionServiceIntTest {
     }
 
     private Cache getTrialStatusCache() {
-        Cache cache = cacheManager.getCache(TrialServiceImpl.TRIAL_STATUS_CACHE);
+        Cache cache = cacheManager.getCache(BillingSubscriptionCache.TRIAL_STATUS_CACHE);
 
         assertThat(cache).isNotNull();
 

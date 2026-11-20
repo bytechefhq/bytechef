@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.billing.service;
+package com.bytechef.platform.billing.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -24,6 +24,8 @@ import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.dto.TrialDTO;
 import com.bytechef.platform.billing.event.TrialExpiredEvent;
 import com.bytechef.platform.billing.repository.BillingSubscriptionRepository;
+import com.bytechef.platform.billing.service.BillingSubscriptionCache;
+import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -48,7 +50,7 @@ import org.springframework.test.context.event.RecordApplicationEvents;
 @Import(PostgreSQLContainerConfiguration.class)
 @RecordApplicationEvents
 @SpringBootTest(classes = BillingIntTestConfiguration.class)
-class TrialServiceIntTest {
+class TrialFacadeIntTest {
 
     @Autowired
     private ApplicationEvents applicationEvents;
@@ -66,7 +68,7 @@ class TrialServiceIntTest {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    private TrialService trialService;
+    private TrialFacade trialFacade;
 
     @BeforeEach
     void beforeEach() {
@@ -75,7 +77,7 @@ class TrialServiceIntTest {
 
         billingSubscriptionRepository.deleteAll();
 
-        Cache cache = cacheManager.getCache(TrialServiceImpl.TRIAL_STATUS_CACHE);
+        Cache cache = cacheManager.getCache(BillingSubscriptionCache.TRIAL_STATUS_CACHE);
 
         if (cache != null) {
             cache.clear();
@@ -84,7 +86,7 @@ class TrialServiceIntTest {
 
     @Test
     void testValidateTrialThrowsWhenNoSubscriptionExists() {
-        assertThatThrownBy(() -> trialService.validateTrial())
+        assertThatThrownBy(() -> trialFacade.validateTrial())
             .isInstanceOf(IllegalStateException.class)
             .hasMessage("No active subscription found");
     }
@@ -100,7 +102,7 @@ class TrialServiceIntTest {
 
         seedDeployedJobs(6000);
 
-        TrialDTO status = trialService.validateTrial();
+        TrialDTO status = trialFacade.validateTrial();
 
         assertThat(status.expired())
             .as("a non-trial (paying) subscription must never be reported as expired, since TrialFilter blocks "
@@ -120,7 +122,7 @@ class TrialServiceIntTest {
 
         seedDeployedJobs(100);
 
-        TrialDTO status = trialService.validateTrial();
+        TrialDTO status = trialFacade.validateTrial();
 
         assertThat(status.expired()).isFalse();
         assertThat(status.jobsExecuted()).isEqualTo(100);
@@ -138,7 +140,7 @@ class TrialServiceIntTest {
 
         seedDeployedJobs(100);
 
-        TrialDTO status = trialService.validateTrial();
+        TrialDTO status = trialFacade.validateTrial();
 
         assertThat(status.expired()).isTrue();
         assertThat(status.daysRemaining()).isZero();
@@ -154,7 +156,7 @@ class TrialServiceIntTest {
 
         seedDeployedJobs(5000);
 
-        TrialDTO status = trialService.validateTrial();
+        TrialDTO status = trialFacade.validateTrial();
 
         assertThat(status.expired()).isTrue();
         assertThat(status.jobsExecuted()).isEqualTo(5000);
@@ -175,7 +177,7 @@ class TrialServiceIntTest {
 
         seedDeployedJobs(100);
 
-        TrialDTO status = trialService.validateTrial();
+        TrialDTO status = trialFacade.validateTrial();
 
         assertThat(status.expired()).isTrue();
         assertThat(findPersisted(savedSubscription).getLastModifiedDate())
@@ -192,19 +194,19 @@ class TrialServiceIntTest {
 
         seedDeployedJobs(100);
 
-        assertThat(trialService.validateTrial()
+        assertThat(trialFacade.validateTrial()
             .jobsExecuted()).isEqualTo(100);
 
         seedDeployedJobs(50);
 
-        assertThat(trialService.validateTrial()
+        assertThat(trialFacade.validateTrial()
             .jobsExecuted())
                 .as("the second call is served from the trialStatus cache")
                 .isEqualTo(100);
 
         billingSubscriptionService.save(subscription);
 
-        assertThat(trialService.validateTrial()
+        assertThat(trialFacade.validateTrial()
             .jobsExecuted())
                 .as("saving a subscription evicts the cache, so the next call recomputes")
                 .isEqualTo(150);

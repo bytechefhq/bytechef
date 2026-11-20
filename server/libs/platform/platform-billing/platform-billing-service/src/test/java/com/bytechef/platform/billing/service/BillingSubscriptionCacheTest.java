@@ -37,8 +37,8 @@ class BillingSubscriptionCacheTest {
 
     @BeforeEach
     void setUp() {
-        cacheManager = new ConcurrentMapCacheManager(TrialServiceImpl.TRIAL_STATUS_CACHE);
-        trialStatusCache = cacheManager.getCache(TrialServiceImpl.TRIAL_STATUS_CACHE);
+        cacheManager = new ConcurrentMapCacheManager(BillingSubscriptionCache.TRIAL_STATUS_CACHE);
+        trialStatusCache = cacheManager.getCache(BillingSubscriptionCache.TRIAL_STATUS_CACHE);
         billingSubscriptionCache = new BillingSubscriptionCache(cacheManager);
     }
 

@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.billing.service;
+package com.bytechef.platform.billing.facade;
 
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.dto.TrialDTO;
 import com.bytechef.platform.billing.event.TrialExpiredEvent;
+import com.bytechef.platform.billing.service.BillingSubscriptionCache;
+import com.bytechef.platform.billing.service.BillingSubscriptionService;
+import com.bytechef.platform.billing.service.BillingUsageService;
 import com.bytechef.tenant.TenantContext;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -34,15 +37,13 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
-public class TrialServiceImpl implements TrialService {
-
-    static final String TRIAL_STATUS_CACHE = "trialStatus";
+public class TrialFacadeImpl implements TrialFacade {
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final BillingSubscriptionService billingSubscriptionService;
     private final BillingUsageService billingUsageService;
 
-    public TrialServiceImpl(
+    public TrialFacadeImpl(
         ApplicationEventPublisher applicationEventPublisher,
         BillingSubscriptionService billingSubscriptionService,
         BillingUsageService billingUsageService) {
@@ -53,7 +54,7 @@ public class TrialServiceImpl implements TrialService {
     }
 
     @Override
-    @Cacheable(cacheNames = TRIAL_STATUS_CACHE)
+    @Cacheable(cacheNames = BillingSubscriptionCache.TRIAL_STATUS_CACHE)
     public TrialDTO validateTrial() {
         Optional<BillingSubscription> subscriptionOptional = billingSubscriptionService.fetchCurrentSubscription();
 
@@ -87,10 +88,10 @@ public class TrialServiceImpl implements TrialService {
 
     private void expireTrial(BillingSubscription subscription) {
         subscription.setStatus(BillingSubscription.Status.CANCELED);
+
         billingSubscriptionService.save(subscription);
 
         applicationEventPublisher.publishEvent(
             new TrialExpiredEvent(this, TenantContext.getCurrentTenantId()));
     }
-
 }

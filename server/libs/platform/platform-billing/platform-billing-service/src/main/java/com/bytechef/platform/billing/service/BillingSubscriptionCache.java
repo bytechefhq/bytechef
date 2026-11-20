@@ -36,7 +36,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  */
 @Component
 @ConditionalOnProperty(prefix = "billing", name = "enabled", havingValue = "true")
-class BillingSubscriptionCache {
+public class BillingSubscriptionCache {
+
+    public static final String TRIAL_STATUS_CACHE = "trialStatus";
 
     private static final Logger log = LoggerFactory.getLogger(BillingSubscriptionCache.class);
 
@@ -60,7 +62,7 @@ class BillingSubscriptionCache {
     }
 
     private void evictTrialStatusCache() {
-        Cache cache = cacheManager.getCache(TrialServiceImpl.TRIAL_STATUS_CACHE);
+        Cache cache = cacheManager.getCache(TRIAL_STATUS_CACHE);
 
         if (cache == null) {
             return;
