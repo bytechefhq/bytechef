@@ -198,7 +198,7 @@ return response.body;
 #### context.log
 
 `context.log(level, message)` writes a line to the step's execution log. `level` is `TRACE`, `DEBUG`, `INFO`, `WARN`
-or `ERROR`, in upper case. Any other value, including the lower-case forms, is logged at `INFO`.
+or `ERROR`, in any case (`"warn"` and `"WARN"` are the same level). Any other value, or no level, is logged at `INFO`.
 
 ```javascript
 context.log("WARN", "item " + input.itemId + " has no owner");
@@ -649,8 +649,10 @@ What the loader requires of the jar:
 - **A `ComponentHandler` registered for `ServiceLoader`.** Annotate the handler with
   `@AutoService(ComponentHandler.class)` (or write `META-INF/services/com.bytechef.component.ComponentHandler` by hand).
   The loader uses the first handler it finds, so put one component in each jar.
-- **An icon at `assets/sample.svg`.** The loader reads the component's icon from that path in the jar, whatever the
-  handler's own `.icon(...)` says. A jar without that file fails to load.
+- **An icon, optionally.** An inline SVG passed to `.icon(...)` is used as is. For `.icon("path:<path>")` the loader
+  reads that file from the jar. Without an inline icon, or when the `path:` file is missing, it tries
+  `assets/<name>.svg` and then `assets/sample.svg`. A jar with no icon at all still loads; the component just has no
+  icon.
 - **Everything except the ByteChef API inside the jar.** Classes in `java.*`, `jdk.*` and `com.bytechef.*` come from the
   server; every other class is loaded only from your jar, with no fallback to the server's class path. Build against
   the ByteChef `component-api` and `definition-api` without bundling them, and bundle every other runtime dependency
@@ -845,7 +847,8 @@ public final class SampleConstants {
 }
 ```
 
-The icon lives at `src/main/resources/assets/sample.svg`, the path the loader reads.
+The icon lives at `src/main/resources/assets/sample.svg`, the path the handler declares with
+`.icon("path:assets/sample.svg")`.
 
 ### Build
 
@@ -999,7 +1002,7 @@ The **New Custom Component** dialog ("Create an empty custom component and start
 
 | Field | |
 |---|---|
-| **Name** | Required, up to 256 characters. It becomes the component's `name` and `title`. It must not contain quotes, backslashes or line breaks, and must not be taken. Use an identifier such as `acmeTasks`: the name is part of every step type that uses the component. |
+| **Name** | Required, up to 128 characters: a letter followed by letters and digits, for example `acmeTasks`. It becomes the component's `name` and `title`. It must not be taken by another custom component (in any version) or by a built-in component. The name is part of every step type that uses the component. |
 | **Language** | **JavaScript**, the only language that can be created in ByteChef. To start in Python, write the file and import it. |
 
 **Create** generates a starter component, version 1, as a **draft**, and opens it in the source editor. The starter
@@ -1051,7 +1054,7 @@ An upload, through the import dialog or the API, works by name and version inste
 | The uploaded file declares | Result |
 |---|---|
 | A name and version that do not exist yet | A new version, already **published** and enabled. |
-| The name and version of a **published** version | That version's file, title, description and icon are replaced in place. Workflows using it pick up the change. |
+| The name and version of a **published** version | That version's file, title, description and icon are replaced in place. Workflows using it pick up the change. The file must be in the same language as the version it replaces; a different language is rejected with `LANGUAGE_MISMATCH`. |
 | The name and version of a **draft** | Rejected with `VERSION_ALREADY_EXISTS`. Publish or delete the draft first. |
 
 ### Errors
@@ -1062,8 +1065,9 @@ An upload, through the import dialog or the API, works by name and version inste
 | `DRAFT_ALREADY_EXISTS` | Saving a published version while the component already has a draft. Edit, publish or delete that draft. |
 | `VERSION_ALREADY_EXISTS` | A draft's new `version` collides with another version, or an upload targets a version owned by a draft. |
 | `COMPONENT_NOT_DRAFT` | Publishing something that is not a draft. |
-| `COMPONENT_ALREADY_EXISTS` | Creating a component whose name is taken. |
-| `INVALID_COMPONENT_NAME` | Creating a component with a blank name, or one containing quotes, backslashes or line breaks. |
+| `COMPONENT_ALREADY_EXISTS` | Creating a component whose name any version, published or draft, already uses. |
+| `INVALID_COMPONENT_NAME` | A component, action or trigger name that is not a letter followed by letters and digits (at most 128 characters), or a component name a built-in component already uses. |
+| `LANGUAGE_MISMATCH` | An upload replaces a published version with a file in a different language. |
 | `SOURCE_RENAME_UNSUPPORTED` | The edited source declares a different `name`. |
 | `JAVA_SOURCE_NOT_EDITABLE` | Reading or saving the source of a Java component. |
 | `LANGUAGE_NOT_SUPPORTED` | Creating a component in a language other than JavaScript, or uploading a Ruby file. |
