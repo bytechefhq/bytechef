@@ -96,6 +96,11 @@ type ConfigurationMoveResult {
     skipped: [ConfigurationMoveSkipped!]!
 }
 
+input ConfigurationMoveWorkflowInputs {
+    workflowUuid: ID!
+    inputs: Map!
+}
+
 type ConfigurationMoveSkipped {
     connectedUserId: ID!
     reason: String!
@@ -114,14 +119,14 @@ extend type Query {
 }
 
 extend type Mutation {
-    changeAutomationProjectConfigurationConnectedUserVersion(sourceId: ID!, connectedUserId: ID!, projectVersion: Int!, targetId: ID): ConfigurationMoveResult!
+    changeAutomationProjectConfigurationConnectedUserVersion(sourceId: ID!, connectedUserId: ID!, projectVersion: Int!, targetId: ID, workflowInputs: [ConfigurationMoveWorkflowInputs!]): ConfigurationMoveResult!
     createAutomationProjectConfiguration(projectId: ID!, environmentId: ID!, name: String!, permissionExpression: String, projectVersion: Int!, enabled: Boolean!, automationHubVisible: Boolean!): ID!
     updateAutomationProjectConfiguration(id: ID!, name: String!, permissionExpression: String, projectVersion: Int!, enabled: Boolean!, automationHubVisible: Boolean!): Boolean!
     deleteAutomationProjectConfiguration(id: ID!): Boolean!
     enableAutomationProjectConfiguration(id: ID!, enable: Boolean!): Boolean!
     enableAutomationProjectConfigurationWorkflow(id: ID!, workflowUuid: ID!, enable: Boolean!): Boolean!
     enableConnectedUserAutomationProjectConfiguration(connectedUserId: ID!, projectId: ID!, enable: Boolean!): Boolean!
-    moveAutomationProjectConfigurationConnectedUsers(sourceId: ID!, targetId: ID!, connectedUserIds: [ID!]!): ConfigurationMoveResult!
-    upgradeAutomationProjectConfigurationConnectedUsers(targetId: ID!, connectedUserIds: [ID!]!): ConfigurationMoveResult!
+    moveAutomationProjectConfigurationConnectedUsers(sourceId: ID!, targetId: ID!, connectedUserIds: [ID!]!, workflowInputs: [ConfigurationMoveWorkflowInputs!]): ConfigurationMoveResult!
+    upgradeAutomationProjectConfigurationConnectedUsers(targetId: ID!, connectedUserIds: [ID!]!, workflowInputs: [ConfigurationMoveWorkflowInputs!]): ConfigurationMoveResult!
     updateAutomationProjectConfigurationWorkflow(id: ID!, workflowUuid: ID!, providedConnections: Map, providedInputs: Map): Boolean!
 }
