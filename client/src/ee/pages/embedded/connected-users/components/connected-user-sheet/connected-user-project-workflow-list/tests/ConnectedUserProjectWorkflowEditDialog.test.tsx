@@ -180,6 +180,34 @@ describe('ConnectedUserProjectWorkflowEditDialog', () => {
         });
     });
 
+    it('does not require an input the server leaves out', async () => {
+        hoisted.provisionableQuery.mockReturnValue({
+            data: {provisionableConnectedUserProjects: createProjects(DIGEST_WORKFLOW)},
+        });
+        hoisted.referenceValuesQuery.mockReturnValue({
+            data: {
+                connectedUserProjectWorkflowReferenceValues: {
+                    connections: [{componentName: 'slack', connectionId: '32'}],
+                    inputs: {'user.channel': '#alerts'},
+                },
+            },
+        });
+
+        renderDialog();
+
+        await userEvent.click(screen.getByRole('tab', {name: /Inputs/}));
+
+        expect(screen.queryByLabelText(/accountId|Account/i)).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Save'})).toBeEnabled();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        const savedInputs = hoisted.mutate.mock.calls[0][0].workflows[0].inputs;
+
+        expect(savedInputs).toEqual({'user.channel': '#alerts'});
+        expect(savedInputs).not.toHaveProperty('accountId');
+    });
+
     it('selects a connection created from the dialog', async () => {
         renderDialog();
 
