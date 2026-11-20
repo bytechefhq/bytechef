@@ -165,6 +165,33 @@ class IntegrationInstanceConfigurationFacadeIntTest {
             "tasks": []
         }""";
 
+    private static final String STRING_TYPED_INPUTS_WORKFLOW_DEFINITION = """
+        {
+            "label": "String Typed Inputs Workflow",
+            "inputs": [
+                {"name": "accountId", "label": "Account", "type": "string", "required": true, "internalOnly": true},
+                {"name": "channel", "label": "Channel", "type": "string", "required": false},
+                {"name": "region", "label": "Region", "type": "string", "required": false},
+                {"name": "removed", "label": "Removed", "type": "string", "required": false}
+            ],
+            "triggers": [],
+            "tasks": []
+        }
+        """;
+
+    private static final String RETYPED_INPUTS_WORKFLOW_DEFINITION = """
+        {
+            "label": "Retyped Inputs Workflow",
+            "inputs": [
+                {"name": "accountId", "label": "Account", "type": "integer", "required": true, "internalOnly": true},
+                {"name": "channel", "label": "Channel", "type": "integer", "required": false},
+                {"name": "region", "label": "Region", "type": "STRING", "required": false}
+            ],
+            "triggers": [],
+            "tasks": []
+        }
+        """;
+
     private static final String INTERNAL_ONLY_REQUIRED_WORKFLOW_DEFINITION = """
         {
             "label": "Required Internal Only Workflow",
@@ -1863,6 +1890,48 @@ class IntegrationInstanceConfigurationFacadeIntTest {
                 copyConfiguration.getId(), changeVersionFixture.otherWorkflowId());
 
         assertThat(carriedConfigurationWorkflow.isEnabled()).isTrue();
+    }
+
+    @Test
+    void testChangeConnectedUserVersionDropsAProvidedInputWhoseTypeChanged() {
+        ChangeVersionFixture changeVersionFixture = createChangeVersionFixture(1, true);
+
+        UUID workflowUuid = UUID.randomUUID();
+
+        String sourceWorkflowId = addWorkflow(
+            changeVersionFixture.integrationId(), 1, workflowUuid, STRING_TYPED_INPUTS_WORKFLOW_DEFINITION);
+        String targetWorkflowId = addWorkflow(
+            changeVersionFixture.integrationId(), 2, workflowUuid, RETYPED_INPUTS_WORKFLOW_DEFINITION);
+
+        IntegrationInstanceConfigurationWorkflow sourceConfigurationWorkflow =
+            new IntegrationInstanceConfigurationWorkflow();
+
+        sourceConfigurationWorkflow.setEnabled(true);
+        sourceConfigurationWorkflow.setInputs(
+            Map.of("accountId", "account-1", "channel", "general", "region", "eu", "removed", "value"));
+        sourceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
+            changeVersionFixture.sourceConfigurationId());
+        sourceConfigurationWorkflow.setWorkflowId(sourceWorkflowId);
+
+        integrationInstanceConfigurationWorkflowService.create(sourceConfigurationWorkflow);
+
+        authenticate(admin());
+
+        ConfigurationMoveResultDTO configurationMoveResultDTO =
+            integrationInstanceConfigurationFacade.changeConnectedUserVersion(
+                changeVersionFixture.sourceConfigurationId(), CONNECTED_USER_ID, 2, null);
+
+        assertThat(configurationMoveResultDTO.movedConnectedUserIds()).containsExactly(CONNECTED_USER_ID);
+
+        IntegrationInstanceConfiguration copyConfiguration = getCopyConfiguration(
+            changeVersionFixture.integrationId(), List.of(changeVersionFixture.sourceConfigurationId()));
+
+        IntegrationInstanceConfigurationWorkflow copiedConfigurationWorkflow =
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                copyConfiguration.getId(), targetWorkflowId);
+
+        assertThat(copiedConfigurationWorkflow.getInputs()).isEqualTo(Map.of("region", "eu"));
+        assertThat(copiedConfigurationWorkflow.isEnabled()).isFalse();
     }
 
     @Test

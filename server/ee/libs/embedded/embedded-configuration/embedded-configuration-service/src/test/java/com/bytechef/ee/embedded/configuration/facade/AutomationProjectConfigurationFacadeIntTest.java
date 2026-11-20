@@ -224,6 +224,21 @@ class AutomationProjectConfigurationFacadeIntTest {
          "triggers":[],"tasks":[]}
         """;
 
+    private static final String STRING_TYPED_INPUTS_DEFINITION = """
+        {"label":"%s","inputs":[{"name":"channel","label":"Channel","type":"string","required":false},
+         {"name":"region","label":"Region","type":"string","required":false},
+         {"name":"removed","label":"Removed","type":"string","required":false},
+         {"name":"accountId","label":"Account","type":"string","required":true,"internalOnly":true}],
+         "triggers":[],"tasks":[]}
+        """;
+
+    private static final String RETYPED_INPUTS_DEFINITION = """
+        {"label":"%s","inputs":[{"name":"channel","label":"Channel","type":"integer","required":false},
+         {"name":"region","label":"Region","type":"STRING","required":false},
+         {"name":"accountId","label":"Account","type":"integer","required":true,"internalOnly":true}],
+         "triggers":[],"tasks":[]}
+        """;
+
     private static final String NO_INPUT_DEFINITION = """
         {"label":"%s","triggers":[],"tasks":[]}
         """;
@@ -1771,7 +1786,7 @@ class AutomationProjectConfigurationFacadeIntTest {
     void testChangeConnectedUserVersionLeavesAWorkflowWithANewRequiredInternalOnlyInputDisabled() {
         long projectId = createProject("Change Version Internal Only");
 
-        String syncWorkflowUuid = addWorkflow(projectId, withLabel(NO_INPUT_DEFINITION, "Sync Accounts"));
+        String syncWorkflowUuid = addWorkflow(projectId, withLabel(CHANNEL_OPTIONAL_DEFINITION, "Sync Accounts"));
         String notifyWorkflowUuid = addWorkflow(projectId, withLabel(CHANNEL_OPTIONAL_DEFINITION, "Notify"));
         String reportWorkflowUuid = addWorkflow(projectId, withLabel(CHANNEL_OPTIONAL_DEFINITION, "Report"));
 
@@ -1816,6 +1831,69 @@ class AutomationProjectConfigurationFacadeIntTest {
         assertThat(copyConfiguration.fetchWorkflow(UUID.fromString(syncWorkflowUuid)))
             .hasValueSatisfying(copyWorkflow -> assertThat(copyWorkflow.getProvidedInputs())
                 .isEqualTo(Map.of("channel", "general")));
+    }
+
+    @Test
+    void testChangeConnectedUserVersionDropsAProvidedInputWhoseTypeChanged() {
+        long projectId = createProject("Change Version Input Type");
+
+        String workflowUuid = addWorkflow(projectId, withLabel(STRING_TYPED_INPUTS_DEFINITION, "Sync Accounts"));
+
+        publish(projectId);
+        redefineDraftWorkflow(workflowUuid, withLabel(RETYPED_INPUTS_DEFINITION, "Sync Accounts"));
+        publish(projectId);
+
+        long sourceConfigurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
+
+        automationProjectConfigurationService.updateWorkflowProvidedValues(
+            sourceConfigurationId, UUID.fromString(workflowUuid), Map.of(),
+            Map.of("accountId", "account-1", "channel", "general", "region", "eu", "removed", "value"));
+
+        long connectedUserId = createConnectedUser(projectId, sourceConfigurationId);
+
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationFacade.changeConnectedUserVersion(
+            sourceConfigurationId, connectedUserId, 2, null);
+
+        assertThat(moveResult.movedConnectedUserIds()).containsExactly(connectedUserId);
+
+        AutomationProjectConfiguration copyConfiguration = automationProjectConfigurationService.getConfiguration(
+            getAssignedConfigurationId(connectedUserId, projectId));
+
+        assertThat(copyConfiguration.fetchWorkflow(UUID.fromString(workflowUuid)))
+            .hasValueSatisfying(copyWorkflow -> {
+                assertThat(copyWorkflow.getProvidedInputs()).isEqualTo(Map.of("region", "eu"));
+                assertThat(copyWorkflow.isEnabled()).isFalse();
+            });
+    }
+
+    @Test
+    void testUpdateConfigurationToAnotherVersionDropsAProvidedInputWhoseTypeChanged() {
+        long projectId = createProject("Update Version Input Type");
+
+        String workflowUuid = addWorkflow(projectId, withLabel(STRING_TYPED_INPUTS_DEFINITION, "Sync Accounts"));
+
+        publish(projectId);
+        redefineDraftWorkflow(workflowUuid, withLabel(RETYPED_INPUTS_DEFINITION, "Sync Accounts"));
+        publish(projectId);
+
+        long configurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, false, true);
+
+        automationProjectConfigurationService.updateWorkflowProvidedValues(
+            configurationId, UUID.fromString(workflowUuid), Map.of(),
+            Map.of("accountId", "account-1", "channel", "general", "region", "eu", "removed", "value"));
+
+        automationProjectConfigurationFacade.updateConfiguration(
+            configurationId, CONFIGURATION_NAME, null, 2, false, true);
+
+        AutomationProjectConfiguration configuration =
+            automationProjectConfigurationService.getConfiguration(configurationId);
+
+        assertThat(configuration.fetchWorkflow(UUID.fromString(workflowUuid)))
+            .hasValueSatisfying(
+                configurationWorkflow -> assertThat(configurationWorkflow.getProvidedInputs())
+                    .isEqualTo(Map.of("region", "eu")));
     }
 
     @Test

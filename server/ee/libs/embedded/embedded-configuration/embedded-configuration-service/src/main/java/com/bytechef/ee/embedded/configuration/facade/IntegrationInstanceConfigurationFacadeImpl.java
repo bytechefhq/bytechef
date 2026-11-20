@@ -43,6 +43,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
+import com.bytechef.ee.embedded.configuration.util.CarriedInputUtils;
 import com.bytechef.ee.embedded.configuration.util.InternalOnlyInputUtils;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -1037,9 +1038,12 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         IntegrationWorkflow integrationWorkflow, @Nullable IntegrationInstanceConfigurationWorkflow sourceWorkflow,
         Integration integration) {
 
-        Map<String, ?> inputs = sourceWorkflow == null ? Map.of() : sourceWorkflow.getInputs();
-
         Workflow workflow = workflowService.getWorkflow(integrationWorkflow.getWorkflowId());
+
+        Map<String, ?> inputs = sourceWorkflow == null
+            ? Map.of()
+            : CarriedInputUtils.retainInputsOfUnchangedType(
+                workflowService.getWorkflow(sourceWorkflow.getWorkflowId()), workflow, sourceWorkflow.getInputs());
 
         List<IntegrationInstanceConfigurationWorkflowConnection> connections =
             sourceWorkflow == null ? List.of() : getCarriedConnections(sourceWorkflow.getConnections(), workflow);
