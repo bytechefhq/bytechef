@@ -24,8 +24,8 @@ import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderAws;
 import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderFilesystem;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
-import com.bytechef.platform.data.storage.file.storage.service.FileDataStorageService;
-import com.bytechef.platform.data.storage.file.storage.service.FileDataStorageServiceImpl;
+import com.bytechef.platform.data.storage.file.storage.facade.FileDataStorageFacade;
+import com.bytechef.platform.data.storage.file.storage.facade.FileDataStorageFacadeImpl;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -45,7 +45,7 @@ public class FileDataStorageConfiguration {
         FileStorageServiceRegistry fileStorageServiceRegistry, ObjectMapper objectMapper) {
 
         return new DataStorageImpl(
-            new FileDataStorageServiceImpl(
+            new FileDataStorageFacadeImpl(
                 fileStorageServiceRegistry.getFileStorageService(Provider.AWS.name()), objectMapper));
     }
 
@@ -55,18 +55,18 @@ public class FileDataStorageConfiguration {
         FileStorageServiceRegistry fileStorageServiceRegistry, ObjectMapper objectMapper) {
 
         return new DataStorageImpl(
-            new FileDataStorageServiceImpl(
+            new FileDataStorageFacadeImpl(
                 fileStorageServiceRegistry.getFileStorageService(Provider.FILESYSTEM.name()), objectMapper));
     }
 
-    private record DataStorageImpl(FileDataStorageService fileDataStorageService) implements DataStorage {
+    private record DataStorageImpl(FileDataStorageFacade fileDataStorageFacade) implements DataStorage {
 
         @Override
         public <T> Optional<T> fetch(
             String componentName, DataStorageScope scope, String scopeId,
             String key, long environmentId, PlatformType type) {
 
-            return fileDataStorageService.fetch(componentName, scope, scopeId, key, environmentId, type);
+            return fileDataStorageFacade.fetch(componentName, scope, scopeId, key, environmentId, type);
         }
 
         @Override
@@ -74,7 +74,7 @@ public class FileDataStorageConfiguration {
             String componentName, DataStorageScope scope, String scopeId,
             String key, long environmentId, PlatformType type) {
 
-            return fileDataStorageService.get(componentName, scope, scopeId, key, environmentId, type);
+            return fileDataStorageFacade.get(componentName, scope, scopeId, key, environmentId, type);
         }
 
         @Override
@@ -82,7 +82,7 @@ public class FileDataStorageConfiguration {
             String componentName, DataStorageScope scope, String scopeId, long environmentId,
             PlatformType type) {
 
-            return fileDataStorageService.getAll(componentName, scope, scopeId, environmentId, type);
+            return fileDataStorageFacade.getAll(componentName, scope, scopeId, environmentId, type);
         }
 
         @Override
@@ -90,7 +90,7 @@ public class FileDataStorageConfiguration {
             String componentName, DataStorageScope scope, String scopeId,
             String key, Object value, long environmentId, PlatformType type) {
 
-            fileDataStorageService.put(componentName, scope, scopeId, key, value, environmentId, type);
+            fileDataStorageFacade.put(componentName, scope, scopeId, key, value, environmentId, type);
         }
 
         @Override
@@ -98,7 +98,7 @@ public class FileDataStorageConfiguration {
             String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
             PlatformType type, Function<Optional<T>, T> updater) {
 
-            return fileDataStorageService.update(componentName, scope, scopeId, key, environmentId, type, updater);
+            return fileDataStorageFacade.update(componentName, scope, scopeId, key, environmentId, type, updater);
         }
 
         @Override
@@ -106,12 +106,12 @@ public class FileDataStorageConfiguration {
             String componentName, DataStorageScope scope, String scopeId,
             String key, long environmentId, PlatformType type) {
 
-            fileDataStorageService.delete(componentName, scope, scopeId, key, environmentId, type);
+            fileDataStorageFacade.delete(componentName, scope, scopeId, key, environmentId, type);
         }
 
         @Override
         public void deleteScopeData(DataStorageScope scope, String scopeId, PlatformType type) {
-            fileDataStorageService.deleteScopeData(scope, scopeId, type);
+            fileDataStorageFacade.deleteScopeData(scope, scopeId, type);
         }
     }
 }

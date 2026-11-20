@@ -25,8 +25,8 @@ import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
-import com.bytechef.platform.data.storage.file.storage.service.FileDataStorageService;
-import com.bytechef.platform.data.storage.file.storage.service.FileDataStorageServiceImpl;
+import com.bytechef.platform.data.storage.file.storage.facade.FileDataStorageFacade;
+import com.bytechef.platform.data.storage.file.storage.facade.FileDataStorageFacadeImpl;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
@@ -478,18 +478,18 @@ class StateValueDataStorageIntTest {
             Path baseDir = Files.createTempDirectory("state_value_data_storage");
 
             return new FileDataStorage(
-                new FileDataStorageServiceImpl(new FilesystemFileStorageService(baseDir.toString()), objectMapper));
+                new FileDataStorageFacadeImpl(new FilesystemFileStorageService(baseDir.toString()), objectMapper));
         }
     }
 
-    private record FileDataStorage(FileDataStorageService fileDataStorageService) implements DataStorage {
+    private record FileDataStorage(FileDataStorageFacade fileDataStorageFacade) implements DataStorage {
 
         @Override
         public void delete(
             String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
             PlatformType type) {
 
-            fileDataStorageService.delete(componentName, scope, scopeId, key, environmentId, type);
+            fileDataStorageFacade.delete(componentName, scope, scopeId, key, environmentId, type);
         }
 
         @Override
@@ -502,7 +502,7 @@ class StateValueDataStorageIntTest {
             String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
             PlatformType type) {
 
-            return fileDataStorageService.fetch(componentName, scope, scopeId, key, environmentId, type);
+            return fileDataStorageFacade.fetch(componentName, scope, scopeId, key, environmentId, type);
         }
 
         @Override
@@ -510,14 +510,14 @@ class StateValueDataStorageIntTest {
             String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
             PlatformType type) {
 
-            return fileDataStorageService.get(componentName, scope, scopeId, key, environmentId, type);
+            return fileDataStorageFacade.get(componentName, scope, scopeId, key, environmentId, type);
         }
 
         @Override
         public <T> Map<String, T> getAll(
             String componentName, DataStorageScope scope, String scopeId, long environmentId, PlatformType type) {
 
-            return fileDataStorageService.getAll(componentName, scope, scopeId, environmentId, type);
+            return fileDataStorageFacade.getAll(componentName, scope, scopeId, environmentId, type);
         }
 
         @Override
@@ -525,7 +525,7 @@ class StateValueDataStorageIntTest {
             String componentName, DataStorageScope scope, String scopeId, String key, Object value,
             long environmentId, PlatformType type) {
 
-            fileDataStorageService.put(componentName, scope, scopeId, key, value, environmentId, type);
+            fileDataStorageFacade.put(componentName, scope, scopeId, key, value, environmentId, type);
         }
 
         @Override
@@ -533,7 +533,7 @@ class StateValueDataStorageIntTest {
             String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
             PlatformType type, Function<Optional<T>, T> updater) {
 
-            return fileDataStorageService.update(componentName, scope, scopeId, key, environmentId, type, updater);
+            return fileDataStorageFacade.update(componentName, scope, scopeId, key, environmentId, type, updater);
         }
     }
 }
