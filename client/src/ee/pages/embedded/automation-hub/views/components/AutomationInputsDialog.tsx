@@ -39,22 +39,14 @@ const AutomationInputsDialog = ({inputValues, inputs, label, onClose, workflowUu
     const {isPending, mutateAsync: updateInputs} = useUpdateAutomationInputsMutation();
 
     const missingRequired = inputs.some(
-        (input) => !input.provided && input.required && toInputValueText(values[input.name ?? '']).trim() === ''
+        (input) => input.required && toInputValueText(values[input.name ?? '']).trim() === ''
     );
-
-    const hasEditableInputs = inputs.some((input) => !input.provided);
 
     const handleSave = async () => {
         setError(undefined);
 
         try {
-            const providedInputNames = new Set(inputs.filter((input) => input.provided).map((input) => input.name));
-
-            const editableValues = Object.fromEntries(
-                Object.entries(values).filter(([inputName]) => !providedInputNames.has(inputName))
-            );
-
-            await updateInputs({inputs: editableValues, workflowUuid});
+            await updateInputs({inputs: values, workflowUuid});
 
             onClose();
         } catch {
@@ -77,25 +69,17 @@ const AutomationInputsDialog = ({inputValues, inputs, label, onClose, workflowUu
                             <Label htmlFor={`automation-input-${input.name}`}>
                                 {input.label || input.name}
 
-                                {input.required && !input.provided && (
-                                    <span className="ml-0.5 text-destructive">*</span>
-                                )}
+                                {input.required && <span className="ml-0.5 text-destructive">*</span>}
                             </Label>
 
-                            {input.provided ? (
-                                <p className="text-sm text-muted-foreground" id={`automation-input-${input.name}`}>
-                                    Provided by your administrator
-                                </p>
-                            ) : (
-                                <Input
-                                    id={`automation-input-${input.name}`}
-                                    onChange={(event) =>
-                                        setValues((current) => ({...current, [input.name ?? '']: event.target.value}))
-                                    }
-                                    type={INPUT_TYPE_ATTRIBUTES[input.type ?? ''] ?? 'text'}
-                                    value={toInputValueText(values[input.name ?? ''])}
-                                />
-                            )}
+                            <Input
+                                id={`automation-input-${input.name}`}
+                                onChange={(event) =>
+                                    setValues((current) => ({...current, [input.name ?? '']: event.target.value}))
+                                }
+                                type={INPUT_TYPE_ATTRIBUTES[input.type ?? ''] ?? 'text'}
+                                value={toInputValueText(values[input.name ?? ''])}
+                            />
                         </div>
                     ))}
 
@@ -106,7 +90,7 @@ const AutomationInputsDialog = ({inputValues, inputs, label, onClose, workflowUu
                     <Button disabled={isPending} label="Cancel" onClick={onClose} variant="outline" />
 
                     <Button
-                        disabled={isPending || missingRequired || !hasEditableInputs}
+                        disabled={isPending || missingRequired || inputs.length === 0}
                         label="Save"
                         onClick={handleSave}
                     />

@@ -11,7 +11,6 @@ import {
     type ConnectionSlotType,
     type GroupValuesType,
     LET_EACH_USER_CONNECT,
-    LET_EACH_USER_FILL,
     NUMERIC_INPUT_TYPES,
     type ProvidableInputPropertyI,
     type ProvidableInputType,
@@ -20,12 +19,12 @@ import {
     type ProvidedInputValueType,
     type ProvidedInputsType,
     type ValueOptionI,
+    getInternalOnlyInputs,
     getProvidedConnectionId,
     isComponentReferenceInput,
 } from './providedValues-utils';
 
 const SET_A_VALUE_PLACEHOLDER = 'Set a value';
-const LET_EACH_USER_FILL_PLACEHOLDER = 'Let each user fill it';
 
 const isBlankText = (text?: string): boolean => !text || text.trim() === '';
 
@@ -43,7 +42,7 @@ interface RequiredInternalOnlyHintProps {
 }
 
 const RequiredInternalOnlyHint = ({input, value}: RequiredInternalOnlyHintProps) => {
-    if (!input.internalOnly || !input.required || !isEmptyInputValue(value)) {
+    if (!input.required || !isEmptyInputValue(value)) {
         return null;
     }
 
@@ -53,11 +52,10 @@ const RequiredInternalOnlyHint = ({input, value}: RequiredInternalOnlyHintProps)
 const getInputLabelText = (input: ProvidableInputType): string => {
     const inputLabel = input.label || input.name;
 
-    return input.internalOnly && input.required ? `${inputLabel} *` : inputLabel;
+    return input.required ? `${inputLabel} *` : inputLabel;
 };
 
 interface ValueSelectProps {
-    internalOnly?: boolean;
     label: string;
     onValueChange: (value: string) => void;
     options: ValueOptionI[];
@@ -65,23 +63,16 @@ interface ValueSelectProps {
     value: string;
 }
 
-const ValueSelect = ({internalOnly = false, label, onValueChange, options, placeholder, value}: ValueSelectProps) => {
+const ValueSelect = ({label, onValueChange, options, placeholder, value}: ValueSelectProps) => {
     const isCurrentValueMissing = !!value && !options.some((option) => option.value === value);
 
     return (
-        <Select
-            onValueChange={(selectedValue) => onValueChange(selectedValue === LET_EACH_USER_FILL ? '' : selectedValue)}
-            value={value || (internalOnly ? '' : LET_EACH_USER_FILL)}
-        >
+        <Select onValueChange={onValueChange} value={value}>
             <SelectTrigger aria-label={label}>
-                <SelectValue placeholder={internalOnly ? placeholder || SET_A_VALUE_PLACEHOLDER : undefined} />
+                <SelectValue placeholder={placeholder || SET_A_VALUE_PLACEHOLDER} />
             </SelectTrigger>
 
             <SelectContent>
-                {!internalOnly && (
-                    <SelectItem value={LET_EACH_USER_FILL}>{placeholder || LET_EACH_USER_FILL_PLACEHOLDER}</SelectItem>
-                )}
-
                 {isCurrentValueMissing && <SelectItem value={value}>{value}</SelectItem>}
 
                 {options.map((option) => (
@@ -149,19 +140,13 @@ const PlainInput = ({input, onValueChange, value}: PlainInputProps) => {
             </label>
 
             {normalizedType === 'BOOLEAN' ? (
-                <ValueSelect
-                    internalOnly={input.internalOnly}
-                    label={inputLabel}
-                    onValueChange={onValueChange}
-                    options={BOOLEAN_OPTIONS}
-                    value={value}
-                />
+                <ValueSelect label={inputLabel} onValueChange={onValueChange} options={BOOLEAN_OPTIONS} value={value} />
             ) : (
                 <Input
                     id={`provided-input-${input.name}`}
                     inputMode={normalizedType && NUMERIC_INPUT_TYPES.has(normalizedType) ? 'decimal' : undefined}
                     onChange={(event) => onValueChange(event.target.value)}
-                    placeholder={input.internalOnly ? SET_A_VALUE_PLACEHOLDER : LET_EACH_USER_FILL_PLACEHOLDER}
+                    placeholder={SET_A_VALUE_PLACEHOLDER}
                     value={value}
                 />
             )}
@@ -226,16 +211,14 @@ const DynamicOptionsSelect = ({
 
     const optionsConnectionLabel = `Load ${label} options with`;
 
-    const basePlaceholder = input.internalOnly ? SET_A_VALUE_PLACEHOLDER : LET_EACH_USER_FILL_PLACEHOLDER;
-
-    let placeholder = basePlaceholder;
+    let placeholder = SET_A_VALUE_PLACEHOLDER;
 
     if (!connectionId) {
-        placeholder = `${basePlaceholder} (no connection to load options)`;
+        placeholder = `${SET_A_VALUE_PLACEHOLDER} (no connection to load options)`;
     } else if (isLoading) {
         placeholder = 'Loading options...';
     } else if (isError) {
-        placeholder = `${basePlaceholder} (options could not be loaded)`;
+        placeholder = `${SET_A_VALUE_PLACEHOLDER} (options could not be loaded)`;
     }
 
     return (
@@ -261,7 +244,6 @@ const DynamicOptionsSelect = ({
             )}
 
             <ValueSelect
-                internalOnly={input.internalOnly}
                 label={label}
                 onValueChange={onValueChange}
                 options={options}
@@ -323,34 +305,18 @@ const ComponentReferenceMember = ({
     }
 
     if (staticOptions.length > 0) {
-        return (
-            <ValueSelect
-                internalOnly={input.internalOnly}
-                label={label}
-                onValueChange={onValueChange}
-                options={staticOptions}
-                value={value}
-            />
-        );
+        return <ValueSelect label={label} onValueChange={onValueChange} options={staticOptions} value={value} />;
     }
 
     if (property.type === 'BOOLEAN') {
-        return (
-            <ValueSelect
-                internalOnly={input.internalOnly}
-                label={label}
-                onValueChange={onValueChange}
-                options={BOOLEAN_OPTIONS}
-                value={value}
-            />
-        );
+        return <ValueSelect label={label} onValueChange={onValueChange} options={BOOLEAN_OPTIONS} value={value} />;
     }
 
     return (
         <Input
             aria-label={label}
             onChange={(event) => onValueChange(event.target.value)}
-            placeholder={input.internalOnly ? SET_A_VALUE_PLACEHOLDER : LET_EACH_USER_FILL_PLACEHOLDER}
+            placeholder={SET_A_VALUE_PLACEHOLDER}
             value={value}
         />
     );
@@ -489,73 +455,80 @@ const ProvidedValuesFields = ({
     providedInputs,
     showWorkflowToggle = false,
     workflowUuid,
-}: ProvidedValuesFieldsProps) => (
-    <WorkflowConfigurationCard
-        connectionCount={providableValues.connectionSlots.length}
-        connectionsContent={
-            providableValues.connectionSlots.length > 0 ? (
-                providableValues.connectionSlots.map((connectionSlot) => (
-                    <ConnectionSlot
-                        connectionSlot={connectionSlot}
-                        key={connectionSlot.componentName}
-                        onValueChange={(connectionId) =>
-                            onProvidedConnectionsChange({
-                                ...providedConnections,
-                                [connectionSlot.componentName]: connectionId,
-                            })
-                        }
-                        value={providedConnections[connectionSlot.componentName] || LET_EACH_USER_CONNECT}
-                    />
-                ))
-            ) : (
-                <p className="p-4 text-center text-sm text-content-neutral-secondary">
-                    This workflow has no connections to provide.
-                </p>
-            )
-        }
-        enabled={enabled}
-        inputCount={providableValues.inputs.length}
-        inputsContent={
-            providableValues.inputs.length > 0 ? (
-                <div className="space-y-4">
-                    {providableValues.inputs.map((input) => {
-                        const value = providedInputs[input.name];
+}: ProvidedValuesFieldsProps) => {
+    const internalOnlyInputs = getInternalOnlyInputs(providableValues);
 
-                        const handleInputValueChange = (inputValue: ProvidedInputValueType) =>
-                            onProvidedInputsChange({...providedInputs, [input.name]: inputValue});
+    return (
+        <WorkflowConfigurationCard
+            connectionCount={providableValues.connectionSlots.length}
+            connectionsContent={
+                providableValues.connectionSlots.length > 0 ? (
+                    providableValues.connectionSlots.map((connectionSlot) => (
+                        <ConnectionSlot
+                            connectionSlot={connectionSlot}
+                            key={connectionSlot.componentName}
+                            onValueChange={(connectionId) =>
+                                onProvidedConnectionsChange({
+                                    ...providedConnections,
+                                    [connectionSlot.componentName]: connectionId,
+                                })
+                            }
+                            value={providedConnections[connectionSlot.componentName] || LET_EACH_USER_CONNECT}
+                        />
+                    ))
+                ) : (
+                    <p className="p-4 text-center text-sm text-content-neutral-secondary">
+                        This workflow has no connections to provide.
+                    </p>
+                )
+            }
+            enabled={enabled}
+            inputCount={internalOnlyInputs.length}
+            inputsContent={
+                internalOnlyInputs.length > 0 ? (
+                    <div className="space-y-4">
+                        {internalOnlyInputs.map((input) => {
+                            const value = providedInputs[input.name];
 
-                        return isComponentReferenceInput(input) ? (
-                            <ComponentReferenceInput
-                                configurationId={configurationId}
-                                input={input}
-                                key={input.name}
-                                onValueChange={handleInputValueChange}
-                                projectVersion={projectVersion}
-                                providedConnectionId={getProvidedConnectionId(providedConnections, input.componentName)}
-                                value={value}
-                                workflowUuid={workflowUuid}
-                            />
-                        ) : (
-                            <PlainInput
-                                input={input}
-                                key={input.name}
-                                onValueChange={handleInputValueChange}
-                                value={typeof value === 'string' ? value : ''}
-                            />
-                        );
-                    })}
-                </div>
-            ) : (
-                <p className="p-4 text-center text-sm text-content-neutral-secondary">
-                    This workflow has no inputs to provide.
-                </p>
-            )
-        }
-        label={label}
-        onEnabledChange={onEnabledChange}
-        showWorkflowToggle={showWorkflowToggle}
-        switchId={`provided-values-${workflowUuid}`}
-    />
-);
+                            const handleInputValueChange = (inputValue: ProvidedInputValueType) =>
+                                onProvidedInputsChange({...providedInputs, [input.name]: inputValue});
+
+                            return isComponentReferenceInput(input) ? (
+                                <ComponentReferenceInput
+                                    configurationId={configurationId}
+                                    input={input}
+                                    key={input.name}
+                                    onValueChange={handleInputValueChange}
+                                    projectVersion={projectVersion}
+                                    providedConnectionId={getProvidedConnectionId(
+                                        providedConnections,
+                                        input.componentName
+                                    )}
+                                    value={value}
+                                    workflowUuid={workflowUuid}
+                                />
+                            ) : (
+                                <PlainInput
+                                    input={input}
+                                    key={input.name}
+                                    onValueChange={handleInputValueChange}
+                                    value={typeof value === 'string' ? value : ''}
+                                />
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <p className="p-4 text-center text-sm text-content-neutral-secondary">
+                        This workflow has no internal-only inputs to set.
+                    </p>
+                )
+            }
+            label={label}
+            onEnabledChange={onEnabledChange}
+            showWorkflowToggle={showWorkflowToggle}
+            switchId={`provided-values-${workflowUuid}`}
+        />
+    );
+};
 
 export default ProvidedValuesFields;

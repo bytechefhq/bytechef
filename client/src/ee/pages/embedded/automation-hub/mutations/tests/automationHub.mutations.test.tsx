@@ -130,7 +130,7 @@ describe('automationHub.mutations', () => {
         expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: AutomationHubKeys.automations});
     });
 
-    it('omits the connections and inputs the administrator provides from the provision body', async () => {
+    it('omits the connections the administrator provides from the provision body', async () => {
         const {result} = renderMutationHook(useProvisionReferenceMutation);
 
         await act(async () => {
@@ -138,13 +138,12 @@ describe('automationHub.mutations', () => {
                 connections: {gmail: 3, slack: 7},
                 inputs: {region: 'eu', sheetName: 'Leads'},
                 providedComponentNames: ['gmail'],
-                providedInputNames: ['region'],
                 workflowUuid: 'template-uuid',
             });
         });
 
         expect(connectedUserProjectWorkflowApiMock.provisionFrontendWorkflowReference).toHaveBeenCalledWith({
-            provisionWorkflowReferenceRequest: {connections: {slack: 7}, inputs: {sheetName: 'Leads'}},
+            provisionWorkflowReferenceRequest: {connections: {slack: 7}, inputs: {region: 'eu', sheetName: 'Leads'}},
             workflowUuid: 'template-uuid',
         });
     });

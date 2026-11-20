@@ -30,8 +30,6 @@ export interface ValueOptionI {
 
 export const LET_EACH_USER_CONNECT = 'let-each-user-connect';
 
-export const LET_EACH_USER_FILL = 'let-each-user-fill';
-
 export const NUMERIC_INPUT_TYPES = new Set(['FLOAT', 'INTEGER', 'NUMBER']);
 
 export const BOOLEAN_OPTIONS: ValueOptionI[] = [
@@ -66,6 +64,9 @@ const toProvidedInputValue = (value: unknown): ProvidedInputValueType => {
     return String(value);
 };
 
+export const getInternalOnlyInputs = (providableValues: ProvidableValuesType): ProvidableInputType[] =>
+    providableValues.inputs.filter((input) => input.internalOnly);
+
 export const isComponentReferenceInput = (input: ProvidableInputType): boolean =>
     !!input.componentName && input.componentVersion != null && !!input.groupName;
 
@@ -76,12 +77,15 @@ export const getInitialProvidedConnections = (providableValues: ProvidableValues
         )
     );
 
-export const getInitialProvidedInputs = (providableValues: ProvidableValuesType): ProvidedInputsType =>
-    Object.fromEntries(
+export const getInitialProvidedInputs = (providableValues: ProvidableValuesType): ProvidedInputsType => {
+    const internalOnlyInputNames = new Set(getInternalOnlyInputs(providableValues).map((input) => input.name));
+
+    return Object.fromEntries(
         Object.entries((providableValues.providedInputs ?? {}) as Record<string, unknown>)
-            .filter(([, value]) => value != null)
+            .filter(([inputName, value]) => internalOnlyInputNames.has(inputName) && value != null)
             .map(([inputName, value]) => [inputName, toProvidedInputValue(value)])
     );
+};
 
 export const getProvidedConnectionId = (
     providedConnections: ProvidedConnectionsType,
@@ -109,7 +113,7 @@ export const buildProvidedValuesPayload = (
 
     const inputsToSave: Record<string, boolean | number | string | GroupValuesType> = {};
 
-    for (const input of providableValues.inputs) {
+    for (const input of getInternalOnlyInputs(providableValues)) {
         const value = providedInputs[input.name];
 
         if (value === undefined) {

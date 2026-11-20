@@ -107,12 +107,13 @@ describe('ProvidedValuesFields', () => {
         expect(screen.queryByText('Required before this workflow can be enabled')).not.toBeInTheDocument();
     });
 
-    it('still offers Let each user fill it for a normal input', async () => {
+    it('does not show an input that is not internal-only', async () => {
         renderFields({internalOnly: false, required: true, type: 'STRING'});
 
         await openInputsTab();
 
-        expect(screen.getByPlaceholderText('Let each user fill it')).toBeInTheDocument();
-        expect(screen.queryByText('Required before this workflow can be enabled')).not.toBeInTheDocument();
+        expect(screen.queryByLabelText('API Key *')).not.toBeInTheDocument();
+        expect(screen.queryByPlaceholderText('Let each user fill it')).not.toBeInTheDocument();
+        expect(screen.getByText('This workflow has no internal-only inputs to set.')).toBeInTheDocument();
     });
 });
