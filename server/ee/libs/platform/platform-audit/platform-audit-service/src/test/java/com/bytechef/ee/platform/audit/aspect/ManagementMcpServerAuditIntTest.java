@@ -10,8 +10,8 @@ package com.bytechef.ee.platform.audit.aspect;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.ai.mcp.server.configuration.audit.ManagementMcpServerAuditEvents;
-import com.bytechef.ai.mcp.server.configuration.service.ManagementMcpServerService;
-import com.bytechef.ai.mcp.server.configuration.service.ManagementMcpServerServiceImpl;
+import com.bytechef.ai.mcp.server.configuration.facade.ManagementMcpServerFacade;
+import com.bytechef.ai.mcp.server.configuration.facade.ManagementMcpServerFacadeImpl;
 import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
@@ -43,13 +43,13 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @SpringBootTest(classes = AuditIntTestConfiguration.class)
 @ActiveProfiles("testint")
 @Import({
-    ManagementMcpServerServiceImpl.class, PostgreSQLContainerConfiguration.class
+    ManagementMcpServerFacadeImpl.class, PostgreSQLContainerConfiguration.class
 })
 @MockitoBean(types = PropertyService.class)
 class ManagementMcpServerAuditIntTest {
 
     @Autowired
-    private ManagementMcpServerService managementMcpServerService;
+    private ManagementMcpServerFacade managementMcpServerFacade;
 
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
@@ -72,7 +72,7 @@ class ManagementMcpServerAuditIntTest {
 
     @Test
     void testSecretKeyRotationIsRecordedWithoutTheNewUrl() {
-        String managementMcpServerUrl = managementMcpServerService.updateManagementMcpServerUrl();
+        String managementMcpServerUrl = managementMcpServerFacade.updateManagementMcpServerUrl();
 
         Page<PersistentAuditEvent> page = persistenceAuditEventRepository.findAllFiltered(
             AuditEventFilter.empty(), PageRequest.of(0, 25));

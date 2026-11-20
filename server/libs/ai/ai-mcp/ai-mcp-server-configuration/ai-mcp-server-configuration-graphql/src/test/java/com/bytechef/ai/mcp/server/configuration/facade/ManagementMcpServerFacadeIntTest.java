@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.server.configuration.service;
+package com.bytechef.ai.mcp.server.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -56,14 +56,14 @@ import tools.jackson.databind.ObjectMapper;
  * @author Ivica Cardic
  */
 @SpringBootTest(
-    classes = ManagementMcpServerServiceIntTest.ManagementMcpServerServiceIntTestConfiguration.class,
+    classes = ManagementMcpServerFacadeIntTest.ManagementMcpServerFacadeIntTestConfiguration.class,
     properties = "bytechef.public-url=http://localhost:8080", webEnvironment = SpringBootTest.WebEnvironment.NONE)
-class ManagementMcpServerServiceIntTest {
+class ManagementMcpServerFacadeIntTest {
 
     private static final String MCP_SERVER_PROPERTY_KEY = "mcp.server";
 
     @Autowired
-    private ManagementMcpServerService managementMcpServerService;
+    private ManagementMcpServerFacade managementMcpServerFacade;
 
     @Autowired
     private PropertyRepository propertyRepository;
@@ -85,20 +85,20 @@ class ManagementMcpServerServiceIntTest {
     void testGetManagementMcpServerUrlFirstTimeSavesOnlyTheSecretKey() {
         assertThat(fetchMcpServerProperty()).isEmpty();
 
-        String url = managementMcpServerService.getManagementMcpServerUrl();
+        String url = managementMcpServerFacade.getManagementMcpServerUrl();
 
         Map<String, ?> value = getMcpServerPropertyValue();
 
         assertThat(value).containsOnlyKeys("secretKey");
         assertThat(url).isEqualTo("http://localhost:8080/api/management/" + value.get("secretKey") + "/mcp");
-        assertThat(managementMcpServerService.getManagementMcpServerUrl()).isEqualTo(url);
+        assertThat(managementMcpServerFacade.getManagementMcpServerUrl()).isEqualTo(url);
     }
 
     @Test
     void testGetManagementMcpServerUrlReusesTheStoredSecretKey() {
         saveSecretKey("abc");
 
-        assertThat(managementMcpServerService.getManagementMcpServerUrl())
+        assertThat(managementMcpServerFacade.getManagementMcpServerUrl())
             .isEqualTo("http://localhost:8080/api/management/abc/mcp");
 
         assertThat(getMcpServerPropertyValue()).isEqualTo(Map.of("secretKey", "abc"));
@@ -107,7 +107,7 @@ class ManagementMcpServerServiceIntTest {
 
     @Test
     void testGetManagementMcpServerCanonicalUrlReturnsTenantlessUrlWithoutTouchingTheProperty() {
-        assertThat(managementMcpServerService.getManagementMcpServerCanonicalUrl())
+        assertThat(managementMcpServerFacade.getManagementMcpServerCanonicalUrl())
             .isEqualTo("http://localhost:8080/api/management/mcp");
 
         assertThat(fetchMcpServerProperty()).isEmpty();
@@ -119,7 +119,7 @@ class ManagementMcpServerServiceIntTest {
             MCP_SERVER_PROPERTY_KEY, Map.of("authentication", true, "secretKey", "abc"), Property.Scope.PLATFORM,
             null);
 
-        String url = managementMcpServerService.updateManagementMcpServerUrl();
+        String url = managementMcpServerFacade.updateManagementMcpServerUrl();
 
         Map<String, ?> value = getMcpServerPropertyValue();
 
@@ -133,11 +133,11 @@ class ManagementMcpServerServiceIntTest {
     class TrailingSlashPublicUrlIntTest {
 
         @Autowired
-        private ManagementMcpServerService trailingSlashManagementMcpServerService;
+        private ManagementMcpServerFacade trailingSlashManagementMcpServerFacade;
 
         @Test
         void testGetManagementMcpServerCanonicalUrlStripsTrailingSlashFromPublicUrl() {
-            assertThat(trailingSlashManagementMcpServerService.getManagementMcpServerCanonicalUrl())
+            assertThat(trailingSlashManagementMcpServerFacade.getManagementMcpServerCanonicalUrl())
                 .isEqualTo("http://localhost:8080/api/management/mcp");
         }
 
@@ -145,7 +145,7 @@ class ManagementMcpServerServiceIntTest {
         void testGetManagementMcpServerUrlStripsTrailingSlashFromPublicUrl() {
             saveSecretKey("abc");
 
-            assertThat(trailingSlashManagementMcpServerService.getManagementMcpServerUrl())
+            assertThat(trailingSlashManagementMcpServerFacade.getManagementMcpServerUrl())
                 .isEqualTo("http://localhost:8080/api/management/abc/mcp");
         }
     }
@@ -169,10 +169,10 @@ class ManagementMcpServerServiceIntTest {
     @EnableAutoConfiguration(excludeName = "org.springframework.boot.graphql.autoconfigure.GraphQlAutoConfiguration")
     @EnableConfigurationProperties(ApplicationProperties.class)
     @Import({
-        JacksonConfiguration.class, LiquibaseConfiguration.class, ManagementMcpServerServiceImpl.class,
+        JacksonConfiguration.class, LiquibaseConfiguration.class, ManagementMcpServerFacadeImpl.class,
         PostgreSQLContainerConfiguration.class, PropertyServiceImpl.class
     })
-    static class ManagementMcpServerServiceIntTestConfiguration {
+    static class ManagementMcpServerFacadeIntTestConfiguration {
 
         @Bean
         EncryptionKey encryptionKey() {
@@ -181,13 +181,13 @@ class ManagementMcpServerServiceIntTest {
 
         @Configuration
         @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
-        static class ManagementMcpServerServiceIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
+        static class ManagementMcpServerFacadeIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
 
             private final Encryption encryption;
             private final ObjectMapper objectMapper;
 
             @SuppressFBWarnings("EI2")
-            ManagementMcpServerServiceIntTestJdbcConfiguration(Encryption encryption, ObjectMapper objectMapper) {
+            ManagementMcpServerFacadeIntTestJdbcConfiguration(Encryption encryption, ObjectMapper objectMapper) {
                 this.encryption = encryption;
                 this.objectMapper = objectMapper;
             }
