@@ -71,6 +71,25 @@ describe('MoveConnectedUsersDialog', () => {
         expect(screen.getByRole('button', {name: 'Move'})).toBeEnabled();
     });
 
+    it('shows each impact as a note', () => {
+        renderDialog({
+            impact: [
+                {
+                    affectedConnectedUserCount: 1,
+                    label: 'Rate ticket',
+                    newRequiredConnections: [],
+                    newRequiredInputs: ['contactPageUrl'],
+                },
+            ],
+        });
+
+        const note = screen.getByRole('alert');
+
+        expect(note).toHaveAttribute('data-slot', 'alert');
+        expect(note).toHaveTextContent('Rate ticket: affects 1 user');
+        expect(note).toHaveTextContent('New required inputs: contactPageUrl');
+    });
+
     it('shows impact warnings', () => {
         renderDialog({
             impact: [

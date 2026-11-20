@@ -1,4 +1,4 @@
-import {Alert, AlertDescription} from '@/components/ui/alert';
+import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import MoveConnectedUsersSkippedList, {
     type SkippedUserDisplayI,
 } from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersSkippedList';
@@ -29,23 +29,31 @@ const MoveConnectedUsersImpact = ({
 }: MoveConnectedUsersImpactProps) => (
     <>
         {impact?.map((impactItem) => (
-            <div className="rounded border border-border/50 px-3 py-2 text-sm" key={impactItem.label} role="alert">
-                <p className="font-medium">
+            <Alert key={impactItem.label} variant="default">
+                <InfoIcon />
+
+                <AlertTitle>
                     {`${impactItem.label}: affects ${impactItem.affectedConnectedUserCount} ${impactItem.affectedConnectedUserCount === 1 ? 'user' : 'users'}`}
-                </p>
+                </AlertTitle>
 
-                {impactItem.newRequiredConnections.length > 0 && (
-                    <p>{`New required connections: ${impactItem.newRequiredConnections.join(', ')}`}</p>
-                )}
+                {(impactItem.newRequiredConnections.length > 0 ||
+                    impactItem.newRequiredInputs.length > 0 ||
+                    impactItem.awaitsConfiguration) && (
+                    <AlertDescription>
+                        {impactItem.newRequiredConnections.length > 0 && (
+                            <p>{`New required connections: ${impactItem.newRequiredConnections.join(', ')}`}</p>
+                        )}
 
-                {impactItem.newRequiredInputs.length > 0 && (
-                    <p>{`New required inputs: ${impactItem.newRequiredInputs.join(', ')}`}</p>
-                )}
+                        {impactItem.newRequiredInputs.length > 0 && (
+                            <p>{`New required inputs: ${impactItem.newRequiredInputs.join(', ')}`}</p>
+                        )}
 
-                {impactItem.awaitsConfiguration && (
-                    <p>Stays disabled until the configuration sets its internal-only inputs</p>
+                        {impactItem.awaitsConfiguration && (
+                            <p>Stays disabled until the configuration sets its internal-only inputs</p>
+                        )}
+                    </AlertDescription>
                 )}
-            </div>
+            </Alert>
         ))}
 
         {!!mcpServerCount && (
