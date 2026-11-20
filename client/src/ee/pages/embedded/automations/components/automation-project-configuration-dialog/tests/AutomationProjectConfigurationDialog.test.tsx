@@ -691,6 +691,95 @@ describe('AutomationProjectConfigurationDialog', () => {
                 providedInputs: {region: 'eu'},
                 workflowUuid: 'workflow-1',
             });
+            expect(mocks.updateWorkflowMutateAsync.mock.invocationCallOrder[0]).toBeLessThan(
+                mocks.enableWorkflowMutateAsync.mock.invocationCallOrder[0]
+            );
+        });
+
+        it('waits for the provided values to be saved before enabling a workflow', async () => {
+            const user = userEvent.setup();
+
+            const onClose = vi.fn();
+
+            let resolveProvidedValuesUpdate: (value: unknown) => void = () => undefined;
+
+            mocks.updateWorkflowMutateAsync.mockImplementationOnce(
+                () =>
+                    new Promise((resolve) => {
+                        resolveProvidedValuesUpdate = resolve;
+                    })
+            );
+
+            render(
+                <TooltipProvider>
+                    <AutomationProjectConfigurationDialog
+                        configuration={existingConfigurationWithWorkflows}
+                        onClose={onClose}
+                        project={project}
+                    />
+                </TooltipProvider>
+            );
+
+            await user.click(screen.getByRole('button', {name: 'Next'}));
+            await user.click(await screen.findByRole('switch', {name: 'Send Digest'}));
+            await user.click(screen.getAllByRole('tab', {name: /Inputs/})[1]);
+            await user.type(screen.getAllByLabelText('Region')[0], 'eu');
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() => expect(mocks.updateWorkflowMutateAsync).toHaveBeenCalledTimes(1));
+
+            expect(mocks.enableWorkflowMutateAsync).not.toHaveBeenCalled();
+
+            resolveProvidedValuesUpdate({updateAutomationProjectConfigurationWorkflow: true});
+
+            await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+
+            expect(mocks.enableWorkflowMutateAsync).toHaveBeenCalledWith({
+                enable: true,
+                id: 'configuration-1',
+                workflowUuid: 'workflow-2',
+            });
+        });
+
+        it('disables a workflow before saving its provided values', async () => {
+            const user = userEvent.setup();
+
+            const onClose = vi.fn();
+
+            render(
+                <TooltipProvider>
+                    <AutomationProjectConfigurationDialog
+                        configuration={existingConfigurationWithWorkflows}
+                        onClose={onClose}
+                        project={project}
+                    />
+                </TooltipProvider>
+            );
+
+            await user.click(screen.getByRole('button', {name: 'Next'}));
+            await user.click(await screen.findByRole('tab', {name: /Inputs/}));
+            await user.type(screen.getByLabelText('Region'), 'eu');
+            await user.click(screen.getByRole('switch', {name: 'Sync Contacts'}));
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+
+            expect(mocks.enableWorkflowMutateAsync).toHaveBeenCalledWith({
+                enable: false,
+                id: 'configuration-1',
+                workflowUuid: 'workflow-1',
+            });
+            expect(mocks.updateWorkflowMutateAsync).toHaveBeenCalledWith({
+                id: 'configuration-1',
+                providedConnections: {},
+                providedInputs: {region: 'eu'},
+                workflowUuid: 'workflow-1',
+            });
+            expect(mocks.enableWorkflowMutateAsync.mock.invocationCallOrder[0]).toBeLessThan(
+                mocks.updateWorkflowMutateAsync.mock.invocationCallOrder[0]
+            );
         });
     });
 
