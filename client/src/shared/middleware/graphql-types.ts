@@ -665,6 +665,7 @@ export type AutomationProjectConfigurationVersionImpact = {
 export type AutomationProjectConfigurationVersionImpactWorkflow = {
   __typename?: 'AutomationProjectConfigurationVersionImpactWorkflow';
   affectedConnectedUserCount: Scalars['Int']['output'];
+  awaitsConfiguration: Scalars['Boolean']['output'];
   label: Scalars['String']['output'];
   newRequiredConnections: Array<Scalars['String']['output']>;
   newRequiredInputs: Array<Scalars['String']['output']>;

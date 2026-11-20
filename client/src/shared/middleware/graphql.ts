@@ -1307,7 +1307,7 @@ export type AutomationProjectConfigurationMoveImpactQueryVariables = Exact<{
 }>;
 
 
-export type AutomationProjectConfigurationMoveImpactQuery = { automationProjectConfigurationMoveImpact: { workflows: Array<{ workflowUuid: string, label: string, newRequiredInputs: Array<string>, newRequiredConnections: Array<string>, affectedConnectedUserCount: number }>, skipped: Array<{ connectedUserId: string, reason: string, workflowLabels: Array<string> }> } };
+export type AutomationProjectConfigurationMoveImpactQuery = { automationProjectConfigurationMoveImpact: { workflows: Array<{ workflowUuid: string, label: string, newRequiredInputs: Array<string>, newRequiredConnections: Array<string>, affectedConnectedUserCount: number, awaitsConfiguration: boolean }>, skipped: Array<{ connectedUserId: string, reason: string, workflowLabels: Array<string> }> } };
 
 export type AutomationProjectConfigurationUpgradeImpactQueryVariables = Exact<{
   targetId: string | number;
@@ -1315,7 +1315,7 @@ export type AutomationProjectConfigurationUpgradeImpactQueryVariables = Exact<{
 }>;
 
 
-export type AutomationProjectConfigurationUpgradeImpactQuery = { automationProjectConfigurationUpgradeImpact: { workflows: Array<{ workflowUuid: string, label: string, newRequiredInputs: Array<string>, newRequiredConnections: Array<string>, affectedConnectedUserCount: number }>, skipped: Array<{ connectedUserId: string, reason: string, workflowLabels: Array<string> }> } };
+export type AutomationProjectConfigurationUpgradeImpactQuery = { automationProjectConfigurationUpgradeImpact: { workflows: Array<{ workflowUuid: string, label: string, newRequiredInputs: Array<string>, newRequiredConnections: Array<string>, affectedConnectedUserCount: number, awaitsConfiguration: boolean }>, skipped: Array<{ connectedUserId: string, reason: string, workflowLabels: Array<string> }> } };
 
 export type AutomationProjectConfigurationVersionImpactQueryVariables = Exact<{
   id: string | number;
@@ -1323,7 +1323,7 @@ export type AutomationProjectConfigurationVersionImpactQueryVariables = Exact<{
 }>;
 
 
-export type AutomationProjectConfigurationVersionImpactQuery = { automationProjectConfigurationVersionImpact: { workflows: Array<{ workflowUuid: string, label: string, newRequiredInputs: Array<string>, newRequiredConnections: Array<string>, affectedConnectedUserCount: number }> } };
+export type AutomationProjectConfigurationVersionImpactQuery = { automationProjectConfigurationVersionImpact: { workflows: Array<{ workflowUuid: string, label: string, newRequiredInputs: Array<string>, newRequiredConnections: Array<string>, affectedConnectedUserCount: number, awaitsConfiguration: boolean }> } };
 
 export type AutomationProjectConfigurationWorkflowInputOptionsQueryVariables = Exact<{
   id: string | number;
@@ -7508,6 +7508,7 @@ export const AutomationProjectConfigurationMoveImpactDocument = new TypedDocumen
       newRequiredInputs
       newRequiredConnections
       affectedConnectedUserCount
+      awaitsConfiguration
     }
     skipped {
       connectedUserId
@@ -7546,6 +7547,7 @@ export const AutomationProjectConfigurationUpgradeImpactDocument = new TypedDocu
       newRequiredInputs
       newRequiredConnections
       affectedConnectedUserCount
+      awaitsConfiguration
     }
     skipped {
       connectedUserId
@@ -7584,6 +7586,7 @@ export const AutomationProjectConfigurationVersionImpactDocument = new TypedDocu
       newRequiredInputs
       newRequiredConnections
       affectedConnectedUserCount
+      awaitsConfiguration
     }
   }
 }
