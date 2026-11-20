@@ -143,6 +143,8 @@ const AutomationEditorLeftSidebar = ({
 
     const targetProjectId = allProjectsSelected || !selectedProjectId ? currentProjectId : selectedProjectId;
 
+    const targetProject = projects.find((automationProject) => automationProject.id === targetProjectId);
+
     const {createWorkflow, handleWorkflowFileChange, workflowFileInputRef} = useCreateAutomationProjectWorkflow({
         bottomResizablePanelRef,
         projectId: targetProjectId,
@@ -314,38 +316,40 @@ const AutomationEditorLeftSidebar = ({
                     sortOptions={codeWorkflowSortShown ? CODE_WORKFLOW_SORT_OPTIONS : SORT_OPTIONS}
                 />
 
-                <ButtonGroup className="w-full">
-                    <Button
-                        className="flex-1 [&_svg]:size-5"
-                        disabled={!targetProjectId}
-                        icon={<PlusIcon />}
-                        label="New Workflow"
-                        onClick={() => setShowWorkflowDialog(true)}
-                        variant="secondary"
-                    />
+                {!targetProject?.codeWorkflowProject && (
+                    <ButtonGroup className="w-full">
+                        <Button
+                            className="flex-1 [&_svg]:size-5"
+                            disabled={!targetProjectId}
+                            icon={<PlusIcon />}
+                            label="New Workflow"
+                            onClick={() => setShowWorkflowDialog(true)}
+                            variant="secondary"
+                        />
 
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                aria-label="More workflow options"
-                                className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary [&_svg]:size-5"
-                                disabled={!targetProjectId}
-                                icon={<ChevronDownIcon />}
-                                size="icon"
-                                variant="secondary"
-                            />
-                        </DropdownMenuTrigger>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    aria-label="More workflow options"
+                                    className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary [&_svg]:size-5"
+                                    disabled={!targetProjectId}
+                                    icon={<ChevronDownIcon />}
+                                    size="icon"
+                                    variant="secondary"
+                                />
+                            </DropdownMenuTrigger>
 
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                                className="cursor-pointer"
-                                onClick={() => workflowFileInputRef.current?.click()}
-                            >
-                                <UploadIcon /> Import Workflow
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </ButtonGroup>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                    className="cursor-pointer"
+                                    onClick={() => workflowFileInputRef.current?.click()}
+                                >
+                                    <UploadIcon /> Import Workflow
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </ButtonGroup>
+                )}
             </div>
 
             <ScrollArea className="mb-3 min-h-0 w-full flex-1 [&_[data-radix-scroll-area-viewport]>div]:block!">
