@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.customcomponent.loader;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
@@ -41,9 +42,6 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.UnifiedApiDefinition;
 import com.bytechef.platform.component.polyglot.PolyglotSandbox;
 import com.bytechef.platform.component.polyglot.PolyglotValues;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,10 +63,6 @@ import org.graalvm.polyglot.proxy.ProxyObject;
 class ComponentHandlerPolyglotEngine {
 
     private static final int PYTHON_VARARGS_FLAG = 0x04;
-
-    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
-        .findAndAddModules()
-        .build();
 
     static ComponentHandler load(String languageId, String script) {
         return PolyglotSandbox.call(languageId, polyglotContext -> {
@@ -426,20 +420,12 @@ class ComponentHandlerPolyglotEngine {
     }
 
     private static String toJson(Object value) {
-        try {
-            return OBJECT_MAPPER.writeValueAsString(value);
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException(e);
-        }
+        return JsonUtils.write(value);
     }
 
     @SuppressWarnings("unchecked")
     private static Map<String, Object> fromJson(String json) {
-        try {
-            return OBJECT_MAPPER.readValue(json, Map.class);
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException(e);
-        }
+        return JsonUtils.read(json, Map.class);
     }
 
     private static <T> T getMember(Value value, String name, Class<T> valueClass) {
