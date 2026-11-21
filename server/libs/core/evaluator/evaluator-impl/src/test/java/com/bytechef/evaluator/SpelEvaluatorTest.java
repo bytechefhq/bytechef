@@ -1570,6 +1570,22 @@ class SpelEvaluatorTest {
         assertEquals(List.of("a"), map.get("bare"));
     }
 
+    @Test
+    void testJdbcCallEscapeSyntaxIsNotAnExpression() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of(
+                "function", "{:balance = call balance(:accountId)}",
+                "procedure", "{call transfer(:from, :to, :status)}",
+                "block", "BEGIN :balance := balance(:accountId); END;",
+                "withDataPill", "{:balance = call ${procedureName}(:accountId)}"),
+            Map.of("procedureName", "balance"));
+
+        assertEquals("{:balance = call balance(:accountId)}", map.get("function"));
+        assertEquals("{call transfer(:from, :to, :status)}", map.get("procedure"));
+        assertEquals("BEGIN :balance := balance(:accountId); END;", map.get("block"));
+        assertEquals("{:balance = call balance(:accountId)}", map.get("withDataPill"));
+    }
+
     private static Map<String, Object> withQuestion(Map<String, Object> context) {
         context.put("question", "Why?");
 

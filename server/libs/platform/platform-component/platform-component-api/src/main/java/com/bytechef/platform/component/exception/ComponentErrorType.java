@@ -34,6 +34,7 @@ public class ComponentErrorType extends AbstractErrorType {
     public static final ComponentErrorType QUERY_MAX_ROWS_EXCEEDED = new ComponentErrorType(108);
     public static final ComponentErrorType INVALID_MAX_ROWS = new ComponentErrorType(109);
     public static final ComponentErrorType POLL_ORDER_VALUE_GROUP_TOO_LARGE = new ComponentErrorType(110);
+    public static final ComponentErrorType INVALID_CALL_PARAMETER = new ComponentErrorType(111);
 
     private ComponentErrorType(int errorKey) {
         super(ComponentErrorType.class, errorKey);
