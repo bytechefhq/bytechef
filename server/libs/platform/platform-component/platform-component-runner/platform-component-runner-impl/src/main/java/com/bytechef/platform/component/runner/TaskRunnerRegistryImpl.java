@@ -110,8 +110,8 @@ public class TaskRunnerRegistryImpl implements TaskRunnerRegistry {
 
             if (GRAALVM.equals(type) && TaskRunnerTrustedMode.isEnabled(applicationProperties)) {
                 log.warn(
-                    "Trusted GraalVM task runner is enabled; scripts selecting it run inside this JVM with full " +
-                        "host access. Enable it only on a single-tenant deployment you control.");
+                    "Trusted GraalVM script mode is enabled; script tasks that select it run inside this JVM with " +
+                        "full host access. Set bytechef.script.trusted.enabled=false on a multi-tenant deployment.");
             } else if (!GRAALVM.equals(type)) {
                 log.warn("Task runner '{}' is enabled; workflows may execute code outside the script sandbox", type);
             }
