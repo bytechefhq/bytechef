@@ -121,7 +121,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
 
     const handleRowClick = () => {
         if (!isJavaComponent) {
-            navigate(String(customComponent.id));
+            void navigate(String(customComponent.id));
         }
     };
 
