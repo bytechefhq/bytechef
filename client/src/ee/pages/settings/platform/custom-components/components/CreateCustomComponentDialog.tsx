@@ -55,12 +55,12 @@ const CreateCustomComponentDialog = ({trigger}: CreateCustomComponentDialogProps
 
     const createCustomComponentMutation = useCreateCustomComponentMutation({
         onSuccess: (data) => {
-            queryClient.invalidateQueries({queryKey: ['customComponents']});
+            void queryClient.invalidateQueries({queryKey: ['customComponents']});
 
             setOpen(false);
             reset();
 
-            navigate(String(data.createCustomComponent.id));
+            void navigate(String(data.createCustomComponent.id));
         },
     });
 

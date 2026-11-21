@@ -253,20 +253,20 @@ const CustomComponentDetail = () => {
             const updatedId = result.updateCustomComponentSource.id;
 
             if (updatedId && updatedId !== id) {
-                queryClient.invalidateQueries({queryKey: ['customComponents']});
+                void queryClient.invalidateQueries({queryKey: ['customComponents']});
 
-                navigate(location.pathname.replace(/\/[^/]+$/, `/${updatedId}`));
+                void navigate(location.pathname.replace(/\/[^/]+$/, `/${updatedId}`));
             } else {
-                queryClient.invalidateQueries({queryKey: ['customComponent', {id}]});
-                queryClient.invalidateQueries({queryKey: ['customComponentSource', {id}]});
+                void queryClient.invalidateQueries({queryKey: ['customComponent', {id}]});
+                void queryClient.invalidateQueries({queryKey: ['customComponentSource', {id}]});
             }
         },
     });
 
     const publishCustomComponentMutation = usePublishCustomComponentMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['customComponent', {id}]});
-            queryClient.invalidateQueries({queryKey: ['customComponents']});
+            void queryClient.invalidateQueries({queryKey: ['customComponent', {id}]});
+            void queryClient.invalidateQueries({queryKey: ['customComponents']});
         },
     });
 
