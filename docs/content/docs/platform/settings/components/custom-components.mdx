@@ -1155,7 +1155,11 @@ the server logs a warning naming it. The other components keep working.
 ## Audit
 
 Every upload, through the import dialog or the API, is recorded in the [audit log](/platform/settings/audit-events) as
-`CUSTOM_COMPONENT_SAVED`, with the component's id, name, version and language.
+`CUSTOM_COMPONENT_SAVED`, with the component's id, name, version and language. Creating a component from the starter
+template records `CUSTOM_COMPONENT_CREATED` with the same fields, publishing a draft records
+`CUSTOM_COMPONENT_PUBLISHED`, enabling or disabling records `CUSTOM_COMPONENT_ENABLED_UPDATED`, and deleting records
+`CUSTOM_COMPONENT_DELETED`. Edits to a draft's source are not recorded one by one; publishing the draft records the
+result.
 
 ## Scaffolding a Java component with the CLI
 
