@@ -3584,7 +3584,7 @@ public class HttpClientExecutorTest {
         @DisplayName("Should use custom timeout when specified")
         void testCustomTimeout() {
             Http.Configuration configuration = Http.responseType(Http.ResponseType.JSON)
-                .timeout(Duration.ofSeconds(30))
+                .connectTimeout(Duration.ofSeconds(30))
                 .build();
 
             HttpClient httpClient = httpClientExecutor.createHttpClient(
