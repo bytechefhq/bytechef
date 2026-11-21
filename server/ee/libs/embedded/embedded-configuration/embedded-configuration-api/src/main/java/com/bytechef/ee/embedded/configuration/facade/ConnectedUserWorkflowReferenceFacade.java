@@ -51,6 +51,10 @@ public interface ConnectedUserWorkflowReferenceFacade {
         String externalUserId, String automationUuid, Environment environment,
         Map<String, Long> requestedConnectionIds, @Nullable Map<String, ?> inputs);
 
+    ConnectedUserProjectWorkflow getOrCreateReference(
+        String externalUserId, String automationUuid, Environment environment,
+        Map<String, Long> requestedConnectionIds, @Nullable Map<String, ?> inputs, @Nullable String provisionedBy);
+
     /**
      * Returns the connections and inputs the reference currently runs with, leaving out the ones its configuration
      * provides.
