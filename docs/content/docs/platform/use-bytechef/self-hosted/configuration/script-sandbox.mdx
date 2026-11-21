@@ -77,7 +77,7 @@ output and error go to the same `[guest]` log lines as strict ones.
 Trusted mode is never chosen by the script itself. The calling code in ByteChef picks the mode. The one built-in caller
 that offers trusted is the [GraalVM task runner](/platform/automation/build/workflows/task-runners#graalvm) of the Script
 component: a Script JavaScript or Python task can set its runner's **Mode** to `trusted`, and only once an operator sets
-`bytechef.script.runners.graalvm.properties.trusted-enabled: true`. Every other caller uses strict.
+`bytechef.script.trusted.enabled: true`. Every other caller uses strict.
 
 ### What runs under the sandbox
 

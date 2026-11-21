@@ -54,8 +54,6 @@ bytechef:
     runners:
       graalvm:
         enabled: true
-        properties:
-          trusted-enabled: false
       process:
         enabled: false
       docker:
@@ -73,12 +71,14 @@ bytechef:
       max-wait: PT1H
       max-log-bytes: 1MB
       max-transfer-bytes: 512MB
+    trusted:
+      enabled: false
 ```
 
 Only `graalvm` is enabled by the shipped configuration; `process`, `docker`, `kubernetes` and `aws-batch` need their own `enabled: true` before
 anything else under them takes effect. What each key costs to turn on:
 
-- `graalvm.trusted-enabled`: lets a workflow's `script` task ask for `mode: trusted`, which drops GraalVM's guest
+- `trusted.enabled`: lets a workflow's `script` task ask for `mode: trusted`, which drops GraalVM's guest
   sandbox entirely and grants the guest context full host access (`HostAccess.ALL`) with no resource ceilings - the
   same access the server process itself has. Off by default for that reason.
 - `process.enabled`: any workflow author can run arbitrary commands on the ByteChef host as the server's user - with
@@ -103,7 +103,7 @@ anything else under them takes effect. What each key costs to turn on:
 
 Every key can also be set as an environment variable, for example `BYTECHEF_SCRIPT_RUNNERS_PROCESS_ENABLED=true`. Drop
 the dash in the `aws-batch` type (`BYTECHEF_SCRIPT_RUNNERS_AWSBATCH_ENABLED`); a dash in a property name may be written
-as an underscore (`BYTECHEF_SCRIPT_RUNNERS_GRAALVM_PROPERTIES_TRUSTED_ENABLED`).
+as an underscore (`BYTECHEF_SCRIPT_RUNNERS_DOCKER_PROPERTIES_ALLOW_TASK_HOST`).
 
 **The property list in the Properties tables above is configuration-dependent, and this page's is not necessarily
 yours.** The `taskRunner` property's schema is assembled from whichever runners were enabled in the registry that

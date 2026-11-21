@@ -540,7 +540,7 @@ Settings of the [task runners](/platform/automation/build/workflows/task-runners
 | `BYTECHEF_SCRIPT_RUNNERS_DOCKER_PROPERTIES_HOST` | Docker API the Docker runner uses, such as `tcp://docker:2375`. Empty means `DOCKER_HOST`, else the local socket | - |
 | `BYTECHEF_SCRIPT_RUNNERS_KUBERNETES_ENABLED` | Enable the Kubernetes runner (Enterprise): tasks run as pods on the cluster their `kubernetes` connection names | `false` |
 | `BYTECHEF_SCRIPT_RUNNERS_AWSBATCH_ENABLED` | Enable the AWS Batch runner (Enterprise): tasks run as Batch jobs in the account their `aws` connection names. Write the type without its dash; `AWS_BATCH` is ignored | `false` |
-| `BYTECHEF_SCRIPT_RUNNERS_GRAALVM_PROPERTIES_TRUSTED_ENABLED` | Offer the GraalVM runner's Trusted mode, which runs scripts with full host access and no resource limits. Single-tenant installations only | `false` |
+| `BYTECHEF_SCRIPT_TRUSTED_ENABLED` | Offer the GraalVM runner's Trusted mode, which runs scripts with full host access and no resource limits. Single-tenant installations only | `false` |
 | `BYTECHEF_SCRIPT_RUNNERS_DOCKER_PROPERTIES_ALLOW_TASK_HOST` | Let a Docker task name its own Docker API | `false` |
 | `BYTECHEF_SCRIPT_RUNNERS_DOCKER_PROPERTIES_ALLOW_VOLUME_MOUNTS` | Let a Docker task bind-mount host paths | `false` |
 | `BYTECHEF_SCRIPT_RUNNERS_<TYPE>_PROPERTIES_MAX_WAIT` | Per-runner override of `runner-limits.max-wait`, as an ISO-8601 duration | - |
