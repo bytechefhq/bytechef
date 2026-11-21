@@ -90,8 +90,6 @@ bytechef:
     runners:
       graalvm:
         enabled: true            # shipped on; the in-process runner every Script step falls back to
-        properties:
-          trusted-enabled: false # lets tasks choose the GraalVM runner's Trusted mode
       process:
         enabled: false
       docker:
@@ -109,6 +107,8 @@ bytechef:
       max-wait: PT1H
       max-log-bytes: 1MB
       max-transfer-bytes: 512MB
+    trusted:
+      enabled: false             # lets tasks choose the GraalVM runner's Trusted mode
 ```
 
 `runner-limits` applies to Docker, Kubernetes and AWS Batch, and each of them can override it under its own
@@ -141,7 +141,7 @@ underscore:
 | `bytechef.script.runners.kubernetes.enabled` | `BYTECHEF_SCRIPT_RUNNERS_KUBERNETES_ENABLED` |
 | `bytechef.script.runners.aws-batch.enabled` | `BYTECHEF_SCRIPT_RUNNERS_AWSBATCH_ENABLED` |
 | `bytechef.script.runners.docker.properties.host` | `BYTECHEF_SCRIPT_RUNNERS_DOCKER_PROPERTIES_HOST` |
-| `bytechef.script.runners.graalvm.properties.trusted-enabled` | `BYTECHEF_SCRIPT_RUNNERS_GRAALVM_PROPERTIES_TRUSTED_ENABLED` |
+| `bytechef.script.trusted.enabled` | `BYTECHEF_SCRIPT_TRUSTED_ENABLED` |
 | `bytechef.script.runners.docker.properties.allow-task-host` | `BYTECHEF_SCRIPT_RUNNERS_DOCKER_PROPERTIES_ALLOW_TASK_HOST` |
 | `bytechef.script.runners.docker.properties.allow-volume-mounts` | `BYTECHEF_SCRIPT_RUNNERS_DOCKER_PROPERTIES_ALLOW_VOLUME_MOUNTS` |
 | `bytechef.script.runners.aws-batch.properties.max-wait` | `BYTECHEF_SCRIPT_RUNNERS_AWSBATCH_PROPERTIES_MAX_WAIT` |
@@ -323,9 +323,9 @@ Its one property is **Mode**:
 | `trusted` | Every restriction lifted. The script runs inside the server process with full host access and reflection. No CPU or heap limit; a wall-clock timeout of 5 minutes applies unless the task sets **Timeout (seconds)**. |
 
 The **Trusted** option is offered only when an operator sets
-`bytechef.script.runners.graalvm.properties.trusted-enabled: true`. A task that asks for it anyway fails with
+`bytechef.script.trusted.enabled: true`. A task that asks for it anyway fails with
 *The GraalVM runner's 'trusted' mode is not enabled. An operator must enable it with
-bytechef.script.runners.graalvm.properties.trusted-enabled=true.*
+bytechef.script.trusted.enabled=true.*
 
 ```json
 "taskRunner": {"type": "graalvm", "mode": "trusted"}
@@ -1045,7 +1045,7 @@ token is masked in `stdout`, `stderr` and the server log.
 - Leave every runner except GraalVM off unless you need it, and turn on only the ones you need.
 - Treat enabling Process, Docker, Kubernetes or AWS Batch as giving every workflow author code execution on that host,
   daemon, cluster or account.
-- Keep `graalvm.properties.trusted-enabled` off on any installation with more than one tenant.
+- Keep `bytechef.script.trusted.enabled` off on any installation with more than one tenant.
 - Point Docker at a dedicated daemon, give Kubernetes a dedicated namespace with Pod Security Admission, and scope the
   AWS identity to the queues, bucket and roles it needs.
 - Deliver secrets as connections, not **Environment** values or literals in the source, so they are masked in output.
