@@ -76,6 +76,12 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
     }
 
     @Override
+    @Audited(event = CustomComponentAuditEvents.CUSTOM_COMPONENT_CREATED, data = {
+        @AuditData(key = "customComponentId", value = "#result?.id"),
+        @AuditData(key = "name", value = "#result?.name"),
+        @AuditData(key = "version", value = "#result?.componentVersion"),
+        @AuditData(key = "language", value = "#language")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public CustomComponent createEmptyCustomComponent(String name, Language language) {
         validateComponentName(name);
@@ -115,6 +121,9 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
     }
 
     @Override
+    @Audited(event = CustomComponentAuditEvents.CUSTOM_COMPONENT_DELETED, data = {
+        @AuditData(key = "customComponentId", value = "#id")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void delete(Long id) {
         CustomComponent customComponent = customComponentService.getCustomComponent(id);
@@ -230,6 +239,11 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
     }
 
     @Override
+    @Audited(event = CustomComponentAuditEvents.CUSTOM_COMPONENT_PUBLISHED, data = {
+        @AuditData(key = "customComponentId", value = "#id"),
+        @AuditData(key = "name", value = "#result?.name"),
+        @AuditData(key = "version", value = "#result?.componentVersion")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public CustomComponent publishCustomComponent(long id) {
         return customComponentService.publishCustomComponent(id);
