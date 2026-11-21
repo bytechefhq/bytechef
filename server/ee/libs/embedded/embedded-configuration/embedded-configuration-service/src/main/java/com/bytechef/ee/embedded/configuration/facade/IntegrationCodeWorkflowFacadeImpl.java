@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.codeworkflow.loader.IntegrationHandlerLoader;
+import com.bytechef.ee.embedded.configuration.audit.IntegrationAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationCodeWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
@@ -26,6 +27,8 @@ import com.bytechef.embedded.integration.IntegrationHandler;
 import com.bytechef.embedded.integration.definition.IntegrationDefinition;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
@@ -110,12 +113,22 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_CREATED, data = {
+        @AuditData(key = "integrationId", value = "#result.id"),
+        @AuditData(key = "name", value = "#result.name"),
+        @AuditData(key = "componentName", value = "#componentName")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public Integration createEmptyCodeWorkflow(String componentName, Language language) {
         return createEmptyCodeWorkflow(componentName, language, null, null, null, null, null);
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_CREATED, data = {
+        @AuditData(key = "integrationId", value = "#result.id"),
+        @AuditData(key = "name", value = "#result.name"),
+        @AuditData(key = "componentName", value = "#componentName")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public Integration createEmptyCodeWorkflow(
         String componentName, Language language, @Nullable String name, @Nullable String description,
