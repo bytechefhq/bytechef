@@ -9,11 +9,13 @@ const ConnectedUserSheetPanelIntegrationWorkflowList = ({
     integrationInstance,
     integrationInstanceConfiguration,
     mcpWorkflowUuids,
+    provisioned = false,
     workflows,
 }: {
     integrationInstance: IntegrationInstance;
     integrationInstanceConfiguration: IntegrationInstanceConfiguration;
     mcpWorkflowUuids?: string[];
+    provisioned?: boolean;
     workflows: Workflow[];
 }) => {
     return (
@@ -45,6 +47,7 @@ const ConnectedUserSheetPanelIntegrationWorkflowList = ({
                                     mcpTool={
                                         !!workflow.workflowUuid && !!mcpWorkflowUuids?.includes(workflow.workflowUuid)
                                     }
+                                    provisioned={provisioned}
                                     workflow={workflow}
                                 />
                             )

@@ -296,6 +296,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                         integrationInstance={integrationInstance}
                         integrationInstanceConfiguration={integrationInstanceConfiguration}
                         mcpWorkflowUuids={mcpWorkflowUuids}
+                        provisioned={!!connectedUserIntegrationInstance.provisioned}
                         workflows={workflows}
                     />
                 )}

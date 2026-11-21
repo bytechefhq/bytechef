@@ -34,6 +34,7 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
     integrationInstanceConfigurationWorkflow,
     integrationInstanceWorkflow,
     mcpTool = false,
+    provisioned = false,
     workflow,
 }: {
     integrationInstance: IntegrationInstance;
@@ -41,6 +42,7 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
     integrationInstanceConfigurationWorkflow: IntegrationInstanceConfigurationWorkflow;
     integrationInstanceWorkflow?: IntegrationInstanceWorkflow;
     mcpTool?: boolean;
+    provisioned?: boolean;
     workflow: Workflow;
 }) => {
     const {workflowComponentDefinitions, workflowTaskDispatcherDefinitions} = useWorkflowComponentDefinitions(
@@ -197,6 +199,7 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
                     integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
                     integrationInstanceWorkflow={integrationInstanceWorkflow}
                     onClose={() => setShowEditDialog(false)}
+                    provisioned={provisioned}
                     workflow={workflow}
                 />
             )}
