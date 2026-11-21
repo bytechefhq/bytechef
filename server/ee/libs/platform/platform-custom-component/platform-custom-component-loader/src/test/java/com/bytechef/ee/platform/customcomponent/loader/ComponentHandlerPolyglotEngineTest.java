@@ -44,6 +44,7 @@ import com.bytechef.component.definition.ai.agent.BaseToolFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.polyglot.PolyglotSandbox;
 import com.bytechef.platform.component.polyglot.PolyglotSandboxSettings;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,7 @@ import java.util.Optional;
 import org.graalvm.polyglot.PolyglotException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
@@ -58,6 +60,7 @@ import org.mockito.ArgumentCaptor;
  *
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class ComponentHandlerPolyglotEngineTest {
 
     @AfterEach

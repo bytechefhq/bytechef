@@ -16,11 +16,14 @@ import static org.mockito.Mockito.verify;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextConsumer;
 import com.bytechef.component.definition.Context.Log;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @version ee
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class HostContextBridgeTest {
 
     @Test

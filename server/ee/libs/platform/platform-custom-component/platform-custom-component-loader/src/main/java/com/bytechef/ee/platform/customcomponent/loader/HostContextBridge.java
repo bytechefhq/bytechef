@@ -7,10 +7,9 @@
 
 package com.bytechef.ee.platform.customcomponent.loader;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,10 +23,6 @@ import java.util.Map;
  */
 public final class HostContextBridge {
 
-    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
-        .findAndAddModules()
-        .build();
-
     private final Context context;
 
     HostContextBridge(Context context) {
@@ -37,7 +32,7 @@ public final class HostContextBridge {
     @SuppressWarnings("unchecked")
     public String httpExecute(String requestJson) {
         try {
-            Map<String, ?> request = OBJECT_MAPPER.readValue(requestJson, Map.class);
+            Map<String, ?> request = JsonUtils.read(requestJson, Map.class);
 
             Http.Response response = context.http(http -> executeRequest(http, request));
 
@@ -47,7 +42,7 @@ public final class HostContextBridge {
             responseMap.put("headers", response.getHeaders());
             responseMap.put("body", response.getBody());
 
-            return OBJECT_MAPPER.writeValueAsString(responseMap);
+            return JsonUtils.write(responseMap);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
