@@ -193,6 +193,7 @@ include("server:libs:platform:platform-component:platform-component-log:platform
 include("server:libs:platform:platform-component:platform-component-log:platform-component-log-service")
 include("server:libs:platform:platform-component:platform-component-polyglot")
 include("server:libs:platform:platform-component:platform-component-runner:platform-component-runner-api")
+include("server:libs:platform:platform-component:platform-component-runner:platform-component-runner-docker")
 include("server:libs:platform:platform-component:platform-component-runner:platform-component-runner-impl")
 include("server:libs:platform:platform-component:platform-component-service")
 include("server:libs:platform:platform-component:platform-component-test-int-support")

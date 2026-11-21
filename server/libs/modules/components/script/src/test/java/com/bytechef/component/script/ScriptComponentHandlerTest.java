@@ -52,7 +52,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.runner.GraalVmTaskRunner;
 import com.bytechef.platform.component.runner.TaskRunnerRegistry;
 import com.bytechef.platform.component.runner.TaskRunnerRegistryImpl;
-import com.bytechef.platform.component.runner.external.DockerTaskRunnerBackend;
+import com.bytechef.platform.component.runner.docker.DockerTaskRunnerBackend;
 import com.bytechef.platform.component.runner.external.ProcessTaskRunner;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.util.HashMap;
