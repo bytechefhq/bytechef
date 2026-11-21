@@ -86,11 +86,11 @@ public class XlsxFileWriteActionTest {
             .getFile());
     }
 
-    private Parameters getWriteParameters(List<?> items, Parameters parameters) {
+    private <T> Parameters getWriteParameters(List<T> items, Parameters parameters) {
         Mockito.when(parameters.getString(Mockito.eq(FILENAME), Mockito.anyString()))
             .thenReturn("file.xlsx");
         Mockito.when(
-            parameters.getList(Mockito.eq(ROWS), Mockito.any(TypeReference.class), Mockito.eq(List.of())))
+            parameters.getList(Mockito.eq(ROWS), Mockito.<TypeReference<T>>any(), Mockito.eq(List.of())))
             .thenReturn(items);
         Mockito.when(parameters.getString(Mockito.eq(SHEET_NAME), Mockito.eq("Sheet")))
             .thenReturn("Sheet");

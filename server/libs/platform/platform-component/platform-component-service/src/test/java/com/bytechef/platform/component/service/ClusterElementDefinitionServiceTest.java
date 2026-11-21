@@ -52,7 +52,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
@@ -74,7 +73,7 @@ class ClusterElementDefinitionServiceTest {
     @BeforeEach
     void setUp() {
         clusterElementDefinitionService = new ClusterElementDefinitionServiceImpl(
-            componentDefinitionRegistry, contextFactory, mock(ObjectProvider.class));
+            componentDefinitionRegistry, contextFactory, mock());
     }
 
     @Test
@@ -408,6 +407,9 @@ class ClusterElementDefinitionServiceTest {
             new ClusterElementType("TOOLS", "tools", "Tools"), "TOOLS", properties);
     }
 
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
     private ClusterElementDefinition getClusterElementDefinition(
         ClusterElementType clusterElementType, String clusterElementTypeName,
         List<? extends com.bytechef.component.definition.Property> properties) {
