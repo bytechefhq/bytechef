@@ -9,7 +9,7 @@ package com.bytechef.platform.codeworkflow.loader.automation;
 
 import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
-import com.bytechef.ee.platform.codeworkflow.loader.AbstractHandlerLoader;
+import com.bytechef.platform.component.polyglot.AbstractHandlerLoader;
 import java.io.IOException;
 import java.net.URL;
 import org.springframework.cache.CacheManager;

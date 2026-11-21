@@ -8,8 +8,8 @@
 package com.bytechef.ee.embedded.codeworkflow.loader;
 
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
-import com.bytechef.ee.platform.codeworkflow.loader.AbstractHandlerLoader;
 import com.bytechef.embedded.integration.IntegrationHandler;
+import com.bytechef.platform.component.polyglot.AbstractHandlerLoader;
 import java.io.IOException;
 import java.net.URL;
 import org.springframework.cache.CacheManager;
