@@ -38,3 +38,6 @@ spring:
 bytechef:
   coordinator:
     enabled: false
+  oauth2:
+    authorization-server:
+      enabled: false
