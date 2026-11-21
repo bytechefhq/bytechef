@@ -27,7 +27,7 @@ interface UpdateIntegrationInstanceWorkflowMutationProps {
 }
 
 export const useUpdateIntegrationInstanceWorkflowMutation = (
-    mutationProps: UpdateIntegrationInstanceWorkflowMutationProps
+    mutationProps?: UpdateIntegrationInstanceWorkflowMutationProps
 ) =>
     useMutation({
         mutationFn: (request: UpdateIntegrationInstanceWorkflowOperationRequest) => {
