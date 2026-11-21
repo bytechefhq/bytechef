@@ -222,7 +222,7 @@ class AiModelConfigurationTest {
         ChatModel chatModel = aiModelConfiguration.resolveChatModel();
 
         assertThat(chatModel).isNotNull();
-        assertThat(chatModel.getDefaultOptions()
+        assertThat(chatModel.getOptions()
             .getMaxTokens()).isEqualTo(AnthropicConstants.DEFAULT_MAX_TOKENS);
     }
 

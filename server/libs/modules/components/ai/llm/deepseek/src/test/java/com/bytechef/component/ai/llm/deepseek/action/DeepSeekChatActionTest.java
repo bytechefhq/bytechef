@@ -110,7 +110,7 @@ class DeepSeekChatActionTest {
         assertNotNull(chatModel);
         assertInstanceOf(DeepSeekChatModel.class, chatModel);
 
-        DeepSeekChatOptions options = (DeepSeekChatOptions) chatModel.getDefaultOptions();
+        DeepSeekChatOptions options = (DeepSeekChatOptions) chatModel.getOptions();
 
         assertEquals("deepseek-chat", options.getModel());
         assertEquals(0.7, options.getTemperature());
@@ -138,7 +138,7 @@ class DeepSeekChatActionTest {
         assertNotNull(chatModel);
         assertInstanceOf(DeepSeekChatModel.class, chatModel);
 
-        DeepSeekChatOptions options = (DeepSeekChatOptions) chatModel.getDefaultOptions();
+        DeepSeekChatOptions options = (DeepSeekChatOptions) chatModel.getOptions();
 
         assertEquals("deepseek-chat", options.getModel());
         assertEquals(0.7, options.getTemperature());

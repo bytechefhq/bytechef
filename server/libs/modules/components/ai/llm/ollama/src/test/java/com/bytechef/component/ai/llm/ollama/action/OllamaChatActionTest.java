@@ -199,7 +199,7 @@ class OllamaChatActionTest {
 
         assertEquals(List.of("http://localhost:11434"), stringArgumentCaptor.getAllValues());
 
-        OllamaChatOptions options = (OllamaChatOptions) chatModel.getDefaultOptions();
+        OllamaChatOptions options = (OllamaChatOptions) chatModel.getOptions();
         assertOptions(options);
         assertNull(options.getOutputSchema());
     }
@@ -217,7 +217,7 @@ class OllamaChatActionTest {
 
         verify(mockedApiBuilder, never()).baseUrl(org.mockito.ArgumentMatchers.anyString());
 
-        OllamaChatOptions options = (OllamaChatOptions) chatModel.getDefaultOptions();
+        OllamaChatOptions options = (OllamaChatOptions) chatModel.getOptions();
         assertOptions(options);
         assertNull(options.getOutputSchema());
     }
@@ -233,7 +233,7 @@ class OllamaChatActionTest {
         assertNotNull(chatModel);
         assertInstanceOf(OllamaChatModel.class, chatModel);
 
-        OllamaChatOptions options = (OllamaChatOptions) chatModel.getDefaultOptions();
+        OllamaChatOptions options = (OllamaChatOptions) chatModel.getOptions();
         assertOptions(options);
         assertEquals(TEST_SCHEMA, options.getOutputSchema());
     }
@@ -299,6 +299,6 @@ class OllamaChatActionTest {
         org.springframework.ai.chat.model.ChatModel chatModel = OllamaChatAction.CHAT_MODEL.createChatModel(
             MockParametersFactory.create(inputParameters), MockParametersFactory.create(Map.of()), false);
 
-        return (OllamaChatOptions) chatModel.getDefaultOptions();
+        return (OllamaChatOptions) chatModel.getOptions();
     }
 }

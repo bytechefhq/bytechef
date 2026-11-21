@@ -124,7 +124,6 @@ class CheckForViolationsTest {
         ChatOptions chatOptions = ChatOptions.builder()
             .build();
 
-        when(chatModel.getDefaultOptions()).thenReturn(chatOptions);
         when(chatModel.getOptions()).thenReturn(chatOptions);
         when(chatModel.call(any(Prompt.class))).thenThrow(new IllegalStateException("provider down"));
         when(modelFunction.apply(any(), any(), anyBoolean())).thenAnswer(invocation -> chatModel);

@@ -122,7 +122,7 @@ class MistralChatActionTest {
         assertNotNull(chatModel);
         assertInstanceOf(MistralAiChatModel.class, chatModel);
 
-        MistralAiChatOptions mistralAiChatOptions = (MistralAiChatOptions) chatModel.getDefaultOptions();
+        MistralAiChatOptions mistralAiChatOptions = (MistralAiChatOptions) chatModel.getOptions();
 
         assertEquals("mistral-large-latest", mistralAiChatOptions.getModel());
         assertEquals(0.7, mistralAiChatOptions.getTemperature());
@@ -151,7 +151,7 @@ class MistralChatActionTest {
         assertNotNull(chatModel);
         assertInstanceOf(MistralAiChatModel.class, chatModel);
 
-        MistralAiChatOptions mistralAiChatOptions = (MistralAiChatOptions) chatModel.getDefaultOptions();
+        MistralAiChatOptions mistralAiChatOptions = (MistralAiChatOptions) chatModel.getOptions();
 
         assertEquals("mistral-large-latest", mistralAiChatOptions.getModel());
         assertEquals(0.7, mistralAiChatOptions.getTemperature());
@@ -182,6 +182,6 @@ class MistralChatActionTest {
         org.springframework.ai.chat.model.ChatModel chatModel = MistralChatAction.CHAT_MODEL.createChatModel(
             MockParametersFactory.create(inputParameters), mockedConnectionParameters, false);
 
-        return (MistralAiChatOptions) chatModel.getDefaultOptions();
+        return (MistralAiChatOptions) chatModel.getOptions();
     }
 }
