@@ -69,11 +69,13 @@ public class ScriptJavaScriptAction {
                             //
                             // connection holds the parameters of each connection defined in the
                             // Connections panel (bottom right of this editor), keyed by its name:
-                            // const token = connection["my-connection"].token;
+                            // const token = connection["my_connection"].token;
                             //
-                            // Reach another component's action through the context:
+                            // Reach another component's action through the context. The optional second
+                            // argument names the connection to use. context is available only under the
+                            // GraalVM task runner:
                             // const response = context.component.httpClient.get(
-                            //     {uri: "https://api.example.com/items"}, "my-connection");
+                            //     {uri: "https://api.example.com/items"}, "my_connection");
 
                             return null;
                         }""")

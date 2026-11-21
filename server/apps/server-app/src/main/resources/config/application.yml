@@ -70,6 +70,8 @@ info:
   signUp:
     activationRequired: ${bytechef.sign-up.activation-required}
     enabled: ${bytechef.sign-up.enabled}
+  script:
+    injectConnections: ${bytechef.script.inject-connections:false}
   socialLogin:
     enabled: ${bytechef.security.social-login.enabled}
   userGuiding:
