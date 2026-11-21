@@ -36,7 +36,6 @@ import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.polyglot.ScriptSandboxMode;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -53,7 +52,7 @@ public class GraalVmTaskRunnerTest {
     private static final Duration TIMEOUT = Duration.ofMinutes(5);
 
     private final PolyglotEngine polyglotEngine = mock(PolyglotEngine.class);
-    private final GraalVmTaskRunner graalVmTaskRunner = newTaskRunner(Map.of());
+    private final GraalVmTaskRunner graalVmTaskRunner = newTaskRunner(false);
 
     @Test
     public void testTypeAndCapabilities() {
@@ -75,7 +74,7 @@ public class GraalVmTaskRunnerTest {
 
     @Test
     public void testGetPropertiesOffersBothOptionsWhenTrustedEnabled() {
-        GraalVmTaskRunner trustingTaskRunner = newTaskRunner(Map.of("trusted-enabled", "true"));
+        GraalVmTaskRunner trustingTaskRunner = newTaskRunner(true);
 
         Property.StringProperty modeProperty = getModeProperty(trustingTaskRunner);
 
@@ -100,18 +99,6 @@ public class GraalVmTaskRunnerTest {
     }
 
     @Test
-    public void testGetPropertiesOffersOnlyStrictWhenTrustedPropertyMalformed() {
-        GraalVmTaskRunner malformedTaskRunner = newTaskRunner(Map.of("trusted-enabled", "yes"));
-
-        Property.StringProperty modeProperty = getModeProperty(malformedTaskRunner);
-
-        assertThat(modeProperty.getOptions())
-            .extracting(Option::getValue)
-            .containsExactly("strict");
-        assertThat(modeProperty.getDefaultValue()).contains("strict");
-    }
-
-    @Test
     public void testRunReturnsPerformResult() {
         when(polyglotEngine.execute(any(), any(), anyString(), any(), anyMap(), any())).thenReturn("done");
 
@@ -124,7 +111,7 @@ public class GraalVmTaskRunnerTest {
 
     @Test
     public void testRunForwardsModeTimeoutAndInputParameters() {
-        GraalVmTaskRunner trustingTaskRunner = newTaskRunner(Map.of("trusted-enabled", "true"));
+        GraalVmTaskRunner trustingTaskRunner = newTaskRunner(true);
 
         ArgumentCaptor<Parameters> inputParametersCaptor = ArgumentCaptor.forClass(Parameters.class);
 
@@ -167,7 +154,7 @@ public class GraalVmTaskRunnerTest {
 
     @Test
     public void testRunBoundsTrustedExecutionsWithTheDefaultCeiling() {
-        GraalVmTaskRunner trustingTaskRunner = newTaskRunner(Map.of("trusted-enabled", "true"));
+        GraalVmTaskRunner trustingTaskRunner = newTaskRunner(true);
 
         when(
             polyglotEngine.execute(
@@ -265,7 +252,7 @@ public class GraalVmTaskRunnerTest {
 
     @Test
     public void testValidateAcceptsATimeoutInTrustedMode() {
-        GraalVmTaskRunner trustingTaskRunner = newTaskRunner(Map.of("trusted-enabled", "true"));
+        GraalVmTaskRunner trustingTaskRunner = newTaskRunner(true);
 
         assertThatCode(() -> trustingTaskRunner.validate(newRequest(Map.of("mode", "trusted"), TIMEOUT)))
             .doesNotThrowAnyException();
@@ -273,7 +260,7 @@ public class GraalVmTaskRunnerTest {
 
     @Test
     public void testValidateAcceptsTrustedWhenTrustedEnabled() {
-        GraalVmTaskRunner trustingTaskRunner = newTaskRunner(Map.of("trusted-enabled", "true"));
+        GraalVmTaskRunner trustingTaskRunner = newTaskRunner(true);
 
         assertThatCode(() -> trustingTaskRunner.validate(newRequest(Map.of("mode", "trusted"))))
             .doesNotThrowAnyException();
@@ -281,27 +268,18 @@ public class GraalVmTaskRunnerTest {
 
     @Test
     public void testValidateRejectsTrustedWhenTrustedDisabled() {
-        GraalVmTaskRunner disallowingTaskRunner = newTaskRunner(Map.of("trusted-enabled", "false"));
+        GraalVmTaskRunner disallowingTaskRunner = newTaskRunner(false);
 
         assertThatThrownBy(() -> disallowingTaskRunner.validate(newRequest(Map.of("mode", "trusted"))))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("bytechef.script.runners.graalvm.properties.trusted-enabled");
+            .hasMessageContaining("bytechef.script.trusted.enabled");
     }
 
     @Test
     public void testValidateRejectsTrustedWhenTrustedPropertyAbsent() {
         assertThatThrownBy(() -> graalVmTaskRunner.validate(newRequest(Map.of("mode", "trusted"))))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("bytechef.script.runners.graalvm.properties.trusted-enabled");
-    }
-
-    @Test
-    public void testValidateRejectsTrustedWhenTrustedPropertyMalformed() {
-        GraalVmTaskRunner malformedTaskRunner = newTaskRunner(Map.of("trusted-enabled", "yes"));
-
-        assertThatThrownBy(() -> malformedTaskRunner.validate(newRequest(Map.of("mode", "trusted"))))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("bytechef.script.runners.graalvm.properties.trusted-enabled");
+            .hasMessageContaining("bytechef.script.trusted.enabled");
     }
 
     @Test
@@ -311,32 +289,35 @@ public class GraalVmTaskRunnerTest {
 
         assertThatThrownBy(() -> unconfiguredTaskRunner.validate(newRequest(Map.of("mode", "trusted"))))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("bytechef.script.runners.graalvm.properties.trusted-enabled");
+            .hasMessageContaining("bytechef.script.trusted.enabled");
     }
 
     @Test
     public void testValidateAcceptsStrictWhateverTheTrustedProperty() {
-        for (Map<String, String> properties : List.of(
-            Map.<String, String>of(), Map.of("trusted-enabled", "false"), Map.of("trusted-enabled", "true"))) {
-
-            GraalVmTaskRunner taskRunner = newTaskRunner(properties);
+        for (boolean trustedEnabled : List.of(false, true)) {
+            GraalVmTaskRunner taskRunner = newTaskRunner(trustedEnabled);
 
             assertThatCode(() -> taskRunner.validate(newRequest(Map.of("mode", "strict"), null)))
                 .doesNotThrowAnyException();
         }
     }
 
-    private GraalVmTaskRunner newTaskRunner(Map<String, String> graalVmProperties) {
+    private GraalVmTaskRunner newTaskRunner(boolean trustedEnabled) {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
         ApplicationProperties.Script.Runner runner = new ApplicationProperties.Script.Runner();
 
         runner.setEnabled(true);
-        runner.setProperties(new HashMap<>(graalVmProperties));
 
-        applicationProperties.getScript()
-            .getRunners()
-            .put("graalvm", runner);
+        ApplicationProperties.Script script = applicationProperties.getScript();
+
+        Map<String, ApplicationProperties.Script.Runner> runners = script.getRunners();
+
+        runners.put("graalvm", runner);
+
+        ApplicationProperties.Script.Trusted trusted = script.getTrusted();
+
+        trusted.setEnabled(trustedEnabled);
 
         return new GraalVmTaskRunner(polyglotEngine, applicationProperties);
     }

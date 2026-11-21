@@ -45,7 +45,7 @@ import org.springframework.context.annotation.ComponentScan;
     properties = {
         "bytechef.workflow.repository.classpath.enabled=true",
         "bytechef.script.runners.graalvm.enabled=true",
-        "bytechef.script.runners.graalvm.properties.trusted-enabled=true"
+        "bytechef.script.trusted.enabled=true"
     })
 public class ScriptComponentHandlerTrustedModeIntTest {
 

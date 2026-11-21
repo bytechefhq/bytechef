@@ -129,8 +129,7 @@ public class TaskRunnerRegistryTest {
     public void testLogEnabledRunnersWarnsForTrustedGraalvm() {
         TaskRunner taskRunner = newTaskRunner("graalvm", Set.of(TaskRunnerCapability.INLINE_SCRIPT));
 
-        TaskRunnerRegistryImpl taskRunnerRegistry = newRegistryImpl(
-            List.of(taskRunner), true, Map.of("trusted-enabled", "true"));
+        TaskRunnerRegistryImpl taskRunnerRegistry = newRegistryImpl(List.of(taskRunner), true, true);
 
         taskRunnerRegistry.logEnabledRunners();
 
@@ -149,7 +148,7 @@ public class TaskRunnerRegistryTest {
     public void testLogEnabledRunnersSilentForUntrustedGraalvm() {
         TaskRunner taskRunner = newTaskRunner("graalvm", Set.of(TaskRunnerCapability.INLINE_SCRIPT));
 
-        TaskRunnerRegistryImpl taskRunnerRegistry = newRegistryImpl(List.of(taskRunner), true, Map.of());
+        TaskRunnerRegistryImpl taskRunnerRegistry = newRegistryImpl(List.of(taskRunner), true, false);
 
         taskRunnerRegistry.logEnabledRunners();
 
@@ -160,7 +159,7 @@ public class TaskRunnerRegistryTest {
     public void testLogEnabledRunnersWarnsForEnabledNonGraalvmRunner() {
         TaskRunner taskRunner = newTaskRunner("process", Set.of(TaskRunnerCapability.COMMANDS));
 
-        TaskRunnerRegistryImpl taskRunnerRegistry = newRegistryImpl(List.of(taskRunner), true, Map.of());
+        TaskRunnerRegistryImpl taskRunnerRegistry = newRegistryImpl(List.of(taskRunner), true, false);
 
         taskRunnerRegistry.logEnabledRunners();
 
@@ -178,7 +177,7 @@ public class TaskRunnerRegistryTest {
     public void testLogEnabledRunnersSilentForDisabledRunner() {
         TaskRunner taskRunner = newTaskRunner("docker", Set.of(TaskRunnerCapability.COMMANDS));
 
-        TaskRunnerRegistryImpl taskRunnerRegistry = newRegistryImpl(List.of(taskRunner), false, Map.of());
+        TaskRunnerRegistryImpl taskRunnerRegistry = newRegistryImpl(List.of(taskRunner), false, false);
 
         taskRunnerRegistry.logEnabledRunners();
 
@@ -186,15 +185,20 @@ public class TaskRunnerRegistryTest {
     }
 
     private static TaskRunnerRegistryImpl newRegistryImpl(
-        List<TaskRunner> taskRunners, boolean enabled, Map<String, String> properties) {
+        List<TaskRunner> taskRunners, boolean enabled, boolean trustedEnabled) {
 
         ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        ApplicationProperties.Script script = applicationProperties.getScript();
+
+        ApplicationProperties.Script.Trusted trusted = script.getTrusted();
+
+        trusted.setEnabled(trustedEnabled);
 
         for (TaskRunner taskRunner : taskRunners) {
             ApplicationProperties.Script.Runner runner = new ApplicationProperties.Script.Runner();
 
             runner.setEnabled(enabled);
-            runner.setProperties(properties);
 
             applicationProperties.getScript()
                 .getRunners()

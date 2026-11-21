@@ -23,16 +23,20 @@ import com.bytechef.config.ApplicationProperties;
  */
 final class TaskRunnerTrustedMode {
 
-    private static final String TRUSTED_ENABLED = "trusted-enabled";
+    private static final String PROPERTY_NAME = "bytechef.script.trusted.enabled";
 
     private TaskRunnerTrustedMode() {
     }
 
-    static boolean isEnabled(ApplicationProperties applicationProperties, String type) {
-        return TaskRunnerOperatorFlag.isEnabled(applicationProperties, type, TRUSTED_ENABLED);
+    static boolean isEnabled(ApplicationProperties applicationProperties) {
+        ApplicationProperties.Script script = applicationProperties.getScript();
+
+        ApplicationProperties.Script.Trusted trusted = script.getTrusted();
+
+        return trusted.isEnabled();
     }
 
-    static String getPropertyName(String type) {
-        return TaskRunnerOperatorFlag.getPropertyName(type, TRUSTED_ENABLED);
+    static String getPropertyName() {
+        return PROPERTY_NAME;
     }
 }

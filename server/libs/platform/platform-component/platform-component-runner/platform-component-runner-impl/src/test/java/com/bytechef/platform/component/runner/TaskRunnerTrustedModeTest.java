@@ -16,13 +16,9 @@
 
 package com.bytechef.platform.component.runner;
 
-import static com.bytechef.platform.component.runner.TaskRunnerConstants.GRAALVM;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.config.ApplicationProperties;
-import java.util.HashMap;
-import java.util.Map;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,62 +27,34 @@ import org.junit.jupiter.api.Test;
 public class TaskRunnerTrustedModeTest {
 
     @Test
-    public void testAbsentRunnerEntryIsNotTrusted() {
-        assertThat(TaskRunnerTrustedMode.isEnabled(new ApplicationProperties(), GRAALVM)).isFalse();
+    public void testUnsetTrustedIsNotTrusted() {
+        assertThat(TaskRunnerTrustedMode.isEnabled(new ApplicationProperties())).isFalse();
     }
 
     @Test
-    public void testNullPropertiesMapIsNotTrusted() {
-        assertThat(isEnabled(null)).isFalse();
+    public void testDisabledTrustedIsNotTrusted() {
+        assertThat(isEnabled(false)).isFalse();
     }
 
     @Test
-    public void testAbsentPropertyIsNotTrusted() {
-        assertThat(isEnabled(Map.of())).isFalse();
-    }
-
-    @Test
-    public void testEmptyValueIsNotTrusted() {
-        assertThat(isEnabled(Map.of("trusted-enabled", ""))).isFalse();
-    }
-
-    @Test
-    public void testMalformedValueIsNotTrusted() {
-        assertThat(isEnabled(Map.of("trusted-enabled", "yes"))).isFalse();
-    }
-
-    @Test
-    public void testLiteralTrueIsTrusted() {
-        assertThat(isEnabled(Map.of("trusted-enabled", "true"))).isTrue();
-    }
-
-    @Test
-    public void testUpperCaseTrueIsTrusted() {
-        assertThat(isEnabled(Map.of("trusted-enabled", "TRUE"))).isTrue();
+    public void testEnabledTrustedIsTrusted() {
+        assertThat(isEnabled(true)).isTrue();
     }
 
     @Test
     public void testGetPropertyNameNamesTheFullConfigurationKey() {
-        assertThat(TaskRunnerTrustedMode.getPropertyName(GRAALVM))
-            .isEqualTo("bytechef.script.runners.graalvm.properties.trusted-enabled");
+        assertThat(TaskRunnerTrustedMode.getPropertyName()).isEqualTo("bytechef.script.trusted.enabled");
     }
 
-    private static boolean isEnabled(@Nullable Map<String, String> properties) {
-        ApplicationProperties.Script.Runner runner = new ApplicationProperties.Script.Runner();
-
-        runner.setEnabled(true);
-        runner.setProperties(properties);
-
+    private static boolean isEnabled(boolean enabled) {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
         ApplicationProperties.Script script = applicationProperties.getScript();
 
-        Map<String, ApplicationProperties.Script.Runner> runners = new HashMap<>();
+        ApplicationProperties.Script.Trusted trusted = script.getTrusted();
 
-        runners.put(GRAALVM, runner);
+        trusted.setEnabled(enabled);
 
-        script.setRunners(runners);
-
-        return TaskRunnerTrustedMode.isEnabled(applicationProperties, GRAALVM);
+        return TaskRunnerTrustedMode.isEnabled(applicationProperties);
     }
 }
