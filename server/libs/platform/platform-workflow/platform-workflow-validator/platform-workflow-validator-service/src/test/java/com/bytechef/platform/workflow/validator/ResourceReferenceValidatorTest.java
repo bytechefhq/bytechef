@@ -60,6 +60,29 @@ class ResourceReferenceValidatorTest {
     }
 
     @Test
+    void unsetRequiredResourcePropertyIsAMissingResourceNotAMissingProperty() {
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        TaskValidator.validateTaskParameters("{}", List.of(TABLE_PROPERTY, NAME_PROPERTY), errors, warnings);
+
+        assertEquals("Resource referenced by property 'table' is not available: none is selected yet",
+            errors.toString());
+    }
+
+    @Test
+    void unsetRequiredPlainPropertyIsAMissingProperty() {
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        TaskValidator.validateTaskParameters(
+            "{}", List.of(new PropertyInfo("name", "STRING", null, true, true, null, null, null, null)), errors,
+            warnings);
+
+        assertEquals("Missing required property: name", errors.toString());
+    }
+
+    @Test
     void missingReferenceProducesError() {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();

@@ -29,6 +29,7 @@ import {WorkflowEditorReadOnlyContext} from '../providers/workflowEditorReadOnly
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import {getAxisCenteredViewport} from '../utils/axisCenteredViewportUtils';
+import FitViewOnWorkflowChange from './FitViewOnWorkflowChange';
 import NodeActionsHint from './NodeActionsHint';
 import WorkflowEditorToolbar from './WorkflowEditorToolbar';
 import WorkflowIssuesNote from './WorkflowIssuesNote';
@@ -51,6 +52,7 @@ type WorkflowEditorPropsType = {
     customCanvasWidth?: number;
     enableUndoRedo?: boolean;
     fitViewOnLoad?: boolean;
+    fitViewOnWorkflowChange?: boolean;
     leftSidebarOpen?: boolean;
     onFitView?: () => void;
     preview?: boolean;
@@ -69,6 +71,7 @@ const WorkflowEditor = ({
     customCanvasWidth,
     enableUndoRedo,
     fitViewOnLoad,
+    fitViewOnWorkflowChange,
     leftSidebarOpen,
     onFitView,
     preview,
@@ -116,6 +119,7 @@ const WorkflowEditor = ({
         componentDefinitions,
         customCanvasWidth,
         fitViewOnLoad: fitsViewOnLoad,
+        fitViewOnWorkflowChange,
         leftSidebarOpen,
         readOnlyLayoutDirection,
         readOnlyWorkflow,
@@ -215,6 +219,8 @@ const WorkflowEditor = ({
                     <GraphTransitionEditorLayer />
 
                     <GraphConnectionLine />
+
+                    {fitViewOnWorkflowChange && <FitViewOnWorkflowChange customCanvasWidth={customCanvasWidth} />}
 
                     {!readOnlyWorkflow && nodes.length > 0 && <WorkflowIssuesNote fallback={<NodeActionsHint />} />}
 

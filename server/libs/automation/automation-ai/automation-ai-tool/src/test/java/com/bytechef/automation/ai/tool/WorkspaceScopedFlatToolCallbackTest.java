@@ -23,10 +23,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.exception.ProjectWorkflowErrorType;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -37,6 +40,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
+import org.springframework.ai.tool.execution.ToolExecutionException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -282,11 +286,50 @@ class WorkspaceScopedFlatToolCallbackTest {
             .containsEntry(AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 9L);
     }
 
+    @Test
+    void testExecutionExceptionMessagePassesThrough() {
+        delegate.failure = new ToolExecutionException(
+            delegate.getToolDefinition(),
+            new ExecutionException("Workflow w was not found", ProjectWorkflowErrorType.UPDATE_WORKFLOW));
+
+        String result = toolCallback.call("{\"name\": \"my server\", \"workspaceId\": 42}");
+
+        assertThat(jsonMapper.readTree(result)
+            .path("error")
+            .asString()).isEqualTo("Workflow w was not found");
+    }
+
+    @Test
+    void testNoAiProviderMessagePassesThrough() {
+        ChatModelUnavailableException exception = ChatModelUnavailableException.noProviderEnabled(0);
+
+        delegate.failure = exception;
+
+        String result = toolCallback.call("{\"name\": \"my server\", \"workspaceId\": 42}");
+
+        assertThat(jsonMapper.readTree(result)
+            .path("error")
+            .asString()).isEqualTo(exception.getMessage());
+    }
+
+    @Test
+    void testUnexpectedDelegateFailureIsReducedToItsClassName() {
+        delegate.failure = new ToolExecutionException(
+            delegate.getToolDefinition(), new IllegalStateException("secret"));
+
+        String result = toolCallback.call("{\"name\": \"my server\", \"workspaceId\": 42}");
+
+        assertThat(result)
+            .contains("IllegalStateException")
+            .doesNotContain("secret");
+    }
+
     private static final class ContextCapturingDelegate implements ToolCallback {
 
         private final String inputSchema;
         private Map<String, Object> capturedContext;
         private String capturedInput;
+        private RuntimeException failure;
 
         private ContextCapturingDelegate(String inputSchema) {
             this.inputSchema = inputSchema;
@@ -310,6 +353,10 @@ class WorkspaceScopedFlatToolCallbackTest {
         public String call(String toolInput, ToolContext toolContext) {
             capturedInput = toolInput;
             capturedContext = toolContext == null ? null : toolContext.getContext();
+
+            if (failure != null) {
+                throw failure;
+            }
 
             return "done";
         }

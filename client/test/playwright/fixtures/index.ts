@@ -1,3 +1,5 @@
+export {aiHubChatsTest} from './aiHubChats';
+export type {AiHubChatsFixturesType} from './aiHubChats';
 export {loginTest} from './authenticated';
 export type {LoginFixturesType} from './authenticated';
 export {projectTest} from './project';

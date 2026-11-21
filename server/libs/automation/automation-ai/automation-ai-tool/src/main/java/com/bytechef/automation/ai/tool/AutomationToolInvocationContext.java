@@ -159,6 +159,23 @@ public record AutomationToolInvocationContext(@Nullable Long workspaceId, @Nulla
         return forwardedContext;
     }
 
+    public static Map<String, Object> withEnvironment(@Nullable ToolContext toolContext, long environmentId) {
+        Map<String, Object> forwardedContext = new HashMap<>();
+
+        if (toolContext != null) {
+            forwardedContext.putAll(toolContext.getContext());
+        }
+
+        forwardedContext.put(TOOL_CONTEXT_ENVIRONMENT_ID_KEY, environmentId);
+        forwardedContext.putAll(
+            AgentToolInvocationContext.builder()
+                .environmentId(environmentId)
+                .build()
+                .toToolContext());
+
+        return forwardedContext;
+    }
+
     private static @Nullable Long asLong(@Nullable Object value) {
         if (value == null) {
             return null;

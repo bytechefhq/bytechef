@@ -21,6 +21,7 @@ import static com.bytechef.automation.configuration.exception.ProjectWorkflowErr
 import com.bytechef.ai.copilot.tool.util.WorkflowPersistCaptureUtils;
 import com.bytechef.automation.ai.tool.model.ProjectWorkflowInfo;
 import com.bytechef.automation.ai.tool.model.WorkflowInfo;
+import com.bytechef.automation.ai.tool.model.WorkflowSaveInfo;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
@@ -34,8 +35,12 @@ import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.ai.tool.util.ToolUtils;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
+import com.bytechef.platform.configuration.context.EnvironmentContext;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +67,7 @@ public class ProjectWorkflowTools {
 
     private static final Logger log = LoggerFactory.getLogger(ProjectWorkflowTools.class);
 
-    private static final String DEFAULT_DEFINITION = """
+    static final String DEFAULT_DEFINITION = """
         {
             "label": "workflowName",
             "description": "workflowDescription",
@@ -87,6 +92,7 @@ public class ProjectWorkflowTools {
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ScopedProjectGuard scopedProjectGuard;
     private final ObjectProvider<WorkflowArtifactRecorder> workflowArtifactRecorderProvider;
+    private final ObjectProvider<WorkflowValidatorFacade> workflowValidatorFacadeProvider;
     private final WorkspaceConnectionFacade workspaceConnectionFacade;
     private final WorkspaceFacade workspaceFacade;
 
@@ -95,6 +101,7 @@ public class ProjectWorkflowTools {
         ComponentDefinitionFacade componentDefinitionFacade, ProjectFacade projectFacade,
         ProjectWorkflowFacade projectWorkflowFacade, ScopedProjectGuard scopedProjectGuard,
         ObjectProvider<WorkflowArtifactRecorder> workflowArtifactRecorderProvider,
+        ObjectProvider<WorkflowValidatorFacade> workflowValidatorFacadeProvider,
         WorkspaceConnectionFacade workspaceConnectionFacade, WorkspaceFacade workspaceFacade) {
 
         this.componentDefinitionFacade = componentDefinitionFacade;
@@ -102,6 +109,7 @@ public class ProjectWorkflowTools {
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.scopedProjectGuard = scopedProjectGuard;
         this.workflowArtifactRecorderProvider = workflowArtifactRecorderProvider;
+        this.workflowValidatorFacadeProvider = workflowValidatorFacadeProvider;
         this.workspaceConnectionFacade = workspaceConnectionFacade;
         this.workspaceFacade = workspaceFacade;
     }
@@ -226,7 +234,7 @@ public class ProjectWorkflowTools {
     }
 
     @Tool(
-        description = "Create a new workflow in a ByteChef project. Returns the created workflow information including id, project id, workflow id, and reference code.")
+        description = "Create a new workflow in a ByteChef project. The definition is validated first: if it has errors, nothing is saved and the errors are returned, so fix them and call this again with the complete definition. Returns the created workflow information including id, project id, workflow id, and reference code.")
     public ProjectWorkflowInfo createProjectWorkflow(
         @ToolParam(description = "The ID of the project to add the workflow to") long projectId,
         @ToolParam(
@@ -237,6 +245,7 @@ public class ProjectWorkflowTools {
         scopedProjectGuard.checkProject(projectId, ScopedProjectGuard.WORKFLOW_CREATE, toolContext,
             ProjectWorkflowErrorType.CREATE_WORKFLOW);
         checkAllowedComponents(definition, toolContext, ProjectWorkflowErrorType.CREATE_WORKFLOW);
+        validateBeforeSave(definition, null, ProjectWorkflowErrorType.CREATE_WORKFLOW, toolContext);
 
         ProjectWorkflowInfo filledProjectWorkflowInfo = fillEmptyTargetWorkflow(projectId, definition, toolContext);
 
@@ -317,6 +326,49 @@ public class ProjectWorkflowTools {
             updatedProjectWorkflowDTO.getLastModifiedDate());
     }
 
+    private List<String> validateBeforeSave(
+        String definition, @Nullable String workflowId, ProjectWorkflowErrorType projectWorkflowErrorType,
+        @Nullable ToolContext toolContext) {
+
+        WorkflowValidatorFacade workflowValidatorFacade = workflowValidatorFacadeProvider.getIfAvailable();
+
+        if (workflowValidatorFacade == null) {
+            return List.of();
+        }
+
+        int environmentId = resolveValidationEnvironmentId(toolContext);
+
+        WorkflowValidatorFacade.WorkflowValidationResult workflowValidationResult =
+            workflowValidatorFacade.validateWorkflow(definition, workflowId, environmentId);
+
+        List<String> errors = workflowValidationResult.savingErrors();
+
+        if (!errors.isEmpty()) {
+            throw new ExecutionException(
+                "Nothing was saved: the workflow definition has " + errors.size() + " validation error(s). Fix " +
+                    "every one of them and save the complete definition again.\n- " + String.join("\n- ", errors),
+                projectWorkflowErrorType);
+        }
+
+        List<String> warnings = new ArrayList<>(workflowValidationResult.warnings());
+
+        warnings.addAll(workflowValidationResult.errors());
+
+        return warnings;
+    }
+
+    private static int resolveValidationEnvironmentId(@Nullable ToolContext toolContext) {
+        Long environmentId = resolveEnvironmentId(toolContext);
+
+        if (environmentId != null) {
+            return environmentId.intValue();
+        }
+
+        Environment environment = EnvironmentContext.fetchCurrentEnvironment();
+
+        return environment == null ? Environment.DEVELOPMENT.ordinal() : environment.ordinal();
+    }
+
     private static boolean hasTasks(@Nullable String definition) {
         if (definition == null || definition.isBlank()) {
             return false;
@@ -354,8 +406,8 @@ public class ProjectWorkflowTools {
     }
 
     @Tool(
-        description = "Update the workflow definition. Pass the version returned by the getWorkflow call the new definition is based on; if the workflow changed since then the update is rejected and the workflow must be re-read with getWorkflow. Returns the updated workflow id, name, definition and new version.")
-    public WorkflowInfo updateWorkflow(
+        description = "Update the workflow definition. Pass the version returned by the getWorkflow or updateWorkflow call the new definition is based on; if the workflow changed since then the update is rejected and the workflow must be re-read with getWorkflow. The definition is validated first: if it has errors, nothing is saved and the errors are returned, so fix them and call this again with the same version. Returns the updated workflow id, name, new version and any validation warnings; the saved definition is the one you sent.")
+    public WorkflowSaveInfo updateWorkflow(
         @ToolParam(description = "The ID of the workflow to update") String workflowId,
         @ToolParam(
             description = "The new definition of the workflow. Needs to be in JSON format similar to " +
@@ -381,6 +433,9 @@ public class ProjectWorkflowTools {
                     ProjectWorkflowErrorType.UPDATE_WORKFLOW);
             }
 
+            List<String> warnings = validateBeforeSave(
+                definition, workflowId, ProjectWorkflowErrorType.UPDATE_WORKFLOW, toolContext);
+
             ProjectWorkflowDTO updatedProjectWorkflowDTO = projectWorkflowFacade.updateWorkflow(
                 projectWorkflowDTO.getId(), definition, version);
 
@@ -392,11 +447,9 @@ public class ProjectWorkflowTools {
 
             captureUpdatedWorkflow(toolContext, workflowId, updatedProjectWorkflowDTO, definition);
 
-            return new WorkflowInfo(
+            return new WorkflowSaveInfo(
                 updatedProjectWorkflowDTO.getId(), updatedProjectWorkflowDTO.getProjectWorkflowId(),
-                updatedProjectWorkflowDTO.getWorkflowUuid(), updatedProjectWorkflowDTO.getLabel(),
-                updatedProjectWorkflowDTO.getDescription(), definition, updatedProjectWorkflowDTO.getVersion(),
-                updatedProjectWorkflowDTO.getCreatedDate(), updatedProjectWorkflowDTO.getLastModifiedDate());
+                updatedProjectWorkflowDTO.getLabel(), updatedProjectWorkflowDTO.getVersion(), warnings);
         } catch (ExecutionException executionException) {
             throw executionException;
         } catch (Exception e) {
@@ -409,12 +462,14 @@ public class ProjectWorkflowTools {
     @Tool(
         description = "Bind a connection the user picked to a workflow node so the workflow can be test-run. Call this "
             +
-            "AFTER the workflow exists (createProjectWorkflow or updateWorkflow) AND after the user picks an existing "
+            "AFTER the workflow exists (createProjectWorkflow or updateWorkflow) AND after choosing a connection: "
             +
-            "connection (selectConnection) or creates one (createConnection). NEVER put a connectionId or id inside " +
+            "listConnections lists the connections of the workflow's workspace and environment; the user creates new "
+            +
+            "ones in the ByteChef UI. NEVER put a connectionId or id inside " +
             "the workflow definition JSON: the definition's 'connections' block only declares the required component " +
             "(componentName/componentVersion). The chosen connection instance is stored separately, per environment, " +
-            "by this tool. The connection is bound for the environment the user is currently working in. Returns a " +
+            "by this tool. The connection is bound in the environment of this call. Returns a " +
             "confirmation message.")
     public String saveWorkflowTestConnection(
         @ToolParam(description = "The id of the workflow the node belongs to") String workflowId,
