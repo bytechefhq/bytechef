@@ -520,7 +520,7 @@ const ConnectionConfigurationList = ({
     }, [connectionsGrouped, workflow?.tasks, workflow?.triggers]);
 
     if (!connectionsToRender.length && !(duplicateSubflowStubs?.length && !connectionsGrouped)) {
-        return <p className="p-4 text-center text-sm text-content-neutral-secondary">No Connections yet</p>;
+        return <p className="text-sm">No Connections yet</p>;
     }
 
     return (

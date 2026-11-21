@@ -14,6 +14,10 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import MoveConnectedUsersImpact from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersImpact';
 import MoveConnectedUsersResult from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersResult';
 import {formatSkippedReason} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
+import useMoveWorkflowInputs, {
+    MoveImpactWorkflowI,
+    MoveWorkflowInputsI,
+} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/useMoveWorkflowInputs';
 import {useMemo, useState} from 'react';
 
 import type {SkippedUserDisplayI} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersSkippedList';
@@ -42,21 +46,21 @@ export interface MoveConnectedUsersResultI {
 interface MoveConnectedUsersDialogProps {
     connectedUsers?: MoveConnectedUsersDialogConnectedUserI[];
     connectedUsersError?: boolean;
-    impact?: Array<{
-        affectedConnectedUserCount: number;
-        awaitsConfiguration: boolean;
-        label: string;
-        newRequiredConnections: string[];
-        newRequiredInputs: string[];
-    }>;
+    editableInputs?: boolean;
+    impact?: MoveImpactWorkflowI[];
     initialSelectedConnectedUserIds?: string[];
     mcpServerCount?: number;
     onClose: () => void;
-    onMove: (targetId: string, connectedUserIds: string[]) => Promise<MoveConnectedUsersResultI>;
+    onMove: (
+        targetId: string,
+        connectedUserIds: string[],
+        workflowInputs: MoveWorkflowInputsI[]
+    ) => Promise<MoveConnectedUsersResultI>;
     onSelectionChange?: (targetId: string | undefined, connectedUserIds: string[]) => void;
     previewError?: boolean;
     previewLoading?: boolean;
     previewSkipped?: MoveConnectedUsersSkippedI[];
+    singleConnectedUser?: boolean;
     sourceLabel: string;
     targets: Array<{id: string; label: string}>;
     title: string;
@@ -74,6 +78,7 @@ const getConnectedUserLabel = (connectedUser: MoveConnectedUsersDialogConnectedU
 
 const MoveConnectedUsersDialogContent = ({
     connectedUsers,
+    editableInputs = false,
     impact,
     initialSelectedConnectedUserIds,
     mcpServerCount,
@@ -83,6 +88,7 @@ const MoveConnectedUsersDialogContent = ({
     previewError,
     previewLoading,
     previewSkipped,
+    singleConnectedUser = false,
     sourceLabel,
     targets,
     title,
@@ -90,10 +96,13 @@ const MoveConnectedUsersDialogContent = ({
     const [moving, setMoving] = useState(false);
     const [result, setResult] = useState<MoveConnectedUsersResultI>();
     const [search, setSearch] = useState('');
+    const [initialSourceLabel] = useState(sourceLabel);
     const [selectedConnectedUserIds, setSelectedConnectedUserIds] = useState<string[]>(
         () => initialSelectedConnectedUserIds || connectedUsers.map((connectedUser) => connectedUser.connectedUserId)
     );
     const [targetId, setTargetId] = useState<string>();
+
+    const {inputValues, missingRequiredInput, setInputValue, workflowInputs} = useMoveWorkflowInputs(impact);
 
     const filteredConnectedUsers = useMemo(() => {
         const term = search.trim().toLowerCase();
@@ -130,7 +139,12 @@ const MoveConnectedUsersDialogContent = ({
         };
     };
 
-    const canMove = !!targetId && selectedConnectedUserIds.length > 0 && !moving && !previewLoading;
+    const canMove =
+        !!targetId &&
+        selectedConnectedUserIds.length > 0 &&
+        !moving &&
+        !previewLoading &&
+        !(editableInputs && missingRequiredInput);
 
     const handleTargetChange = (value: string) => {
         setTargetId(value);
@@ -156,7 +170,7 @@ const MoveConnectedUsersDialogContent = ({
         setMoving(true);
 
         try {
-            setResult(await onMove(targetId, selectedConnectedUserIds));
+            setResult(await onMove(targetId, selectedConnectedUserIds, editableInputs ? workflowInputs : []));
         } catch {
             setResult(undefined);
         } finally {
@@ -170,7 +184,11 @@ const MoveConnectedUsersDialogContent = ({
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
 
-                    <DialogDescription>{`Moving users from ${sourceLabel}`}</DialogDescription>
+                    <DialogDescription>
+                        {singleConnectedUser
+                            ? `Moving ${labelByConnectedUserId.get(selectedConnectedUserIds[0]) || 'this connected user'} from ${initialSourceLabel}`
+                            : `Moving users from ${initialSourceLabel}`}
+                    </DialogDescription>
                 </DialogHeader>
 
                 {result ? (
@@ -197,44 +215,52 @@ const MoveConnectedUsersDialogContent = ({
 
                         <MoveConnectedUsersImpact
                             impact={impact}
+                            inputValues={inputValues}
                             mcpServerCount={mcpServerCount}
+                            onInputChange={editableInputs ? setInputValue : undefined}
                             previewError={previewError}
                             previewSkipped={previewSkipped}
                             toSkippedUser={toSkippedUser}
                         />
 
-                        <Input
-                            aria-label="Search users"
-                            onChange={(event) => setSearch(event.target.value)}
-                            placeholder="Search users"
-                            value={search}
-                        />
+                        {!singleConnectedUser && (
+                            <>
+                                <Input
+                                    aria-label="Search users"
+                                    onChange={(event) => setSearch(event.target.value)}
+                                    placeholder="Search users"
+                                    value={search}
+                                />
 
-                        <ul className="flex max-h-64 flex-col gap-2 overflow-y-auto">
-                            {filteredConnectedUsers.map((connectedUser) => {
-                                const label = getConnectedUserLabel(connectedUser);
+                                <ul className="flex max-h-64 flex-col gap-2 overflow-y-auto">
+                                    {filteredConnectedUsers.map((connectedUser) => {
+                                        const label = getConnectedUserLabel(connectedUser);
 
-                                return (
-                                    <li className="flex items-center gap-2" key={connectedUser.connectedUserId}>
-                                        <Checkbox
-                                            aria-label={label}
-                                            checked={selectedConnectedUserIds.includes(connectedUser.connectedUserId)}
-                                            onCheckedChange={(checked) =>
-                                                handleToggle(connectedUser.connectedUserId, checked === true)
-                                            }
-                                        />
+                                        return (
+                                            <li className="flex items-center gap-2" key={connectedUser.connectedUserId}>
+                                                <Checkbox
+                                                    aria-label={label}
+                                                    checked={selectedConnectedUserIds.includes(
+                                                        connectedUser.connectedUserId
+                                                    )}
+                                                    onCheckedChange={(checked) =>
+                                                        handleToggle(connectedUser.connectedUserId, checked === true)
+                                                    }
+                                                />
 
-                                        <span className="text-sm">{label}</span>
+                                                <span className="text-sm">{label}</span>
 
-                                        {connectedUser.email && connectedUser.email !== label && (
-                                            <span className="text-xs text-content-neutral-secondary">
-                                                {connectedUser.email}
-                                            </span>
-                                        )}
-                                    </li>
-                                );
-                            })}
-                        </ul>
+                                                {connectedUser.email && connectedUser.email !== label && (
+                                                    <span className="text-xs text-content-neutral-secondary">
+                                                        {connectedUser.email}
+                                                    </span>
+                                                )}
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </>
+                        )}
                     </div>
                 )}
 

@@ -1,5 +1,13 @@
-mutation upgradeAutomationProjectConfigurationConnectedUsers($targetId: ID!, $connectedUserIds: [ID!]!) {
-    upgradeAutomationProjectConfigurationConnectedUsers(targetId: $targetId, connectedUserIds: $connectedUserIds) {
+mutation upgradeAutomationProjectConfigurationConnectedUsers(
+    $targetId: ID!
+    $connectedUserIds: [ID!]!
+    $workflowInputs: [ConfigurationMoveWorkflowInputs!]
+) {
+    upgradeAutomationProjectConfigurationConnectedUsers(
+        targetId: $targetId
+        connectedUserIds: $connectedUserIds
+        workflowInputs: $workflowInputs
+    ) {
         movedConnectedUserIds
         needsAttentionConnectedUserIds
         skipped {

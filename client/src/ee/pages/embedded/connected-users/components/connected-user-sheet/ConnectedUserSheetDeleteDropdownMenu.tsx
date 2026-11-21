@@ -6,13 +6,24 @@ import {
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ClipboardIcon, EditIcon, EllipsisVerticalIcon, KeyRoundIcon, RefreshCcwIcon, Trash2Icon} from 'lucide-react';
+import {
+    ArrowUpDownIcon,
+    ClipboardIcon,
+    EditIcon,
+    EllipsisVerticalIcon,
+    KeyRoundIcon,
+    RefreshCcwIcon,
+    Trash2Icon,
+} from 'lucide-react';
 
 interface ConnectedUserSheetDeleteDropdownMenuProps {
     changeConfigurationDisabled?: boolean;
     changeConfigurationDisabledReason?: string;
+    changeVersionDisabled?: boolean;
+    changeVersionDisabledReason?: string;
     credentialsDisabledReason?: string;
     onChangeConfigurationClick?: () => void;
+    onChangeVersionClick?: () => void;
     onCopyWorkflowUuidClick?: () => void;
     onCredentialsClick?: () => void;
     onDeleteClick?: () => void;
@@ -22,8 +33,11 @@ interface ConnectedUserSheetDeleteDropdownMenuProps {
 const ConnectedUserSheetDeleteDropdownMenu = ({
     changeConfigurationDisabled,
     changeConfigurationDisabledReason,
+    changeVersionDisabled,
+    changeVersionDisabledReason,
     credentialsDisabledReason,
     onChangeConfigurationClick,
+    onChangeVersionClick,
     onCopyWorkflowUuidClick,
     onCredentialsClick,
     onDeleteClick,
@@ -74,6 +88,26 @@ const ConnectedUserSheetDeleteDropdownMenu = ({
 
                     {changeConfigurationDisabledReason && (
                         <TooltipContent side="left">{changeConfigurationDisabledReason}</TooltipContent>
+                    )}
+                </Tooltip>
+            )}
+
+            {onChangeVersionClick && (
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <span className="block">
+                            <DropdownMenuItem
+                                aria-label="Change version"
+                                disabled={changeVersionDisabled || !!changeVersionDisabledReason}
+                                icon={<ArrowUpDownIcon />}
+                                label="Change version…"
+                                onClick={onChangeVersionClick}
+                            />
+                        </span>
+                    </TooltipTrigger>
+
+                    {changeVersionDisabledReason && (
+                        <TooltipContent side="left">{changeVersionDisabledReason}</TooltipContent>
                     )}
                 </Tooltip>
             )}

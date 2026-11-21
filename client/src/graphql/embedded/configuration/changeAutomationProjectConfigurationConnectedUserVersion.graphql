@@ -1,0 +1,23 @@
+mutation changeAutomationProjectConfigurationConnectedUserVersion(
+    $sourceId: ID!
+    $connectedUserId: ID!
+    $projectVersion: Int!
+    $targetId: ID
+    $workflowInputs: [ConfigurationMoveWorkflowInputs!]
+) {
+    changeAutomationProjectConfigurationConnectedUserVersion(
+        sourceId: $sourceId
+        connectedUserId: $connectedUserId
+        projectVersion: $projectVersion
+        targetId: $targetId
+        workflowInputs: $workflowInputs
+    ) {
+        movedConnectedUserIds
+        needsAttentionConnectedUserIds
+        skipped {
+            connectedUserId
+            reason
+            workflowLabels
+        }
+    }
+}

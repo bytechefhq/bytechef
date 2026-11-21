@@ -28,6 +28,10 @@ public interface AutomationProjectConfigurationFacade {
     ConfigurationMoveResultDTO changeConnectedUserVersion(
         long sourceId, long connectedUserId, int projectVersion, @Nullable Long targetId);
 
+    ConfigurationMoveResultDTO changeConnectedUserVersion(
+        long sourceId, long connectedUserId, int projectVersion, @Nullable Long targetId,
+        Map<String, Map<String, Object>> workflowInputs);
+
     long createConfiguration(
         long projectId, long environmentId, String name, @Nullable String permissionExpression, int projectVersion,
         boolean enabled, boolean automationHubVisible);
@@ -58,6 +62,13 @@ public interface AutomationProjectConfigurationFacade {
 
     AutomationProjectConfigurationDeleteImpactDTO getDeleteImpact(long id);
 
+    AutomationProjectConfigurationWorkflowProvidableValuesDTO getProjectWorkflowProvidableValues(
+        long projectId, long environmentId, int projectVersion, String workflowUuid);
+
+    List<AutomationProjectConfigurationWorkflowProvidableValuesDTO.InputOption> getProjectWorkflowInputOptions(
+        long projectId, long environmentId, int projectVersion, String workflowUuid, String inputName,
+        String propertyName, long connectionId, Map<String, ?> lookupDependsOnValues, @Nullable String searchText);
+
     ConfigurationMoveImpactDTO getMoveImpact(
         long sourceId, long targetId, List<Long> connectedUserIds);
 
@@ -67,6 +78,9 @@ public interface AutomationProjectConfigurationFacade {
 
     ConfigurationMoveResultDTO moveConnectedUsers(long sourceId, long targetId, List<Long> connectedUserIds);
 
+    ConfigurationMoveResultDTO moveConnectedUsers(
+        long sourceId, long targetId, List<Long> connectedUserIds, Map<String, Map<String, Object>> workflowInputs);
+
     void updateConfiguration(
         long id, String name, @Nullable String permissionExpression, int projectVersion, boolean enabled,
         boolean automationHubVisible);
@@ -75,4 +89,7 @@ public interface AutomationProjectConfigurationFacade {
         long id, String workflowUuid, Map<String, Long> providedConnections, Map<String, Object> providedInputs);
 
     ConfigurationMoveResultDTO upgradeConnectedUsers(long targetId, List<Long> connectedUserIds);
+
+    ConfigurationMoveResultDTO upgradeConnectedUsers(
+        long targetId, List<Long> connectedUserIds, Map<String, Map<String, Object>> workflowInputs);
 }

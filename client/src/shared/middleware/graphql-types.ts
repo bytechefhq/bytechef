@@ -887,6 +887,11 @@ export type ConfigurationMoveSkipped = {
   workflowLabels: Array<Scalars['String']['output']>;
 };
 
+export type ConfigurationMoveWorkflowInputs = {
+  inputs: Scalars['Map']['input'];
+  workflowUuid: Scalars['ID']['input'];
+};
+
 export type ConnectedUser = {
   __typename?: 'ConnectedUser';
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -2122,6 +2127,7 @@ export type Mutation = {
   addDataTableColumn: Scalars['Boolean']['output'];
   cancelAiAgentEvalRun: AiAgentEvalRun;
   cancelGenerationJob: Scalars['Boolean']['output'];
+  changeAutomationProjectConfigurationConnectedUserVersion: ConfigurationMoveResult;
   createA2aProject?: Maybe<A2aProject>;
   createA2aServer?: Maybe<A2aServer>;
   createAdditionalFilesInSkill: AiSkill;
@@ -2347,6 +2353,15 @@ export type MutationCancelAiAgentEvalRunArgs = {
 
 export type MutationCancelGenerationJobArgs = {
   jobId: Scalars['String']['input'];
+};
+
+
+export type MutationChangeAutomationProjectConfigurationConnectedUserVersionArgs = {
+  connectedUserId: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
+  sourceId: Scalars['ID']['input'];
+  targetId?: InputMaybe<Scalars['ID']['input']>;
+  workflowInputs?: InputMaybe<Array<ConfigurationMoveWorkflowInputs>>;
 };
 
 
@@ -2959,6 +2974,7 @@ export type MutationMoveAutomationProjectConfigurationConnectedUsersArgs = {
   connectedUserIds: Array<Scalars['ID']['input']>;
   sourceId: Scalars['ID']['input'];
   targetId: Scalars['ID']['input'];
+  workflowInputs?: InputMaybe<Array<ConfigurationMoveWorkflowInputs>>;
 };
 
 
@@ -3462,6 +3478,7 @@ export type MutationUpdateWorkspaceMcpToolEnabledArgs = {
 export type MutationUpgradeAutomationProjectConfigurationConnectedUsersArgs = {
   connectedUserIds: Array<Scalars['ID']['input']>;
   targetId: Scalars['ID']['input'];
+  workflowInputs?: InputMaybe<Array<ConfigurationMoveWorkflowInputs>>;
 };
 
 export type NodeValidationIssue = {
@@ -3875,6 +3892,8 @@ export type Query = {
   automationProjectVersionWorkflowChanges: VersionWorkflowChanges;
   automationProjectVersionWorkflows: Array<AutomationProjectVersionWorkflow>;
   automationProjectVersions: Array<AutomationProjectVersion>;
+  automationProjectWorkflowInputOptions: Array<AutomationProjectConfigurationInputOption>;
+  automationProjectWorkflowProvidableValues: AutomationProjectConfigurationWorkflowProvidableValues;
   automationProjects: Array<AutomationProject>;
   automationSearch: Array<SearchResult>;
   clusterElementComponentConnections: Array<ComponentConnection>;
@@ -4301,6 +4320,27 @@ export type QueryAutomationProjectVersionWorkflowsArgs = {
 
 export type QueryAutomationProjectVersionsArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryAutomationProjectWorkflowInputOptionsArgs = {
+  connectionId: Scalars['ID']['input'];
+  environmentId: Scalars['ID']['input'];
+  inputName: Scalars['String']['input'];
+  lookupDependsOnValues?: InputMaybe<Scalars['Map']['input']>;
+  projectId: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
+  propertyName: Scalars['String']['input'];
+  searchText?: InputMaybe<Scalars['String']['input']>;
+  workflowUuid: Scalars['ID']['input'];
+};
+
+
+export type QueryAutomationProjectWorkflowProvidableValuesArgs = {
+  environmentId: Scalars['ID']['input'];
+  projectId: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
+  workflowUuid: Scalars['ID']['input'];
 };
 
 

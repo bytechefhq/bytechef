@@ -1,13 +1,4 @@
-import Button from '@/components/Button/Button';
-import {
-    Dialog,
-    DialogBody,
-    DialogCancelButton,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogMain,
-} from '@/components/Dialog';
+import WorkflowEditDialog from '@/shared/components/workflow-configuration/WorkflowEditDialog';
 import {
     AutomationProjectConfigurationsQuery,
     useAutomationProjectConfigurationWorkflowProvidableValuesQuery,
@@ -27,14 +18,23 @@ import {
 type AutomationProjectConfigurationType =
     AutomationProjectConfigurationsQuery['automationProjectConfigurations'][number];
 
+const PROVIDED_VALUES_DESCRIPTION = 'Used by every connected user, who cannot change them.';
+
 interface ProvidedValuesFormProps {
     configuration: AutomationProjectConfigurationType;
     onClose: () => void;
     providableValues: ProvidableValuesType;
+    workflowLabel: string;
     workflowUuid: string;
 }
 
-const ProvidedValuesForm = ({configuration, onClose, providableValues, workflowUuid}: ProvidedValuesFormProps) => {
+const ProvidedValuesForm = ({
+    configuration,
+    onClose,
+    providableValues,
+    workflowLabel,
+    workflowUuid,
+}: ProvidedValuesFormProps) => {
     const [providedConnections, setProvidedConnections] = useState(() =>
         getInitialProvidedConnections(providableValues)
     );
@@ -65,37 +65,24 @@ const ProvidedValuesForm = ({configuration, onClose, providableValues, workflowU
     };
 
     return (
-        <form
-            className="flex min-h-0 flex-1 flex-col"
-            onSubmit={(event) => {
-                event.preventDefault();
-
-                handleSubmit();
-            }}
+        <WorkflowEditDialog
+            description={PROVIDED_VALUES_DESCRIPTION}
+            onClose={onClose}
+            onSave={handleSubmit}
+            saveDisabled={updateWorkflowMutation.isPending}
+            submitOnEnter
+            workflowLabel={workflowLabel}
         >
-            <DialogHeader
-                description="Connections and inputs set here are used by every connected user and cannot be changed by them."
-                title="Provided Values"
+            <ProvidedValuesFields
+                onProvidedConnectionsChange={setProvidedConnections}
+                onProvidedInputsChange={setProvidedInputs}
+                optionsScope={{configurationId: configuration.id}}
+                providableValues={providableValues}
+                providedConnections={providedConnections}
+                providedInputs={providedInputs}
+                workflowUuid={workflowUuid}
             />
-
-            <DialogBody>
-                <ProvidedValuesFields
-                    configurationId={configuration.id}
-                    onProvidedConnectionsChange={setProvidedConnections}
-                    onProvidedInputsChange={setProvidedInputs}
-                    providableValues={providableValues}
-                    providedConnections={providedConnections}
-                    providedInputs={providedInputs}
-                    workflowUuid={workflowUuid}
-                />
-            </DialogBody>
-
-            <DialogFooter>
-                <DialogCancelButton />
-
-                <Button disabled={updateWorkflowMutation.isPending} label="Save" type="submit" />
-            </DialogFooter>
-        </form>
+        </WorkflowEditDialog>
     );
 };
 
@@ -117,39 +104,30 @@ const AutomationProjectConfigurationWorkflowDialog = ({
 
     const providableValues = data?.automationProjectConfigurationWorkflowProvidableValues;
 
-    return (
-        <Dialog
-            onOpenChange={(open) => {
-                if (!open) {
-                    onClose();
-                }
-            }}
-            open
-        >
-            <DialogContent aria-label="Provided Values Dialog" onInteractOutside={(event) => event.preventDefault()}>
-                <DialogMain>
-                    {providableValues ? (
-                        <ProvidedValuesForm
-                            configuration={configuration}
-                            onClose={onClose}
-                            providableValues={providableValues}
-                            workflowUuid={workflow.workflowUuid}
-                        />
-                    ) : (
-                        <>
-                            <DialogHeader
-                                description="Connections and inputs set here are used by every connected user and cannot be changed by them."
-                                title="Provided Values"
-                            />
+    const workflowLabel = workflow.label || workflow.workflowUuid;
 
-                            <DialogBody>
-                                <p className="text-sm text-content-neutral-secondary">Loading...</p>
-                            </DialogBody>
-                        </>
-                    )}
-                </DialogMain>
-            </DialogContent>
-        </Dialog>
+    if (!providableValues) {
+        return (
+            <WorkflowEditDialog
+                description={PROVIDED_VALUES_DESCRIPTION}
+                onClose={onClose}
+                onSave={() => undefined}
+                saveDisabled
+                workflowLabel={workflowLabel}
+            >
+                <p className="text-sm text-content-neutral-secondary">Loading...</p>
+            </WorkflowEditDialog>
+        );
+    }
+
+    return (
+        <ProvidedValuesForm
+            configuration={configuration}
+            onClose={onClose}
+            providableValues={providableValues}
+            workflowLabel={workflowLabel}
+            workflowUuid={workflow.workflowUuid}
+        />
     );
 };
 

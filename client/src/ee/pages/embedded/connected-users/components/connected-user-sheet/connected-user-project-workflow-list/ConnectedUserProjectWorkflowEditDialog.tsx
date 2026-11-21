@@ -1,13 +1,3 @@
-import Button from '@/components/Button/Button';
-import {
-    Dialog,
-    DialogBody,
-    DialogCancelButton,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogMain,
-} from '@/components/Dialog';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import ConnectedUserNewConnectionDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserNewConnectionDialog';
@@ -15,6 +5,7 @@ import ProvisionProjectWorkflowConnectionField from '@/ee/pages/embedded/connect
 import {Connection} from '@/ee/shared/middleware/embedded/configuration';
 import {useGetAllConnectedUserConnectionsQuery} from '@/ee/shared/queries/embedded/connections.queries';
 import WorkflowConfigurationCard from '@/shared/components/workflow-configuration/WorkflowConfigurationCard';
+import WorkflowEditDialog from '@/shared/components/workflow-configuration/WorkflowEditDialog';
 import {
     useConnectedUserProjectWorkflowReferenceValuesQuery,
     useProvisionConnectedUserProjectWorkflowsMutation,
@@ -159,115 +150,12 @@ const ConnectedUserProjectWorkflowEditDialog = ({
     };
 
     return (
-        <Dialog onOpenChange={(open) => !open && onClose()} open>
-            <DialogContent className="gap-0 p-0" onInteractOutside={(event) => event.preventDefault()}>
-                <DialogMain>
-                    <DialogHeader
-                        description="Set the connections and inputs this connected user's workflow runs with."
-                        title={`Edit ${workflowLabel} Workflow`}
-                    />
-
-                    <DialogBody>
-                        <div className="max-h-dialog-height overflow-y-auto">
-                            {loading ? (
-                                <p className="text-sm text-content-neutral-secondary">Loading...</p>
-                            ) : !workflow ? (
-                                <p className="text-sm text-content-neutral-secondary">
-                                    This workflow cannot be edited because its configuration is not released to this
-                                    user&apos;s environment.
-                                </p>
-                            ) : workflow.dangling ? (
-                                <p className="text-sm text-content-warning-primary">
-                                    This workflow needs attention before its connections and inputs can be edited. Its
-                                    configuration no longer includes it.
-                                </p>
-                            ) : (
-                                <WorkflowConfigurationCard
-                                    connectionCount={components.length}
-                                    connectionsContent={
-                                        components.length === 0 ? (
-                                            <p className="text-sm text-content-neutral-secondary">
-                                                No connections to set. The configuration provides them or the workflow
-                                                needs none.
-                                            </p>
-                                        ) : (
-                                            <fieldset className="space-y-3 border-0 p-0">
-                                                {components.map((component) => (
-                                                    <ProvisionProjectWorkflowConnectionField
-                                                        componentTitle={component.title || component.name}
-                                                        connections={
-                                                            connectionsByComponentName.get(component.name) ?? []
-                                                        }
-                                                        id={`edit-workflow-connection-${component.name}`}
-                                                        key={component.name}
-                                                        onChange={(connectionId) =>
-                                                            setChangedConnectionIds((previousConnectionIds) => ({
-                                                                ...previousConnectionIds,
-                                                                [component.name]: connectionId,
-                                                            }))
-                                                        }
-                                                        onNewConnection={() =>
-                                                            setNewConnectionComponentName(component.name)
-                                                        }
-                                                        value={getConnectionId(component.name)}
-                                                    />
-                                                ))}
-                                            </fieldset>
-                                        )
-                                    }
-                                    enabled
-                                    inputCount={inputs.length}
-                                    inputsContent={
-                                        inputs.length === 0 ? (
-                                            <p className="text-sm text-content-neutral-secondary">
-                                                No inputs to set. The configuration provides them or the workflow
-                                                defines none.
-                                            </p>
-                                        ) : (
-                                            <fieldset className="space-y-3 border-0 p-0">
-                                                {inputs.map((input) => (
-                                                    <fieldset className="space-y-1 border-0 p-0" key={input.name}>
-                                                        <Label htmlFor={`edit-workflow-input-${input.name}`}>
-                                                            {input.label || input.name}
-
-                                                            {input.required && ' *'}
-                                                        </Label>
-
-                                                        <Input
-                                                            id={`edit-workflow-input-${input.name}`}
-                                                            onChange={(event) =>
-                                                                setChangedInputs((previousInputs) => ({
-                                                                    ...previousInputs,
-                                                                    [input.name]: event.target.value,
-                                                                }))
-                                                            }
-                                                            value={getInputValue(input.name)}
-                                                        />
-                                                    </fieldset>
-                                                ))}
-                                            </fieldset>
-                                        )
-                                    }
-                                    onEnabledChange={() => undefined}
-                                    showWorkflowToggle={false}
-                                    switchId={`edit-workflow-${workflowUuid}`}
-                                />
-                            )}
-                        </div>
-                    </DialogBody>
-
-                    <DialogFooter>
-                        <DialogCancelButton />
-
-                        <Button
-                            disabled={!canSave || provisionConnectedUserProjectWorkflowsMutation.isPending}
-                            label="Save"
-                            onClick={handleSave}
-                        />
-                    </DialogFooter>
-                </DialogMain>
-
-                {newConnectionComponentName && (
+        <WorkflowEditDialog
+            description="Set the connections and inputs for this connected user."
+            onClose={onClose}
+            onSave={handleSave}
+            outsideContent={
+                newConnectionComponentName && (
                     <ConnectedUserNewConnectionDialog
                         componentName={newConnectionComponentName}
                         connectedUserId={connectedUserId}
@@ -281,9 +169,86 @@ const ConnectedUserProjectWorkflowEditDialog = ({
                             setNewConnectionComponentName(undefined);
                         }}
                     />
-                )}
-            </DialogContent>
-        </Dialog>
+                )
+            }
+            saveDisabled={!canSave || provisionConnectedUserProjectWorkflowsMutation.isPending}
+            workflowLabel={workflowLabel}
+        >
+            {loading ? (
+                <p className="text-sm text-content-neutral-secondary">Loading...</p>
+            ) : !workflow ? (
+                <p className="text-sm text-content-neutral-secondary">
+                    This workflow cannot be edited because its configuration is not released to this user&apos;s
+                    environment.
+                </p>
+            ) : workflow.dangling ? (
+                <p className="text-sm text-content-warning-primary">
+                    This workflow needs attention before its connections and inputs can be edited. Its configuration no
+                    longer includes it.
+                </p>
+            ) : (
+                <WorkflowConfigurationCard
+                    connectionCount={components.length}
+                    connectionsContent={
+                        components.length === 0 ? (
+                            <p className="text-sm">No Connections yet</p>
+                        ) : (
+                            <fieldset className="space-y-3 border-0 p-0">
+                                {components.map((component) => (
+                                    <ProvisionProjectWorkflowConnectionField
+                                        componentTitle={component.title || component.name}
+                                        connections={connectionsByComponentName.get(component.name) ?? []}
+                                        id={`edit-workflow-connection-${component.name}`}
+                                        key={component.name}
+                                        onChange={(connectionId) =>
+                                            setChangedConnectionIds((previousConnectionIds) => ({
+                                                ...previousConnectionIds,
+                                                [component.name]: connectionId,
+                                            }))
+                                        }
+                                        onNewConnection={() => setNewConnectionComponentName(component.name)}
+                                        value={getConnectionId(component.name)}
+                                    />
+                                ))}
+                            </fieldset>
+                        )
+                    }
+                    enabled
+                    inputCount={inputs.length}
+                    inputsContent={
+                        inputs.length === 0 ? (
+                            <p className="text-sm">No Inputs yet</p>
+                        ) : (
+                            <fieldset className="space-y-3 border-0 p-0">
+                                {inputs.map((input) => (
+                                    <fieldset className="space-y-1 border-0 p-0" key={input.name}>
+                                        <Label htmlFor={`edit-workflow-input-${input.name}`}>
+                                            {input.label || input.name}
+
+                                            {input.required && ' *'}
+                                        </Label>
+
+                                        <Input
+                                            id={`edit-workflow-input-${input.name}`}
+                                            onChange={(event) =>
+                                                setChangedInputs((previousInputs) => ({
+                                                    ...previousInputs,
+                                                    [input.name]: event.target.value,
+                                                }))
+                                            }
+                                            value={getInputValue(input.name)}
+                                        />
+                                    </fieldset>
+                                ))}
+                            </fieldset>
+                        )
+                    }
+                    onEnabledChange={() => undefined}
+                    showWorkflowToggle={false}
+                    switchId={`edit-workflow-${workflowUuid}`}
+                />
+            )}
+        </WorkflowEditDialog>
     );
 };
 

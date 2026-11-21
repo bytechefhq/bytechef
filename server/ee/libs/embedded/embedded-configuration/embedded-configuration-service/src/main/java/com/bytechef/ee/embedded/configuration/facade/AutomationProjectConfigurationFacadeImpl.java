@@ -12,6 +12,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -33,6 +34,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationProjectConfiguration
 import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveResultDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceValuesDTO;
 import com.bytechef.ee.embedded.configuration.event.AutomationProjectConfigurationDeletedEvent;
 import com.bytechef.ee.embedded.configuration.event.AutomationProjectConfigurationUpdatedEvent;
 import com.bytechef.ee.embedded.configuration.exception.AutomationProjectConfigurationErrorType;
@@ -68,6 +70,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -192,6 +195,31 @@ public class AutomationProjectConfigurationFacadeImpl
     public ConfigurationMoveResultDTO changeConnectedUserVersion(
         long sourceId, long connectedUserId, int projectVersion, @Nullable Long targetId) {
 
+        return doChangeConnectedUserVersion(sourceId, connectedUserId, projectVersion, targetId, Map.of());
+    }
+
+    @Override
+    @Audited(
+        event = AutomationProjectAuditEvents.AUTOMATION_PROJECT_CONFIGURATION_CONNECTED_USER_VERSION_CHANGED,
+        data = {
+            @AuditData(key = "sourceConfigurationId", value = "#sourceId"),
+            @AuditData(key = "connectedUserId", value = "#connectedUserId"),
+            @AuditData(key = "projectVersion", value = "#projectVersion"),
+            @AuditData(key = "targetConfigurationId", value = "#result?.targetConfigurationId"),
+            @AuditData(key = "movedConnectedUserIds", value = "#result?.movedConnectedUserIds")
+        })
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public ConfigurationMoveResultDTO changeConnectedUserVersion(
+        long sourceId, long connectedUserId, int projectVersion, @Nullable Long targetId,
+        Map<String, Map<String, Object>> workflowInputs) {
+
+        return doChangeConnectedUserVersion(sourceId, connectedUserId, projectVersion, targetId, workflowInputs);
+    }
+
+    private ConfigurationMoveResultDTO doChangeConnectedUserVersion(
+        long sourceId, long connectedUserId, int projectVersion, @Nullable Long targetId,
+        Map<String, Map<String, Object>> workflowInputs) {
+
         AutomationProjectConfiguration sourceConfiguration =
             automationProjectConfigurationService.getConfiguration(sourceId);
 
@@ -206,7 +234,7 @@ public class AutomationProjectConfigurationFacadeImpl
             validateVersionTargetConfiguration(sourceConfiguration, targetId, projectVersion);
 
             return getVersionChangeResult(
-                moveConnectedUsers(sourceId, targetId, List.of(connectedUserId)), connectedUserId);
+                doMoveConnectedUsers(sourceId, targetId, List.of(connectedUserId), workflowInputs), connectedUserId);
         }
 
         Optional<AutomationProjectConfiguration> targetConfigurationOptional = fetchVersionTargetConfiguration(
@@ -216,7 +244,8 @@ public class AutomationProjectConfigurationFacadeImpl
             AutomationProjectConfiguration targetConfiguration = targetConfigurationOptional.get();
 
             return getVersionChangeResult(
-                moveConnectedUsers(sourceId, targetConfiguration.getId(), List.of(connectedUserId)), connectedUserId);
+                doMoveConnectedUsers(sourceId, targetConfiguration.getId(), List.of(connectedUserId), workflowInputs),
+                connectedUserId);
         }
 
         long copyConfigurationId = createConfiguration(
@@ -232,7 +261,7 @@ public class AutomationProjectConfigurationFacadeImpl
 
             enableConfiguration(copyConfigurationId, true);
 
-            moveResult = moveConnectedUsers(sourceId, copyConfigurationId, List.of(connectedUserId));
+            moveResult = doMoveConnectedUsers(sourceId, copyConfigurationId, List.of(connectedUserId), workflowInputs);
         } catch (RuntimeException exception) {
             try {
                 deleteConfiguration(copyConfigurationId);
@@ -641,7 +670,8 @@ public class AutomationProjectConfigurationFacadeImpl
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         return new AutomationProjectConfigurationWorkflowProvidableValuesDTO(
-            toConnectionSlotDTOs(configuration, workflowId), toInputDTOs(configuration, workflow),
+            toConnectionSlotDTOs(configuration.getEnvironmentId(), workflowId),
+            toInputDTOs(configuration.getEnvironmentId(), workflow),
             configurationWorkflowOptional
                 .map(AutomationProjectConfigurationWorkflow::getProvidedConnections)
                 .orElse(Map.of()),
@@ -663,30 +693,36 @@ public class AutomationProjectConfigurationFacadeImpl
 
         ProjectWorkflow projectWorkflow = getProjectWorkflow(configuration, workflowUuid, projectVersion);
 
-        Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
+        return getWorkflowInputOptions(
+            configuration.getEnvironmentId(), projectWorkflow, workflowUuid, inputName, propertyName, connectionId,
+            lookupDependsOnValues, searchText);
+    }
 
-        WorkflowInput.ComponentInputReference componentInputReference = WorkflowInput.of(workflow)
-            .stream()
-            .filter(workflowInput -> Objects.equals(workflowInput.getName(), inputName))
-            .findFirst()
-            .map(AutomationProjectConfigurationFacadeImpl::getComponentInputReference)
-            .orElseThrow(() -> newInvalidProvidedValueException(
-                "Input %s of workflow uuid=%s does not reference a component input".formatted(
-                    inputName, workflowUuid)));
+    @Override
+    @Transactional(readOnly = true)
+    public AutomationProjectConfigurationWorkflowProvidableValuesDTO getProjectWorkflowProvidableValues(
+        long projectId, long environmentId, int projectVersion, String workflowUuid) {
 
-        validateAdministratorConnection(configuration, componentInputReference.componentName(), connectionId);
+        ProjectWorkflow projectWorkflow = getPublishedProjectWorkflow(projectId, projectVersion, workflowUuid);
 
-        Map<String, ?> dependsOnValues = lookupDependsOnValues == null ? Map.of() : lookupDependsOnValues;
+        String workflowId = projectWorkflow.getWorkflowId();
 
-        List<Option> options = componentDefinitionFacade.executeWorkflowInputOptions(
-            componentInputReference.componentName(), componentInputReference.componentVersion(),
-            componentInputReference.groupName(), propertyName, dependsOnValues,
-            List.copyOf(dependsOnValues.keySet()), searchText, connectionId);
+        return new AutomationProjectConfigurationWorkflowProvidableValuesDTO(
+            toConnectionSlotDTOs(environmentId, workflowId),
+            toInputDTOs(environmentId, workflowService.getWorkflow(workflowId)), Map.of(), Map.of());
+    }
 
-        return options.stream()
-            .map(option -> new AutomationProjectConfigurationWorkflowProvidableValuesDTO.InputOption(
-                option.getLabel(), String.valueOf(option.getValue()), option.getDescription()))
-            .toList();
+    @Override
+    @Transactional(readOnly = true)
+    public List<AutomationProjectConfigurationWorkflowProvidableValuesDTO.InputOption> getProjectWorkflowInputOptions(
+        long projectId, long environmentId, int projectVersion, String workflowUuid, String inputName,
+        String propertyName, long connectionId, Map<String, ?> lookupDependsOnValues, @Nullable String searchText) {
+
+        ProjectWorkflow projectWorkflow = getPublishedProjectWorkflow(projectId, projectVersion, workflowUuid);
+
+        return getWorkflowInputOptions(
+            environmentId, projectWorkflow, workflowUuid, inputName, propertyName, connectionId,
+            lookupDependsOnValues, searchText);
     }
 
     @Override
@@ -909,6 +945,27 @@ public class AutomationProjectConfigurationFacadeImpl
         })
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public ConfigurationMoveResultDTO moveConnectedUsers(long sourceId, long targetId, List<Long> connectedUserIds) {
+        return doMoveConnectedUsers(sourceId, targetId, connectedUserIds, Map.of());
+    }
+
+    @Override
+    @Audited(
+        event = AutomationProjectAuditEvents.AUTOMATION_PROJECT_CONFIGURATION_CONNECTED_USERS_MOVED,
+        data = {
+            @AuditData(key = "sourceConfigurationId", value = "#sourceId"),
+            @AuditData(key = "targetConfigurationId", value = "#targetId"),
+            @AuditData(key = "connectedUserIds", value = "#connectedUserIds")
+        })
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public ConfigurationMoveResultDTO moveConnectedUsers(
+        long sourceId, long targetId, List<Long> connectedUserIds, Map<String, Map<String, Object>> workflowInputs) {
+
+        return doMoveConnectedUsers(sourceId, targetId, connectedUserIds, workflowInputs);
+    }
+
+    private ConfigurationMoveResultDTO doMoveConnectedUsers(
+        long sourceId, long targetId, List<Long> connectedUserIds, Map<String, Map<String, Object>> workflowInputs) {
+
         if (sourceId == targetId) {
             throw new IllegalArgumentException("The source and target configurations must differ");
         }
@@ -920,12 +977,14 @@ public class AutomationProjectConfigurationFacadeImpl
 
         validateSameProjectAndEnvironment(sourceConfiguration, targetConfiguration);
 
-        return moveConnectedUsers(sourceConfiguration, targetConfiguration, getSortedDistinct(connectedUserIds));
+        return moveConnectedUsers(
+            sourceConfiguration, targetConfiguration, getSortedDistinct(connectedUserIds), workflowInputs);
     }
 
     private ConfigurationMoveResultDTO moveConnectedUsers(
         AutomationProjectConfiguration sourceConfiguration,
-        AutomationProjectConfiguration targetConfiguration, List<Long> sortedConnectedUserIds) {
+        AutomationProjectConfiguration targetConfiguration, List<Long> sortedConnectedUserIds,
+        Map<String, Map<String, Object>> workflowInputs) {
 
         Map<String, Set<String>> removedProvidedInputNames = getRemovedProvidedInputNames(
             sourceConfiguration, targetConfiguration);
@@ -940,7 +999,8 @@ public class AutomationProjectConfigurationFacadeImpl
             try {
                 moveOutcome = requiresNewTransactionTemplate.execute(
                     status -> moveConnectedUser(
-                        connectedUserId, sourceConfiguration, targetConfiguration, removedProvidedInputNames));
+                        connectedUserId, sourceConfiguration, targetConfiguration, removedProvidedInputNames,
+                        workflowInputs));
             } catch (RuntimeException exception) {
                 log.error(
                     "Moving connected user id={} from configuration id={} to id={} failed", connectedUserId,
@@ -1148,6 +1208,26 @@ public class AutomationProjectConfigurationFacadeImpl
         })
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public ConfigurationMoveResultDTO upgradeConnectedUsers(long targetId, List<Long> connectedUserIds) {
+        return doUpgradeConnectedUsers(targetId, connectedUserIds, Map.of());
+    }
+
+    @Override
+    @Audited(
+        event = AutomationProjectAuditEvents.AUTOMATION_PROJECT_CONFIGURATION_CONNECTED_USERS_UPGRADED,
+        data = {
+            @AuditData(key = "targetConfigurationId", value = "#targetId"),
+            @AuditData(key = "connectedUserIds", value = "#connectedUserIds")
+        })
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public ConfigurationMoveResultDTO upgradeConnectedUsers(
+        long targetId, List<Long> connectedUserIds, Map<String, Map<String, Object>> workflowInputs) {
+
+        return doUpgradeConnectedUsers(targetId, connectedUserIds, workflowInputs);
+    }
+
+    private ConfigurationMoveResultDTO doUpgradeConnectedUsers(
+        long targetId, List<Long> connectedUserIds, Map<String, Map<String, Object>> workflowInputs) {
+
         AutomationProjectConfiguration targetConfiguration =
             automationProjectConfigurationService.getConfiguration(targetId);
 
@@ -1162,7 +1242,8 @@ public class AutomationProjectConfigurationFacadeImpl
 
         for (UpgradeSource upgradeSource : upgradeSources) {
             ConfigurationMoveResultDTO moveResult = moveConnectedUsers(
-                upgradeSource.sourceConfiguration(), targetConfiguration, upgradeSource.connectedUserIds());
+                upgradeSource.sourceConfiguration(), targetConfiguration, upgradeSource.connectedUserIds(),
+                workflowInputs);
 
             movedConnectedUserIds.addAll(moveResult.movedConnectedUserIds());
             needsAttentionConnectedUserIds.addAll(moveResult.needsAttentionConnectedUserIds());
@@ -1260,7 +1341,7 @@ public class AutomationProjectConfigurationFacadeImpl
     }
 
     private List<AutomationProjectConfigurationWorkflowProvidableValuesDTO.ConnectionSlot> toConnectionSlotDTOs(
-        AutomationProjectConfiguration configuration, String workflowId) {
+        long environmentId, String workflowId) {
 
         Map<String, List<ComponentConnection>> componentConnectionsByName = workflowConnectionSlot.getSlots(workflowId)
             .stream()
@@ -1287,18 +1368,17 @@ public class AutomationProjectConfigurationFacadeImpl
 
             connectionSlots.add(
                 new AutomationProjectConfigurationWorkflowProvidableValuesDTO.ConnectionSlot(
-                    componentName, title, required, getProvidableConnections(configuration, componentName)));
+                    componentName, title, required, getProvidableConnections(environmentId, componentName)));
         }
 
         return connectionSlots;
     }
 
     private List<AutomationProjectConfigurationWorkflowProvidableValuesDTO.ProvidableConnection>
-        getProvidableConnections(
-            AutomationProjectConfiguration configuration, String componentName) {
+        getProvidableConnections(long environmentId, String componentName) {
 
         List<Connection> connections = connectionService.getConnections(
-            componentName, null, null, configuration.getEnvironmentId(), PlatformType.EMBEDDED);
+            componentName, null, null, environmentId, PlatformType.EMBEDDED);
 
         Set<Long> ownedConnectionIds = connectedUserConnectionMembership.getConnectedUserOwnedConnectionIds(
             connections.stream()
@@ -1314,7 +1394,7 @@ public class AutomationProjectConfigurationFacadeImpl
     }
 
     private List<AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input> toInputDTOs(
-        AutomationProjectConfiguration configuration, Workflow workflow) {
+        long environmentId, Workflow workflow) {
 
         Map<String, List<AutomationProjectConfigurationWorkflowProvidableValuesDTO.ProvidableConnection>> optionConnectionsByComponentName =
             new HashMap<>();
@@ -1341,7 +1421,7 @@ public class AutomationProjectConfigurationFacadeImpl
 
             List<AutomationProjectConfigurationWorkflowProvidableValuesDTO.ProvidableConnection> optionConnections =
                 optionConnectionsByComponentName.computeIfAbsent(
-                    componentName, curComponentName -> getProvidableConnections(configuration, curComponentName));
+                    componentName, curComponentName -> getProvidableConnections(environmentId, curComponentName));
 
             inputs.add(
                 new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
@@ -1768,7 +1848,7 @@ public class AutomationProjectConfigurationFacadeImpl
     private MoveOutcome moveConnectedUser(
         long connectedUserId, AutomationProjectConfiguration sourceConfiguration,
         AutomationProjectConfiguration targetConfiguration,
-        Map<String, Set<String>> removedProvidedInputNames) {
+        Map<String, Set<String>> removedProvidedInputNames, Map<String, Map<String, Object>> workflowInputs) {
 
         long projectId = sourceConfiguration.getProjectId();
 
@@ -1820,7 +1900,95 @@ public class AutomationProjectConfigurationFacadeImpl
             connectedUserReferenceRolloutManager.applyDeploymentConfigurationState(
                 projectDeploymentId, removedProvidedInputNames);
 
+        mergeWorkflowInputs(connectedUserOptional.get(), references, workflowInputs);
+
         return MoveOutcome.moved(connectedUserId, needsAttention(references));
+    }
+
+    private void mergeWorkflowInputs(
+        ConnectedUser connectedUser, List<ConnectedUserProjectWorkflow> references,
+        Map<String, Map<String, Object>> workflowInputs) {
+
+        for (ConnectedUserProjectWorkflow reference : references) {
+            String automationUuid = reference.getAutomationUuid();
+
+            Map<String, Object> inputs = automationUuid == null ? null : workflowInputs.get(automationUuid);
+
+            if (inputs == null || inputs.isEmpty() || reference.isDangling()) {
+                continue;
+            }
+
+            ConnectedUserWorkflowReferenceValuesDTO referenceValues =
+                connectedUserWorkflowReferenceFacade.getReferenceValues(Objects.requireNonNull(reference.getId()));
+
+            Map<String, Object> mergedInputs = new HashMap<>(referenceValues.inputs());
+
+            Map<String, String> inputTypes = getInputTypes(reference);
+
+            for (Map.Entry<String, Object> inputEntry : inputs.entrySet()) {
+                String inputName = inputEntry.getKey();
+
+                if (isMissingValue(mergedInputs.get(inputName))) {
+                    mergedInputs.put(inputName, toTypedInputValue(inputTypes.get(inputName), inputEntry.getValue()));
+                }
+            }
+
+            connectedUserWorkflowReferenceFacade.updateReferenceInputs(
+                connectedUser.getExternalId(), automationUuid, mergedInputs, connectedUser.getEnvironment());
+        }
+    }
+
+    private Map<String, String> getInputTypes(ConnectedUserProjectWorkflow reference) {
+        Optional<ProjectDeploymentWorkflow> rowOptional = connectedUserReferenceDeploymentManager.fetchRow(
+            Objects.requireNonNull(reference.getProjectDeploymentId()),
+            Objects.requireNonNull(reference.getAutomationUuid()));
+
+        if (rowOptional.isEmpty()) {
+            return Map.of();
+        }
+
+        ProjectDeploymentWorkflow row = rowOptional.get();
+
+        Workflow workflow = connectedUserReferenceDeploymentManager.getWorkflow(row.getWorkflowId());
+
+        Map<String, String> inputTypes = new HashMap<>();
+
+        for (Workflow.Input input : workflow.getInputs()) {
+            if (input.type() != null) {
+                inputTypes.put(input.name(), input.type());
+            }
+        }
+
+        return inputTypes;
+    }
+
+    private static Object toTypedInputValue(@Nullable String type, Object value) {
+        if (type == null || !(value instanceof String stringValue)) {
+            return value;
+        }
+
+        String trimmedValue = stringValue.trim();
+
+        try {
+            return switch (type.toLowerCase(Locale.ROOT)) {
+                case "boolean" -> {
+                    if (trimmedValue.equalsIgnoreCase("true") || trimmedValue.equalsIgnoreCase("false")) {
+                        yield Boolean.parseBoolean(trimmedValue);
+                    }
+
+                    yield value;
+                }
+                case "integer" -> Long.parseLong(trimmedValue);
+                case "number" -> Double.parseDouble(trimmedValue);
+                default -> value;
+            };
+        } catch (NumberFormatException numberFormatException) {
+            return value;
+        }
+    }
+
+    private static boolean isMissingValue(@Nullable Object value) {
+        return value == null || (value instanceof String stringValue && stringValue.isBlank());
     }
 
     private boolean needsAttention(List<ConnectedUserProjectWorkflow> references) {
@@ -1923,8 +2091,47 @@ public class AutomationProjectConfigurationFacadeImpl
                     "Component %s has no connection id".formatted(componentName));
             }
 
-            validateAdministratorConnection(configuration, componentName, connectionId);
+            validateAdministratorConnection(configuration.getEnvironmentId(), componentName, connectionId);
         }
+    }
+
+    private List<AutomationProjectConfigurationWorkflowProvidableValuesDTO.InputOption> getWorkflowInputOptions(
+        long environmentId, ProjectWorkflow projectWorkflow, String workflowUuid, String inputName,
+        String propertyName, long connectionId, Map<String, ?> lookupDependsOnValues, @Nullable String searchText) {
+
+        Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
+
+        WorkflowInput.ComponentInputReference componentInputReference = WorkflowInput.of(workflow)
+            .stream()
+            .filter(workflowInput -> Objects.equals(workflowInput.getName(), inputName))
+            .findFirst()
+            .map(AutomationProjectConfigurationFacadeImpl::getComponentInputReference)
+            .orElseThrow(() -> newInvalidProvidedValueException(
+                "Input %s of workflow uuid=%s does not reference a component input".formatted(
+                    inputName, workflowUuid)));
+
+        validateAdministratorConnection(environmentId, componentInputReference.componentName(), connectionId);
+
+        Map<String, ?> dependsOnValues = lookupDependsOnValues == null ? Map.of() : lookupDependsOnValues;
+
+        List<Option> options = componentDefinitionFacade.executeWorkflowInputOptions(
+            componentInputReference.componentName(), componentInputReference.componentVersion(),
+            componentInputReference.groupName(), propertyName, dependsOnValues,
+            List.copyOf(dependsOnValues.keySet()), searchText, connectionId);
+
+        return options.stream()
+            .map(option -> new AutomationProjectConfigurationWorkflowProvidableValuesDTO.InputOption(
+                option.getLabel(), String.valueOf(option.getValue()), option.getDescription()))
+            .toList();
+    }
+
+    private ProjectWorkflow getPublishedProjectWorkflow(long projectId, int projectVersion, String workflowUuid) {
+        validatePublishedProjectVersion(projectId, projectVersion);
+
+        return projectWorkflowService
+            .fetchProjectWorkflow(projectId, projectVersion, workflowUuid)
+            .orElseThrow(() -> newInvalidProvidedValueException(
+                "Workflow uuid=%s is not part of version %d".formatted(workflowUuid, projectVersion)));
     }
 
     private ProjectWorkflow getProjectWorkflow(
@@ -1942,8 +2149,7 @@ public class AutomationProjectConfigurationFacadeImpl
                 "Workflow uuid=%s is not part of version %d".formatted(workflowUuid, workflowProjectVersion)));
     }
 
-    private void validateAdministratorConnection(
-        AutomationProjectConfiguration configuration, String componentName, long connectionId) {
+    private void validateAdministratorConnection(long environmentId, String componentName, long connectionId) {
 
         Connection connection = connectionService.fetchConnection(connectionId)
             .orElseThrow(() -> newInvalidProvidedValueException(
@@ -1955,11 +2161,10 @@ public class AutomationProjectConfigurationFacadeImpl
                     connectionId, connection.getComponentName(), componentName));
         }
 
-        if (connection.getEnvironmentId() != configuration.getEnvironmentId()) {
+        if (connection.getEnvironmentId() != environmentId) {
             throw newInvalidProvidedValueException(
                 "Connection id=%s for component %s belongs to environment id=%s, not id=%s".formatted(
-                    connectionId, componentName, connection.getEnvironmentId(),
-                    configuration.getEnvironmentId()));
+                    connectionId, componentName, connection.getEnvironmentId(), environmentId));
         }
 
         if (connection.getType() != PlatformType.EMBEDDED) {

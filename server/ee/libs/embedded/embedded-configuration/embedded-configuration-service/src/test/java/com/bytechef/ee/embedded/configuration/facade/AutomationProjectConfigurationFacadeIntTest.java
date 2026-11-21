@@ -1283,6 +1283,47 @@ class AutomationProjectConfigurationFacadeIntTest {
     }
 
     @Test
+    void testGetProjectWorkflowProvidableValuesNeedsNoConfiguration() {
+        long projectId = createProject("Before Configuration");
+
+        String workflowUuid = addWorkflow(
+            projectId, withLabel(SLACK_WITH_INTERNAL_ONLY_CHANNEL_DEFINITION, "Before Configuration"));
+
+        publish(projectId);
+        redefineDraftWorkflow(workflowUuid, withLabel(NO_INPUT_DEFINITION, "Before Configuration"));
+
+        givenSlots(new ComponentConnection("slack", 1, "postMessage1", "slack", true));
+
+        AutomationProjectConfigurationWorkflowProvidableValuesDTO providableValues =
+            automationProjectConfigurationFacade.getProjectWorkflowProvidableValues(
+                projectId, ENVIRONMENT_ID, 1, workflowUuid);
+
+        assertThat(providableValues.connectionSlots()).extracting(
+            AutomationProjectConfigurationWorkflowProvidableValuesDTO.ConnectionSlot::componentName)
+            .containsExactly("slack");
+        assertThat(providableValues.inputs()).containsExactly(
+            new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
+                "channel", "Channel", "string", false, true));
+        assertThat(providableValues.providedConnections()).isEmpty();
+        assertThat(providableValues.providedInputs()).isEmpty();
+    }
+
+    @Test
+    void testGetProjectWorkflowProvidableValuesRejectsAnUnpublishedVersion() {
+        long projectId = createProject("Unpublished Version");
+
+        String workflowUuid = addWorkflow(projectId, withLabel(NO_INPUT_DEFINITION, "Unpublished Version"));
+
+        publish(projectId);
+
+        assertThatThrownBy(
+            () -> automationProjectConfigurationFacade.getProjectWorkflowProvidableValues(
+                projectId, ENVIRONMENT_ID, 2, workflowUuid))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("is not a published version");
+    }
+
+    @Test
     void testGetProvidableValuesReadsAWorkflowOfTheGivenVersionTheConfigurationIsNotOnYet() {
         long projectId = createProject("Target Version Slots");
 

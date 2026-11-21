@@ -520,11 +520,12 @@ describe('UpgradeConnectedUsersDialog', () => {
                 expect(mocks.automationMutateAsync).toHaveBeenCalledWith({
                     connectedUserIds: ['1', '2'],
                     targetId: '201',
+                    workflowInputs: [],
                 })
             );
 
             expect(await screen.findByText('1 moved, 0 need attention')).toBeInTheDocument();
-            expect(screen.getByText("Doesn't have this project")).toBeInTheDocument();
+            expect(screen.getByText('Not provisioned with this project')).toBeInTheDocument();
             expect(within(getSkippedItems()[0]).getByText('Bob')).toBeInTheDocument();
 
             await userEvent.click(screen.getAllByRole('button', {name: 'Close'}).at(-1)!);

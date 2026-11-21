@@ -1,6 +1,7 @@
 import MoveConnectedUsersDialog, {
     MoveConnectedUsersResultI,
 } from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/MoveConnectedUsersDialog';
+import {MoveWorkflowInputsI} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/useMoveWorkflowInputs';
 import {
     AutomationProjectConfigurationsQuery,
     useAutomationProjectConfigurationConnectedUsersQuery,
@@ -22,6 +23,7 @@ interface AutomationProjectConfigurationMoveUsersDialogProps {
     connectedUsers?: Array<{connectedUserId: string; email?: string | null; externalId: string; name?: string | null}>;
     initialSelectedConnectedUserIds?: string[];
     onClose: () => void;
+    singleConnectedUser?: boolean;
     targetConfigurations: TargetConfigurationType[];
     title?: string;
 }
@@ -37,6 +39,7 @@ const AutomationProjectConfigurationMoveUsersDialog = ({
     connectedUsers: presetConnectedUsers,
     initialSelectedConnectedUserIds,
     onClose,
+    singleConnectedUser,
     targetConfigurations,
     title = 'Move Users',
 }: AutomationProjectConfigurationMoveUsersDialogProps) => {
@@ -83,11 +86,16 @@ const AutomationProjectConfigurationMoveUsersDialog = ({
     const {mutateAsync: moveConnectedUsers} = moveMutation;
 
     const handleMove = useCallback(
-        async (targetId: string, connectedUserIds: string[]): Promise<MoveConnectedUsersResultI> => {
+        async (
+            targetId: string,
+            connectedUserIds: string[],
+            workflowInputs: MoveWorkflowInputsI[]
+        ): Promise<MoveConnectedUsersResultI> => {
             const response = await moveConnectedUsers({
                 connectedUserIds,
                 sourceId: configuration.id,
                 targetId,
+                workflowInputs,
             });
 
             return response.moveAutomationProjectConfigurationConnectedUsers;
@@ -99,6 +107,7 @@ const AutomationProjectConfigurationMoveUsersDialog = ({
         <MoveConnectedUsersDialog
             connectedUsers={connectedUsers}
             connectedUsersError={connectedUsersError}
+            editableInputs
             impact={moveImpact?.workflows}
             initialSelectedConnectedUserIds={initialSelectedConnectedUserIds}
             onClose={onClose}
@@ -107,6 +116,7 @@ const AutomationProjectConfigurationMoveUsersDialog = ({
             previewError={moveImpactError}
             previewLoading={moveImpactLoading}
             previewSkipped={moveImpact?.skipped}
+            singleConnectedUser={singleConnectedUser}
             sourceLabel={formatConfigurationLabel(configuration)}
             targets={targets}
             title={title}

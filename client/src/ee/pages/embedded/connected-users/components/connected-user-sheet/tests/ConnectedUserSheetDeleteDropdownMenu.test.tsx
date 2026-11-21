@@ -192,6 +192,55 @@ describe('ConnectedUserSheetDeleteDropdownMenu', () => {
         );
     });
 
+    it('should list Change version after Change configuration and call its handler', async () => {
+        const onChangeVersionClick = vi.fn();
+
+        render(
+            <TooltipProvider>
+                <ConnectedUserSheetDeleteDropdownMenu
+                    onChangeConfigurationClick={vi.fn()}
+                    onChangeVersionClick={onChangeVersionClick}
+                    onDeleteClick={hoisted.onDeleteClick}
+                />
+            </TooltipProvider>
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+
+        expect(screen.getAllByRole('menuitem').map((item) => item.textContent)).toEqual([
+            'Change configuration…',
+            'Change version…',
+            'Delete',
+        ]);
+
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Change version'}));
+
+        expect(onChangeVersionClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('should disable Change version with the given reason', async () => {
+        render(
+            <TooltipProvider>
+                <ConnectedUserSheetDeleteDropdownMenu
+                    changeVersionDisabledReason="No other published version"
+                    onChangeVersionClick={vi.fn()}
+                />
+            </TooltipProvider>
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+
+        const item = screen.getByRole('menuitem', {name: 'Change version'});
+
+        expect(item).toHaveAttribute('aria-disabled', 'true');
+
+        await userEvent.hover(item.parentElement as HTMLElement);
+
+        await waitFor(async () =>
+            expect((await screen.findAllByText('No other published version')).length).toBeGreaterThan(0)
+        );
+    });
+
     it('should call onCopyWorkflowUuidClick when clicking Copy Workflow UUID', async () => {
         const onCopyWorkflowUuidClick = vi.fn();
 

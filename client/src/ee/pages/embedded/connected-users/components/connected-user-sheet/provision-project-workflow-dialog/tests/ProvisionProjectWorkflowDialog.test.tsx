@@ -144,6 +144,9 @@ const renderDialog = (
 };
 
 describe('ProvisionProjectWorkflowDialog', () => {
+    const openInputsTab = (workflowLabel: string) =>
+        userEvent.click(within(screen.getByRole('group', {name: workflowLabel})).getByRole('tab', {name: /Inputs/}));
+
     beforeEach(() => {
         windowResizeObserver();
 
@@ -170,10 +173,11 @@ describe('ProvisionProjectWorkflowDialog', () => {
         expect(screen.queryByRole('button', {name: 'Save'})).not.toBeInTheDocument();
     });
 
-    it('shows each project with its version', () => {
+    it('shows each project by name only, leaving the version to the configuration', () => {
         renderDialog();
 
-        expect(screen.getByRole('option', {name: 'Onboarding V3'})).toBeInTheDocument();
+        expect(screen.getByRole('option', {name: 'Onboarding'})).toBeInTheDocument();
+        expect(screen.queryByRole('option', {name: /V3/})).not.toBeInTheDocument();
     });
 
     it("lists the chosen project's workflows and disables provisioned ones", async () => {
@@ -182,11 +186,11 @@ describe('ProvisionProjectWorkflowDialog', () => {
         await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
 
         expect(screen.getByText('Welcome')).toBeInTheDocument();
-        expect(screen.getByRole('checkbox', {name: 'Welcome'})).toBeEnabled();
-        expect(screen.getByRole('checkbox', {name: 'Already there'})).toBeDisabled();
-        expect(screen.getByRole('checkbox', {name: 'Already there'})).toBeChecked();
+        expect(screen.getByRole('switch', {name: 'Welcome'})).toBeEnabled();
+        expect(screen.getByRole('switch', {name: 'Already there'})).toBeDisabled();
+        expect(screen.getByRole('switch', {name: 'Already there'})).toBeChecked();
         expect(screen.getByText('Provisioned')).toBeInTheDocument();
-        expect(screen.getByRole('checkbox', {name: 'Broken'})).toBeDisabled();
+        expect(screen.getByRole('switch', {name: 'Broken'})).toBeDisabled();
         expect(screen.getByText('Needs attention')).toBeInTheDocument();
     });
 
@@ -197,10 +201,11 @@ describe('ProvisionProjectWorkflowDialog', () => {
 
         expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
 
-        await userEvent.click(screen.getByRole('checkbox', {name: 'Welcome'}));
+        await userEvent.click(screen.getByRole('switch', {name: 'Welcome'}));
 
         expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
 
+        await openInputsTab('Welcome');
         await userEvent.type(screen.getByLabelText(/Name/), 'x');
 
         await waitFor(() => expect(screen.getByRole('button', {name: 'Save'})).toBeEnabled());
@@ -212,7 +217,8 @@ describe('ProvisionProjectWorkflowDialog', () => {
         const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries');
 
         await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
-        await userEvent.click(screen.getByRole('checkbox', {name: 'Welcome'}));
+        await userEvent.click(screen.getByRole('switch', {name: 'Welcome'}));
+        await openInputsTab('Welcome');
         await userEvent.type(screen.getByLabelText(/Name/), 'x');
 
         await waitFor(() => expect(screen.getByRole('button', {name: 'Save'})).toBeEnabled());
@@ -237,7 +243,8 @@ describe('ProvisionProjectWorkflowDialog', () => {
         const {rerenderDialog} = renderDialog();
 
         await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
-        await userEvent.click(screen.getByRole('checkbox', {name: 'Welcome'}));
+        await userEvent.click(screen.getByRole('switch', {name: 'Welcome'}));
+        await openInputsTab('Welcome');
         await userEvent.type(screen.getByLabelText(/Name/), 'x');
 
         const [project] = PROJECTS;
@@ -258,8 +265,8 @@ describe('ProvisionProjectWorkflowDialog', () => {
 
         rerenderDialog();
 
-        expect(screen.getByRole('checkbox', {name: 'Welcome'})).toBeChecked();
-        expect(screen.getByRole('checkbox', {name: 'Dotted'})).not.toBeChecked();
+        expect(screen.getByRole('switch', {name: 'Welcome'})).toBeChecked();
+        expect(screen.getByRole('switch', {name: 'Dotted'})).not.toBeChecked();
         expect(screen.getByLabelText(/Name/)).toHaveValue('x');
 
         await userEvent.click(screen.getByRole('button', {name: 'Save'}));
@@ -275,7 +282,8 @@ describe('ProvisionProjectWorkflowDialog', () => {
         renderDialog();
 
         await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
-        await userEvent.click(screen.getByRole('checkbox', {name: 'Dotted'}));
+        await userEvent.click(screen.getByRole('switch', {name: 'Dotted'}));
+        await openInputsTab('Dotted');
         await userEvent.type(screen.getByLabelText(/Email/), 'a@b.c');
 
         await waitFor(() => expect(screen.getByRole('button', {name: 'Save'})).toBeEnabled());
@@ -317,14 +325,14 @@ describe('ProvisionProjectWorkflowDialog', () => {
 
         await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
 
-        expect(screen.getByRole('checkbox', {name: 'Welcome'})).toBeInTheDocument();
-        expect(screen.queryByRole('checkbox', {name: 'Beta only'})).not.toBeInTheDocument();
+        expect(screen.getByRole('switch', {name: 'Welcome'})).toBeInTheDocument();
+        expect(screen.queryByRole('switch', {name: 'Beta only'})).not.toBeInTheDocument();
 
         await userEvent.click(screen.getByRole('combobox', {name: 'Configuration'}));
         await userEvent.click(await screen.findByRole('option', {name: /Beta/}));
 
-        expect(screen.getByRole('checkbox', {name: 'Beta only'})).toBeInTheDocument();
-        expect(screen.queryByRole('checkbox', {name: 'Welcome'})).not.toBeInTheDocument();
+        expect(screen.getByRole('switch', {name: 'Beta only'})).toBeInTheDocument();
+        expect(screen.queryByRole('switch', {name: 'Welcome'})).not.toBeInTheDocument();
     });
 
     it('sends configurationId when provisioning', async () => {
@@ -333,7 +341,7 @@ describe('ProvisionProjectWorkflowDialog', () => {
         await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
         await userEvent.click(screen.getByRole('combobox', {name: 'Configuration'}));
         await userEvent.click(await screen.findByRole('option', {name: /Beta/}));
-        await userEvent.click(screen.getByRole('checkbox', {name: 'Beta only'}));
+        await userEvent.click(screen.getByRole('switch', {name: 'Beta only'}));
 
         await waitFor(() => expect(screen.getByRole('button', {name: 'Save'})).toBeEnabled());
 
@@ -360,9 +368,9 @@ describe('ProvisionProjectWorkflowDialog', () => {
         expect(
             screen.getByText(/choose Change configuration… in the project's ⋮ menu on the Automations tab/)
         ).toBeInTheDocument();
-        expect(screen.getByRole('checkbox', {name: 'Beta only'})).toBeInTheDocument();
+        expect(screen.getByRole('switch', {name: 'Beta only'})).toBeInTheDocument();
 
-        await userEvent.click(screen.getByRole('checkbox', {name: 'Beta only'}));
+        await userEvent.click(screen.getByRole('switch', {name: 'Beta only'}));
 
         await waitFor(() => expect(screen.getByRole('button', {name: 'Save'})).toBeEnabled());
 
@@ -409,7 +417,7 @@ describe('ProvisionProjectWorkflowDialog', () => {
 
         expect(screen.getByLabelText('Configuration')).toHaveValue('Paused');
         expect(screen.getByText(/this configuration is disabled/i)).toBeInTheDocument();
-        expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+        expect(screen.queryByRole('switch')).not.toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
     });
 
@@ -446,7 +454,7 @@ describe('ProvisionProjectWorkflowDialog', () => {
             renderDialog();
 
             await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
-            await userEvent.click(screen.getByRole('checkbox', {name: 'Notify'}));
+            await userEvent.click(screen.getByRole('switch', {name: 'Notify'}));
 
             const slackConnectionSelect = screen.getByRole('combobox', {name: 'Slack connection'});
 
@@ -479,7 +487,7 @@ describe('ProvisionProjectWorkflowDialog', () => {
             renderDialog();
 
             await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
-            await userEvent.click(screen.getByRole('checkbox', {name: 'Notify'}));
+            await userEvent.click(screen.getByRole('switch', {name: 'Notify'}));
             await userEvent.click(screen.getByRole('combobox', {name: 'Slack connection'}));
             await userEvent.click(await screen.findByRole('option', {name: /Shared Slack/}));
             await userEvent.click(screen.getByRole('button', {name: 'Save'}));
@@ -495,7 +503,7 @@ describe('ProvisionProjectWorkflowDialog', () => {
             renderDialog();
 
             await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
-            await userEvent.click(screen.getByRole('checkbox', {name: 'Notify'}));
+            await userEvent.click(screen.getByRole('switch', {name: 'Notify'}));
 
             expect(
                 screen.getByText(
@@ -524,7 +532,7 @@ describe('ProvisionProjectWorkflowDialog', () => {
             renderDialog();
 
             await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
-            await userEvent.click(screen.getByRole('checkbox', {name: 'Notify'}));
+            await userEvent.click(screen.getByRole('switch', {name: 'Notify'}));
             await userEvent.click(screen.getByRole('button', {name: 'New Slack connection'}));
             await userEvent.click(screen.getByRole('button', {name: 'Create slack connection for user 7'}));
 
@@ -542,25 +550,53 @@ describe('ProvisionProjectWorkflowDialog', () => {
             });
         });
 
-        it("shows a workflow's connections and then its inputs inside the workflow's box", async () => {
+        it("shows a workflow's connections on its Connections tab and its inputs on its Inputs tab", async () => {
             hoisted.connectionsQuery.mockReturnValue({data: SLACK_CONNECTIONS});
             hoisted.provisionableQuery.mockReturnValue({data: {provisionableConnectedUserProjects: SLACK_PROJECTS}});
 
             renderDialog();
 
             await userEvent.selectOptions(screen.getByLabelText('Project'), '20');
-            await userEvent.click(screen.getByRole('checkbox', {name: 'Digest'}));
+            await userEvent.click(screen.getByRole('switch', {name: 'Digest'}));
 
             const workflowBox = within(screen.getByRole('group', {name: 'Digest'}));
 
-            const connectionsHeading = workflowBox.getByText('Connections');
-            const connectionSelect = workflowBox.getByRole('combobox', {name: 'Slack connection'});
-            const inputsHeading = workflowBox.getByText('Inputs');
-            const channelInput = workflowBox.getByLabelText('Channel');
+            expect(workflowBox.getByRole('tab', {name: /Connections/})).toHaveAttribute('aria-selected', 'true');
+            expect(workflowBox.getByRole('combobox', {name: 'Slack connection'})).toBeInTheDocument();
+            expect(workflowBox.queryByLabelText('Channel')).not.toBeInTheDocument();
 
-            expect(connectionsHeading.compareDocumentPosition(connectionSelect)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-            expect(connectionSelect.compareDocumentPosition(inputsHeading)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-            expect(inputsHeading.compareDocumentPosition(channelInput)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+            await openInputsTab('Digest');
+
+            expect(workflowBox.getByLabelText('Channel')).toBeInTheDocument();
+            expect(workflowBox.queryByRole('combobox', {name: 'Slack connection'})).not.toBeInTheDocument();
+        });
+
+        it('marks the Connections tab when the user has no connection for a component the workflow needs', async () => {
+            hoisted.connectionsQuery.mockReturnValue({data: []});
+            hoisted.provisionableQuery.mockReturnValue({data: {provisionableConnectedUserProjects: SLACK_PROJECTS}});
+
+            renderDialog();
+
+            await userEvent.selectOptions(screen.getByLabelText('Project'), '20');
+            await userEvent.click(screen.getByRole('switch', {name: 'Digest'}));
+
+            const connectionsTab = within(screen.getByRole('group', {name: 'Digest'})).getByRole('tab', {
+                name: /Connections/,
+            });
+
+            expect(within(connectionsTab).getByRole('img', {name: 'Missing connection'})).toBeInTheDocument();
+        });
+
+        it('does not mark the Connections tab when every component the workflow needs has a connection', async () => {
+            hoisted.connectionsQuery.mockReturnValue({data: SLACK_CONNECTIONS});
+            hoisted.provisionableQuery.mockReturnValue({data: {provisionableConnectedUserProjects: SLACK_PROJECTS}});
+
+            renderDialog();
+
+            await userEvent.selectOptions(screen.getByLabelText('Project'), '20');
+            await userEvent.click(screen.getByRole('switch', {name: 'Digest'}));
+
+            expect(screen.queryByRole('img', {name: 'Missing connection'})).not.toBeInTheDocument();
         });
 
         it('sends each workflow the connection picked for it', async () => {
@@ -570,8 +606,8 @@ describe('ProvisionProjectWorkflowDialog', () => {
             renderDialog();
 
             await userEvent.selectOptions(screen.getByLabelText('Project'), '20');
-            await userEvent.click(screen.getByRole('checkbox', {name: 'Digest'}));
-            await userEvent.click(screen.getByRole('checkbox', {name: 'Alert'}));
+            await userEvent.click(screen.getByRole('switch', {name: 'Digest'}));
+            await userEvent.click(screen.getByRole('switch', {name: 'Alert'}));
             await userEvent.click(
                 within(screen.getByRole('group', {name: 'Alert'})).getByRole('combobox', {name: 'Slack connection'})
             );
@@ -598,7 +634,7 @@ describe('ProvisionProjectWorkflowDialog', () => {
             renderDialog();
 
             await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
-            await userEvent.click(screen.getByRole('checkbox', {name: 'Welcome'}));
+            await userEvent.click(screen.getByRole('switch', {name: 'Welcome'}));
 
             expect(screen.queryByRole('combobox', {name: 'Slack connection'})).not.toBeInTheDocument();
         });

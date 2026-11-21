@@ -21,6 +21,7 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -79,6 +80,29 @@ public class AutomationProjectConfigurationGraphQlController {
         return automationProjectConfigurationFacade.getConfigurationWorkflowInputOptions(
             Long.parseLong(id), workflowUuid, projectVersion, inputName, propertyName,
             parseConnectionId(inputName, connectionId),
+            lookupDependsOnValues == null ? Map.of() : lookupDependsOnValues, searchText);
+    }
+
+    @QueryMapping
+    public AutomationProjectConfigurationWorkflowProvidableValuesDTO automationProjectWorkflowProvidableValues(
+        @Argument String projectId, @Argument String environmentId, @Argument int projectVersion,
+        @Argument String workflowUuid) {
+
+        return automationProjectConfigurationFacade.getProjectWorkflowProvidableValues(
+            Long.parseLong(projectId), Long.parseLong(environmentId), projectVersion, workflowUuid);
+    }
+
+    @QueryMapping
+    public List<AutomationProjectConfigurationWorkflowProvidableValuesDTO.InputOption>
+        automationProjectWorkflowInputOptions(
+            @Argument String projectId, @Argument String environmentId, @Argument int projectVersion,
+            @Argument String workflowUuid, @Argument String inputName, @Argument String propertyName,
+            @Argument String connectionId, @Argument @Nullable Map<String, Object> lookupDependsOnValues,
+            @Argument @Nullable String searchText) {
+
+        return automationProjectConfigurationFacade.getProjectWorkflowInputOptions(
+            Long.parseLong(projectId), Long.parseLong(environmentId), projectVersion, workflowUuid, inputName,
+            propertyName, parseConnectionId(inputName, connectionId),
             lookupDependsOnValues == null ? Map.of() : lookupDependsOnValues, searchText);
     }
 
@@ -168,27 +192,53 @@ public class AutomationProjectConfigurationGraphQlController {
     @MutationMapping
     public ConfigurationMoveResultDTO changeAutomationProjectConfigurationConnectedUserVersion(
         @Argument String sourceId, @Argument String connectedUserId, @Argument int projectVersion,
-        @Argument @Nullable String targetId) {
+        @Argument @Nullable String targetId, @Argument @Nullable List<ConfigurationMoveWorkflowInputs> workflowInputs) {
 
         return automationProjectConfigurationFacade.changeConnectedUserVersion(
             Long.parseLong(sourceId), Long.parseLong(connectedUserId), projectVersion,
-            targetId == null ? null : Long.valueOf(targetId));
+            targetId == null ? null : Long.valueOf(targetId), toWorkflowInputs(workflowInputs));
     }
 
     @MutationMapping
     public ConfigurationMoveResultDTO moveAutomationProjectConfigurationConnectedUsers(
-        @Argument String sourceId, @Argument String targetId, @Argument List<String> connectedUserIds) {
+        @Argument String sourceId, @Argument String targetId, @Argument List<String> connectedUserIds,
+        @Argument @Nullable List<ConfigurationMoveWorkflowInputs> workflowInputs) {
 
         return automationProjectConfigurationFacade.moveConnectedUsers(
-            Long.parseLong(sourceId), Long.parseLong(targetId), toLongs(connectedUserIds));
+            Long.parseLong(sourceId), Long.parseLong(targetId), toLongs(connectedUserIds),
+            toWorkflowInputs(workflowInputs));
     }
 
     @MutationMapping
     public ConfigurationMoveResultDTO upgradeAutomationProjectConfigurationConnectedUsers(
-        @Argument String targetId, @Argument List<String> connectedUserIds) {
+        @Argument String targetId, @Argument List<String> connectedUserIds,
+        @Argument @Nullable List<ConfigurationMoveWorkflowInputs> workflowInputs) {
 
         return automationProjectConfigurationFacade.upgradeConnectedUsers(
-            Long.parseLong(targetId), toLongs(connectedUserIds));
+            Long.parseLong(targetId), toLongs(connectedUserIds), toWorkflowInputs(workflowInputs));
+    }
+
+    private static Map<String, Map<String, Object>> toWorkflowInputs(
+        @Nullable List<ConfigurationMoveWorkflowInputs> workflowInputs) {
+
+        if (workflowInputs == null) {
+            return Map.of();
+        }
+
+        Map<String, Map<String, Object>> inputsByWorkflowUuid = new LinkedHashMap<>();
+
+        for (ConfigurationMoveWorkflowInputs workflowInput : workflowInputs) {
+            if (inputsByWorkflowUuid.putIfAbsent(workflowInput.workflowUuid(), workflowInput.inputs()) != null) {
+                throw new IllegalArgumentException(
+                    "Workflow %s has more than one set of inputs".formatted(workflowInput.workflowUuid()));
+            }
+        }
+
+        return inputsByWorkflowUuid;
+    }
+
+    @SuppressFBWarnings("EI")
+    public record ConfigurationMoveWorkflowInputs(String workflowUuid, Map<String, Object> inputs) {
     }
 
     @MutationMapping

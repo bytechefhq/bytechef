@@ -258,7 +258,7 @@ describe('ConnectedUserProjectWorkflowEditDialog', () => {
 
         renderDialog();
 
-        expect(screen.getByText(/No connections to set/)).toBeInTheDocument();
+        expect(screen.getByText('No Connections yet')).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
     });
 
