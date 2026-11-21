@@ -34,6 +34,8 @@ public class OAuth2AuthorizationParametersModel {
 
   private Map<String, Boolean> scopes = new HashMap<>();
 
+  private @Nullable String authorizationContext;
+
   public OAuth2AuthorizationParametersModel authorizationUrl(@Nullable String authorizationUrl) {
     this.authorizationUrl = authorizationUrl;
     return this;
@@ -134,6 +136,27 @@ public class OAuth2AuthorizationParametersModel {
     this.scopes = scopes;
   }
 
+  public OAuth2AuthorizationParametersModel authorizationContext(@Nullable String authorizationContext) {
+    this.authorizationContext = authorizationContext;
+    return this;
+  }
+
+  /**
+   * Opaque, server-sealed state the client must post back with the authorization code.
+   * @return authorizationContext
+   */
+  
+  @Schema(name = "authorizationContext", description = "Opaque, server-sealed state the client must post back with the authorization code.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("authorizationContext")
+  public @Nullable String getAuthorizationContext() {
+    return authorizationContext;
+  }
+
+  @JsonProperty("authorizationContext")
+  public void setAuthorizationContext(@Nullable String authorizationContext) {
+    this.authorizationContext = authorizationContext;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -146,12 +169,13 @@ public class OAuth2AuthorizationParametersModel {
     return Objects.equals(this.authorizationUrl, oauth2AuthorizationParameters.authorizationUrl) &&
         Objects.equals(this.extraQueryParameters, oauth2AuthorizationParameters.extraQueryParameters) &&
         Objects.equals(this.clientId, oauth2AuthorizationParameters.clientId) &&
-        Objects.equals(this.scopes, oauth2AuthorizationParameters.scopes);
+        Objects.equals(this.scopes, oauth2AuthorizationParameters.scopes) &&
+        Objects.equals(this.authorizationContext, oauth2AuthorizationParameters.authorizationContext);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(authorizationUrl, extraQueryParameters, clientId, scopes);
+    return Objects.hash(authorizationUrl, extraQueryParameters, clientId, scopes, authorizationContext);
   }
 
   @Override
@@ -162,6 +186,7 @@ public class OAuth2AuthorizationParametersModel {
     sb.append("    extraQueryParameters: ").append(toIndentedString(extraQueryParameters)).append("\n");
     sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
     sb.append("    scopes: ").append(toIndentedString(scopes)).append("\n");
+    sb.append("    authorizationContext: ").append(toIndentedString(authorizationContext)).append("\n");
     sb.append("}");
     return sb.toString();
   }

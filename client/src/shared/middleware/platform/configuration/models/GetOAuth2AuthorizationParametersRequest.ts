@@ -36,6 +36,10 @@ export interface GetOAuth2AuthorizationParametersRequest {
      */
     componentName: string;
     /**
+     * The id of a connection whose credentials are being updated.
+     */
+    connectionId?: number;
+    /**
      * The version of a connection.
      */
     connectionVersion?: number;
@@ -43,8 +47,21 @@ export interface GetOAuth2AuthorizationParametersRequest {
      * The parameters of a connection.
      */
     parameters: { [key: string]: any; };
+    /**
+     * The platform type the connection is authorized for.
+     */
+    type?: GetOAuth2AuthorizationParametersRequestTypeEnum;
 }
 
+
+/**
+ * @export
+ */
+export const GetOAuth2AuthorizationParametersRequestTypeEnum = {
+    Automation: 'AUTOMATION',
+    Embedded: 'EMBEDDED',
+} as const;
+export type GetOAuth2AuthorizationParametersRequestTypeEnum = typeof GetOAuth2AuthorizationParametersRequestTypeEnum[keyof typeof GetOAuth2AuthorizationParametersRequestTypeEnum];
 
 
 /**
@@ -69,8 +86,10 @@ export function GetOAuth2AuthorizationParametersRequestFromJSONTyped(json: any, 
         
         'authorizationType': AuthorizationTypeFromJSON(json['authorizationType']),
         'componentName': json['componentName'],
+        'connectionId': json['connectionId'] == null ? undefined : json['connectionId'],
         'connectionVersion': json['connectionVersion'] == null ? undefined : json['connectionVersion'],
         'parameters': json['parameters'],
+        'type': json['type'] == null ? undefined : json['type'],
     };
 }
 
@@ -87,8 +106,10 @@ export function GetOAuth2AuthorizationParametersRequestToJSONTyped(value?: GetOA
         
         'authorizationType': AuthorizationTypeToJSON(value['authorizationType']),
         'componentName': value['componentName'],
+        'connectionId': value['connectionId'],
         'connectionVersion': value['connectionVersion'],
         'parameters': value['parameters'],
+        'type': value['type'],
     };
 }
 

@@ -33,9 +33,48 @@ public class GetOAuth2AuthorizationParametersRequestModel {
 
   private String componentName;
 
+  private @Nullable Long connectionId;
+
   private @Nullable Integer connectionVersion;
 
   private Map<String, Object> parameters = new HashMap<>();
+
+  /**
+   * The platform type the connection is authorized for.
+   */
+  public enum TypeEnum {
+    AUTOMATION("AUTOMATION"),
+    
+    EMBEDDED("EMBEDDED");
+
+    private final String value;
+
+    TypeEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static TypeEnum fromValue(String value) {
+      for (TypeEnum b : TypeEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  private @Nullable TypeEnum type;
 
   public GetOAuth2AuthorizationParametersRequestModel() {
     super();
@@ -92,6 +131,27 @@ public class GetOAuth2AuthorizationParametersRequestModel {
     this.componentName = componentName;
   }
 
+  public GetOAuth2AuthorizationParametersRequestModel connectionId(@Nullable Long connectionId) {
+    this.connectionId = connectionId;
+    return this;
+  }
+
+  /**
+   * The id of a connection whose credentials are being updated.
+   * @return connectionId
+   */
+  
+  @Schema(name = "connectionId", description = "The id of a connection whose credentials are being updated.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connectionId")
+  public @Nullable Long getConnectionId() {
+    return connectionId;
+  }
+
+  @JsonProperty("connectionId")
+  public void setConnectionId(@Nullable Long connectionId) {
+    this.connectionId = connectionId;
+  }
+
   public GetOAuth2AuthorizationParametersRequestModel connectionVersion(@Nullable Integer connectionVersion) {
     this.connectionVersion = connectionVersion;
     return this;
@@ -142,6 +202,27 @@ public class GetOAuth2AuthorizationParametersRequestModel {
     this.parameters = parameters;
   }
 
+  public GetOAuth2AuthorizationParametersRequestModel type(@Nullable TypeEnum type) {
+    this.type = type;
+    return this;
+  }
+
+  /**
+   * The platform type the connection is authorized for.
+   * @return type
+   */
+  
+  @Schema(name = "type", description = "The platform type the connection is authorized for.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("type")
+  public @Nullable TypeEnum getType() {
+    return type;
+  }
+
+  @JsonProperty("type")
+  public void setType(@Nullable TypeEnum type) {
+    this.type = type;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -153,13 +234,15 @@ public class GetOAuth2AuthorizationParametersRequestModel {
     GetOAuth2AuthorizationParametersRequestModel getOAuth2AuthorizationParametersRequest = (GetOAuth2AuthorizationParametersRequestModel) o;
     return Objects.equals(this.authorizationType, getOAuth2AuthorizationParametersRequest.authorizationType) &&
         Objects.equals(this.componentName, getOAuth2AuthorizationParametersRequest.componentName) &&
+        Objects.equals(this.connectionId, getOAuth2AuthorizationParametersRequest.connectionId) &&
         Objects.equals(this.connectionVersion, getOAuth2AuthorizationParametersRequest.connectionVersion) &&
-        Objects.equals(this.parameters, getOAuth2AuthorizationParametersRequest.parameters);
+        Objects.equals(this.parameters, getOAuth2AuthorizationParametersRequest.parameters) &&
+        Objects.equals(this.type, getOAuth2AuthorizationParametersRequest.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(authorizationType, componentName, connectionVersion, parameters);
+    return Objects.hash(authorizationType, componentName, connectionId, connectionVersion, parameters, type);
   }
 
   @Override
@@ -168,8 +251,10 @@ public class GetOAuth2AuthorizationParametersRequestModel {
     sb.append("class GetOAuth2AuthorizationParametersRequestModel {\n");
     sb.append("    authorizationType: ").append(toIndentedString(authorizationType)).append("\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
+    sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
     sb.append("    connectionVersion: ").append(toIndentedString(connectionVersion)).append("\n");
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
+    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
     return sb.toString();
   }

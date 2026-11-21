@@ -7,6 +7,7 @@ The parameters needed to start an OAuth2 authorization flow.
 
 Name | Type
 ------------ | -------------
+`authorizationContext` | string
 `authorizationUrl` | string
 `clientId` | string
 `extraQueryParameters` | { [key: string]: string; }
@@ -19,6 +20,7 @@ import type { OAuth2AuthorizationParameters } from ''
 
 // TODO: Update the object below with actual values
 const example = {
+  "authorizationContext": null,
   "authorizationUrl": null,
   "clientId": null,
   "extraQueryParameters": null,

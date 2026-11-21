@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.oauth2.service.OAuth2AuthorizationContextService;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -33,8 +34,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    ConnectionDefinitionService.class, OAuth2Service.class, ComponentConnectionFacade.class, WorkflowService.class,
-    WorkflowTestConfigurationService.class
+    ConnectionDefinitionService.class, OAuth2AuthorizationContextService.class, OAuth2Service.class,
+    ComponentConnectionFacade.class, WorkflowService.class, WorkflowTestConfigurationService.class
 
 })
 public @interface ConnectionIntTestConfigurationSharedMocks {

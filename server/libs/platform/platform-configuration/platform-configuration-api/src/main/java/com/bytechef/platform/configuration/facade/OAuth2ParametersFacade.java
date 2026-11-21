@@ -18,14 +18,24 @@ package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface OAuth2ParametersFacade {
 
+    default OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
+        String componentName, int connectionVersion, Map<String, ?> connectionParameters,
+        AuthorizationType authorizationType) {
+
+        return getOAuth2AuthorizationParameters(
+            componentName, connectionVersion, connectionParameters, authorizationType, null, null);
+    }
+
     OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters,
-        AuthorizationType authorizationType);
+        AuthorizationType authorizationType, @Nullable Long connectionId, @Nullable PlatformType type);
 }

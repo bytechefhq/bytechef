@@ -24,6 +24,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.file.storage.EditorTempFileStorage;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
@@ -47,7 +48,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @MockitoBean(types = {
     ActionDefinitionFacade.class, ActionDefinitionService.class, ClusterElementDefinitionFacade.class,
     ClusterElementDefinitionService.class, ComponentDefinitionService.class, ConnectionDefinitionService.class,
-    ConnectionService.class, EditorTempFileStorage.class, JobPrincipalAccessorRegistry.class,
+    ConnectionFacade.class, ConnectionService.class, EditorTempFileStorage.class, JobPrincipalAccessorRegistry.class,
     OAuth2Service.class, TaskDispatcherDefinitionService.class, TriggerDefinitionFacade.class,
     TriggerDefinitionService.class
 })
