@@ -196,7 +196,9 @@ class CustomComponentAuditIntTest {
 
             ApplicationProperties.Component.CustomComponent customComponent = component.getCustomComponent();
 
-            customComponent.setJavaEnabled(true);
+            ApplicationProperties.Component.CustomComponent.Java java = customComponent.getJava();
+
+            java.setEnabled(true);
 
             return new CustomComponentFacadeImpl(
                 applicationProperties, customComponentService,

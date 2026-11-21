@@ -265,8 +265,11 @@ class CustomComponentFacadeCreateEmptyTest {
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {
         ApplicationProperties.Component component = new ApplicationProperties.Component();
 
-        component.getCustomComponent()
-            .setJavaEnabled(javaEnabled);
+        ApplicationProperties.Component.CustomComponent customComponent = component.getCustomComponent();
+
+        ApplicationProperties.Component.CustomComponent.Java java = customComponent.getJava();
+
+        java.setEnabled(javaEnabled);
 
         ApplicationProperties applicationProperties = mock(ApplicationProperties.class);
 

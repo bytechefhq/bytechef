@@ -3732,18 +3732,35 @@ public class ApplicationProperties {
          */
         public static class CustomComponent {
 
-            /**
-             * Whether uploading of Java (jar) custom components is enabled. When disabled, Java custom component upload
-             * requests are rejected while other languages and previously uploaded Java custom components keep working.
-             */
-            private boolean javaEnabled;
+            private Java java = new Java();
 
-            public boolean isJavaEnabled() {
-                return javaEnabled;
+            public Java getJava() {
+                return java;
             }
 
-            public void setJavaEnabled(boolean javaEnabled) {
-                this.javaEnabled = javaEnabled;
+            public void setJava(Java java) {
+                this.java = java;
+            }
+
+            /**
+             * Java custom component settings.
+             */
+            public static class Java {
+
+                /**
+                 * Whether uploading of Java (jar) custom components is enabled. When disabled, Java custom component
+                 * upload requests are rejected while other languages and previously uploaded Java custom components
+                 * keep working.
+                 */
+                private boolean enabled;
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
             }
         }
 
