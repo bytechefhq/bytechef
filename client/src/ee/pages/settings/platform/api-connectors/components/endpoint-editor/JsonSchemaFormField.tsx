@@ -1,5 +1,6 @@
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
+import {useJsonSchemaModelPath} from '@/shared/components/monaco/useJsonSchemaModelPath';
 import {Suspense, lazy} from 'react';
 import {Control, ControllerProps, FieldValues, Path} from 'react-hook-form';
 
@@ -28,33 +29,38 @@ const JsonSchemaFormField = <TFieldValuesType extends FieldValues, TNameType ext
     label,
     name,
     rules,
-}: JsonSchemaFormFieldProps<TFieldValuesType, TNameType>) => (
-    <FormField
-        control={control}
-        name={name}
-        render={({field}) => (
-            <FormItem>
-                <FormLabel>{label}</FormLabel>
+}: JsonSchemaFormFieldProps<TFieldValuesType, TNameType>) => {
+    const modelPath = useJsonSchemaModelPath();
 
-                <FormControl>
-                    <div className="h-48 overflow-hidden rounded-md border">
-                        <Suspense fallback={<MonacoEditorLoader />}>
-                            <MonacoEditorWrapper
-                                defaultLanguage="json"
-                                onChange={(value) => field.onChange(value || '')}
-                                onMount={() => {}}
-                                options={editorOptions}
-                                value={field.value}
-                            />
-                        </Suspense>
-                    </div>
-                </FormControl>
+    return (
+        <FormField
+            control={control}
+            name={name}
+            render={({field}) => (
+                <FormItem>
+                    <FormLabel>{label}</FormLabel>
 
-                <FormMessage />
-            </FormItem>
-        )}
-        rules={rules}
-    />
-);
+                    <FormControl>
+                        <div className="h-48 overflow-hidden rounded-md border">
+                            <Suspense fallback={<MonacoEditorLoader />}>
+                                <MonacoEditorWrapper
+                                    defaultLanguage="json"
+                                    onChange={(value) => field.onChange(value || '')}
+                                    onMount={() => {}}
+                                    options={editorOptions}
+                                    path={modelPath}
+                                    value={field.value}
+                                />
+                            </Suspense>
+                        </div>
+                    </FormControl>
+
+                    <FormMessage />
+                </FormItem>
+            )}
+            rules={rules}
+        />
+    );
+};
 
 export default JsonSchemaFormField;
