@@ -104,7 +104,7 @@ class ComponentHandlerClassLoaderTest {
                 .toURL(),
             componentHandlerClass.getName(), new ConcurrentMapCacheManager())) {
 
-            ComponentHandler componentHandler = componentHandlerClassLoader.loadComponentHandler();
+            ComponentHandler componentHandler = componentHandlerClassLoader.loadHandler();
 
             ComponentDefinition componentDefinition = componentHandler.getDefinition();
 

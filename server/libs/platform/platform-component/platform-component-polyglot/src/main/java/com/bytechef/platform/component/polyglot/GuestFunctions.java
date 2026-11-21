@@ -24,7 +24,33 @@ import org.graalvm.polyglot.Value;
  */
 public final class GuestFunctions {
 
+    private static final int PYTHON_VARARGS_FLAG = 0x04;
+
     private GuestFunctions() {
+    }
+
+    public static int getAcceptedArgumentCount(Value function, int argumentCount) {
+        if (!function.hasMember("__code__")) {
+            return argumentCount;
+        }
+
+        Value code = function.getMember("__code__");
+
+        Value flags = code.getMember("co_flags");
+
+        if ((flags.asInt() & PYTHON_VARARGS_FLAG) != 0) {
+            return argumentCount;
+        }
+
+        Value declaredArgumentCountValue = code.getMember("co_argcount");
+
+        int declaredArgumentCount = declaredArgumentCountValue.asInt();
+
+        if (function.hasMember("__func__") && function.hasMember("__self__")) {
+            declaredArgumentCount--;
+        }
+
+        return Math.min(argumentCount, Math.max(declaredArgumentCount, 0));
     }
 
     public static int getRequiredParameterCount(

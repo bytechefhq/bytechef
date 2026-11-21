@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.customcomponent.loader;
 
+import com.bytechef.classloader.AbstractHandlerClassLoader;
 import com.bytechef.classloader.IsolatingClassLoader;
 import com.bytechef.classloader.util.ClassLoaderUtils;
 import com.bytechef.component.ComponentHandler;
@@ -20,7 +21,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.ServiceLoader;
 import org.springframework.cache.CacheManager;
 import org.springframework.util.StreamUtils;
 
@@ -29,35 +29,21 @@ import org.springframework.util.StreamUtils;
  *
  * @author Ivica Cardic
  */
-class ComponentHandlerClassLoader extends IsolatingClassLoader<ComponentHandler> {
+class ComponentHandlerClassLoader extends AbstractHandlerClassLoader<ComponentHandler> {
 
     private static final String DEFAULT_ICON_PATH = "assets/sample.svg";
     private static final String PATH_PREFIX = "path:";
 
-    private final String cacheKey;
-
-    @SuppressWarnings("PMD.AvoidBranchingStatementAsLastInLoop")
     private ComponentHandlerClassLoader(URL jarUrl, String cacheKey, CacheManager cacheManager) {
         super(
-            new URL[] {
-                jarUrl
-            }, ComponentHandlerClassLoader.class.getClassLoader(),
-            cacheManager,
-            (key, classLoader) -> {
-                ServiceLoader<ComponentHandler> loader = ServiceLoader.load(ComponentHandler.class, classLoader);
+            jarUrl, cacheKey, cacheManager, ComponentHandler.class,
+            (componentHandler, classLoader) -> {
+                ComponentDefinition componentDefinition = ClassLoaderUtils.loadWithClassLoader(
+                    classLoader, componentHandler::getDefinition);
 
-                for (ComponentHandler componentHandler : loader) {
-                    ComponentDefinition componentDefinition = ClassLoaderUtils.loadWithClassLoader(
-                        classLoader, componentHandler::getDefinition);
-
-                    return new ContextClassLoaderComponentHandler(
-                        componentHandler, readIcon(componentDefinition, classLoader), classLoader);
-                }
-
-                return null;
+                return new ContextClassLoaderComponentHandler(
+                    componentHandler, readIcon(componentDefinition, classLoader), classLoader);
             });
-
-        this.cacheKey = cacheKey;
     }
 
     @SuppressFBWarnings("DP")
@@ -65,12 +51,8 @@ class ComponentHandlerClassLoader extends IsolatingClassLoader<ComponentHandler>
         return new ComponentHandlerClassLoader(jarUrl, cacheKey, cacheManager);
     }
 
-    ComponentHandler loadComponentHandler() {
-        return get(cacheKey);
-    }
-
     ComponentDefinition loadComponentDefinition() {
-        return applyUncached(cacheKey, ComponentHandler::getDefinition);
+        return applyUncached(getCacheKey(), ComponentHandler::getDefinition);
     }
 
     static String readIcon(ComponentDefinition componentDefinition, ClassLoader classLoader) {

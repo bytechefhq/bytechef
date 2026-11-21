@@ -40,6 +40,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.UnifiedApiDefinition;
+import com.bytechef.platform.component.polyglot.GuestFunctions;
 import com.bytechef.platform.component.polyglot.PolyglotSandbox;
 import com.bytechef.platform.component.polyglot.PolyglotValues;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -318,7 +319,7 @@ class ComponentHandlerPolyglotEngine {
 
     private static Object executeGuestFunction(Value function, Object... arguments) {
         Value result = function
-            .execute(Arrays.copyOf(arguments, PythonFunctions.getAcceptedArgumentCount(function, arguments.length)));
+            .execute(Arrays.copyOf(arguments, GuestFunctions.getAcceptedArgumentCount(function, arguments.length)));
 
         return PolyglotValues.copyFromPolyglotContext(PolyglotValues.copyToJavaValue(result));
     }
