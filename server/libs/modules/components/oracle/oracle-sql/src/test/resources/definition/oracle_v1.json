@@ -357,7 +357,6 @@
       "required": false,
       "type": "ARRAY"
     }, {
-      "name": "values",
       "advancedOption": false,
       "description": null,
       "displayCondition": null,
@@ -369,6 +368,7 @@
       "header": null,
       "hidden": false,
       "metadata": { },
+      "name": "values",
       "required": false,
       "type": "DYNAMIC_PROPERTIES"
     } ],
@@ -584,7 +584,6 @@
       "required": false,
       "type": "ARRAY"
     }, {
-      "name": "values",
       "advancedOption": false,
       "description": null,
       "displayCondition": null,
@@ -596,6 +595,7 @@
       "header": null,
       "hidden": false,
       "metadata": { },
+      "name": "values",
       "required": false,
       "type": "DYNAMIC_PROPERTIES"
     } ],
@@ -1079,6 +1079,337 @@
     } ],
     "resumePerform": null,
     "title": "Execute",
+    "workflowNodeDescription": null
+  }, {
+    "batch": false,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": false,
+    "description": "Call a stored procedure or function (PL/SQL, PL/pgSQL, ...) and return its output parameters.",
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/oracle_v1#call-procedure"
+    },
+    "metadata": { },
+    "name": "call",
+    "outputDefinition": {
+      "output": { },
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": false,
+      "controlType": "TEXT_AREA",
+      "defaultValue": null,
+      "description": "The call statement in JDBC escape syntax, for example {:result = call balance(:accountId)} for a function or {call transfer(:from, :to, :status)} for a procedure. A vendor block such as BEGIN :result := balance(:accountId); END; also works. Every :name placeholder is an input parameter unless it is declared in Output Parameters. Pass values through Parameters instead of writing them into the statement.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Call",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "call",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": "{:result = call balance(:accountId)}",
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "additionalProperties": [ {
+        "advancedOption": false,
+        "controlType": "SELECT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": true,
+        "hidden": false,
+        "label": null,
+        "metadata": { },
+        "name": null,
+        "options": [ {
+          "description": null,
+          "label": "True",
+          "value": true
+        }, {
+          "description": null,
+          "label": "False",
+          "value": false
+        } ],
+        "placeholder": null,
+        "required": false,
+        "type": "BOOLEAN"
+      }, {
+        "advancedOption": false,
+        "controlType": "DATE_TIME",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": true,
+        "hidden": false,
+        "label": null,
+        "metadata": { },
+        "name": null,
+        "options": [ ],
+        "optionsDataSource": null,
+        "placeholder": null,
+        "required": false,
+        "type": "DATE_TIME"
+      }, {
+        "advancedOption": false,
+        "controlType": "NUMBER",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": true,
+        "hidden": false,
+        "label": null,
+        "maxNumberPrecision": null,
+        "maxValue": null,
+        "metadata": { },
+        "minNumberPrecision": null,
+        "minValue": null,
+        "name": null,
+        "numberPrecision": null,
+        "options": [ ],
+        "optionsDataSource": null,
+        "placeholder": null,
+        "required": false,
+        "type": "NUMBER"
+      }, {
+        "advancedOption": false,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": true,
+        "hidden": false,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": [ ],
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": false,
+        "placeholder": null,
+        "regex": null,
+        "required": false,
+        "type": "STRING"
+      } ],
+      "advancedOption": false,
+      "controlType": "OBJECT_BUILDER",
+      "defaultValue": null,
+      "description": "Values of the input (IN) and input/output (IN_OUT) parameters, keyed by placeholder name.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Parameters",
+      "metadata": { },
+      "multipleValues": true,
+      "name": "parameters",
+      "options": [ ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "properties": [ ],
+      "required": false,
+      "type": "OBJECT"
+    }, {
+      "advancedOption": false,
+      "controlType": "ARRAY_BUILDER",
+      "defaultValue": null,
+      "description": "Placeholders the database writes to: the function return value and OUT or IN_OUT procedure arguments.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "items": [ {
+        "additionalProperties": [ ],
+        "advancedOption": false,
+        "controlType": "OBJECT_BUILDER",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": true,
+        "hidden": false,
+        "label": null,
+        "metadata": { },
+        "multipleValues": true,
+        "name": null,
+        "options": [ ],
+        "optionsDataSource": null,
+        "placeholder": null,
+        "properties": [ {
+          "advancedOption": false,
+          "controlType": "TEXT",
+          "defaultValue": null,
+          "description": "Placeholder name used in the call statement, without the colon.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": true,
+          "hidden": false,
+          "label": "Name",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "name",
+          "options": [ ],
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": false,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }, {
+          "advancedOption": false,
+          "controlType": "SELECT",
+          "defaultValue": "VARCHAR",
+          "description": "JDBC type the database returns for this parameter.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": true,
+          "hidden": false,
+          "label": "Type",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "type",
+          "options": [ {
+            "description": null,
+            "label": "BIGINT",
+            "value": "BIGINT"
+          }, {
+            "description": null,
+            "label": "BOOLEAN",
+            "value": "BOOLEAN"
+          }, {
+            "description": null,
+            "label": "CHAR",
+            "value": "CHAR"
+          }, {
+            "description": null,
+            "label": "DATE",
+            "value": "DATE"
+          }, {
+            "description": null,
+            "label": "DECIMAL",
+            "value": "DECIMAL"
+          }, {
+            "description": null,
+            "label": "DOUBLE",
+            "value": "DOUBLE"
+          }, {
+            "description": null,
+            "label": "FLOAT",
+            "value": "FLOAT"
+          }, {
+            "description": null,
+            "label": "INTEGER",
+            "value": "INTEGER"
+          }, {
+            "description": null,
+            "label": "NUMERIC",
+            "value": "NUMERIC"
+          }, {
+            "description": null,
+            "label": "NVARCHAR",
+            "value": "NVARCHAR"
+          }, {
+            "description": null,
+            "label": "REAL",
+            "value": "REAL"
+          }, {
+            "description": null,
+            "label": "SMALLINT",
+            "value": "SMALLINT"
+          }, {
+            "description": null,
+            "label": "TIME",
+            "value": "TIME"
+          }, {
+            "description": null,
+            "label": "TIMESTAMP",
+            "value": "TIMESTAMP"
+          }, {
+            "description": null,
+            "label": "TIMESTAMP_WITH_TIMEZONE",
+            "value": "TIMESTAMP_WITH_TIMEZONE"
+          }, {
+            "description": null,
+            "label": "VARCHAR",
+            "value": "VARCHAR"
+          } ],
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": false,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        }, {
+          "advancedOption": false,
+          "controlType": "SELECT",
+          "defaultValue": "OUT",
+          "description": "OUT for a return value or OUT argument, IN_OUT for an argument that also takes its value from Parameters.",
+          "displayCondition": null,
+          "exampleValue": null,
+          "expressionEnabled": true,
+          "hidden": false,
+          "label": "Mode",
+          "languageId": null,
+          "maxLength": null,
+          "metadata": { },
+          "minLength": null,
+          "name": "mode",
+          "options": [ {
+            "description": null,
+            "label": "OUT",
+            "value": "OUT"
+          }, {
+            "description": null,
+            "label": "IN_OUT",
+            "value": "IN_OUT"
+          } ],
+          "optionsDataSource": null,
+          "optionsLoadedDynamically": false,
+          "placeholder": null,
+          "regex": null,
+          "required": true,
+          "type": "STRING"
+        } ],
+        "required": false,
+        "type": "OBJECT"
+      } ],
+      "label": "Output Parameters",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": true,
+      "name": "outputParameters",
+      "options": [ ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "ARRAY"
+    } ],
+    "resumePerform": null,
+    "title": "Call Procedure",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
