@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.codeworkflow.loader;
 import com.bytechef.platform.component.polyglot.ComponentActionInvoker;
 import com.bytechef.platform.component.polyglot.ComponentCatalog;
 import com.bytechef.platform.component.polyglot.ComponentProxyObject;
+import com.bytechef.platform.component.polyglot.GuestFunctions;
 import com.bytechef.platform.component.polyglot.PolyglotSandbox;
 import com.bytechef.platform.component.polyglot.PolyglotValues;
 import com.bytechef.workflow.definition.CompositeTaskDefinition;
@@ -29,7 +30,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
-import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
 import org.graalvm.polyglot.proxy.ProxyExecutable;
 import org.graalvm.polyglot.proxy.ProxyObject;
@@ -100,7 +100,7 @@ public abstract class AbstractHandlerPolyglotEngine<H> {
 
             Value result;
 
-            if (getRequiredPerformParameterCount(polyglotContext, languageId, performFunction) >= 3) {
+            if (GuestFunctions.getRequiredParameterCount(polyglotContext, languageId, performFunction, 2) >= 3) {
                 Object guestConnection = PolyglotValues.copyToGuestMemberAndHashMap(connection, languageId);
 
                 result = performFunction.execute(guestInput, guestConnection, guestContext);
@@ -110,27 +110,6 @@ public abstract class AbstractHandlerPolyglotEngine<H> {
 
             return PolyglotValues.copyFromPolyglotContext(PolyglotValues.copyToJavaValue(result));
         });
-    }
-
-    private static int getRequiredPerformParameterCount(
-        Context polyglotContext, String languageId, Value performFunction) {
-
-        String parameterCountFunctionSource = switch (languageId) {
-            case "js" -> "(performFunction) => performFunction.length";
-            case "python" -> "lambda perform_function: perform_function.__code__.co_argcount - " +
-                "len(perform_function.__defaults__ or ())";
-            default -> null;
-        };
-
-        if (parameterCountFunctionSource == null) {
-            return 2;
-        }
-
-        Value parameterCountFunction = polyglotContext.eval(languageId, parameterCountFunctionSource);
-
-        Value parameterCount = parameterCountFunction.execute(performFunction);
-
-        return parameterCount.fitsInInt() ? parameterCount.asInt() : 2;
     }
 
     private static Value findWorkflow(Value value, String workflowName) {
