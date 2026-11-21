@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.runner.external;
+package com.bytechef.platform.component.runner.docker;
 
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
@@ -43,7 +43,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.platform.component.runner.TaskRunnerConnection;
-import com.bytechef.platform.component.runner.TaskRunnerOperatorFlag;
 import com.bytechef.platform.component.runner.TaskRunnerRequest;
 import com.bytechef.platform.component.runner.remote.CleanupMode;
 import com.bytechef.platform.component.runner.remote.Deadline;
@@ -130,11 +129,9 @@ public class DockerTaskRunnerBackend implements RemoteTaskRunnerBackend {
 
     private static final Pattern MEMORY_PATTERN = Pattern.compile("^(\\d+)\\s*([bkmg])?$", Pattern.CASE_INSENSITIVE);
 
-    private static final Map<ExternalLanguage, String> DEFAULT_IMAGES = Map.of(
-        ExternalLanguage.BASH, "ubuntu:24.04",
-        ExternalLanguage.JAVASCRIPT, "node:22-alpine",
-        ExternalLanguage.PYTHON, "python:3.12-slim",
-        ExternalLanguage.SHELL, "ubuntu:24.04");
+    private static final Map<String, String> DEFAULT_IMAGES = Map.of(
+        "bash", "ubuntu:24.04", "javascript", "node:22-alpine", "js", "node:22-alpine", "python", "python:3.12-slim",
+        "shell", "ubuntu:24.04");
 
     private final BiFunction<String, Duration, DockerClient> dockerClientFactory;
 
@@ -315,7 +312,7 @@ public class DockerTaskRunnerBackend implements RemoteTaskRunnerBackend {
             throw new IllegalArgumentException(
                 "The docker runner's '%s' option is not enabled. An operator must enable it with %s=true.".formatted(
                     HOST,
-                    TaskRunnerOperatorFlag.getPropertyName(DOCKER, DockerOperatorSettings.ALLOW_TASK_HOST_PROPERTY)));
+                    DockerOperatorSettings.getPropertyName(DockerOperatorSettings.ALLOW_TASK_HOST_PROPERTY)));
         }
 
         List<String> volumes = parameters.getList(VOLUMES, String.class, List.of());
@@ -324,8 +321,7 @@ public class DockerTaskRunnerBackend implements RemoteTaskRunnerBackend {
             throw new IllegalArgumentException(
                 "The docker runner's '%s' option is not enabled. An operator must enable it with %s=true.".formatted(
                     VOLUMES,
-                    TaskRunnerOperatorFlag.getPropertyName(DOCKER,
-                        DockerOperatorSettings.ALLOW_VOLUME_MOUNTS_PROPERTY)));
+                    DockerOperatorSettings.getPropertyName(DockerOperatorSettings.ALLOW_VOLUME_MOUNTS_PROPERTY)));
         }
 
         for (String volume : volumes) {
@@ -799,7 +795,7 @@ public class DockerTaskRunnerBackend implements RemoteTaskRunnerBackend {
             return image;
         }
 
-        String defaultImage = DEFAULT_IMAGES.get(ExternalLanguage.of(languageId));
+        String defaultImage = DEFAULT_IMAGES.get(languageId);
 
         if (defaultImage == null) {
             throw new IllegalArgumentException(

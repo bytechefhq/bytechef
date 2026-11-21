@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.runner.external;
+package com.bytechef.platform.component.runner.docker;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -34,6 +34,7 @@ import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.runner.TaskRunnerRequest;
 import com.bytechef.platform.component.runner.TaskRunnerResult;
+import com.bytechef.platform.component.runner.external.RemoteTaskRunner;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.ListContainersCmd;

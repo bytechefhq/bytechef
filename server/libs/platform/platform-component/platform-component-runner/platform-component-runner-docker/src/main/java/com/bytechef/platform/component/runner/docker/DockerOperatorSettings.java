@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.runner.external;
+package com.bytechef.platform.component.runner.docker;
 
 import java.util.Map;
 
@@ -44,6 +44,10 @@ public final class DockerOperatorSettings {
             host == null ? "" : host.trim(),
             Boolean.parseBoolean(properties.get(ALLOW_TASK_HOST_PROPERTY)),
             Boolean.parseBoolean(properties.get(ALLOW_VOLUME_MOUNTS_PROPERTY)));
+    }
+
+    public static String getPropertyName(String propertyName) {
+        return "bytechef.script.runners.docker.properties.%s".formatted(propertyName);
     }
 
     public String getHost() {

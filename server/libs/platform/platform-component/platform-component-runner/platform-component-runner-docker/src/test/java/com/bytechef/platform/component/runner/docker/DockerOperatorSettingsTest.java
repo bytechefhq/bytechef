@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.runner.external;
+package com.bytechef.platform.component.runner.docker;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

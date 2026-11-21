@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.runner.external;
+package com.bytechef.platform.component.runner.docker;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -34,6 +34,7 @@ import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.runner.TaskRunnerCapability;
 import com.bytechef.platform.component.runner.TaskRunnerRequest;
 import com.bytechef.platform.component.runner.TaskRunnerResult;
+import com.bytechef.platform.component.runner.external.RemoteTaskRunner;
 import com.bytechef.platform.component.runner.remote.CleanupMode;
 import com.bytechef.platform.component.runner.remote.RemoteJobContext;
 import com.bytechef.platform.component.runner.remote.RemoteJobHandle;
@@ -63,14 +64,12 @@ import com.github.dockerjava.api.model.PullResponseItem;
 import com.github.dockerjava.api.model.StreamType;
 import com.github.dockerjava.api.model.WaitResponse;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +78,8 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Stream;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -1178,30 +1178,24 @@ class DockerTaskRunnerBackendTest {
         }
 
         private InputStream outputArchive() throws IOException {
-            Path path = Files.createTempDirectory("bytechef-docker-test-");
+            byte[] content = "{\"ok\": true}".getBytes(StandardCharsets.UTF_8);
 
-            try {
-                Path outputPath = Files.createDirectory(path.resolve("output"));
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-                Files.writeString(outputPath.resolve("output.json"), "{\"ok\": true}", StandardCharsets.UTF_8);
+            try (TarArchiveOutputStream tarArchiveOutputStream = new TarArchiveOutputStream(byteArrayOutputStream)) {
+                tarArchiveOutputStream.putArchiveEntry(new TarArchiveEntry("output/"));
+                tarArchiveOutputStream.closeArchiveEntry();
 
-                try (InputStream inputStream = ContainerArchive.toTar(path)) {
-                    return new ByteArrayInputStream(inputStream.readAllBytes());
-                }
-            } finally {
-                deleteRecursively(path);
+                TarArchiveEntry fileEntry = new TarArchiveEntry("output/output.json");
+
+                fileEntry.setSize(content.length);
+
+                tarArchiveOutputStream.putArchiveEntry(fileEntry);
+                tarArchiveOutputStream.write(content);
+                tarArchiveOutputStream.closeArchiveEntry();
             }
-        }
 
-        private static void deleteRecursively(Path path) throws IOException {
-            try (Stream<Path> paths = Files.walk(path)) {
-                List<Path> candidates = paths.sorted(Comparator.reverseOrder())
-                    .toList();
-
-                for (Path candidate : candidates) {
-                    Files.deleteIfExists(candidate);
-                }
-            }
+            return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
         }
     }
 }
