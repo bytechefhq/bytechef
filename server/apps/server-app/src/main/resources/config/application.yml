@@ -56,7 +56,7 @@ info:
     enabled: ${bytechef.audit.enabled:false}
   component:
     customComponent:
-      javaEnabled: ${bytechef.component.custom-component.java-enabled}
+      javaEnabled: ${bytechef.component.custom-component.java.enabled}
   docs:
     changelogUrl: ${docs.changelog-url:}
     communitySupportUrl: ${docs.community-support-url:}

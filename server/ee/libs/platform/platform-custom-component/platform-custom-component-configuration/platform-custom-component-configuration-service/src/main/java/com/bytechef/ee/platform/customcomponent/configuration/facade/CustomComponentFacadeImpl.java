@@ -70,9 +70,13 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
         this.componentDefinitionServiceProvider = componentDefinitionServiceProvider;
         this.customComponentService = customComponentService;
         this.customComponentFileStorage = customComponentFileStorage;
-        this.javaEnabled = applicationProperties.getComponent()
-            .getCustomComponent()
-            .isJavaEnabled();
+        ApplicationProperties.Component component = applicationProperties.getComponent();
+
+        ApplicationProperties.Component.CustomComponent customComponent = component.getCustomComponent();
+
+        ApplicationProperties.Component.CustomComponent.Java java = customComponent.getJava();
+
+        this.javaEnabled = java.isEnabled();
     }
 
     @Override
