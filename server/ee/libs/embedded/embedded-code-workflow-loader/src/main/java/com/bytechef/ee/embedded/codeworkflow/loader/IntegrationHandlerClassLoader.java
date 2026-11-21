@@ -12,6 +12,7 @@ import com.bytechef.classloader.IsolatingClassLoader;
 import com.bytechef.classloader.util.ClassLoaderUtils;
 import com.bytechef.embedded.integration.IntegrationHandler;
 import com.bytechef.embedded.integration.definition.IntegrationDefinition;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URL;
 import org.springframework.cache.CacheManager;
 
@@ -30,6 +31,7 @@ class IntegrationHandlerClassLoader extends AbstractHandlerClassLoader<Integrati
         return new IntegrationHandlerClassLoader(jarUrl, cacheKey, cacheManager);
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     private record ContextClassLoaderIntegrationHandler(
         IntegrationHandler integrationHandler, IsolatingClassLoader<?> classLoader)
         implements IntegrationHandler, IsolatingClassLoader.ClassLoaderOwner {

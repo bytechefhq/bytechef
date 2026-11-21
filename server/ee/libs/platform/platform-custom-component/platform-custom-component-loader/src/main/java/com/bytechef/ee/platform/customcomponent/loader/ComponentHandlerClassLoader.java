@@ -119,6 +119,7 @@ class ComponentHandlerClassLoader extends IsolatingClassLoader<ComponentHandler>
      *
      * @author Ivica Cardic
      */
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     private record ContextClassLoaderComponentHandler(
         ComponentHandler componentHandler, String icon, IsolatingClassLoader<?> classLoader)
         implements ComponentHandler, IsolatingClassLoader.ClassLoaderOwner {
