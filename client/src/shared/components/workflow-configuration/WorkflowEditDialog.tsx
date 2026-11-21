@@ -8,7 +8,7 @@ import {
     DialogHeader,
     DialogMain,
 } from '@/components/Dialog';
-import {FormEvent, ReactNode} from 'react';
+import {ReactNode, SubmitEvent} from 'react';
 
 interface WorkflowEditDialogProps {
     children: ReactNode;
@@ -35,7 +35,7 @@ const WorkflowEditDialog = ({
     submitOnEnter = false,
     workflowLabel,
 }: WorkflowEditDialogProps) => {
-    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         if (!saveDisabled) {
