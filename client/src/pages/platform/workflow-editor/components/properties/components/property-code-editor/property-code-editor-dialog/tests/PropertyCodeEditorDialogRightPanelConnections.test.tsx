@@ -39,6 +39,10 @@ vi.mock('../hooks/usePropertyCodeEditorDialogRightPanelConnections', () => ({
     }),
 }));
 
+vi.mock('../PropertyCodeEditorDialogRightPanelConnectionsDelivery', () => ({
+    default: ({language}: {language: string}) => <div data-testid="connections-delivery">{language}</div>,
+}));
+
 vi.mock('../PropertyCodeEditorDialogRightPanelConnectionsLabel', () => ({
     default: ({
         componentConnection,
@@ -66,7 +70,7 @@ vi.mock('../PropertyCodeEditorDialogRightPanelConnectionsSelect', () => ({
 vi.mock('../PropertyCodeEditorDialogRightPanelConnectionsPopover', () => ({
     default: ({onSubmit, triggerNode}: {onSubmit: (values: unknown) => void; triggerNode?: React.ReactNode}) => (
         <div data-testid="connections-popover">
-            {triggerNode || <button data-testid="add-component-btn">Add Component</button>}
+            {triggerNode || <button data-testid="add-component-btn">Add Connection</button>}
 
             <button
                 data-testid="submit-popover-btn"
@@ -101,6 +105,7 @@ describe('PropertyCodeEditorDialogRightPanelConnections', () => {
                 workflowNodeName: 'testNode',
             },
         ],
+        language: 'shell',
         workflow: {
             definition: '{}',
             id: 'workflow-1',
@@ -127,6 +132,20 @@ describe('PropertyCodeEditorDialogRightPanelConnections', () => {
             render(<PropertyCodeEditorDialogRightPanelConnections {...defaultProps} />);
 
             expect(screen.getByText('Connections')).toBeInTheDocument();
+        });
+    });
+
+    describe('connection delivery', () => {
+        it('should explain how the script receives connections for the dialog language', () => {
+            render(<PropertyCodeEditorDialogRightPanelConnections {...defaultProps} />);
+
+            expect(screen.getByTestId('connections-delivery')).toHaveTextContent('shell');
+        });
+
+        it('should explain how the script receives connections when none are defined yet', () => {
+            render(<PropertyCodeEditorDialogRightPanelConnections {...defaultProps} componentConnections={[]} />);
+
+            expect(screen.getByTestId('connections-delivery')).toHaveTextContent('shell');
         });
     });
 
@@ -180,9 +199,9 @@ describe('PropertyCodeEditorDialogRightPanelConnections', () => {
         it('should display empty state message', () => {
             render(<PropertyCodeEditorDialogRightPanelConnections {...defaultProps} componentConnections={[]} />);
 
-            expect(screen.getByText('No defined components')).toBeInTheDocument();
+            expect(screen.getByText('No defined connections')).toBeInTheDocument();
             expect(
-                screen.getByText('You have not defined any component and its connection to use inside this script yet.')
+                screen.getByText('You have not defined any connection to use inside this script yet.')
             ).toBeInTheDocument();
         });
 

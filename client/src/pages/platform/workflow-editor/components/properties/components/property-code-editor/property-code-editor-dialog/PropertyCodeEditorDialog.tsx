@@ -72,7 +72,11 @@ const PropertyCodeEditorDialog = ({
                                             className="rounded-lg bg-surface-neutral-primary"
                                             defaultSize={750}
                                         >
-                                            <PropertyCodeEditorDialogEditor language={language} />
+                                            <PropertyCodeEditorDialogEditor
+                                                language={language}
+                                                workflowId={workflow.id}
+                                                workflowNodeName={workflowNodeName}
+                                            />
                                         </ResizablePanel>
 
                                         <ResizableHandle className="bg-transparent aria-[orientation=horizontal]:h-1.5" />
@@ -100,6 +104,7 @@ const PropertyCodeEditorDialog = ({
                                             minSize={280}
                                         >
                                             <PropertyCodeEditorDialogRightPanel
+                                                language={language}
                                                 workflow={workflow}
                                                 workflowNodeName={workflowNodeName}
                                             />

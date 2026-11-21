@@ -279,6 +279,7 @@ const WorkflowEditorLayout = ({
                             language={codeWorkflowLanguage}
                             onTestConfigurationClick={() => setShowCodeWorkflowTestConfigurationDialog(true)}
                             testConfigurationDisabled={testConfigurationDisabled}
+                            workflowId={workflow.id}
                         />
                     </Suspense>
                 ) : isCodeWorkflow && codeWorkflowLanguage && integrationId ? (
@@ -290,6 +291,7 @@ const WorkflowEditorLayout = ({
                             language={codeWorkflowLanguage}
                             onTestConfigurationClick={() => setShowCodeWorkflowTestConfigurationDialog(true)}
                             testConfigurationDisabled={testConfigurationDisabled}
+                            workflowId={workflow.id}
                         />
                     </Suspense>
                 ) : isCodeWorkflow && codeWorkflowLanguage && projectId ? (
@@ -301,6 +303,7 @@ const WorkflowEditorLayout = ({
                             onTestConfigurationClick={() => setShowCodeWorkflowTestConfigurationDialog(true)}
                             projectId={projectId}
                             testConfigurationDisabled={testConfigurationDisabled}
+                            workflowId={workflow.id}
                         />
                     </Suspense>
                 ) : (

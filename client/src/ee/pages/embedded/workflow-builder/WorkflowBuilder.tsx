@@ -89,6 +89,7 @@ const WorkflowBuilder = () => {
                                 cancelWorkflowQueries,
                                 deleteClusterElementParameterMutation,
                                 deleteWorkflowNodeParameterMutation,
+                                includeComponents,
                                 invalidateWorkflowQueries,
                                 platformType: PlatformType.Automation,
                                 updateClusterElementParameterMutation,

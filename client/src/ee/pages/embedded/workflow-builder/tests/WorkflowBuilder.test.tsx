@@ -3,14 +3,17 @@ import {render, screen} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {describe, expect, it, vi} from 'vitest';
 
-const {workflowEditorLayoutMock} = vi.hoisted(() => ({workflowEditorLayoutMock: vi.fn()}));
+const {editorIncludeComponentsMock, workflowEditorLayoutMock} = vi.hoisted(() => ({
+    editorIncludeComponentsMock: vi.fn(),
+    workflowEditorLayoutMock: vi.fn(),
+}));
 
 vi.mock('@/ee/pages/embedded/workflow-builder/hooks/useWorkflowBuilder', () => ({
     useWorkflowBuilder: () => ({
         bottomResizablePanelRef: {current: null},
         cancelWorkflowQueries: vi.fn(),
         connectedUserProjectWorkflow: {connectedUserId: 1, workflowVersion: 1},
-        includeComponents: undefined,
+        includeComponents: ['slack'],
         initialized: true,
         invalidateWorkflowQueries: vi.fn(),
         projectId: 2,
@@ -41,13 +44,20 @@ vi.mock('@/components/ui/resizable', () => ({
     ResizablePanelGroup: ({children}: {children?: ReactNode}) => <div>{children}</div>,
 }));
 
-vi.mock('@/pages/platform/workflow-editor/WorkflowEditorLayout', () => ({
-    default: (props: Record<string, unknown>) => {
+vi.mock('@/pages/platform/workflow-editor/WorkflowEditorLayout', async () => {
+    const {useWorkflowEditor} = await import('@/pages/platform/workflow-editor/providers/workflowEditorProvider');
+
+    const MockWorkflowEditorLayout = (props: Record<string, unknown>) => {
+        const {includeComponents} = useWorkflowEditor();
+
+        editorIncludeComponentsMock(includeComponents);
         workflowEditorLayoutMock(props);
 
         return <div data-testid="workflow-editor-layout" />;
-    },
-}));
+    };
+
+    return {default: MockWorkflowEditorLayout};
+});
 
 describe('WorkflowBuilder', () => {
     it('hides the AI copilot and the workflow inputs panel from the connected user', () => {
@@ -57,5 +67,11 @@ describe('WorkflowBuilder', () => {
         expect(workflowEditorLayoutMock).toHaveBeenCalledWith(
             expect.objectContaining({showCopilot: false, showWorkflowInputs: false})
         );
+    });
+
+    it('hands the host component filter to the workflow editor', () => {
+        render(<WorkflowBuilder />);
+
+        expect(editorIncludeComponentsMock).toHaveBeenCalledWith(['slack']);
     });
 });

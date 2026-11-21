@@ -102,6 +102,30 @@ describe('applicationInfoStore', () => {
             expect(applicationInfoStore.getState().oauth2.authorizationServer.enabled).toBe(false);
         });
 
+        it('turns script connection injection off only when the actuator info says false', async () => {
+            mockActuatorInfo({...ACTUATOR_INFO, script: {injectConnections: 'false'}});
+
+            const {getApplicationInfo} = applicationInfoStore.getState();
+
+            await getApplicationInfo();
+
+            const {script} = applicationInfoStore.getState();
+
+            expect(script.injectConnections).toBe(false);
+        });
+
+        it('keeps script connection injection on when the field is missing', async () => {
+            mockActuatorInfo(ACTUATOR_INFO);
+
+            const {getApplicationInfo} = applicationInfoStore.getState();
+
+            await getApplicationInfo();
+
+            const {script} = applicationInfoStore.getState();
+
+            expect(script.injectConnections).toBe(true);
+        });
+
         it('leaves blank or missing docs URLs undefined', async () => {
             mockActuatorInfo({
                 ...ACTUATOR_INFO,

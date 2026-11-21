@@ -61,6 +61,9 @@ export interface ApplicationInfoI {
             enabled: boolean;
         };
     };
+    script: {
+        injectConnections: boolean;
+    };
     signUp: {
         activationRequired: boolean;
         enabled: boolean;
@@ -157,6 +160,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                                 enabled: json.oauth2?.authorizationServer?.enabled === 'true',
                             },
                         },
+                        script: {
+                            injectConnections: json.script?.injectConnections !== 'false',
+                        },
                         signUp: {
                             activationRequired: json.signUp?.activationRequired === 'true',
                             enabled: json.signUp?.enabled === 'true',
@@ -242,6 +248,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                     authorizationServer: {
                         enabled: false,
                     },
+                },
+                script: {
+                    injectConnections: true,
                 },
                 signUp: {
                     activationRequired: false,

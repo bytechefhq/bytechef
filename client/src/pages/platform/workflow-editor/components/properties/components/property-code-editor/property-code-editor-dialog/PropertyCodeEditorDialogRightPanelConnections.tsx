@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import PropertyCodeEditorDialogRightPanelConnectionsDelivery from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialogRightPanelConnectionsDelivery';
 import PropertyCodeEditorDialogRightPanelConnectionsLabel from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialogRightPanelConnectionsLabel';
 import PropertyCodeEditorDialogRightPanelConnectionsPopover from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialogRightPanelConnectionsPopover';
 import PropertyCodeEditorDialogRightPanelConnectionsSelect from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialogRightPanelConnectionsSelect';
@@ -10,10 +11,12 @@ import {LinkIcon, XIcon} from 'lucide-react';
 
 const PropertyCodeEditorDialogRightPanelConnections = ({
     componentConnections,
+    language,
     workflow,
     workflowNodeName,
 }: {
     componentConnections: ComponentConnection[];
+    language: string;
     workflow: Workflow;
     workflowNodeName: string;
 }) => {
@@ -41,6 +44,8 @@ const PropertyCodeEditorDialogRightPanelConnections = ({
                 <CardHeader className="px-0 py-4">
                     <CardTitle>Connections</CardTitle>
                 </CardHeader>
+
+                <PropertyCodeEditorDialogRightPanelConnectionsDelivery language={language} />
 
                 {componentConnections?.length ? (
                     <>
@@ -85,16 +90,16 @@ const PropertyCodeEditorDialogRightPanelConnections = ({
                                     <LinkIcon className="size-6 text-content-neutral-tertiary" />
                                 </span>
 
-                                <h3 className="mt-2 text-sm font-semibold">No defined components</h3>
+                                <h3 className="mt-2 text-sm font-semibold">No defined connections</h3>
 
                                 <p className="mt-1 text-sm text-content-neutral-secondary">
-                                    You have not defined any component and its connection to use inside this script yet.
+                                    You have not defined any connection to use inside this script yet.
                                 </p>
 
                                 <div className="mt-6">
                                     <PropertyCodeEditorDialogRightPanelConnectionsPopover
                                         onSubmit={handleOnSubmit}
-                                        triggerNode={<Button label="Add Component" />}
+                                        triggerNode={<Button label="Add Connection" />}
                                     />
                                 </div>
                             </div>

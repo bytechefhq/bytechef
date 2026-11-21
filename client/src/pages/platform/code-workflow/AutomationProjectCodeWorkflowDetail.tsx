@@ -12,6 +12,7 @@ interface AutomationProjectCodeWorkflowDetailProps {
     language: string;
     onTestConfigurationClick?: () => void;
     testConfigurationDisabled?: boolean;
+    workflowId?: string;
 }
 
 const AutomationProjectCodeWorkflowDetail = ({
@@ -21,6 +22,7 @@ const AutomationProjectCodeWorkflowDetail = ({
     language,
     onTestConfigurationClick,
     testConfigurationDisabled,
+    workflowId,
 }: AutomationProjectCodeWorkflowDetailProps) => {
     const queryClient = useQueryClient();
 
@@ -41,6 +43,7 @@ const AutomationProjectCodeWorkflowDetail = ({
 
     return (
         <CodeWorkflowSourceEditor
+            embedded
             error={sourceError}
             headerless={headerless}
             isLoading={sourceLoading}
@@ -55,6 +58,7 @@ const AutomationProjectCodeWorkflowDetail = ({
             onTestConfigurationClick={onTestConfigurationClick}
             source={sourceData?.automationProjectCodeWorkflowSource.content}
             testConfigurationDisabled={testConfigurationDisabled}
+            workflowId={workflowId}
         />
     );
 };

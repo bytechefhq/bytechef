@@ -108,6 +108,7 @@ export interface WorkflowEditorStateI extends WorkflowReadOnlyStateI {
         DeleteWorkflowNodeParameterRequest,
         unknown
     >;
+    includeComponents?: string[];
     invalidateWorkflowQueries: () => void;
     platformType: PlatformType;
     updateWorkflowMutation: UpdateWorkflowMutationType;

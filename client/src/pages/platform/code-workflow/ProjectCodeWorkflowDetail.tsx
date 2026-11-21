@@ -10,6 +10,7 @@ interface ProjectCodeWorkflowDetailProps {
     onTestConfigurationClick?: () => void;
     projectId: string;
     testConfigurationDisabled?: boolean;
+    workflowId?: string;
 }
 
 const ProjectCodeWorkflowDetail = ({
@@ -19,6 +20,7 @@ const ProjectCodeWorkflowDetail = ({
     onTestConfigurationClick,
     projectId,
     testConfigurationDisabled,
+    workflowId,
 }: ProjectCodeWorkflowDetailProps) => {
     const queryClient = useQueryClient();
 
@@ -48,6 +50,7 @@ const ProjectCodeWorkflowDetail = ({
             onTestConfigurationClick={onTestConfigurationClick}
             source={sourceData?.codeWorkflowSource ?? undefined}
             testConfigurationDisabled={testConfigurationDisabled}
+            workflowId={workflowId}
         />
     );
 };

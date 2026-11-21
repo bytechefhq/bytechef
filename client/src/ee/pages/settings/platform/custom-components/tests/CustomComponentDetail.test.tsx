@@ -1,3 +1,7 @@
+import {
+    getCompletionContext,
+    unregisterCompletionContext,
+} from '@/shared/components/monaco/completion/completionContextRegistry';
 import {CustomComponentLanguage, CustomComponentStatus} from '@/shared/middleware/graphql';
 import {act, fireEvent, render, resetAll, screen} from '@/shared/util/test-utils';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
@@ -40,10 +44,12 @@ vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
     default: ({
         defaultLanguage,
         onChange,
+        onMount,
         value,
     }: {
         defaultLanguage: string;
         onChange: (value: string | undefined) => void;
+        onMount: (editor: {getModel: () => unknown}) => void;
         value: string;
     }) => (
         <div data-language={defaultLanguage} data-testid="monaco-editor-mock">
@@ -53,6 +59,13 @@ vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
 
             <button onClick={() => onChange('newer content')} type="button">
                 Edit again
+            </button>
+
+            <button
+                onClick={() => onMount({getModel: () => ({uri: {toString: () => 'inmemory://test'}})})}
+                type="button"
+            >
+                Mount
             </button>
 
             {value}
@@ -77,11 +90,41 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+    unregisterCompletionContext('inmemory://test');
     resetAll();
     vi.clearAllMocks();
 });
 
 describe('CustomComponentDetail', () => {
+    it('registers a custom component completion context for a Ruby component', async () => {
+        hoisted.mockUseCustomComponentQuery.mockReturnValue({
+            data: {
+                customComponent: {
+                    componentVersion: 1,
+                    description: null,
+                    enabled: true,
+                    id: '1',
+                    language: CustomComponentLanguage.Ruby,
+                    name: 'my-component',
+                    title: 'My Component',
+                },
+            },
+            error: null,
+            isLoading: false,
+        });
+        hoisted.mockUseCustomComponentSourceQuery.mockReturnValue({
+            data: {customComponentSource: 'puts 1'},
+            error: null,
+            isLoading: false,
+        });
+
+        renderDetail('1');
+
+        fireEvent.click(await screen.findByRole('button', {name: 'Mount'}));
+
+        expect(getCompletionContext('inmemory://test')).toEqual({kind: 'customComponent', language: 'ruby'});
+    });
+
     it('renders an editable Monaco editor for a non-Java custom component', async () => {
         hoisted.mockUseCustomComponentQuery.mockReturnValue({
             data: {
