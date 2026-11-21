@@ -21,6 +21,12 @@ bytechef:
   edition: EE
   file-storage:
     provider: JDBC
+  script:
+    sandbox:
+      enabled: true
+      max-concurrent-executions: 16
+      max-cpu-time: 5m
+      max-heap-memory: 512MB
   webhook-delivery:
     concurrency-limit: 10
     max-pending-deliveries: 1000
