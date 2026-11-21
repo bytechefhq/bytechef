@@ -174,4 +174,48 @@ describe('useOAuth2', () => {
         expect(popupUrl.searchParams.get('code_challenge')).toBe('challenge-2');
         expect(onCodeSuccess).toHaveBeenCalledWith(expect.objectContaining({authorizationContext: 'context-2'}));
     });
+
+    it('answers only the latest popup when sign-in is started again while a popup is pending', () => {
+        const onCodeSuccess = vi.fn();
+
+        const buildProps = (version: number) => ({
+            authorizationContext: `context-${version}`,
+            authorizationUrl: 'https://auth.example.com/authorize',
+            clientId: 'client',
+            extraQueryParameters: {code_challenge: `challenge-${version}`, code_challenge_method: 'S256'},
+            onCodeSuccess,
+            redirectUri: 'https://bytechef.example.com/callback',
+            responseType: 'code' as const,
+            scope: 'read',
+        });
+
+        const {rerender, result} = renderHook((props: ReturnType<typeof buildProps>) => useOAuth2(props), {
+            initialProps: buildProps(1),
+        });
+
+        act(() => {
+            stopAuthFunctions.push(result.current.getAuth());
+        });
+
+        rerender(buildProps(2));
+
+        act(() => {
+            stopAuthFunctions.push(result.current.getAuth());
+        });
+
+        const secondPopupUrl = new URL(vi.mocked(window.open).mock.calls[1][0] as string);
+        const savedState = sessionStorage.getItem(OAUTH_STATE_KEY);
+
+        act(() => {
+            window.dispatchEvent(
+                new MessageEvent('message', {
+                    data: {payload: {code: 'the-code', state: savedState}, type: OAUTH_RESPONSE},
+                })
+            );
+        });
+
+        expect(secondPopupUrl.searchParams.get('code_challenge')).toBe('challenge-2');
+        expect(onCodeSuccess).toHaveBeenCalledTimes(1);
+        expect(onCodeSuccess).toHaveBeenCalledWith(expect.objectContaining({authorizationContext: 'context-2'}));
+    });
 });
