@@ -938,8 +938,11 @@ class IntegrationCodeWorkflowFacadeDraftTest {
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {
         ApplicationProperties.Workflow workflow = new ApplicationProperties.Workflow();
 
-        workflow.getCodeWorkflow()
-            .setJavaEnabled(javaEnabled);
+        ApplicationProperties.Workflow.CodeWorkflow codeWorkflow = workflow.getCodeWorkflow();
+
+        ApplicationProperties.Workflow.CodeWorkflow.Java java = codeWorkflow.getJava();
+
+        java.setEnabled(javaEnabled);
 
         ApplicationProperties applicationProperties = mock(ApplicationProperties.class);
 
