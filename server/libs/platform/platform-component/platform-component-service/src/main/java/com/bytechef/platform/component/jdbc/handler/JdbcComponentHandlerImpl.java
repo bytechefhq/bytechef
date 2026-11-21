@@ -34,6 +34,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.ALL_ROWS;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.CALL;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.COLUMNS;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.CONDITION;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.DATABASE;
@@ -42,9 +43,11 @@ import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.HOST;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.INITIALIZED;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.LAST_ITEM;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.MAX_ROWS;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.MODE;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.NAME;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.ORDER_BY;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.ORDER_DIRECTION;
+import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.OUTPUT_PARAMETERS;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.PARAMETERS;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.PASSWORD;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.PORT;
@@ -67,6 +70,7 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.Property.Type;
@@ -85,6 +89,8 @@ import com.bytechef.platform.component.exception.ComponentErrorType;
 import com.bytechef.platform.component.jdbc.DataSourceFactory;
 import com.bytechef.platform.component.jdbc.JdbcExecutor;
 import com.bytechef.platform.component.jdbc.datastream.JdbcItemWriter;
+import com.bytechef.platform.component.jdbc.operation.CallJdbcOperation;
+import com.bytechef.platform.component.jdbc.operation.CallJdbcOperation.OutputParameter;
 import com.bytechef.platform.component.jdbc.operation.DeleteJdbcOperation;
 import com.bytechef.platform.component.jdbc.operation.ExecuteJdbcOperation;
 import com.bytechef.platform.component.jdbc.operation.InsertJdbcOperation;
@@ -94,6 +100,7 @@ import com.bytechef.platform.component.jdbc.operation.UpdateJdbcOperation;
 import com.bytechef.platform.component.util.SqlUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.Connection;
+import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -285,7 +292,58 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                         "The list of values which should be used to replace corresponding criteria parameters.")
                     .additionalProperties(bool(), dateTime(), number(), string()))
             .output()
-            .perform(this::performExecute));
+            .perform(this::performExecute),
+        action(CALL)
+            .title("Call Procedure")
+            .description(
+                "Call a stored procedure or function (PL/SQL, PL/pgSQL, ...) and return its output parameters.")
+            .properties(
+                string(CALL)
+                    .label("Call")
+                    .description(
+                        "The call statement in JDBC escape syntax, for example {:result = call balance(:accountId)} " +
+                            "for a function or {call transfer(:from, :to, :status)} for a procedure. A vendor block " +
+                            "such as BEGIN :result := balance(:accountId); END; also works. Every :name placeholder " +
+                            "is an input parameter unless it is declared in Output Parameters. Pass values through " +
+                            "Parameters instead of writing them into the statement.")
+                    .placeholder("{:result = call balance(:accountId)}")
+                    .controlType(ControlType.TEXT_AREA)
+                    .required(true),
+                object(PARAMETERS)
+                    .label("Parameters")
+                    .description(
+                        "Values of the input (IN) and input/output (IN_OUT) parameters, keyed by placeholder name.")
+                    .additionalProperties(bool(), dateTime(), number(), string()),
+                array(OUTPUT_PARAMETERS)
+                    .label("Output Parameters")
+                    .description(
+                        "Placeholders the database writes to: the function return value and OUT or IN_OUT " +
+                            "procedure arguments.")
+                    .items(
+                        object()
+                            .properties(
+                                string(NAME)
+                                    .label("Name")
+                                    .description("Placeholder name used in the call statement, without the colon.")
+                                    .required(true),
+                                string(TYPE)
+                                    .label("Type")
+                                    .description("JDBC type the database returns for this parameter.")
+                                    .options(getOutputParameterTypeOptions())
+                                    .defaultValue("VARCHAR")
+                                    .required(true),
+                                string(MODE)
+                                    .label("Mode")
+                                    .description(
+                                        "OUT for a return value or OUT argument, IN_OUT for an argument that also " +
+                                            "takes its value from Parameters.")
+                                    .options(
+                                        option("OUT", CallJdbcOperation.MODE_OUT),
+                                        option("IN_OUT", CallJdbcOperation.MODE_IN_OUT))
+                                    .defaultValue(CallJdbcOperation.MODE_OUT)
+                                    .required(true))))
+            .output(JdbcComponentHandlerImpl::callOutput)
+            .perform(this::performCall));
 
     private final List<ModifiableTriggerDefinition> triggerDefinitions = List.of(
         trigger("newRow")
@@ -319,6 +377,7 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition;
     private final String urlTemplate;
+    private final CallJdbcOperation callJdbcOperation;
     private final DeleteJdbcOperation deleteJdbcOperation;
     private final ExecuteJdbcOperation executeJdbcOperation;
     private final InsertJdbcOperation insertJdbcOperation;
@@ -339,6 +398,7 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
             OptionalUtils.orElse(jdbcComponentDefinition.getIcon(), null),
             OptionalUtils.orElse(jdbcComponentDefinition.getTitle(), null), jdbcDriverClassName);
 
+        this.callJdbcOperation = new CallJdbcOperation();
         this.deleteJdbcOperation = new DeleteJdbcOperation();
         this.executeJdbcOperation = new ExecuteJdbcOperation();
         this.insertJdbcOperation = new InsertJdbcOperation();
@@ -349,6 +409,37 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
     @Override
     public ComponentDefinition getDefinition() {
         return componentDefinition;
+    }
+
+    protected Map<String, Object> performCall(
+        Map<String, ?> inputParameters, Map<String, ?> connectionParameters, ActionContext context) {
+
+        try (SingleConnectionDataSource dataSource = getDataSource(connectionParameters)) {
+            return callJdbcOperation.execute(inputParameters, dataSource);
+        }
+    }
+
+    @SuppressWarnings("PMD.UnusedFormalParameter")
+    static OutputResponse callOutput(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
+        List<OutputParameter> outputParameters = inputParameters.getList(
+            OUTPUT_PARAMETERS, OutputParameter.class, List.of());
+
+        List<ValueProperty<?>> outputProperties = new ArrayList<>();
+
+        for (OutputParameter outputParameter : outputParameters) {
+            String name = outputParameter.name();
+            String type = outputParameter.type();
+
+            if (name == null || name.isBlank() || type == null) {
+                continue;
+            }
+
+            outputProperties.add(toColumnProperty(name, CallJdbcOperation.getJdbcTypeNumber(type)));
+        }
+
+        return OutputResponse.of(object().properties(outputProperties));
     }
 
     protected Map<String, Integer> performDelete(
@@ -718,6 +809,13 @@ public class JdbcComponentHandlerImpl implements ComponentHandler {
                 .items(
                     object()
                         .properties(properties)));
+    }
+
+    private static List<Option<String>> getOutputParameterTypeOptions() {
+        return CallJdbcOperation.OUTPUT_PARAMETER_TYPES.stream()
+            .map(JDBCType::getName)
+            .<Option<String>>map(typeName -> option(typeName, typeName))
+            .toList();
     }
 
     private record Column(String name, String type) {

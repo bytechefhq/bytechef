@@ -22,6 +22,7 @@ package com.bytechef.platform.component.jdbc.constant;
 public final class JdbcConstants {
 
     public static final String ALL_ROWS = "allRows";
+    public static final String CALL = "call";
     public static final String COLUMNS = "columns";
     public static final String CONDITION = "condition";
     public static final String DATABASE = "database";
@@ -30,9 +31,11 @@ public final class JdbcConstants {
     public static final String INITIALIZED = "initialized";
     public static final String LAST_ITEM = "lastItem";
     public static final String MAX_ROWS = "maxRows";
+    public static final String MODE = "mode";
     public static final String NAME = "name";
     public static final String ORDER_BY = "orderBy";
     public static final String ORDER_DIRECTION = "orderDirection";
+    public static final String OUTPUT_PARAMETERS = "outputParameters";
     public static final String PARAMETERS = "parameters";
     public static final String PASSWORD = "password";
     public static final String PORT = "port";

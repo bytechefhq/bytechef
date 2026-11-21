@@ -86,7 +86,7 @@ class JdbcComponentHandlerLoaderIntTest {
         assertEquals("PostgreSQL", componentDefinition.getTitle()
             .orElseThrow());
         assertEquals(
-            List.of("query", "insert", "update", "delete", "execute"),
+            List.of("query", "insert", "update", "delete", "execute", "call"),
             componentDefinition.getActions()
                 .stream()
                 .map(ActionDefinition::getName)
