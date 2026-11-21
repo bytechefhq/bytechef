@@ -132,13 +132,13 @@ class EmbeddedUserFacadeIntTest {
     void testAnEmbeddedViewerListsMembersButCannotAdd() {
         authenticate(ADMIN, true);
 
-        embeddedUserFacade.addEmbeddedUser(userId(EMBEDDED_VIEWER), WorkspaceRole.VIEWER);
+        embeddedUserFacade.addEmbeddedUser(userId(EMBEDDED_VIEWER), WorkspaceRole.VIEWER, null);
 
         authenticate(EMBEDDED_VIEWER, false);
 
         assertThat(embeddedUserFacade.getEmbeddedUsers()).hasSize(1);
 
-        assertThatThrownBy(() -> embeddedUserFacade.addEmbeddedUser(userId(MEMBER), WorkspaceRole.VIEWER))
+        assertThatThrownBy(() -> embeddedUserFacade.addEmbeddedUser(userId(MEMBER), WorkspaceRole.VIEWER, null))
             .isInstanceOf(AccessDeniedException.class);
 
         assertThat(embeddedUserRepository.existsByUserId(userId(MEMBER))).isFalse();
@@ -148,11 +148,11 @@ class EmbeddedUserFacadeIntTest {
     void testAnEmbeddedAdminAddsAMember() {
         authenticate(ADMIN, true);
 
-        embeddedUserFacade.addEmbeddedUser(userId(EMBEDDED_ADMIN), WorkspaceRole.ADMIN);
+        embeddedUserFacade.addEmbeddedUser(userId(EMBEDDED_ADMIN), WorkspaceRole.ADMIN, null);
 
         authenticate(EMBEDDED_ADMIN, false);
 
-        embeddedUserFacade.addEmbeddedUser(userId(MEMBER), WorkspaceRole.EDITOR);
+        embeddedUserFacade.addEmbeddedUser(userId(MEMBER), WorkspaceRole.EDITOR, null);
 
         assertThat(embeddedUserRepository.existsByUserId(userId(MEMBER))).isTrue();
     }
@@ -161,7 +161,7 @@ class EmbeddedUserFacadeIntTest {
     void testATenantAdminWithNoRowAddsAMember() {
         authenticate(ADMIN, true);
 
-        embeddedUserFacade.addEmbeddedUser(userId(MEMBER), WorkspaceRole.VIEWER);
+        embeddedUserFacade.addEmbeddedUser(userId(MEMBER), WorkspaceRole.VIEWER, null);
 
         assertThat(embeddedUserRepository.existsByUserId(userId(MEMBER))).isTrue();
     }
@@ -170,12 +170,12 @@ class EmbeddedUserFacadeIntTest {
     void testAnEmbeddedAdminAddsAnExistingUserByEmail() {
         authenticate(ADMIN, true);
 
-        embeddedUserFacade.addEmbeddedUser(userId(EMBEDDED_ADMIN), WorkspaceRole.ADMIN);
+        embeddedUserFacade.addEmbeddedUser(userId(EMBEDDED_ADMIN), WorkspaceRole.ADMIN, null);
 
         authenticate(EMBEDDED_ADMIN, false);
 
         EmbeddedUser embeddedUser = embeddedUserFacade.addEmbeddedUserByEmail(
-            MEMBER + "@example.com", WorkspaceRole.EDITOR);
+            MEMBER + "@example.com", WorkspaceRole.EDITOR, null);
 
         assertThat(embeddedUser.getUserId()).isEqualTo(userId(MEMBER));
         assertThat(embeddedUserRepository.existsByUserId(userId(MEMBER))).isTrue();
@@ -185,19 +185,21 @@ class EmbeddedUserFacadeIntTest {
     void testAnUnknownEmailIsRefusedWithTheSameErrorForEveryone() {
         authenticate(ADMIN, true);
 
-        assertThatThrownBy(() -> embeddedUserFacade.addEmbeddedUserByEmail("nobody@example.com", WorkspaceRole.VIEWER))
-            .isInstanceOf(UserNotFoundException.class)
-            .hasMessage("User not found");
+        assertThatThrownBy(
+            () -> embeddedUserFacade.addEmbeddedUserByEmail("nobody@example.com", WorkspaceRole.VIEWER, null))
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessage("User not found");
 
-        embeddedUserFacade.addEmbeddedUser(userId(EMBEDDED_ADMIN), WorkspaceRole.ADMIN);
+        embeddedUserFacade.addEmbeddedUser(userId(EMBEDDED_ADMIN), WorkspaceRole.ADMIN, null);
 
         authenticate(EMBEDDED_ADMIN, false);
 
-        assertThatThrownBy(() -> embeddedUserFacade.addEmbeddedUserByEmail("nobody@example.com", WorkspaceRole.VIEWER))
-            .isInstanceOf(UserNotFoundException.class)
-            .hasMessage("User not found");
+        assertThatThrownBy(
+            () -> embeddedUserFacade.addEmbeddedUserByEmail("nobody@example.com", WorkspaceRole.VIEWER, null))
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessage("User not found");
 
-        assertThatThrownBy(() -> embeddedUserFacade.addEmbeddedUser(UNKNOWN_USER_ID, WorkspaceRole.VIEWER))
+        assertThatThrownBy(() -> embeddedUserFacade.addEmbeddedUser(UNKNOWN_USER_ID, WorkspaceRole.VIEWER, null))
             .isInstanceOf(UserNotFoundException.class)
             .hasMessage("User not found");
     }
@@ -206,12 +208,12 @@ class EmbeddedUserFacadeIntTest {
     void testAnEmbeddedEditorCannotAdd() {
         authenticate(ADMIN, true);
 
-        embeddedUserFacade.addEmbeddedUser(userId(EMBEDDED_VIEWER), WorkspaceRole.EDITOR);
+        embeddedUserFacade.addEmbeddedUser(userId(EMBEDDED_VIEWER), WorkspaceRole.EDITOR, null);
 
         authenticate(EMBEDDED_VIEWER, false);
 
         assertThatThrownBy(
-            () -> embeddedUserFacade.addEmbeddedUserByEmail(MEMBER + "@example.com", WorkspaceRole.VIEWER))
+            () -> embeddedUserFacade.addEmbeddedUserByEmail(MEMBER + "@example.com", WorkspaceRole.VIEWER, null))
                 .isInstanceOf(AccessDeniedException.class);
 
         assertThat(embeddedUserRepository.existsByUserId(userId(MEMBER))).isFalse();

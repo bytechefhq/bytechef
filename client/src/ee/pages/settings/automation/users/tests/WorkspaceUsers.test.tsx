@@ -1,5 +1,5 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {useMyWorkspaceScopesQuery} from '@/shared/middleware/graphql';
+import {useCustomRolesQuery, useMyWorkspaceScopesQuery} from '@/shared/middleware/graphql';
 import {act, mockScrollIntoView, render, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -38,6 +38,7 @@ vi.mock('@/shared/stores/useAuthenticationStore', () => ({
 
 vi.mock('@/shared/middleware/graphql', () => ({
     EnvironmentEnum: {Development: 'DEVELOPMENT', Production: 'PRODUCTION', Staging: 'STAGING'},
+    PermissionScopeSide: {Automation: 'AUTOMATION', Embedded: 'EMBEDDED'},
     WorkspaceRole: {Admin: 'ADMIN', Editor: 'EDITOR', Viewer: 'VIEWER'},
     useAddWorkspaceUserMutation: vi.fn(() => ({mutate: hoisted.addWorkspaceUserMutate})),
     useAssignWorkspaceUserCustomRoleMutation: vi.fn(() => ({mutate: hoisted.assignCustomRoleMutate})),
@@ -279,6 +280,12 @@ describe('WorkspaceUsers', () => {
 
         expect(screen.getByRole('option', {name: 'Deployer'})).toBeInTheDocument();
         expect(screen.getByRole('option', {name: 'Editor'})).toBeInTheDocument();
+    });
+
+    it('offers only workspace custom roles, never embedded ones', () => {
+        render(<WorkspaceUsers />);
+
+        expect(useCustomRolesQuery).toHaveBeenCalledWith(expect.objectContaining({side: 'AUTOMATION'}));
     });
 
     it('shows one role row per environment once a member has environment roles', async () => {

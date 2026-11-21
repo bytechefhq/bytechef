@@ -10,6 +10,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {CUSTOM_ROLE_PREFIX} from '@/ee/pages/settings/automation/users/util/workspace-role-values';
 import {WorkspaceRole} from '@/shared/middleware/graphql';
 import {getRoleLabel} from '@/shared/util/role-utils';
 import {useEffect, useId, useState} from 'react';
@@ -17,14 +18,15 @@ import {useEffect, useId, useState} from 'react';
 const EMBEDDED_ROLES = Object.values(WorkspaceRole);
 
 interface EmbeddedAddMemberDialogProps {
-    onAdd: (email: string, role: WorkspaceRole) => void;
+    customRoles?: {id: string; name: string}[];
+    onAdd: (email: string, roleValue: string) => void;
     onOpenChange: (open: boolean) => void;
     open: boolean;
 }
 
-const EmbeddedAddMemberDialog = ({onAdd, onOpenChange, open}: EmbeddedAddMemberDialogProps) => {
+const EmbeddedAddMemberDialog = ({customRoles = [], onAdd, onOpenChange, open}: EmbeddedAddMemberDialogProps) => {
     const [email, setEmail] = useState('');
-    const [role, setRole] = useState<WorkspaceRole>(WorkspaceRole.Editor);
+    const [role, setRole] = useState<string>(WorkspaceRole.Editor);
 
     const emailInputId = useId();
     const roleSelectId = useId();
@@ -69,7 +71,7 @@ const EmbeddedAddMemberDialog = ({onAdd, onOpenChange, open}: EmbeddedAddMemberD
                             Role
                         </label>
 
-                        <Select onValueChange={(value) => setRole(value as WorkspaceRole)} value={role}>
+                        <Select onValueChange={setRole} value={role}>
                             <SelectTrigger id={roleSelectId}>
                                 <SelectValue />
                             </SelectTrigger>
@@ -78,6 +80,12 @@ const EmbeddedAddMemberDialog = ({onAdd, onOpenChange, open}: EmbeddedAddMemberD
                                 {EMBEDDED_ROLES.map((embeddedRole) => (
                                     <SelectItem key={embeddedRole} value={embeddedRole}>
                                         {getRoleLabel(embeddedRole)}
+                                    </SelectItem>
+                                ))}
+
+                                {customRoles.map((customRole) => (
+                                    <SelectItem key={customRole.id} value={`${CUSTOM_ROLE_PREFIX}${customRole.id}`}>
+                                        {customRole.name}
                                     </SelectItem>
                                 ))}
                             </SelectContent>

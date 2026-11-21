@@ -22,6 +22,7 @@ import com.bytechef.ee.automation.configuration.domain.CustomRole;
 import com.bytechef.ee.automation.configuration.dto.PermissionScopeGroupDTO;
 import com.bytechef.ee.automation.configuration.exception.CustomRoleErrorType;
 import com.bytechef.ee.automation.configuration.facade.CustomRoleFacade;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.exception.ConfigurationException;
 import java.util.HashMap;
 import java.util.List;
@@ -54,14 +55,14 @@ class CustomRoleGraphQlControllerTest {
     void testCreateCustomRoleRejectsAnAbsentScopesField() {
         assertScopesRequired(() -> controller.createCustomRole(inputWithoutScopes()));
 
-        verify(customRoleFacade, never()).createCustomRole(anyString(), anyString(), any());
+        verify(customRoleFacade, never()).createCustomRole(anyString(), anyString(), any(), any());
     }
 
     @Test
     void testCreateCustomRoleRejectsAnEmptyScopesList() {
         assertScopesRequired(() -> controller.createCustomRole(input(List.of())));
 
-        verify(customRoleFacade, never()).createCustomRole(anyString(), anyString(), any());
+        verify(customRoleFacade, never()).createCustomRole(anyString(), anyString(), any(), any());
     }
 
     @Test
@@ -86,7 +87,8 @@ class CustomRoleGraphQlControllerTest {
         ArgumentCaptor<Set<String>> scopeNamesArgumentCaptor = ArgumentCaptor.forClass(Set.class);
 
         verify(customRoleFacade).createCustomRole(
-            eq("Auditor"), eq("Reads workflows"), scopeNamesArgumentCaptor.capture());
+            eq("Auditor"), eq("Reads workflows"), eq(PermissionScopeSide.AUTOMATION),
+            scopeNamesArgumentCaptor.capture());
 
         // Membership validation is the service's job against the PermissionScopeRegistry; the controller must hand over
         // the names unchanged rather than filtering to a list it thinks it knows.
@@ -102,22 +104,54 @@ class CustomRoleGraphQlControllerTest {
      */
     @Test
     void testCustomRolesPassesANullWorkspaceIdThroughUntouched() {
-        when(customRoleFacade.getCustomRoles(null)).thenReturn(List.of());
+        when(customRoleFacade.getCustomRoles(null, null)).thenReturn(List.of());
 
-        assertThat(controller.customRoles(null)).isEmpty();
+        assertThat(controller.customRoles(null, null)).isEmpty();
 
-        verify(customRoleFacade).getCustomRoles(null);
+        verify(customRoleFacade).getCustomRoles(null, null);
     }
 
     @Test
     void testCustomRolesPassesAWorkspaceIdThroughUntouched() {
         CustomRole customRole = new CustomRole("Auditor", Set.of("WORKFLOW_VIEW"));
 
-        when(customRoleFacade.getCustomRoles(7L)).thenReturn(List.of(customRole));
+        when(customRoleFacade.getCustomRoles(7L, null)).thenReturn(List.of(customRole));
 
-        assertThat(controller.customRoles(7L)).containsExactly(customRole);
+        assertThat(controller.customRoles(7L, null)).containsExactly(customRole);
 
-        verify(customRoleFacade).getCustomRoles(7L);
+        verify(customRoleFacade).getCustomRoles(7L, null);
+    }
+
+    @Test
+    void testCustomRolesPassesTheSideThrough() {
+        when(customRoleFacade.getCustomRoles(null, PermissionScopeSide.EMBEDDED)).thenReturn(List.of());
+
+        assertThat(controller.customRoles(null, PermissionScopeSide.EMBEDDED)).isEmpty();
+
+        verify(customRoleFacade).getCustomRoles(null, PermissionScopeSide.EMBEDDED);
+    }
+
+    @Test
+    void testScopesOfAnEmbeddedRoleAreFilteredByTheEmbeddedCatalogue() {
+        CustomRole customRole = new CustomRole(
+            "Integrator", PermissionScopeSide.EMBEDDED, Set.of("INTEGRATION_CREATE", "REMOVED_SCOPE"));
+
+        when(customRoleFacade.getPermissionScopeGroups(PermissionScopeSide.EMBEDDED))
+            .thenReturn(List.of(new PermissionScopeGroupDTO("INTEGRATION", List.of("INTEGRATION_CREATE"))));
+
+        assertThat(controller.scopes(customRole)).containsExactly("INTEGRATION_CREATE");
+    }
+
+    @Test
+    void testCreateCustomRolePassesTheRequestedSide() {
+        Map<String, Object> input = new HashMap<>(input(List.of("INTEGRATION_CREATE")));
+
+        input.put("side", "EMBEDDED");
+
+        controller.createCustomRole(input);
+
+        verify(customRoleFacade).createCustomRole(
+            eq("Auditor"), eq("Reads workflows"), eq(PermissionScopeSide.EMBEDDED), any());
     }
 
     @Test
@@ -141,7 +175,7 @@ class CustomRoleGraphQlControllerTest {
     }
 
     private void givenRegisteredScopes(String... scopeNames) {
-        when(customRoleFacade.getPermissionScopeGroups())
+        when(customRoleFacade.getPermissionScopeGroups(PermissionScopeSide.AUTOMATION))
             .thenReturn(List.of(new PermissionScopeGroupDTO("WORKFLOW", List.of(scopeNames))));
     }
 

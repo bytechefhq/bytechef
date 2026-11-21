@@ -22,6 +22,7 @@ import com.bytechef.ee.automation.configuration.dto.BuiltInRoleDTO;
 import com.bytechef.ee.automation.configuration.dto.PermissionScopeGroupDTO;
 import com.bytechef.ee.automation.configuration.exception.CustomRoleErrorType;
 import com.bytechef.ee.automation.configuration.repository.CustomRoleRepository;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.exception.ConfigurationException;
 import java.util.List;
 import java.util.Optional;
@@ -52,8 +53,10 @@ class CustomRoleServiceTest {
         permissionService = mock(PermissionService.class);
         workspaceUserService = mock(WorkspaceUserService.class);
 
-        when(permissionScopeRegistry.getAllScopeNames())
+        when(permissionScopeRegistry.getAllScopeNames(PermissionScopeSide.AUTOMATION))
             .thenReturn(Set.of("WORKFLOW_VIEW", "WORKFLOW_CREATE", "WORKFLOW_EDIT"));
+        when(permissionScopeRegistry.getAllScopeNames(PermissionScopeSide.EMBEDDED))
+            .thenReturn(Set.of("INTEGRATION_CREATE", "WORKFLOW_VIEW"));
 
         customRoleService = new CustomRoleServiceImpl(customRoleRepository, embeddedUserService,
             permissionScopeRegistry, permissionService,
@@ -87,6 +90,67 @@ class CustomRoleServiceTest {
             customRoleArgumentCaptor.getValue()
                 .getScopeNames())
                     .containsExactlyInAnyOrder("WORKFLOW_VIEW", "WORKFLOW_EDIT");
+    }
+
+    @Test
+    void testCreateCustomRoleCreatesAnEmbeddedRoleFromTheEmbeddedCatalogue() {
+        when(customRoleRepository.save(any(CustomRole.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        CustomRole customRole = customRoleService.createCustomRole(
+            "Integrator", null, PermissionScopeSide.EMBEDDED, Set.of("INTEGRATION_CREATE", "WORKFLOW_VIEW"));
+
+        assertThat(customRole.getSide()).isEqualTo(PermissionScopeSide.EMBEDDED);
+        assertThat(customRole.getScopeNames()).containsExactlyInAnyOrder("INTEGRATION_CREATE", "WORKFLOW_VIEW");
+    }
+
+    @Test
+    void testCreateCustomRoleRejectsAScopeOutsideItsSidesCatalogue() {
+        assertThatThrownBy(
+            () -> customRoleService.createCustomRole(
+                "Integrator", null, PermissionScopeSide.EMBEDDED, Set.of("WORKFLOW_EDIT")))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("WORKFLOW_EDIT");
+
+        assertThatThrownBy(
+            () -> customRoleService.createCustomRole(
+                "Editor", null, PermissionScopeSide.AUTOMATION, Set.of("INTEGRATION_CREATE")))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("INTEGRATION_CREATE");
+
+        verify(customRoleRepository, never()).save(any(CustomRole.class));
+    }
+
+    @Test
+    void testUpdateCustomRoleValidatesAgainstTheRolesOwnSide() {
+        CustomRole customRole = new CustomRole(
+            "Integrator", PermissionScopeSide.EMBEDDED, Set.of("INTEGRATION_CREATE"));
+
+        when(customRoleRepository.findById(5L)).thenReturn(Optional.of(customRole));
+
+        assertThatThrownBy(
+            () -> customRoleService.updateCustomRole(5L, "Integrator", null, Set.of("WORKFLOW_EDIT")))
+                .isInstanceOf(ConfigurationException.class);
+
+        verify(customRoleRepository, never()).save(any(CustomRole.class));
+    }
+
+    @Test
+    void testGetCustomRolesFiltersBySide() {
+        CustomRole automationCustomRole = new CustomRole("Editor", Set.of("WORKFLOW_EDIT"));
+        CustomRole embeddedCustomRole = new CustomRole(
+            "Integrator", PermissionScopeSide.EMBEDDED, Set.of("INTEGRATION_CREATE"));
+
+        when(customRoleRepository.findAll()).thenReturn(List.of(automationCustomRole, embeddedCustomRole));
+
+        assertThat(customRoleService.getCustomRoles(null, PermissionScopeSide.EMBEDDED))
+            .extracting(CustomRole::getName)
+            .containsExactly("Integrator");
+        assertThat(customRoleService.getCustomRoles(null, PermissionScopeSide.AUTOMATION))
+            .extracting(CustomRole::getName)
+            .containsExactly("Editor");
+        assertThat(customRoleService.getCustomRoles(null, null))
+            .extracting(CustomRole::getName)
+            .containsExactly("Editor", "Integrator");
     }
 
     @Test

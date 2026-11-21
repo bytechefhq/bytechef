@@ -11,6 +11,7 @@ import com.bytechef.ee.automation.configuration.domain.EmbeddedUser;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Manages the embedded members of the tenant on behalf of the signed-in user. Authorization is declared on the
@@ -22,9 +23,10 @@ import java.util.List;
  */
 public interface EmbeddedUserFacade {
 
-    EmbeddedUser addEmbeddedUser(long userId, WorkspaceRole embeddedRole);
+    EmbeddedUser addEmbeddedUser(long userId, @Nullable WorkspaceRole embeddedRole, @Nullable Long customRoleId);
 
-    EmbeddedUser addEmbeddedUserByEmail(String email, WorkspaceRole embeddedRole);
+    EmbeddedUser addEmbeddedUserByEmail(
+        String email, @Nullable WorkspaceRole embeddedRole, @Nullable Long customRoleId);
 
     List<EmbeddedUser> getEmbeddedUsers();
 
@@ -32,7 +34,8 @@ public interface EmbeddedUserFacade {
 
     boolean removeEmbeddedUser(long userId);
 
-    EmbeddedUser setEnvironmentRole(long userId, Environment environment, WorkspaceRole embeddedRole);
+    EmbeddedUser setEnvironmentRole(
+        long userId, Environment environment, @Nullable WorkspaceRole embeddedRole, @Nullable Long customRoleId);
 
-    EmbeddedUser updateEmbeddedUserRole(long userId, WorkspaceRole embeddedRole);
+    EmbeddedUser updateEmbeddedUserRole(long userId, @Nullable WorkspaceRole embeddedRole, @Nullable Long customRoleId);
 }

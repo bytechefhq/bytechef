@@ -18,14 +18,17 @@ import {
     ENVIRONMENT_ORDER,
     toWorkspaceMembers,
 } from '@/ee/pages/settings/automation/users/util/workspace-environment-roles';
+import {CUSTOM_ROLE_PREFIX, toRoleArguments} from '@/ee/pages/settings/automation/users/util/workspace-role-values';
 import EmbeddedAddMemberDialog from '@/ee/pages/settings/embedded/members/components/EmbeddedAddMemberDialog';
 import {EmbeddedScopeType, UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {
     EnvironmentEnum,
+    PermissionScopeSide,
     WorkspaceRole,
     useAddEmbeddedUserByEmailMutation,
+    useCustomRolesQuery,
     useEmbeddedUsersQuery,
     useMyEmbeddedScopesQuery,
     useRemoveEmbeddedUserEnvironmentRoleMutation,
@@ -82,6 +85,13 @@ const EmbeddedMembers = () => {
 
     const scopesLoading = developmentScopesLoading || productionScopesLoading || stagingScopesLoading;
 
+    const {data: customRolesData} = useCustomRolesQuery(
+        {side: PermissionScopeSide.Embedded},
+        {enabled: memberViewGranted || memberManageEnvironments.length > 0}
+    );
+
+    const customRoles = customRolesData?.customRoles ?? [];
+
     const members = useMemo(
         () =>
             toWorkspaceMembers(
@@ -119,18 +129,18 @@ const EmbeddedMembers = () => {
 
     const removeEnvironmentRoleMutation = useRemoveEmbeddedUserEnvironmentRoleMutation({onSuccess: refreshMembers});
 
-    const handleAdd = (email: string, role: WorkspaceRole) => {
-        addEmbeddedUserByEmailMutation.mutate({email, role});
+    const handleAdd = (email: string, roleValue: string) => {
+        addEmbeddedUserByEmailMutation.mutate({email, ...toRoleArguments(roleValue)});
     };
 
-    const handleRoleChange = (userId: string, role: WorkspaceRole) => {
-        updateEmbeddedUserRoleMutation.mutate({role, userId});
+    const handleRoleChange = (userId: string, roleValue: string) => {
+        updateEmbeddedUserRoleMutation.mutate({...toRoleArguments(roleValue), userId});
     };
 
-    const handleEnvironmentRoleChange = (userId: string, environment: EnvironmentEnum, role: WorkspaceRole) => {
+    const handleEnvironmentRoleChange = (userId: string, environment: EnvironmentEnum, roleValue: string) => {
         setSplittingUserId(null);
 
-        setEnvironmentRoleMutation.mutate({environment, role, userId});
+        setEnvironmentRoleMutation.mutate({...toRoleArguments(roleValue), environment, userId});
     };
 
     const handleEnvironmentRoleRemove = (userId: string, environment: EnvironmentEnum) => {
@@ -166,6 +176,7 @@ const EmbeddedMembers = () => {
                 {memberViewGranted ? (
                     <div className="w-full space-y-6 p-4">
                         <EmbeddedAddMemberDialog
+                            customRoles={customRoles}
                             onAdd={handleAdd}
                             onOpenChange={setAddDialogOpen}
                             open={addDialogOpen}
@@ -204,16 +215,17 @@ const EmbeddedMembers = () => {
 
                                             {!member.inherited && member.environmentRoles.length > 0 && (
                                                 <WorkspaceUserEnvironmentRoles
+                                                    customRoles={customRoles}
                                                     environmentRoles={member.environmentRoles}
                                                     manageableEnvironments={memberManageEnvironments}
                                                     onRemove={(environment) =>
                                                         handleEnvironmentRoleRemove(member.userId, environment)
                                                     }
-                                                    onRoleChange={(environment, role) =>
+                                                    onRoleChange={(environment, roleValue) =>
                                                         handleEnvironmentRoleChange(
                                                             member.userId,
                                                             environment,
-                                                            role as WorkspaceRole
+                                                            roleValue
                                                         )
                                                     }
                                                     onlyRoleRemovalDescription={(roleLabel) =>
@@ -233,9 +245,13 @@ const EmbeddedMembers = () => {
                                                         <Select
                                                             disabled={!canManageMembers}
                                                             onValueChange={(value) =>
-                                                                handleRoleChange(member.userId, value as WorkspaceRole)
+                                                                handleRoleChange(member.userId, value)
                                                             }
-                                                            value={member.implicitRow?.workspaceRole ?? undefined}
+                                                            value={
+                                                                member.implicitRow?.customRoleId
+                                                                    ? `${CUSTOM_ROLE_PREFIX}${member.implicitRow.customRoleId}`
+                                                                    : (member.implicitRow?.workspaceRole ?? undefined)
+                                                            }
                                                         >
                                                             <SelectTrigger className="w-44">
                                                                 <SelectValue placeholder="Custom role" />
@@ -245,6 +261,15 @@ const EmbeddedMembers = () => {
                                                                 {EMBEDDED_ROLES.map((embeddedRole) => (
                                                                     <SelectItem key={embeddedRole} value={embeddedRole}>
                                                                         {getRoleLabel(embeddedRole)}
+                                                                    </SelectItem>
+                                                                ))}
+
+                                                                {customRoles.map((customRole) => (
+                                                                    <SelectItem
+                                                                        key={customRole.id}
+                                                                        value={`${CUSTOM_ROLE_PREFIX}${customRole.id}`}
+                                                                    >
+                                                                        {customRole.name}
                                                                     </SelectItem>
                                                                 ))}
                                                             </SelectContent>
@@ -259,9 +284,10 @@ const EmbeddedMembers = () => {
                                                                         handleEnvironmentRoleChange(
                                                                             member.userId,
                                                                             environment as EnvironmentEnum,
-                                                                            (member.implicitRow
-                                                                                ?.workspaceRole as WorkspaceRole) ??
-                                                                                WorkspaceRole.Viewer
+                                                                            member.implicitRow?.customRoleId
+                                                                                ? `${CUSTOM_ROLE_PREFIX}${member.implicitRow.customRoleId}`
+                                                                                : (member.implicitRow?.workspaceRole ??
+                                                                                      WorkspaceRole.Viewer)
                                                                         )
                                                                     }
                                                                     value=""

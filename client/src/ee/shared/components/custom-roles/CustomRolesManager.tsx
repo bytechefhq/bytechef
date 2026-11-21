@@ -2,6 +2,7 @@ import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import {Input} from '@/components/Input/Input';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Checkbox} from '@/components/ui/checkbox';
 import {
     Dialog,
@@ -19,6 +20,7 @@ import PermissionScopeSummary from '@/ee/shared/components/custom-roles/componen
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {
+    PermissionScopeSide,
     useCreateCustomRoleMutation,
     useCustomRolesQuery,
     useDeleteCustomRoleMutation,
@@ -43,9 +45,11 @@ const CustomRolesManager = () => {
     const [name, setName] = useState('');
     const [pendingDeletionRoleId, setPendingDeletionRoleId] = useState<string | null>(null);
     const [selectedScopes, setSelectedScopes] = useState<string[]>([]);
+    const [side, setSide] = useState<PermissionScopeSide>(PermissionScopeSide.Automation);
 
     const descriptionInputId = useId();
     const nameInputId = useId();
+    const sideSelectId = useId();
 
     const queryClient = useQueryClient();
 
@@ -53,9 +57,22 @@ const CustomRolesManager = () => {
     // offer a name the server would reject, nor omit one a module contributed after the client was written. The
     // grouping is the registry's too — the module a scope belongs to is the enum declaring it, which a client cannot
     // recover from the scope name (WORKSPACE_MEMBER_MANAGE belongs to Workspace, not to a "Workspace Member" module).
-    const {data: permissionScopeGroupsData} = usePermissionScopeGroupsQuery({});
+    const {data: automationPermissionScopeGroupsData} = usePermissionScopeGroupsQuery({
+        side: PermissionScopeSide.Automation,
+    });
+    const {data: embeddedPermissionScopeGroupsData} = usePermissionScopeGroupsQuery({
+        side: PermissionScopeSide.Embedded,
+    });
 
-    const permissionScopeGroups = permissionScopeGroupsData?.permissionScopeGroups ?? [];
+    const automationPermissionScopeGroups = automationPermissionScopeGroupsData?.permissionScopeGroups ?? [];
+    const embeddedPermissionScopeGroups = embeddedPermissionScopeGroupsData?.permissionScopeGroups ?? [];
+
+    const getPermissionScopeGroups = (permissionScopeSide: PermissionScopeSide) =>
+        permissionScopeSide === PermissionScopeSide.Embedded
+            ? embeddedPermissionScopeGroups
+            : automationPermissionScopeGroups;
+
+    const permissionScopeGroups = getPermissionScopeGroups(side);
 
     // Every custom role in the tenant — roles are tenant-global and assignable in any workspace.
     const {data: rolesData, isLoading: customRolesLoading} = useCustomRolesQuery({});
@@ -72,6 +89,7 @@ const CustomRolesManager = () => {
         setEditingRoleId(null);
         setName('');
         setSelectedScopes([]);
+        setSide(PermissionScopeSide.Automation);
     };
 
     const invalidateCustomRoles = () => {
@@ -120,7 +138,7 @@ const CustomRolesManager = () => {
             });
         } else {
             createCustomRoleMutation.mutate({
-                input: {description, name, scopes: selectedScopes},
+                input: {description, name, scopes: selectedScopes, side},
             });
         }
     };
@@ -131,7 +149,13 @@ const CustomRolesManager = () => {
         setName(customRole.name);
         setDescription(customRole.description ?? '');
         setSelectedScopes([...customRole.scopes]);
+        setSide(customRole.side);
         setDialogOpen(true);
+    };
+
+    const handleSideChange = (value: string) => {
+        setSide(value as PermissionScopeSide);
+        setSelectedScopes([]);
     };
 
     const handleCreate = () => {
@@ -166,7 +190,7 @@ const CustomRolesManager = () => {
             header={
                 <Header
                     centerTitle
-                    description="What a workspace member may do. Built-in roles cover the common tiers; custom roles cover the rest."
+                    description="What a workspace or embedded member may do. Built-in roles cover the common tiers; custom roles cover the rest."
                     position="main"
                     right={
                         activeTab === CUSTOM_ROLES_TAB &&
@@ -222,6 +246,26 @@ const CustomRolesManager = () => {
                                 />
                             </div>
 
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium" htmlFor={sideSelectId}>
+                                    Members
+                                </label>
+
+                                <Select disabled={!!editingRoleId} onValueChange={handleSideChange} value={side}>
+                                    <SelectTrigger id={sideSelectId}>
+                                        <SelectValue />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        <SelectItem value={PermissionScopeSide.Automation}>
+                                            Workspace members
+                                        </SelectItem>
+
+                                        <SelectItem value={PermissionScopeSide.Embedded}>Embedded members</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
                             <fieldset className="space-y-2 border-0 p-0">
                                 <legend className="text-sm font-medium">Permissions</legend>
 
@@ -271,7 +315,8 @@ const CustomRolesManager = () => {
 
                     <TabsContent className="flex flex-1 flex-col pt-2" value={CUSTOM_ROLES_TAB}>
                         <p className="text-sm text-content-neutral-secondary">
-                            Tenant-global: defined once, assignable to any member of any workspace.
+                            Tenant-global: a workspace role is assignable to any member of any workspace, an embedded
+                            role to any embedded member.
                         </p>
 
                         {customRolesLoading ? (
@@ -294,6 +339,8 @@ const CustomRolesManager = () => {
                                         <TableRow>
                                             <TableHead>Name</TableHead>
 
+                                            <TableHead>Members</TableHead>
+
                                             <TableHead>Permissions</TableHead>
 
                                             <TableHead />
@@ -314,8 +361,16 @@ const CustomRolesManager = () => {
                                                 </TableCell>
 
                                                 <TableCell>
+                                                    {customRole.side === PermissionScopeSide.Embedded
+                                                        ? 'Embedded'
+                                                        : 'Workspace'}
+                                                </TableCell>
+
+                                                <TableCell>
                                                     <PermissionScopeSummary
-                                                        permissionScopeGroups={permissionScopeGroups}
+                                                        permissionScopeGroups={getPermissionScopeGroups(
+                                                            customRole.side
+                                                        )}
                                                         scopes={customRole.scopes}
                                                     />
                                                 </TableCell>
@@ -348,7 +403,7 @@ const CustomRolesManager = () => {
                     </TabsContent>
 
                     <TabsContent className="pt-2" value={BUILT_IN_ROLES_TAB}>
-                        <BuiltInRoles permissionScopeGroups={permissionScopeGroups} />
+                        <BuiltInRoles permissionScopeGroups={automationPermissionScopeGroups} />
                     </TabsContent>
                 </Tabs>
 

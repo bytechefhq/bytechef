@@ -32,6 +32,7 @@ import com.bytechef.ee.automation.configuration.exception.WorkspaceErrorType;
 import com.bytechef.ee.automation.configuration.exception.WorkspaceUserErrorType;
 import com.bytechef.ee.automation.configuration.repository.CustomRoleRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -167,6 +168,20 @@ class WorkspaceUserServiceTest {
 
         // The XOR invariant holds on creation too, not just on a later conversion.
         assertThat(result.getWorkspaceRole()).isNull();
+    }
+
+    @Test
+    void testAddWorkspaceUserRefusesAnEmbeddedCustomRole() {
+        when(customRoleRepository.findById(900L))
+            .thenReturn(
+                Optional.of(new CustomRole("Integrator", PermissionScopeSide.EMBEDDED, Set.of("INTEGRATION_CREATE"))));
+
+        assertThatThrownBy(() -> workspaceUserService.addWorkspaceUser(USER_ID, WORKSPACE_ID, null, 900L))
+            .isInstanceOf(ConfigurationException.class)
+            .extracting(throwable -> ((ConfigurationException) throwable).getErrorKey())
+            .isEqualTo(WorkspaceUserErrorType.CUSTOM_ROLE_SIDE_MISMATCH.getErrorKey());
+
+        verify(workspaceUserRepository, never()).save(any(WorkspaceUser.class));
     }
 
     @Test

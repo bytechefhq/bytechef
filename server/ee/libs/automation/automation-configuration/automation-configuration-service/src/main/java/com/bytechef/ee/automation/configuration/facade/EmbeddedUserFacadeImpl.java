@@ -20,6 +20,7 @@ import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,18 +50,22 @@ public class EmbeddedUserFacadeImpl implements EmbeddedUserFacade {
     @Override
     @Audited(event = EmbeddedUserAuditEvents.EMBEDDED_USER_ADDED, mapper = EmbeddedUserAuditMapper.class)
     @PreAuthorize("hasEmbeddedScopeInEveryEnvironment('EMBEDDED_MEMBER_MANAGE')")
-    public EmbeddedUser addEmbeddedUser(long userId, WorkspaceRole embeddedRole) {
-        return embeddedUserService.addEmbeddedUser(userId, embeddedRole);
+    public EmbeddedUser addEmbeddedUser(
+        long userId, @Nullable WorkspaceRole embeddedRole, @Nullable Long customRoleId) {
+
+        return embeddedUserService.addEmbeddedUser(userId, embeddedRole, customRoleId);
     }
 
     @Override
     @Audited(event = EmbeddedUserAuditEvents.EMBEDDED_USER_ADDED, mapper = EmbeddedUserAuditMapper.class)
     @PreAuthorize("hasEmbeddedScopeInEveryEnvironment('EMBEDDED_MEMBER_MANAGE')")
-    public EmbeddedUser addEmbeddedUserByEmail(String email, WorkspaceRole embeddedRole) {
+    public EmbeddedUser addEmbeddedUserByEmail(
+        String email, @Nullable WorkspaceRole embeddedRole, @Nullable Long customRoleId) {
+
         User user = userService.fetchUserByEmail(email)
             .orElseThrow(UserNotFoundException::new);
 
-        return embeddedUserService.addEmbeddedUser(user.getId(), embeddedRole);
+        return embeddedUserService.addEmbeddedUser(user.getId(), embeddedRole, customRoleId);
     }
 
     @Override
@@ -89,14 +94,18 @@ public class EmbeddedUserFacadeImpl implements EmbeddedUserFacade {
     @Audited(
         event = EmbeddedUserAuditEvents.EMBEDDED_USER_ENVIRONMENT_ROLE_UPDATED, mapper = EmbeddedUserAuditMapper.class)
     @PreAuthorize("hasEmbeddedScopeInEnvironment('EMBEDDED_MEMBER_MANAGE', #environment)")
-    public EmbeddedUser setEnvironmentRole(long userId, Environment environment, WorkspaceRole embeddedRole) {
-        return embeddedUserService.setEnvironmentRole(userId, environment, embeddedRole);
+    public EmbeddedUser setEnvironmentRole(
+        long userId, Environment environment, @Nullable WorkspaceRole embeddedRole, @Nullable Long customRoleId) {
+
+        return embeddedUserService.setEnvironmentRole(userId, environment, embeddedRole, customRoleId);
     }
 
     @Override
     @Audited(event = EmbeddedUserAuditEvents.EMBEDDED_USER_ROLE_UPDATED, mapper = EmbeddedUserAuditMapper.class)
     @PreAuthorize("hasEmbeddedScopeInEveryEnvironment('EMBEDDED_MEMBER_MANAGE')")
-    public EmbeddedUser updateEmbeddedUserRole(long userId, WorkspaceRole embeddedRole) {
-        return embeddedUserService.updateEmbeddedUserRole(userId, embeddedRole);
+    public EmbeddedUser updateEmbeddedUserRole(
+        long userId, @Nullable WorkspaceRole embeddedRole, @Nullable Long customRoleId) {
+
+        return embeddedUserService.updateEmbeddedUserRole(userId, embeddedRole, customRoleId);
     }
 }

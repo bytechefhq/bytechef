@@ -11,6 +11,7 @@ import com.bytechef.ee.automation.configuration.domain.EmbeddedUser;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -20,6 +21,8 @@ import java.util.List;
 public interface EmbeddedUserService {
 
     EmbeddedUser addEmbeddedUser(long userId, WorkspaceRole embeddedRole);
+
+    EmbeddedUser addEmbeddedUser(long userId, @Nullable WorkspaceRole embeddedRole, @Nullable Long customRoleId);
 
     long countByCustomRoleId(long customRoleId);
 
@@ -37,5 +40,10 @@ public interface EmbeddedUserService {
 
     EmbeddedUser setEnvironmentRole(long userId, Environment environment, WorkspaceRole embeddedRole);
 
+    EmbeddedUser setEnvironmentRole(
+        long userId, Environment environment, @Nullable WorkspaceRole embeddedRole, @Nullable Long customRoleId);
+
     EmbeddedUser updateEmbeddedUserRole(long userId, WorkspaceRole embeddedRole);
+
+    EmbeddedUser updateEmbeddedUserRole(long userId, @Nullable WorkspaceRole embeddedRole, @Nullable Long customRoleId);
 }
