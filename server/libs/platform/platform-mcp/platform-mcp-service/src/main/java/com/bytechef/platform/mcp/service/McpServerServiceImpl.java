@@ -109,6 +109,16 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
+    public String getEditableMcpServerSecretKey(long mcpServerId) {
+        McpServer mcpServer = mcpServerRepository.findById(mcpServerId)
+            .orElseThrow(() -> new IllegalArgumentException("MCP server with id " + mcpServerId + " not found"));
+
+        return mcpServer.getSecretKey();
+    }
+
+    @Override
     public McpServer getMcpServer(String secretKey) {
         return mcpServerRepository.findBySecretKey(secretKey)
             .orElseThrow(() -> new IllegalArgumentException("MCP server for the given secret key not found"));
@@ -137,6 +147,15 @@ public class McpServerServiceImpl implements McpServerService {
         }
 
         return create(mcpServer);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<McpServer> getEnabledMcpServers(PlatformType type) {
+        return mcpServerRepository.findAll()
+            .stream()
+            .filter(server -> server.getType() == type && server.isEnabled())
+            .toList();
     }
 
     @Override

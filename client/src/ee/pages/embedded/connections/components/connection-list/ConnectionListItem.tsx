@@ -10,9 +10,11 @@ import {
     useUpdateConnectionMutation,
 } from '@/ee/shared/mutations/embedded/connections.mutations';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/ee/shared/queries/embedded/connections.queries';
+import {PlatformType} from '@/pages/home/stores/usePlatformTypeStore';
 import TagList from '@/shared/components/TagList';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionListItemLayout from '@/shared/components/connection/ConnectionListItemLayout';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {
     ComponentDefinitionKeys,
@@ -32,6 +34,9 @@ interface ConnectionListItemProps {
 const ConnectionListItem = ({badges, componentDefinitions, connection, remainingTags}: ConnectionListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const canEdit = useHasEmbeddedScope('CONNECTION_EDIT', connection.environmentId);
+    const canDelete = useHasEmbeddedScope('CONNECTION_DELETE', connection.environmentId);
 
     const {data: componentDefinition} = useGetConnectionComponentDefinitionQuery({
         componentName: connection.componentName,
@@ -104,15 +109,17 @@ const ConnectionListItem = ({badges, componentDefinitions, connection, remaining
             icon={componentDefinition.icon}
             id={connection.id}
             menuItems={
-                <DropdownMenuItem
-                    icon={<Trash2Icon />}
-                    label="Delete"
-                    onClick={() => setShowDeleteDialog(true)}
-                    variant="destructive"
-                />
+                canDelete && (
+                    <DropdownMenuItem
+                        icon={<Trash2Icon />}
+                        label="Delete"
+                        onClick={() => setShowDeleteDialog(true)}
+                        variant="destructive"
+                    />
+                )
             }
             name={connection.name}
-            onEditClick={() => setShowEditDialog(true)}
+            onEditClick={canEdit ? () => setShowEditDialog(true) : undefined}
             tagList={
                 connection.tags && (
                     <TagList
@@ -123,6 +130,7 @@ const ConnectionListItem = ({badges, componentDefinitions, connection, remaining
                             },
                         })}
                         id={connection.id!}
+                        readOnly={!canEdit}
                         remainingTags={remainingTags}
                         tags={connection.tags}
                         updateTagsMutation={updateConnectionTagsMutation}
@@ -144,6 +152,7 @@ const ConnectionListItem = ({badges, componentDefinitions, connection, remaining
                     connectionTagsQueryKey={ConnectionKeys.connectionTags}
                     connectionsQueryKey={ConnectionKeys.connections}
                     onClose={() => setShowEditDialog(false)}
+                    platformType={PlatformType.EMBEDDED}
                     showSharedOption
                     useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                     useUpdateConnectionCredentialsMutation={useUpdateConnectionCredentialsMutation}

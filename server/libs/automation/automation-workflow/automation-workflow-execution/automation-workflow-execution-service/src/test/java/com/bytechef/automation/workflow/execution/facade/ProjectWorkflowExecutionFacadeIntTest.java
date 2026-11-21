@@ -65,6 +65,8 @@ import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerContributor;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -140,6 +142,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.util.AopTestUtils;
@@ -196,6 +199,9 @@ class ProjectWorkflowExecutionFacadeIntTest {
     @Autowired
     private OwnedProjectDeploymentIds mcpProjectDeploymentIds;
 
+    @MockitoBean
+    private EmbeddedResourceResolver embeddedResourceResolver;
+
     @Autowired
     private ProjectWorkflowExecutionFacade facade;
 
@@ -204,6 +210,9 @@ class ProjectWorkflowExecutionFacadeIntTest {
 
     @MockitoSpyBean
     private JobService jobService;
+
+    @MockitoBean
+    private PermissionService permissionService;
 
     @Autowired
     private PrincipalJobService principalJobService;
@@ -258,6 +267,8 @@ class ProjectWorkflowExecutionFacadeIntTest {
         when(componentDefinitionService.hasComponentDefinition(anyString(), any())).thenReturn(true);
         when(componentDefinitionService.getComponentDefinition(anyString(), any())).thenReturn(componentDefinition);
         when(projectFacade.getWorkspaceProjectWorkflows(anyLong())).thenReturn(List.of());
+        when(permissionService.hasResourceScope(any(), anyString(), anyString())).thenReturn(true);
+        when(permissionService.hasWorkflowScope(anyString(), anyString())).thenReturn(true);
 
         workspace = workspaceRepository.save(new Workspace("execution-workspace"));
     }
@@ -317,6 +328,22 @@ class ProjectWorkflowExecutionFacadeIntTest {
         assertThat(taskExecutionDTO.input())
             .isEqualTo(Map.of("folderName", "=substring(${anthropic_1.dateOfInvoice}, 5, 7)"));
         assertThat(taskExecutionDTO.output()).isEqualTo("output-value");
+    }
+
+    @Test
+    void testGetWorkflowExecutionTaskExecutionWithoutDetailsScopeOmitsTaskData() {
+        Job job = saveJob(createWorkflowId(createProject(workspace)), null);
+        TaskExecution taskExecution = saveTaskExecutionWithData(job, null);
+
+        when(permissionService.hasResourceScope(getId(job), "Job", "EXECUTION_DETAILS_VIEW")).thenReturn(false);
+
+        TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(
+            getId(job), getId(taskExecution));
+
+        assertThat(taskExecutionDTO.id()).isEqualTo(getId(taskExecution));
+        assertThat(taskExecutionDTO.input()).isNull();
+        assertThat(taskExecutionDTO.output()).isNull();
+        assertThat(taskExecutionDTO.error()).isNull();
     }
 
     @Test
@@ -682,6 +709,62 @@ class ProjectWorkflowExecutionFacadeIntTest {
     }
 
     @Nested
+    class ConnectedUserProjectRunsIntTest {
+
+        @Test
+        void testGetWorkflowExecutionDeniesAConnectedUserProjectJobWithoutConnectedUserView() {
+            Job job = saveConnectedUserProjectJob();
+
+            when(permissionService.hasResourceScope(getId(job), "Job", "CONNECTED_USER_VIEW")).thenReturn(false);
+
+            assertThatThrownBy(() -> facade.getWorkflowExecution(getId(job)))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetWorkflowExecutionTaskExecutionDeniesAConnectedUserProjectJobWithoutConnectedUserView() {
+            Job job = saveConnectedUserProjectJob();
+            TaskExecution taskExecution = saveTaskExecutionWithData(job, null);
+
+            when(permissionService.hasResourceScope(getId(job), "Job", "CONNECTED_USER_VIEW")).thenReturn(false);
+
+            assertThatThrownBy(() -> facade.getWorkflowExecutionTaskExecution(getId(job), getId(taskExecution)))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetWorkflowExecutionTaskExecutionAllowsAConnectedUserProjectJobWithConnectedUserView() {
+            Job job = saveConnectedUserProjectJob();
+            TaskExecution taskExecution = saveTaskExecutionWithData(job, null);
+
+            TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(
+                getId(job), getId(taskExecution));
+
+            assertThat(taskExecutionDTO.output()).isEqualTo("output-value");
+
+            verify(permissionService).hasResourceScope(getId(job), "Job", "CONNECTED_USER_VIEW");
+        }
+
+        @Test
+        void testGetWorkflowExecutionTaskExecutionSkipsConnectedUserViewForOtherJobs() {
+            Job job = saveJob(createWorkflowId(createProject(workspace)), null);
+            TaskExecution taskExecution = saveTaskExecutionWithData(job, null);
+
+            facade.getWorkflowExecutionTaskExecution(getId(job), getId(taskExecution));
+
+            verify(permissionService, never()).hasResourceScope(getId(job), "Job", "CONNECTED_USER_VIEW");
+        }
+
+        private Job saveConnectedUserProjectJob() {
+            String workflowId = createWorkflowId(createProject(workspace));
+
+            when(embeddedResourceResolver.isConnectedUserProjectWorkflow(workflowId)).thenReturn(true);
+
+            return saveJob(workflowId, null);
+        }
+    }
+
+    @Nested
     class GetWorkflowExecutionsIntTest {
 
         private String catalogWorkflowId;
@@ -732,6 +815,13 @@ class ProjectWorkflowExecutionFacadeIntTest {
 
             verify(projectDeploymentService, times(1)).getProjectDeployments(
                 eq(true), any(), any(), any(), any());
+        }
+
+        @Test
+        void testEmbeddedListingDoesNotCallTheGatedWorkspaceWorkflowFacade() {
+            facade.getWorkflowExecutions(true, null, null, null, null, null, null, null, null, getId(workspace), 0);
+
+            verify(projectFacade, never()).getWorkspaceProjectWorkflows(anyLong());
         }
 
         @Test
@@ -880,6 +970,55 @@ class ProjectWorkflowExecutionFacadeIntTest {
                 getId(projectProjectDeployment), null, null, null, getId(workspace), 0);
 
             assertThat(workflowExecutionDTOPage.getContent()).isEmpty();
+        }
+    }
+
+    @Nested
+    class NarrowingScopeChecksIntTest {
+
+        private Project project;
+        private String workflowId;
+
+        @BeforeEach
+        void beforeEach() {
+            project = createProject(workspace);
+            workflowId = createWorkflowId(project);
+        }
+
+        @Test
+        void testGetWorkflowExecutionsDeniesAWorkflowTheCallerCannotView() {
+            when(permissionService.hasWorkflowScope(workflowId, "EXECUTION_VIEW")).thenReturn(false);
+
+            assertThatThrownBy(
+                () -> facade.getWorkflowExecutions(
+                    false, null, null, null, null, null, null, null, workflowId, null, getId(workspace), 0))
+                        .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetWorkflowExecutionsDeniesAProjectTheCallerCannotView() {
+            when(permissionService.hasResourceScope(getId(project), "Project", "EXECUTION_VIEW")).thenReturn(false);
+
+            assertThatThrownBy(
+                () -> facade.getWorkflowExecutions(
+                    false, null, null, null, null, getId(project), null, null, null, null, getId(workspace), 0))
+                        .isInstanceOf(AccessDeniedException.class);
+
+            verify(projectWorkflowService, never()).getProjectWorkflowIds(anyLong());
+        }
+
+        @Test
+        void testGetWorkflowExecutionsDeniesAProjectDeploymentTheCallerCannotView() {
+            ProjectDeployment projectDeployment = createProjectDeployment(project, "deployment");
+
+            when(permissionService.hasResourceScope(getId(projectDeployment), "ProjectDeployment", "EXECUTION_VIEW"))
+                .thenReturn(false);
+
+            assertThatThrownBy(
+                () -> facade.getWorkflowExecutions(
+                    false, null, null, null, null, getId(project), getId(projectDeployment), null, null, null,
+                    getId(workspace), 0))
+                        .isInstanceOf(AccessDeniedException.class);
         }
     }
 

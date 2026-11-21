@@ -68,6 +68,11 @@ public interface UserService {
 
     Page<User> getAllManagedUsers(Pageable pageable);
 
+    /**
+     * Activated users holding the given tenant authority, e.g. {@code ROLE_ADMIN}.
+     */
+    List<User> getUsersByAuthorityName(String authorityName);
+
     User getCurrentUser();
 
     User getUser(long id);

@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.weaviate.constant.WeaviateCo
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.LOAD;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,10 @@ import org.springframework.stereotype.Component;
 @Component(WEAVIATE + "/v1/" + LOAD)
 public class WeaviateLoadTaskHandler extends AbstractTaskHandler {
 
-    public WeaviateLoadTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(WEAVIATE, 1, LOAD, actionDefinitionFacade);
+    public WeaviateLoadTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(WEAVIATE, 1, LOAD, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }

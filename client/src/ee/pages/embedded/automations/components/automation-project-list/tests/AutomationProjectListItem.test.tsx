@@ -14,12 +14,18 @@ import {
 } from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: (scope: string) => !mocks.deniedScopes.has(scope),
+}));
+
 type AutomationProjectType = AutomationProjectsQuery['automationProjects'][number];
 
 const mocks = vi.hoisted(() => ({
     deleteMutate: vi.fn(),
     deleteMutationOptions: undefined as {onSuccess?: () => void} | undefined,
     deletePending: false,
+    deniedScopes: new Set<string>(),
     duplicateMutate: vi.fn(),
     duplicateMutationOptions: undefined as {onSuccess?: () => void} | undefined,
     invalidateQueries: vi.fn(),
@@ -130,6 +136,8 @@ describe('AutomationProjectListItem', () => {
 
     afterEach(() => {
         resetAll();
+
+        mocks.deniedScopes.clear();
         vi.clearAllMocks();
     });
 
@@ -261,6 +269,15 @@ describe('AutomationProjectListItem', () => {
             await userEvent.click(screen.getByRole('menuitem', {name: 'New Configuration'}));
 
             expect(handlers.onCreateConfiguration).toHaveBeenCalledWith(expect.objectContaining({id: 'project-1'}));
+        });
+
+        it('should not offer New Configuration to a member who may not create configurations', async () => {
+            mocks.deniedScopes.add('INTEGRATION_INSTANCE_CONFIGURATION_CREATE');
+
+            await openMenu('More Project Actions', {published: true});
+
+            expect(screen.queryByRole('menuitem', {name: 'New Configuration'})).not.toBeInTheDocument();
+            expect(screen.getByRole('menuitem', {name: 'New Workflow'})).toBeInTheDocument();
         });
 
         it('should disable New Configuration until the project is published', async () => {

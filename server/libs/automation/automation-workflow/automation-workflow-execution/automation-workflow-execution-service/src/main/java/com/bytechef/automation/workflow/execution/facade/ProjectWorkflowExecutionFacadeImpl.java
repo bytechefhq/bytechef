@@ -36,8 +36,10 @@ import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerReference;
+import com.bytechef.automation.configuration.security.EmbeddedResourceResolver;
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
 import com.bytechef.automation.configuration.service.ConnectedUserWorkflowCopyResolver;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -72,6 +74,7 @@ import com.bytechef.platform.workflow.execution.service.WorkflowExecutionRowServ
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -85,6 +88,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
@@ -93,6 +97,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -104,15 +110,20 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
     private static final Logger log = LoggerFactory.getLogger(ProjectWorkflowExecutionFacadeImpl.class);
 
+    private static final String CONNECTED_USER_VIEW = "CONNECTED_USER_VIEW";
+    private static final String EXECUTION_DETAILS_VIEW = "EXECUTION_DETAILS_VIEW";
+
     private final ComponentDefinitionService componentDefinitionService;
     private final ObjectProvider<ConnectedUserProjectDeploymentResolver> connectedUserProjectDeploymentResolverProvider;
     private final ObjectProvider<ConnectedUserWorkflowCopyResolver> connectedUserWorkflowCopyResolverProvider;
     private final ContextService contextService;
+    private final ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider;
     private final Evaluator evaluator;
     private final EnvironmentService environmentService;
     private final WorkflowExecutionRowService workflowExecutionRowService;
     private final JobService jobService;
     private final LazyTaskExecutionTreeBuilder lazyTaskExecutionTreeBuilder;
+    private final PermissionService permissionService;
     private final PrincipalJobService principalJobService;
     private final ProjectFacade projectFacade;
     private final ProjectDeploymentService projectDeploymentService;
@@ -131,9 +142,10 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         ComponentDefinitionService componentDefinitionService,
         ObjectProvider<ConnectedUserProjectDeploymentResolver> connectedUserProjectDeploymentResolverProvider,
         ObjectProvider<ConnectedUserWorkflowCopyResolver> connectedUserWorkflowCopyResolverProvider,
-        ContextService contextService, Evaluator evaluator,
-        EnvironmentService environmentService, WorkflowExecutionRowService workflowExecutionRowService,
-        JobService jobService,
+        ContextService contextService, ObjectProvider<EmbeddedResourceResolver> embeddedResourceResolverProvider,
+        Evaluator evaluator, EnvironmentService environmentService,
+        WorkflowExecutionRowService workflowExecutionRowService,
+        JobService jobService, PermissionService permissionService,
         PrincipalJobService principalJobService,
         ProjectFacade projectFacade, ProjectDeploymentService projectDeploymentService,
         ProjectOwnershipService projectOwnershipService, ProjectService projectService,
@@ -146,10 +158,12 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         this.connectedUserProjectDeploymentResolverProvider = connectedUserProjectDeploymentResolverProvider;
         this.connectedUserWorkflowCopyResolverProvider = connectedUserWorkflowCopyResolverProvider;
         this.contextService = contextService;
+        this.embeddedResourceResolverProvider = embeddedResourceResolverProvider;
         this.evaluator = evaluator;
         this.environmentService = environmentService;
         this.workflowExecutionRowService = workflowExecutionRowService;
         this.jobService = jobService;
+        this.permissionService = permissionService;
         this.principalJobService = principalJobService;
         this.projectFacade = projectFacade;
         this.projectDeploymentService = projectDeploymentService;
@@ -169,8 +183,11 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#id, 'Job', 'EXECUTION_VIEW')")
     public WorkflowExecutionDTO getWorkflowExecution(long id, boolean lazy) {
         Job job = jobService.getJob(id);
+
+        requireConnectedUserViewForConnectedUserProject(id, "Job", job::getWorkflowId);
 
         Map<String, ?> outputs = job.getOutputs() == null
             ? null
@@ -202,7 +219,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 Objects.equals(rootProjectDeployment.getProjectId(), project.getId()))
             .orElse(null);
 
-        return new WorkflowExecutionDTO(
+        WorkflowExecutionDTO workflowExecutionDTO = new WorkflowExecutionDTO(
             jobDTO.id(), project, projectDeployment, getProjectVersion(jobDTO.workflowId()), jobDTO,
             workflowService.getWorkflow(jobDTO.workflowId()),
             getTriggerExecutionDTO(
@@ -211,10 +228,14 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                     .orElse(null),
                 job),
             focusPath, taskExecutionCount);
+
+        return permissionService.hasResourceScope(id, "Job", EXECUTION_DETAILS_VIEW)
+            ? workflowExecutionDTO : workflowExecutionDTO.withoutDetails();
     }
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#triggerExecutionId, 'TriggerExecution', 'EXECUTION_VIEW')")
     public WorkflowExecutionDTO getTriggerExecutionWorkflowExecution(long triggerExecutionId) {
         TriggerExecution triggerExecution = triggerExecutionService.getTriggerExecution(triggerExecutionId);
 
@@ -226,23 +247,37 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 "Trigger execution " + triggerExecutionId + " does not belong to a deployed workflow");
         }
 
-        return workflowExecutionDTO;
+        Workflow workflow = workflowExecutionDTO.workflow();
+
+        requireConnectedUserViewForConnectedUserProject(triggerExecutionId, "TriggerExecution", workflow::getId);
+
+        return permissionService.hasResourceScope(triggerExecutionId, "TriggerExecution", EXECUTION_DETAILS_VIEW)
+            ? workflowExecutionDTO : workflowExecutionDTO.withoutDetails();
     }
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#id, 'Job', 'EXECUTION_VIEW')")
     public TaskExecutionDTO getWorkflowExecutionTaskExecution(long id, long taskExecutionId) {
         TaskExecution taskExecution = getRequestedTaskExecution(taskExecutionId);
 
         validateTaskExecutionBelongsToJob(id, taskExecution, taskExecutionId);
 
+        requireConnectedUserViewForConnectedUserProject(id, "Job", () -> jobService.getJob(id)
+            .getWorkflowId());
+
         JobDTO childJob = lazyTaskExecutionTreeBuilder.getChildJob(taskExecutionId);
+
+        if (!permissionService.hasResourceScope(id, "Job", EXECUTION_DETAILS_VIEW)) {
+            return toTaskExecutionDTO(taskExecution, childJob, false).withoutDetails();
+        }
 
         return toTaskExecutionDTO(taskExecution, childJob, true);
     }
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#id, 'Job', 'EXECUTION_VIEW')")
     public TaskExecutionChildrenPageDTO getWorkflowExecutionTaskExecutionChildren(
         long id, long taskExecutionId, int pageNumber, int pageSize) {
 
@@ -250,7 +285,14 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
         validateTaskExecutionBelongsToJob(id, taskExecution, taskExecutionId);
 
-        return lazyTaskExecutionTreeBuilder.getChildrenPage(taskExecution, pageNumber, pageSize);
+        requireConnectedUserViewForConnectedUserProject(id, "Job", () -> jobService.getJob(id)
+            .getWorkflowId());
+
+        TaskExecutionChildrenPageDTO taskExecutionChildrenPageDTO = lazyTaskExecutionTreeBuilder.getChildrenPage(
+            taskExecution, pageNumber, pageSize);
+
+        return permissionService.hasResourceScope(id, "Job", EXECUTION_DETAILS_VIEW)
+            ? taskExecutionChildrenPageDTO : taskExecutionChildrenPageDTO.withoutDetails();
     }
 
     private long getRootJobId(Job job) {
@@ -287,6 +329,82 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             .orElseThrow(() -> new NoSuchElementException("Task execution " + taskExecutionId + " not found"));
     }
 
+    @Nullable
+    private List<ProjectDeployment> getEmbeddedProjectDeployments(
+        Boolean embedded, Long environmentId, long workspaceId) {
+
+        if (!Boolean.TRUE.equals(embedded)) {
+            return null;
+        }
+
+        Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
+
+        return projectDeploymentService.getProjectDeployments(true, environment, null, null, workspaceId);
+    }
+
+    private List<String> getNarrowedWorkflowIds(
+        Boolean embedded, Long projectId, String workflowId, Integer projectVersion, long workspaceId,
+        @Nullable List<ProjectDeployment> embeddedProjectDeployments) {
+
+        List<String> workflowIds = new ArrayList<>();
+
+        // The getWorkflowExecutions gate answers "may this caller list executions in this workspace and environment",
+        // which is the whole question only for the unnarrowed listing. Each narrowing argument names a resource that
+        // the caller might not reach, and the gate cannot see it, so each is checked here against the same scope.
+        // Without this a member holding EXECUTION_VIEW anywhere in the workspace could name any project, deployment or
+        // workflow in it and read back that one's runs.
+        if (workflowId != null) {
+            // hasWorkflowScope rather than a 'Workflow' resource check: no ownership resolver registers that token on
+            // this branch, and hasResourceScope denies outright for an unregistered type -- which would turn every
+            // by-workflow listing into a 403 rather than a narrowing. This method resolves workflow -> project ->
+            // workspace itself and asks the same question.
+            if (!permissionService.hasWorkflowScope(workflowId, "EXECUTION_VIEW")) {
+                throw new AccessDeniedException("Workflow id=%s".formatted(workflowId));
+            }
+
+            workflowIds.addAll(getWorkflowVersionWorkflowIds(workflowId, projectVersion));
+
+            if (Boolean.TRUE.equals(embedded)) {
+                workflowIds.addAll(getWorkflowCopyWorkflowIds(workflowId));
+            }
+        } else if (projectId != null) {
+            requireResourceScope(projectId, "Project", "EXECUTION_VIEW");
+
+            workflowIds.addAll(projectWorkflowService.getProjectWorkflowIds(projectId));
+        } else if (embeddedProjectDeployments != null) {
+            workflowIds.addAll(new LinkedHashSet<>(getProjectDeploymentWorkflowIds(embeddedProjectDeployments)));
+        } else {
+            workflowIds.addAll(
+                new LinkedHashSet<>(
+                    CollectionUtils.map(
+                        projectFacade.getWorkspaceProjectWorkflows(workspaceId), ProjectWorkflowDTO::getId)));
+        }
+
+        return workflowIds;
+    }
+
+    private void requireConnectedUserViewForConnectedUserProject(
+        Serializable id, String resourceType, Supplier<String> workflowIdSupplier) {
+
+        EmbeddedResourceResolver embeddedResourceResolver = embeddedResourceResolverProvider.getIfAvailable();
+
+        if (embeddedResourceResolver != null
+            && embeddedResourceResolver.isConnectedUserProjectWorkflow(workflowIdSupplier.get())) {
+
+            requireResourceScope(id, resourceType, CONNECTED_USER_VIEW);
+        }
+    }
+
+    /**
+     * Denies unless the caller holds {@code scope} for the resource. Throwing rather than returning a narrowed result
+     * on purpose: the caller named this resource, so an empty page would read as "no runs" and hide the refusal.
+     */
+    private void requireResourceScope(Serializable id, String resourceType, String scope) {
+        if (!permissionService.hasResourceScope(id, resourceType, scope)) {
+            throw new AccessDeniedException("%s id=%s".formatted(resourceType, id));
+        }
+    }
+
     private void validateTaskExecutionBelongsToJob(long id, TaskExecution taskExecution, long taskExecutionId) {
         long currentJobId = Objects.requireNonNull(taskExecution.getJobId());
         Set<Long> visitedJobIds = new HashSet<>();
@@ -313,6 +431,41 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("#embedded == true ? (hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) and "
+        + "hasEmbeddedScopeInEnvironmentId('CONNECTED_USER_VIEW', #environmentId)) : "
+        + "hasWorkspaceScopeInEnvironmentId(#workspaceId, 'EXECUTION_VIEW', #environmentId)")
+    public Page<WorkflowExecutionDTO> getWorkflowExecutions(
+        Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
+        Long projectId, Long projectDeploymentId, String workflowId, Integer projectVersion, long workspaceId,
+        int pageNumber) {
+
+        return getWorkflowExecutions(
+            embedded, environmentId, jobStatus, jobStartDate, jobEndDate, projectId, projectDeploymentId, null,
+            workflowId, projectVersion, workspaceId, pageNumber);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("#connectedUserId != null ? "
+        + "(hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) and "
+        + "hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')) : "
+        + "(#embedded == true ? (hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) and "
+        + "hasEmbeddedScopeInEnvironmentId('CONNECTED_USER_VIEW', #environmentId)) : "
+        + "hasWorkspaceScopeInEnvironmentId(#workspaceId, 'EXECUTION_VIEW', #environmentId))")
+    public Page<WorkflowExecutionDTO> getWorkflowExecutions(
+        Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
+        Long projectId, Long projectDeploymentId, Long connectedUserId, String workflowId, Integer projectVersion,
+        long workspaceId, int pageNumber) {
+
+        return getWorkflowExecutions(
+            embedded, environmentId, WorkflowExecutionSource.PROJECT_DEPLOYMENT, jobStatus, jobStartDate, jobEndDate,
+            projectId, projectDeploymentId, connectedUserId, workflowId, projectVersion, workspaceId, pageNumber);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("#embedded == true ? hasEmbeddedScopeInEnvironmentId('EXECUTION_VIEW', #environmentId) : "
+        + "hasWorkspaceScopeInEnvironmentId(#workspaceId, 'EXECUTION_VIEW', #environmentId)")
     public Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Boolean embedded, Long environmentId, WorkflowExecutionSource workflowExecutionSource, Status jobStatus,
         Instant jobStartDate, Instant jobEndDate, Long projectId, Long projectDeploymentId, Long connectedUserId,
@@ -368,34 +521,10 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 connectedUserId, environmentId, jobStatus, workflowId, projectVersion);
         }
 
-        List<ProjectDeployment> embeddedProjectDeployments = null;
-        List<String> workflowIds = new ArrayList<>();
-
-        if (workflowId != null) {
-            workflowIds.addAll(getWorkflowVersionWorkflowIds(workflowId, projectVersion));
-
-            if (Boolean.TRUE.equals(embedded)) {
-                workflowIds.addAll(getWorkflowCopyWorkflowIds(workflowId));
-            }
-        } else if (projectId != null) {
-            workflowIds.addAll(projectWorkflowService.getProjectWorkflowIds(projectId));
-        } else {
-            Set<String> workspaceWorkflowIds = new LinkedHashSet<>(
-                CollectionUtils.map(
-                    projectFacade.getWorkspaceProjectWorkflows(workspaceId), ProjectWorkflowDTO::getId));
-
-            if (Boolean.TRUE.equals(embedded)) {
-                Environment environment =
-                    environmentId == null ? null : environmentService.getEnvironment(environmentId);
-
-                embeddedProjectDeployments = projectDeploymentService.getProjectDeployments(
-                    true, environment, null, null, workspaceId);
-
-                workspaceWorkflowIds.addAll(getProjectDeploymentWorkflowIds(embeddedProjectDeployments));
-            }
-
-            workflowIds.addAll(workspaceWorkflowIds);
-        }
+        List<ProjectDeployment> embeddedProjectDeployments = workflowId == null && projectId == null
+            ? getEmbeddedProjectDeployments(embedded, environmentId, workspaceId) : null;
+        List<String> workflowIds = getNarrowedWorkflowIds(
+            embedded, projectId, workflowId, projectVersion, workspaceId, embeddedProjectDeployments);
 
         if (workflowIds.isEmpty()) {
             return null;
@@ -516,6 +645,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         @Nullable List<ProjectDeployment> embeddedProjectDeployments) {
 
         if (projectDeploymentId != null) {
+            requireResourceScope(projectDeploymentId, "ProjectDeployment", "EXECUTION_VIEW");
+
             return List.of(projectDeploymentId);
         }
 
@@ -653,13 +784,33 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                     .map(WorkflowExecutionRowDTO::id)
                     .toList()));
 
+        Map<Long, Boolean> projectDeploymentDetailsVisibleMap = new HashMap<>();
+
         return workflowExecutionRowDTOs
             .stream()
             .map(row -> row.kind() == WorkflowExecutionRowDTO.Kind.JOB
                 ? jobWorkflowExecutionDTOMap.get(row.id())
                 : triggerWorkflowExecutionDTOMap.get(row.id()))
             .filter(Objects::nonNull)
+            .map(workflowExecutionDTO -> isDetailsVisible(workflowExecutionDTO, projectDeploymentDetailsVisibleMap)
+                ? workflowExecutionDTO : workflowExecutionDTO.withoutDetails())
             .toList();
+    }
+
+    private boolean isDetailsVisible(
+        WorkflowExecutionDTO workflowExecutionDTO, Map<Long, Boolean> projectDeploymentDetailsVisibleMap) {
+
+        ProjectDeployment projectDeployment = workflowExecutionDTO.projectDeployment();
+
+        if (projectDeployment == null || projectDeployment.getId() == null) {
+            return !workflowExecutionDTO.isTriggerOnly() &&
+                permissionService.hasResourceScope(workflowExecutionDTO.id(), "Job", EXECUTION_DETAILS_VIEW);
+        }
+
+        return projectDeploymentDetailsVisibleMap.computeIfAbsent(
+            projectDeployment.getId(),
+            projectDeploymentId -> permissionService.hasResourceScope(
+                projectDeploymentId, "ProjectDeployment", EXECUTION_DETAILS_VIEW));
     }
 
     private List<String> getProjectDeploymentWorkflowIds(List<ProjectDeployment> projectDeployments) {

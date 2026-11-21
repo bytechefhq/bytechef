@@ -51,7 +51,7 @@ public class RemoteWorkspaceDataTableFacadeClient implements WorkspaceDataTableF
     }
 
     @Override
-    public void dropTable(long dataTableId, long environmentId) {
+    public boolean dropTable(long dataTableId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
@@ -115,7 +115,7 @@ public class RemoteWorkspaceDataTableFacadeClient implements WorkspaceDataTableF
     }
 
     @Override
-    public List<Tag> getDataTableTags(long workspaceId) {
+    public List<Tag> getDataTableTags(long workspaceId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
@@ -230,7 +230,7 @@ public class RemoteWorkspaceDataTableFacadeClient implements WorkspaceDataTableF
     }
 
     @Override
-    public Map<Long, List<Tag>> getTagsByTableId(long workspaceId) {
+    public Map<Long, List<Tag>> getTagsByTableId(long workspaceId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 

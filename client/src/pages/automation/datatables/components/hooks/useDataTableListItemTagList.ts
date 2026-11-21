@@ -4,6 +4,7 @@ import {
     UpdateDataTableTagsMutationVariables,
     useUpdateDataTableTagsMutation,
 } from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 
 type DataTableTagsByTableEntryType = DataTableTagsByTableQuery['dataTableTagsByTable'][number];
@@ -13,11 +14,15 @@ interface UseDataTableListItemTagListProps {
 }
 
 export default function useDataTableListItemTagList({tableId}: UseDataTableListItemTagListProps) {
+    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const queryClient = useQueryClient();
 
-    const tagsByTableQueryKey = ['dataTableTagsByTable', {workspaceId: String(workspaceId)}];
+    const tagsByTableQueryKey = [
+        'dataTableTagsByTable',
+        {environmentId: String(environmentId), workspaceId: String(workspaceId)},
+    ];
 
     const updateTagsMutation = useUpdateDataTableTagsMutation({
         onError: (_err, _vars, ctx) => {
@@ -26,7 +31,7 @@ export default function useDataTableListItemTagList({tableId}: UseDataTableListI
             }
         },
         onMutate: async (variables: UpdateDataTableTagsMutationVariables) => {
-            await queryClient.cancelQueries({queryKey: ['dataTableTagsByTable']});
+            await queryClient.cancelQueries({queryKey: tagsByTableQueryKey});
 
             const previous = queryClient.getQueryData<{dataTableTagsByTable: DataTableTagsByTableEntryType[]}>(
                 tagsByTableQueryKey

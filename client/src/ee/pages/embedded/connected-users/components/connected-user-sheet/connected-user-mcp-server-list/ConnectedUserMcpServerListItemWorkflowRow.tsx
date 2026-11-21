@@ -7,6 +7,7 @@ import {useGetIntegrationInstanceQuery} from '@/ee/shared/queries/embedded/integ
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import isCollapsibleRowClick from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import useWorkflowComponentDefinitions, {
     getWorkflowComponentNames,
 } from '@/shared/hooks/useWorkflowComponentDefinitions';
@@ -22,6 +23,7 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
     connectedUserId: number;
     workflow: ConnectedUserMcpServerWorkflow;
 }) => {
+    const canManageConnectedUser = useHasEmbeddedScope('CONNECTED_USER_MANAGE');
     const lastExecutionDate = workflow.lastExecutionDate ? new Date(Date.parse(workflow.lastExecutionDate)) : undefined;
 
     const openIntegrationInstanceConfigurationWorkflowSheet = useIntegrationInstanceConfigurationWorkflowSheetStore(
@@ -128,6 +130,7 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
 
                     <Switch
                         checked={workflow.enabled}
+                        disabled={!canManageConnectedUser}
                         onCheckedChange={(value) => {
                             enableConnectedUserMcpWorkflowMutation.mutate({enable: value, id: workflow.id});
                         }}

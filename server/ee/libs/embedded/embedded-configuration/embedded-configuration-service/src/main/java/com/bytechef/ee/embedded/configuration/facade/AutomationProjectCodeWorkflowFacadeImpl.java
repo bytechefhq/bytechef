@@ -129,7 +129,7 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
 
         projectCodeWorkflowDraftFacade.saveDraft(project, projectDefinition, bytes, language);
 
-        automationProjectFacade.publishProject(projectId);
+        automationProjectFacade.publishProject(projectId, null);
 
         if (release) {
             releaseToEnvironment(projectId, environment);

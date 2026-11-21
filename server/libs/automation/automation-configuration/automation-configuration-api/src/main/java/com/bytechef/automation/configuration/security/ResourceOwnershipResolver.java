@@ -31,7 +31,8 @@ public interface ResourceOwnershipResolver {
 
     /**
      * Resource-type discriminator matching the {@code @PreAuthorize} token prefix, e.g. {@code "Connection"} for the
-     * token {@code 'Connection'}. Must be unique across all registered resolvers.
+     * token {@code 'Connection'}. Several resolvers may share a type; they are consulted in turn and the first one that
+     * knows the resource answers.
      */
     String resourceType();
 
@@ -51,13 +52,53 @@ public interface ResourceOwnershipResolver {
     }
 
     /**
+     * The id of the project owning the given resource, for a resolver whose resource family is project-bearing. Returns
+     * empty for a non-numeric id, a missing resource, or a resource with no owning project; never throws for "not
+     * found". The default answers empty for resolvers that are not project-bearing.
+     */
+    default OptionalLong resolveProjectId(Serializable id) {
+        return OptionalLong.empty();
+    }
+
+    /**
      * Owning coordinates of a resource. A resolver may populate {@code workspaceId} (workspace-mapped resources),
      * {@code ownerUserId} (user-owned resources), or both.
      */
-    record ResourceOwner(OptionalLong workspaceId, OptionalLong ownerUserId) {
+    record ResourceOwner(
+        OptionalLong workspaceId, OptionalLong ownerUserId, boolean embedded, boolean embeddedProject) {
+
+        public ResourceOwner {
+            if (embedded && workspaceId.isPresent()) {
+                throw new IllegalArgumentException("An embedded resource owner cannot have a workspace");
+            }
+
+            if (embeddedProject && !embedded) {
+                throw new IllegalArgumentException("An embedded project owner must be embedded");
+            }
+        }
+
+        public ResourceOwner(OptionalLong workspaceId, OptionalLong ownerUserId, boolean embedded) {
+            this(workspaceId, ownerUserId, embedded, false);
+        }
+
+        public ResourceOwner(OptionalLong workspaceId, OptionalLong ownerUserId) {
+            this(workspaceId, ownerUserId, false);
+        }
 
         public static ResourceOwner unknown() {
             return new ResourceOwner(OptionalLong.empty(), OptionalLong.empty());
+        }
+
+        public static ResourceOwner ofEmbedded() {
+            return new ResourceOwner(OptionalLong.empty(), OptionalLong.empty(), true);
+        }
+
+        public static ResourceOwner ofEmbedded(long ownerUserId) {
+            return new ResourceOwner(OptionalLong.empty(), OptionalLong.of(ownerUserId), true);
+        }
+
+        public static ResourceOwner ofEmbeddedProject() {
+            return new ResourceOwner(OptionalLong.empty(), OptionalLong.empty(), true, true);
         }
 
         public static ResourceOwner ofWorkspace(long workspaceId) {
@@ -70,6 +111,10 @@ public interface ResourceOwnershipResolver {
 
         public static ResourceOwner of(OptionalLong workspaceId, OptionalLong ownerUserId) {
             return new ResourceOwner(workspaceId, ownerUserId);
+        }
+
+        public boolean isUnknown() {
+            return workspaceId.isEmpty() && ownerUserId.isEmpty() && !embedded;
         }
     }
 }

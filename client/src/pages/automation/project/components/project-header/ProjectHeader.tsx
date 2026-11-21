@@ -10,18 +10,24 @@ import ProjectItemSelect from '@/pages/automation/project/components/project-hea
 import ProjectSkeleton from '@/pages/automation/project/components/project-header/components/ProjectSkeleton';
 import SettingsMenu from '@/pages/automation/project/components/project-header/components/settings-menu/SettingsMenu';
 import {useProjectHeader} from '@/pages/automation/project/components/project-header/hooks/useProjectHeader';
+import useProjectPublishPermission from '@/pages/automation/project/components/project-header/hooks/useProjectPublishPermission';
+import {useProjectWorkflowViewOnlyNotice} from '@/pages/automation/project/hooks/useProjectWorkflowViewOnlyNotice';
 import useProjectHeaderDialogsStore from '@/pages/automation/project/stores/useProjectHeaderDialogsStore';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import CodeWorkflowHeaderActions, {
     CodeWorkflowSaveButton,
 } from '@/pages/platform/code-workflow/components/CodeWorkflowHeaderActions';
 import WorkflowActionsButton from '@/pages/platform/workflow-editor/components/WorkflowActionsButton';
+import WorkflowViewOnlyBadge from '@/pages/platform/workflow-editor/components/WorkflowViewOnlyBadge';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import PublishPopover from '@/shared/components/PublishPopover';
 import useCopilotCompactHeader from '@/shared/components/copilot/hooks/useCopilotCompactHeader';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import LeftSidebarButton from '@/shared/layout/LeftSidebarButton';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {onlineManager, useIsMutating} from '@tanstack/react-query';
@@ -91,6 +97,9 @@ const ProjectHeader = ({
             workflow: state.workflow,
         }))
     );
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canViewDeployments = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_VIEW');
 
     const openSavedProjectDeployment = useOpenSavedProjectDeployment({
         onDevelopmentDeploymentSaved: (projectDeploymentId) =>
@@ -100,6 +109,8 @@ const ProjectHeader = ({
 
     const isOnline = useSyncExternalStore(subscribeToOnlineStatus, getOnlineStatus);
     const isSaving = useIsMutating();
+    const readOnly = useWorkflowEditorReadOnly();
+    const viewOnlyNoticeVisible = useProjectWorkflowViewOnlyNotice();
     const {
         handleProjectValueChange,
         handleProjectWorkflowValueChange,
@@ -117,6 +128,7 @@ const ProjectHeader = ({
         chatTrigger,
         projectId,
     });
+    const {canPublishProject, disabledTooltip: publishDisabledTooltip} = useProjectPublishPermission();
 
     useEffect(
         () => () => {
@@ -168,6 +180,8 @@ const ProjectHeader = ({
                 )}
 
                 {loadingIndicator}
+
+                {readOnly && viewOnlyNoticeVisible && <WorkflowViewOnlyBadge />}
             </div>
 
             <div className="flex shrink-0 items-center gap-1">
@@ -178,13 +192,15 @@ const ProjectHeader = ({
                     leadingAction={codeWorkflow ? <CodeWorkflowSaveButton /> : undefined}
                     onRunClick={handleRunClick}
                     onStopClick={handleStopClick}
+                    readOnly={readOnly}
                     runDisabled={runDisabled}
                     workflowIsRunning={workflowIsRunning}
                 />
 
                 <ButtonGroup>
                     <PublishPopover
-                        disabled={!hasUnpublishedChanges}
+                        disabled={!canPublishProject || !hasUnpublishedChanges}
+                        disabledTooltip={publishDisabledTooltip}
                         isPending={publishProjectMutationIsPending}
                         onOpenChange={setPublishPopoverOpen}
                         onPublishSubmit={handlePublishProjectSubmit}
@@ -200,7 +216,9 @@ const ProjectHeader = ({
                         project={project}
                     />
 
-                    <ProjectDeploymentsButton onClick={() => setProjectDeploymentsSheetState({})} />
+                    {canViewDeployments && (
+                        <ProjectDeploymentsButton onClick={() => setProjectDeploymentsSheetState({})} />
+                    )}
                 </ButtonGroup>
 
                 <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
@@ -213,7 +231,7 @@ const ProjectHeader = ({
                 />
             </div>
 
-            {projectDeploymentsSheetState && (
+            {canViewDeployments && projectDeploymentsSheetState && (
                 <ProjectDeploymentsSheet
                     expandedProjectDeploymentId={projectDeploymentsSheetState.expandedProjectDeploymentId}
                     onSheetOpenChange={(open) => !open && setProjectDeploymentsSheetState(undefined)}

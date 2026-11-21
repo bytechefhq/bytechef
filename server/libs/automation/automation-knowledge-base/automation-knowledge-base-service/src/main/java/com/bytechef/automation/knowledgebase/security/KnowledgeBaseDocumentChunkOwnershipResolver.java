@@ -20,14 +20,11 @@ import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
+import java.util.Optional;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
- * Resolves a knowledge base document chunk id to the workspace of its knowledge base, for
- * {@code hasPermission(#id, 'KnowledgeBaseDocumentChunk', ...)}.
- *
  * @author Ivica Cardic
  */
 @Component
@@ -53,14 +50,14 @@ public class KnowledgeBaseDocumentChunkOwnershipResolver implements ResourceOwne
 
     @Override
     public ResourceOwner resolveOwner(long id) {
-        List<KnowledgeBaseDocumentChunk> knowledgeBaseDocumentChunks =
-            knowledgeBaseDocumentChunkService.getKnowledgeBaseDocumentChunks(List.of(id));
+        Optional<KnowledgeBaseDocumentChunk> knowledgeBaseDocumentChunkOptional =
+            knowledgeBaseDocumentChunkService.fetchKnowledgeBaseDocumentChunk(id);
 
-        if (knowledgeBaseDocumentChunks.isEmpty()) {
+        if (knowledgeBaseDocumentChunkOptional.isEmpty()) {
             return ResourceOwner.unknown();
         }
 
-        KnowledgeBaseDocumentChunk knowledgeBaseDocumentChunk = knowledgeBaseDocumentChunks.getFirst();
+        KnowledgeBaseDocumentChunk knowledgeBaseDocumentChunk = knowledgeBaseDocumentChunkOptional.get();
 
         Long knowledgeBaseDocumentId = knowledgeBaseDocumentChunk.getKnowledgeBaseDocumentId();
 

@@ -46,9 +46,11 @@ import {getEnabledWorkflowTasks} from '@/pages/platform/workflow-editor/utils/ge
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import useWorkflowTestConfigurationConnections from '@/shared/hooks/useWorkflowTestConfigurationConnections';
 import {Authorization, AuthorizationType} from '@/shared/middleware/platform/configuration';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
+import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {KeyRoundIcon, Settings2Icon} from 'lucide-react';
@@ -60,6 +62,7 @@ import IntegrationInstanceConfigurationDialogBasicStep from './IntegrationInstan
 import IntegrationInstanceConfigurationDialogCredentials from './IntegrationInstanceConfigurationDialogCredentials';
 import IntegrationInstanceConfigurationDialogWorkflowsStep from './IntegrationInstanceConfigurationDialogWorkflowsStep';
 import {NO_AUTHORIZATION_TYPE} from './noAuthorizationType';
+import {omitCredentials} from './utils/omitCredentials';
 
 const OAUTH2_AUTHORIZATION_TYPES = new Set<string>([
     AuthorizationType.Oauth2AuthorizationCode,
@@ -150,6 +153,22 @@ interface IntegrationInstanceConfigurationDialogProps {
     updateIntegrationVersion?: boolean;
 }
 
+const IntegrationInstanceConfigurationDialogNextButton = ({
+    canSave,
+    isPending,
+}: {
+    canSave: boolean;
+    isPending: boolean;
+}) => {
+    const {isLastStep} = useDialogSteps();
+
+    if (isLastStep && !canSave) {
+        return null;
+    }
+
+    return <DialogNextButton isPending={isPending} label="Next" lastStepLabel="Save" />;
+};
+
 const IntegrationInstanceConfigurationDialog = ({
     filterWorkflowUuids,
     integrationInstanceConfiguration: integrationInstanceConfigurationProp,
@@ -175,12 +194,16 @@ const IntegrationInstanceConfigurationDialog = ({
     const initializedConfigKeyRef = useRef<string>('');
     const prefilledConfigKeyRef = useRef<string>('');
 
+    const account = useAuthenticationStore((state) => state.account);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const [resetWorkflowsEnabledStore, setWorkflowEnabled] = useWorkflowsEnabledStore(
         useShallow(({reset, setWorkflowEnabled}) => [reset, setWorkflowEnabled])
     );
 
     const {captureIntegrationInstanceConfigurationCreated} = useAnalytics();
+
+    const canCreateConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_CREATE');
+    const canEditConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_EDIT');
 
     const integrationInstanceConfiguration = selectedExistingConfiguration ?? integrationInstanceConfigurationProp;
 
@@ -206,6 +229,13 @@ const IntegrationInstanceConfigurationDialog = ({
             },
             showTabs && isOpen && !!integrationInstanceConfigurationProp?.integrationId
         );
+
+    const canSave = integrationInstanceConfiguration?.id ? canEditConfiguration : canCreateConfiguration;
+
+    const isConfigurationCreator = !!account?.login && account.login === integrationInstanceConfiguration?.createdBy;
+
+    const credentialsHidden =
+        !!integrationInstanceConfiguration?.id && (!canEditConfiguration || !isConfigurationCreator);
 
     const {data: allWorkflows, isPending: isWorkflowsPending} = useGetIntegrationVersionWorkflowsQuery(
         curIntegrationId!,
@@ -486,7 +516,7 @@ const IntegrationInstanceConfigurationDialog = ({
 
         if (integrationInstanceConfiguration?.id) {
             updateIntegrationInstanceConfigurationMutation.mutate({
-                ...integrationInstanceConfiguration,
+                ...omitCredentials(integrationInstanceConfiguration),
                 ...formData,
                 integrationInstanceConfigurationWorkflows: formData.integrationInstanceConfigurationWorkflows?.map(
                     (integrationInstanceConfigurationWorkflow) => {
@@ -761,7 +791,10 @@ const IntegrationInstanceConfigurationDialog = ({
                             <DialogFooter startContent={<DialogCancelButton />}>
                                 <DialogPreviousButton className="lg:hidden" />
 
-                                <DialogNextButton isPending={isSaving} label="Next" lastStepLabel="Save" />
+                                <IntegrationInstanceConfigurationDialogNextButton
+                                    canSave={canSave}
+                                    isPending={isSaving}
+                                />
                             </DialogFooter>
                         }
                         icon={<Settings2Icon />}
@@ -802,6 +835,7 @@ const IntegrationInstanceConfigurationDialog = ({
                                             connectionParameters={
                                                 integrationInstanceConfiguration?.connectionConnectionParameters
                                             }
+                                            credentialsHidden={credentialsHidden}
                                         />
                                     </div>
                                 )}
@@ -820,7 +854,7 @@ const IntegrationInstanceConfigurationDialog = ({
                             <DialogFooter>
                                 <DialogCancelButton />
 
-                                {canUpdateCredentials && !isUpdatingCredentials && (
+                                {canSave && canUpdateCredentials && !isUpdatingCredentials && (
                                     <Button
                                         onClick={() => setIsUpdatingCredentials(true)}
                                         type="button"
@@ -839,21 +873,23 @@ const IntegrationInstanceConfigurationDialog = ({
                                     />
                                 )}
 
-                                <Button
-                                    disabled={
-                                        isSaving ||
-                                        authorizationTypePending ||
-                                        (isUpdatingCredentials &&
-                                            Object.keys(enteredCredentialsParameters).length === 0)
-                                    }
-                                    icon={isSaving ? <LoadingIcon /> : undefined}
-                                    label="Save"
-                                    onClick={
-                                        isUpdatingCredentials
-                                            ? credentialsForm.handleSubmit(handleSaveCredentialsClick)
-                                            : handleSubmit(handleSaveClick)
-                                    }
-                                />
+                                {canSave && (
+                                    <Button
+                                        disabled={
+                                            isSaving ||
+                                            authorizationTypePending ||
+                                            (isUpdatingCredentials &&
+                                                Object.keys(enteredCredentialsParameters).length === 0)
+                                        }
+                                        icon={isSaving ? <LoadingIcon /> : undefined}
+                                        label="Save"
+                                        onClick={
+                                            isUpdatingCredentials
+                                                ? credentialsForm.handleSubmit(handleSaveCredentialsClick)
+                                                : handleSubmit(handleSaveClick)
+                                        }
+                                    />
+                                )}
                             </DialogFooter>
                         </Form>
                     </DialogMain>

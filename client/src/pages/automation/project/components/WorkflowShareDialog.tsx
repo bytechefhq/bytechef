@@ -5,7 +5,9 @@ import Switch from '@/components/Switch/Switch';
 import {Alert, AlertDescription} from '@/components/ui/alert';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {TEMPLATE_SHARING_DOCUMENTATION_URL} from '@/shared/constants';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {
     useDeleteSharedWorkflowMutation,
     useExportSharedWorkflowMutation,
@@ -34,6 +36,10 @@ export function WorkflowShareDialog({
     const [shareState, setShareState] = useState<'not-shared' | 'exported' | 'disabled'>('not-shared');
     const [templateUrl, setTemplateUrl] = useState<string | undefined>();
     const [isCopied, setIsCopied] = useState(false);
+
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canDeleteSharedWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_DELETE');
 
     const {data: {sharedWorkflow} = {}, refetch} = useSharedWorkflowQuery({
         workflowUuid,
@@ -74,7 +80,7 @@ export function WorkflowShareDialog({
                     },
                 }
             );
-        } else if (shareState === 'exported') {
+        } else if (shareState === 'exported' && canDeleteSharedWorkflow) {
             deleteSharedWorkflowMutation.mutate(
                 {
                     workflowId,
@@ -161,7 +167,12 @@ export function WorkflowShareDialog({
                                                 <span>An older version of this workflow is shared as a template</span>
                                             )}
 
-                                            <Switch checked={true} onCheckedChange={handleToggleCheckedChange} />
+                                            <Switch
+                                                aria-label="Shared template"
+                                                checked={true}
+                                                disabled={!canDeleteSharedWorkflow}
+                                                onCheckedChange={handleToggleCheckedChange}
+                                            />
                                         </div>
 
                                         {sharedWorkflow?.projectVersion === projectVersion ? (
@@ -202,7 +213,10 @@ export function WorkflowShareDialog({
                                                 This workflow is not currently shared
                                             </span>
 
-                                            <Switch onCheckedChange={handleToggleCheckedChange} />
+                                            <Switch
+                                                aria-label="Shared template"
+                                                onCheckedChange={handleToggleCheckedChange}
+                                            />
                                         </div>
 
                                         <div>

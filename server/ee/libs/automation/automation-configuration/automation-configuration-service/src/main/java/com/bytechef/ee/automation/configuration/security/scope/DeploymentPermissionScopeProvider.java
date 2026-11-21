@@ -14,6 +14,13 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 /**
+ * Declares the deployment-domain permission scopes. Read is granted from VIEWER; create and edit from EDITOR.
+ *
+ * <p>
+ * Only operations acting on a deployment remain here. Publishing a project version and syncing a project with Git moved
+ * to {@link ProjectPermissionScopeProvider}, which is the object they act on; what is left is creating a deployment of
+ * a version into an environment, and editing or enabling one that exists.
+ *
  * @version ee
  *
  * @author Ivica Cardic
@@ -24,6 +31,10 @@ public class DeploymentPermissionScopeProvider implements PermissionScopeProvide
 
     @Override
     public Set<ScopeDefinition> scopeDefinitions() {
-        return Set.of(new ScopeDefinition(DeploymentPermissionScope.DEPLOYMENT_PUSH, WorkspaceRole.EDITOR));
+        return Set.of(
+            new ScopeDefinition(DeploymentPermissionScope.DEPLOYMENT_VIEW, WorkspaceRole.VIEWER),
+            new ScopeDefinition(DeploymentPermissionScope.DEPLOYMENT_CREATE, WorkspaceRole.EDITOR),
+            new ScopeDefinition(DeploymentPermissionScope.DEPLOYMENT_EDIT, WorkspaceRole.EDITOR),
+            new ScopeDefinition(DeploymentPermissionScope.DEPLOYMENT_DELETE, WorkspaceRole.ADMIN));
     }
 }

@@ -1,6 +1,7 @@
 import {usePropertyCodeEditorDialogStore} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/stores/usePropertyCodeEditorDialogStore';
 import {isExternalTaskRunner} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/utils/isExternalTaskRunner';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {resolveMainClusterRootName} from '@/pages/platform/workflow-editor/utils/resolveClusterRootId';
@@ -110,17 +111,24 @@ const PropertyCodeEditorDialogEditor = ({
 
     useCompletionContext(model, completionContext);
 
+    const readOnly = useWorkflowEditorReadOnly();
+
     return (
         <Suspense fallback={<MonacoEditorLoader />}>
             <MonacoEditor
                 className="size-full py-3"
                 defaultLanguage={language}
-                onChange={(value) => setEditorValue(value)}
+                onChange={(value) => {
+                    if (!readOnly) {
+                        setEditorValue(value);
+                    }
+                }}
                 onMount={(mountedEditor) => {
                     mountedEditor.focus();
 
                     setModel(mountedEditor.getModel() ?? undefined);
                 }}
+                options={{readOnly}}
                 value={editorValue}
             />
         </Suspense>

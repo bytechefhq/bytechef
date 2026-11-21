@@ -18,11 +18,16 @@ import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {CodePayloadI, TokenPayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
+import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {
     Authorization,
     AuthorizationType,
@@ -39,6 +44,7 @@ import {
     useGetOAuth2AuthorizationParametersQuery,
     useGetOAuth2PropertiesQuery,
 } from '@/shared/queries/platform/oauth2.queries';
+import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
@@ -77,6 +83,7 @@ interface ConnectionDialogProps {
     description?: string;
     onClose?: () => void;
     onConnectionCreate?: (connectionId: number) => void;
+    platformType?: PlatformType;
     showSharedOption?: boolean;
     startInCredentialsMode?: boolean;
     title?: string;
@@ -85,7 +92,7 @@ interface ConnectionDialogProps {
         onSuccess?: (result: number, variables: ConnectionI) => void;
         onError?: (error: Error, variables: ConnectionI) => void;
     }) => UseMutationResult<number, Error, ConnectionI, unknown>;
-    useGetConnectionTagsQuery: () => UseQueryResult<Tag[], Error>;
+    useGetConnectionTagsQuery?: () => UseQueryResult<Tag[], Error>;
     useUpdateConnectionCredentialsMutation?: (mutationProps: {
         onSuccess?: (result: void, variables: ConnectionI) => void;
         onError?: (error: Error, variables: ConnectionI) => void;
@@ -95,6 +102,10 @@ interface ConnectionDialogProps {
         onError?: (error: Error, variables: ConnectionI) => void;
     }) => UseMutationResult<void, Error, ConnectionI, unknown>;
 }
+
+const NO_TAGS_QUERY_RESULT = {data: undefined, error: null, isLoading: false} as UseQueryResult<Tag[], Error>;
+
+const useNoConnectionTagsQuery = () => NO_TAGS_QUERY_RESULT;
 
 const ConnectionDialog = ({
     componentDefinition,
@@ -106,6 +117,7 @@ const ConnectionDialog = ({
     description,
     onClose,
     onConnectionCreate,
+    platformType,
     showSharedOption,
     startInCredentialsMode,
     title,
@@ -126,7 +138,18 @@ const ConnectionDialog = ({
     >(componentDefinition);
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
+    const account = useAuthenticationStore((state) => state.account);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const storedPlatformType = usePlatformTypeStore((state) => state.currentType);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canEditEmbeddedConnection = useHasEmbeddedScope('CONNECTION_EDIT', connection?.environmentId);
+    const isTenantAdmin = useIsTenantAdmin();
+    const canEditWorkspaceConnection = useHasWorkspaceScope(
+        currentWorkspaceId,
+        'CONNECTION_EDIT',
+        connection?.environmentId
+    );
 
     const form = useForm<ConnectionDialogFormProps>({
         defaultValues: {
@@ -172,7 +195,9 @@ const ConnectionDialog = ({
         isLoading: oAuth2AuthorizationParametersLoading,
     } = useGetOAuth2AuthorizationParametersQuery(getNewOAuth2AuthorizationParameters(), wizardStep === 'oauth_step');
 
-    const {data: tags, error: tagsError, isLoading: tagsLoading} = useGetConnectionTagsQuery();
+    const useTagsQuery = useGetConnectionTagsQuery ?? useNoConnectionTagsQuery;
+
+    const {data: tags, error: tagsError, isLoading: tagsLoading} = useTagsQuery();
 
     const {
         data: oAuth2Properties,
@@ -182,11 +207,23 @@ const ConnectionDialog = ({
 
     const queryClient = useQueryClient();
 
+    const currentType = platformType ?? storedPlatformType;
+
     const isEdit = !!connection?.id;
 
     const selectedComponentName = selectedComponentDefinition?.name || connection?.componentName;
 
-    const canUpdateCredentials = isEdit && !!useUpdateConnectionCredentialsMutation && !connection?.managed;
+    const canEditConnection =
+        currentType === PlatformType.EMBEDDED ? canEditEmbeddedConnection : canEditWorkspaceConnection;
+
+    const isConnectionCreator = !!account?.login && account.login === connection?.createdBy;
+
+    const credentialsHidden = isEdit && (!canEditConnection || !isConnectionCreator);
+
+    const canReplaceCredentials = canEditConnection && (isConnectionCreator || isTenantAdmin);
+
+    const canUpdateCredentials =
+        isEdit && !!useUpdateConnectionCredentialsMutation && !connection?.managed && canReplaceCredentials;
 
     const canEditConnectionProperties = isEdit && !!connectionPropertiesEditable;
 
@@ -403,7 +440,7 @@ const ConnectionDialog = ({
             errors.push(credentialsMutation.error.message);
         }
 
-        if (tagsError && !tagsLoading) {
+        if (useGetConnectionTagsQuery && tagsError && !tagsLoading) {
             errors.push(tagsError.message);
         }
 
@@ -431,7 +468,7 @@ const ConnectionDialog = ({
     }
 
     function saveConnection(additionalParameters?: object) {
-        if (isUpdatingCredentials && credentialsMutation) {
+        if (isUpdatingCredentials && credentialsMutation && canUpdateCredentials) {
             const {parameters} = getValues();
 
             const connectionPropertyNames = (connectionDefinition?.properties || []).map((property) => property.name);
@@ -802,7 +839,7 @@ const ConnectionDialog = ({
                                         </div>
                                     )}
 
-                                    {!tagsLoading && !isUpdatingCredentials && (
+                                    {useGetConnectionTagsQuery && !tagsLoading && !isUpdatingCredentials && (
                                         <FormField
                                             control={control}
                                             name="tags"
@@ -895,6 +932,7 @@ const ConnectionDialog = ({
                                         connectionParameters={
                                             canEditConnectionProperties ? undefined : connection.connectionParameters
                                         }
+                                        credentialsHidden={credentialsHidden}
                                     />
                                 </div>
                             )}

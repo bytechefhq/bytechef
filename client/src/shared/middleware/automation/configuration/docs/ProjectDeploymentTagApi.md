@@ -11,7 +11,7 @@ All URIs are relative to */api/automation/internal*
 
 ## getProjectDeploymentTags
 
-> Array&lt;Tag&gt; getProjectDeploymentTags(id)
+> Array&lt;Tag&gt; getProjectDeploymentTags(id, environmentId)
 
 Get project deployment tags
 
@@ -33,6 +33,8 @@ async function example() {
   const body = {
     // number | The id of a workspace.
     id: 789,
+    // number | The id of an environment. (optional)
+    environmentId: 789,
   } satisfies GetProjectDeploymentTagsRequest;
 
   try {
@@ -53,6 +55,7 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **id** | `number` | The id of a workspace. | [Defaults to `undefined`] |
+| **environmentId** | `number` | The id of an environment. | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 

@@ -12,6 +12,7 @@ import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPa
 import {decodePath} from './encodingUtils';
 import {getPropertySaveOverride} from './propertySaveOverrides';
 import {resolveMainClusterRootName} from './resolveClusterRootId';
+import {isWorkflowEditorReadOnly} from './workflowEditorReadOnlyGuard';
 import {enqueueWorkflowMutation} from './workflowMutationQueue';
 
 interface SavePropertyProps {
@@ -48,6 +49,10 @@ export default function saveProperty({
     value,
     workflowId,
 }: SavePropertyProps) {
+    if (isWorkflowEditorReadOnly()) {
+        return;
+    }
+
     const {currentNode} = useWorkflowNodeDetailsPanelStore.getState();
     const {rootClusterElementNodeData} = useWorkflowEditorStore.getState();
     const mainClusterRootName = resolveMainClusterRootName(currentNode, rootClusterElementNodeData);

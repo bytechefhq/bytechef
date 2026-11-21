@@ -140,11 +140,10 @@ class ProjectToolsTest {
         }
 
         @Test
-        void testRunThatSkipsAuthorizationWithoutAScopedProjectCannotListProjects() {
+        void testConnectedUserRunWithoutAScopedProjectCannotListProjects() {
             ToolContext toolContext = new ToolContext(
                 AgentToolInvocationContext.builder()
                     .authentication(new UsernamePasswordAuthenticationToken("1234567890", null, List.of()))
-                    .skipAutomationAuthorization(true)
                     .build()
                     .toToolContext());
 

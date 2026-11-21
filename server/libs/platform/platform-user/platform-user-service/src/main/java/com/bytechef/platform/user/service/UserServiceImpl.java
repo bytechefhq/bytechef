@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -78,17 +79,21 @@ public class UserServiceImpl implements UserService {
     private final SecretGenerator totpSecretGenerator = new DefaultSecretGenerator();
     private final DefaultCodeVerifier totpCodeVerifier;
     private final UserRepository userRepository;
+    private final ObjectProvider<WorkspaceMembershipAssigner> workspaceMembershipAssignerProvider;
 
     @SuppressFBWarnings("EI")
     public UserServiceImpl(
         AuthorityRepository authorityRepository, CacheManager cacheManager, PasswordEncoder passwordEncoder,
-        PersistentTokenRepository persistentTokenRepository, UserRepository userRepository) {
+        PersistentTokenRepository persistentTokenRepository,
+        UserRepository userRepository,
+        ObjectProvider<WorkspaceMembershipAssigner> workspaceMembershipAssignerProvider) {
 
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
         this.passwordEncoder = passwordEncoder;
         this.persistentTokenRepository = persistentTokenRepository;
         this.userRepository = userRepository;
+        this.workspaceMembershipAssignerProvider = workspaceMembershipAssignerProvider;
 
         totpCodeVerifier = new DefaultCodeVerifier(new DefaultCodeGenerator(), new SystemTimeProvider());
 
@@ -266,6 +271,10 @@ public class UserServiceImpl implements UserService {
     public void delete(String login) {
         userRepository.findByLogin(login)
             .ifPresent(user -> {
+                long userId = user.getId();
+
+                removeWorkspaceMemberships(userId);
+
                 userRepository.delete(user);
 
                 this.clearUserCaches(user);
@@ -438,6 +447,12 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public Page<User> getAllManagedUsers(Pageable pageable) {
         return userRepository.findAll(pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<User> getUsersByAuthorityName(String authorityName) {
+        return userRepository.findAllByAuthorityName(authorityName);
     }
 
     @Override
@@ -709,10 +724,33 @@ public class UserServiceImpl implements UserService {
             .forEach(user -> {
                 log.debug("Deleting not activated user {}", user.getLogin());
 
+                removeWorkspaceMemberships(user.getId());
+
                 userRepository.delete(user);
 
                 this.clearUserCaches(user);
             });
+    }
+
+    /**
+     * Withdraws every workspace membership the user holds, so no row survives the account. Nothing else does this: the
+     * {@code workspace_user.user_id} foreign key is created only in the {@code mono} Liquibase context, so on split
+     * deployments the rows are simply orphaned, and the members view, which resolves each row's user, then fails for
+     * everybody who can see the workspace. On a monolith the same call is what stops the delete failing on that key.
+     *
+     * <p>
+     * Reached through the {@link WorkspaceMembershipAssigner} SPI rather than a direct call, because workspace
+     * membership lives in the automation modules, which depend on this one. No implementation registered means the
+     * deployment has no workspace concept (embedded), where there is nothing to withdraw.
+     */
+    private void removeWorkspaceMemberships(long userId) {
+        WorkspaceMembershipAssigner workspaceMembershipAssigner = workspaceMembershipAssignerProvider.getIfAvailable();
+
+        if (workspaceMembershipAssigner == null) {
+            return;
+        }
+
+        workspaceMembershipAssigner.removeMemberships(userId);
     }
 
     private void clearUserCaches(User user) {
@@ -729,6 +767,8 @@ public class UserServiceImpl implements UserService {
         if (existingUser.isActivated() || existingUser.getActivationKey() == null || existingUser.isInvited()) {
             return false;
         }
+
+        removeWorkspaceMemberships(existingUser.getId());
 
         userRepository.delete(existingUser);
 

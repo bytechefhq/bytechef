@@ -6,6 +6,7 @@ import {
     UpdateKnowledgeBaseTagsInput,
     useUpdateKnowledgeBaseTagsMutation,
 } from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo} from 'react';
 
@@ -24,11 +25,15 @@ export default function useKnowledgeBaseListItemTagList({
     remainingTags,
     tags,
 }: UseKnowledgeBaseListItemTagListProps) {
+    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const queryClient = useQueryClient();
 
-    const tagsByKnowledgeBaseQueryKey = ['knowledgeBaseTagsByKnowledgeBase', {workspaceId: String(workspaceId)}];
+    const tagsByKnowledgeBaseQueryKey = [
+        'knowledgeBaseTagsByKnowledgeBase',
+        {environmentId: String(environmentId), workspaceId: String(workspaceId)},
+    ];
 
     const updateTagsMutation = useUpdateKnowledgeBaseTagsMutation({
         onError: (_err, _vars, ctx) => {
@@ -37,7 +42,7 @@ export default function useKnowledgeBaseListItemTagList({
             }
         },
         onMutate: async (variables: UpdateKnowledgeBaseTagsVarsI) => {
-            await queryClient.cancelQueries({queryKey: ['knowledgeBaseTagsByKnowledgeBase']});
+            await queryClient.cancelQueries({queryKey: tagsByKnowledgeBaseQueryKey});
 
             const previous = queryClient.getQueryData<{knowledgeBaseTagsByKnowledgeBase: KnowledgeBaseTagsEntry[]}>(
                 tagsByKnowledgeBaseQueryKey

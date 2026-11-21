@@ -30,30 +30,47 @@ describe('projectDeploymentTags.queries', () => {
     });
 
     it('keys the cache by workspace, so two workspaces cannot share an entry', () => {
-        expect(ProjectDeploymentTagKeys.workspaceProjectDeploymentTags(1)).toEqual(['projectDeploymentTags', 1]);
-        expect(ProjectDeploymentTagKeys.workspaceProjectDeploymentTags(1)).not.toEqual(
-            ProjectDeploymentTagKeys.workspaceProjectDeploymentTags(2)
+        expect(ProjectDeploymentTagKeys.workspaceProjectDeploymentTags({environmentId: 2, id: 1})).toEqual([
+            'projectDeploymentTags',
+            {environmentId: 2, id: 1},
+        ]);
+        expect(ProjectDeploymentTagKeys.workspaceProjectDeploymentTags({environmentId: 2, id: 1})).not.toEqual(
+            ProjectDeploymentTagKeys.workspaceProjectDeploymentTags({environmentId: 2, id: 2})
         );
     });
 
     it('asks for the tags of the current workspace', async () => {
         getProjectDeploymentTagsMock.mockResolvedValue([{id: 10, name: 'billing'}]);
 
-        const {result} = renderHook(() => useGetProjectDeploymentTagsQuery(), {wrapper: Wrapper});
+        const {result} = renderHook(
+            () =>
+                useGetProjectDeploymentTagsQuery({
+                    environmentId: 2,
+                    id: useWorkspaceStore.getState().currentWorkspaceId!,
+                }),
+            {wrapper: Wrapper}
+        );
 
         await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-        expect(getProjectDeploymentTagsMock).toHaveBeenCalledWith({id: 7});
+        expect(getProjectDeploymentTagsMock).toHaveBeenCalledWith({environmentId: 2, id: 7});
         expect(result.current.data).toEqual([{id: 10, name: 'billing'}]);
-        expect(queryClient.getQueryData(ProjectDeploymentTagKeys.workspaceProjectDeploymentTags(7))).toEqual([
-            {id: 10, name: 'billing'},
-        ]);
+        expect(
+            queryClient.getQueryData(ProjectDeploymentTagKeys.workspaceProjectDeploymentTags({environmentId: 2, id: 7}))
+        ).toEqual([{id: 10, name: 'billing'}]);
     });
 
     it('does not fetch while no workspace is selected', () => {
         useWorkspaceStore.getState().clearCurrentWorkspaceId();
 
-        const {result} = renderHook(() => useGetProjectDeploymentTagsQuery(), {wrapper: Wrapper});
+        const {result} = renderHook(
+            () =>
+                useGetProjectDeploymentTagsQuery({
+                    environmentId: 2,
+                    id: useWorkspaceStore.getState().currentWorkspaceId!,
+                }),
+            {wrapper: Wrapper}
+        );
 
         expect(result.current.fetchStatus).toBe('idle');
         expect(getProjectDeploymentTagsMock).not.toHaveBeenCalled();

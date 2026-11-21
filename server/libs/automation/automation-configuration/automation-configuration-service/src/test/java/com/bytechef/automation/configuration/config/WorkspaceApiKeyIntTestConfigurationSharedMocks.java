@@ -24,6 +24,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
+import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
@@ -33,6 +34,7 @@ import com.bytechef.platform.githubproxy.client.GitHubProxyClient;
 import com.bytechef.platform.githubproxy.client.WorkflowTemplateProxyClient;
 import com.bytechef.platform.security.facade.ApiKeyFacadeImpl;
 import com.bytechef.platform.security.service.ApiKeyServiceImpl;
+import com.bytechef.platform.security.service.OwnedApiKeyCreatorImpl;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
@@ -57,7 +59,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 @Retention(RetentionPolicy.RUNTIME)
 @EnableMethodSecurity
 @Import({
-    ApiKeyFacadeImpl.class, ApiKeyServiceImpl.class,
+    ApiKeyFacadeImpl.class, ApiKeyServiceImpl.class, OwnedApiKeyCreatorImpl.class,
     PostgreSQLContainerConfiguration.class
 })
 @MockitoBean(types = {
@@ -65,8 +67,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
     ConnectionFacade.class, ConnectionLifecycleFacade.class, ConnectionService.class, EnvironmentService.class,
     GitHubProxyClient.class, JobFacade.class, JobService.class, PrincipalJobFacade.class, PrincipalJobService.class,
     TaskExecutionService.class, TriggerDefinitionService.class, TriggerExecutionService.class,
-    TriggerLifecycleFacade.class, UserService.class, WorkflowCacheManager.class, WorkflowNodeParameterFacade.class,
-    WorkflowNodeTestOutputService.class, WorkflowTemplateProxyClient.class
+    TriggerLifecycleFacade.class, UserService.class, WebhookTriggerTestFacade.class, WorkflowCacheManager.class,
+    WorkflowNodeParameterFacade.class, WorkflowNodeTestOutputService.class, WorkflowTemplateProxyClient.class
 })
 @MockitoSpyBean(types = PermissionService.class)
 public @interface WorkspaceApiKeyIntTestConfigurationSharedMocks {

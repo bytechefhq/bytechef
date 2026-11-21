@@ -12,7 +12,7 @@ const getStepStatus = (complete: boolean, current: boolean): JourneyStepStatusTy
 interface AutomationConfigurationsEmptyStateProps {
     hasProject: boolean;
     hasPublishedProject: boolean;
-    onCreateConfiguration: () => void;
+    onCreateConfiguration?: () => void;
     onGoToAutomations: () => void;
 }
 
@@ -52,7 +52,9 @@ const AutomationConfigurationsEmptyState = ({
             },
             {
                 ...(createConfigurationStatus === 'current' && {
-                    action: <Button label="Create Configuration" onClick={onCreateConfiguration} size="sm" />,
+                    ...(onCreateConfiguration && {
+                        action: <Button label="Create Configuration" onClick={onCreateConfiguration} size="sm" />,
+                    }),
                     description: 'Pick a project and a published version, then name the configuration.',
                 }),
                 id: 'createConfiguration',

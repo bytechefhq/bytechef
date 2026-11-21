@@ -166,7 +166,7 @@ import org.springframework.test.context.event.RecordApplicationEvents;
     ClusterElementDefinitionService.class, TriggerDefinitionFacade.class,
     ComponentConnectionFacade.class,
     ComponentDefinitionService.class, ConnectedUserService.class, ConnectionDefinitionService.class,
-    ConnectedUserWorkflowReferenceFacade.class,
+    ConnectedUserWorkflowReferenceFacade.class, ConnectedUserWorkflowReferenceReader.class,
     ConnectionFacade.class, ConnectionLifecycleFacade.class, ConnectionService.class,
     EmbeddedPermissionEvaluator.class, EnvironmentService.class,
     GitHubProxyClient.class, JobFacade.class, JobService.class, McpComponentService.class,
@@ -291,7 +291,7 @@ class AutomationProjectConfigurationFacadeIntTest {
     private ComponentDefinitionFacade componentDefinitionFacade;
 
     @Autowired
-    private ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
+    private ConnectedUserWorkflowReferenceReader connectedUserWorkflowReferenceReader;
 
     @Autowired
     private ConnectedUserConnectionService connectedUserConnectionService;
@@ -353,17 +353,17 @@ class AutomationProjectConfigurationFacadeIntTest {
     }
 
     @Test
-    void testCreateConfigurationWithAnUnknownEnvironmentIdThrows() {
+    void testCreateConfigurationWithAnUnknownEnvironmentIdIsDenied() {
         long projectId = createPublishedProject("Unknown Environment", 1);
 
         assertThatThrownBy(
             () -> automationProjectConfigurationFacade.createConfiguration(
                 projectId, Environment.values().length, CONFIGURATION_NAME, null, 1, true, true))
-                    .isInstanceOf(ConfigurationException.class);
+                    .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(
             () -> automationProjectConfigurationFacade.createConfiguration(
                 projectId, -1, CONFIGURATION_NAME, null, 1, true, true))
-                    .isInstanceOf(ConfigurationException.class);
+                    .isInstanceOf(AccessDeniedException.class);
         assertThat(automationProjectConfigurationFacade.getConfigurations(projectId)).isEmpty();
     }
 
@@ -504,7 +504,7 @@ class AutomationProjectConfigurationFacadeIntTest {
         long projectId = createPublishedProject("Pinned Version", 1);
 
         automationProjectFacade.createProjectWorkflow(projectId, null, null);
-        automationProjectFacade.publishProject(projectId);
+        automationProjectFacade.publishProject(projectId, null);
 
         long configurationId = automationProjectConfigurationFacade.createConfiguration(
             projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
@@ -911,7 +911,7 @@ class AutomationProjectConfigurationFacadeIntTest {
             projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 2, true, true);
 
         automationProjectFacade.deleteProjectWorkflow(workflowUuid);
-        automationProjectFacade.publishProject(projectId);
+        automationProjectFacade.publishProject(projectId, null);
 
         givenReferences(configurationId,
             newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false));
@@ -2044,7 +2044,7 @@ class AutomationProjectConfigurationFacadeIntTest {
 
         long connectedUserId = createConnectedUser(fixture.projectId(), fixture.sourceConfigurationId());
 
-        when(connectedUserWorkflowReferenceFacade.getReferences(anySet()))
+        when(connectedUserWorkflowReferenceReader.getReferences(anySet()))
             .thenReturn(List.of(
                 new ConnectedUserWorkflowReferenceDTO(
                     fixture.secondWorkflowUuid(), connectedUserId, "user-" + connectedUserId,
@@ -2436,7 +2436,7 @@ class AutomationProjectConfigurationFacadeIntTest {
     }
 
     private void publish(long projectId) {
-        automationProjectFacade.publishProject(projectId);
+        automationProjectFacade.publishProject(projectId, null);
     }
 
     private void redefineDraftWorkflow(String workflowUuid, String definition) {
@@ -2450,7 +2450,7 @@ class AutomationProjectConfigurationFacadeIntTest {
         String workflowUuid = automationProjectFacade.createProjectWorkflow(
             projectId, "{\"label\": \"" + label + "\", \"description\": \"\", \"tasks\": []}", null);
 
-        automationProjectFacade.publishProject(projectId);
+        automationProjectFacade.publishProject(projectId, null);
 
         return workflowUuid;
     }
@@ -2464,7 +2464,7 @@ class AutomationProjectConfigurationFacadeIntTest {
                 reference.connectedUserId(), configuration.getProjectId(), configurationId);
         }
 
-        when(connectedUserWorkflowReferenceFacade.getReferences(anySet()))
+        when(connectedUserWorkflowReferenceReader.getReferences(anySet()))
             .thenReturn(List.of(references));
     }
 
@@ -2507,7 +2507,7 @@ class AutomationProjectConfigurationFacadeIntTest {
         automationProjectFacade.createProjectWorkflow(projectId, null, null);
 
         for (int i = 0; i < publishedVersionCount; i++) {
-            automationProjectFacade.publishProject(projectId);
+            automationProjectFacade.publishProject(projectId, null);
         }
 
         return projectId;

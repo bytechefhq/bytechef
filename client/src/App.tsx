@@ -15,8 +15,10 @@ import {AUTHORITIES, DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
+import {useLoadEmbeddedScopes} from '@/shared/hooks/useLoadEmbeddedScopes';
 import {useLoadWorkspaceScopes} from '@/shared/hooks/useLoadWorkspaceScopes';
 import {useOnLogout} from '@/shared/hooks/useOnLogout';
+import {useViewableEmbeddedPageHrefs} from '@/shared/hooks/useViewableEmbeddedPageHrefs';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
 import {TrialBanner} from '@/shared/layout/TrialBanner';
 import {AppSidebar} from '@/shared/layout/app-sidebar/AppSidebar';
@@ -218,6 +220,7 @@ function App() {
 
     const analytics = useAnalytics();
     const helpHub = useHelpHub();
+    const viewableEmbeddedPageHrefs = useViewableEmbeddedPageHrefs();
     const location = useLocation();
     const queryClient = useQueryClient();
     const userGuiding = useUserGuiding();
@@ -225,7 +228,10 @@ function App() {
     const platformMode = resolveShellPlatformMode(location.pathname, currentType);
 
     useFetchInterceptor();
-    useLoadWorkspaceScopes(platformMode === PlatformType.AUTOMATION ? currentWorkspaceId : undefined);
+
+    useLoadWorkspaceScopes(authenticated ? currentWorkspaceId : undefined);
+
+    useLoadEmbeddedScopes(authenticated && currentType === PlatformType.EMBEDDED);
 
     const canEditWorkspace = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_CREATE');
 
@@ -299,26 +305,7 @@ function App() {
             return showEmbeddedGettingStarted;
         }
 
-        if (currentEnvironmentId !== 0 && navItem.href === '/embedded/integrations') {
-            return false;
-        }
-
-        if (currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT && navItem.href === '/embedded/automations') {
-            return false;
-        }
-
-        if (currentEnvironmentId === DEVELOPMENT_ENVIRONMENT && navItem.href === '/embedded/configurations') {
-            return false;
-        }
-
-        if (
-            currentEnvironmentId === DEVELOPMENT_ENVIRONMENT &&
-            navItem.href === '/embedded/automation-configurations'
-        ) {
-            return false;
-        }
-
-        return true;
+        return viewableEmbeddedPageHrefs.includes(navItem.href);
     });
 
     let navigation: NavigationType[] = [];

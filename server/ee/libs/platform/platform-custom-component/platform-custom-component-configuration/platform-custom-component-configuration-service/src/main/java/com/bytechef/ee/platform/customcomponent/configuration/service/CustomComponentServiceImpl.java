@@ -8,14 +8,11 @@
 package com.bytechef.ee.platform.customcomponent.configuration.service;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.ee.platform.customcomponent.configuration.audit.CustomComponentAuditEvents;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent;
 import com.bytechef.ee.platform.customcomponent.configuration.exception.CustomComponentErrorType;
 import com.bytechef.ee.platform.customcomponent.configuration.repository.CustomComponentRepository;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.audit.AuditData;
-import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.time.Instant;
 import java.util.List;
@@ -58,10 +55,6 @@ public class CustomComponentServiceImpl implements CustomComponentService {
     }
 
     @Override
-    @Audited(event = CustomComponentAuditEvents.CUSTOM_COMPONENT_ENABLED_UPDATED, data = {
-        @AuditData(key = "customComponentId", value = "#id"),
-        @AuditData(key = "enabled", value = "#enable")
-    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void enableCustomComponent(long id, boolean enable) {
         CustomComponent customComponent = getCustomComponent(id);

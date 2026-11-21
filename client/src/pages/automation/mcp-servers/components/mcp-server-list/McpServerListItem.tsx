@@ -4,10 +4,12 @@ import Switch from '@/components/Switch/Switch';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import McpServerDialog from '@/pages/automation/mcp-servers/components/McpServerDialog';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import TagList from '@/shared/components/TagList';
 import McpServerListItemDropdownMenu from '@/shared/components/mcp-server/McpServerListItemDropdownMenu';
 import McpServerToolCounts from '@/shared/components/mcp-server/McpServerToolCounts';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {McpServer, Tag} from '@/shared/middleware/graphql';
 
 import {McpProjectWorkflowItemType} from '../mcp-project-workflow-list/hooks/useMcpProjectList';
@@ -20,6 +22,13 @@ interface McpServerListItemProps {
 }
 
 const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerListItemProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    // The server requires MCP_DELETE in the server's workspace (WorkspaceMcpServerFacadeImpl.deleteWorkspaceMcpServer),
+    // so offering delete to a member without it means a confirm dialog that ends in a 403.
+    const canDeleteMcpServer = useHasWorkspaceScope(currentWorkspaceId, 'MCP_DELETE');
+    const canEditMcpServer = useHasWorkspaceScope(currentWorkspaceId, 'MCP_EDIT');
+
     const {
         handleDeleteClick,
         handleMcpServerListItemClick,
@@ -73,6 +82,7 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
                                             tags: tags || [],
                                         })}
                                         id={parseInt(mcpServer.id!)}
+                                        readOnly={!canEditMcpServer}
                                         remainingTags={tags
                                             ?.filter((tag) => !mcpServerTagIds?.includes(tag.id))
                                             .map((tag) => {
@@ -95,7 +105,7 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
 
                                 <Switch
                                     checked={mcpServer.enabled}
-                                    disabled={isEnablePending}
+                                    disabled={isEnablePending || !canEditMcpServer}
                                     onCheckedChange={handleOnCheckedChange}
                                 />
                             </div>
@@ -116,6 +126,8 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
                         </div>
 
                         <McpServerListItemDropdownMenu
+                            canDelete={canDeleteMcpServer}
+                            canEdit={canEditMcpServer}
                             mcpServer={mcpServer}
                             onDeleteClick={() => setShowDeleteDialog(true)}
                             onEditClick={() => setShowEditDialog(true)}

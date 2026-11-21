@@ -11,6 +11,7 @@ import useAutomationExecutionsSheetStore from '@/ee/pages/embedded/automations/s
 import OpenAutomationButton from '@/ee/pages/embedded/shared/OpenAutomationButton';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {
     AutomationProjectConfigurationsQuery,
     AutomationProjectsQuery,
@@ -47,6 +48,8 @@ const AutomationProjectConfigurationWorkflowListItem = ({
     const openAutomationExecutionsSheet = useAutomationExecutionsSheetStore(
         (state) => state.openAutomationExecutionsSheet
     );
+
+    const canEdit = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_EDIT', Number(configuration.environmentId));
 
     const queryClient = useQueryClient();
 
@@ -151,7 +154,7 @@ const AutomationProjectConfigurationWorkflowListItem = ({
                 <Switch
                     aria-label={`Enable ${workflowLabel}`}
                     checked={workflow.enabled}
-                    disabled={enableWorkflowMutation.isPending}
+                    disabled={!canEdit || enableWorkflowMutation.isPending}
                     onCheckedChange={(enable) =>
                         enableWorkflowMutation.mutate(
                             {enable, id: configuration.id, workflowUuid: workflow.workflowUuid},
@@ -165,25 +168,27 @@ const AutomationProjectConfigurationWorkflowListItem = ({
                     }
                 />
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            aria-label="Workflow Actions"
-                            icon={<EllipsisVerticalIcon />}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </DropdownMenuTrigger>
+                {canEdit && (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                aria-label="Workflow Actions"
+                                icon={<EllipsisVerticalIcon />}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                            aria-label="Edit"
-                            icon={<EditIcon />}
-                            label="Edit"
-                            onClick={() => setShowProvidedValuesDialog(true)}
-                        />
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                                aria-label="Edit"
+                                icon={<EditIcon />}
+                                label="Edit"
+                                onClick={() => setShowProvidedValuesDialog(true)}
+                            />
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
             </div>
 
             {showProvidedValuesDialog && (

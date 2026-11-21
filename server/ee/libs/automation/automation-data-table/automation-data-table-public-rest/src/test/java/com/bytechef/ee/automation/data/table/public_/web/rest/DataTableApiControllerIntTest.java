@@ -112,7 +112,8 @@ class DataTableApiControllerIntTest {
 
         when(workspaceDataTableFacade.listTables(1L, STAGING_ENVIRONMENT_ID))
             .thenReturn(List.of(ordersDataTableInfo, otherDataTableInfo));
-        when(workspaceDataTableFacade.getTagsByTableId(1L)).thenReturn(Map.of(7L, List.of(new Tag("hot"))));
+        when(workspaceDataTableFacade.getTagsByTableId(eq(1L), anyLong()))
+            .thenReturn(Map.of(7L, List.of(new Tag("hot"))));
 
         mockMvc
             .perform(
@@ -136,7 +137,8 @@ class DataTableApiControllerIntTest {
 
         when(workspaceDataTableFacade.listTables(1L, PRODUCTION_ENVIRONMENT_ID))
             .thenReturn(List.of(ordersDataTableInfo, otherDataTableInfo));
-        when(workspaceDataTableFacade.getTagsByTableId(1L)).thenReturn(Map.of(7L, List.of(new Tag("hot"))));
+        when(workspaceDataTableFacade.getTagsByTableId(eq(1L), anyLong()))
+            .thenReturn(Map.of(7L, List.of(new Tag("hot"))));
 
         mockMvc
             .perform(get(WORKSPACE_DATA_TABLES_PATH, 1L).accept(MediaType.APPLICATION_JSON))
@@ -146,7 +148,8 @@ class DataTableApiControllerIntTest {
 
     @Test
     void testAccessDeniedOnAWorkspaceUrlIsRethrown() throws Exception {
-        when(workspaceDataTableFacade.getTagsByTableId(1L)).thenThrow(new AccessDeniedException("denied"));
+        when(workspaceDataTableFacade.getTagsByTableId(eq(1L), anyLong()))
+            .thenThrow(new AccessDeniedException("denied"));
 
         ServletException servletException = assertThrows(
             ServletException.class,
@@ -160,7 +163,7 @@ class DataTableApiControllerIntTest {
         when(workspaceDataTableFacade.createTable(anyString(), any(), anyList(), eq(1L), anyLong())).thenReturn(7L);
         when(workspaceDataTableFacade.getTable(7L, PRODUCTION_ENVIRONMENT_ID))
             .thenReturn(new DataTableInfo(7L, "orders", WORKSPACE_ID, "d", List.of(), Instant.EPOCH));
-        when(workspaceDataTableFacade.getTagsByTableId(1L)).thenReturn(Map.of());
+        when(workspaceDataTableFacade.getTagsByTableId(eq(1L), anyLong())).thenReturn(Map.of());
 
         mockMvc
             .perform(
@@ -195,7 +198,7 @@ class DataTableApiControllerIntTest {
         when(workspaceDataTableFacade.createTable(anyString(), any(), anyList(), eq(1L), anyLong())).thenReturn(7L);
         when(workspaceDataTableFacade.getTable(7L, PRODUCTION_ENVIRONMENT_ID))
             .thenReturn(new DataTableInfo(7L, "orders", WORKSPACE_ID, null, List.of(), Instant.EPOCH));
-        when(workspaceDataTableFacade.getTagsByTableId(1L)).thenReturn(Map.of());
+        when(workspaceDataTableFacade.getTagsByTableId(eq(1L), anyLong())).thenReturn(Map.of());
 
         mockMvc
             .perform(
@@ -269,7 +272,8 @@ class DataTableApiControllerIntTest {
                 new DataTableInfo(
                     7L, "orders", WORKSPACE_ID, "d", List.of(new ColumnSpec("total", ColumnType.NUMBER)),
                     Instant.EPOCH));
-        when(workspaceDataTableFacade.getTagsByTableId(1L)).thenReturn(Map.of(7L, List.of(new Tag("hot"))));
+        when(workspaceDataTableFacade.getTagsByTableId(eq(1L), anyLong()))
+            .thenReturn(Map.of(7L, List.of(new Tag("hot"))));
 
         mockMvc
             .perform(get(DATA_TABLE_PATH, WORKSPACE_ID, "orders").accept(MediaType.APPLICATION_JSON))
@@ -518,7 +522,7 @@ class DataTableApiControllerIntTest {
 
         when(workspaceDataTableFacade.getTable(7L, PRODUCTION_ENVIRONMENT_ID))
             .thenReturn(new DataTableInfo(7L, "orders", WORKSPACE_ID, null, List.of(linkColumnSpec), Instant.EPOCH));
-        when(workspaceDataTableFacade.getTagsByTableId(1L)).thenReturn(Map.of());
+        when(workspaceDataTableFacade.getTagsByTableId(eq(1L), anyLong())).thenReturn(Map.of());
 
         mockMvc
             .perform(
@@ -565,7 +569,7 @@ class DataTableApiControllerIntTest {
     void testCreateLinkColumnWithoutOnDeleteDefaultsToBlock() throws Exception {
         stubOrdersTable();
 
-        when(workspaceDataTableFacade.getTagsByTableId(1L)).thenReturn(Map.of());
+        when(workspaceDataTableFacade.getTagsByTableId(eq(1L), anyLong())).thenReturn(Map.of());
 
         mockMvc
             .perform(
@@ -641,7 +645,7 @@ class DataTableApiControllerIntTest {
 
         when(workspaceDataTableFacade.getTable(7L, PRODUCTION_ENVIRONMENT_ID))
             .thenReturn(new DataTableInfo(7L, "orders", WORKSPACE_ID, null, List.of(linkColumnSpec), Instant.EPOCH));
-        when(workspaceDataTableFacade.getTagsByTableId(1L)).thenReturn(Map.of());
+        when(workspaceDataTableFacade.getTagsByTableId(eq(1L), anyLong())).thenReturn(Map.of());
 
         mockMvc
             .perform(get(DATA_TABLE_PATH, WORKSPACE_ID, "orders").accept(MediaType.APPLICATION_JSON))
@@ -670,7 +674,7 @@ class DataTableApiControllerIntTest {
         stubDataTable("orders", 7L);
         when(workspaceDataTableFacade.getTable(7L, PRODUCTION_ENVIRONMENT_ID))
             .thenReturn(new DataTableInfo(7L, "orders", WORKSPACE_ID, "d", List.of(), Instant.EPOCH));
-        when(workspaceDataTableFacade.getTagsByTableId(anyLong())).thenReturn(Map.of());
+        when(workspaceDataTableFacade.getTagsByTableId(anyLong(), anyLong())).thenReturn(Map.of());
     }
 
     private void stubDataTable(String name, long dataTableId) {

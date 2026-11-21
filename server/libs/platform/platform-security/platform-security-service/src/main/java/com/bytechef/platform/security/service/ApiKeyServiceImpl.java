@@ -66,8 +66,10 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     }
 
     @Override
-    public boolean exists(String secretKey, long environmentId) {
-        return apiKeyRepository.existsBySecretKeyAndEnvironment(secretKey, (int) environmentId);
+    public boolean exists(String secretKey, long environmentId, PlatformType type) {
+        Validate.notNull(type, "'type' must not be null");
+
+        return apiKeyRepository.existsBySecretKeyAndEnvironmentAndType(secretKey, (int) environmentId, type.ordinal());
     }
 
     @Override
@@ -120,6 +122,13 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<ApiKey> getUserApiKeys(long userId) {
+        return apiKeyRepository.findAllByUserId(userId);
+    }
+
+    @Override
+    @Audited(event = ApiKeyAuditEvents.API_KEY_UPDATED, mapper = ApiKeyAuditMapper.class)
     public ApiKey update(ApiKey apiKey) {
         Assert.notNull(apiKey, "'apiKey' must not be null");
 

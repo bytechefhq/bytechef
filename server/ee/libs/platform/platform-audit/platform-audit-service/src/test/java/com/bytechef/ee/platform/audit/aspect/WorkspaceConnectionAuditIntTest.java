@@ -31,7 +31,6 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
-import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
@@ -215,8 +214,8 @@ class WorkspaceConnectionAuditIntTest {
 
             return new WorkspaceConnectionFacadeImpl(
                 mock(ConnectionFacade.class), mock(ConnectionLifecycleFacade.class), connectionService,
-                projectDeploymentWorkflowService, mock(TagService.class), mock(WorkflowTestConfigurationService.class),
-                mock(WorkspaceConnectionService.class));
+                mock(PermissionService.class), projectDeploymentWorkflowService,
+                mock(WorkflowTestConfigurationService.class), mock(WorkspaceConnectionService.class));
         }
     }
 }

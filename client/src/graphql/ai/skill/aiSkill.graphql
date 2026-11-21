@@ -3,6 +3,7 @@ query aiSkill($id: ID!) {
         id
         name
         description
+        createdBy
         createdDate
         lastModifiedDate
     }

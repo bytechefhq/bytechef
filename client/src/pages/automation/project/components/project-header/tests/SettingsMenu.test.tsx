@@ -6,6 +6,10 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {afterEach, expect, it, vi} from 'vitest';
 
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => true,
+}));
+
 const mockProject = {
     id: 1,
     name: 'Test Project',

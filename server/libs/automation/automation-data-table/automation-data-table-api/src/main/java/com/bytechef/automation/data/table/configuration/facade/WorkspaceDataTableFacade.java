@@ -45,11 +45,11 @@ public interface WorkspaceDataTableFacade {
     long createTable(
         String name, String description, List<ColumnSpec> columnSpecs, long workspaceId, long environmentId);
 
-    void dropTable(long dataTableId, long environmentId);
+    boolean dropTable(long dataTableId, long environmentId);
 
     long duplicateTable(long dataTableId, String newName, long environmentId);
 
-    List<Tag> getDataTableTags(long workspaceId);
+    List<Tag> getDataTableTags(long workspaceId, long environmentId);
 
     List<DataTableInfo> listTables(long workspaceId, long environmentId);
 
@@ -118,7 +118,7 @@ public interface WorkspaceDataTableFacade {
 
     long clearRows(long dataTableId, long environmentId);
 
-    Map<Long, List<Tag>> getTagsByTableId(long workspaceId);
+    Map<Long, List<Tag>> getTagsByTableId(long workspaceId, long environmentId);
 
     long getWorkspaceId(long dataTableId);
 }

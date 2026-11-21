@@ -26,6 +26,7 @@ import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import TagList from '@/shared/components/TagList';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useMemo, useRef, useState} from 'react';
@@ -75,6 +76,10 @@ const IntegrationInstanceConfigurationListItem = ({
         lastPublishedIntegrationVersion > integrationInstanceConfiguration.integrationVersion;
 
     const {captureIntegrationInstanceConfigurationEnabled} = useAnalytics();
+
+    const canDeleteConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_DELETE');
+    const canEditConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_EDIT');
+    const canViewConnectedUsers = useHasEmbeddedScope('CONNECTED_USER_VIEW');
 
     const queryClient = useQueryClient();
 
@@ -253,6 +258,7 @@ const IntegrationInstanceConfigurationListItem = ({
                                                 },
                                             })}
                                             id={integrationInstanceConfiguration.id!}
+                                            readOnly={!canEditConfiguration}
                                             remainingTags={remainingTags}
                                             tags={integrationInstanceConfiguration.tags}
                                             updateTagsMutation={updateIntegrationInstanceConfigurationTagsMutation}
@@ -284,7 +290,10 @@ const IntegrationInstanceConfigurationListItem = ({
 
                                 <Switch
                                     checked={integrationInstanceConfiguration.enabled}
-                                    disabled={enableIntegrationInstanceConfigurationMutation.isPending}
+                                    disabled={
+                                        !canEditConfiguration ||
+                                        enableIntegrationInstanceConfigurationMutation.isPending
+                                    }
                                     onCheckedChange={handleOnCheckedChange}
                                 />
                             </div>
@@ -305,6 +314,9 @@ const IntegrationInstanceConfigurationListItem = ({
                         </div>
 
                         <IntegrationInstanceConfigurationListItemDropdownMenu
+                            canDelete={canDeleteConfiguration}
+                            canEdit={canEditConfiguration}
+                            canMoveUsers={canEditConfiguration && canViewConnectedUsers}
                             moveUsersDisabled={!integrationConfigurations}
                             moveUsersDisabledReason={moveUsersDisabledReason}
                             onDeleteClick={() => setShowDeleteDialog(true)}

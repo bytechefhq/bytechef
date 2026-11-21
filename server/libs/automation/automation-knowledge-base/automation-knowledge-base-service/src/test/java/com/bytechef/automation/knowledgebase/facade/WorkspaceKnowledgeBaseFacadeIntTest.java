@@ -34,9 +34,14 @@ import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.knowledgebase.audit.KnowledgeBaseAuditEvents;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
+import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseDocumentChunkRepository;
+import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseDocumentRepository;
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
@@ -86,10 +91,19 @@ class WorkspaceKnowledgeBaseFacadeIntTest {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
+    private KnowledgeBaseDocumentChunkRepository knowledgeBaseDocumentChunkRepository;
+
+    @Autowired
+    private KnowledgeBaseDocumentRepository knowledgeBaseDocumentRepository;
+
+    @Autowired
     private KnowledgeBaseRepository knowledgeBaseRepository;
 
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
+
+    @Autowired
+    private WorkspaceKnowledgeBaseDocumentFacade workspaceKnowledgeBaseDocumentFacade;
 
     @Autowired
     private WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade;
@@ -243,7 +257,144 @@ class WorkspaceKnowledgeBaseFacadeIntTest {
             .containsEntry("knowledgeBaseId", String.valueOf(Long.MAX_VALUE));
     }
 
+    @Test
+    void testUpdateRecordsTheNewName() {
+        KnowledgeBase knowledgeBase = createKnowledgeBase();
+
+        workspaceKnowledgeBaseFacade.updateKnowledgeBase(knowledgeBase.getId(), newKnowledgeBase("Renamed articles"));
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(KnowledgeBaseAuditEvents.KB_UPDATED);
+
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("knowledgeBaseId", String.valueOf(knowledgeBase.getId()))
+            .containsEntry("name", "Renamed articles")
+            .doesNotContainKeys("dataError", "errorClass", "mapperError");
+
+        KnowledgeBase savedKnowledgeBase = knowledgeBaseRepository.findById(knowledgeBase.getId())
+            .orElseThrow();
+
+        assertThat(savedKnowledgeBase.getName()).isEqualTo("Renamed articles");
+    }
+
+    @Test
+    void testUpdateOfAnUnknownKnowledgeBaseRecordsAnError() {
+        KnowledgeBase renamedKnowledgeBase = newKnowledgeBase("Renamed articles");
+
+        assertThatThrownBy(
+            () -> workspaceKnowledgeBaseFacade.updateKnowledgeBase(Long.MAX_VALUE, renamedKnowledgeBase))
+                .isInstanceOf(NoSuchElementException.class);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(KnowledgeBaseAuditEvents.KB_UPDATED);
+
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "ERROR")
+            .containsEntry("errorClass", NoSuchElementException.class.getName())
+            .containsEntry("knowledgeBaseId", String.valueOf(Long.MAX_VALUE))
+            .doesNotContainKey("name");
+    }
+
+    @Test
+    void testUpdateChunkRecordsTheChunkAndItsDocumentWithoutTheContent() {
+        KnowledgeBaseDocumentChunk knowledgeBaseDocumentChunk = createChunk();
+
+        workspaceKnowledgeBaseDocumentFacade.updateKnowledgeBaseDocumentChunk(
+            knowledgeBaseDocumentChunk.getId(), "confidential paragraph");
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(
+            KnowledgeBaseAuditEvents.KB_DOCUMENT_CHUNK_UPDATED);
+
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("knowledgeBaseDocumentChunkId", String.valueOf(knowledgeBaseDocumentChunk.getId()))
+            .containsEntry(
+                "knowledgeBaseDocumentId", String.valueOf(knowledgeBaseDocumentChunk.getKnowledgeBaseDocumentId()))
+            .doesNotContainValue("confidential paragraph")
+            .doesNotContainKeys("dataError", "errorClass");
+    }
+
+    @Test
+    void testUpdateOfAnUnknownChunkRecordsAnError() {
+        assertThatThrownBy(
+            () -> workspaceKnowledgeBaseDocumentFacade.updateKnowledgeBaseDocumentChunk(Long.MAX_VALUE, "paragraph"))
+                .isExactlyInstanceOf(RuntimeException.class);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(
+            KnowledgeBaseAuditEvents.KB_DOCUMENT_CHUNK_UPDATED);
+
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "ERROR")
+            .containsEntry("errorClass", RuntimeException.class.getName())
+            .containsEntry("knowledgeBaseDocumentChunkId", String.valueOf(Long.MAX_VALUE))
+            .doesNotContainKey("knowledgeBaseDocumentId");
+    }
+
+    @Test
+    void testDeleteChunkRecordsTheChunk() {
+        KnowledgeBaseDocumentChunk knowledgeBaseDocumentChunk = createChunk();
+
+        workspaceKnowledgeBaseDocumentFacade.deleteKnowledgeBaseDocumentChunk(knowledgeBaseDocumentChunk.getId());
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(
+            KnowledgeBaseAuditEvents.KB_DOCUMENT_CHUNK_DELETED);
+
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("knowledgeBaseDocumentChunkId", String.valueOf(knowledgeBaseDocumentChunk.getId()))
+            .doesNotContainKeys("dataError", "errorClass");
+        assertThat(knowledgeBaseDocumentChunkRepository.findById(knowledgeBaseDocumentChunk.getId())).isEmpty();
+    }
+
+    @Test
+    void testDeleteOfAnUnknownChunkRecordsAnError() {
+        assertThatThrownBy(
+            () -> workspaceKnowledgeBaseDocumentFacade.deleteKnowledgeBaseDocumentChunk(Long.MAX_VALUE))
+                .isExactlyInstanceOf(RuntimeException.class);
+
+        PersistentAuditEvent persistentAuditEvent = findSingleEvent(
+            KnowledgeBaseAuditEvents.KB_DOCUMENT_CHUNK_DELETED);
+
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "ERROR")
+            .containsEntry("errorClass", RuntimeException.class.getName())
+            .containsEntry("knowledgeBaseDocumentChunkId", String.valueOf(Long.MAX_VALUE));
+    }
+
+    private KnowledgeBaseDocumentChunk createChunk() {
+        KnowledgeBase knowledgeBase = createKnowledgeBase();
+
+        KnowledgeBaseDocument knowledgeBaseDocument = new KnowledgeBaseDocument();
+
+        knowledgeBaseDocument.setKnowledgeBaseId(knowledgeBase.getId());
+        knowledgeBaseDocument.setName("handbook.txt");
+        knowledgeBaseDocument.setStatus(KnowledgeBaseDocument.STATUS_READY);
+
+        knowledgeBaseDocument = knowledgeBaseDocumentRepository.save(knowledgeBaseDocument);
+
+        KnowledgeBaseDocumentChunk knowledgeBaseDocumentChunk = new KnowledgeBaseDocumentChunk();
+
+        knowledgeBaseDocumentChunk.setKnowledgeBaseDocumentId(knowledgeBaseDocument.getId());
+        knowledgeBaseDocumentChunk.setTextContent("first paragraph");
+
+        return knowledgeBaseDocumentChunkRepository.save(knowledgeBaseDocumentChunk);
+    }
+
+    private KnowledgeBase createKnowledgeBase() {
+        KnowledgeBase knowledgeBase = workspaceKnowledgeBaseFacade.createWorkspaceKnowledgeBase(
+            newKnowledgeBase("Support articles"), WORKSPACE_ID, DEVELOPMENT_ENVIRONMENT_ID);
+
+        persistenceAuditEventRepository.deleteAll();
+
+        return knowledgeBase;
+    }
+
     private void deleteKnowledgeBases() {
+        knowledgeBaseDocumentChunkRepository.deleteAll();
+        knowledgeBaseDocumentRepository.deleteAll();
         workspaceKnowledgeBaseRepository.deleteAll();
         knowledgeBaseRepository.deleteAll();
     }
@@ -275,6 +426,7 @@ class WorkspaceKnowledgeBaseFacadeIntTest {
     class PreAuthorizeEnforcement {
 
         private static final String KNOWLEDGE_BASE_CREATE = "KNOWLEDGE_BASE_CREATE";
+        private static final String KNOWLEDGE_BASE_DELETE = "KNOWLEDGE_BASE_DELETE";
         private static final String KNOWLEDGE_BASE_EDIT = "KNOWLEDGE_BASE_EDIT";
         private static final String KNOWLEDGE_BASE_VIEW = "KNOWLEDGE_BASE_VIEW";
 
@@ -287,35 +439,35 @@ class WorkspaceKnowledgeBaseFacadeIntTest {
         }
 
         @Test
-        void testCreateWorkspaceKnowledgeBaseRequiresCreateScopeOnTheWorkspace() {
-            assertRequiresScope(
+        void testCreateWorkspaceKnowledgeBaseRequiresCreateScopeInTheEnvironment() {
+            assertRequiresWorkspaceScope(
                 () -> workspaceKnowledgeBaseFacade.createWorkspaceKnowledgeBase(
                     newKnowledgeBase("Support articles"), WORKSPACE_ID, DEVELOPMENT_ENVIRONMENT_ID),
-                WORKSPACE_ID, "Workspace", KNOWLEDGE_BASE_CREATE, KNOWLEDGE_BASE_VIEW);
+                KNOWLEDGE_BASE_CREATE, KNOWLEDGE_BASE_VIEW, Environment.DEVELOPMENT);
 
             assertThat(knowledgeBaseRepository.count()).isEqualTo(1);
         }
 
         @Test
-        void testCloneWorkspaceKnowledgeBaseRequiresCreateScopeOnTheWorkspace() {
+        void testCloneWorkspaceKnowledgeBaseRequiresCreateScopeInTheTargetEnvironment() {
             KnowledgeBase knowledgeBase = createKnowledgeBase("Support articles");
 
-            assertRequiresScope(
+            assertRequiresWorkspaceScope(
                 () -> workspaceKnowledgeBaseFacade.cloneWorkspaceKnowledgeBase(
                     knowledgeBase.getId(), WORKSPACE_ID, STAGING_ENVIRONMENT_ID, "Staging articles"),
-                WORKSPACE_ID, "Workspace", KNOWLEDGE_BASE_CREATE, KNOWLEDGE_BASE_VIEW);
+                KNOWLEDGE_BASE_CREATE, KNOWLEDGE_BASE_VIEW, Environment.STAGING);
 
             assertThat(knowledgeBaseRepository.count()).isEqualTo(2);
         }
 
         @Test
-        void testGetWorkspaceKnowledgeBasesRequiresViewScopeOnTheWorkspace() {
+        void testGetWorkspaceKnowledgeBasesRequiresViewScopeInTheEnvironment() {
             KnowledgeBase knowledgeBase = createKnowledgeBase("Support articles");
 
-            List<KnowledgeBase> knowledgeBases = assertRequiresScope(
+            List<KnowledgeBase> knowledgeBases = assertRequiresWorkspaceScope(
                 () -> workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBases(
                     WORKSPACE_ID, DEVELOPMENT_ENVIRONMENT_ID),
-                WORKSPACE_ID, "Workspace", KNOWLEDGE_BASE_VIEW, null);
+                KNOWLEDGE_BASE_VIEW, null, Environment.DEVELOPMENT);
 
             assertThat(knowledgeBases)
                 .extracting(KnowledgeBase::getId)
@@ -323,17 +475,19 @@ class WorkspaceKnowledgeBaseFacadeIntTest {
         }
 
         @Test
-        void testGetWorkspaceKnowledgeBaseTagsRequiresViewScopeOnTheWorkspace() {
-            assertRequiresScope(
-                () -> workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBaseTags(WORKSPACE_ID),
-                WORKSPACE_ID, "Workspace", KNOWLEDGE_BASE_VIEW, null);
+        void testGetWorkspaceKnowledgeBaseTagsRequiresViewScopeInTheEnvironment() {
+            assertRequiresWorkspaceScope(
+                () -> workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBaseTags(
+                    WORKSPACE_ID, DEVELOPMENT_ENVIRONMENT_ID),
+                KNOWLEDGE_BASE_VIEW, null, Environment.DEVELOPMENT);
         }
 
         @Test
-        void testGetWorkspaceKnowledgeBaseTagsByKnowledgeBaseIdRequiresViewScopeOnTheWorkspace() {
-            assertRequiresScope(
-                () -> workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBaseTagsByKnowledgeBaseId(WORKSPACE_ID),
-                WORKSPACE_ID, "Workspace", KNOWLEDGE_BASE_VIEW, null);
+        void testGetWorkspaceKnowledgeBaseTagsByKnowledgeBaseIdRequiresViewScopeInTheEnvironment() {
+            assertRequiresWorkspaceScope(
+                () -> workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBaseTagsByKnowledgeBaseId(
+                    WORKSPACE_ID, DEVELOPMENT_ENVIRONMENT_ID),
+                KNOWLEDGE_BASE_VIEW, null, Environment.DEVELOPMENT);
         }
 
         @Test
@@ -382,7 +536,7 @@ class WorkspaceKnowledgeBaseFacadeIntTest {
         }
 
         @Test
-        void testDeleteWorkspaceKnowledgeBaseRequiresEditScopeOnTheKnowledgeBase() {
+        void testDeleteWorkspaceKnowledgeBaseRequiresDeleteScopeOnTheKnowledgeBase() {
             KnowledgeBase knowledgeBase = createKnowledgeBase("Support articles");
 
             assertRequiresScope(
@@ -391,7 +545,7 @@ class WorkspaceKnowledgeBaseFacadeIntTest {
 
                     return null;
                 },
-                knowledgeBase.getId(), "KnowledgeBase", KNOWLEDGE_BASE_EDIT, KNOWLEDGE_BASE_VIEW);
+                knowledgeBase.getId(), "KnowledgeBase", KNOWLEDGE_BASE_DELETE, KNOWLEDGE_BASE_EDIT);
 
             assertThat(knowledgeBaseRepository.findById(knowledgeBase.getId())).isEmpty();
         }
@@ -431,8 +585,46 @@ class WorkspaceKnowledgeBaseFacadeIntTest {
             }
         }
 
+        private <T> T assertRequiresWorkspaceScope(
+            Callable<T> callable, String scope, @Nullable String lesserScope, Environment environment) {
+
+            assertThatThrownBy(callable::call).isInstanceOf(AccessDeniedException.class);
+
+            if (lesserScope != null) {
+                when(permissionService.hasWorkspaceScope(WORKSPACE_ID, lesserScope, environment)).thenReturn(true);
+
+                assertThatThrownBy(callable::call).isInstanceOf(AccessDeniedException.class);
+
+                reset(permissionService);
+            }
+
+            when(permissionService.hasWorkspaceScope(WORKSPACE_ID + 1, scope, environment)).thenReturn(true);
+
+            assertThatThrownBy(callable::call).isInstanceOf(AccessDeniedException.class);
+
+            reset(permissionService);
+
+            for (Environment otherEnvironment : Environment.values()) {
+                if (otherEnvironment != environment) {
+                    when(permissionService.hasWorkspaceScope(WORKSPACE_ID, scope, otherEnvironment)).thenReturn(true);
+                }
+            }
+
+            assertThatThrownBy(callable::call).isInstanceOf(AccessDeniedException.class);
+
+            reset(permissionService);
+
+            when(permissionService.hasWorkspaceScope(WORKSPACE_ID, scope, environment)).thenReturn(true);
+
+            try {
+                return callable.call();
+            } catch (Exception exception) {
+                throw new AssertionError("Expected the granted call to succeed", exception);
+            }
+        }
+
         private KnowledgeBase createKnowledgeBase(String name) {
-            when(permissionService.hasResourceScope(WORKSPACE_ID, "Workspace", KNOWLEDGE_BASE_CREATE))
+            when(permissionService.hasWorkspaceScope(WORKSPACE_ID, KNOWLEDGE_BASE_CREATE, Environment.DEVELOPMENT))
                 .thenReturn(true);
 
             KnowledgeBase knowledgeBase = workspaceKnowledgeBaseFacade.createWorkspaceKnowledgeBase(

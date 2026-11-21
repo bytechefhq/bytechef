@@ -17,17 +17,10 @@ import com.bytechef.ee.platform.apiconnector.configuration.dto.GenerateSpecifica
 import com.bytechef.ee.platform.apiconnector.configuration.dto.ParameterDefinitionDTO;
 import com.bytechef.ee.platform.apiconnector.configuration.dto.RequestBodyDefinitionDTO;
 import com.bytechef.ee.platform.apiconnector.configuration.dto.ResponseDefinitionDTO;
-import com.bytechef.ee.platform.apiconnector.configuration.exception.ApiConnectorErrorType;
 import com.bytechef.ee.platform.apiconnector.configuration.facade.ApiConnectorFacade;
-import com.bytechef.ee.platform.apiconnector.configuration.facade.ApiConnectorGenerationJobFacade;
-import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorGenerationJobService;
-import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorService;
-import com.bytechef.ee.platform.apiconnector.configuration.service.OpenApiSpecificationGenerator;
-import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -46,28 +39,15 @@ import org.springframework.stereotype.Controller;
 public class ApiConnectorGraphQlController {
 
     private final ApiConnectorFacade apiConnectorFacade;
-    private final ApiConnectorGenerationJobFacade apiConnectorGenerationJobFacade;
-    private final ApiConnectorGenerationJobService apiConnectorGenerationJobService;
-    private final ApiConnectorService apiConnectorService;
-    private final OpenApiSpecificationGenerator openApiSpecificationGenerator;
 
     @SuppressFBWarnings("EI")
-    public ApiConnectorGraphQlController(
-        ApiConnectorFacade apiConnectorFacade,
-        Optional<ApiConnectorGenerationJobFacade> apiConnectorGenerationJobFacade,
-        ApiConnectorGenerationJobService apiConnectorGenerationJobService, ApiConnectorService apiConnectorService,
-        OpenApiSpecificationGenerator openApiSpecificationGenerator) {
-
+    public ApiConnectorGraphQlController(ApiConnectorFacade apiConnectorFacade) {
         this.apiConnectorFacade = apiConnectorFacade;
-        this.apiConnectorGenerationJobFacade = apiConnectorGenerationJobFacade.orElse(null);
-        this.apiConnectorGenerationJobService = apiConnectorGenerationJobService;
-        this.apiConnectorService = apiConnectorService;
-        this.openApiSpecificationGenerator = openApiSpecificationGenerator;
     }
 
     @QueryMapping
     public ApiConnector apiConnector(@Argument long id) {
-        return apiConnectorService.getApiConnector(id);
+        return apiConnectorFacade.getApiConnector(id);
     }
 
     @QueryMapping
@@ -77,7 +57,7 @@ public class ApiConnectorGraphQlController {
 
     @QueryMapping
     public GenerationJobStatusRecord generationJobStatus(@Argument String jobId) {
-        return apiConnectorGenerationJobService.get(jobId)
+        return apiConnectorFacade.fetchGenerationJob(jobId)
             .map(this::toGenerationJobStatusRecord)
             .orElse(null);
     }
@@ -92,26 +72,26 @@ public class ApiConnectorGraphQlController {
         apiConnector.setIcon(input.icon());
         apiConnector.setConnectorVersion(input.connectorVersion());
 
-        return apiConnectorService.create(apiConnector);
+        return apiConnectorFacade.createApiConnector(apiConnector);
     }
 
     @MutationMapping
     public boolean deleteApiConnector(@Argument long id) {
-        apiConnectorService.delete(id);
+        apiConnectorFacade.deleteApiConnector(id);
 
         return true;
     }
 
     @MutationMapping
     public boolean enableApiConnector(@Argument long id, @Argument boolean enable) {
-        apiConnectorService.enableApiConnector(id, enable);
+        apiConnectorFacade.enableApiConnector(id, enable);
 
         return true;
     }
 
     @MutationMapping
     public ApiConnector updateApiConnector(@Argument long id, @Argument UpdateApiConnectorInput input) {
-        ApiConnector apiConnector = apiConnectorService.getApiConnector(id);
+        ApiConnector apiConnector = apiConnectorFacade.getApiConnector(id);
 
         if (input.name() != null) {
             apiConnector.setName(input.name());
@@ -134,7 +114,7 @@ public class ApiConnectorGraphQlController {
                 .intValue());
         }
 
-        return apiConnectorService.update(apiConnector);
+        return apiConnectorFacade.updateApiConnector(apiConnector);
     }
 
     @MutationMapping
@@ -144,11 +124,7 @@ public class ApiConnectorGraphQlController {
 
     @MutationMapping
     public GenerateSpecificationResponseRecord generateSpecification(@Argument GenerateSpecificationInput input) {
-        GenerateSpecificationRequestDTO requestDTO = toDTO(input);
-
-        String specification = openApiSpecificationGenerator.generate(requestDTO);
-
-        return new GenerateSpecificationResponseRecord(specification);
+        return new GenerateSpecificationResponseRecord(apiConnectorFacade.generateSpecification(toDTO(input)));
     }
 
     @MutationMapping
@@ -160,23 +136,13 @@ public class ApiConnectorGraphQlController {
     public GenerationJobStatusRecord startGenerateFromDocumentationPreview(
         @Argument GenerateFromDocumentationInput input) {
 
-        if (apiConnectorGenerationJobFacade == null) {
-            throw new ConfigurationException(
-                "AI service is not configured. Please configure bytechef.ai.copilot settings.",
-                ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
-        }
-
-        ApiConnectorGenerationJob job = apiConnectorGenerationJobService.create(input.documentationUrl());
-
-        apiConnectorGenerationJobFacade.generateOpenApiSpecificationAsync(
-            job.getId(), input.documentationUrl(), input.userPrompt());
-
-        return toGenerationJobStatusRecord(job);
+        return toGenerationJobStatusRecord(
+            apiConnectorFacade.startGenerationJob(input.documentationUrl(), input.userPrompt()));
     }
 
     @MutationMapping
     public boolean cancelGenerationJob(@Argument String jobId) {
-        return apiConnectorGenerationJobService.requestCancellation(jobId);
+        return apiConnectorFacade.cancelGenerationJob(jobId);
     }
 
     private GenerationJobStatusRecord toGenerationJobStatusRecord(ApiConnectorGenerationJob job) {

@@ -154,8 +154,8 @@ describe('AiSkills', () => {
         const onDownload = vi.fn();
         const onSave = vi.fn();
 
-        const openMoreActionsMenu = async () => {
-            useAiSkillDetailToolbarStore.setState({handlers: {onCopilot, onDelete, onDownload, onSave}});
+        const openMoreActionsMenu = async (canManage = true) => {
+            useAiSkillDetailToolbarStore.setState({canManage, handlers: {onCopilot, onDelete, onDownload, onSave}});
             useAiSkillsStore.setState({selectedSkillId: '42', skillsView: 'detail'});
 
             renderPage(`${LIST_PATH}/42`);
@@ -187,6 +187,14 @@ describe('AiSkills', () => {
             await userEvent.click(screen.getByRole('menuitem', {name: 'Delete Skill'}));
 
             expect(onDelete).toHaveBeenCalledTimes(1);
+        });
+
+        it('offers only Download Skill and no Save to a member who may not manage the skill', async () => {
+            await openMoreActionsMenu(false);
+
+            expect(screen.getByRole('menuitem', {name: 'Download Skill'})).toBeInTheDocument();
+            expect(screen.queryByRole('menuitem', {name: 'Delete Skill'})).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Save changes'})).not.toBeInTheDocument();
         });
     });
 });

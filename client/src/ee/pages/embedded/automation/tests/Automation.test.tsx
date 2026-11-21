@@ -1,12 +1,31 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import {isWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/utils/workflowEditorReadOnlyGuard';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
+import {permissionStore} from '@/shared/stores/usePermissionStore';
 import {fireEvent, render, screen, userEvent} from '@/shared/util/test-utils';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import Automation from '../Automation';
+
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => {
+    const isGranted = (scope: string, environmentId?: number) =>
+        hoisted.scopeGrants === undefined || (hoisted.scopeGrants[environmentId ?? 0] ?? []).includes(scope);
+
+    return {
+        UNION_ENVIRONMENT_ID: -1,
+        useEmbeddedScopeState: (scope: string, environmentId?: number) => ({
+            editionUnknown: false,
+            error: false,
+            granted: isGranted(scope, environmentId),
+            loading: false,
+        }),
+        useHasEmbeddedScope: isGranted,
+    };
+});
 
 // ---------------------------------------------------------------------------
 // Hoisted mocks
@@ -17,6 +36,7 @@ const hoisted = vi.hoisted(() => {
         getWorkflowQueryMock: vi.fn(),
         navigateMock: vi.fn(),
         publishMutationMock: vi.fn(),
+        scopeGrants: undefined as Record<number, string[]> | undefined,
         workflow: {id: 'workflow-1', label: 'My Workflow Template'} as Record<string, unknown>,
         workflowUuid: 'workflow-1',
     };
@@ -115,11 +135,13 @@ vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowDataStore', () => ({
 vi.mock('@/pages/platform/workflow-editor/WorkflowEditorLayout', () => ({
     default: function WorkflowEditorLayoutMock() {
         const {platformType, useGetComponentDefinitionsQuery} = useWorkflowEditor();
+        const readOnly = useWorkflowEditorReadOnly();
 
         return (
             <div
                 data-component-definitions-source={useGetComponentDefinitionsQuery!({}).data?.[0]?.name}
                 data-platform-type={platformType}
+                data-read-only={String(readOnly)}
                 data-testid="workflow-editor-layout"
             />
         );
@@ -203,6 +225,9 @@ beforeEach(() => {
     hoisted.getWorkflowQueryMock.mockImplementation(() => ({data: hoisted.workflow, isLoading: false}));
     hoisted.navigateMock.mockReset();
     hoisted.publishMutationMock.mockReset();
+    hoisted.scopeGrants = undefined;
+
+    permissionStore.setState({embeddedScopeStates: {}});
     hoisted.workflow = {id: 'workflow-1', label: 'My Workflow Template'};
     hoisted.workflowUuid = 'workflow-1';
 
@@ -273,6 +298,32 @@ describe('Automation', () => {
         await user.click(screen.getByRole('button', {name: 'Publish button'}));
 
         expect(hoisted.publishMutationMock).toHaveBeenCalledWith({id: 'project-1'}, expect.anything());
+    });
+
+    it('testTheHubEditorOpensReadOnlyWithoutDevelopmentWorkflowEdit', () => {
+        hoisted.scopeGrants = {[-1]: ['INTEGRATION_PUBLISH', 'WORKFLOW_EDIT', 'WORKFLOW_VIEW'], 0: ['WORKFLOW_VIEW']};
+
+        permissionStore.setState({embeddedScopeStates: {0: {scopes: ['WORKFLOW_VIEW'], status: 'loaded'}}});
+
+        renderAutomation();
+
+        expect(screen.getByTestId('workflow-editor-layout')).toHaveAttribute('data-read-only', 'true');
+        expect(isWorkflowEditorReadOnly()).toBe(true);
+        expect(screen.getByLabelText('View only')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Publish'})).toBeInTheDocument();
+    });
+
+    it('opens the Hub editor for editing when Development workflow edit is held', () => {
+        hoisted.scopeGrants = {
+            [-1]: ['INTEGRATION_PUBLISH', 'WORKFLOW_EDIT', 'WORKFLOW_VIEW'],
+            0: ['WORKFLOW_EDIT', 'WORKFLOW_VIEW'],
+        };
+
+        renderAutomation();
+
+        expect(screen.getByTestId('workflow-editor-layout')).toHaveAttribute('data-read-only', 'false');
+        expect(screen.queryByLabelText('View only')).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Publish'})).toBeInTheDocument();
     });
 
     it('shows the draft version badge for a published project', () => {

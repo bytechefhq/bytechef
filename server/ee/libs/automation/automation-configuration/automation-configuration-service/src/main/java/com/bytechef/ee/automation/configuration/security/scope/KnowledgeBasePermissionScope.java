@@ -18,5 +18,6 @@ public enum KnowledgeBasePermissionScope implements PermissionScopeType {
 
     KNOWLEDGE_BASE_VIEW,
     KNOWLEDGE_BASE_CREATE,
-    KNOWLEDGE_BASE_EDIT
+    KNOWLEDGE_BASE_EDIT,
+    KNOWLEDGE_BASE_DELETE
 }

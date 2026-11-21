@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.execution.public_.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications;
 import com.bytechef.ee.embedded.execution.facade.ToolFacade;
 import com.bytechef.ee.embedded.execution.facade.dto.ToolDTO;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentModel;
@@ -48,6 +49,8 @@ public class ToolApiController implements ToolApi {
         String externalUserId, ExecuteToolRequestModel executeToolRequestModel, EnvironmentModel xEnvironment,
         Long xInstanceId) {
 
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
+
         Environment environment = environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
 
         return ResponseEntity.ok(
@@ -60,6 +63,8 @@ public class ToolApiController implements ToolApi {
     public ResponseEntity<Map<String, List<ToolModel>>> getTools(
         String externalUserId, EnvironmentModel xEnvironment, List<String> categories, List<String> components,
         List<String> tools) {
+
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
 
         Environment environment = environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
 

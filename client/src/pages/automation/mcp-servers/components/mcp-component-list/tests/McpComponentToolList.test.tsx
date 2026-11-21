@@ -12,6 +12,16 @@ vi.mock('@/shared/queries/platform/componentDefinitions.queries', () => ({
     useGetComponentDefinitionQuery: () => ({data: hoisted.componentDefinition}),
 }));
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: () => true,
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasWorkspaceScope')>()),
+    useHasWorkspaceScope: () => true,
+}));
+
 vi.mock('../McpComponentToolListItem', () => ({
     default: ({
         connectionRequired,

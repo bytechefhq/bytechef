@@ -5,6 +5,8 @@ import ConnectedUserSheetPanelListSkeleton from '@/ee/pages/embedded/connected-u
 import ConnectedUserMcpServerListItem from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerListItem';
 import ProvisionMcpServerDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/provision-mcp-server-dialog/ProvisionMcpServerDialog';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
+import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {
     useConnectedUserMcpServersQuery,
     useProvisionableConnectedUserMcpServersQuery,
@@ -21,13 +23,22 @@ const ConnectedUserSheetPanelMcpServerList = ({
 }) => {
     const [showProvisionDialog, setShowProvisionDialog] = useState(false);
 
-    const {data, isLoading} = useConnectedUserMcpServersQuery({
-        connectedUserId: connectedUserId.toString(),
-    });
+    const canViewMcpServers = useHasEmbeddedScope('MCP_VIEW');
+    const isTenantAdmin = useIsTenantAdmin();
 
-    const {data: provisionableData} = useProvisionableConnectedUserMcpServersQuery({
-        connectedUserId: connectedUserId.toString(),
-    });
+    const {data, isLoading} = useConnectedUserMcpServersQuery(
+        {
+            connectedUserId: connectedUserId.toString(),
+        },
+        {enabled: canViewMcpServers}
+    );
+
+    const {data: provisionableData} = useProvisionableConnectedUserMcpServersQuery(
+        {
+            connectedUserId: connectedUserId.toString(),
+        },
+        {enabled: isTenantAdmin}
+    );
 
     if (isLoading) {
         return <ConnectedUserSheetPanelListSkeleton label="Loading MCP servers" variant="mcpServer" />;

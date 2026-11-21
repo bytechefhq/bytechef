@@ -8,6 +8,7 @@
 package com.bytechef.ee.automation.configuration.security;
 
 import com.bytechef.automation.configuration.security.constant.PermissionScopeType;
+import com.bytechef.ee.automation.configuration.security.constant.PermissionScopeSide;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import java.util.Set;
 
@@ -28,6 +29,10 @@ public interface PermissionScopeProvider {
      * with different {@link ScopeDefinition#minimumRole()}) is a registration error.
      */
     Set<ScopeDefinition> scopeDefinitions();
+
+    default PermissionScopeSide side() {
+        return PermissionScopeSide.AUTOMATION;
+    }
 
     /**
      * A single scope: its {@link PermissionScopeType} and the lowest built-in {@link WorkspaceRole} that is granted it.

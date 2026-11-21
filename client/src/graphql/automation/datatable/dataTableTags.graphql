@@ -1,5 +1,5 @@
-query dataTableTags($workspaceId: ID!) {
-    dataTableTags(workspaceId: $workspaceId) {
+query dataTableTags($environmentId: ID!, $workspaceId: ID!) {
+    dataTableTags(environmentId: $environmentId, workspaceId: $workspaceId) {
         id
         name
     }

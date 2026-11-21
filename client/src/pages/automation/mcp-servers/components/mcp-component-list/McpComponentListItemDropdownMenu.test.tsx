@@ -15,6 +15,14 @@ const hoisted = vi.hoisted(() => ({
     deletePending: false,
 }));
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', () => ({
+    useHasEmbeddedScope: () => true,
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => true,
+}));
+
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
     useDeleteEmbeddedMcpComponentMutation: (options: {onSuccess: () => void}) => {

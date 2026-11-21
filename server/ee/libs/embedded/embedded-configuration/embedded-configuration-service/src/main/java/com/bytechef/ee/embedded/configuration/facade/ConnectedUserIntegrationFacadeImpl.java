@@ -9,7 +9,6 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationComponent;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
@@ -70,7 +69,6 @@ import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
@@ -107,7 +105,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @ConditionalOnEEVersion
-@SkipAutomationAuthorization
 public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrationFacade {
 
     private static final Logger log = LoggerFactory.getLogger(ConnectedUserIntegrationFacadeImpl.class);
@@ -295,8 +292,11 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             throw new EmbeddedIntegrationNotVisibleException(integrationId);
         }
 
+        Set<Long> enabledEmbeddedMcpServerIds = getEnabledEmbeddedMcpServerIds();
+        Set<Long> enabledEmbeddedMcpToolIds = getEnabledEmbeddedMcpToolIds(enabledEmbeddedMcpServerIds);
+
         List<ConnectedUserIntegrationDTO.McpWorkflowInfo> mcpWorkflows = getMcpWorkflows(
-            integrationId, connectedUser);
+            integrationId, connectedUser, enabledEmbeddedMcpServerIds);
 
         IntegrationInstanceConfigurationDTO filteredConfiguration =
             filterWorkflows(integrationInstanceConfigurationDTO, connectedUser, mcpWorkflows);
@@ -357,8 +357,13 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             oAuth2Service.getRedirectUri());
 
         connectedUserIntegrationDTO = connectedUserIntegrationDTO.withMcp(
-            getMcpTools(Objects.requireNonNull(integrationDTO.id()), integrationDTO.componentName()), mcpWorkflows,
-            attachInstanceMcpData(connectedUserIntegrationDTO.integrationInstances(), connectedUser));
+            getMcpTools(
+                Objects.requireNonNull(integrationDTO.id()), integrationDTO.componentName(),
+                enabledEmbeddedMcpServerIds),
+            mcpWorkflows,
+            attachInstanceMcpData(
+                connectedUserIntegrationDTO.integrationInstances(), connectedUser, enabledEmbeddedMcpServerIds,
+                enabledEmbeddedMcpToolIds));
 
         return connectedUserIntegrationDTO.withStaticWebhookWorkflowUuids(
             getStaticWebhookWorkflowUuids(filteredConfiguration));
@@ -371,19 +376,23 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
+        Set<Long> enabledEmbeddedMcpServerIds = getEnabledEmbeddedMcpServerIds();
+        Set<Long> enabledEmbeddedMcpToolIds = getEnabledEmbeddedMcpToolIds(enabledEmbeddedMcpServerIds);
+
         return integrationInstanceConfigurationFacade
             .getIntegrationInstanceConfigurationIntegrations(enabled, environment, connectedUser)
             .stream()
             .filter(integrationInstanceConfigurationDTO -> isIntegrationVisible(
                 integrationInstanceConfigurationDTO.integration(), connectedUser))
             .map(integrationInstanceConfigurationDTO -> toConnectedUserIntegrationDTO(
-                connectedUser, integrationInstanceConfigurationDTO, environment))
+                connectedUser, integrationInstanceConfigurationDTO, environment, enabledEmbeddedMcpServerIds,
+                enabledEmbeddedMcpToolIds))
             .toList();
     }
 
     @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')")
     public List<ProvisionableIntegrationDTO> getProvisionableIntegrations(long connectedUserId) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
 
@@ -421,7 +430,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         @AuditData(key = "integrationInstanceConfigurationId", value = "#integrationInstanceConfigurationId"),
         @AuditData(key = "integrationInstanceId", value = "#result")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_MANAGE')")
     public long provisionIntegrationInstance(
         long connectedUserId, long integrationInstanceConfigurationId,
         @Nullable Map<String, Object> connectionParameters,
@@ -625,7 +634,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         ConnectionDefinition connectionDefinition;
 
         try {
-            mcpWorkflows = getMcpWorkflows(integration.getId(), connectedUser);
+            mcpWorkflows = getMcpWorkflows(integration.getId(), connectedUser, getEnabledEmbeddedMcpServerIds());
 
             ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
                 integration.getComponentName(), integration.getComponentVersion());
@@ -844,12 +853,12 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
     private ConnectedUserIntegrationDTO toConnectedUserIntegrationDTO(
         ConnectedUser connectedUser, IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO,
-        Environment environment) {
+        Environment environment, Set<Long> enabledEmbeddedMcpServerIds, Set<Long> enabledEmbeddedMcpToolIds) {
 
         IntegrationDTO integrationDTO = integrationInstanceConfigurationDTO.integration();
 
         List<ConnectedUserIntegrationDTO.McpWorkflowInfo> mcpWorkflows = getMcpWorkflows(
-            integrationDTO.id(), connectedUser);
+            integrationDTO.id(), connectedUser, enabledEmbeddedMcpServerIds);
 
         IntegrationInstanceConfigurationDTO filteredConfiguration =
             filterWorkflows(integrationInstanceConfigurationDTO, connectedUser, mcpWorkflows);
@@ -876,8 +885,13 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             integrationInstanceConfigurationsById);
 
         connectedUserIntegrationDTO = connectedUserIntegrationDTO.withMcp(
-            getMcpTools(Objects.requireNonNull(integrationDTO.id()), integrationDTO.componentName()), mcpWorkflows,
-            attachInstanceMcpData(connectedUserIntegrationDTO.integrationInstances(), connectedUser));
+            getMcpTools(
+                Objects.requireNonNull(integrationDTO.id()), integrationDTO.componentName(),
+                enabledEmbeddedMcpServerIds),
+            mcpWorkflows,
+            attachInstanceMcpData(
+                connectedUserIntegrationDTO.integrationInstances(), connectedUser, enabledEmbeddedMcpServerIds,
+                enabledEmbeddedMcpToolIds));
 
         return connectedUserIntegrationDTO.withStaticWebhookWorkflowUuids(
             getStaticWebhookWorkflowUuids(filteredConfiguration));
@@ -970,16 +984,30 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             .orElse(true);
     }
 
-    private boolean isEmbeddedMcpServerEnabled(long mcpServerId) {
-        McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
-
-        return mcpServer.getType() == PlatformType.EMBEDDED && mcpServer.isEnabled();
+    Set<Long> getEnabledEmbeddedMcpServerIds() {
+        return mcpServerService.getEnabledMcpServers(PlatformType.EMBEDDED)
+            .stream()
+            .map(McpServer::getId)
+            .collect(Collectors.toSet());
     }
 
-    List<ConnectedUserIntegrationDTO.McpToolInfo> getMcpTools(long integrationId, String componentName) {
+    Set<Long> getEnabledEmbeddedMcpToolIds(Set<Long> enabledEmbeddedMcpServerIds) {
+        return enabledEmbeddedMcpServerIds.stream()
+            .flatMap(mcpServerId -> mcpComponentService.getMcpServerMcpComponents(mcpServerId)
+                .stream())
+            .flatMap(mcpComponent -> mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())
+                .stream())
+            .filter(McpTool::isEnabled)
+            .map(McpTool::getId)
+            .collect(Collectors.toSet());
+    }
+
+    List<ConnectedUserIntegrationDTO.McpToolInfo> getMcpTools(
+        long integrationId, String componentName, Set<Long> enabledEmbeddedMcpServerIds) {
+
         return mcpComponentService.getMcpComponentsByComponentName(componentName)
             .stream()
-            .filter(mcpComponent -> isEmbeddedMcpServerEnabled(mcpComponent.getMcpServerId()))
+            .filter(mcpComponent -> enabledEmbeddedMcpServerIds.contains(mcpComponent.getMcpServerId()))
             .filter(mcpComponent -> isMcpComponentOfIntegration(mcpComponent.getId(), integrationId))
             .flatMap(mcpComponent -> mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())
                 .stream()
@@ -996,33 +1024,25 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             .toList();
     }
 
-    List<ConnectedUserIntegrationDTO.McpInstanceToolInfo> getMcpInstanceTools(long integrationInstanceId) {
+    List<ConnectedUserIntegrationDTO.McpInstanceToolInfo> getMcpInstanceTools(
+        long integrationInstanceId, Set<Long> enabledEmbeddedMcpToolIds) {
+
         return mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId)
             .stream()
-            .filter(mcpIntegrationInstanceTool -> {
-                McpTool mcpTool = mcpToolService.fetchMcpTool(mcpIntegrationInstanceTool.getMcpToolId())
-                    .orElse(null);
-
-                if (mcpTool == null || !mcpTool.isEnabled()) {
-                    return false;
-                }
-
-                McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpTool.getMcpComponentId());
-
-                return isEmbeddedMcpServerEnabled(mcpComponent.getMcpServerId());
-            })
+            .filter(mcpIntegrationInstanceTool -> enabledEmbeddedMcpToolIds.contains(
+                mcpIntegrationInstanceTool.getMcpToolId()))
             .map(mcpIntegrationInstanceTool -> new ConnectedUserIntegrationDTO.McpInstanceToolInfo(
                 mcpIntegrationInstanceTool.getMcpToolId(), mcpIntegrationInstanceTool.isEnabled()))
             .toList();
     }
 
     private List<ConnectedUserIntegrationDTO.McpWorkflowInfo> getMcpWorkflows(
-        long integrationId, ConnectedUser connectedUser) {
+        long integrationId, ConnectedUser connectedUser, Set<Long> enabledEmbeddedMcpServerIds) {
 
         return mcpIntegrationInstanceConfigurationService
             .getMcpIntegrationInstanceConfigurationsByIntegrationId(integrationId)
             .stream()
-            .filter(mcpIntegrationInstanceConfiguration -> isEmbeddedMcpServerEnabled(
+            .filter(mcpIntegrationInstanceConfiguration -> enabledEmbeddedMcpServerIds.contains(
                 mcpIntegrationInstanceConfiguration.getMcpServerId()))
             .map(McpIntegrationInstanceConfiguration::getId)
             .flatMap(mcpIntegrationInstanceConfigurationId -> mcpIntegrationInstanceConfigurationWorkflowService
@@ -1079,16 +1099,17 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             });
     }
 
-    private List<ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance> attachInstanceMcpData(
+    List<ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance> attachInstanceMcpData(
         List<ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance> integrationInstances,
-        ConnectedUser connectedUser) {
+        ConnectedUser connectedUser, Set<Long> enabledEmbeddedMcpServerIds, Set<Long> enabledEmbeddedMcpToolIds) {
 
         return integrationInstances.stream()
             .map(integrationInstance -> new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance(
                 integrationInstance.connection(), integrationInstance.integrationInstance(),
                 getWorkflowsWithStaticWebhookUrl(integrationInstance),
-                getMcpInstanceTools(getIntegrationInstanceId(integrationInstance)),
-                getMcpInstanceWorkflows(integrationInstance.integrationInstance(), connectedUser),
+                getMcpInstanceTools(getIntegrationInstanceId(integrationInstance), enabledEmbeddedMcpToolIds),
+                getMcpInstanceWorkflows(
+                    integrationInstance.integrationInstance(), connectedUser, enabledEmbeddedMcpServerIds),
                 integrationInstance.integrationInstanceConfiguration(), integrationInstance.connectionConfig()))
             .toList();
     }
@@ -1145,7 +1166,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
     }
 
     private List<ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstanceWorkflow> getMcpInstanceWorkflows(
-        IntegrationInstance integrationInstance, ConnectedUser connectedUser) {
+        IntegrationInstance integrationInstance, ConnectedUser connectedUser, Set<Long> enabledEmbeddedMcpServerIds) {
 
         long integrationInstanceId = Objects.requireNonNull(integrationInstance.getId());
 
@@ -1155,7 +1176,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             .getMcpIntegrationInstanceConfigurationsByIntegrationInstanceConfigurationId(
                 integrationInstance.getIntegrationInstanceConfigurationId())) {
 
-            if (!isEmbeddedMcpServerEnabled(mcpIntegrationInstanceConfiguration.getMcpServerId())) {
+            if (!enabledEmbeddedMcpServerIds.contains(mcpIntegrationInstanceConfiguration.getMcpServerId())) {
                 continue;
             }
 

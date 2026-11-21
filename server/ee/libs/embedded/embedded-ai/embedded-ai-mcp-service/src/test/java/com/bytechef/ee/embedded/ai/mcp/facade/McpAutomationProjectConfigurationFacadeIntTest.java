@@ -12,8 +12,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
 
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
@@ -131,8 +129,6 @@ class McpAutomationProjectConfigurationFacadeIntTest {
                 .as("%s.%s", McpAutomationProjectConfigurationFacade.class.getSimpleName(), method.getName())
                 .isInstanceOf(AccessDeniedException.class);
         }
-
-        verify(permissionService, times(methods.size())).isTenantAdmin();
     }
 
     private void invoke(Method method) throws Throwable {

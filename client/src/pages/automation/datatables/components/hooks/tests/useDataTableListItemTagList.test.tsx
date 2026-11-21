@@ -1,4 +1,5 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {renderHook} from '@testing-library/react';
 import {ReactNode} from 'react';
@@ -25,8 +26,8 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useUpdateDataTableTagsMutation: useUpdateDataTableTagsMutationMock,
 }));
 
-const CURRENT_WORKSPACE_KEY = ['dataTableTagsByTable', {workspaceId: '7'}];
-const OTHER_WORKSPACE_KEY = ['dataTableTagsByTable', {workspaceId: '8'}];
+const CURRENT_WORKSPACE_KEY = ['dataTableTagsByTable', {environmentId: '2', workspaceId: '7'}];
+const OTHER_WORKSPACE_KEY = ['dataTableTagsByTable', {environmentId: '2', workspaceId: '8'}];
 
 let queryClient: QueryClient;
 
@@ -46,6 +47,7 @@ describe('useDataTableListItemTagList', () => {
 
         queryClient = new QueryClient();
 
+        environmentStore.setState({currentEnvironmentId: 2});
         useWorkspaceStore.setState({currentWorkspaceId: 7});
     });
 

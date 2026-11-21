@@ -4,6 +4,9 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")
 
+    testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
 }

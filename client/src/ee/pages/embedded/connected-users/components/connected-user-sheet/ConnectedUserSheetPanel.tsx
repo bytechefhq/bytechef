@@ -7,12 +7,15 @@ import ConnectedUserSheetPanelProfile from '@/ee/pages/embedded/connected-users/
 import ConnectedUserSheetPanelWorkflowExecutionList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelWorkflowExecutionList';
 import ConnectedUserSheetPanelWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelWorkflowList';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 
 interface ConnectedUserSheetPanelProps {
     connectedUser: ConnectedUser;
 }
 
 const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) => {
+    const canViewMcpServers = useHasEmbeddedScope('MCP_VIEW');
+
     return (
         <div className="flex min-h-full w-full shrink-0 flex-col space-y-10 rounded-lg bg-background p-3">
             <div className="w-full space-y-2">
@@ -27,7 +30,7 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
 
                     <TabsTrigger value="workflows">Automations</TabsTrigger>
 
-                    <TabsTrigger value="mcp-servers">MCP Servers</TabsTrigger>
+                    {canViewMcpServers && <TabsTrigger value="mcp-servers">MCP Servers</TabsTrigger>}
 
                     <TabsTrigger value="connections">Connections</TabsTrigger>
 
@@ -56,14 +59,16 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                     )}
                 </TabsContent>
 
-                <TabsContent value="mcp-servers">
-                    {connectedUser.id != null && (
-                        <ConnectedUserSheetPanelMcpServerList
-                            connectedUserId={connectedUser.id}
-                            connectedUserIntegrationInstances={connectedUser.integrationInstances ?? []}
-                        />
-                    )}
-                </TabsContent>
+                {canViewMcpServers && (
+                    <TabsContent value="mcp-servers">
+                        {connectedUser.id != null && (
+                            <ConnectedUserSheetPanelMcpServerList
+                                connectedUserId={connectedUser.id}
+                                connectedUserIntegrationInstances={connectedUser.integrationInstances ?? []}
+                            />
+                        )}
+                    </TabsContent>
+                )}
 
                 <TabsContent value="connections">
                     {connectedUser.id != null && (
