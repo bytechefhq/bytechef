@@ -1,6 +1,6 @@
 import {useCreateKnowledgeBaseMutation} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {getCookie} from '@/shared/util/cookie-utils';
+import {formatFileSize, uploadSelectedFile} from '@/shared/util/file-upload-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChangeEvent, useState} from 'react';
 
@@ -39,54 +39,14 @@ export default function useCreateKnowledgeBaseDialog({workspaceId}: UseCreateKno
         setUploading(false);
     };
 
-    const uploadFile = async (knowledgeBaseId: string, file: File, index: number) => {
-        setSelectedFiles((prev) => {
-            const copy = [...prev];
-            copy[index] = {...copy[index], status: 'uploading'};
-
-            return copy;
+    const uploadFile = (knowledgeBaseId: string, file: File, index: number) =>
+        uploadSelectedFile({
+            fieldName: 'file',
+            file,
+            index,
+            setSelectedFiles,
+            url: `/api/automation/internal/knowledge-bases/${knowledgeBaseId}/documents`,
         });
-
-        try {
-            const formData = new FormData();
-
-            formData.append('file', file);
-
-            const response = await fetch(`/api/automation/internal/knowledge-bases/${knowledgeBaseId}/documents`, {
-                body: formData,
-                headers: {
-                    'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
-                },
-                method: 'POST',
-            });
-
-            if (!response.ok) {
-                throw new Error(`Upload failed: ${response.statusText}`);
-            }
-
-            setSelectedFiles((prev) => {
-                const copy = [...prev];
-                copy[index] = {
-                    ...copy[index],
-                    status: 'completed',
-                    statusMessage: 'Uploaded successfully',
-                };
-
-                return copy;
-            });
-        } catch (error) {
-            setSelectedFiles((prev) => {
-                const copy = [...prev];
-                copy[index] = {
-                    ...copy[index],
-                    status: 'error',
-                    statusMessage: error instanceof Error ? error.message : 'Upload failed',
-                };
-
-                return copy;
-            });
-        }
-    };
 
     const uploadFiles = async (knowledgeBaseId: string, files: SelectedFileI[]) => {
         setUploading(true);
@@ -144,18 +104,6 @@ export default function useCreateKnowledgeBaseDialog({workspaceId}: UseCreateKno
             },
             workspaceId,
         });
-    };
-
-    const formatFileSize = (bytes: number) => {
-        if (bytes === 0) {
-            return '0 Bytes';
-        }
-
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
     };
 
     const handleOpenChange = (newOpen: boolean) => {
