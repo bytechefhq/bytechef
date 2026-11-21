@@ -1,6 +1,6 @@
 dependencies {
     api(project(":sdks:backend:java:automation:project-api"))
-    api(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-loader"))
+    api(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-loader:platform-code-workflow-loader-api"))
 
     testImplementation(project(":server:libs:platform:platform-component:platform-component-polyglot"))
 }

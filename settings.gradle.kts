@@ -733,7 +733,7 @@ include("server:ee:libs:platform:platform-code-workflow:platform-code-workflow-c
 include("server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-service")
 include("server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-api")
 include("server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-impl")
-include("server:ee:libs:platform:platform-code-workflow:platform-code-workflow-loader")
+include("server:ee:libs:platform:platform-code-workflow:platform-code-workflow-loader:platform-code-workflow-loader-api")
 include("server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-api")
 include("server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-graphql")
 include("server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-rest")
