@@ -65,7 +65,7 @@ public class GraalVmTaskRunner implements TaskRunner {
 
     @Override
     public List<? extends ModifiableValueProperty<?, ?>> getProperties() {
-        boolean trustedEnabled = TaskRunnerTrustedMode.isEnabled(applicationProperties, GRAALVM);
+        boolean trustedEnabled = TaskRunnerTrustedMode.isEnabled(applicationProperties);
 
         List<ModifiableOption<String>> options = new ArrayList<>();
 
@@ -167,11 +167,11 @@ public class GraalVmTaskRunner implements TaskRunner {
         };
 
         if (scriptSandboxMode == ScriptSandboxMode.TRUSTED &&
-            !TaskRunnerTrustedMode.isEnabled(applicationProperties, GRAALVM)) {
+            !TaskRunnerTrustedMode.isEnabled(applicationProperties)) {
 
             throw new IllegalArgumentException(
                 "The GraalVM runner's '%s' mode is not enabled. An operator must enable it with %s=true."
-                    .formatted(TRUSTED, TaskRunnerTrustedMode.getPropertyName(GRAALVM)));
+                    .formatted(TRUSTED, TaskRunnerTrustedMode.getPropertyName()));
         }
 
         return scriptSandboxMode;

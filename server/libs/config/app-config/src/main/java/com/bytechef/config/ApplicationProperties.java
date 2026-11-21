@@ -5062,6 +5062,8 @@ public class ApplicationProperties {
 
         private Sandbox sandbox = new Sandbox();
 
+        private Trusted trusted = new Trusted();
+
         private boolean injectConnections;
 
         private RunnerLimits runnerLimits = new RunnerLimits();
@@ -5111,6 +5113,10 @@ public class ApplicationProperties {
             return sandbox;
         }
 
+        public Trusted getTrusted() {
+            return trusted;
+        }
+
         public boolean isInjectConnections() {
             return injectConnections;
         }
@@ -5129,6 +5135,10 @@ public class ApplicationProperties {
 
         public void setSandbox(Sandbox sandbox) {
             this.sandbox = sandbox;
+        }
+
+        public void setTrusted(Trusted trusted) {
+            this.trusted = trusted;
         }
 
         private static String toCanonicalName(String name) {
@@ -5183,6 +5193,19 @@ public class ApplicationProperties {
 
             public void setMaxHeapMemory(DataSize maxHeapMemory) {
                 this.maxHeapMemory = maxHeapMemory;
+            }
+        }
+
+        public static class Trusted {
+
+            private boolean enabled;
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
             }
         }
 

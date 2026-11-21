@@ -62,7 +62,6 @@ public class ApplicationPropertiesScriptBindingTest {
         applicationContextRunner
             .withPropertyValues(
                 "bytechef.script.runners.graalvm.enabled=true",
-                "bytechef.script.runners.graalvm.properties.trusted-enabled=true",
                 "bytechef.script.runners.docker.enabled=false")
             .run(context -> {
                 assertThat(context).hasNotFailed();
@@ -75,10 +74,6 @@ public class ApplicationPropertiesScriptBindingTest {
                     .getRunners()
                     .get("graalvm")
                     .isEnabled()).isTrue();
-                assertThat(applicationProperties.getScript()
-                    .getRunners()
-                    .get("graalvm")
-                    .getProperties()).containsEntry("trusted-enabled", "true");
             });
     }
 
@@ -97,8 +92,7 @@ public class ApplicationPropertiesScriptBindingTest {
                     Map.of(
                         "BYTECHEF_SCRIPT_RUNNERS_AWSBATCH_ENABLED", "true",
                         "BYTECHEF_SCRIPT_RUNNERS_KUBERNETES_PROPERTIES_MAXWAIT", "PT3H",
-                        "BYTECHEF_SCRIPT_RUNNERS_AWSBATCH_PROPERTIES_MAXWAIT", "PT2H",
-                        "BYTECHEF_SCRIPT_RUNNERS_GRAALVM_PROPERTIES_TRUSTED_ENABLED", "true"))))
+                        "BYTECHEF_SCRIPT_RUNNERS_AWSBATCH_PROPERTIES_MAXWAIT", "PT2H"))))
             .run(context -> {
                 assertThat(context).hasNotFailed();
 
@@ -118,11 +112,42 @@ public class ApplicationPropertiesScriptBindingTest {
                 assertThat(kubernetesRunner).isNotNull();
                 assertThat(kubernetesRunner.isEnabled()).isTrue();
                 assertThat(kubernetesRunner.propertiesByCanonicalName()).containsEntry("max-wait", "PT3H");
+            });
+    }
 
-                ApplicationProperties.Script.Runner graalVmRunner = script.findRunner("graalvm");
+    @Test
+    public void testTrustedBindsFalseWhenUnset() {
+        applicationContextRunner.run(context -> {
+            assertThat(context).hasNotFailed();
 
-                assertThat(graalVmRunner).isNotNull();
-                assertThat(graalVmRunner.propertiesByCanonicalName()).containsEntry("trusted-enabled", "true");
+            ApplicationProperties applicationProperties = context.getBean(ApplicationProperties.class);
+
+            ApplicationProperties.Script script = applicationProperties.getScript();
+
+            ApplicationProperties.Script.Trusted trusted = script.getTrusted();
+
+            assertThat(trusted.isEnabled()).isFalse();
+        });
+    }
+
+    @Test
+    public void testTrustedBindsFromEnvironmentVariable() {
+        applicationContextRunner
+            .withInitializer(applicationContext -> applicationContext.getEnvironment()
+                .getPropertySources()
+                .addFirst(new SystemEnvironmentPropertySource(
+                    StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME,
+                    Map.of("BYTECHEF_SCRIPT_TRUSTED_ENABLED", "true"))))
+            .run(context -> {
+                assertThat(context).hasNotFailed();
+
+                ApplicationProperties applicationProperties = context.getBean(ApplicationProperties.class);
+
+                ApplicationProperties.Script script = applicationProperties.getScript();
+
+                ApplicationProperties.Script.Trusted trusted = script.getTrusted();
+
+                assertThat(trusted.isEnabled()).isTrue();
             });
     }
 

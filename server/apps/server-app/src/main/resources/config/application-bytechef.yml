@@ -334,6 +334,9 @@ bytechef:
       max-concurrent-executions: 16
       max-cpu-time: 5m
       max-heap-memory: 512MB
+    trusted:
+      # Lets a script task ask for mode: trusted, which runs it with full host access and no resource limits.
+      enabled: false
     # Ceilings on what a remote task runner may cost this server: a held worker permit, captured log bytes, and
     # bytes moved in or out of the execution. A runner may override them under its own properties.
     runner-limits:
