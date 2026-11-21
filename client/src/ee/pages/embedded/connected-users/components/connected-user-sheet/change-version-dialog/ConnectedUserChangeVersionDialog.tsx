@@ -19,7 +19,7 @@ import useMoveWorkflowInputs, {
     MoveWorkflowInputsI,
 } from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/useMoveWorkflowInputs';
 import {InfoIcon} from 'lucide-react';
-import {useMemo, useState} from 'react';
+import {ReactNode, useMemo, useState} from 'react';
 
 import type {
     MoveConnectedUsersResultI,
@@ -76,6 +76,38 @@ const formatVersionLabel = (version: number, latestVersion: number, currentVersi
     }
 
     return label;
+};
+
+interface ChangeAllowedOptionsI {
+    changing: boolean;
+    editableInputs: boolean;
+    matchingConfigurationCount: number;
+    missingRequiredInput: boolean;
+    pending?: boolean;
+    previewLoading?: boolean;
+    targetSelected: boolean;
+    version?: number;
+}
+
+const isChangeAllowed = ({
+    changing,
+    editableInputs,
+    matchingConfigurationCount,
+    missingRequiredInput,
+    pending,
+    previewLoading,
+    targetSelected,
+    version,
+}: ChangeAllowedOptionsI): boolean => {
+    if (version === undefined || changing || pending) {
+        return false;
+    }
+
+    if (!targetSelected) {
+        return matchingConfigurationCount === 0;
+    }
+
+    return !previewLoading && !(editableInputs && missingRequiredInput);
 };
 
 const ConnectedUserChangeVersionDialog = ({
@@ -181,13 +213,32 @@ const ConnectedUserChangeVersionDialog = ({
         }
     };
 
-    const canChange =
-        selectedVersion !== undefined &&
-        (matchingConfigurations.length === 0 || !!selectedTarget) &&
-        !changing &&
-        !pending &&
-        !(selectedTarget && previewLoading) &&
-        !(editableInputs && selectedTarget && missingRequiredInput);
+    const canChange = isChangeAllowed({
+        changing,
+        editableInputs,
+        matchingConfigurationCount: matchingConfigurations.length,
+        missingRequiredInput,
+        pending,
+        previewLoading,
+        targetSelected: !!selectedTarget,
+        version: selectedVersion,
+    });
+
+    let statusContent: ReactNode = null;
+
+    if (movedResult) {
+        statusContent = (
+            <div className="flex flex-col gap-2">
+                <p className="text-sm text-content-neutral-secondary">
+                    {`${connectedUserLabel} moved to V${selectedVersion}, but some turned-on workflows need attention.`}
+                </p>
+
+                <MoveConnectedUsersResult result={movedResult} toSkippedUser={toSkippedUser} />
+            </div>
+        );
+    } else if (otherVersions.length === 0) {
+        statusContent = <p className="text-sm text-content-neutral-secondary">{NO_OTHER_VERSION_REASON}</p>;
+    }
 
     return (
         <Dialog onOpenChange={(open) => !open && onClose()} open>
@@ -198,17 +249,7 @@ const ConnectedUserChangeVersionDialog = ({
                     <DialogDescription>{`Currently on ${currentConfigurationName} · V${currentVersion}`}</DialogDescription>
                 </DialogHeader>
 
-                {movedResult ? (
-                    <div className="flex flex-col gap-2">
-                        <p className="text-sm text-content-neutral-secondary">
-                            {`${connectedUserLabel} moved to V${selectedVersion}, but some turned-on workflows need attention.`}
-                        </p>
-
-                        <MoveConnectedUsersResult result={movedResult} toSkippedUser={toSkippedUser} />
-                    </div>
-                ) : otherVersions.length === 0 ? (
-                    <p className="text-sm text-content-neutral-secondary">{NO_OTHER_VERSION_REASON}</p>
-                ) : (
+                {statusContent ?? (
                     <div className="flex flex-col gap-4">
                         <fieldset className="space-y-2 border-0 p-0">
                             <Label htmlFor="connected-user-change-version-version">Version</Label>
