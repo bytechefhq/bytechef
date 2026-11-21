@@ -231,6 +231,46 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+### Call Procedure
+Name: call
+
+`Call a stored procedure or function (PL/SQL, PL/pgSQL, ...) and return its output parameters.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| call | Call | STRING | The call statement in JDBC escape syntax, for example &#123;:result = call balance(:accountId)&#125; for a function or &#123;call transfer(:from, :to, :status)&#125; for a procedure. A vendor block such as BEGIN :result := balance(:accountId); END; also works. Every :name placeholder is an input parameter unless it is declared in Output Parameters. Pass values through Parameters instead of writing them into the statement. | true |
+| parameters | Parameters | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Values of the input (IN) and input/output (IN_OUT) parameters, keyed by placeholder name. | false |
+| outputParameters | Output Parameters | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(type), STRING\(mode)&#125;] </details> | Placeholders the database writes to: the function return value and OUT or IN_OUT procedure arguments. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Call Procedure",
+  "name" : "call",
+  "parameters" : {
+    "call" : "",
+    "parameters" : { },
+    "outputParameters" : [ {
+      "name" : "",
+      "type" : "",
+      "mode" : ""
+    } ]
+  },
+  "type" : "mysql/v1/call"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
 
 ## Triggers
 
