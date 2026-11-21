@@ -28,12 +28,14 @@ import java.util.Map;
 import org.graalvm.polyglot.Value;
 import org.graalvm.polyglot.proxy.ProxyObject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Ivica Cardic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
+@Timeout(120)
 public class PolyglotValuesTest {
 
     private static final String LANGUAGE_ID = "js";

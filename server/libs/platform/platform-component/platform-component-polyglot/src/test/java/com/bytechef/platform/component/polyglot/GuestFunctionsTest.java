@@ -20,10 +20,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.graalvm.polyglot.Value;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 /**
  * @author Ivica Cardic
  */
+@Timeout(120)
 class GuestFunctionsTest {
 
     @Test

@@ -30,10 +30,12 @@ import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.SandboxPolicy;
 import org.graalvm.polyglot.Value;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 /**
  * @author Ivica Cardic
  */
+@Timeout(120)
 public class PolyglotValuesSandboxPolicyTest {
 
     private static final HostAccess HOST_ACCESS = HostAccess.newBuilder(HostAccess.NONE)
