@@ -107,7 +107,8 @@ public record IntegrationDTO(
     public IntegrationDTO withUnpublishedChanges(boolean unpublishedChanges) {
         return new IntegrationDTO(
             category, codeWorkflow, codeWorkflowLanguage, componentName, componentVersion, createdBy, createdDate,
-            description, developmentConfigurationCount, icon, id, integrationVersions, integrationWorkflowIds, lastModifiedBy,
+            description, developmentConfigurationCount, icon, id, integrationVersions, integrationWorkflowIds,
+            lastModifiedBy,
             lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, multipleInstances, name,
             permissionExpression, tags, title, version, unpublishedChanges);
     }
