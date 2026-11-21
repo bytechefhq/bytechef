@@ -418,7 +418,8 @@ bytechef:
       sync-concurrency-limit: 5
   workflow:
     code-workflow:
-      java-enabled: true
+      java:
+        enabled: true
     execution:
       agent:
         # Maximum nesting depth of sub-workflows called by AI agent tools default: 10

@@ -107,9 +107,13 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
         this.tagService = tagService;
         this.workflowService = workflowService;
         this.workflowPreDeleteListeners = workflowPreDeleteListeners;
-        this.javaEnabled = applicationProperties.getWorkflow()
-            .getCodeWorkflow()
-            .isJavaEnabled();
+        ApplicationProperties.Workflow workflow = applicationProperties.getWorkflow();
+
+        ApplicationProperties.Workflow.CodeWorkflow codeWorkflow = workflow.getCodeWorkflow();
+
+        ApplicationProperties.Workflow.CodeWorkflow.Java java = codeWorkflow.getJava();
+
+        this.javaEnabled = java.isEnabled();
     }
 
     @Override

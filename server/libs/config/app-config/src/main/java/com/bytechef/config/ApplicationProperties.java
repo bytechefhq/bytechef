@@ -6112,17 +6112,33 @@ public class ApplicationProperties {
          */
         public static class CodeWorkflow {
 
-            /**
-             * Whether uploading of Java (jar) code workflows is enabled
-             */
-            private boolean javaEnabled;
+            private Java java = new Java();
 
-            public boolean isJavaEnabled() {
-                return javaEnabled;
+            public Java getJava() {
+                return java;
             }
 
-            public void setJavaEnabled(boolean javaEnabled) {
-                this.javaEnabled = javaEnabled;
+            public void setJava(Java java) {
+                this.java = java;
+            }
+
+            /**
+             * Java code workflow settings.
+             */
+            public static class Java {
+
+                /**
+                 * Whether uploading of Java (jar) code workflows is enabled
+                 */
+                private boolean enabled;
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
             }
         }
 

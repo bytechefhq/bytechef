@@ -127,9 +127,13 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.workflowService = workflowService;
-        this.javaEnabled = applicationProperties.getWorkflow()
-            .getCodeWorkflow()
-            .isJavaEnabled();
+        ApplicationProperties.Workflow workflow = applicationProperties.getWorkflow();
+
+        ApplicationProperties.Workflow.CodeWorkflow codeWorkflow = workflow.getCodeWorkflow();
+
+        ApplicationProperties.Workflow.CodeWorkflow.Java java = codeWorkflow.getJava();
+
+        this.javaEnabled = java.isEnabled();
     }
 
     @Override

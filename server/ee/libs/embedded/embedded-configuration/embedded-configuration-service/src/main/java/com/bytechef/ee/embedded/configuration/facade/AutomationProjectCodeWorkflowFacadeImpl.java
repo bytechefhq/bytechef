@@ -90,9 +90,13 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
         this.cacheManager = cacheManager;
         this.codeWorkflowContainerService = codeWorkflowContainerService;
         this.codeWorkflowFileStorage = codeWorkflowFileStorage;
-        this.javaEnabled = applicationProperties.getWorkflow()
-            .getCodeWorkflow()
-            .isJavaEnabled();
+        ApplicationProperties.Workflow workflow = applicationProperties.getWorkflow();
+
+        ApplicationProperties.Workflow.CodeWorkflow codeWorkflow = workflow.getCodeWorkflow();
+
+        ApplicationProperties.Workflow.CodeWorkflow.Java java = codeWorkflow.getJava();
+
+        this.javaEnabled = java.isEnabled();
         this.projectCodeWorkflowDraftFacade = projectCodeWorkflowDraftFacade;
         this.projectCodeWorkflowService = projectCodeWorkflowService;
         this.projectService = projectService;
