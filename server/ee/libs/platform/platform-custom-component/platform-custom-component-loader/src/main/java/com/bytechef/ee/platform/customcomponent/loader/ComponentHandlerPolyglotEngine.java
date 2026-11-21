@@ -62,8 +62,6 @@ import org.graalvm.polyglot.proxy.ProxyObject;
  */
 class ComponentHandlerPolyglotEngine {
 
-    private static final int PYTHON_VARARGS_FLAG = 0x04;
-
     static ComponentHandler load(String languageId, String script) {
         return PolyglotSandbox.call(languageId, polyglotContext -> {
             Value value = polyglotContext.eval(languageId, script);
@@ -319,32 +317,10 @@ class ComponentHandlerPolyglotEngine {
     }
 
     private static Object executeGuestFunction(Value function, Object... arguments) {
-        Value result = function.execute(Arrays.copyOf(arguments, getAcceptedArgumentCount(function, arguments.length)));
+        Value result = function
+            .execute(Arrays.copyOf(arguments, PythonFunctions.getAcceptedArgumentCount(function, arguments.length)));
 
         return PolyglotValues.copyFromPolyglotContext(PolyglotValues.copyToJavaValue(result));
-    }
-
-    private static int getAcceptedArgumentCount(Value function, int argumentCount) {
-        if (!function.hasMember("__code__")) {
-            return argumentCount;
-        }
-
-        Value code = function.getMember("__code__");
-
-        if ((code.getMember("co_flags")
-            .asInt() & PYTHON_VARARGS_FLAG) != 0) {
-
-            return argumentCount;
-        }
-
-        int declaredArgumentCount = code.getMember("co_argcount")
-            .asInt();
-
-        if (function.hasMember("__func__") && function.hasMember("__self__")) {
-            declaredArgumentCount--;
-        }
-
-        return Math.min(argumentCount, Math.max(declaredArgumentCount, 0));
     }
 
     private static Value getGuestMember(Value value, String key) {
