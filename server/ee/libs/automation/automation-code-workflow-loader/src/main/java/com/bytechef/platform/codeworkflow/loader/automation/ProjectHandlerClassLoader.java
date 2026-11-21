@@ -12,6 +12,7 @@ import com.bytechef.automation.project.definition.ProjectDefinition;
 import com.bytechef.classloader.AbstractHandlerClassLoader;
 import com.bytechef.classloader.IsolatingClassLoader;
 import com.bytechef.classloader.util.ClassLoaderUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URL;
 import org.springframework.cache.CacheManager;
 
@@ -30,6 +31,7 @@ class ProjectHandlerClassLoader extends AbstractHandlerClassLoader<ProjectHandle
         return new ProjectHandlerClassLoader(jarUrl, cacheKey, cacheManager);
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     private record ContextClassLoaderProjectHandler(
         ProjectHandler projectHandler, IsolatingClassLoader<?> classLoader)
         implements ProjectHandler, IsolatingClassLoader.ClassLoaderOwner {
