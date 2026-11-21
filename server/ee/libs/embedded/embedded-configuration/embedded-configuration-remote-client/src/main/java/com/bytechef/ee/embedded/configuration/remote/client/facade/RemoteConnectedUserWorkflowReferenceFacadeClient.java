@@ -70,6 +70,14 @@ public class RemoteConnectedUserWorkflowReferenceFacadeClient implements Connect
     }
 
     @Override
+    public ConnectedUserProjectWorkflow getOrCreateReference(
+        String externalUserId, String automationUuid, Environment environment,
+        Map<String, Long> requestedConnectionIds, @Nullable Map<String, ?> inputs, @Nullable String provisionedBy) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public ConnectedUserWorkflowReferenceValuesDTO getReferenceValues(long referenceId) {
         throw new UnsupportedOperationException();
     }

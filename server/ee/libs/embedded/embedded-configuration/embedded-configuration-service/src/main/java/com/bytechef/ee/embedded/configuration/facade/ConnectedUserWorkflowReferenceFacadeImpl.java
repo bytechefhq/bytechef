@@ -166,7 +166,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
     })
     public ConnectedUserProjectWorkflow getOrCreateReference(
         String externalUserId, String automationUuid, Environment environment) {
-        return provisionReference(externalUserId, automationUuid, environment, Map.of(), null);
+        return provisionReference(externalUserId, automationUuid, environment, Map.of(), null, null);
     }
 
     @Override
@@ -176,7 +176,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
     public ConnectedUserProjectWorkflow getOrCreateReference(
         String externalUserId, String automationUuid, Environment environment,
         Map<String, Long> requestedConnectionIds) {
-        return provisionReference(externalUserId, automationUuid, environment, requestedConnectionIds, null);
+        return provisionReference(externalUserId, automationUuid, environment, requestedConnectionIds, null, null);
     }
 
     @Override
@@ -186,12 +186,24 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
     public ConnectedUserProjectWorkflow getOrCreateReference(
         String externalUserId, String automationUuid, Environment environment,
         Map<String, Long> requestedConnectionIds, @Nullable Map<String, ?> inputs) {
-        return provisionReference(externalUserId, automationUuid, environment, requestedConnectionIds, inputs);
+        return provisionReference(externalUserId, automationUuid, environment, requestedConnectionIds, inputs, null);
+    }
+
+    @Override
+    @Transactional(noRollbackFor = {
+        MissingConnectionException.class, MissingInputException.class
+    })
+    public ConnectedUserProjectWorkflow getOrCreateReference(
+        String externalUserId, String automationUuid, Environment environment,
+        Map<String, Long> requestedConnectionIds, @Nullable Map<String, ?> inputs, @Nullable String provisionedBy) {
+
+        return provisionReference(
+            externalUserId, automationUuid, environment, requestedConnectionIds, inputs, provisionedBy);
     }
 
     private ConnectedUserProjectWorkflow provisionReference(
         String externalUserId, String automationUuid, Environment environment,
-        Map<String, Long> requestedConnectionIds, @Nullable Map<String, ?> inputs) {
+        Map<String, Long> requestedConnectionIds, @Nullable Map<String, ?> inputs, @Nullable String provisionedBy) {
         ConnectedUserProject connectedUserProject = lockConnectedUserProject(externalUserId, environment);
 
         Optional<ConnectedUserProjectWorkflow> existingReference = connectedUserProjectWorkflowRepository
@@ -230,6 +242,7 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
         reference.setConnectedUserProjectId(connectedUserProject.getId());
         reference.setEnabled(false);
         reference.setProjectDeploymentId(projectDeploymentId);
+        reference.setProvisionedBy(provisionedBy);
 
         ConnectedUserProjectWorkflow savedReference = connectedUserProjectWorkflowRepository.save(reference);
 

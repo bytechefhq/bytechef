@@ -61,6 +61,9 @@ public class ConnectedUserProjectWorkflow {
     @Column("dangling_reason")
     private String danglingReason;
 
+    @Column("provisioned_by")
+    private String provisionedBy;
+
     @CreatedBy
     @Column("created_by")
     private String createdBy;
@@ -183,6 +186,15 @@ public class ConnectedUserProjectWorkflow {
         this.danglingReason = danglingReason;
     }
 
+    @Nullable
+    public String getProvisionedBy() {
+        return provisionedBy;
+    }
+
+    public void setProvisionedBy(@Nullable String provisionedBy) {
+        this.provisionedBy = provisionedBy;
+    }
+
     public String getCreatedBy() {
         return createdBy;
     }
@@ -240,6 +252,7 @@ public class ConnectedUserProjectWorkflow {
             ", enabled=" + enabled +
             ", dangling=" + dangling +
             ", danglingReason='" + danglingReason + '\'' +
+            ", provisionedBy='" + provisionedBy + '\'' +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
