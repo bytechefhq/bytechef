@@ -16,8 +16,9 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent.Language;
-import customcomponentfixture.LazyHelper;
-import customcomponentfixture.LazyHelperComponentHandler;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import com.example.customcomponent.LazyHelper;
+import com.example.customcomponent.LazyHelperComponentHandler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
@@ -36,6 +38,7 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 /**
  * @version ee
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class ComponentHandlerLoaderTest {
 
     @TempDir

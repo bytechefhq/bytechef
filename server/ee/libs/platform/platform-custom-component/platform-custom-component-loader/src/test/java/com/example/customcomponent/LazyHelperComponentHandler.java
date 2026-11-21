@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package customcomponentfixture;
+package com.example.customcomponent;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionContext;
