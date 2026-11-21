@@ -74,8 +74,14 @@ public class GitWorkflowRepository implements WorkflowRepository {
     }
 
     public GitWorkflowRepository(String url, String branch, String username, String password) {
+        this(url, branch, username, password, List.of());
+    }
+
+    public GitWorkflowRepository(
+        String url, String branch, String username, String password, List<String> contentDirectories) {
+
         this.gitWorkflowOperations = new JGitWorkflowOperations(
-            url, branch, List.of("json", "yaml", "yml"), List.of(), username, password);
+            url, branch, List.of("json", "yaml", "yml"), List.of(), contentDirectories, username, password);
     }
 
     @Override
@@ -109,7 +115,7 @@ public class GitWorkflowRepository implements WorkflowRepository {
                     .map(GitWorkflowRepository::readWorkflow)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList()),
-                headFiles.gitInfo());
+                headFiles.gitInfo(), headFiles.contentFiles());
         } finally {
             lock.unlock();
         }
@@ -165,12 +171,16 @@ public class GitWorkflowRepository implements WorkflowRepository {
     }
 
     public String save(List<Workflow> workflows, String commitMessage) {
+        return save(workflows, Map.of(), commitMessage);
+    }
+
+    public String save(List<Workflow> workflows, Map<String, byte[]> contentFiles, String commitMessage) {
         return gitWorkflowOperations.write(
             workflows.stream()
                 .map(workflow -> new WorkflowResource(
                     workflow.getId(), Map.of(), getResource(workflow), workflow.getFormat()))
                 .toList(),
-            commitMessage);
+            contentFiles, commitMessage);
     }
 
     private static ByteArrayResource getResource(Workflow workflow) {
@@ -211,6 +221,10 @@ public class GitWorkflowRepository implements WorkflowRepository {
     }
 
     @SuppressFBWarnings("EI")
-    public record GitWorkflows(List<Workflow> workflows, GitInfo gitInfo) {
+    public record GitWorkflows(List<Workflow> workflows, GitInfo gitInfo, Map<String, byte[]> contentFiles) {
+
+        public GitWorkflows(List<Workflow> workflows, GitInfo gitInfo) {
+            this(workflows, gitInfo, Map.of());
+        }
     }
 }

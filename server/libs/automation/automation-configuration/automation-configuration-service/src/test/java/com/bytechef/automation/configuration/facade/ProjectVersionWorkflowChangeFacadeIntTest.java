@@ -31,6 +31,7 @@ import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
+import com.bytechef.automation.configuration.domain.ProjectWorkflowType;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
@@ -351,7 +352,8 @@ class ProjectVersionWorkflowChangeFacadeIntTest {
 
         String workflowId = Validate.notNull(workflow.getId(), "id");
 
-        projectWorkflowService.addWorkflow(projectId, projectVersion, workflowId, uuid(key));
+        projectWorkflowService.addWorkflow(
+            projectId, projectVersion, workflowId, uuid(key), ProjectWorkflowType.WORKFLOW);
 
         return workflowId;
     }

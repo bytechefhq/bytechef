@@ -27,6 +27,7 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.chat.AiHubChatServiceImpl;
 import com.bytechef.ee.ai.hub.chat.AiHubChatStatus;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatRepository;
+import com.bytechef.ee.ai.hub.toolsearch.ClusterElementToolCallback;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +40,7 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.PlatformTransactionManager;
 import tools.jackson.core.type.TypeReference;
 
@@ -104,6 +106,62 @@ class AiHubApprovalGateToolCallbackTest {
     }
 
     @Test
+    void testAClusterElementToolThatWritesIsHeldForApprovalAsAComponentRow() {
+        when(approvalService.findPending(CHAT_ID)).thenReturn(Optional.empty());
+        when(approvalService.createPending(any())).thenAnswer(invocation -> {
+            AiHubToolApproval approval = invocation.getArgument(0);
+
+            approval.setId(77L);
+
+            return approval;
+        });
+
+        ClusterElementToolCallback clusterElementTool = clusterElementToolCallback("slack", "sendMessage");
+
+        String result = gate(Set.of(), Set.of(), NonEmptyToolCallback.wrap(clusterElementTool)).call(
+            "{\"text\":\"hi\"}", toolContext());
+
+        assertThat(result).contains("\"awaitingApproval\":true");
+        verify(clusterElementTool, never()).call(anyString(), any());
+
+        ArgumentCaptor<AiHubToolApproval> captor = ArgumentCaptor.forClass(AiHubToolApproval.class);
+
+        verify(approvalService).createPending(captor.capture());
+
+        AiHubToolApproval saved = captor.getValue();
+
+        assertThat(saved.getToolName()).isEqualTo("slack_sendMessage");
+        assertThat(saved.getToolKind()).isEqualTo(AiHubToolApproval.ToolKind.COMPONENT);
+        assertThat(saved.getComponentName()).isEqualTo("slack");
+        assertThat(saved.getComponentVersion()).isEqualTo(1);
+    }
+
+    @Test
+    void testAClusterElementToolThatReadsRunsWithoutApproval() {
+        ClusterElementToolCallback clusterElementTool = clusterElementToolCallback("slack", "listChannels");
+
+        String result = gate(Set.of(), Set.of(), NonEmptyToolCallback.wrap(clusterElementTool)).call(
+            "{}", toolContext());
+
+        assertThat(result).isEqualTo("[]");
+        verify(approvalService, never()).createPending(any());
+    }
+
+    @Test
+    void testAWorkspaceRuleRequiresApprovalOfAClusterElementToolThatReads() {
+        when(approvalService.findPending(CHAT_ID)).thenReturn(Optional.empty());
+        when(approvalService.createPending(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        ClusterElementToolCallback clusterElementTool = clusterElementToolCallback("slack", "listChannels");
+
+        String result = gate(Set.of("slack_listChannels"), Set.of(), NonEmptyToolCallback.wrap(clusterElementTool))
+            .call("{}", toolContext());
+
+        assertThat(result).contains("\"awaitingApproval\":true");
+        verify(clusterElementTool, never()).call(anyString(), any());
+    }
+
+    @Test
     void testSecondGatedCallWhileOnePendingIsDeferred() {
         AiHubToolApproval pending = new AiHubToolApproval();
 
@@ -150,7 +208,8 @@ class AiHubApprovalGateToolCallbackTest {
         @SuppressWarnings("unchecked")
         AiHubChatService notDeletedChatService = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, mock(ObjectProvider.class), registry,
-            mock(PlatformTransactionManager.class), mock(ObjectProvider.class));
+            mock(PlatformTransactionManager.class), mock(ObjectProvider.class),
+            mock(ApplicationEventPublisher.class));
 
         AiHubChat chat = new AiHubChat(USER_ID);
 
@@ -302,5 +361,25 @@ class AiHubApprovalGateToolCallbackTest {
         when(callback.call(anyString(), any())).thenReturn(result);
 
         return callback;
+    }
+
+    private static ClusterElementToolCallback clusterElementToolCallback(
+        String componentName, String clusterElementName) {
+
+        ClusterElementToolCallback clusterElementToolCallback = mock(ClusterElementToolCallback.class);
+        String toolName = componentName + "_" + clusterElementName;
+
+        when(clusterElementToolCallback.getToolDefinition()).thenReturn(
+            ToolDefinition.builder()
+                .name(toolName)
+                .description(toolName)
+                .inputSchema("{}")
+                .build());
+        when(clusterElementToolCallback.getComponentName()).thenReturn(componentName);
+        when(clusterElementToolCallback.getComponentVersion()).thenReturn(1);
+        when(clusterElementToolCallback.getClusterElementName()).thenReturn(clusterElementName);
+        when(clusterElementToolCallback.call(anyString(), any())).thenReturn("[]");
+
+        return clusterElementToolCallback;
     }
 }

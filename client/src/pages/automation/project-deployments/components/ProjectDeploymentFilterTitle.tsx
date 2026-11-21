@@ -1,14 +1,17 @@
 import Badge from '@/components/Badge/Badge';
+import {AgentsFilterType} from '@/pages/automation/agents/components/AgentsFilterLeftSidebarNav';
 import {Type} from '@/pages/automation/project-deployments/ProjectDeployments';
 import {Project, Tag} from '@/shared/middleware/automation/configuration';
 import {ReactNode} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 const ProjectDeploymentFilterTitle = ({
+    agentsFilter,
     filterData,
     projects,
     tags,
 }: {
+    agentsFilter?: AgentsFilterType;
     environment?: number;
     filterData: {id?: number; type: Type};
     projects: Project[] | undefined;
@@ -34,6 +37,14 @@ const ProjectDeploymentFilterTitle = ({
                 styleType="primary-outline"
                 weight="semibold"
             />
+
+            {agentsFilter && (
+                <Badge
+                    label={`Agents: ${agentsFilter === 'scheduled' ? 'Scheduled' : 'All Agents'}`}
+                    styleType="primary-outline"
+                    weight="semibold"
+                />
+            )}
         </div>
     );
 };

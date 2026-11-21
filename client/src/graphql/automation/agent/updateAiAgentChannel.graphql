@@ -1,0 +1,3 @@
+mutation updateAiAgentChannel($input: UpdateAiAgentChannelInput!) {
+    updateAiAgentChannel(input: $input)
+}

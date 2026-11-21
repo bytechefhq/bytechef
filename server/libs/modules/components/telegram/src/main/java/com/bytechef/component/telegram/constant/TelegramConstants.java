@@ -31,17 +31,21 @@ import java.util.List;
 public class TelegramConstants {
 
     public static final String BOT_TOKEN = "botToken";
+    public static final String CHAT = "chat";
     public static final String CHAT_ID = "chat_id";
     public static final String WEBHOOK_SECRET_TOKEN = "webhookSecretToken";
     public static final String DIRECT_MESSAGES_TOPIC_ID = "direct_messages_topic_id";
     public static final String DOCUMENT = "document";
+    public static final String ID = "id";
     public static final String MEDIA_TYPE = "mediaType";
+    public static final String MESSAGE = "message";
     public static final String PHOTO = "photo";
+    public static final String TELEGRAM = "telegram";
     public static final String TEXT = "text";
     public static final String VIDEO = "video";
 
     private static final List<ValueProperty<?>> CHAT_OUTPUT_PROPERTIES = List.of(
-        integer("id")
+        integer(ID)
             .description("Unique identifier for this chat."),
         string("title")
             .description("Title, for supergroups, channels and group chats."),
@@ -99,9 +103,9 @@ public class TelegramConstants {
             .properties(CHAT_OUTPUT_PROPERTIES),
         integer("date")
             .description("Date the message was sent in Unix time."),
-        object("chat")
+        object(CHAT)
             .properties(CHAT_OUTPUT_PROPERTIES),
-        string("text")
+        string(TEXT)
             .description("For text messages, the actual UTF-8 text of the message."),
         object("direct_messages_topic")
             .description("Information about the direct messages chat topic that contains the message.")

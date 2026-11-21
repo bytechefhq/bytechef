@@ -18,13 +18,14 @@ import ProjectVersionWorkflowChanges from './ProjectVersionWorkflowChanges';
 
 interface ProjectVersionHistorySheetProps {
     deleteProjectVersionPending?: boolean;
-    onDeleteProjectVersion: (projectVersion: number, onSuccess: () => void) => void;
-    onRestoreProjectVersion: (projectVersion: number, onSuccess: () => void) => void;
+    onDeleteProjectVersion?: (projectVersion: number, onSuccess: () => void) => void;
+    onRestoreProjectVersion?: (projectVersion: number, onSuccess: () => void) => void;
     onSheetOpenChange: (open: boolean) => void;
-    projectId: number;
+    projectId?: number;
     projectVersions: ProjectVersion[];
     restoreProjectVersionPending?: boolean;
     sheetOpen: boolean;
+    title?: string;
     unpublishedChanges?: boolean;
 }
 
@@ -37,14 +38,18 @@ const ProjectVersionHistorySheet = ({
     projectVersions,
     restoreProjectVersionPending,
     sheetOpen,
+    title = 'Project Version History',
     unpublishedChanges,
 }: ProjectVersionHistorySheetProps) => {
     const [deleteCandidateVersion, setDeleteCandidateVersion] = useState<number | undefined>();
     const [restoreConfirmationOpen, setRestoreConfirmationOpen] = useState(false);
     const [selectedVersion, setSelectedVersion] = useState<number | undefined>();
 
+    const versionActionsAvailable =
+        projectId !== undefined && onDeleteProjectVersion !== undefined && onRestoreProjectVersion !== undefined;
+
     const handleDeleteConfirm = () => {
-        if (deleteCandidateVersion === undefined) {
+        if (deleteCandidateVersion === undefined || !onDeleteProjectVersion) {
             return;
         }
 
@@ -58,7 +63,7 @@ const ProjectVersionHistorySheet = ({
     };
 
     const handleRestoreConfirm = () => {
-        if (selectedVersion === undefined) {
+        if (selectedVersion === undefined || !onRestoreProjectVersion) {
             return;
         }
 
@@ -80,7 +85,7 @@ const ProjectVersionHistorySheet = ({
                     <div className="flex items-center gap-x-2">
                         <HistoryIcon className="size-5" />
 
-                        <SheetTitle className="text-lg font-semibold">Project Version History</SheetTitle>
+                        <SheetTitle className="text-lg font-semibold">{title}</SheetTitle>
                     </div>
 
                     <SheetCloseButton />
@@ -95,52 +100,58 @@ const ProjectVersionHistorySheet = ({
                         version: projectVersion.version!,
                     }))}
                     onSelectVersion={setSelectedVersion}
-                    renderActions={({published, version}) => (
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    aria-label={`Version ${version} actions`}
-                                    className="size-6"
-                                    icon={<EllipsisVerticalIcon />}
-                                    onClick={(event) => event.stopPropagation()}
-                                    onKeyDown={(event) => event.stopPropagation()}
-                                    size="icon"
-                                    variant="ghost"
-                                />
-                            </DropdownMenuTrigger>
+                    renderActions={
+                        versionActionsAvailable
+                            ? ({published, version}) => (
+                                  <DropdownMenu>
+                                      <DropdownMenuTrigger asChild>
+                                          <Button
+                                              aria-label={`Version ${version} actions`}
+                                              className="size-6"
+                                              icon={<EllipsisVerticalIcon />}
+                                              onClick={(event) => event.stopPropagation()}
+                                              onKeyDown={(event) => event.stopPropagation()}
+                                              size="icon"
+                                              variant="ghost"
+                                          />
+                                      </DropdownMenuTrigger>
 
-                            <DropdownMenuContent align="end" onClick={(event) => event.stopPropagation()}>
-                                <DropdownMenuItem
-                                    icon={<DownloadIcon />}
-                                    label="Export"
-                                    onClick={() =>
-                                        (window.location.href = `/api/automation/internal/projects/${projectId}/export?projectVersion=${version}`)
-                                    }
-                                />
+                                      <DropdownMenuContent align="end" onClick={(event) => event.stopPropagation()}>
+                                          <DropdownMenuItem
+                                              icon={<DownloadIcon />}
+                                              label="Export"
+                                              onClick={() =>
+                                                  (window.location.href = `/api/automation/internal/projects/${projectId}/export?projectVersion=${version}`)
+                                              }
+                                          />
 
-                                {published && (
-                                    <>
-                                        <DropdownMenuSeparator />
+                                          {published && (
+                                              <>
+                                                  <DropdownMenuSeparator />
 
-                                        <DropdownMenuItem
-                                            icon={<Trash2Icon />}
-                                            label="Delete"
-                                            onClick={() => setDeleteCandidateVersion(version)}
-                                            variant="destructive"
-                                        />
-                                    </>
-                                )}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    )}
-                    renderChanges={({published, version}) => (
-                        <ProjectVersionWorkflowChanges
-                            draft={!published}
-                            expanded
-                            projectId={projectId}
-                            projectVersion={version}
-                        />
-                    )}
+                                                  <DropdownMenuItem
+                                                      icon={<Trash2Icon />}
+                                                      label="Delete"
+                                                      onClick={() => setDeleteCandidateVersion(version)}
+                                                      variant="destructive"
+                                                  />
+                                              </>
+                                          )}
+                                      </DropdownMenuContent>
+                                  </DropdownMenu>
+                              )
+                            : undefined
+                    }
+                    renderChanges={({published, version}) =>
+                        projectId !== undefined && (
+                            <ProjectVersionWorkflowChanges
+                                draft={!published}
+                                expanded
+                                projectId={projectId}
+                                projectVersion={version}
+                            />
+                        )
+                    }
                     selectedVersion={selectedVersion}
                     unpublishedChanges={unpublishedChanges}
                 />
@@ -148,12 +159,14 @@ const ProjectVersionHistorySheet = ({
                 <footer className="flex shrink-0 justify-end gap-x-2 rounded-b-md border-t border-t-border/50 bg-surface-neutral-primary p-3">
                     <Button label="Cancel" onClick={() => onSheetOpenChange(false)} variant="outline" />
 
-                    <Button
-                        disabled={selectedVersion === undefined || restoreProjectVersionPending}
-                        icon={restoreProjectVersionPending ? <LoadingIcon /> : <CheckIcon />}
-                        label="Apply selected version"
-                        onClick={() => setRestoreConfirmationOpen(true)}
-                    />
+                    {versionActionsAvailable && (
+                        <Button
+                            disabled={selectedVersion === undefined || restoreProjectVersionPending}
+                            icon={restoreProjectVersionPending ? <LoadingIcon /> : <CheckIcon />}
+                            label="Apply selected version"
+                            onClick={() => setRestoreConfirmationOpen(true)}
+                        />
+                    )}
                 </footer>
             </SheetContent>
 

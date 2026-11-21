@@ -85,7 +85,6 @@ public class McpProjectWorkflowGraphQlController {
     @QueryMapping
     public List<ProjectWorkflow> toolEligibleProjectVersionWorkflows(
         @Argument long projectId, @Argument int projectVersion) {
-
         return mcpProjectWorkflowFacade.getToolEligibleProjectVersionWorkflows(projectId, projectVersion);
     }
 

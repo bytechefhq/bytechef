@@ -217,6 +217,12 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
             advisorParams.put(AiHubSessionMemory.USER_MESSAGE_ID_PARAM, userMessageId);
         }
 
+        Integer environmentOrdinal = environmentOrdinal(input);
+
+        if (environmentOrdinal != null) {
+            advisorParams.put(AiHubStateKeys.ENVIRONMENT_ID, environmentOrdinal.longValue());
+        }
+
         return advisorParams;
     }
 
@@ -270,6 +276,10 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
 
     @Override
     protected boolean endsTurn(ToolResponseMessage.ToolResponse toolResponse) {
+        return isTurnEnding(toolResponse);
+    }
+
+    public static boolean isTurnEnding(ToolResponseMessage.ToolResponse toolResponse) {
         String responseData = toolResponse.responseData();
 
         if (responseData == null

@@ -12,6 +12,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.ai.llm.tool.DelegatingToolCallback;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
+import com.bytechef.ee.ai.hub.toolsearch.ClusterElementToolCallback;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -95,7 +96,13 @@ public final class AiHubApprovalGateToolCallback implements DelegatingToolCallba
 
         AiHubToolApprovalPolicy.Decision decision = policy.decide(workspaceId);
 
-        if (!decision.isGated(toolName)) {
+        ClusterElementToolCallback clusterElementToolCallback = clusterElementToolCallback();
+
+        boolean gated = clusterElementToolCallback == null
+            ? decision.isGated(toolName)
+            : decision.isComponentToolGated(toolName, clusterElementToolCallback.getClusterElementName());
+
+        if (!gated) {
             return delegate.call(toolInput, toolContext);
         }
 
@@ -119,7 +126,8 @@ public final class AiHubApprovalGateToolCallback implements DelegatingToolCallba
 
         try {
             approval = approvalService.createPending(
-                toApproval(chat, userId, toolName, toolInput, invocationContext, toolContext));
+                toApproval(
+                    chat, userId, toolName, toolInput, invocationContext, toolContext, clusterElementToolCallback));
         } catch (RuntimeException exception) {
             log.warn("Could not record a tool approval for tool={} chat={}", toolName, chat.getId(), exception);
 
@@ -148,22 +156,37 @@ public final class AiHubApprovalGateToolCallback implements DelegatingToolCallba
         }
     }
 
+    private @Nullable ClusterElementToolCallback clusterElementToolCallback() {
+        ToolCallback unwrapped = DelegatingToolCallback.unwrap(delegate);
+
+        return unwrapped instanceof ClusterElementToolCallback clusterElementToolCallback
+            ? clusterElementToolCallback : null;
+    }
+
     private static AiHubToolApproval toApproval(
         AiHubChat chat, long userId, String toolName, @Nullable String toolInput,
-        AgentToolInvocationContext invocationContext, @Nullable ToolContext toolContext) {
+        AgentToolInvocationContext invocationContext, @Nullable ToolContext toolContext,
+        @Nullable ClusterElementToolCallback clusterElementToolCallback) {
 
         AiHubToolApproval approval = new AiHubToolApproval();
 
         approval.setChatId(chat.getId());
         approval.setThreadId(chat.getThreadId());
         approval.setRequestedByUserId(userId);
-        approval.setToolKind(AiHubToolApproval.ToolKind.CATALOG);
         approval.setToolName(toolName);
         approval.setArguments(toolInput == null ? "{}" : toolInput);
         approval.setMode(readMode(toolContext));
         approval.setEnvironment((int) chat.getEnvironmentId());
         approval.setLlmProvider(invocationContext.llmProvider());
         approval.setLlmModel(invocationContext.llmModel());
+
+        if (clusterElementToolCallback == null) {
+            approval.setToolKind(AiHubToolApproval.ToolKind.CATALOG);
+        } else {
+            approval.setToolKind(AiHubToolApproval.ToolKind.COMPONENT);
+            approval.setComponentName(clusterElementToolCallback.getComponentName());
+            approval.setComponentVersion(clusterElementToolCallback.getComponentVersion());
+        }
 
         return approval;
     }
