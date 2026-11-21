@@ -23,13 +23,13 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.JobContextAware;
 import com.bytechef.platform.component.polyglot.ComponentActionInvoker;
 import com.bytechef.platform.component.polyglot.ContextProxyObject;
+import com.bytechef.platform.component.polyglot.GuestFunctions;
 import com.bytechef.platform.component.polyglot.PolyglotSandbox;
 import com.bytechef.platform.component.polyglot.PolyglotValues;
 import com.bytechef.platform.component.polyglot.ScriptSandboxMode;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
@@ -93,7 +93,7 @@ public class PolyglotEngine {
 
             Value value;
 
-            if (getRequiredPerformParameterCount(polyglotContext, languageId) >= 3) {
+            if (GuestFunctions.getRequiredParameterCount(polyglotContext, languageId, performFunction, 2) >= 3) {
                 Map<String, ComponentConnection> exposedComponentConnections =
                     exposeConnectionParameters ? scriptComponentConnections : Map.of();
 
@@ -109,22 +109,6 @@ public class PolyglotEngine {
 
             return PolyglotValues.copyFromPolyglotContext(PolyglotValues.copyToJavaValue(value));
         });
-    }
-
-    private static int getRequiredPerformParameterCount(Context polyglotContext, String languageId) {
-        String parameterCountExpression = switch (languageId) {
-            case "js" -> "perform.length";
-            case "python" -> "perform.__code__.co_argcount - len(perform.__defaults__ or ())";
-            default -> null;
-        };
-
-        if (parameterCountExpression == null) {
-            return 2;
-        }
-
-        Value parameterCount = polyglotContext.eval(languageId, parameterCountExpression);
-
-        return parameterCount.fitsInInt() ? parameterCount.asInt() : 2;
     }
 
     private static void writeLog(JobContextAware jobContextAware, String level, String message) {
