@@ -5,6 +5,7 @@ import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {useResponseSchemaNoteStore} from '@/pages/platform/workflow-editor/stores/useResponseSchemaNoteStore';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
+import {useJsonSchemaModelPath} from '@/shared/components/monaco/useJsonSchemaModelPath';
 import {SPACE} from '@/shared/constants';
 import {MessageCircleQuestionIcon} from 'lucide-react';
 import {VisuallyHidden} from 'radix-ui';
@@ -25,6 +26,8 @@ const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: Prop
     const [localSchema, setLocalSchema] = useState<SchemaRecordType | undefined>(schema);
 
     const editorRef = useRef<StandaloneCodeEditorType | null>(null);
+
+    const modelPath = useJsonSchemaModelPath();
 
     const {setShowResponseSchemaNote, showResponseSchemaNote} = useResponseSchemaNoteStore();
 
@@ -119,6 +122,7 @@ const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: Prop
                                     onMount={(editor) => {
                                         editorRef.current = editor;
                                     }}
+                                    path={modelPath}
                                     value={JSON.stringify(localSchema, null, SPACE)}
                                 />
                             </Suspense>
