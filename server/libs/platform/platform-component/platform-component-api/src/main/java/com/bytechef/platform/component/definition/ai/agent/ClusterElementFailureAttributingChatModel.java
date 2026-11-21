@@ -67,8 +67,4 @@ public final class ClusterElementFailureAttributingChatModel implements ChatMode
         return delegate.getOptions();
     }
 
-    @Override
-    public ChatOptions getDefaultOptions() {
-        return delegate.getDefaultOptions();
-    }
 }

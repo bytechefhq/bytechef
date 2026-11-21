@@ -107,7 +107,7 @@ class AmazonBedrockChatActionTest {
 
             BedrockProxyChatModel bedrockProxyChatModel = (BedrockProxyChatModel) chatModel;
 
-            ChatOptions bedrockChatOptions = bedrockProxyChatModel.getDefaultOptions();
+            ChatOptions bedrockChatOptions = bedrockProxyChatModel.getOptions();
 
             assertEquals("amazon.nova-pro-v1:0", bedrockChatOptions.getModel());
             assertEquals(1000, bedrockChatOptions.getMaxTokens());

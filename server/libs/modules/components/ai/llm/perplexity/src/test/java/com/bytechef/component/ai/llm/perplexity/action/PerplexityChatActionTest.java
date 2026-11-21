@@ -111,7 +111,7 @@ class PerplexityChatActionTest {
         assertNotNull(chatModel);
         assertInstanceOf(OpenAiChatModel.class, chatModel);
 
-        OpenAiChatOptions options = (OpenAiChatOptions) chatModel.getDefaultOptions();
+        OpenAiChatOptions options = (OpenAiChatOptions) chatModel.getOptions();
 
         assertEquals("sonar", options.getModel());
         assertEquals(0.7, options.getTemperature());
@@ -143,7 +143,7 @@ class PerplexityChatActionTest {
         assertNotNull(chatModel);
         assertInstanceOf(OpenAiChatModel.class, chatModel);
 
-        OpenAiChatOptions options = (OpenAiChatOptions) chatModel.getDefaultOptions();
+        OpenAiChatOptions options = (OpenAiChatOptions) chatModel.getOptions();
 
         assertEquals("sonar", options.getModel());
         assertEquals(0.7, options.getTemperature());
@@ -178,6 +178,6 @@ class PerplexityChatActionTest {
         org.springframework.ai.chat.model.ChatModel chatModel = PerplexityChatAction.CHAT_MODEL.createChatModel(
             MockParametersFactory.create(inputParameters), mockedConnectionParameters, false);
 
-        return (OpenAiChatOptions) chatModel.getDefaultOptions();
+        return (OpenAiChatOptions) chatModel.getOptions();
     }
 }

@@ -107,7 +107,7 @@ class GroqChatActionTest {
 
             OpenAiChatModel openAiChatModel = (OpenAiChatModel) chatModel;
 
-            OpenAiChatOptions openAiChatOptions = (OpenAiChatOptions) openAiChatModel.getDefaultOptions();
+            OpenAiChatOptions openAiChatOptions = (OpenAiChatOptions) openAiChatModel.getOptions();
 
             assertEquals("token", openAiChatOptions.getApiKey());
             assertEquals("llama-3.3-70b-versatile", openAiChatOptions.getModel());

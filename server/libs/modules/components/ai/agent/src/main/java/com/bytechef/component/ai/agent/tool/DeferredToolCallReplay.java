@@ -157,11 +157,6 @@ public record DeferredToolCallReplay(List<Message> conversation, List<AssistantM
         }
 
         @Override
-        public ChatOptions getDefaultOptions() {
-            return delegate.getDefaultOptions();
-        }
-
-        @Override
         public ChatOptions getOptions() {
             return delegate.getOptions();
         }

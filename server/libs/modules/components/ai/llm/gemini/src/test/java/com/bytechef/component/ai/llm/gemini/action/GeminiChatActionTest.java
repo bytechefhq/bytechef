@@ -142,7 +142,7 @@ class GeminiChatActionTest {
 
         assertNotNull(chatModel);
 
-        GoogleGenAiChatOptions options = (GoogleGenAiChatOptions) chatModel.getDefaultOptions();
+        GoogleGenAiChatOptions options = (GoogleGenAiChatOptions) chatModel.getOptions();
 
         assertEquals("text/plain", options.getResponseMimeType());
     }
@@ -165,7 +165,7 @@ class GeminiChatActionTest {
         assertNotNull(chatModel);
         assertInstanceOf(GoogleGenAiChatModel.class, chatModel);
 
-        GoogleGenAiChatOptions options = (GoogleGenAiChatOptions) chatModel.getDefaultOptions();
+        GoogleGenAiChatOptions options = (GoogleGenAiChatOptions) chatModel.getOptions();
 
         assertEquals("gemini-2.0-flash", options.getModel());
         assertEquals(0.7, options.getTemperature());
