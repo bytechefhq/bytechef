@@ -20,7 +20,6 @@ import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.COLUMN
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.NAME;
 import static com.bytechef.platform.component.jdbc.constant.JdbcConstants.TYPE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -38,6 +37,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -72,7 +72,7 @@ class JdbcItemWriterTest {
             Map.of(NAME, "name", TYPE, "STRING"),
             Map.of(NAME, "active", TYPE, "BOOLEAN"));
 
-        when(inputParameters.getList(eq(COLUMNS), any(TypeReference.class), eq(List.of()))).thenReturn(columns);
+        stubColumns(columns);
 
         List<FieldDefinition> fields = jdbcItemWriter.getFields(inputParameters, connectionParameters, context);
 
@@ -93,7 +93,7 @@ class JdbcItemWriterTest {
 
     @Test
     void testGetFieldsWithEmptyColumns() {
-        when(inputParameters.getList(eq(COLUMNS), any(TypeReference.class), eq(List.of()))).thenReturn(List.of());
+        stubColumns(List.of());
 
         List<FieldDefinition> fields = jdbcItemWriter.getFields(inputParameters, connectionParameters, context);
 
@@ -109,7 +109,7 @@ class JdbcItemWriterTest {
             Map.of(NAME, "float_col", TYPE, "FLOAT"),
             Map.of(NAME, "real_col", TYPE, "REAL"));
 
-        when(inputParameters.getList(eq(COLUMNS), any(TypeReference.class), eq(List.of()))).thenReturn(columns);
+        stubColumns(columns);
 
         List<FieldDefinition> fields = jdbcItemWriter.getFields(inputParameters, connectionParameters, context);
 
@@ -133,7 +133,7 @@ class JdbcItemWriterTest {
             Map.of(NAME, "time_col", TYPE, "TIME"),
             Map.of(NAME, "timestamp_col", TYPE, "TIMESTAMP"));
 
-        when(inputParameters.getList(eq(COLUMNS), any(TypeReference.class), eq(List.of()))).thenReturn(columns);
+        stubColumns(columns);
 
         List<FieldDefinition> fields = jdbcItemWriter.getFields(inputParameters, connectionParameters, context);
 
@@ -152,7 +152,7 @@ class JdbcItemWriterTest {
             Map.of(NAME, "unknown_col", TYPE, "UNKNOWN_TYPE"),
             Map.of(NAME, "text_col", TYPE, "TEXT"));
 
-        when(inputParameters.getList(eq(COLUMNS), any(TypeReference.class), eq(List.of()))).thenReturn(columns);
+        stubColumns(columns);
 
         List<FieldDefinition> fields = jdbcItemWriter.getFields(inputParameters, connectionParameters, context);
 
@@ -168,7 +168,7 @@ class JdbcItemWriterTest {
         List<Map<String, Object>> columns = List.of(
             Map.of(NAME, "col_without_type"));
 
-        when(inputParameters.getList(eq(COLUMNS), any(TypeReference.class), eq(List.of()))).thenReturn(columns);
+        stubColumns(columns);
 
         List<FieldDefinition> fields = jdbcItemWriter.getFields(inputParameters, connectionParameters, context);
 
@@ -177,5 +177,12 @@ class JdbcItemWriterTest {
             .name()).isEqualTo("col_without_type");
         assertThat(fields.get(0)
             .type()).isEqualTo(String.class);
+    }
+
+    private void stubColumns(List<Map<String, Object>> columns) {
+        when(
+            inputParameters.getList(
+                eq(COLUMNS), ArgumentMatchers.<TypeReference<Map<String, Object>>>any(), eq(List.of())))
+                    .thenReturn(columns);
     }
 }

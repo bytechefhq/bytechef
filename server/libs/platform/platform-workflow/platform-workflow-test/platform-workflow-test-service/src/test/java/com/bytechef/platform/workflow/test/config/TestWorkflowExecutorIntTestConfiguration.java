@@ -171,7 +171,7 @@ public class TestWorkflowExecutorIntTestConfiguration {
         ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory) {
 
         return new ClusterElementDefinitionServiceImpl(
-            componentDefinitionRegistry, contextFactory, mock(ObjectProvider.class));
+            componentDefinitionRegistry, contextFactory, mock());
     }
 
     @Bean

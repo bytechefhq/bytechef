@@ -39,6 +39,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InOrder;
 import org.mockito.MockedStatic;
 import software.amazon.awssdk.services.scheduler.SchedulerClient;
@@ -100,13 +101,13 @@ class AwsTriggerSchedulerTest {
 
         awsTriggerScheduler = new AwsTriggerScheduler(awsProperties, polling, mockSchedulerClient);
 
-        when(mockSchedulerClient.createSchedule(any(Consumer.class)))
+        when(mockSchedulerClient.createSchedule(ArgumentMatchers.<Consumer<CreateScheduleRequest.Builder>>any()))
             .thenReturn(CreateScheduleResponse.builder()
                 .build());
-        when(mockSchedulerClient.deleteSchedule(any(Consumer.class)))
+        when(mockSchedulerClient.deleteSchedule(ArgumentMatchers.<Consumer<DeleteScheduleRequest.Builder>>any()))
             .thenReturn(DeleteScheduleResponse.builder()
                 .build());
-        when(mockSchedulerClient.updateSchedule(any(Consumer.class)))
+        when(mockSchedulerClient.updateSchedule(ArgumentMatchers.<Consumer<UpdateScheduleRequest.Builder>>any()))
             .thenReturn(UpdateScheduleResponse.builder()
                 .build());
     }
@@ -132,7 +133,7 @@ class AwsTriggerSchedulerTest {
             pattern, zoneId, output, workflowExecutionId));
 
         // Then
-        ArgumentCaptor<Consumer<CreateScheduleRequest.Builder>> captor = ArgumentCaptor.forClass(Consumer.class);
+        ArgumentCaptor<Consumer<CreateScheduleRequest.Builder>> captor = ArgumentCaptor.captor();
 
         verify(mockSchedulerClient).createSchedule(captor.capture());
 
@@ -158,7 +159,7 @@ class AwsTriggerSchedulerTest {
         assertDoesNotThrow(() -> awsTriggerScheduler.schedulePollingTrigger(workflowExecutionId));
 
         // Then
-        ArgumentCaptor<Consumer<CreateScheduleRequest.Builder>> captor = ArgumentCaptor.forClass(Consumer.class);
+        ArgumentCaptor<Consumer<CreateScheduleRequest.Builder>> captor = ArgumentCaptor.captor();
 
         verify(mockSchedulerClient).createSchedule(captor.capture());
 
@@ -192,7 +193,7 @@ class AwsTriggerSchedulerTest {
             webhookExpirationDate, componentName, componentVersion, workflowExecutionId, connectionId));
 
         // Then
-        ArgumentCaptor<Consumer<CreateScheduleRequest.Builder>> captor = ArgumentCaptor.forClass(Consumer.class);
+        ArgumentCaptor<Consumer<CreateScheduleRequest.Builder>> captor = ArgumentCaptor.captor();
 
         verify(mockSchedulerClient).createSchedule(captor.capture());
 
@@ -221,7 +222,7 @@ class AwsTriggerSchedulerTest {
         assertDoesNotThrow(() -> awsTriggerScheduler.cancelScheduleTrigger(workflowExecutionId.toString()));
 
         // Then
-        ArgumentCaptor<Consumer<DeleteScheduleRequest.Builder>> captor = ArgumentCaptor.forClass(Consumer.class);
+        ArgumentCaptor<Consumer<DeleteScheduleRequest.Builder>> captor = ArgumentCaptor.captor();
 
         verify(mockSchedulerClient).deleteSchedule(captor.capture());
 
@@ -241,7 +242,7 @@ class AwsTriggerSchedulerTest {
     void testCancelOneTimeTask() {
         assertDoesNotThrow(() -> awsTriggerScheduler.cancelOneTimeTask(404L));
 
-        ArgumentCaptor<Consumer<DeleteScheduleRequest.Builder>> captor = ArgumentCaptor.forClass(Consumer.class);
+        ArgumentCaptor<Consumer<DeleteScheduleRequest.Builder>> captor = ArgumentCaptor.captor();
 
         verify(mockSchedulerClient).deleteSchedule(captor.capture());
 
@@ -264,9 +265,9 @@ class AwsTriggerSchedulerTest {
         awsTriggerScheduler.cancelOneTimeTask(404L);
 
         ArgumentCaptor<Consumer<CreateScheduleRequest.Builder>> createCaptor =
-            ArgumentCaptor.forClass(Consumer.class);
+            ArgumentCaptor.captor();
         ArgumentCaptor<Consumer<DeleteScheduleRequest.Builder>> deleteCaptor =
-            ArgumentCaptor.forClass(Consumer.class);
+            ArgumentCaptor.captor();
 
         InOrder inOrder = inOrder(mockSchedulerClient);
 
@@ -307,7 +308,7 @@ class AwsTriggerSchedulerTest {
             Instant.parse("2026-10-03T12:00:00.001Z"), Map.of("jobResumeId", "abc"), 404L);
 
         ArgumentCaptor<Consumer<CreateScheduleRequest.Builder>> createCaptor =
-            ArgumentCaptor.forClass(Consumer.class);
+            ArgumentCaptor.captor();
 
         verify(mockSchedulerClient).createSchedule(createCaptor.capture());
 
@@ -322,7 +323,7 @@ class AwsTriggerSchedulerTest {
 
     @Test
     void testCancelOneTimeTaskIgnoresAnAlreadyDeletedSchedule() {
-        when(mockSchedulerClient.deleteSchedule(any(Consumer.class)))
+        when(mockSchedulerClient.deleteSchedule(ArgumentMatchers.<Consumer<DeleteScheduleRequest.Builder>>any()))
             .thenThrow(ResourceNotFoundException.builder()
                 .message("Schedule not found")
                 .build());
@@ -340,7 +341,7 @@ class AwsTriggerSchedulerTest {
         assertDoesNotThrow(() -> awsTriggerScheduler.cancelPollingTrigger(workflowExecutionId.toString()));
 
         // Then
-        ArgumentCaptor<Consumer<DeleteScheduleRequest.Builder>> captor = ArgumentCaptor.forClass(Consumer.class);
+        ArgumentCaptor<Consumer<DeleteScheduleRequest.Builder>> captor = ArgumentCaptor.captor();
 
         verify(mockSchedulerClient).deleteSchedule(captor.capture());
 
@@ -365,7 +366,7 @@ class AwsTriggerSchedulerTest {
             () -> awsTriggerScheduler.cancelDynamicWebhookTriggerRefresh(workflowExecutionId.toString()));
 
         // Then
-        ArgumentCaptor<Consumer<DeleteScheduleRequest.Builder>> captor = ArgumentCaptor.forClass(Consumer.class);
+        ArgumentCaptor<Consumer<DeleteScheduleRequest.Builder>> captor = ArgumentCaptor.captor();
 
         verify(mockSchedulerClient).deleteSchedule(captor.capture());
 
@@ -390,7 +391,7 @@ class AwsTriggerSchedulerTest {
         String zoneId = "UTC";
         Map<String, Object> output = Map.of("key", "value");
 
-        when(mockSchedulerClient.createSchedule(any(Consumer.class)))
+        when(mockSchedulerClient.createSchedule(ArgumentMatchers.<Consumer<CreateScheduleRequest.Builder>>any()))
             .thenThrow(ConflictException.builder()
                 .message("Schedule already exists")
                 .build());
@@ -400,7 +401,7 @@ class AwsTriggerSchedulerTest {
             pattern, zoneId, output, workflowExecutionId));
 
         // Then
-        ArgumentCaptor<Consumer<UpdateScheduleRequest.Builder>> captor = ArgumentCaptor.forClass(Consumer.class);
+        ArgumentCaptor<Consumer<UpdateScheduleRequest.Builder>> captor = ArgumentCaptor.captor();
 
         verify(mockSchedulerClient).updateSchedule(captor.capture());
 
@@ -423,7 +424,7 @@ class AwsTriggerSchedulerTest {
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
             PlatformType.AUTOMATION, 456L, "test-polling-workflow", "test-trigger");
 
-        when(mockSchedulerClient.createSchedule(any(Consumer.class)))
+        when(mockSchedulerClient.createSchedule(ArgumentMatchers.<Consumer<CreateScheduleRequest.Builder>>any()))
             .thenThrow(ConflictException.builder()
                 .message("Schedule already exists")
                 .build());
@@ -432,7 +433,7 @@ class AwsTriggerSchedulerTest {
         assertDoesNotThrow(() -> awsTriggerScheduler.schedulePollingTrigger(workflowExecutionId));
 
         // Then
-        ArgumentCaptor<Consumer<UpdateScheduleRequest.Builder>> captor = ArgumentCaptor.forClass(Consumer.class);
+        ArgumentCaptor<Consumer<UpdateScheduleRequest.Builder>> captor = ArgumentCaptor.captor();
 
         verify(mockSchedulerClient).updateSchedule(captor.capture());
 
@@ -460,7 +461,7 @@ class AwsTriggerSchedulerTest {
         int componentVersion = 1;
         Long connectionId = 456L;
 
-        when(mockSchedulerClient.createSchedule(any(Consumer.class)))
+        when(mockSchedulerClient.createSchedule(ArgumentMatchers.<Consumer<CreateScheduleRequest.Builder>>any()))
             .thenThrow(ConflictException.builder()
                 .message("Schedule already exists")
                 .build());
@@ -470,7 +471,7 @@ class AwsTriggerSchedulerTest {
             webhookExpirationDate, componentName, componentVersion, workflowExecutionId, connectionId));
 
         // Then
-        ArgumentCaptor<Consumer<UpdateScheduleRequest.Builder>> captor = ArgumentCaptor.forClass(Consumer.class);
+        ArgumentCaptor<Consumer<UpdateScheduleRequest.Builder>> captor = ArgumentCaptor.captor();
 
         verify(mockSchedulerClient).updateSchedule(captor.capture());
 
@@ -513,6 +514,6 @@ class AwsTriggerSchedulerTest {
         assertDoesNotThrow(() -> scheduler.schedulePollingTrigger(workflowExecutionId));
 
         // Verify the scheduler client was called
-        verify(mockSchedulerClient).createSchedule(any(Consumer.class));
+        verify(mockSchedulerClient).createSchedule(ArgumentMatchers.<Consumer<CreateScheduleRequest.Builder>>any());
     }
 }

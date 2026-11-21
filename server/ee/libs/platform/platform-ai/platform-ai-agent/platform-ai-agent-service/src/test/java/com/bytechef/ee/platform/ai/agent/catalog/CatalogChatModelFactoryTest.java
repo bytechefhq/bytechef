@@ -39,7 +39,7 @@ class CatalogChatModelFactoryTest {
             factory.createChatModel(Provider.ANTHROPIC, "claude-sonnet-5", "sk-test-key", null);
 
         assertThat(chatModel).isNotNull();
-        assertThat(chatModel.getDefaultOptions()
+        assertThat(chatModel.getOptions()
             .getMaxTokens()).isEqualTo(AnthropicConstants.DEFAULT_MAX_TOKENS);
     }
 

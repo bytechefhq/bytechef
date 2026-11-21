@@ -1081,7 +1081,7 @@ public class HttpClientExecutorTest {
 
             Http.Response response = httpClientExecutor.handleResponse(testHttpResponse, configuration, context);
 
-            Map<String, Object> body = response.getBody(Map.class);
+            Map<?, ?> body = response.getBody(Map.class);
 
             assertNotNull(body);
             assertEquals("test", body.get("name"));

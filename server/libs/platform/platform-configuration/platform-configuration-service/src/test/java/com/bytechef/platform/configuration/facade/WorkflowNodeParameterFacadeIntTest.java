@@ -3185,6 +3185,7 @@ class WorkflowNodeParameterFacadeIntTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testUpdateWorkflowNodeParameterWithNullNestedObjectProperty() {
         // Given
         String workflowNodeName = "task1";
