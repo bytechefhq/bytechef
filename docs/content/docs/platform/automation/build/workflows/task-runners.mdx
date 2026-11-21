@@ -108,7 +108,7 @@ bytechef:
       max-log-bytes: 1MB
       max-transfer-bytes: 512MB
     trusted:
-      enabled: false             # lets tasks choose the GraalVM runner's Trusted mode
+      enabled: true              # lets tasks choose the GraalVM runner's Trusted mode
 ```
 
 `runner-limits` applies to Docker, Kubernetes and AWS Batch, and each of them can override it under its own
@@ -124,7 +124,7 @@ is enabled:
 
 ```text
 Task runner 'docker' is enabled; workflows may execute code outside the script sandbox
-Trusted GraalVM task runner is enabled; scripts selecting it run inside this JVM with full host access. Enable it only on a single-tenant deployment you control.
+Trusted GraalVM script mode is enabled; script tasks that select it run inside this JVM with full host access. Set bytechef.script.trusted.enabled=false on a multi-tenant deployment.
 ```
 
 ### Environment variables
@@ -322,8 +322,8 @@ Its one property is **Mode**:
 | `strict` (default) | No file system, no environment, no process or thread creation, and the CPU and heap limits of `bytechef.script.sandbox`. |
 | `trusted` | Every restriction lifted. The script runs inside the server process with full host access and reflection. No CPU or heap limit; a wall-clock timeout of 5 minutes applies unless the task sets **Timeout (seconds)**. |
 
-The **Trusted** option is offered only when an operator sets
-`bytechef.script.trusted.enabled: true`. A task that asks for it anyway fails with
+The **Trusted** option is offered while `bytechef.script.trusted.enabled` is `true`, which the shipped self-hosted
+configuration sets. With it set to `false`, a task that asks for it anyway fails with
 *The GraalVM runner's 'trusted' mode is not enabled. An operator must enable it with
 bytechef.script.trusted.enabled=true.*
 
@@ -332,8 +332,10 @@ bytechef.script.trusted.enabled=true.*
 ```
 
 <Callout type="warn" title="Trusted mode is the server's own access">
-A trusted script can read the server's files, environment and memory, including other tenants' data. Enable it only
-on a single-tenant installation where every workflow author is trusted with the server itself.
+A trusted script can read the server's files, environment and memory, including other tenants' data. It is on by
+default because a self-hosted installation already trusts workflow authors with Java code workflows and custom
+components. Turn it off on a multi-tenant installation, or wherever workflow authors are not trusted with the server
+itself.
 </Callout>
 
 Script tools for AI agents, script item processors and AI skill scripts always run in strict mode on GraalVM; they
@@ -1045,7 +1047,7 @@ token is masked in `stdout`, `stderr` and the server log.
 - Leave every runner except GraalVM off unless you need it, and turn on only the ones you need.
 - Treat enabling Process, Docker, Kubernetes or AWS Batch as giving every workflow author code execution on that host,
   daemon, cluster or account.
-- Keep `bytechef.script.trusted.enabled` off on any installation with more than one tenant.
+- Set `bytechef.script.trusted.enabled` to `false` on any installation with more than one tenant.
 - Point Docker at a dedicated daemon, give Kubernetes a dedicated namespace with Pod Security Admission, and scope the
   AWS identity to the queues, bucket and roles it needs.
 - Deliver secrets as connections, not **Environment** values or literals in the source, so they are masked in output.
