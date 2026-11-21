@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.domain;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.category.domain.Category;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -86,6 +87,9 @@ public final class Project {
 
     @Column("uuid")
     private UUID uuid;
+
+    @Column
+    private int visibility = ResourceVisibility.WORKSPACE.ordinal();
 
     @Version
     private int version;
@@ -215,6 +219,18 @@ public final class Project {
         return uuid == null ? null : uuid.toString();
     }
 
+    public ResourceVisibility getVisibility() {
+        ResourceVisibility[] values = ResourceVisibility.values();
+
+        if (visibility < 0 || visibility >= values.length) {
+            throw new IllegalStateException(
+                "Project id=%s has invalid visibility ordinal %d (valid range: 0-%d)".formatted(
+                    id, visibility, values.length - 1));
+        }
+
+        return values[visibility];
+    }
+
     public int getVersion() {
         return version;
     }
@@ -300,6 +316,12 @@ public final class Project {
         this.uuid = uuid;
     }
 
+    public void setVisibility(ResourceVisibility visibility) {
+        Objects.requireNonNull(visibility, "visibility");
+
+        this.visibility = visibility.ordinal();
+    }
+
     public void setVersion(int version) {
         this.version = version;
     }
@@ -318,6 +340,7 @@ public final class Project {
             ", description='" + description + '\'' +
             ", projectTags=" + projectTags +
             ", version=" + version +
+            ", visibility=" + visibility +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
@@ -339,6 +362,7 @@ public final class Project {
         private String name;
         private List<Long> tagIds;
         private int version;
+        private ResourceVisibility visibility;
         private long workspaceId;
 
         private Builder() {
@@ -380,6 +404,12 @@ public final class Project {
             return this;
         }
 
+        public Builder visibility(ResourceVisibility visibility) {
+            this.visibility = visibility;
+
+            return this;
+        }
+
         public Builder workspaceId(long workspaceId) {
             this.workspaceId = workspaceId;
 
@@ -398,6 +428,11 @@ public final class Project {
             project.setName(name);
             project.setTagIds(tagIds);
             project.setVersion(version);
+
+            if (visibility != null) {
+                project.setVisibility(visibility);
+            }
+
             project.setWorkspaceId(workspaceId);
 
             return project;

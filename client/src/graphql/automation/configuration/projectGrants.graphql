@@ -1,0 +1,3 @@
+query ProjectGrants($workspaceId: ID!, $projectId: ID!) {
+    projectGrants(workspaceId: $workspaceId, projectId: $projectId)
+}

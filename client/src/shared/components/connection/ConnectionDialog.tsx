@@ -25,9 +25,12 @@ import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-edito
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {CodePayloadI, TokenPayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
+import ResourceVisibilityBadge from '@/shared/components/visibility/ResourceVisibilityBadge';
+import ResourceVisibilityPicker from '@/shared/components/visibility/ResourceVisibilityPicker';
 import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
+import {useIsVisibilityEditionEnabled} from '@/shared/hooks/useVisibilityFeatureEnabled';
 import {
     Authorization,
     AuthorizationType,
@@ -69,6 +72,7 @@ export interface ConnectionDialogFormProps {
     selectedScopes?: {[key: string]: boolean};
     shared: boolean;
     tags: Array<Tag | {label: string; value: string}>;
+    visibility: 'PRIVATE' | 'WORKSPACE' | 'ORGANIZATION';
 }
 
 const NO_AUTHORIZATION_OPTION_VALUE = 'NONE';
@@ -81,6 +85,7 @@ interface ConnectionDialogProps {
     connectionTagsQueryKey: QueryKey;
     connectionsQueryKey: QueryKey;
     description?: string;
+    fixedVisibility?: 'ORGANIZATION';
     onClose?: () => void;
     onConnectionCreate?: (connectionId: number) => void;
     platformType?: PlatformType;
@@ -115,6 +120,7 @@ const ConnectionDialog = ({
     connectionTagsQueryKey,
     connectionsQueryKey,
     description,
+    fixedVisibility,
     onClose,
     onConnectionCreate,
     platformType,
@@ -143,13 +149,21 @@ const ConnectionDialog = ({
     const storedPlatformType = usePlatformTypeStore((state) => state.currentType);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
+    const currentType = platformType ?? storedPlatformType;
+
     const canEditEmbeddedConnection = useHasEmbeddedScope('CONNECTION_EDIT', connection?.environmentId);
-    const isTenantAdmin = useIsTenantAdmin();
-    const canEditWorkspaceConnection = useHasWorkspaceScope(
+    const hasWorkspaceConnectionEditScope = useHasWorkspaceScope(
         currentWorkspaceId,
         'CONNECTION_EDIT',
         connection?.environmentId
     );
+    const isTenantAdmin = useIsTenantAdmin();
+
+    // Compose the shared EE-edition primitive with this dialog's platform-type scope. Keeping the
+    // edition check in one hook means a future migration away from EditionType.EE updates the
+    // list-page gate (useVisibilityFeatureEnabled) and this dialog simultaneously.
+    const isEE = useIsVisibilityEditionEnabled();
+    const visibilityFeatureEnabled = isEE && currentType === PlatformType.AUTOMATION;
 
     const form = useForm<ConnectionDialogFormProps>({
         defaultValues: {
@@ -165,6 +179,7 @@ const ConnectionDialog = ({
                     ...tag,
                     label: tag.name,
                 })) || [],
+            visibility: 'WORKSPACE',
         },
         mode: 'onTouched',
     });
@@ -207,20 +222,24 @@ const ConnectionDialog = ({
 
     const queryClient = useQueryClient();
 
-    const currentType = platformType ?? storedPlatformType;
-
     const isEdit = !!connection?.id;
 
     const selectedComponentName = selectedComponentDefinition?.name || connection?.componentName;
 
-    const canEditConnection =
-        currentType === PlatformType.EMBEDDED ? canEditEmbeddedConnection : canEditWorkspaceConnection;
+    const isConnectionOwner = !!account?.login && account.login === connection?.createdBy;
 
-    const isConnectionCreator = !!account?.login && account.login === connection?.createdBy;
+    const canSeeCredentials =
+        currentType === PlatformType.EMBEDDED
+            ? canEditEmbeddedConnection && isConnectionOwner
+            : hasWorkspaceConnectionEditScope &&
+              (isConnectionOwner || (connection?.visibility === 'ORGANIZATION' && isTenantAdmin));
 
-    const credentialsHidden = isEdit && (!canEditConnection || !isConnectionCreator);
+    const credentialsHidden = isEdit && !canSeeCredentials;
 
-    const canReplaceCredentials = canEditConnection && (isConnectionCreator || isTenantAdmin);
+    const canReplaceCredentials =
+        currentType === PlatformType.EMBEDDED
+            ? canEditEmbeddedConnection && (isConnectionOwner || isTenantAdmin)
+            : hasWorkspaceConnectionEditScope && (isConnectionOwner || isTenantAdmin);
 
     const canUpdateCredentials =
         isEdit && !!useUpdateConnectionCredentialsMutation && !connection?.managed && canReplaceCredentials;
@@ -395,7 +414,7 @@ const ConnectionDialog = ({
     }
 
     function getNewConnection(additionalParameters?: object) {
-        const {componentName, name, parameters, shared, tags} = getValues();
+        const {componentName, name, parameters, shared, tags, visibility} = getValues();
 
         return {
             authorizationType,
@@ -409,6 +428,7 @@ const ConnectionDialog = ({
             },
             tags: tags,
             ...(showSharedOption ? {shared} : {}),
+            ...(visibilityFeatureEnabled ? {visibility} : {}),
         } as ConnectionI;
     }
 
@@ -730,6 +750,58 @@ const ConnectionDialog = ({
                                                 </FormItem>
                                             )}
                                         />
+                                    )}
+
+                                    {!connection?.id && fixedVisibility && (
+                                        <FormItem className="space-x-2">
+                                            <FormLabel>Visibility</FormLabel>
+
+                                            <FormControl>
+                                                <ResourceVisibilityBadge visibility={fixedVisibility} />
+                                            </FormControl>
+                                        </FormItem>
+                                    )}
+
+                                    {!connection?.id && !fixedVisibility && visibilityFeatureEnabled && (
+                                        <FormField
+                                            control={control}
+                                            name="visibility"
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormLabel>Visibility</FormLabel>
+
+                                                    <FormControl>
+                                                        {/* Grants cannot be written before the connection has
+                                                            an id, so creation offers reach only; the list-page
+                                                            picker adds people afterwards. */}
+
+                                                        <ResourceVisibilityPicker
+                                                            grantedUserIds={[]}
+                                                            onGrantedUserIdsChange={() => undefined}
+                                                            onVisibilityChange={field.onChange}
+                                                            showSpecificPeopleOption={false}
+                                                            visibility={field.value}
+                                                        />
+                                                    </FormControl>
+
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    )}
+
+                                    {connection?.id && visibilityFeatureEnabled && connection.visibility && (
+                                        <FormItem className="space-x-2">
+                                            <FormLabel>Visibility</FormLabel>
+
+                                            <FormControl>
+                                                <ResourceVisibilityBadge visibility={connection.visibility} />
+                                            </FormControl>
+
+                                            <p className="text-xs text-muted-foreground">
+                                                Change visibility and sharing from the connection list.
+                                            </p>
+                                        </FormItem>
                                     )}
 
                                     {(!connection?.id || (canEditConnectionProperties && !isUpdatingCredentials)) &&

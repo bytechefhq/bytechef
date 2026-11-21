@@ -751,6 +751,8 @@ include("server:ee:libs:platform:platform-external-invocation-log:platform-exter
 include("server:ee:libs:platform:platform-external-invocation-log:platform-external-invocation-log-remote-client")
 include("server:ee:libs:platform:platform-external-invocation-log:platform-external-invocation-log-service")
 include("server:ee:libs:platform:platform-notification:platform-notification-remote-client")
+include("server:ee:libs:platform:platform-resource-grant:platform-resource-grant-api")
+include("server:ee:libs:platform:platform-resource-grant:platform-resource-grant-service")
 include("server:ee:libs:platform:platform-scheduler:platform-scheduler-aws")
 include("server:ee:libs:platform:platform-scheduler:platform-scheduler-impl")
 include("server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-client")

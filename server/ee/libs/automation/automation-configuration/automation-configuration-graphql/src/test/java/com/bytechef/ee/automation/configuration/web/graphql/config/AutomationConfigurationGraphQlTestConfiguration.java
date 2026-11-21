@@ -7,7 +7,10 @@
 
 package com.bytechef.ee.automation.configuration.web.graphql.config;
 
+import com.bytechef.test.config.graphql.GraphQLScalarTypes;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.graphql.execution.RuntimeWiringConfigurer;
 
 /**
  * @version ee
@@ -16,4 +19,10 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class AutomationConfigurationGraphQlTestConfiguration {
+
+    @Bean
+    RuntimeWiringConfigurer scalarWiringConfigurer() {
+        return wiringBuilder -> wiringBuilder.scalar(GraphQLScalarTypes.longScalar())
+            .scalar(GraphQLScalarTypes.mapScalar());
+    }
 }

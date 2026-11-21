@@ -108,80 +108,92 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                     loading: true,
                 }));
 
-                const response = await fetchGetActuatorInfo();
+                let response: Response;
 
-                if (response.status === 200) {
-                    const json = await response.json();
+                try {
+                    response = await fetchGetActuatorInfo();
+                } catch (error) {
+                    set((state) => ({...state, loading: false}));
 
-                    set((state) => ({
-                        ...state,
-                        ai: {
-                            copilot: {
-                                enabled: json.ai.copilot.enabled === 'true',
-                            },
-                            knowledgeBase: {
-                                enabled: json.ai.knowledgeBase?.enabled === 'true',
-                            },
-                        },
-                        analytics: {
-                            enabled: json.analytics.enabled === 'true',
-                            postHog: json.analytics.postHog,
-                        },
-                        application: json.application,
-                        audit: {
-                            enabled: json.audit?.enabled === 'true',
-                        },
-                        billing: {
-                            customerPortalUrl: json.billing?.customerPortalUrl || undefined,
-                            enabled: json.billing?.enabled === 'true',
-                        },
-                        component: {
-                            customComponent: {
-                                javaEnabled: json.component?.customComponent?.javaEnabled !== 'false',
-                            },
-                        },
-                        docs: {
-                            changelogUrl: json.docs?.changelogUrl || undefined,
-                            communitySupportUrl: json.docs?.communitySupportUrl || undefined,
-                            documentationUrl: json.docs?.documentationUrl || undefined,
-                            reportBugUrl: json.docs?.reportBugUrl || undefined,
-                        },
-                        embedded: {
-                            allowedParentOrigins: toAllowedParentOrigins(json.embedded?.allowedParentOrigins),
-                        },
-                        featureFlags: json.featureFlags,
-                        helpHub: {
-                            commandBar: json.helpHub.commandBar,
-                            enabled: json.helpHub.enabled === 'true',
-                        },
-                        loading: false,
-                        oauth2: {
-                            authorizationServer: {
-                                enabled: json.oauth2?.authorizationServer?.enabled === 'true',
-                            },
-                        },
-                        script: {
-                            injectConnections: json.script?.injectConnections !== 'false',
-                        },
-                        signUp: {
-                            activationRequired: json.signUp?.activationRequired === 'true',
-                            enabled: json.signUp?.enabled === 'true',
-                        },
-                        socialLogin: {
-                            enabled: json.socialLogin?.enabled === 'true',
-                        },
-                        templatesSubmissionForm: json.templatesSubmissionForm,
-                        userGuiding: {
-                            containerId: json.userGuiding?.containerId,
-                            enabled: json.userGuiding?.enabled === 'true',
-                        },
-                        workflow: {
-                            codeWorkflow: {
-                                javaEnabled: json.workflow?.codeWorkflow?.javaEnabled !== 'false',
-                            },
-                        },
-                    }));
+                    throw error;
                 }
+
+                if (response.status !== 200) {
+                    set((state) => ({...state, loading: false}));
+
+                    return;
+                }
+
+                const json = await response.json();
+
+                set((state) => ({
+                    ...state,
+                    ai: {
+                        copilot: {
+                            enabled: json.ai.copilot.enabled === 'true',
+                        },
+                        knowledgeBase: {
+                            enabled: json.ai.knowledgeBase?.enabled === 'true',
+                        },
+                    },
+                    analytics: {
+                        enabled: json.analytics.enabled === 'true',
+                        postHog: json.analytics.postHog,
+                    },
+                    application: json.application,
+                    audit: {
+                        enabled: json.audit?.enabled === 'true',
+                    },
+                    billing: {
+                        customerPortalUrl: json.billing?.customerPortalUrl || undefined,
+                        enabled: json.billing?.enabled === 'true',
+                    },
+                    component: {
+                        customComponent: {
+                            javaEnabled: json.component?.customComponent?.javaEnabled !== 'false',
+                        },
+                    },
+                    docs: {
+                        changelogUrl: json.docs?.changelogUrl || undefined,
+                        communitySupportUrl: json.docs?.communitySupportUrl || undefined,
+                        documentationUrl: json.docs?.documentationUrl || undefined,
+                        reportBugUrl: json.docs?.reportBugUrl || undefined,
+                    },
+                    embedded: {
+                        allowedParentOrigins: toAllowedParentOrigins(json.embedded?.allowedParentOrigins),
+                    },
+                    featureFlags: json.featureFlags,
+                    helpHub: {
+                        commandBar: json.helpHub.commandBar,
+                        enabled: json.helpHub.enabled === 'true',
+                    },
+                    loading: false,
+                    oauth2: {
+                        authorizationServer: {
+                            enabled: json.oauth2?.authorizationServer?.enabled === 'true',
+                        },
+                    },
+                    script: {
+                        injectConnections: json.script?.injectConnections !== 'false',
+                    },
+                    signUp: {
+                        activationRequired: json.signUp?.activationRequired === 'true',
+                        enabled: json.signUp?.enabled === 'true',
+                    },
+                    socialLogin: {
+                        enabled: json.socialLogin?.enabled === 'true',
+                    },
+                    templatesSubmissionForm: json.templatesSubmissionForm,
+                    userGuiding: {
+                        containerId: json.userGuiding?.containerId,
+                        enabled: json.userGuiding?.enabled === 'true',
+                    },
+                    workflow: {
+                        codeWorkflow: {
+                            javaEnabled: json.workflow?.codeWorkflow?.javaEnabled !== 'false',
+                        },
+                    },
+                }));
             };
 
             return {

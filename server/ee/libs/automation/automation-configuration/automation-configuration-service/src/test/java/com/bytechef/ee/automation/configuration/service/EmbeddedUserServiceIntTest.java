@@ -20,6 +20,8 @@ import com.bytechef.automation.configuration.security.ProjectOwnershipResolver;
 import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
+import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.ee.automation.configuration.config.EeAutomationConfigurationIntTestConfiguration;
 import com.bytechef.ee.automation.configuration.domain.EmbeddedUser;
 import com.bytechef.ee.automation.configuration.repository.EmbeddedUserRepository;
@@ -62,6 +64,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.access.AccessDeniedException;
@@ -103,6 +106,9 @@ class EmbeddedUserServiceIntTest {
 
     @Autowired
     private PermissionService permissionService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private WorkspaceUserRepository workspaceUserRepository;
@@ -226,8 +232,8 @@ class EmbeddedUserServiceIntTest {
         embeddedUserService.addEmbeddedUser(userId(MEMBER), WorkspaceRole.EDITOR);
 
         WorkspaceMembershipAssignerImpl workspaceMembershipAssigner = new WorkspaceMembershipAssignerImpl(
-            embeddedUserService, permissionService, mock(WorkspaceService.class), workspaceUserRepository,
-            mock(WorkspaceUserService.class));
+            mock(ApplicationEventPublisher.class), embeddedUserService, permissionService, userService,
+            mock(WorkspaceService.class), workspaceUserRepository, mock(WorkspaceUserService.class));
 
         workspaceMembershipAssigner.removeMemberships(userId(MEMBER));
 
@@ -398,6 +404,13 @@ class EmbeddedUserServiceIntTest {
         WorkspaceScopeCache.class
     })
     static class RealEmbeddedUserServiceConfiguration {
+
+        @Bean
+        ResourceVisibilityResolver resourceVisibilityResolver() {
+            return (resourceType, workspaceId, candidates) -> candidates.stream()
+                .map(VisibilityRecord::id)
+                .collect(Collectors.toSet());
+        }
 
         @Bean
         CacheManager cacheManager() {
