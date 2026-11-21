@@ -449,6 +449,12 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_CONFIGURATION_ENABLED_UPDATED, data = {
+        @AuditData(key = "integrationInstanceConfigurationId", value = "#result"),
+        @AuditData(key = "integrationId", value = "#integrationId"),
+        @AuditData(key = "integrationVersion", value = "#integrationVersion"),
+        @AuditData(key = "environment", value = "#environment")
+    })
     @PreAuthorize("isTenantAdmin()")
     public long enableIntegrationVersion(long integrationId, int integrationVersion, Environment environment) {
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =

@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.audit.ProjectAuditEvents;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
@@ -36,6 +37,8 @@ import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowC
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
@@ -131,12 +134,22 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
     }
 
     @Override
+    @Audited(event = ProjectAuditEvents.PROJECT_CREATED, data = {
+        @AuditData(key = "projectId", value = "#result.id"),
+        @AuditData(key = "name", value = "#name"),
+        @AuditData(key = "workspaceId", value = "#workspaceId")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public Project createEmptyCodeWorkflow(long workspaceId, String name, Language language) {
         return createEmptyCodeWorkflow(workspaceId, name, language, null, null, null);
     }
 
     @Override
+    @Audited(event = ProjectAuditEvents.PROJECT_CREATED, data = {
+        @AuditData(key = "projectId", value = "#result.id"),
+        @AuditData(key = "name", value = "#name"),
+        @AuditData(key = "workspaceId", value = "#workspaceId")
+    })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public Project createEmptyCodeWorkflow(
         long workspaceId, String name, Language language, @Nullable String description, @Nullable Long categoryId,
