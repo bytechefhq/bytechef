@@ -35,6 +35,7 @@ dependencies {
     testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
     testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
     testImplementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-service"))
+    testImplementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-api"))
     testImplementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))

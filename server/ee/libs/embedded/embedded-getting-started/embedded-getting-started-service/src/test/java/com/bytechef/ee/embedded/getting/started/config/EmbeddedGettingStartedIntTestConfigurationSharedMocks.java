@@ -26,6 +26,9 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowDraftFacade;
+import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowFacade;
+import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRowFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
@@ -35,6 +38,9 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade;
+import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
+import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -83,6 +89,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     ConnectedUserService.class, EmbeddedPermissionEvaluator.class, EnvironmentService.class,
     PrincipalJobFacade.class,
     PrincipalJobService.class, JobFacade.class, JobService.class, McpAutomationRowFacade.class,
+    ProjectCodeWorkflowFacade.class,
+    CodeWorkflowContainerFacade.class,
+    ProjectCodeWorkflowDraftFacade.class,
+    CodeWorkflowFileStorage.class,
+    CodeWorkflowContainerService.class,
+    ProjectCodeWorkflowService.class,
     McpComponentService.class,
     McpIntegrationComponentService.class,
     McpIntegrationInstanceConfigurationService.class, McpIntegrationInstanceConfigurationWorkflowService.class,
