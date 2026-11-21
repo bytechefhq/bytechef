@@ -301,15 +301,16 @@ bytechef:
       max-log-bytes: 1MB
       max-transfer-bytes: 512MB
     trusted:
-      enabled: false
+      enabled: true
 ```
 
-Only `graalvm` is enabled by the shipped configuration; `process`, `docker`, `kubernetes` and `aws-batch` need their own `enabled: true` before
+Only `graalvm` and `trusted` are enabled by the shipped configuration; `process`, `docker`, `kubernetes` and `aws-batch` need their own `enabled: true` before
 anything else under them takes effect. What each key costs to turn on:
 
 - `trusted.enabled`: lets a workflow's `script` task ask for `mode: trusted`, which drops GraalVM's guest
   sandbox entirely and grants the guest context full host access (`HostAccess.ALL`) with no resource ceilings - the
-  same access the server process itself has. Off by default for that reason.
+  same access the server process itself has. On in the shipped self-hosted configuration, which already trusts
+  workflow authors with Java code workflows and custom components; turn it off on a multi-tenant installation.
 - `process.enabled`: any workflow author can run arbitrary commands on the ByteChef host as the server's user - with
   that user's files, credentials and network reach. Leave it off unless every workflow author is trusted with the host.
 - `docker.enabled`: any workflow author can choose any image, `user`, `privileged: true` and `networkMode: host` -

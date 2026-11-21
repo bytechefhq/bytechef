@@ -355,7 +355,7 @@ The `Script Task Runners Demo` sample workflow (`demo/script-runners.json` in `a
 ##### The GraalVM Runner's Modes
 
 - **Strict** (default): no file system, no environment, no process creation, and the CPU and heap limits of `bytechef.script.sandbox`. Use this unless you have a specific reason not to.
-- **Trusted**: every restriction lifted. The script runs inside the server process with full reflection, so it can reach anything the server can, including other tenants' data. It has no CPU or heap limit, and a wall-clock timeout of 5 minutes unless the task sets `timeout`. The option is offered only after an operator sets `bytechef.script.trusted.enabled=true`; enable it only on a single-tenant deployment you control.
+- **Trusted**: every restriction lifted. The script runs inside the server process with full reflection, so it can reach anything the server can, including other tenants' data. It has no CPU or heap limit, and a wall-clock timeout of 5 minutes unless the task sets `timeout`. The option is offered while `bytechef.script.trusted.enabled` is `true`, which is the shipped self-hosted default; set it to `false` on a multi-tenant deployment.
 
 The GraalVM runner does not accept **Environment**, **Input Files** or **Output Files**, and its strict mode does not accept a **Timeout**: strict already runs under CPU and heap limits, and a wall clock would kill a script that is only waiting on a slow component call.
 
