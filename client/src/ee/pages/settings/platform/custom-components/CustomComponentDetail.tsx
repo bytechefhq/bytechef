@@ -21,6 +21,8 @@ import {ArrowLeftIcon, SendIcon, ZapIcon} from 'lucide-react';
 import {useRef, useState} from 'react';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
+import CustomComponentDefinitionItemList from './components/CustomComponentDefinitionItemList';
+
 const MONACO_LANGUAGE_BY_CUSTOM_COMPONENT_LANGUAGE: Record<CustomComponentLanguage, string> = {
     [CustomComponentLanguage.Java]: 'java',
     [CustomComponentLanguage.Javascript]: 'javascript',
@@ -141,23 +143,7 @@ const CustomComponentDefinitionList = ({items, title}: CustomComponentDefinition
             </span>
         </h4>
 
-        {items.length > 0 ? (
-            <ul className="divide-y divide-stroke-neutral-primary">
-                {items.map((item) => (
-                    <li className="py-2" key={item.name}>
-                        <div className="text-sm font-medium">{item.title || item.name}</div>
-
-                        <div className="text-xs text-content-neutral-secondary">{item.name}</div>
-
-                        {item.description && (
-                            <div className="mt-1 text-xs text-content-neutral-secondary">{item.description}</div>
-                        )}
-                    </li>
-                ))}
-            </ul>
-        ) : (
-            <p className="text-sm text-content-neutral-secondary">No {title.toLowerCase()} defined</p>
-        )}
+        <CustomComponentDefinitionItemList emptyMessage={`No ${title.toLowerCase()} defined`} items={items} />
     </div>
 );
 

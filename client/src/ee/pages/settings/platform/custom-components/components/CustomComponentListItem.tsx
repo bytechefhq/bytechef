@@ -22,6 +22,8 @@ import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
+import CustomComponentDefinitionItemList from './CustomComponentDefinitionItemList';
+
 interface CustomComponentItemProps {
     customComponent: CustomComponent;
 }
@@ -42,31 +44,6 @@ const Title = ({customComponent, opensDetail}: {customComponent: CustomComponent
         </div>
     );
 };
-
-interface DefinitionItemI {
-    description?: string | null;
-    name: string;
-    title?: string | null;
-}
-
-const DefinitionItemList = ({emptyMessage, items}: {emptyMessage: string; items: Array<DefinitionItemI>}) =>
-    items.length > 0 ? (
-        <ul className="divide-y divide-stroke-neutral-primary">
-            {items.map((item) => (
-                <li className="py-2" key={item.name}>
-                    <div className="text-sm font-medium">{item.title || item.name}</div>
-
-                    <div className="text-xs text-content-neutral-secondary">{item.name}</div>
-
-                    {item.description && (
-                        <div className="mt-1 text-xs text-content-neutral-secondary">{item.description}</div>
-                    )}
-                </li>
-            ))}
-        </ul>
-    ) : (
-        <p className="text-sm text-content-neutral-secondary">{emptyMessage}</p>
-    );
 
 const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -302,11 +279,17 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                                 </TabsList>
 
                                 <TabsContent className="pt-2" value="actions">
-                                    <DefinitionItemList emptyMessage="No actions defined" items={actions} />
+                                    <CustomComponentDefinitionItemList
+                                        emptyMessage="No actions defined"
+                                        items={actions}
+                                    />
                                 </TabsContent>
 
                                 <TabsContent className="pt-2" value="triggers">
-                                    <DefinitionItemList emptyMessage="No triggers defined" items={triggers} />
+                                    <CustomComponentDefinitionItemList
+                                        emptyMessage="No triggers defined"
+                                        items={triggers}
+                                    />
                                 </TabsContent>
                             </Tabs>
                         )}
