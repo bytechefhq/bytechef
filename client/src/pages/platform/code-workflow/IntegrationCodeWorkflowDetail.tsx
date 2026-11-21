@@ -12,6 +12,7 @@ interface IntegrationCodeWorkflowDetailProps {
     language: string;
     onTestConfigurationClick?: () => void;
     testConfigurationDisabled?: boolean;
+    workflowId?: string;
 }
 
 const IntegrationCodeWorkflowDetail = ({
@@ -21,6 +22,7 @@ const IntegrationCodeWorkflowDetail = ({
     language,
     onTestConfigurationClick,
     testConfigurationDisabled,
+    workflowId,
 }: IntegrationCodeWorkflowDetailProps) => {
     const queryClient = useQueryClient();
 
@@ -41,6 +43,7 @@ const IntegrationCodeWorkflowDetail = ({
 
     return (
         <CodeWorkflowSourceEditor
+            embedded
             error={sourceError}
             headerless={headerless}
             isLoading={sourceLoading}
@@ -50,6 +53,7 @@ const IntegrationCodeWorkflowDetail = ({
             onTestConfigurationClick={onTestConfigurationClick}
             source={sourceData?.integrationCodeWorkflowSource ?? undefined}
             testConfigurationDisabled={testConfigurationDisabled}
+            workflowId={workflowId}
         />
     );
 };

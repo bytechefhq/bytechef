@@ -1,13 +1,25 @@
-import {render, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';
+import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {
+    getCompletionContext,
+    unregisterCompletionContext,
+} from '@/shared/components/monaco/completion/completionContextRegistry';
+import {fireEvent, render, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import PropertyCodeEditorDialogEditor from '../PropertyCodeEditorDialogEditor';
 
 const hoisted = vi.hoisted(() => {
     return {
+        catalog: {components: [], getConnectionDefinition: vi.fn(), getDefinition: vi.fn()},
+        editorState: {includeComponents: undefined as string[] | undefined, platformType: 'AUTOMATION'},
         mockSetEditorValue: vi.fn(),
+        mockUseComponentCatalog: vi.fn(),
         storeState: {
+            componentConnections: [] as Array<{componentName: string; componentVersion: number; name: string}>,
             editorValue: 'const x = 1;',
+            inputParameters: undefined as Record<string, unknown> | undefined,
+            scriptInput: {} as Record<string, unknown>,
         },
     };
 });
@@ -15,7 +27,10 @@ const hoisted = vi.hoisted(() => {
 vi.mock('../stores/usePropertyCodeEditorDialogStore', () => ({
     usePropertyCodeEditorDialogStore: (selector: (state: unknown) => unknown) =>
         selector({
+            componentConnections: hoisted.storeState.componentConnections,
             editorValue: hoisted.storeState.editorValue,
+            inputParameters: hoisted.storeState.inputParameters,
+            scriptInput: hoisted.storeState.scriptInput,
             setEditorValue: hoisted.mockSetEditorValue,
         }),
 }));
@@ -31,7 +46,7 @@ vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
         className?: string;
         defaultLanguage: string;
         onChange: (value: string | undefined) => void;
-        onMount: (editor: {focus: () => void}) => void;
+        onMount: (editor: {focus: () => void; getModel: () => unknown}) => void;
         value?: string;
     }) => (
         <div data-testid="monaco-editor">
@@ -53,13 +68,26 @@ vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
             <button
                 data-testid="mount-btn"
                 onClick={() => {
-                    onMount({focus: vi.fn()});
+                    onMount({focus: vi.fn(), getModel: () => ({uri: {toString: () => 'inmemory://test'}})});
                 }}
             >
                 Mount
             </button>
         </div>
     ),
+}));
+
+vi.mock('@/shared/components/monaco/completion/useComponentCatalog', () => ({
+    useComponentCatalog: (options: unknown) => {
+        hoisted.mockUseComponentCatalog(options);
+
+        return hoisted.catalog;
+    },
+}));
+
+vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', async (importOriginal) => ({
+    ...(await importOriginal<object>()),
+    useWorkflowEditor: () => hoisted.editorState,
 }));
 
 vi.mock('@/shared/components/MonacoEditorLoader', () => ({
@@ -70,11 +98,50 @@ describe('PropertyCodeEditorDialogEditor', () => {
     beforeEach(() => {
         windowResizeObserver();
         hoisted.storeState.editorValue = 'const x = 1;';
+        hoisted.storeState.componentConnections = [];
+        hoisted.storeState.inputParameters = undefined;
+        hoisted.storeState.scriptInput = {};
+        hoisted.editorState.includeComponents = undefined;
+        hoisted.editorState.platformType = 'AUTOMATION';
+
+        useWorkflowNodeDetailsPanelStore.setState({currentNode: undefined});
+        useWorkflowEditorStore.setState({rootClusterElementNodeData: undefined});
     });
 
     afterEach(() => {
+        unregisterCompletionContext('inmemory://test');
         resetAll();
         vi.clearAllMocks();
+    });
+
+    describe('component catalog', () => {
+        it('reads the embedded catalog when the editor hosts an embedded workflow', async () => {
+            hoisted.editorState.platformType = 'EMBEDDED';
+
+            render(<PropertyCodeEditorDialogEditor language="javascript" />);
+
+            await screen.findByTestId('monaco-editor');
+
+            expect(hoisted.mockUseComponentCatalog).toHaveBeenCalledWith({embedded: true});
+        });
+
+        it('reads the automation catalog otherwise', async () => {
+            render(<PropertyCodeEditorDialogEditor language="javascript" />);
+
+            await screen.findByTestId('monaco-editor');
+
+            expect(hoisted.mockUseComponentCatalog).toHaveBeenCalledWith({embedded: false});
+        });
+
+        it('limits the catalog to the components the host includes', async () => {
+            hoisted.editorState.includeComponents = ['slack'];
+
+            render(<PropertyCodeEditorDialogEditor language="javascript" />);
+
+            await screen.findByTestId('monaco-editor');
+
+            expect(hoisted.mockUseComponentCatalog).toHaveBeenCalledWith({embedded: false, include: ['slack']});
+        });
     });
 
     describe('rendering', () => {
@@ -148,6 +215,191 @@ describe('PropertyCodeEditorDialogEditor', () => {
             changeBtn.click();
 
             expect(hoisted.mockSetEditorValue).toHaveBeenCalledWith('new value');
+        });
+    });
+
+    describe('completion context', () => {
+        const mountEditor = async () => {
+            fireEvent.click(await screen.findByTestId('mount-btn'));
+        };
+
+        it('registers a script completion context with the dialog connections and input', async () => {
+            hoisted.storeState.componentConnections = [{componentName: 'googleMaps', componentVersion: 1, name: 'gm'}];
+            hoisted.storeState.scriptInput = {order: 1};
+
+            render(<PropertyCodeEditorDialogEditor language="javascript" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toMatchObject({
+                connections: [{name: 'gm'}],
+                input: {order: 1},
+                kind: 'script',
+                language: 'javascript',
+            });
+        });
+
+        it('marks a script in a non-GraalVM task runner as external', async () => {
+            useWorkflowNodeDetailsPanelStore.setState({
+                currentNode: {
+                    componentName: 'script',
+                    label: 'JavaScript',
+                    name: 'script_1',
+                    parameters: {taskRunner: {type: 'docker'}},
+                    workflowNodeName: 'script_1',
+                },
+            } as unknown as Parameters<typeof useWorkflowNodeDetailsPanelStore.setState>[0]);
+
+            render(<PropertyCodeEditorDialogEditor language="javascript" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toMatchObject({externalTaskRunner: true, kind: 'script'});
+        });
+
+        it('does not mark a script in the GraalVM task runner as external', async () => {
+            useWorkflowNodeDetailsPanelStore.setState({
+                currentNode: {
+                    componentName: 'script',
+                    label: 'JavaScript',
+                    name: 'script_1',
+                    parameters: {taskRunner: {type: 'graalvm'}},
+                    workflowNodeName: 'script_1',
+                },
+            } as unknown as Parameters<typeof useWorkflowNodeDetailsPanelStore.setState>[0]);
+
+            render(<PropertyCodeEditorDialogEditor language="javascript" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toMatchObject({externalTaskRunner: false, kind: 'script'});
+        });
+
+        it('prefers the edited input parameters over the stored script input', async () => {
+            hoisted.storeState.inputParameters = {edited: true};
+            hoisted.storeState.scriptInput = {order: 1};
+
+            render(<PropertyCodeEditorDialogEditor language="python" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toMatchObject({
+                input: {edited: true},
+                kind: 'script',
+                language: 'python',
+            });
+        });
+
+        it('lowercases the dialog language', async () => {
+            render(<PropertyCodeEditorDialogEditor language="JAVASCRIPT" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toMatchObject({kind: 'script', language: 'javascript'});
+        });
+
+        it('registers a shell completion context with the task connections, environment and input', async () => {
+            hoisted.storeState.componentConnections = [{componentName: 'slack', componentVersion: 1, name: 'slack'}];
+            hoisted.storeState.scriptInput = {channel: '#general'};
+
+            useWorkflowNodeDetailsPanelStore.setState({
+                currentNode: {
+                    componentName: 'script',
+                    label: 'Bash',
+                    name: 'script_1',
+                    parameters: {env: {API_TOKEN: 'secret', REGION: 'eu'}},
+                    workflowNodeName: 'script_1',
+                },
+            } as unknown as Parameters<typeof useWorkflowNodeDetailsPanelStore.setState>[0]);
+
+            render(<PropertyCodeEditorDialogEditor language="shell" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toEqual({
+                connections: [{componentName: 'slack', componentVersion: 1, name: 'slack'}],
+                env: ['API_TOKEN', 'REGION'],
+                input: {channel: '#general'},
+                kind: 'shell',
+            });
+        });
+
+        it('registers a shell completion context without environment keys when the task sets none', async () => {
+            render(<PropertyCodeEditorDialogEditor language="shell" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toMatchObject({env: [], kind: 'shell'});
+        });
+
+        it('resolves the cluster root of a script tool from the node when no root is stored', async () => {
+            useWorkflowNodeDetailsPanelStore.setState({
+                currentNode: {
+                    clusterElementType: 'TOOLS',
+                    componentName: 'script',
+                    label: 'JavaScript',
+                    name: 'script_1',
+                    topLevelClusterRootId: 'aiAgent_1',
+                    workflowNodeName: 'script_1',
+                },
+            } as unknown as Parameters<typeof useWorkflowNodeDetailsPanelStore.setState>[0]);
+
+            render(<PropertyCodeEditorDialogEditor language="javascript" workflowNodeName="script_1" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toMatchObject({
+                clusterElementNode: {clusterElementType: 'TOOLS', clusterElementWorkflowNodeName: 'script_1'},
+                kind: 'script',
+                workflowNodeName: 'aiAgent_1',
+            });
+        });
+
+        it('prefers the parent cluster root of a script tool over a stale stored root', async () => {
+            useWorkflowEditorStore.setState({
+                rootClusterElementNodeData: {
+                    componentName: 'aiAgent',
+                    name: 'aiAgent_2',
+                    workflowNodeName: 'aiAgent_2',
+                },
+            } as unknown as Parameters<typeof useWorkflowEditorStore.setState>[0]);
+
+            useWorkflowNodeDetailsPanelStore.setState({
+                currentNode: {
+                    clusterElementType: 'TOOLS',
+                    componentName: 'script',
+                    label: 'JavaScript',
+                    name: 'script_1',
+                    parentClusterRootId: 'aiAgent_1',
+                    workflowNodeName: 'script_1',
+                },
+            } as unknown as Parameters<typeof useWorkflowNodeDetailsPanelStore.setState>[0]);
+
+            render(<PropertyCodeEditorDialogEditor language="python" workflowNodeName="script_1" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toMatchObject({
+                clusterElementNode: {clusterElementType: 'TOOLS', clusterElementWorkflowNodeName: 'script_1'},
+                kind: 'script',
+                workflowNodeName: 'aiAgent_1',
+            });
+        });
+
+        it('registers no context for a Java script', async () => {
+            render(<PropertyCodeEditorDialogEditor language="java" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toBeUndefined();
+        });
+
+        it('registers no context for an R script', async () => {
+            render(<PropertyCodeEditorDialogEditor language="R" />);
+
+            await mountEditor();
+
+            expect(getCompletionContext('inmemory://test')).toBeUndefined();
         });
     });
 });

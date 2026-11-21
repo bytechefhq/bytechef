@@ -12,20 +12,31 @@ import {
 } from '@/shared/middleware/graphql';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {useEffect, useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
+import {usePropertyCodeEditorDialogStore} from './stores/usePropertyCodeEditorDialogStore';
+
 interface PropertyCodeEditorDialogConnectionsSheetRightPanelProps {
+    language: string;
     workflow: Workflow;
     workflowNodeName: string;
 }
 
 const PropertyCodeEditorDialogRightPanel = ({
+    language,
     workflow,
     workflowNodeName,
 }: PropertyCodeEditorDialogConnectionsSheetRightPanelProps) => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
     const rootClusterElementNodeData = useWorkflowEditorStore(useShallow((state) => state.rootClusterElementNodeData));
+    const {setComponentConnections, setScriptInput} = usePropertyCodeEditorDialogStore(
+        useShallow((state) => ({
+            setComponentConnections: state.setComponentConnections,
+            setScriptInput: state.setScriptInput,
+        }))
+    );
 
     const mainClusterRootName = resolveMainClusterRootName(currentNode, rootClusterElementNodeData);
     const isClusterElement = currentNode?.clusterElementType && mainClusterRootName;
@@ -79,13 +90,43 @@ const PropertyCodeEditorDialogRightPanel = ({
         }
     );
 
-    const input = isClusterElement
-        ? (clusterElementScriptInputData?.clusterElementScriptInput ?? {})
-        : (workflowNodeScriptInputData?.workflowNodeScriptInput ?? {});
+    const input = useMemo(
+        () =>
+            isClusterElement
+                ? (clusterElementScriptInputData?.clusterElementScriptInput ?? {})
+                : (workflowNodeScriptInputData?.workflowNodeScriptInput ?? {}),
+        [
+            clusterElementScriptInputData?.clusterElementScriptInput,
+            isClusterElement,
+            workflowNodeScriptInputData?.workflowNodeScriptInput,
+        ]
+    );
 
-    const componentConnections = isClusterElement
-        ? (clusterElementComponentConnectionsData?.clusterElementComponentConnections ?? [])
-        : (workflowNodeComponentConnectionsData?.workflowNodeComponentConnections ?? []);
+    const componentConnections = useMemo(
+        () =>
+            isClusterElement
+                ? (clusterElementComponentConnectionsData?.clusterElementComponentConnections ?? [])
+                : (workflowNodeComponentConnectionsData?.workflowNodeComponentConnections ?? []),
+        [
+            clusterElementComponentConnectionsData?.clusterElementComponentConnections,
+            isClusterElement,
+            workflowNodeComponentConnectionsData?.workflowNodeComponentConnections,
+        ]
+    );
+
+    useEffect(() => {
+        setComponentConnections(
+            componentConnections.map((connection) => ({
+                componentName: connection.componentName,
+                componentVersion: connection.componentVersion,
+                name: connection.key,
+            }))
+        );
+    }, [componentConnections, setComponentConnections]);
+
+    useEffect(() => {
+        setScriptInput(input as Record<string, unknown>);
+    }, [input, setScriptInput]);
 
     return (
         <ResizablePanelGroup orientation="vertical">
@@ -98,6 +139,7 @@ const PropertyCodeEditorDialogRightPanel = ({
             <ResizablePanel className="overflow-auto rounded-lg bg-surface-neutral-primary" minSize={120}>
                 <PropertyCodeEditorDialogRightPanelConnections
                     componentConnections={componentConnections}
+                    language={language}
                     workflow={workflow}
                     workflowNodeName={workflowNodeName}
                 />
