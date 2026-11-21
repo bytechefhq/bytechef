@@ -37,6 +37,47 @@ class GuestFunctionsTest {
             getRequiredParameterCount("python", "def perform(input, context, extra=None):\n    pass\nperform"));
     }
 
+    @Test
+    void testPlainFunctionAcceptsItsDeclaredArguments() {
+        assertEquals(2, getAcceptedArgumentCount("python", "def perform(input, connection):\n    pass\nperform", 3));
+    }
+
+    @Test
+    void testFunctionAcceptsNoMoreThanItIsGiven() {
+        assertEquals(1,
+            getAcceptedArgumentCount("python", "def perform(input, connection, context):\n    pass\nperform", 1));
+    }
+
+    @Test
+    void testVarargsFunctionAcceptsEveryArgument() {
+        assertEquals(3, getAcceptedArgumentCount("python", "def perform(*arguments):\n    pass\nperform", 3));
+    }
+
+    @Test
+    void testBoundMethodDoesNotCountSelf() {
+        String script = """
+            class Action:
+                def perform(self, input):
+                    pass
+            Action().perform
+            """;
+
+        assertEquals(1, getAcceptedArgumentCount("python", script, 3));
+    }
+
+    @Test
+    void testJavaScriptFunctionAcceptsEveryArgument() {
+        assertEquals(3, getAcceptedArgumentCount("js", "(function perform(input) {})", 3));
+    }
+
+    private static int getAcceptedArgumentCount(String languageId, String script, int argumentCount) {
+        return PolyglotSandbox.call(languageId, polyglotContext -> {
+            Value function = polyglotContext.eval(languageId, script);
+
+            return GuestFunctions.getAcceptedArgumentCount(function, argumentCount);
+        });
+    }
+
     private static int getRequiredParameterCount(String languageId, String script) {
         return PolyglotSandbox.call(languageId, polyglotContext -> {
             Value function = polyglotContext.eval(languageId, script);
