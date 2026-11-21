@@ -9,10 +9,10 @@ package com.bytechef.ee.embedded.codeworkflow.loader;
 
 import com.bytechef.classloader.IsolatingClassLoader;
 import com.bytechef.classloader.util.ClassLoaderUtils;
+import com.bytechef.ee.platform.codeworkflow.loader.AbstractHandlerClassLoader;
 import com.bytechef.embedded.integration.IntegrationHandler;
 import com.bytechef.embedded.integration.definition.IntegrationDefinition;
 import java.net.URL;
-import java.util.ServiceLoader;
 import org.springframework.cache.CacheManager;
 
 /**
@@ -20,41 +20,16 @@ import org.springframework.cache.CacheManager;
  *
  * @author Ivica Cardic
  */
-class IntegrationHandlerClassLoader extends IsolatingClassLoader<IntegrationHandler> {
+class IntegrationHandlerClassLoader extends AbstractHandlerClassLoader<IntegrationHandler> {
 
-    private final String cacheKey;
-
-    @SuppressWarnings("PMD.AvoidBranchingStatementAsLastInLoop")
     private IntegrationHandlerClassLoader(URL jarUrl, String cacheKey, CacheManager cacheManager) {
-        super(
-            new URL[] {
-                jarUrl
-            }, IntegrationHandlerClassLoader.class.getClassLoader(),
-            cacheManager,
-            (key, classLoader) -> {
-                ServiceLoader<IntegrationHandler> loader = ServiceLoader.load(IntegrationHandler.class, classLoader);
-
-                for (IntegrationHandler integrationHandler : loader) {
-                    return new ContextClassLoaderIntegrationHandler(integrationHandler, classLoader);
-                }
-
-                return null;
-            });
-
-        this.cacheKey = cacheKey;
+        super(jarUrl, cacheKey, cacheManager, IntegrationHandler.class, ContextClassLoaderIntegrationHandler::new);
     }
 
     static IntegrationHandlerClassLoader of(URL jarUrl, String cacheKey, CacheManager cacheManager) {
         return new IntegrationHandlerClassLoader(jarUrl, cacheKey, cacheManager);
     }
 
-    IntegrationHandler loadIntegrationHandler() {
-        return get(cacheKey);
-    }
-
-    /**
-     * @author Ivica Cardic
-     */
     private record ContextClassLoaderIntegrationHandler(
         IntegrationHandler integrationHandler, IsolatingClassLoader<?> classLoader) implements IntegrationHandler {
 

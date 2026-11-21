@@ -11,8 +11,8 @@ import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.automation.project.definition.ProjectDefinition;
 import com.bytechef.classloader.IsolatingClassLoader;
 import com.bytechef.classloader.util.ClassLoaderUtils;
+import com.bytechef.ee.platform.codeworkflow.loader.AbstractHandlerClassLoader;
 import java.net.URL;
-import java.util.ServiceLoader;
 import org.springframework.cache.CacheManager;
 
 /**
@@ -20,44 +20,16 @@ import org.springframework.cache.CacheManager;
  *
  * @author Ivica Cardic
  */
-class ProjectHandlerClassLoader extends IsolatingClassLoader<ProjectHandler> {
+class ProjectHandlerClassLoader extends AbstractHandlerClassLoader<ProjectHandler> {
 
-    private final String cacheKey;
-
-    @SuppressWarnings("PMD.AvoidBranchingStatementAsLastInLoop")
     private ProjectHandlerClassLoader(URL jarUrl, String cacheKey, CacheManager cacheManager) {
-        super(
-            new URL[] {
-                jarUrl
-            }, ProjectHandlerClassLoader.class.getClassLoader(),
-            cacheManager,
-            (key, classLoader) -> {
-                ServiceLoader<ProjectHandler> loader = ServiceLoader.load(ProjectHandler.class, classLoader);
-
-                for (ProjectHandler projectHandler : loader) {
-                    return new ContextClassLoaderProjectHandler(projectHandler, classLoader);
-                }
-
-                return null;
-            });
-
-        this.cacheKey = cacheKey;
+        super(jarUrl, cacheKey, cacheManager, ProjectHandler.class, ContextClassLoaderProjectHandler::new);
     }
 
     static ProjectHandlerClassLoader of(URL jarUrl, String cacheKey, CacheManager cacheManager) {
         return new ProjectHandlerClassLoader(jarUrl, cacheKey, cacheManager);
     }
 
-    ProjectHandler loadWorkflowHandler() {
-        return get(cacheKey);
-    }
-
-    /**
-     * A WorkflowHandler that wraps another WorkflowHandler, using the given class loader as the thread's context class
-     * loader for all its invocations.
-     *
-     * @author Ivica Cardic
-     */
     private record ContextClassLoaderProjectHandler(
         ProjectHandler projectHandler, IsolatingClassLoader<?> classLoader) implements ProjectHandler {
 

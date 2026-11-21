@@ -9,16 +9,9 @@ package com.bytechef.platform.codeworkflow.loader.automation;
 
 import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.ee.platform.codeworkflow.loader.AbstractHandlerLoader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import org.springframework.cache.CacheManager;
 
 /**
@@ -26,62 +19,28 @@ import org.springframework.cache.CacheManager;
  *
  * @author Ivica Cardic
  */
-public class ProjectHandlerLoader {
+public class ProjectHandlerLoader extends AbstractHandlerLoader<ProjectHandler> {
 
-    /**
-     * <b>Security Note:</b> Path traversal is intentional. The URL is derived from internal code workflow container
-     * configuration, not from untrusted user input.
-     */
-    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
-    public static ProjectHandler loadProjectHandler(
-        URL url, Language language, String cacheKey, CacheManager cacheManager) {
+    private static final ProjectHandlerLoader INSTANCE = new ProjectHandlerLoader();
 
-        try {
-            return switch (language) {
-                case JAVA -> loadJavaProjectHandler(url, cacheKey, cacheManager);
-                case JAVASCRIPT, PYTHON -> ProjectHandlerPolyglotEngine.load(
-                    getLanguageId(language), Files.readString(toLocalPath(url)));
-                case RUBY -> throw new IllegalArgumentException("Unsupported language: " + language);
-            };
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    private ProjectHandlerLoader() {
+    }
+
+    public static ProjectHandler
+        loadProjectHandler(URL url, Language language, String cacheKey, CacheManager cacheManager) {
+        return INSTANCE.loadHandler(url, language, cacheKey, cacheManager);
+    }
+
+    @Override
+    protected ProjectHandler loadJavaHandler(URL url, String cacheKey, CacheManager cacheManager) throws IOException {
+        try (ProjectHandlerClassLoader projectHandlerClassLoader =
+            ProjectHandlerClassLoader.of(url, cacheKey, cacheManager)) {
+            return projectHandlerClassLoader.loadHandler();
         }
     }
 
-    private static ProjectHandler loadJavaProjectHandler(URL url, String cacheKey, CacheManager cacheManager)
-        throws IOException {
-
-        try (ProjectHandlerClassLoader projectHandlerClassLoader = ProjectHandlerClassLoader.of(
-            url, cacheKey, cacheManager)) {
-
-            return projectHandlerClassLoader.loadWorkflowHandler();
-        }
-    }
-
-    private static String getLanguageId(Language language) {
-        return switch (language) {
-            case JAVASCRIPT -> "js";
-            case PYTHON -> "python";
-            default -> throw new IllegalArgumentException("Unsupported language: " + language);
-        };
-    }
-
-    @SuppressFBWarnings({
-        "PATH_TRAVERSAL_IN", "URLCONNECTION_SSRF_FD"
-    })
-    private static Path toLocalPath(URL url) throws IOException, URISyntaxException {
-        URI uri = url.toURI();
-
-        if ("file".equals(uri.getScheme())) {
-            return Paths.get(uri);
-        }
-
-        Path tempFile = Files.createTempFile("code_workflow", null);
-
-        try (InputStream inputStream = url.openStream()) {
-            Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
-        }
-
-        return tempFile;
+    @Override
+    protected ProjectHandler loadPolyglotHandler(String languageId, String script) {
+        return ProjectHandlerPolyglotEngine.load(languageId, script);
     }
 }
