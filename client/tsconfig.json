@@ -1,6 +1,5 @@
 {
     "compilerOptions": {
-        "baseUrl": "./src",
         "target": "esnext",
         "incremental": true,
         "lib": ["dom", "dom.iterable", "esnext"],
@@ -17,8 +16,8 @@
         "noEmit": true,
         "jsx": "react-jsx",
         "paths": {
-            "@/*": ["./*"],
-            "@bytechef/embedded-api": ["../../sdks/api/typescript/src/configuration/index.ts"]
+            "@/*": ["./src/*"],
+            "@bytechef/embedded-api": ["../sdks/api/typescript/src/configuration/index.ts"]
         }
     },
     "include": ["src"],

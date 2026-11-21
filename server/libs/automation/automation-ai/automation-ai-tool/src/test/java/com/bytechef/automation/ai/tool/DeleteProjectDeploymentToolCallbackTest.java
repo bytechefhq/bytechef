@@ -28,10 +28,12 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.ai.chat.model.ToolContext;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -39,6 +41,7 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class DeleteProjectDeploymentToolCallbackTest {
 
     private static final long WORKSPACE_ID = 99L;

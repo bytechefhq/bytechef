@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.tool;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
+import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.NoSuchElementException;
 import org.jspecify.annotations.Nullable;
@@ -26,7 +27,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -49,13 +49,12 @@ public class CloneMcpProjectToolCallback implements ToolCallback {
                 "type": "object",
                 "properties": {
                     "mcpProjectId": {"type": "integer", "description": "Source MCP project id. Never invent ids."},
-                    "targetMcpServerId": {"type": "string", "description": "Numeric MCP server id where the clone should land. May equal the source's server."}
+                    "targetMcpServerId": {"type": "integer", "description": "Numeric MCP server id where the clone should land. May equal the source's server."}
                 },
                 "required": ["mcpProjectId", "targetMcpServerId"]
             }""";
 
     private final McpProjectFacade mcpProjectFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public CloneMcpProjectToolCallback(McpProjectFacade mcpProjectFacade) {
@@ -79,7 +78,7 @@ public class CloneMcpProjectToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            CloneMcpProjectInput input = jsonMapper.readValue(toolInput, CloneMcpProjectInput.class);
+            CloneMcpProjectInput input = JsonUtils.read(toolInput, CloneMcpProjectInput.class);
 
             Long mcpProjectId = input.mcpProjectId();
 
@@ -103,26 +102,34 @@ public class CloneMcpProjectToolCallback implements ToolCallback {
 
             McpProject clone = mcpProjectFacade.cloneMcpProject(mcpProjectId, targetMcpServerId);
 
-            return jsonMapper.writeValueAsString(
+            return writeResult(
                 new CloneMcpProjectOutput(
                     clone.getId(), clone.getProjectDeploymentId(), clone.getMcpServerId()));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (IllegalArgumentException | IllegalStateException | NoSuchElementException
             | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(jsonMapper, CloneMcpProjectToolCallback.class, TOOL_NAME, exception);
+            return ToolErrors.runtimeFailure(CloneMcpProjectToolCallback.class, TOOL_NAME, exception);
         }
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record CloneMcpProjectInput(@Nullable Long mcpProjectId, @Nullable String targetMcpServerId) {
     }
 
     public record CloneMcpProjectOutput(long mcpProjectId, long projectDeploymentId, long mcpServerId) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(CloneMcpProjectToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }

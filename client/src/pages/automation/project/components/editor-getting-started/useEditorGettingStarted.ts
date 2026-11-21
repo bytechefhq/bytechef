@@ -70,7 +70,7 @@ export default function useEditorGettingStarted({
 
     const canCreateProject = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_CREATE');
 
-    const {data: projects} = useGetWorkspaceProjectsQuery({id: currentWorkspaceId}, canCreateProject);
+    const {data: projects} = useGetWorkspaceProjectsQuery({id: currentWorkspaceId!}, canCreateProject);
 
     const guideWorkflow = canCreateProject ? resolveGuideWorkflow(getRememberedGuideWorkflow(), projects) : undefined;
     const isGuideWorkflow =
@@ -78,7 +78,7 @@ export default function useEditorGettingStarted({
     const queriesEnabled = canCreateProject && isGuideWorkflow;
 
     const {data: deployments} = useGetWorkspaceProjectDeploymentsQuery(
-        {environmentId: currentEnvironmentId, id: currentWorkspaceId, projectId},
+        {environmentId: currentEnvironmentId, id: currentWorkspaceId!, projectId},
         queriesEnabled
     );
 

@@ -16,22 +16,121 @@
 
 package com.bytechef.platform.ai.tool.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.exception.AbstractException;
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.exception.ErrorType;
+import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.util.ToolUtils.PropertyDecorator;
 import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.component.domain.BooleanProperty;
 import com.bytechef.platform.component.domain.IntegerProperty;
 import com.bytechef.platform.component.domain.ObjectProperty;
+import com.bytechef.platform.component.domain.Option;
+import com.bytechef.platform.component.domain.OptionsDataSource;
 import com.bytechef.platform.component.domain.StringProperty;
+import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class ToolUtilsTest {
+
+    private static final ErrorType ERROR_TYPE = new ErrorType() {
+
+        @Override
+        public Class<?> getErrorClass() {
+            return ToolUtilsTest.class;
+        }
+
+        @Override
+        public int getErrorKey() {
+            return 100;
+        }
+    };
+
+    @Test
+    void testToToolExecutionExceptionRethrowsAnAbstractExceptionUnchanged() {
+        ConfigurationException configurationException = new ConfigurationException("Invalid definition", ERROR_TYPE);
+
+        assertSame(
+            configurationException,
+            ToolUtils.toToolExecutionException("update workflow", configurationException, ERROR_TYPE));
+    }
+
+    @Test
+    void testToToolExecutionExceptionKeepsTheMessageOfAnIllegalArgumentException() {
+        IllegalArgumentException illegalArgumentException = new IllegalArgumentException("Category 3 not found");
+
+        AbstractException abstractException = ToolUtils.toToolExecutionException(
+            "create project", illegalArgumentException, ERROR_TYPE);
+
+        assertThat(abstractException).isInstanceOf(ExecutionException.class)
+            .hasMessage("Failed to create project: Category 3 not found")
+            .hasCause(illegalArgumentException);
+    }
+
+    @Test
+    void testToToolExecutionExceptionReducesAnIllegalArgumentExceptionCarryingOnlyItsCause() {
+        IllegalArgumentException illegalArgumentException = new IllegalArgumentException(
+            new IllegalStateException("secret"));
+
+        AbstractException abstractException = ToolUtils.toToolExecutionException(
+            "create project", illegalArgumentException, ERROR_TYPE);
+
+        assertThat(abstractException).hasMessage("Failed to create project: IllegalArgumentException");
+    }
+
+    @Test
+    void testToToolExecutionExceptionNamesTheOperationAndCauseTypeWithoutTheCauseMessage() {
+        IllegalStateException illegalStateException = new IllegalStateException("SQL [select secret] failed");
+
+        AbstractException abstractException = ToolUtils.toToolExecutionException(
+            "update workflow", illegalStateException, ERROR_TYPE);
+
+        assertThat(abstractException).isInstanceOf(ExecutionException.class)
+            .hasMessage("Failed to update workflow: IllegalStateException")
+            .hasCause(illegalStateException);
+    }
+
+    @Test
+    void testConvertToPropertyInfoCarriesFixedOptionValues() {
+        IntegerProperty countProperty = new IntegerProperty(
+            ComponentDsl.integer("count")
+                .options(ComponentDsl.option("Ten", 10), ComponentDsl.option("Twenty", 20)));
+
+        PropertyInfo propertyInfo = ToolUtils.convertToPropertyInfo(countProperty);
+
+        assertThat(propertyInfo.optionValues()).containsExactly(10L, 20L);
+    }
+
+    @Test
+    void testConvertToPropertyInfoOmitsOptionValuesWithoutOptions() {
+        PropertyInfo propertyInfo = ToolUtils.convertToPropertyInfo(
+            new IntegerProperty(ComponentDsl.integer("count")));
+
+        assertThat(propertyInfo.optionValues()).isNull();
+    }
+
+    @Test
+    void testConvertToPropertyInfoOmitsOptionValuesForDynamicOptions() {
+        StringProperty sheetNameProperty = mock(StringProperty.class);
+
+        when(sheetNameProperty.getName()).thenReturn("sheetName");
+        when(sheetNameProperty.getOptions()).thenReturn(List.of(new Option(ComponentDsl.option("Sheet1", "Sheet1"))));
+        when(sheetNameProperty.getOptionsDataSource()).thenReturn(mock(OptionsDataSource.class));
+
+        PropertyInfo propertyInfo = ToolUtils.convertToPropertyInfo(sheetNameProperty);
+
+        assertThat(propertyInfo.optionValues()).isNull();
+    }
 
     @Test
     void testListDisplayConditionsEmptyGet() {

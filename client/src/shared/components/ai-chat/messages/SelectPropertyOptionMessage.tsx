@@ -5,7 +5,7 @@ import {useEffect, useState} from 'react';
 
 export interface SelectPropertyOptionItemI {
     label: string;
-    value: string;
+    value: number | string;
 }
 
 export interface SelectPropertyOptionDataI {
@@ -16,12 +16,6 @@ export interface SelectPropertyOptionDataI {
     truncated?: boolean;
 }
 
-/**
- * Renders the selectPropertyOption / selectTriggerPropertyOption tool result as a searchable picker of all
- * options the tool fetched from the connection (taken straight from the tool result, not re-emitted by the
- * LLM). On pick, the option's real value is submitted as a system message "User picked: <label> (value:
- * <value>)" so the agent writes the value (e.g. a channel id) into the workflow.
- */
 const SelectPropertyOptionMessage = ({data}: DataMessagePartProps<SelectPropertyOptionDataI>) => {
     const [picked, setPicked] = useState<SelectPropertyOptionItemI | undefined>();
     const [superseded, setSuperseded] = useState(false);

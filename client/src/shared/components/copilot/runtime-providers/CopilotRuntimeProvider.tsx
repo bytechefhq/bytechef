@@ -1,14 +1,19 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {humanizeAgentErrorMessage} from '@/shared/components/ai-chat/messages/humanizeAgentErrorMessage';
+import {
+    findExternalStoreMessageIndex,
+    findTurnUserMessageIndex,
+} from '@/shared/components/ai-chat/messages/findExternalStoreMessageIndex';
+import {toRunErrorData} from '@/shared/components/ai-chat/messages/toRunErrorData';
 import {parseJson, toToolResultDataPart} from '@/shared/components/ai-chat/messages/toToolResultDataPart';
 import {aiChatToolCallStore} from '@/shared/components/ai-chat/stores/useAiChatToolCallStore';
-import {readLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
+import {resolveRememberedModel} from '@/shared/components/ai/model-picker/resolveRememberedModel';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import useCopilotToolResultHandlerRegistry from '@/shared/components/copilot/stores/useCopilotToolResultHandlerRegistry';
-import {findTurnRewindIndexes} from '@/shared/components/copilot/utils/findTurnRewindIndexes';
-import {environmentStore} from '@/shared/stores/useEnvironmentStore';
+import {toAgentMessages} from '@/shared/components/copilot/utils/toAgentMessages';
+import {useAiProviderCatalogQuery} from '@/shared/middleware/graphql';
+import {environmentStore, useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {getCookie} from '@/shared/util/cookie-utils';
 import {getRandomId} from '@/shared/util/random-utils';
 import {AgentSubscriber, HttpAgent, contentToText} from '@ag-ui/client';
@@ -21,7 +26,7 @@ import {
     ThreadMessageLike,
     useExternalStoreRuntime,
 } from '@assistant-ui/react';
-import {ReactNode, useMemo, useState} from 'react';
+import {ReactNode, useEffect, useMemo, useRef, useState} from 'react';
 import {toast} from 'sonner';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -39,6 +44,8 @@ export function CopilotRuntimeProvider({
     suggestions?: SuggestionConfig[];
 }>) {
     const [isRunning, setIsRunning] = useState(false);
+
+    const abortedAgentsRef = useRef(new WeakSet<HttpAgent>());
 
     const {
         addMessage,
@@ -60,6 +67,15 @@ export function CopilotRuntimeProvider({
             selectedLlmModel: state.selectedLlmModel,
             selectedLlmProvider: state.selectedLlmProvider,
         }))
+    );
+
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
+    const catalogEnvironment = context?.environmentId ?? currentEnvironmentId;
+
+    const {data: providerCatalogData} = useAiProviderCatalogQuery(
+        {environment: String(catalogEnvironment)},
+        {enabled: catalogEnvironment >= 0}
     );
 
     const sourceKey = sourceProp ?? context?.source ?? Source.WORKFLOW_EDITOR;
@@ -84,31 +100,10 @@ export function CopilotRuntimeProvider({
             throw new Error('Copilot is not ready: taskId has not been initialized yet');
         }
 
-        setIsRunning(true);
+        const runConversationId = conversationId;
 
-        const contextWithoutError: Record<string, unknown> = {...(context ?? {})};
-
-        delete contextWithoutError.workflowExecutionError;
-
-        const currentWorkspaceId = useWorkspaceStore.getState().currentWorkspaceId;
-
-        // Fall back to the persisted last-used model so a refreshed/new conversation still sends the model the composer
-        // displays (the store selection is reset per conversation).
-        const lastUsedModel = currentWorkspaceId != null ? readLastUsedModel(currentWorkspaceId) : null;
-        const userSelectedLlmProvider = selectedLlmProvider ?? lastUsedModel?.provider ?? null;
-        const userSelectedLlmModel = selectedLlmModel ?? lastUsedModel?.model ?? null;
-
-        const stateToSend = {
-            ...contextWithoutError,
-            ...useCopilotStateContributorRegistry.getState().contribute(),
-            environmentId: String(environmentStore.getState().currentEnvironmentId ?? 0),
-            ...(currentWorkspaceId != null ? {workspaceId: String(currentWorkspaceId)} : {}),
-            ...(userSelectedLlmProvider != null && userSelectedLlmModel != null
-                ? {userSelectedLlmModel, userSelectedLlmProvider}
-                : {}),
-        };
-
-        agent.setState(stateToSend);
+        const isStaleRun = () =>
+            useCopilotStore.getState().conversationId !== runConversationId || abortedAgentsRef.current.has(agent);
 
         const toolCallNamesById = new Map<string, string>();
 
@@ -116,15 +111,22 @@ export function CopilotRuntimeProvider({
 
         const subscriber: AgentSubscriber = {
             onRunErrorEvent: ({event}) => {
-                const rawMessage = typeof event?.message === 'string' ? event.message.trim() : '';
-                const message =
-                    rawMessage.length > 0
-                        ? humanizeAgentErrorMessage(rawMessage)
-                        : 'The agent run failed before completing this turn.';
+                if (isStaleRun()) {
+                    return;
+                }
 
-                addMessage({content: [{data: {message}, type: 'data-run-error'}], role: 'assistant'});
+                addMessage({
+                    content: [
+                        {data: toRunErrorData({code: event?.code, message: event?.message}), type: 'data-run-error'},
+                    ],
+                    role: 'assistant',
+                });
             },
             onTextMessageContentEvent: ({event, textMessageBuffer}) => {
+                if (isStaleRun()) {
+                    return;
+                }
+
                 const text = textMessageBuffer + event.delta;
 
                 if (textMessageHasBubble) {
@@ -136,6 +138,10 @@ export function CopilotRuntimeProvider({
                 }
             },
             onTextMessageEndEvent: ({textMessageBuffer}) => {
+                if (isStaleRun()) {
+                    return;
+                }
+
                 if (textMessageHasBubble) {
                     appendToLastAssistantMessage(textMessageBuffer);
                 }
@@ -144,6 +150,10 @@ export function CopilotRuntimeProvider({
                 textMessageHasBubble = false;
             },
             onToolCallResultEvent: ({event}) => {
+                if (isStaleRun()) {
+                    return;
+                }
+
                 const toolCallName = toolCallNamesById.get(event.toolCallId);
 
                 toolCallNamesById.delete(event.toolCallId);
@@ -187,30 +197,74 @@ export function CopilotRuntimeProvider({
             },
         };
 
-        try {
-            await agent.runAgent({runId: getRandomId()}, subscriber);
-        } finally {
-            setIsRunning(false);
+        setIsRunning(true);
 
-            useCopilotPostTurnRegistry.getState().runFor(sourceKey);
+        try {
+            const contextWithoutError: Record<string, unknown> = {...(context ?? {})};
+
+            delete contextWithoutError.workflowExecutionError;
+
+            const currentWorkspaceId = useWorkspaceStore.getState().currentWorkspaceId;
+
+            const persistedModel =
+                selectedLlmProvider != null && selectedLlmModel != null
+                    ? null
+                    : resolveRememberedModel(currentWorkspaceId, providerCatalogData?.aiProviderCatalog);
+
+            const userSelectedLlmProvider = selectedLlmProvider ?? persistedModel?.provider ?? null;
+            const userSelectedLlmModel = selectedLlmModel ?? persistedModel?.model ?? null;
+
+            agent.setMessages(toAgentMessages(useCopilotStore.getState().messages));
+
+            agent.setState({
+                ...contextWithoutError,
+                ...useCopilotStateContributorRegistry.getState().contribute(),
+                environmentId: String(context?.environmentId ?? environmentStore.getState().currentEnvironmentId ?? 0),
+                ...(currentWorkspaceId != null ? {workspaceId: String(currentWorkspaceId)} : {}),
+                ...(userSelectedLlmProvider != null && userSelectedLlmModel != null
+                    ? {userSelectedLlmModel, userSelectedLlmProvider}
+                    : {}),
+            });
+
+            await agent.runAgent({runId: getRandomId()}, subscriber);
+        } catch (error) {
+            if (!isStaleRun()) {
+                throw error;
+            }
+        } finally {
+            if (!isStaleRun()) {
+                useCopilotPostTurnRegistry.getState().runFor(sourceKey);
+            }
+
+            setIsRunning(false);
         }
     };
 
     const onNew = async (message: AppendMessage) => {
         if (message.content[0]?.type !== 'text') {
-            throw new Error('Only text messages are supported');
+            toast.error('Only text messages are supported');
+
+            return;
         }
 
         if (!agent) {
-            throw new Error('Copilot is not ready: taskId has not been initialized yet');
+            toast.error('Copilot is not ready yet');
+
+            return;
         }
 
         const input = message.content[0].text;
 
-        addMessage({content: input, role: 'user'});
-        agent.addMessage({content: input, id: getRandomId(), role: 'user'});
+        try {
+            addMessage({content: input, id: getRandomId(), role: 'user'});
 
-        await runAgentNow();
+            await runAgentNow();
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+
+            console.error('Copilot send failed:', error);
+            toast.error(`Failed to send message: ${errorMessage}`);
+        }
     };
 
     const onEdit = async (message: AppendMessage) => {
@@ -226,23 +280,11 @@ export function CopilotRuntimeProvider({
             return;
         }
 
-        // The external-store runtime assigns each message id = String(index), so sourceId is the array index
-        // of the user message being edited.
-        const editedIndex = Number(message.sourceId);
+        const storeMessages = useCopilotStore.getState().messages;
 
-        if (!Number.isInteger(editedIndex) || editedIndex < 0) {
-            toast.error('Could not resolve edited message');
+        const editedIndex = findExternalStoreMessageIndex(storeMessages, message.sourceId);
 
-            return;
-        }
-
-        const turnRewindIndexes = findTurnRewindIndexes(
-            useCopilotStore.getState().messages,
-            agent.messages,
-            editedIndex
-        );
-
-        if (!turnRewindIndexes || turnRewindIndexes.userMessageIndex !== editedIndex) {
+        if (editedIndex === -1 || storeMessages[editedIndex].role !== 'user') {
             toast.error('Could not resolve edited message');
 
             return;
@@ -251,12 +293,7 @@ export function CopilotRuntimeProvider({
         const input = message.content[0].text;
 
         try {
-            // Rewind both layers (UI store + AG-UI agent transcript) to the edit point so the next run sees
-            // the corrected history without the stale assistant reply.
             editUserMessage(editedIndex, input);
-
-            agent.setMessages(agent.messages.slice(0, turnRewindIndexes.agentUserMessageIndex));
-            agent.addMessage({content: input, id: getRandomId(), role: 'user'});
 
             await runAgentNow();
         } catch (error) {
@@ -274,26 +311,20 @@ export function CopilotRuntimeProvider({
             return;
         }
 
-        const parentIndex = parentId == null ? -1 : Number(parentId);
+        const storeMessages = useCopilotStore.getState().messages;
 
-        const turnRewindIndexes = Number.isInteger(parentIndex)
-            ? findTurnRewindIndexes(useCopilotStore.getState().messages, agent.messages, parentIndex)
-            : null;
+        const parentIndex = findExternalStoreMessageIndex(storeMessages, parentId);
 
-        if (!turnRewindIndexes) {
+        const userMessageIndex = parentIndex === -1 ? -1 : findTurnUserMessageIndex(storeMessages, parentIndex);
+
+        if (userMessageIndex === -1) {
             toast.error('Could not resolve message to refresh');
 
             return;
         }
 
         try {
-            const truncatedMessages = useCopilotStore
-                .getState()
-                .messages.slice(0, turnRewindIndexes.userMessageIndex + 1);
-
-            useCopilotStore.setState({messages: truncatedMessages});
-
-            agent.setMessages(agent.messages.slice(0, turnRewindIndexes.agentUserMessageIndex + 1));
+            useCopilotStore.setState({messages: storeMessages.slice(0, userMessageIndex + 1)});
 
             await runAgentNow();
         } catch (error) {
@@ -311,6 +342,22 @@ export function CopilotRuntimeProvider({
         onNew,
         onReload,
     });
+
+    useEffect(() => {
+        const abortedAgents = abortedAgentsRef.current;
+
+        if (agent) {
+            abortedAgents.delete(agent);
+        }
+
+        return () => {
+            if (agent) {
+                abortedAgents.add(agent);
+
+                agent.abortRun();
+            }
+        };
+    }, [agent]);
 
     return (
         <AssistantRuntimeProvider config={AuiConfig({suggestions: Suggestions(suggestions ?? [])})} runtime={runtime}>

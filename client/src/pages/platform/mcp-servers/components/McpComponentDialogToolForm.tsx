@@ -22,6 +22,7 @@ interface McpComponentDialogToolFormProps {
     connectionId?: string | null;
     connectionRequired?: boolean;
     isNew: boolean;
+    mcpComponentId?: string;
     onFormChange: McpToolFormChangeHandlerType;
     savedParameters?: Record<string, unknown> | null;
     toolName: string;
@@ -34,6 +35,7 @@ const McpComponentDialogToolForm = ({
     connectionId,
     connectionRequired,
     isNew,
+    mcpComponentId,
     onFormChange,
     savedParameters,
     toolName,
@@ -89,6 +91,7 @@ const McpComponentDialogToolForm = ({
                 connectionId={connectionId}
                 connectionRequired={connectionRequired}
                 form={form}
+                mcpComponentId={mcpComponentId}
                 properties={properties}
                 toolName={toolName}
             />

@@ -9,13 +9,19 @@ import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/us
 import filterWorkflowNodeOutputs from '@/pages/platform/workflow-editor/utils/filterWorkflowNodeOutputs';
 import openIssuesSidebar from '@/pages/platform/workflow-editor/utils/openIssuesSidebar';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
-import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {
+    MODE,
+    Source,
+    isWorkflowEditorSource,
+    useCopilotStore,
+} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useEffect, useMemo} from 'react';
+import {useParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
 export const useWorkflowLayout = (includeComponents?: string[]) => {
@@ -91,6 +97,7 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
     }, [workflow]);
 
     const {useGetComponentDefinitionsQuery} = useWorkflowEditor();
+    const {integrationId} = useParams();
 
     const componentDefinitionsQueryParameters: object = {
         actionDefinitions: true,
@@ -170,9 +177,9 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
 
         setContext({
             ...currentContext,
-            mode: MODE.ASK,
-            parameters: {},
-            source: Source.WORKFLOW_EDITOR,
+            mode: isWorkflowEditorSource(currentContext.source) ? currentContext.mode : MODE.ASK,
+            parameters: integrationId ? {integrationId} : {},
+            source: integrationId ? Source.WORKFLOW_EDITOR_EMBEDDED : Source.WORKFLOW_EDITOR,
         });
 
         if (!copilotPanelOpen) {

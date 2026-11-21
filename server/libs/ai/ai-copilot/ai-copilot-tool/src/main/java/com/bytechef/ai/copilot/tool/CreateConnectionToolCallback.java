@@ -111,8 +111,8 @@ public class CreateConnectionToolCallback implements ToolCallback {
             String resolvedFromComponentName = null;
 
             if (componentDefinition.isEmpty()) {
-                String resolvedComponentName = ComponentSlugUtils.resolveSingleMatch(
-                    componentName, componentDefinitionService);
+                String resolvedComponentName =
+                    ComponentSlugUtils.resolveSingleMatch(componentName, componentDefinitionService);
 
                 if (resolvedComponentName == null) {
                     return toolError(ComponentSlugUtils.unknownComponentMessage(componentName,
@@ -147,7 +147,7 @@ public class CreateConnectionToolCallback implements ToolCallback {
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
                 CreateConnectionToolCallback.class, "createConnection", exception);

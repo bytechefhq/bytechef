@@ -116,8 +116,8 @@ public class ConverterSpringAIAgent extends CopilotSpringAIAgent {
     }
 
     @Override
-    protected void run(RunAgentInput input, AgentSubscriber subscriber) {
-        super.run(input, new JsonExtractingSubscriber(subscriber));
+    protected AgentSubscriber decorateSubscriber(AgentSubscriber subscriber) {
+        return new JsonExtractingSubscriber(subscriber);
     }
 
     @Override

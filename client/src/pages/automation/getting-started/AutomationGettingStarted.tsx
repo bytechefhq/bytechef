@@ -65,14 +65,14 @@ const AutomationGettingStarted = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const workspaceScopeStatus = usePermissionStore(
-        (state) => state.workspaceScopeStates[currentWorkspaceId]?.[currentEnvironmentId]?.status
+        (state) => state.workspaceScopeStates[currentWorkspaceId!]?.[currentEnvironmentId]?.status
     );
 
     const canCreateProject = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_CREATE');
 
     const queryClient = useQueryClient();
 
-    const {data: projects} = useGetWorkspaceProjectsQuery({id: currentWorkspaceId});
+    const {data: projects} = useGetWorkspaceProjectsQuery({id: currentWorkspaceId!});
 
     const {data, error, isLoading} = useAutomationGettingStartedQuery(
         {workspaceId: `${currentWorkspaceId}`},

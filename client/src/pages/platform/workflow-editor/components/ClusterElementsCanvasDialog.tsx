@@ -66,7 +66,6 @@ const ClusterElementsCanvasDialog = ({
     const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
         (state) => state.workflowNodeDetailsPanelOpen
     );
-    const ff_4070 = useFeatureFlagsStore()('ff-4070');
     const ff_4553 = useFeatureFlagsStore()('ff-4553');
 
     const {handleClose: handleEvalsClose} = useAiAgentEvals();
@@ -151,7 +150,7 @@ const ClusterElementsCanvasDialog = ({
                                 'transition-[margin] duration-300 ease-in-out',
                                 copilotPanelOpen && 'mr-[450px]'
                             )}
-                            copilotEnabled={ff_4070 && copilotEnabled}
+                            copilotEnabled={copilotEnabled}
                             onClose={handleClose}
                             onCopilotClick={handleCopilotClick}
                             onToggleEditor={isDataStreamSimpleModeAvailable ? handleToggleEditor : undefined}
@@ -171,7 +170,7 @@ const ClusterElementsCanvasDialog = ({
                                 'transition-[margin] duration-300 ease-in-out',
                                 copilotPanelOpen && 'mr-[450px]'
                             )}
-                            copilotEnabled={ff_4070 && copilotEnabled}
+                            copilotEnabled={copilotEnabled}
                             onClose={handleClose}
                             onCopilotClick={handleCopilotClick}
                             onToggleEditor={handleToggleEditor}
@@ -201,7 +200,7 @@ const ClusterElementsCanvasDialog = ({
                             </div>
 
                             <ClusterElementsWorkflowEditorHeader
-                                copilotEnabled={ff_4070 && copilotEnabled}
+                                copilotEnabled={copilotEnabled}
                                 onCopilotClick={handleCopilotClick}
                                 onEvalsClick={
                                     ff_4553 && isAiAgentClusterRoot ? () => setEvalsPanelOpen(true) : undefined

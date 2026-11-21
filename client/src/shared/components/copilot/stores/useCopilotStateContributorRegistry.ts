@@ -10,7 +10,15 @@ interface StateContributorRegistryStateI {
 
 const useCopilotStateContributorRegistry = create<StateContributorRegistryStateI>((set, get) => ({
     contribute: () =>
-        get().contributors.reduce<Record<string, unknown>>((acc, contributor) => ({...acc, ...contributor()}), {}),
+        get().contributors.reduce<Record<string, unknown>>((contributedState, contributor) => {
+            for (const [key, value] of Object.entries(contributor())) {
+                if (value !== undefined) {
+                    contributedState[key] = value;
+                }
+            }
+
+            return contributedState;
+        }, {}),
     contributors: [],
     register: (contributor) => {
         set((state) => ({contributors: [...state.contributors, contributor]}));

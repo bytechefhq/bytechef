@@ -25,6 +25,7 @@ vi.mock('@/pages/platform/workflow-editor/components/properties/Properties', () 
         return (
             <div
                 data-connection-required={String(clusterElementContext?.connectionRequired)}
+                data-mcp-component-id={clusterElementContext?.mcpComponentId}
                 data-testid="properties"
             />
         );
@@ -65,7 +66,7 @@ vi.mock('@/shared/queries/platform/useFormDisplayConditions', () => ({
     default: () => ({displayConditions: hoisted.displayConditions, isEvaluating: hoisted.isEvaluating}),
 }));
 
-const mcpTool = {id: '1', mcpComponentId: '1', name: 'post', title: 'POST', version: 1} as McpTool;
+const mcpTool = {id: '1', mcpComponentId: '5', name: 'post', title: 'POST', version: 1} as McpTool;
 
 const renderPopover = (connectionRequired?: boolean) =>
     render(
@@ -97,6 +98,14 @@ describe('McpComponentToolPropertiesPopover', () => {
         renderPopover(true);
 
         expect(screen.getAllByTestId('properties')[0]).toHaveAttribute('data-connection-required', 'true');
+    });
+
+    it('passes the MCP component id of the tool through to the cluster element context', () => {
+        hoisted.displayConditions = {};
+
+        renderPopover(true);
+
+        expect(screen.getByTestId('properties')).toHaveAttribute('data-mcp-component-id', '5');
     });
 
     it('picks up connectionRequired when it arrives after the first render', () => {

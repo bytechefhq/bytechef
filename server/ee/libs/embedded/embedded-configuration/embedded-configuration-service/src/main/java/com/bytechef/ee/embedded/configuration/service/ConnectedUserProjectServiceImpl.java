@@ -98,6 +98,12 @@ public class ConnectedUserProjectServiceImpl implements ConnectedUserProjectServ
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<ConnectedUserProject> fetchProjectConnectedUserProject(long projectId) {
+        return connectUserProjectRepository.findByProjectId(projectId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<ConnectedUserProject> getConnectedUserProjects(
         @Nullable Long connectedUserId, @Nullable Environment environment) {
 

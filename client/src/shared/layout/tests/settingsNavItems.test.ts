@@ -20,7 +20,11 @@ describe('getSettingsNavItems', () => {
         const {organization, section} = splitAtOrganization(getSettingsNavItems(PlatformType.AUTOMATION));
 
         expect(findAiGroup(section)?.items).toEqual([{href: '/automation/settings/ai/memories', title: 'Memories'}]);
-        expect(findAiGroup(organization)?.items?.map((item) => item.title)).toEqual(['Providers', 'Skills']);
+        expect(findAiGroup(organization)?.items?.map((item) => item.title)).toEqual([
+            'Providers',
+            'Skills',
+            'Web Search',
+        ]);
     });
 
     it('lists the Embedded Memories page in Embedded, and not the Automation one', () => {
@@ -34,7 +38,11 @@ describe('getSettingsNavItems', () => {
         const {organization, section} = splitAtOrganization(getSettingsNavItems(PlatformType.EMBEDDED));
 
         expect(findAiGroup(section)?.items).toEqual([{href: '/embedded/settings/ai/memories', title: 'Memories'}]);
-        expect(findAiGroup(organization)?.items?.map((item) => item.title)).toEqual(['Providers', 'Skills']);
+        expect(findAiGroup(organization)?.items?.map((item) => item.title)).toEqual([
+            'Providers',
+            'Skills',
+            'Web Search',
+        ]);
     });
 
     it('lists no Embedded Memories page in Automation', () => {

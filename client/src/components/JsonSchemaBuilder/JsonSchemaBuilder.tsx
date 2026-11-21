@@ -9,27 +9,24 @@ interface JsonSchemaBuilderProps {
     schema?: SchemaRecordType;
 }
 
+const buildSchema = (schema?: SchemaRecordType): SchemaRecordType =>
+    isEmpty(schema)
+        ? {
+              $schema: 'https://json-schema.org/draft/2020-12/schema',
+              properties: {},
+              required: [],
+              type: 'object',
+          }
+        : {...schema};
+
 const JsonSchemaBuilder = ({onChange, schema}: JsonSchemaBuilderProps) => {
-    const [curSchema, setCurSchema] = useState<SchemaRecordType>();
+    const [curSchema, setCurSchema] = useState<SchemaRecordType>(() => buildSchema(schema));
 
     useEffect(() => {
-        setCurSchema(
-            isEmpty(schema)
-                ? {
-                      $schema: 'https://json-schema.org/draft/2020-12/schema',
-                      properties: {},
-                      required: [],
-                      type: 'object',
-                  }
-                : {...schema}
-        );
+        const nextSchema = buildSchema(schema);
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    if (!curSchema) {
-        return null;
-    }
+        setCurSchema((current) => (JSON.stringify(current) === JSON.stringify(nextSchema) ? current : nextSchema));
+    }, [schema]);
 
     return (
         <SchemaCreator

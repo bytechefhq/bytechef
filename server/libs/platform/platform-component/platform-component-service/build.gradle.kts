@@ -9,6 +9,7 @@ dependencies {
     implementation("org.springframework:spring-jdbc")
     implementation("org.springframework.boot:spring-boot")
     implementation("org.springframework.boot:spring-boot-jackson")
+    implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
     implementation(project(":server:libs:config:app-config"))

@@ -3,6 +3,10 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import OutputTabSampleDataDialog from './OutputTabSampleDataDialog';
 
+vi.mock('@/shared/components/copilot/CopilotPanel', () => ({
+    default: () => <div data-testid="copilot-panel" />,
+}));
+
 // Mock the lazy-loaded Monaco Editor
 vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
     default: ({
@@ -69,7 +73,9 @@ describe('OutputTabSampleDataDialog', () => {
             renderDialog();
 
             expect(
-                await screen.findByText("Add sample value in JSON format. Click Upload when you're done.")
+                await screen.findByText(
+                    "Chat with the assistant or edit the JSON directly. Click Upload when you're done."
+                )
             ).toBeInTheDocument();
         });
 

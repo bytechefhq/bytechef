@@ -10,13 +10,19 @@ package com.bytechef.ee.automation.configuration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.domain.WorkspaceConnection;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
+import com.bytechef.automation.configuration.repository.WorkspaceConnectionRepository;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
+import com.bytechef.automation.configuration.security.ConnectionOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.automation.configuration.service.CurrentUserResolver;
@@ -26,8 +32,13 @@ import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.user.service.UserService;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -76,6 +87,9 @@ class PermissionServiceIntTest {
 
     @Autowired
     private ProjectWorkflowRepository projectWorkflowRepository;
+
+    @Autowired
+    private WorkspaceConnectionRepository workspaceConnectionRepository;
 
     @Autowired
     private WorkspaceRepository workspaceRepository;
@@ -408,6 +422,39 @@ class PermissionServiceIntTest {
             resolver("Connection", ResourceOwner.unknown()));
 
         assertThat(resourcePermissionService.hasResourceScope(1L, "Connection", "WORKFLOW_VIEW")).isFalse();
+    }
+
+    @Test
+    void testHasResourceScopeForAConnectionRequiresMembershipOfItsWorkspace() {
+        addMember(WorkspaceRole.VIEWER);
+
+        Workspace foreignWorkspace = workspaceRepository.save(
+            new Workspace("Permission Service Foreign " + UUID.randomUUID()));
+
+        WorkspaceConnection workspaceConnection = workspaceConnectionRepository.save(
+            new WorkspaceConnection(91001L, workspaceId));
+        WorkspaceConnection foreignWorkspaceConnection = workspaceConnectionRepository.save(
+            new WorkspaceConnection(91002L, foreignWorkspace.getId()));
+
+        try {
+            Connection connection = mock(Connection.class);
+
+            when(connection.getType()).thenReturn(PlatformType.AUTOMATION);
+
+            ConnectionService connectionService = mock(ConnectionService.class);
+
+            when(connectionService.fetchConnection(anyLong())).thenReturn(Optional.of(connection));
+
+            PermissionService resourcePermissionService = createPermissionService(
+                new ConnectionOwnershipResolver(
+                    connectionService, mock(UserService.class), workspaceConnectionRepository));
+
+            assertThat(resourcePermissionService.hasResourceScope(91001L, "Connection", "WORKFLOW_VIEW")).isTrue();
+            assertThat(resourcePermissionService.hasResourceScope(91002L, "Connection", "WORKFLOW_VIEW")).isFalse();
+            assertThat(resourcePermissionService.hasResourceScope(91003L, "Connection", "WORKFLOW_VIEW")).isFalse();
+        } finally {
+            workspaceConnectionRepository.deleteAll(List.of(workspaceConnection, foreignWorkspaceConnection));
+        }
     }
 
     @Test

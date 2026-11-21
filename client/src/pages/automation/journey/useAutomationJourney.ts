@@ -25,7 +25,7 @@ export const useAutomationJourney = (): UseAutomationJourneyI => {
         data: projects,
         error: projectsError,
         isLoading: projectsIsLoading,
-    } = useGetWorkspaceProjectsQuery({id: currentWorkspaceId});
+    } = useGetWorkspaceProjectsQuery({id: currentWorkspaceId!});
 
     const {
         data: projectDeployments,
@@ -33,7 +33,7 @@ export const useAutomationJourney = (): UseAutomationJourneyI => {
         isLoading: projectDeploymentsIsLoading,
     } = useGetWorkspaceProjectDeploymentsQuery({
         environmentId: currentEnvironmentId,
-        id: currentWorkspaceId,
+        id: currentWorkspaceId!,
     });
 
     const journey = useMemo(

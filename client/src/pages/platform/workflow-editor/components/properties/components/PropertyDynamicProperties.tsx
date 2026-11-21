@@ -198,6 +198,7 @@ const PropertyDynamicProperties = ({
                 connectionId: clusterElementContext?.connectionId,
                 inputParameters: clusterElementInputParameters,
                 lookupDependsOnPaths: (lookupDependsOnPaths as string[]) || [],
+                mcpComponentId: clusterElementContext?.mcpComponentId || '',
                 propertyName: name || '',
             },
             {
@@ -210,6 +211,7 @@ const PropertyDynamicProperties = ({
                         componentVersion: clusterElementContext?.componentVersion,
                         connectionId: clusterElementContext?.connectionId,
                         lookupDependsOnValues: clusterElementLookupDependsOnValues,
+                        mcpComponentId: clusterElementContext?.mcpComponentId,
                         propertyName: name,
                     },
                 ],
