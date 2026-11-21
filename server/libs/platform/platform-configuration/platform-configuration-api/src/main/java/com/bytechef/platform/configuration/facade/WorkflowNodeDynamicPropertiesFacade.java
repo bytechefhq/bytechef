@@ -17,8 +17,12 @@
 package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.platform.component.domain.Property;
+import com.bytechef.platform.configuration.domain.ClusterElementNode;
+import com.bytechef.platform.configuration.domain.ComponentOperation;
 import com.bytechef.platform.domain.BaseProperty;
 import java.util.List;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -29,6 +33,11 @@ public interface WorkflowNodeDynamicPropertiesFacade {
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, String propertyName, List<String> lookupDependsOnPath,
         long environmentId);
+
+    List<Property> getWorkflowNodeComponentOperationDynamicProperties(
+        String workflowId, String workflowNodeName, @Nullable ClusterElementNode clusterElementNode,
+        ComponentOperation componentOperation, String propertyName, @Nullable String connectionKey,
+        Map<String, ?> parameters, List<String> lookupDependsOnPaths, long environmentId);
 
     List<? extends BaseProperty> getWorkflowNodeDynamicProperties(
         String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
