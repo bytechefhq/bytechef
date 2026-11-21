@@ -18,6 +18,7 @@ package com.bytechef.classloader;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -102,6 +103,7 @@ class IsolatingClassLoaderTest {
         assertThat(testIsolatingClassLoader.getResource(MARKER_RESOURCE)).isNull();
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     private record TestValue(IsolatingClassLoader<?> classLoader) implements IsolatingClassLoader.ClassLoaderOwner {
     }
 
