@@ -207,7 +207,7 @@ public class ModelUtils {
 
         ChatResponseMetadata metadata = chatResponse.getMetadata();
 
-        if (metadata == null || metadata.isEmpty()) {
+        if (metadata.isEmpty()) {
             return Map.of();
         }
 
