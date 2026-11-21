@@ -14,6 +14,10 @@ package com.bytechef.ee.platform.customcomponent.configuration.audit;
  */
 public final class CustomComponentAuditEvents {
 
+    public static final String CUSTOM_COMPONENT_CREATED = "CUSTOM_COMPONENT_CREATED";
+    public static final String CUSTOM_COMPONENT_DELETED = "CUSTOM_COMPONENT_DELETED";
+    public static final String CUSTOM_COMPONENT_ENABLED_UPDATED = "CUSTOM_COMPONENT_ENABLED_UPDATED";
+    public static final String CUSTOM_COMPONENT_PUBLISHED = "CUSTOM_COMPONENT_PUBLISHED";
     public static final String CUSTOM_COMPONENT_SAVED = "CUSTOM_COMPONENT_SAVED";
 
     private CustomComponentAuditEvents() {

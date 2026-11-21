@@ -103,6 +103,8 @@ class AuditDataContractTest {
         Map.entry("ConnectedUserConnectionFacadeImpl.updateIntegrationInstanceConnectionCredentials",
             RECORDED_BY_CALLER),
         Map.entry("com.bytechef.ee.embedded.configuration.facade.ConnectionFacadeImpl.updateConnectionTags", TAGS),
+        Map.entry("CustomComponentFacadeImpl.updateCustomComponentSource", DEFINITION_EDIT),
+        Map.entry("CustomComponentServiceImpl.publishCustomComponent", RECORDED_BY_CALLER),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpComponent", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpServer", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.deleteEmbeddedMcpComponent", DELEGATES),
