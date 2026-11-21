@@ -123,6 +123,7 @@ const useOAuth2 = ({
     const currentStateRef = useRef(undefined);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const intervalRef = useRef<any | null>(null);
+    const messageListenerRef = useRef<((message: MessageEvent) => void) | null>(null);
 
     const [{error, loading}, setUI] = useState<{
         loading: boolean;
@@ -130,6 +131,12 @@ const useOAuth2 = ({
     }>({error: null, loading: false});
 
     const getAuth = useCallback(() => {
+        if (messageListenerRef.current) {
+            cleanup(intervalRef, popupRef, messageListenerRef.current);
+
+            messageListenerRef.current = null;
+        }
+
         // 1. Init
         setUI({
             error: null,
@@ -233,6 +240,8 @@ const useOAuth2 = ({
         }
 
         window.addEventListener('message', handleMessageListener);
+
+        messageListenerRef.current = handleMessageListener;
 
         // 4. Begin interval to check if popup was closed forcefully by the user
         intervalRef.current = setInterval(() => {
