@@ -22,6 +22,7 @@ import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
+import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
 import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
@@ -30,6 +31,7 @@ import com.bytechef.automation.ai.tool.ReadProjectTools;
 import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ScopedProjectGuard;
 import com.bytechef.automation.ai.tool.WorkflowExecutionTools;
+import com.bytechef.automation.ai.tool.aiagent.AiAgentToolCallbacksFactory;
 import com.bytechef.automation.configuration.facade.ProjectCategoryFacade;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
@@ -87,6 +89,7 @@ public final class AiHubAgentFixtures {
     public final AiHubToolApprovalService approvalService = mock(AiHubToolApprovalService.class);
     public final AiHubChatService chatService = mock(AiHubChatService.class);
     public final AiHubChatAccessPolicy chatAccessPolicy = mock(AiHubChatAccessPolicy.class);
+    public final AiAgentFacade aiAgentFacade = mock(AiAgentFacade.class);
     public final ChatModel chatModel = mock(ChatModel.class);
     public final ComponentTools componentTools = mock(ComponentTools.class);
     public final PersistedWorkflowChecker persistedWorkflowChecker = mock(PersistedWorkflowChecker.class);
@@ -208,7 +211,8 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubAskToolCallbacks(
             readProjectTools, readProjectWorkflowTools, workflowExecutionTools, componentToolsProvider(),
             persistedWorkflowCheckerProvider(), projectServiceProvider(), deploymentToolCallbacksFactoryProvider(),
-            interactivePickerToolCallbacks, projectWorkflowFacade, chatService, chatAccessPolicy,
+            aiAgentToolCallbacksFactoryProvider(), availableProvider(aiAgentFacade), interactivePickerToolCallbacks,
+            projectWorkflowFacade, chatService, chatAccessPolicy,
             availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
     }
 
@@ -226,7 +230,8 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubBuildToolCallbacks(
             projectTools, projectWorkflowLifecycleTools, workflowExecutionTools, componentToolsProvider(),
             persistedWorkflowCheckerProvider(), projectServiceProvider(), deploymentToolCallbacksFactoryProvider(),
-            interactivePickerToolCallbacks, intelligentToolCatalog, workspaceFacade, projectWorkflowFacade,
+            aiAgentToolCallbacksFactoryProvider(), availableProvider(aiAgentFacade), interactivePickerToolCallbacks,
+            intelligentToolCatalog, workspaceFacade, projectWorkflowFacade,
             projectDeploymentFacade, chatService, chatAccessPolicy, artifactRecorder, policy,
             availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
     }
@@ -296,6 +301,11 @@ public final class AiHubAgentFixtures {
             new DeploymentToolCallbacksFactory(projectDeploymentFacade, mock(ProjectWorkflowService.class)));
 
         return provider;
+    }
+
+    public ObjectProvider<AiAgentToolCallbacksFactory> aiAgentToolCallbacksFactoryProvider() {
+        return availableProvider(
+            new AiAgentToolCallbacksFactory(aiAgentFacade, mock(ClusterElementDefinitionService.class), null, null));
     }
 
     @SuppressWarnings("unchecked")

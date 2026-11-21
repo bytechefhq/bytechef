@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.tool.aiagent;
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.ai.agent.dto.AiAgentDTO;
 import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
+import com.bytechef.exception.ConfigurationException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -37,9 +38,9 @@ public class UpdateAiAgentToolCallback implements ToolCallback {
 
     private static final String DESCRIPTION = """
         Update an AI Agent's title, description, and/or instructions. instructions is the agent's system
-        prompt text — the persona and behaviour the model follows on every turn. Only the fields you
+        prompt text: the persona and behaviour the model follows on every turn. Only the fields you
         supply are changed; omitted fields keep their current value (there is no way to clear a field to
-        empty through this tool). Every mutating call regenerates the agent's draft workflow — the
+        empty through this tool). Every mutating call regenerates the agent's draft workflow; the
         change is live in the test-chat panel immediately, but is only visible to deployed
         channels after the agent's project is published with publishProject.""";
 
@@ -97,7 +98,7 @@ public class UpdateAiAgentToolCallback implements ToolCallback {
                         .getTitle()));
         } catch (JacksonException exception) {
             return ToolErrors.invalidInput(exception);
-        } catch (IllegalArgumentException exception) {
+        } catch (ConfigurationException | IllegalArgumentException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(jsonMapper, UpdateAiAgentToolCallback.class, TOOL_NAME, exception);

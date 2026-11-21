@@ -3,6 +3,7 @@ import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsSt
 import {ToolCallEntryI, useAiChatToolCallStore} from '@/shared/components/ai-chat/stores/useAiChatToolCallStore';
 import {
     AlertCircleIcon,
+    BotIcon,
     CheckCircle2Icon,
     ChevronDownIcon,
     ChevronRightIcon,
@@ -134,6 +135,7 @@ const DefaultBody = ({entry}: ToolCallBodyProps) => {
 };
 
 const ARTIFACT_OPEN_META: Record<string, {icon: ComponentType<{className?: string}>; kind: string}> = {
+    openAiAgentTab: {icon: BotIcon, kind: 'AI Agent'},
     openWorkflowTab: {icon: WorkflowIcon, kind: 'Workflow'},
 };
 
@@ -142,7 +144,9 @@ export const ARTIFACT_OPEN_TOOL_NAMES: ReadonlySet<string> = new Set(Object.keys
 const openArtifactTab = (toolName: string, args: Record<string, unknown> | undefined) => {
     const name = typeof args?.name === 'string' && args.name ? args.name : 'Untitled';
 
-    if (
+    if (toolName === 'openAiAgentTab' && typeof args?.aiAgentId === 'string' && args.aiAgentId) {
+        aiHubTabsStore.getState().openAiAgentTab({aiAgentId: args.aiAgentId, name});
+    } else if (
         toolName === 'openWorkflowTab' &&
         typeof args?.workflowId === 'string' &&
         args?.projectId != null &&
