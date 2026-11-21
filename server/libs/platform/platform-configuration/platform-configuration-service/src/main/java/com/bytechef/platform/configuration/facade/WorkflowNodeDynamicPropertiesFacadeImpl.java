@@ -29,8 +29,11 @@ import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import com.bytechef.platform.configuration.domain.ClusterElementNode;
+import com.bytechef.platform.configuration.domain.ComponentOperation;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.facade.ComponentOperationConnectionResolver.ResolvedConnection;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
@@ -41,7 +44,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -53,6 +58,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
+    private final ComponentOperationConnectionResolver componentOperationConnectionResolver;
     private final Evaluator evaluator;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
@@ -63,7 +69,8 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
     @SuppressFBWarnings("EI")
     public WorkflowNodeDynamicPropertiesFacadeImpl(
         ActionDefinitionFacade actionDefinitionFacade, ClusterElementDefinitionFacade clusterElementDefinitionFacade,
-        ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator,
+        ClusterElementDefinitionService clusterElementDefinitionService,
+        ComponentOperationConnectionResolver componentOperationConnectionResolver, Evaluator evaluator,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade,
@@ -72,6 +79,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
+        this.componentOperationConnectionResolver = componentOperationConnectionResolver;
         this.evaluator = evaluator;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
@@ -163,6 +171,35 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
         }
 
         return result;
+    }
+
+    @Override
+    public List<Property> getWorkflowNodeComponentOperationDynamicProperties(
+        String workflowId, String workflowNodeName, @Nullable ClusterElementNode clusterElementNode,
+        ComponentOperation componentOperation, String propertyName, @Nullable String connectionKey,
+        Map<String, ?> parameters, List<String> lookupDependsOnPaths, long environmentId) {
+
+        Optional<ResolvedConnection> resolvedConnection = componentOperationConnectionResolver.resolve(
+            workflowId, workflowNodeName, clusterElementNode, componentOperation.componentName(), connectionKey,
+            environmentId);
+
+        if (resolvedConnection.isEmpty()) {
+            return List.of();
+        }
+
+        Long connectionId = resolvedConnection.get()
+            .connectionId();
+
+        if (componentOperation.trigger()) {
+            return triggerDefinitionFacade.executeDynamicProperties(
+                componentOperation.componentName(), componentOperation.componentVersion(),
+                componentOperation.operationName(), propertyName, parameters, lookupDependsOnPaths, connectionId);
+        }
+
+        return actionDefinitionFacade.executeDynamicProperties(
+            componentOperation.componentName(), componentOperation.componentVersion(),
+            componentOperation.operationName(), propertyName, parameters, lookupDependsOnPaths, workflowId,
+            connectionId);
     }
 
     @Override
