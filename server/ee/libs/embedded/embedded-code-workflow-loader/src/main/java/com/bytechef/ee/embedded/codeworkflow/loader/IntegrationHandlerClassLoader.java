@@ -7,9 +7,9 @@
 
 package com.bytechef.ee.embedded.codeworkflow.loader;
 
+import com.bytechef.classloader.AbstractHandlerClassLoader;
 import com.bytechef.classloader.IsolatingClassLoader;
 import com.bytechef.classloader.util.ClassLoaderUtils;
-import com.bytechef.ee.platform.codeworkflow.loader.AbstractHandlerClassLoader;
 import com.bytechef.embedded.integration.IntegrationHandler;
 import com.bytechef.embedded.integration.definition.IntegrationDefinition;
 import java.net.URL;
