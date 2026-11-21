@@ -77,6 +77,7 @@ import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
+import com.bytechef.platform.oauth2.exception.OAuth2ErrorType;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.AbstractMap;
@@ -348,10 +349,8 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             !OAuth2DiscoveryUtils.runsDiscovery(
                 authorization.isDiscovery(), integrationInstanceConfigurationDTO.connectionParameters())) {
 
-            oAuth2AuthorizationParameters = oAuth2ParametersFacade
-                .getOAuth2AuthorizationParameters(integrationDTO.componentName(), connectionDefinition.getVersion(),
-                    integrationInstanceConfigurationDTO.connectionParameters(),
-                    integrationInstanceConfigurationDTO.authorizationType());
+            oAuth2AuthorizationParameters = getOAuth2AuthorizationParameters(
+                integrationDTO.componentName(), connectionDefinition.getVersion(), integrationInstanceConfigurationDTO);
         }
 
         ConnectedUserIntegrationDTO connectedUserIntegrationDTO = new ConnectedUserIntegrationDTO(
@@ -924,12 +923,38 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             return null;
         }
 
-        OAuth2AuthorizationParameters oAuth2AuthorizationParameters = oAuth2ParametersFacade
-            .getOAuth2AuthorizationParameters(
-                componentName, connectionDefinition.getVersion(),
-                integrationInstanceConfigurationDTO.connectionParameters(), authorizationType);
+        OAuth2AuthorizationParameters oAuth2AuthorizationParameters = getOAuth2AuthorizationParameters(
+            componentName, connectionDefinition.getVersion(), integrationInstanceConfigurationDTO);
+
+        if (oAuth2AuthorizationParameters == null) {
+            return null;
+        }
 
         return new ConnectedUserIntegrationDTO.OAuth2(oAuth2AuthorizationParameters, oAuth2Service.getRedirectUri());
+    }
+
+    private @Nullable OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
+        String componentName, int connectionVersion,
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
+
+        try {
+            return oAuth2ParametersFacade.getOAuth2AuthorizationParameters(
+                componentName, connectionVersion, integrationInstanceConfigurationDTO.connectionParameters(),
+                integrationInstanceConfigurationDTO.authorizationType());
+        } catch (ConfigurationException configurationException) {
+            if (configurationException.getEntityClass() != OAuth2ErrorType.class ||
+                configurationException.getErrorKey() != OAuth2ErrorType.CLIENT_ID_REQUIRED.getErrorKey()) {
+
+                throw configurationException;
+            }
+
+            log.warn(
+                "Integration instance configuration id={} has an Authorization URL and Token URL but no Client Id, " +
+                    "its OAuth2 sign-in is unavailable until the configuration is fixed",
+                integrationInstanceConfigurationDTO.id());
+
+            return null;
+        }
     }
 
     private Map<Long, IntegrationInstanceConfigurationDTO> getInstanceConfigurations(

@@ -117,6 +117,7 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
+import com.bytechef.platform.oauth2.exception.OAuth2ErrorType;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.security.facade.ApiKeyFacade;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -1154,6 +1155,57 @@ class ConnectedUserIntegrationFacadeIntTest {
             assertThat(connectedUserIntegrationDTO.connectionConfig()
                 .oauth2()
                 .oAuth2AuthorizationParameters()).isEqualTo(oAuth2AuthorizationParameters);
+        }
+
+        @Test
+        void testManualEndpointsWithoutClientIdStillReadTheIntegrationWithoutOAuth2Parameters() {
+            String externalUserId = createConnectedUser(Map.of());
+
+            long integrationId = createIntegrationRow(null);
+
+            createIntegrationInstanceConfiguration(
+                integrationId, 1, AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE,
+                Map.of(
+                    "url", "https://mcp.example.com/mcp", "authorizationUrl", "https://auth.example.com/authorize",
+                    "tokenUrl", "https://auth.example.com/token"));
+
+            stubDiscoveryConnectionDefinition();
+
+            when(oAuth2ParametersFacade.getOAuth2AuthorizationParameters(anyString(), anyInt(), any(), any()))
+                .thenThrow(new ConfigurationException("Client Id required", OAuth2ErrorType.CLIENT_ID_REQUIRED));
+
+            ConnectedUserIntegrationDTO connectedUserIntegrationDTO =
+                connectedUserIntegrationFacade.getConnectedUserIntegration(
+                    externalUserId, integrationId, true, Environment.PRODUCTION);
+
+            ConnectedUserIntegrationDTO.ConnectionConfig connectionConfig =
+                connectedUserIntegrationDTO.connectionConfig();
+
+            assertThat(connectedUserIntegrationDTO.oAuth2AuthorizationParameters()).isNull();
+            assertThat(connectionConfig).isNotNull();
+            assertThat(connectionConfig.oauth2()).isNull();
+        }
+
+        @Test
+        void testOtherOAuth2ParameterFailuresStillFailTheIntegrationRead() {
+            String externalUserId = createConnectedUser(Map.of());
+
+            long integrationId = createIntegrationRow(null);
+
+            createIntegrationInstanceConfiguration(
+                integrationId, 1, AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE,
+                Map.of(
+                    "url", "https://mcp.example.com/mcp", "authorizationUrl", "https://auth.example.com/authorize",
+                    "tokenUrl", "https://auth.example.com/token", "clientId", "manual"));
+
+            stubDiscoveryConnectionDefinition();
+
+            when(oAuth2ParametersFacade.getOAuth2AuthorizationParameters(anyString(), anyInt(), any(), any()))
+                .thenThrow(new ConfigurationException("Not available", OAuth2ErrorType.DISCOVERY_NOT_AVAILABLE));
+
+            assertThatThrownBy(() -> connectedUserIntegrationFacade.getConnectedUserIntegration(
+                externalUserId, integrationId, true, Environment.PRODUCTION))
+                    .isInstanceOf(ConfigurationException.class);
         }
 
         @Test
