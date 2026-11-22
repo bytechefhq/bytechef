@@ -23,12 +23,12 @@ import static org.springframework.test.context.NestedTestConfiguration.Enclosing
 import com.bytechef.ai.copilot.config.CopilotConfiguration;
 import com.bytechef.ai.copilot.config.CopilotPgVectorConfiguration;
 import com.bytechef.ai.copilot.service.CopilotVectorStoreService;
+import com.bytechef.ai.copilot.web.rest.CopilotApiController;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.automation.configuration.web.rest.WorkflowApiController;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
-import com.bytechef.ee.ai.copilot.web.rest.CopilotApiController;
 import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
 import com.bytechef.platform.component.log.JdbcLogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorage;

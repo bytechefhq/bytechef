@@ -142,6 +142,11 @@ dependencies {
     implementation(project(":server:libs:core:tenant:tenant-api"))
 
     implementation(project(":server:libs:ai:ai-api"))
+    implementation("org.springframework:spring-webmvc")
+    implementation(project(":spring-ai:spring-ag-ui:servers:spring"))
+    implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
+    implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
     testImplementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
     testImplementation(project(":server:libs:test:test-support"))
