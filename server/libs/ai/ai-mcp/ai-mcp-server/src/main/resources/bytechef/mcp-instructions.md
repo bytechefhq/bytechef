@@ -101,11 +101,11 @@ provider (optionally chosen with `bytechef.ai.copilot.provider`).
 ## tools: createAppApiCollection, deployProject
 A code project is a project deployed from a file with `bytechef automation project deploy`, and it is a project of its
 own. Before its first deploy, run `listProjects` and pick a project `name` no other project in the workspace uses.
-Deploy matches that name case-insensitively and writes into any project with it, a visual one included. It adds the
-file's workflows to that project and publishes it, together with the visual project's unpublished edits. On a later
-deploy of the same file, `listProjects` shows the project under that name: that match is this file's own project, so
-keep the name. Afterwards that `name`, and each workflow's `name`, stay fixed. A renamed workflow gets a new uuid, which
-breaks the endpoint or binding that points at it.
+Deploy matches that name case-insensitively. When the match is a visual project, one not deployed from a file, deploy
+refuses it with a name clash and writes nothing: pick another name and deploy again. On a later deploy of the same file,
+`listProjects` shows the project under that name: that match is this file's own project, so keep the name. Afterwards
+that `name`, and each workflow's `name`, stay fixed. A renamed workflow gets a new uuid, which breaks the endpoint or
+binding that points at it.
 
 ## tools: createAppApiCollection, createAppApiEndpoint, updateAppApiCollectionVersion, deployProject
 After a deploy, find the ids:
