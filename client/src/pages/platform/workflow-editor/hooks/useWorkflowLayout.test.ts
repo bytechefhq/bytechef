@@ -7,6 +7,14 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {useWorkflowLayout} from './useWorkflowLayout';
 
+const hoisted = vi.hoisted(() => ({
+    routeParams: {} as Record<string, string | undefined>,
+}));
+
+vi.mock('react-router-dom', () => ({
+    useParams: () => hoisted.routeParams,
+}));
+
 vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () => ({
     useWorkflowEditor: () => ({
         useGetComponentDefinitionsQuery: () => ({data: undefined, error: null, isLoading: false}),
@@ -26,6 +34,8 @@ vi.mock('@/shared/queries/platform/workflowTestConfigurations.queries', () => ({
 }));
 
 beforeEach(() => {
+    hoisted.routeParams = {};
+
     useCopilotPanelStore.setState({copilotPanelOpen: false});
     useCopilotStore.setState({
         context: {mode: MODE.BUILD, parameters: {}, source: Source.WORKFLOW_EDITOR},
@@ -34,7 +44,9 @@ beforeEach(() => {
 });
 
 describe('useWorkflowLayout', () => {
-    it('opens the workflow editor Copilot', () => {
+    it('opens the project workflow editor Copilot when no integration is in the route', () => {
+        hoisted.routeParams = {projectId: '1', projectWorkflowId: '2'};
+
         const {result} = renderHook(() => useWorkflowLayout());
 
         act(() => {
@@ -49,7 +61,26 @@ describe('useWorkflowLayout', () => {
         expect(useCopilotPanelStore.getState().copilotPanelOpen).toBe(true);
     });
 
+    it('opens the embedded workflow editor Copilot when an integration is in the route', () => {
+        hoisted.routeParams = {integrationId: '7'};
+
+        const {result} = renderHook(() => useWorkflowLayout());
+
+        act(() => {
+            result.current.handleCopilotClick();
+        });
+
+        expect(useCopilotStore.getState().context).toEqual({
+            mode: MODE.BUILD,
+            parameters: {integrationId: '7'},
+            source: Source.WORKFLOW_EDITOR_EMBEDDED,
+        });
+        expect(useCopilotPanelStore.getState().copilotPanelOpen).toBe(true);
+    });
+
     it('opens the editor Copilot in Ask after a Skills conversation was left in Build', () => {
+        hoisted.routeParams = {projectId: '1', projectWorkflowId: '2'};
+
         useCopilotStore.setState({
             context: {mode: MODE.BUILD, parameters: {}, source: Source.SKILLS},
         });
@@ -77,6 +108,8 @@ describe('useWorkflowLayout', () => {
         const {rerender} = renderHook(({workflowKey}) => useCopilotWorkflowEditorBinding(workflowKey), {
             initialProps: {workflowKey: 'project:1:2'},
         });
+
+        hoisted.routeParams = {projectId: '1', projectWorkflowId: '3'};
 
         rerender({workflowKey: 'project:1:3'});
 
