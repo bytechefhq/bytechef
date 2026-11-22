@@ -65,11 +65,11 @@ class PrincipalEnvironmentTest {
     }
 
     @Test
-    void testApiKeyTokenBuiltWithoutAnEnvironmentCarriesNone() {
+    void testApiKeyTokenBuiltWithoutAnEnvironmentIsConfinedToProduction() {
         authenticate(new TestApiKeyAuthenticationToken());
 
-        assertThat(PrincipalEnvironment.fetchCurrentPrincipalEnvironmentId()).isEmpty();
-        assertThat(PrincipalEnvironment.resolveEffectiveEnvironmentId(STAGING_ORDINAL)).isEqualTo(STAGING_ORDINAL);
+        assertThat(PrincipalEnvironment.fetchCurrentPrincipalEnvironmentId()).contains(PRODUCTION_ORDINAL);
+        assertThat(PrincipalEnvironment.resolveEffectiveEnvironmentId(STAGING_ORDINAL)).isEqualTo(PRODUCTION_ORDINAL);
     }
 
     private static void authenticate(org.springframework.security.core.Authentication authentication) {
