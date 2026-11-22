@@ -76,83 +76,83 @@ public class CallJdbcOperationIntTest {
 
     @Test
     public void testCallFunctionReturnsValue() throws SQLException {
-        Map<String, ?> inputParameters = Map.of(
+        Map<String, ?> nameInputParameters = Map.of(
             JdbcConstants.CALL, "{:balance = call call_balance(:accountId)}",
             JdbcConstants.PARAMETERS, Map.of("accountId", 1),
             JdbcConstants.OUTPUT_PARAMETERS, List.of(Map.of("name", "balance", "type", "NUMERIC", "mode", "OUT")));
 
-        Map<String, Object> result = execute(inputParameters);
+        Map<String, Object> nameOutputValues = execute(nameInputParameters);
 
-        assertThat(result).containsOnlyKeys("balance");
-        assertThat((BigDecimal) result.get("balance")).isEqualByComparingTo("120.50");
+        assertThat(nameOutputValues).containsOnlyKeys("balance");
+        assertThat((BigDecimal) nameOutputValues.get("balance")).isEqualByComparingTo("120.50");
     }
 
     @Test
     public void testCallProcedureWithOutAndInOutParameters() throws SQLException {
-        Map<String, ?> inputParameters = Map.of(
+        Map<String, ?> nameInputParameters = Map.of(
             JdbcConstants.CALL, "call call_transfer(:from, :to, :amount, :note, :remaining)",
             JdbcConstants.PARAMETERS, Map.of("amount", 20.5, "from", 1, "note", "transfer", "to", 2),
             JdbcConstants.OUTPUT_PARAMETERS, List.of(
                 Map.of("name", "note", "type", "VARCHAR", "mode", "IN_OUT"),
                 Map.of("name", "remaining", "type", "NUMERIC", "mode", "OUT")));
 
-        Map<String, Object> result = execute(inputParameters);
+        Map<String, Object> nameOutputValues = execute(nameInputParameters);
 
-        assertThat(result).containsEntry("note", "transfer done");
-        assertThat((BigDecimal) result.get("remaining")).isEqualByComparingTo("100.00");
+        assertThat(nameOutputValues).containsEntry("note", "transfer done");
+        assertThat((BigDecimal) nameOutputValues.get("remaining")).isEqualByComparingTo("100.00");
         assertThat(jdbcTemplate.queryForObject("SELECT balance FROM call_account WHERE id = 2", BigDecimal.class))
             .isEqualByComparingTo("30.50");
     }
 
     @Test
     public void testCallWithoutOutputParametersReturnsEmptyMap() throws SQLException {
-        Map<String, ?> inputParameters = Map.of(
+        Map<String, ?> nameInputParameters = Map.of(
             JdbcConstants.CALL, "{call call_balance(:accountId)}",
             JdbcConstants.PARAMETERS, Map.of("accountId", 2));
 
-        assertThat(execute(inputParameters)).isEmpty();
+        assertThat(execute(nameInputParameters)).isEmpty();
     }
 
     @Test
     public void testMissingInputValueFails() {
-        Map<String, ?> inputParameters = Map.of(
+        Map<String, ?> nameInputParameters = Map.of(
             JdbcConstants.CALL, "{:balance = call call_balance(:accountId)}",
             JdbcConstants.OUTPUT_PARAMETERS, List.of(Map.of("name", "balance", "type", "NUMERIC")));
 
-        assertThatThrownBy(() -> execute(inputParameters))
+        assertThatThrownBy(() -> execute(nameInputParameters))
             .isInstanceOf(ConfigurationException.class)
             .hasMessageContaining(":accountId");
     }
 
     @Test
     public void testOutputParameterMissingFromStatementFails() {
-        Map<String, ?> inputParameters = Map.of(
+        Map<String, ?> nameInputParameters = Map.of(
             JdbcConstants.CALL, "{call call_balance(:accountId)}",
             JdbcConstants.PARAMETERS, Map.of("accountId", 1),
             JdbcConstants.OUTPUT_PARAMETERS, List.of(Map.of("name", "balance", "type", "NUMERIC")));
 
-        assertThatThrownBy(() -> execute(inputParameters))
+        assertThatThrownBy(() -> execute(nameInputParameters))
             .isInstanceOf(ConfigurationException.class)
             .hasMessageContaining(":balance is not used");
     }
 
     @Test
     public void testUnsupportedOutputTypeFails() {
-        Map<String, ?> inputParameters = Map.of(
+        Map<String, ?> nameInputParameters = Map.of(
             JdbcConstants.CALL, "{:balance = call call_balance(:accountId)}",
             JdbcConstants.PARAMETERS, Map.of("accountId", 1),
             JdbcConstants.OUTPUT_PARAMETERS, List.of(Map.of("name", "balance", "type", "BLOB")));
 
-        assertThatThrownBy(() -> execute(inputParameters))
+        assertThatThrownBy(() -> execute(nameInputParameters))
             .isInstanceOf(ConfigurationException.class)
             .hasMessageContaining("Unsupported output parameter type: BLOB");
     }
 
-    private Map<String, Object> execute(Map<String, ?> inputParameters) throws SQLException {
+    private Map<String, Object> execute(Map<String, ?> nameInputParameters) throws SQLException {
         try (SingleConnectionDataSource singleConnectionDataSource =
             new SingleConnectionDataSource(dataSource.getConnection(), false)) {
 
-            return new CallJdbcOperation().execute(inputParameters, singleConnectionDataSource);
+            return new CallJdbcOperation().execute(nameInputParameters, singleConnectionDataSource);
         }
     }
 }
