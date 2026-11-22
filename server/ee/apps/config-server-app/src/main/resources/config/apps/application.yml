@@ -26,6 +26,7 @@ info:
     postHog:
       apiKey: ${bytechef.analytics.postHog.apiKey:}
       host: ${bytechef.analytics.postHog.host:}
+      uiHost: ${bytechef.analytics.postHog.uiHost:}
   application:
     edition: ${bytechef.edition:}
   docs:

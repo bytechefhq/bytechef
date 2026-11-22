@@ -23,7 +23,8 @@ bytechef:
     enabled: true
     postHog:
       apiKey: phc_oZ9XWAVf8xf6sI7IYBAbGldSbiud07ioZItD1XvhJ7S
-      host: https://eu.i.posthog.com
+      host: https://t.bytechef.io
+      uiHost: https://eu.posthog.com
   helpHub:
     enabled: true
     command-bar:
