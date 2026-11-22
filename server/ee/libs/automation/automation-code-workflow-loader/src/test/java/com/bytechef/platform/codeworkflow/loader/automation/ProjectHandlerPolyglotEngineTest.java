@@ -49,6 +49,7 @@ import javax.tools.ToolProvider;
 import org.graalvm.polyglot.PolyglotException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 /**
  * @version ee
@@ -56,6 +57,7 @@ import org.junit.jupiter.api.Test;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("PATH_TRAVERSAL_IN")
+@Timeout(120)
 class ProjectHandlerPolyglotEngineTest {
 
     @AfterEach

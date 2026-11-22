@@ -35,12 +35,14 @@ import java.util.OptionalInt;
 import org.graalvm.polyglot.PolyglotException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
+@Timeout(120)
 class IntegrationHandlerPolyglotEngineTest {
 
     @AfterEach
