@@ -3032,6 +3032,13 @@ export type WorkflowNodeScriptInputQueryVariables = Exact<{
 
 export type WorkflowNodeScriptInputQuery = { workflowNodeScriptInput: any };
 
+export type GeneratePropertyValueMutationVariables = Exact<{
+  input: Types.GeneratePropertyValueInput;
+}>;
+
+
+export type GeneratePropertyValueMutation = { generatePropertyValue: { value: string, valid: boolean, message: string | null } };
+
 export type CreateCustomComponentMutationVariables = Exact<{
   name: string;
   language: Types.CustomComponentLanguage;
@@ -14373,6 +14380,29 @@ export const useWorkflowNodeScriptInputQuery = <
       {
     queryKey: ['workflowNodeScriptInput', variables],
     queryFn: fetcher<WorkflowNodeScriptInputQuery, WorkflowNodeScriptInputQueryVariables>(WorkflowNodeScriptInputDocument, variables),
+    ...options
+  }
+    )};
+
+export const GeneratePropertyValueDocument = new TypedDocumentString(`
+    mutation generatePropertyValue($input: GeneratePropertyValueInput!) {
+  generatePropertyValue(input: $input) {
+    value
+    valid
+    message
+  }
+}
+    `);
+
+export const useGeneratePropertyValueMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<GeneratePropertyValueMutation, TError, GeneratePropertyValueMutationVariables, TContext>) => {
+    
+    return useMutation<GeneratePropertyValueMutation, TError, GeneratePropertyValueMutationVariables, TContext>(
+      {
+    mutationKey: ['generatePropertyValue'],
+    mutationFn: (variables?: GeneratePropertyValueMutationVariables) => fetcher<GeneratePropertyValueMutation, GeneratePropertyValueMutationVariables>(GeneratePropertyValueDocument, variables)(),
     ...options
   }
     )};
