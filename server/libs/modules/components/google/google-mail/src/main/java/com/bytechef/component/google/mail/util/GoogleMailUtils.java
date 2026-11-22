@@ -171,7 +171,7 @@ public class GoogleMailUtils {
     protected static final ModifiableObjectProperty METADATA_MESSAGE_OUTPUT_PROPERTY = object()
         .properties(
             string(HISTORY_ID)
-                .description("A short part of the message text."),
+                .description("The ID of the last history record that modified this message."),
             string(ID)
                 .description("The ID of the message."),
             number(INTERNAL_DATE)
@@ -191,13 +191,13 @@ public class GoogleMailUtils {
                                     string(NAME)
                                         .description("The name of the header before the : separator."),
                                     string(VALUE)
-                                        .description("The value of the header after the : separator."))),
-                    integer(SIZE_ESTIMATE)
-                        .description("Estimated size in bytes of the message."),
-                    string(SNIPPET)
-                        .description("A short part of the message text."),
-                    string(THREAD_ID)
-                        .description("The ID of the thread the message belongs to.")));
+                                        .description("The value of the header after the : separator.")))),
+            integer(SIZE_ESTIMATE)
+                .description("Estimated size in bytes of the message."),
+            string(SNIPPET)
+                .description("A short part of the message text."),
+            string(THREAD_ID)
+                .description("The ID of the thread the message belongs to."));
 
     private GoogleMailUtils() {
     }

@@ -50,6 +50,8 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.google.mail.definition.Format;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
@@ -71,6 +73,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -288,6 +291,31 @@ class GoogleMailUtilsTest {
         ModifiableObjectProperty messageOutputProperty = GoogleMailUtils.getMessageOutputProperty(Format.METADATA);
 
         assertEquals(METADATA_MESSAGE_OUTPUT_PROPERTY, messageOutputProperty);
+    }
+
+    @Test
+    void testMetadataMessageOutputPropertyKeepsMessageFieldsAtTopLevel() {
+        List<String> propertyNames = METADATA_MESSAGE_OUTPUT_PROPERTY.getProperties()
+            .stream()
+            .map(Property::getName)
+            .toList();
+
+        assertEquals(
+            List.of("historyId", "id", "internalDate", "labelIds", "payload", "sizeEstimate", "snippet", "threadId"),
+            propertyNames);
+
+        ObjectProperty payloadProperty = (ObjectProperty) METADATA_MESSAGE_OUTPUT_PROPERTY.getProperties()
+            .stream()
+            .filter(property -> Objects.equals(property.getName(), "payload"))
+            .findFirst()
+            .orElseThrow();
+
+        List<String> payloadPropertyNames = payloadProperty.getProperties()
+            .stream()
+            .map(Property::getName)
+            .toList();
+
+        assertEquals(List.of("headers"), payloadPropertyNames);
     }
 
     @Test
