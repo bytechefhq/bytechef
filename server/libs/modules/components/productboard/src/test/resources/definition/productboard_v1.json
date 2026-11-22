@@ -5307,6 +5307,7 @@
         "required": true,
         "type": "STRING"
       } ],
+      "protectedResourceUrl": null,
       "refresh": null,
       "refreshOn": [ 401 ],
       "refreshToken": null,
@@ -5372,6 +5373,7 @@
         "required": true,
         "type": "STRING"
       } ],
+      "protectedResourceUrl": null,
       "refresh": null,
       "refreshOn": [ 401 ],
       "refreshToken": null,
