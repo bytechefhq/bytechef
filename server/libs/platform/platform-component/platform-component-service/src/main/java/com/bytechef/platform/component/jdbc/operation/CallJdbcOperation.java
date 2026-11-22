@@ -61,38 +61,40 @@ public class CallJdbcOperation implements JdbcOperation<Map<String, Object>> {
     @Override
     public Map<String, Object> execute(Map<String, ?> inputParameters, DataSource dataSource) {
         String statement = MapUtils.getRequiredString(inputParameters, JdbcConstants.CALL);
-        Map<String, @Nullable Object> parameterValues = getParameterValues(inputParameters);
-        Map<String, ResolvedOutputParameter> outputParameters = getOutputParameters(inputParameters);
+        Map<String, @Nullable Object> nameParameterValues = getNameParameterValues(inputParameters);
+        Map<String, ResolvedOutputParameter> nameResolvedOutputParameters = getNameResolvedOutputParameters(
+            inputParameters);
 
         ParsedSql parsedSql = NamedParameterUtils.parseSqlStatement(statement);
 
-        MapSqlParameterSource parameterSource = new MapSqlParameterSource(parameterValues);
+        MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource(nameParameterValues);
 
-        List<SqlParameter> placeholders = NamedParameterUtils.buildSqlParameterList(parsedSql, parameterSource);
+        List<SqlParameter> sqlParameters = NamedParameterUtils.buildSqlParameterList(
+            parsedSql, mapSqlParameterSource);
 
-        List<SqlParameter> declaredParameters = createDeclaredParameters(
-            placeholders, parameterValues, outputParameters);
+        List<SqlParameter> declaredSqlParameters = createDeclaredParameters(
+            sqlParameters, nameParameterValues, nameResolvedOutputParameters);
 
-        String sql = NamedParameterUtils.substituteNamedParameters(parsedSql, parameterSource);
+        String sql = NamedParameterUtils.substituteNamedParameters(parsedSql, mapSqlParameterSource);
 
         CallableStatementCreatorFactory callableStatementCreatorFactory = new CallableStatementCreatorFactory(
-            sql, declaredParameters);
+            sql, declaredSqlParameters);
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 
         jdbcTemplate.setSkipUndeclaredResults(true);
 
-        Map<String, Object> callResult = jdbcTemplate.call(
-            callableStatementCreatorFactory.newCallableStatementCreator(parameterValues),
-            declaredParameters);
+        Map<String, Object> nameCallResultValues = jdbcTemplate.call(
+            callableStatementCreatorFactory.newCallableStatementCreator(nameParameterValues),
+            declaredSqlParameters);
 
-        Map<String, Object> outputValues = new LinkedHashMap<>();
+        Map<String, Object> nameOutputValues = new LinkedHashMap<>();
 
-        for (String name : outputParameters.keySet()) {
-            outputValues.put(name, callResult.get(name));
+        for (String outputParameterName : nameResolvedOutputParameters.keySet()) {
+            nameOutputValues.put(outputParameterName, nameCallResultValues.get(outputParameterName));
         }
 
-        return outputValues;
+        return nameOutputValues;
     }
 
     public static int getJdbcTypeNumber(String typeName) {
@@ -112,26 +114,26 @@ public class CallJdbcOperation implements JdbcOperation<Map<String, Object>> {
         }
     }
 
-    private static Map<String, @Nullable Object> getParameterValues(Map<String, ?> inputParameters) {
-        Map<String, ?> parameters = MapUtils.getMap(inputParameters, JdbcConstants.PARAMETERS, Map.of());
+    private static Map<String, @Nullable Object> getNameParameterValues(Map<String, ?> inputParameters) {
+        Map<String, ?> nameValues = MapUtils.getMap(inputParameters, JdbcConstants.PARAMETERS, Map.of());
 
-        Map<String, @Nullable Object> parameterValues = new HashMap<>();
+        Map<String, @Nullable Object> nameParameterValues = new HashMap<>();
 
-        for (Map.Entry<String, ?> entry : parameters.entrySet()) {
-            Object value = entry.getValue();
+        for (Map.Entry<String, ?> nameValueEntry : nameValues.entrySet()) {
+            Object parameterValue = nameValueEntry.getValue();
 
-            if (value instanceof Double || value instanceof Float) {
-                value = new BigDecimal(value.toString());
+            if (parameterValue instanceof Double || parameterValue instanceof Float) {
+                parameterValue = new BigDecimal(parameterValue.toString());
             }
 
-            parameterValues.put(entry.getKey(), value);
+            nameParameterValues.put(nameValueEntry.getKey(), parameterValue);
         }
 
-        return parameterValues;
+        return nameParameterValues;
     }
 
     private static List<SqlParameter> createDeclaredParameters(
-        List<SqlParameter> sqlParameters, Map<String, ?> parameterValues,
+        List<SqlParameter> sqlParameters, Map<String, ?> nameParameterValues,
         Map<String, ResolvedOutputParameter> nameResolvedOutputParameters) {
 
         Set<String> sqlParameterNames = sqlParameters.stream()
@@ -146,7 +148,7 @@ public class CallJdbcOperation implements JdbcOperation<Map<String, Object>> {
             }
         }
 
-        List<SqlParameter> declaredParameters = new ArrayList<>();
+        List<SqlParameter> declaredSqlParameters = new ArrayList<>();
         Set<String> createdOutputParameterNames = new HashSet<>();
 
         for (SqlParameter sqlParameter : sqlParameters) {
@@ -155,14 +157,14 @@ public class CallJdbcOperation implements JdbcOperation<Map<String, Object>> {
             ResolvedOutputParameter resolvedOutputParameter = nameResolvedOutputParameters.get(sqlParameterName);
 
             if (resolvedOutputParameter == null) {
-                if (!parameterValues.containsKey(sqlParameterName)) {
+                if (!nameParameterValues.containsKey(sqlParameterName)) {
                     throw new ConfigurationException(
                         "No value for input parameter :" + sqlParameterName + ". Add it to Parameters or declare it " +
                             "as an output parameter.",
                         ComponentErrorType.INVALID_CALL_PARAMETER);
                 }
 
-                Object parameterValue = parameterValues.get(sqlParameterName);
+                Object parameterValue = nameParameterValues.get(sqlParameterName);
 
                 if (parameterValue instanceof Collection<?> || parameterValue instanceof Object[]) {
                     throw new ConfigurationException(
@@ -170,7 +172,7 @@ public class CallJdbcOperation implements JdbcOperation<Map<String, Object>> {
                         ComponentErrorType.INVALID_CALL_PARAMETER);
                 }
 
-                declaredParameters.add(new SqlParameter(sqlParameterName, SqlTypeValue.TYPE_UNKNOWN));
+                declaredSqlParameters.add(new SqlParameter(sqlParameterName, SqlTypeValue.TYPE_UNKNOWN));
 
                 continue;
             }
@@ -182,23 +184,26 @@ public class CallJdbcOperation implements JdbcOperation<Map<String, Object>> {
             }
 
             if (resolvedOutputParameter.inOut()) {
-                declaredParameters
+                declaredSqlParameters
                     .add(new SqlInOutParameter(sqlParameterName, resolvedOutputParameter.jdbcTypeNumber()));
             } else {
-                declaredParameters.add(new SqlOutParameter(sqlParameterName, resolvedOutputParameter.jdbcTypeNumber()));
+                declaredSqlParameters.add(
+                    new SqlOutParameter(sqlParameterName, resolvedOutputParameter.jdbcTypeNumber()));
             }
         }
 
-        return declaredParameters;
+        return declaredSqlParameters;
     }
 
-    private static Map<String, ResolvedOutputParameter> getOutputParameters(Map<String, ?> inputParameters) {
-        List<OutputParameter> outputParameterList = MapUtils.getList(
+    private static Map<String, ResolvedOutputParameter> getNameResolvedOutputParameters(
+        Map<String, ?> inputParameters) {
+
+        List<OutputParameter> outputParameters = MapUtils.getList(
             inputParameters, JdbcConstants.OUTPUT_PARAMETERS, OutputParameter.class, List.of());
 
-        Map<String, ResolvedOutputParameter> outputParameters = new LinkedHashMap<>();
+        Map<String, ResolvedOutputParameter> nameResolvedOutputParameters = new LinkedHashMap<>();
 
-        for (OutputParameter outputParameter : outputParameterList) {
+        for (OutputParameter outputParameter : outputParameters) {
             String name = outputParameter.name();
 
             if (name == null || name.isBlank()) {
@@ -224,14 +229,14 @@ public class CallJdbcOperation implements JdbcOperation<Map<String, Object>> {
             ResolvedOutputParameter resolvedOutputParameter = new ResolvedOutputParameter(
                 getJdbcTypeNumber(type), MODE_IN_OUT.equals(mode));
 
-            if (outputParameters.put(name, resolvedOutputParameter) != null) {
+            if (nameResolvedOutputParameters.put(name, resolvedOutputParameter) != null) {
                 throw new ConfigurationException(
                     "Output parameter :" + name + " is declared more than once.",
                     ComponentErrorType.INVALID_CALL_PARAMETER);
             }
         }
 
-        return outputParameters;
+        return nameResolvedOutputParameters;
     }
 
     public record OutputParameter(@Nullable String name, @Nullable String type, @Nullable String mode) {
