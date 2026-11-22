@@ -1,0 +1,26 @@
+dependencies {
+    api(project(":spring-ai:spring-ag-ui:integrations:spring-ai"))
+    api(project(":spring-ai:spring-ag-ui:packages:core"))
+    api(project(":spring-ai:spring-ag-ui:packages:server"))
+
+    implementation("org.slf4j:slf4j-api")
+    implementation("org.springframework.ai:spring-ai-client-chat")
+    implementation("org.springframework.ai:spring-ai-model")
+    implementation("org.springframework.security:spring-security-core")
+    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
+    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool-api"))
+    implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-tool"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("org.mockito:mockito-junit-jupiter")
+    testImplementation(project(":server:libs:ai:ai-copilot:ai-copilot-service"))
+    testImplementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    testImplementation(project(":server:libs:test:test-support"))
+}

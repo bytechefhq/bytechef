@@ -29,11 +29,11 @@ import static org.mockito.Mockito.when;
 
 import com.agui.core.state.State;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
-import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.platform.ai.tool.SecurityContextRehydrator;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import java.util.ArrayList;
 import java.util.HashMap;

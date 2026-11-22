@@ -27,7 +27,7 @@ import com.agui.server.LocalAgent;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ai.copilot.util.Mode;
 import com.bytechef.ai.copilot.util.Source;
-import com.bytechef.platform.ai.tool.TaskTools;
+import com.bytechef.platform.component.tool.TaskTools;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;

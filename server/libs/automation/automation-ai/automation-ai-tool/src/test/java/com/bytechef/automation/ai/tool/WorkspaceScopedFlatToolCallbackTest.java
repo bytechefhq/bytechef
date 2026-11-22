@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
+import com.bytechef.automation.ai.mcp.tool.CreateMcpServerToolCallback;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.platform.configuration.domain.Environment;

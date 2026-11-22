@@ -14,6 +14,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
+    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-agent-api"))
+    implementation(project(":server:libs:automation:automation-ai:automation-ai-agent:automation-ai-agent-tool"))
+    implementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-tool"))
+    implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-tool"))
+    implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-tool"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:jdbc-config"))
 
