@@ -37,9 +37,10 @@ export const ConditionalPostHogProvider = ({children}: ConditionalPostHogProvide
                     }
                 },
                 person_profiles: 'identified_only',
+                ui_host: analytics.postHog.uiHost || undefined,
             });
         }
-    }, [posthog, analytics.postHog.apiKey, analytics.postHog.host]);
+    }, [posthog, analytics.postHog.apiKey, analytics.postHog.host, analytics.postHog.uiHost]);
 
     // In tests, disable PostHog entirely to avoid loading the SDK in JSDOM
     if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
