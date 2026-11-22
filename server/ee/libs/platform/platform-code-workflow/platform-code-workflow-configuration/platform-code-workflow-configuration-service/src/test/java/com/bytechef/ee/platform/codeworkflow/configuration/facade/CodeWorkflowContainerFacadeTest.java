@@ -778,6 +778,72 @@ class CodeWorkflowContainerFacadeTest {
         assertThat(respondTask.getType()).isEqualTo("apiPlatform/v1/responseToAPIRequest");
     }
 
+    @Test
+    void testUpdateRejectsAnExpressionThatReferencesAHyphenatedTaskName() {
+        assertWorkflowRejected(
+            WorkflowDsl.workflow("wf-a")
+                .tasks(
+                    WorkflowDsl.task("fetch-orders")
+                        .perform((input, context) -> "orders"),
+                    WorkflowDsl.componentTask("respond", "apiPlatform/v1/responseToAPIRequest")
+                        .parameters(Map.of("response", Map.of("success", "${fetch-orders}")))),
+            "Task respond", "${fetch-orders}", "fetch-orders", "fetchOrders");
+    }
+
+    @Test
+    void testUpdateRejectsAnExpressionThatReferencesAHyphenatedTriggerName() {
+        assertWorkflowRejected(
+            WorkflowDsl.workflow("wf-a")
+                .triggers(WorkflowDsl.trigger("new-request", "apiPlatform/v1/newApiRequest"))
+                .tasks(
+                    WorkflowDsl.componentTask("transactions", "gaurus/v1/getAccountTransactions")
+                        .parameters(Map.of("accounts", List.of(Map.of("iban", "${new-request.parameters.iban}"))))),
+            "Task transactions", "new-request", "newRequest");
+    }
+
+    @Test
+    void testUpdateRejectsAHyphenatedTaskNameReferencedInsideAGroup() {
+        assertWorkflowRejected(
+            WorkflowDsl.workflow("wf-a")
+                .tasks(
+                    WorkflowDsl.task("fetch-orders")
+                        .perform((input, context) -> "orders"),
+                    WorkflowDsl.parallel("notify")
+                        .tasks(
+                            WorkflowDsl.componentTask("log", "logger/v1/info")
+                                .parameters(Map.of("text", "Orders: ${fetch-orders.count}")))),
+            "Task log", "fetch-orders");
+    }
+
+    @Test
+    void testUpdateAcceptsAHyphenatedTaskNameNoExpressionReferences() {
+        Workflow parsedWorkflow = updateAndCaptureWorkflow(
+            codeWorkflowContainerFacade,
+            WorkflowDsl.workflow("wf-a")
+                .tasks(
+                    WorkflowDsl.task("fetch-orders")
+                        .perform((input, context) -> "orders"),
+                    WorkflowDsl.componentTask("respond", "apiPlatform/v1/responseToAPIRequest")
+                        .parameters(Map.of("response", Map.of("success", "${fetch}")))));
+
+        List<WorkflowTask> workflowTasks = parsedWorkflow.getTasks();
+
+        assertThat(workflowTasks).extracting(WorkflowTask::getName)
+            .containsExactly("fetch-orders", "respond");
+    }
+
+    private void assertWorkflowRejected(WorkflowDefinition workflowDefinition, String... expectedMessageParts) {
+        CodeWorkflowContainer codeWorkflowContainer = newComponentTaskContainer();
+
+        assertThatThrownBy(
+            () -> codeWorkflowContainerFacade.update(
+                codeWorkflowContainer, "v2", List.of(workflowDefinition), "content".getBytes(),
+                PlatformType.AUTOMATION))
+                    .cause()
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContainingAll(expectedMessageParts);
+    }
+
     private void assertComponentTaskRejected(String type, String... expectedMessageParts) {
         CodeWorkflowContainerFacadeImpl facade = newFacadeWithComponentDefinitionService();
 

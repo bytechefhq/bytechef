@@ -31,6 +31,7 @@ import com.bytechef.workflow.definition.TriggerDefinition;
 import com.bytechef.workflow.definition.WorkflowDefinition;
 import com.bytechef.workflow.definition.WorkflowTaskDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -63,6 +64,9 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
 
     private static final Pattern COMPONENT_TASK_TYPE_PATTERN =
         Pattern.compile("([^/\\s]+)/v([1-9]\\d{0,8})/([^/\\s]+)");
+    private static final Pattern EXPRESSION_PATTERN = Pattern.compile("\\$\\{([^}]*)}");
+    private static final Pattern EXPRESSION_NAME_PATTERN = Pattern.compile("[A-Za-z_][A-Za-z0-9_]*");
+    private static final Pattern NAME_SEPARATOR_PATTERN = Pattern.compile("[^A-Za-z0-9_]+");
 
     private final CodeWorkflowContainerService codeWorkflowContainerService;
     private final CodeWorkflowFileStorage codeWorkflowFileStorage;
@@ -537,6 +541,8 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
     private String getDefinition(
         String codeWorkflowContainerUuid, WorkflowDefinition workflowDefinition, PlatformType type) {
 
+        validateExpressionReferences(workflowDefinition);
+
         ObjectNode objectNode = objectMapper.createObjectNode();
 
         OptionalUtils.ifPresent(workflowDefinition.getLabel(), label -> objectNode.put("label", label));
@@ -553,5 +559,114 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
             tasks -> objectNode.set("tasks", toArrayNode(codeWorkflowContainerUuid, workflowDefinition, tasks, type)));
 
         return objectMapper.writeValueAsString(objectNode);
+    }
+
+    private static void validateExpressionReferences(WorkflowDefinition workflowDefinition) {
+        List<String> names = new ArrayList<>();
+        List<ComponentTaskDefinition> componentTaskDefinitions = new ArrayList<>();
+
+        OptionalUtils.ifPresent(
+            workflowDefinition.getTriggers(),
+            triggers -> triggers.forEach(trigger -> names.add(trigger.getName())));
+        OptionalUtils.ifPresent(
+            workflowDefinition.getTasks(), tasks -> collectTasks(tasks, names, componentTaskDefinitions));
+
+        List<String> unsafeNames = names.stream()
+            .filter(Objects::nonNull)
+            .filter(name -> !isExpressionName(name))
+            .toList();
+
+        if (unsafeNames.isEmpty()) {
+            return;
+        }
+
+        for (ComponentTaskDefinition componentTaskDefinition : componentTaskDefinitions) {
+            validateExpressionReferences(
+                componentTaskDefinition.getName(), componentTaskDefinition.getParameters(), unsafeNames);
+        }
+    }
+
+    private static void collectTasks(
+        List<? extends WorkflowTaskDefinition> tasks, List<String> names,
+        List<ComponentTaskDefinition> componentTaskDefinitions) {
+
+        for (WorkflowTaskDefinition taskDefinition : tasks) {
+            names.add(taskDefinition.getName());
+
+            if (taskDefinition instanceof ComponentTaskDefinition componentTaskDefinition) {
+                componentTaskDefinitions.add(componentTaskDefinition);
+            } else if (taskDefinition instanceof CompositeTaskDefinition compositeTaskDefinition) {
+                if (compositeTaskDefinition.getType() == CompositeTaskDefinition.Type.PARALLEL) {
+                    collectTasks(compositeTaskDefinition.getTasks(), names, componentTaskDefinitions);
+                } else {
+                    for (List<? extends WorkflowTaskDefinition> branch : compositeTaskDefinition.getBranches()) {
+                        collectTasks(branch, names, componentTaskDefinitions);
+                    }
+                }
+            }
+        }
+    }
+
+    private static void validateExpressionReferences(String taskName, Object value, List<String> unsafeNames) {
+        if (value instanceof Map<?, ?> map) {
+            for (Object entryValue : map.values()) {
+                validateExpressionReferences(taskName, entryValue, unsafeNames);
+            }
+        } else if (value instanceof List<?> list) {
+            for (Object item : list) {
+                validateExpressionReferences(taskName, item, unsafeNames);
+            }
+        } else if (value instanceof String text) {
+            Matcher matcher = EXPRESSION_PATTERN.matcher(text);
+
+            while (matcher.find()) {
+                String expression = matcher.group(1);
+
+                for (String unsafeName : unsafeNames) {
+                    Pattern referencePattern = Pattern.compile(
+                        "(?<![A-Za-z0-9_-])" + Pattern.quote(unsafeName) + "(?![A-Za-z0-9_-])");
+
+                    Matcher referenceMatcher = referencePattern.matcher(expression);
+
+                    if (referenceMatcher.find()) {
+                        throw new IllegalArgumentException(
+                            ("Task %s references %s in %s; an expression can name a task or trigger only when the " +
+                                "name has letters, digits and underscores, so rename %s, e.g. to %s")
+                                    .formatted(taskName, unsafeName, matcher.group(), unsafeName,
+                                        toExpressionName(unsafeName)));
+                    }
+                }
+            }
+        }
+    }
+
+    private static boolean isExpressionName(String name) {
+        Matcher matcher = EXPRESSION_NAME_PATTERN.matcher(name);
+
+        return matcher.matches();
+    }
+
+    private static String toExpressionName(String name) {
+        String[] parts = NAME_SEPARATOR_PATTERN.split(name);
+        StringBuilder sb = new StringBuilder();
+
+        for (String part : parts) {
+            if (part.isEmpty()) {
+                continue;
+            }
+
+            if (sb.isEmpty()) {
+                sb.append(part);
+            } else {
+                sb.append(Character.toUpperCase(part.charAt(0)));
+                sb.append(part.substring(1));
+            }
+        }
+
+        if (sb.isEmpty() || Character.isDigit(sb.charAt(0))) {
+            sb.insert(0, "task");
+        }
+
+        return sb.toString();
     }
 }
