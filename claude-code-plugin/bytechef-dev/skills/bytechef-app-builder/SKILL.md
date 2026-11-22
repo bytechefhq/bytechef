@@ -27,7 +27,8 @@ For each thing the app needs, take the first option that fits:
    starts and does not wait for (`waitSeconds: 0`, then poll the run).
 3. **Direct action or tool** — a single operation where a workflow would be overkill, or tools for an app that runs
    its own LLM.
-4. **Proxy** — last resort, for a raw API call no action covers.
+4. **Proxy** — last resort, for a raw API call no action covers. Inside a workflow, an API no component covers is a
+   question for the person; see [An API no component covers](#an-api-no-component-covers).
 
 Going past option 1 states why, in the reply to the user. An endpoint keeps the logic in a ByteChef workflow an admin
 can see, change, disable and reuse; an action called from app code hard-wires it into the app.
@@ -43,6 +44,10 @@ can see, change, disable and reuse; an action called from app code hard-wires it
 | A raw API call no action covers | — | proxy |
 
 Scheduled work runs on its own; the app never starts it. A background run is started by the app, once, on demand.
+
+A [code workflow](#code-workflows) is another way to build the same endpoint, scheduled or Call-workflow workflow: a
+file in the app's repository, deployed with the CLI, instead of `buildWorkflow`. Use it when `buildWorkflow` cannot
+express the logic, or when the person asks for code.
 
 ## One-time setup, by a person
 
@@ -274,6 +279,99 @@ any other `environment`.
 If `buildWorkflow` is not registered, a ByteChef admin must set `bytechef.ai.copilot.enabled: true` with a chat model
 provider (optionally chosen with `bytechef.ai.copilot.provider`).
 <!-- /transport -->
+
+## Code workflows
+
+A code workflow is an automation project written as a file and deployed as a whole. Write one when `buildWorkflow`
+cannot express the logic or the person asks for code: in TypeScript, the app's language, or in Python when the person
+asks. Before writing it, read the **ByteChef Code Workflow Builder** skill: its file contract, its "Component tasks"
+section and its "Reading the trigger and the call input" section.
+
+**The file.** `bytechef/workflows/<project>.ts` (or `.py`), committed with the app. One project per file.
+
+- TypeScript: the file is a bare `({ ... })` expression. Never `import` or `export` anything: either one makes the
+  file a module, and an `export` in the deployed file makes deploy answer HTTP 500.
+- Compile it before every deploy with `npm run build:workflows` (`tsc -p bytechef/workflows`), which writes
+  `bytechef/workflows/dist/<project>.js`. Deploy that `.js`, never the `.ts`: the server runs JavaScript. An app
+  without the script gets the template's `bytechef/workflows/tsconfig.json` and the script. The config doesn't
+  require types on `input` and `context`, because `@bytechef/workflow-api` is not published; once it is installed
+  from a ByteChef checkout, add `/// <reference types="@bytechef/workflow-api" />` and end the object in
+  `satisfies ByteChef.ProjectDefinition`.
+- Python: the definition is a `dict`, with the variable alone on the last line.
+- Every workflow has a `label`, unique in the project; the lookup below finds workflows by it.
+
+**Per kind.**
+
+- An endpoint workflow has the `apiPlatform/v1/newApiRequest` trigger and ends in an
+  `apiPlatform/v1/responseToAPIRequest` component task. Nothing checks for that task: without it the endpoint
+  answers 200 with an empty body, so never leave it out.
+- A scheduled workflow has a schedule trigger. Read its parameters with `getTriggerDefinition`: deploy does not check
+  trigger or action parameters. `dataTable/v1/createRecords` takes `records: {values: [...]}`, a list of column
+  maps, although its definition shows `records` as an open object.
+- A Call-workflow workflow has the `workflow/v1/newWorkflowCall` trigger, with `inputSchema` as a string. The run's
+  result is the workflow's `outputs` (`[{name, value: "${task}"}]`); without them it is `{}`.
+
+<!-- transport: mcp uses: createAppApiCollection, deployProject edition: ee -->
+A code project is a project deployed from a file with `bytechef automation project deploy`, and it is a project of its
+own. Before its first deploy, run `listProjects` and pick a project `name` no other project in the workspace uses.
+Deploy matches that name case-insensitively and writes into any project with it, a visual one included. It adds the
+file's workflows to that project and publishes it, together with the visual project's unpublished edits. On a later
+deploy of the same file, `listProjects` shows the project under that name: that match is this file's own project, so
+keep the name. Afterwards that `name`, and each workflow's `name`, stay fixed. A renamed workflow gets a new uuid, which
+breaks the endpoint or binding that points at it.
+<!-- /transport -->
+
+<!-- transport: cli uses: automation project deploy -->
+Deploy the file in DEVELOPMENT. Each deploy publishes a new version of the project:
+
+```bash
+npm run build:workflows
+bytechef automation project deploy --project-file bytechef/workflows/dist/orders.js --profile dev
+```
+
+- A deploy error that names a task: fix the file and deploy again.
+- `401`: the profile's key is not an automation API key created in DEVELOPMENT. `403`: its user may not create or
+  publish projects in the workspace. Stop and ask a person in both cases.
+<!-- /transport -->
+
+<!-- transport: mcp uses: createAppApiCollection, createAppApiEndpoint, updateAppApiCollectionVersion, deployProject edition: ee -->
+After a deploy, find the ids:
+
+1. `listProjects` (pass `workspaceId`): the project `id`, matching its `name`.
+2. `getProject`: the highest entry of `versions` whose `status` is `PUBLISHED`. That is the project version.
+3. `listWorkflows`: each workflow's `workflow_uuid`, matching `name`, which carries the workflow's label. Its `version`
+   field is not the project version.
+
+Then bind with these ids, in place of `buildWorkflow` and `publishProject`:
+
+- **An endpoint**: create a collection for this project with `createAppApiCollection` and its own `contextPath`; a
+  collection serves only one project, so never add a code workflow to the visual project's collection. Then add the
+  endpoint with `createAppApiEndpoint` and run the collection's `bindCommand`. An `unresolved` or `arming failed`
+  result is handled as in the API endpoint steps.
+- **A schedule**: `deployProject` with the scheduled workflow's uuid in `enabledWorkflows`.
+- **A Call-workflow run**: `deployProject`, then run the `bytechef automation app bind workflow` command it prints.
+
+To change a code workflow: edit the file, deploy again, and take the new `PUBLISHED` version from `getProject`. Then run
+`updateAppApiCollectionVersion` for an endpoint, or `deployProject` for a schedule or a Call-workflow run. If
+`updateAppApiCollectionVersion` refuses because an endpoint's workflow is missing, a workflow `name` changed: restore it
+in the file and deploy again. Never pass `removeMissingEndpoints` to get past that refusal, since it deletes the
+endpoint the app calls. Never change a code project with a workflow tool (`buildWorkflow`, `updateWorkflow`,
+`createProjectWorkflow`, `deleteWorkflow`, `updateScriptComponentCode` or `publishProject`), even when a `deployProject`
+result suggests `draftWorkflowId`. The next deploy overwrites or publishes that edit, so the file is the only source.
+<!-- /transport -->
+
+## An API no component covers
+
+When a workflow needs an API no ByteChef component covers, never pick the way alone, even if the person said earlier
+to just proceed. Name the API and ask which they want:
+
+- **The HTTP Client component** inside this workflow. The call stays in this one workflow.
+- **A custom component**, written in JavaScript (Python on request). Every workflow on the instance can see and reuse
+  it. Publishing it needs an admin API key, which the app's automation profile does not hold: a person creates a
+  second CLI profile with one.
+
+Wait for the answer. On "custom component", build it with the **ByteChef Custom Component Builder** skill, then call
+its action from a component task or from `context.component` in a `perform`.
 
 ## Binding a deployed workflow
 
