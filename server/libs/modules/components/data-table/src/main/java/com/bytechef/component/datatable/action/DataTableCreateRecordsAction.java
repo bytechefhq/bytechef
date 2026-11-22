@@ -85,6 +85,10 @@ public class DataTableCreateRecordsAction {
                     .options(DataTableUtils.getActionTableOptions(dataTableService, dataTableWorkspaceResolver)),
                 dynamicProperties(RECORDS,
                     DataTableUtils.createDynamicProperties(dataTableService, dataTableWorkspaceResolver, false))
+                        .description(
+                            "The records to insert, as an object with a values array holding one object per record " +
+                                "that maps column names to values: {\"values\": [{\"<column>\": <value>}, ...]}. " +
+                                "A plain array or a flat object of column values is not accepted.")
                         .propertiesLookupDependsOn(TABLE)
                         .required(true))
             .output(this::output)
