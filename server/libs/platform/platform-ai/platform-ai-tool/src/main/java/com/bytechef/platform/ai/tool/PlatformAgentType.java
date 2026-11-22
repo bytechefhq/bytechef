@@ -26,7 +26,9 @@ import com.bytechef.ai.copilot.util.Source;
 public enum PlatformAgentType implements AgentType {
 
     JSON_SCHEMA_BUILDER_ASK(Source.JSON_SCHEMA_BUILDER, Mode.ASK),
-    JSON_SCHEMA_BUILDER_BUILD(Source.JSON_SCHEMA_BUILDER, Mode.BUILD);
+    JSON_SCHEMA_BUILDER_BUILD(Source.JSON_SCHEMA_BUILDER, Mode.BUILD),
+    SAMPLE_OUTPUT_ASK(Source.SAMPLE_OUTPUT, Mode.ASK),
+    SAMPLE_OUTPUT_BUILD(Source.SAMPLE_OUTPUT, Mode.BUILD);
 
     private final String key;
 
