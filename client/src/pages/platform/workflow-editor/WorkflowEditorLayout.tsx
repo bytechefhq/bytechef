@@ -2,7 +2,6 @@ import {ReactFlowProvider} from '@xyflow/react';
 
 import './WorkflowEditorLayout.css';
 
-import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import ClusterElementsCanvasDialog from '@/pages/platform/workflow-editor/components/ClusterElementsCanvasDialog';
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
 import {useClusterElementsCanvasDialogStore} from '@/pages/platform/workflow-editor/components/stores/useClusterElementsCanvasDialogStore';
@@ -230,20 +229,6 @@ const WorkflowEditorLayout = ({
     }, []);
 
     useEffect(() => {
-        if (integrationId) {
-            return useCopilotPostTurnRegistry.getState().register(Source.WORKFLOW_EDITOR_EMBEDDED, () => {
-                if (integrationWorkflowId) {
-                    void queryClient.invalidateQueries({
-                        queryKey: IntegrationWorkflowKeys.integrationWorkflow(+integrationId, +integrationWorkflowId),
-                    });
-                }
-
-                void queryClient.invalidateQueries({
-                    queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations,
-                });
-            });
-        }
-
         return useCopilotPostTurnRegistry.getState().register(Source.WORKFLOW_EDITOR, () => {
             void queryClient.invalidateQueries({
                 queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
@@ -251,7 +236,7 @@ const WorkflowEditorLayout = ({
 
             void queryClient.invalidateQueries({queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations});
         });
-    }, [integrationId, integrationWorkflowId, projectId, projectWorkflowId, queryClient]);
+    }, [projectId, projectWorkflowId, queryClient]);
 
     useEffect(() => {
         if (clusterElementsCanvasOpen) {

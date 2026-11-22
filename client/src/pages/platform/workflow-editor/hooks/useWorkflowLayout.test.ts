@@ -78,8 +78,6 @@ describe('useWorkflowLayout', () => {
             initialProps: {workflowKey: 'project:1:2'},
         });
 
-        hoisted.routeParams = {projectId: '1', projectWorkflowId: '3'};
-
         rerender({workflowKey: 'project:1:3'});
 
         const {result} = renderHook(() => useWorkflowLayout());
