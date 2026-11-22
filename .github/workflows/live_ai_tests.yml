@@ -104,6 +104,7 @@ jobs:
             test/playwright/tests/ai-hub/aiHubDebugLive.spec.ts \
             test/playwright/tests/ai-hub/aiHubLive.spec.ts \
             test/playwright/tests/copilot/copilotCardsLive.spec.ts \
+            test/playwright/tests/copilot/copilotEmbeddedLive.spec.ts \
             test/playwright/tests/copilot/copilotLive.spec.ts \
             --grep-invert "configuration" \
             --project=chromium --workers=3 --reporter=list,html
