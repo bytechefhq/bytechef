@@ -27,7 +27,7 @@ Name: createRecords
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | table | Table | STRING |  | true |
-| records | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> table </details> |  | true |
+| records | null | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> table </details> | The records to insert, as an object with a values array holding one object per record that maps column names to values: &#123;"values": [&#123;"&lt;column&gt;": &lt;value&gt;&#125;, ...]&#125;. A plain array or a flat object of column values is not accepted. | true |
 
 #### Example JSON Structure
 ```json
