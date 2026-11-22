@@ -16,10 +16,12 @@ import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowC
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.workflow.definition.ComponentTaskDefinition;
 import com.bytechef.workflow.definition.CompositeTaskDefinition;
 import com.bytechef.workflow.definition.ConnectionRequirement;
 import com.bytechef.workflow.definition.Input;
@@ -34,9 +36,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
@@ -55,6 +60,9 @@ import tools.jackson.databind.node.ObjectNode;
 @Transactional
 @ConditionalOnEEVersion
 public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFacade {
+
+    private static final Pattern COMPONENT_TASK_TYPE_PATTERN =
+        Pattern.compile("([^/\\s]+)/v([1-9]\\d{0,8})/([^/\\s]+)");
 
     private final CodeWorkflowContainerService codeWorkflowContainerService;
     private final CodeWorkflowFileStorage codeWorkflowFileStorage;
@@ -234,6 +242,8 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
                 arrayNode.add(
                     toCompositeTaskNode(
                         codeWorkflowContainerUuid, workflowDefinition, compositeTaskDefinition, type));
+            } else if (taskDefinition instanceof ComponentTaskDefinition componentTaskDefinition) {
+                arrayNode.add(toComponentTaskNode(componentTaskDefinition));
             } else {
                 arrayNode.add(
                     toTaskNode(
@@ -261,8 +271,7 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
             ArrayNode tasksNode = objectMapper.createArrayNode();
 
             for (WorkflowTaskDefinition taskDefinition : compositeTaskDefinition.getTasks()) {
-                tasksNode.add(
-                    toTaskNode(codeWorkflowContainerUuid, workflowDefinition, (TaskDefinition) taskDefinition, type));
+                tasksNode.add(toNestedTaskNode(codeWorkflowContainerUuid, workflowDefinition, taskDefinition, type));
             }
 
             parametersNode.set("tasks", tasksNode);
@@ -276,8 +285,7 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
 
                 for (WorkflowTaskDefinition taskDefinition : branch) {
                     branchNode.add(
-                        toTaskNode(
-                            codeWorkflowContainerUuid, workflowDefinition, (TaskDefinition) taskDefinition, type));
+                        toNestedTaskNode(codeWorkflowContainerUuid, workflowDefinition, taskDefinition, type));
                 }
 
                 branchesNode.add(branchNode);
@@ -289,6 +297,88 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
         taskNode.set("parameters", parametersNode);
 
         return taskNode;
+    }
+
+    private ObjectNode toNestedTaskNode(
+        String codeWorkflowContainerUuid, WorkflowDefinition workflowDefinition,
+        WorkflowTaskDefinition workflowTaskDefinition, PlatformType type) {
+
+        if (workflowTaskDefinition instanceof TaskDefinition taskDefinition) {
+            return toTaskNode(codeWorkflowContainerUuid, workflowDefinition, taskDefinition, type);
+        }
+
+        if (workflowTaskDefinition instanceof ComponentTaskDefinition componentTaskDefinition) {
+            return toComponentTaskNode(componentTaskDefinition);
+        }
+
+        if (workflowTaskDefinition instanceof CompositeTaskDefinition) {
+            throw new IllegalArgumentException(
+                "Task %s is nested inside a group, and a group inside a group is not supported"
+                    .formatted(workflowTaskDefinition.getName()));
+        }
+
+        Class<?> taskDefinitionClass = workflowTaskDefinition.getClass();
+
+        throw new IllegalArgumentException(
+            "Task %s has an unsupported task type %s; a group holds only perform tasks and component tasks"
+                .formatted(workflowTaskDefinition.getName(), taskDefinitionClass.getName()));
+    }
+
+    private ObjectNode toComponentTaskNode(ComponentTaskDefinition componentTaskDefinition) {
+        validateComponentTask(componentTaskDefinition);
+
+        ObjectNode taskNode = objectMapper.createObjectNode()
+            .put("description", OptionalUtils.orElse(componentTaskDefinition.getDescription(), null))
+            .put("label", OptionalUtils.orElse(componentTaskDefinition.getLabel(), null))
+            .put("name", componentTaskDefinition.getName())
+            .put("type", componentTaskDefinition.getType());
+
+        taskNode.set("parameters", objectMapper.valueToTree(componentTaskDefinition.getParameters()));
+
+        return taskNode;
+    }
+
+    private void validateComponentTask(ComponentTaskDefinition componentTaskDefinition) {
+        if (componentDefinitionService == null) {
+            return;
+        }
+
+        String name = componentTaskDefinition.getName();
+        String type = componentTaskDefinition.getType();
+
+        Matcher matcher = COMPONENT_TASK_TYPE_PATTERN.matcher(type == null ? "" : type);
+
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException(
+                ("Task %s declares type %s; a component task type reads <component>/v<version>/<action>, e.g. " +
+                    "apiPlatform/v1/responseToAPIRequest").formatted(name, type));
+        }
+
+        String componentName = matcher.group(1);
+        int componentVersion = Integer.parseInt(matcher.group(2));
+        String actionName = matcher.group(3);
+
+        Optional<ComponentDefinition> componentDefinitionOptional = componentDefinitionService
+            .fetchComponentDefinition(componentName, componentVersion);
+
+        if (componentDefinitionOptional.isEmpty()) {
+            throw new IllegalArgumentException(
+                "Task %s names component %s version %d, which this instance does not have"
+                    .formatted(name, componentName, componentVersion));
+        }
+
+        ComponentDefinition componentDefinition = componentDefinitionOptional.get();
+
+        List<ActionDefinition> actionDefinitions = componentDefinition.getActions();
+
+        boolean hasAction = actionDefinitions.stream()
+            .anyMatch(actionDefinition -> Objects.equals(actionDefinition.getName(), actionName));
+
+        if (!hasAction) {
+            throw new IllegalArgumentException(
+                "Task %s names action %s, which component %s version %d does not have"
+                    .formatted(name, actionName, componentName, componentVersion));
+        }
     }
 
     private ObjectNode toTaskNode(
