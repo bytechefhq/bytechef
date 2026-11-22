@@ -98,6 +98,40 @@ any other `environment`.
 If `buildWorkflow` is not registered, a ByteChef admin must set `bytechef.ai.copilot.enabled: true` with a chat model
 provider (optionally chosen with `bytechef.ai.copilot.provider`).
 
+## tools: createAppApiCollection, deployProject
+A code project is a project deployed from a file with `bytechef automation project deploy`, and it is a project of its
+own. Before its first deploy, run `listProjects` and pick a project `name` no other project in the workspace uses.
+Deploy matches that name case-insensitively and writes into any project with it, a visual one included. It adds the
+file's workflows to that project and publishes it, together with the visual project's unpublished edits. On a later
+deploy of the same file, `listProjects` shows the project under that name: that match is this file's own project, so
+keep the name. Afterwards that `name`, and each workflow's `name`, stay fixed. A renamed workflow gets a new uuid, which
+breaks the endpoint or binding that points at it.
+
+## tools: createAppApiCollection, createAppApiEndpoint, updateAppApiCollectionVersion, deployProject
+After a deploy, find the ids:
+
+1. `listProjects` (pass `workspaceId`): the project `id`, matching its `name`.
+2. `getProject`: the highest entry of `versions` whose `status` is `PUBLISHED`. That is the project version.
+3. `listWorkflows`: each workflow's `workflow_uuid`, matching `name`, which carries the workflow's label. Its `version`
+   field is not the project version.
+
+Then bind with these ids, in place of `buildWorkflow` and `publishProject`:
+
+- **An endpoint**: create a collection for this project with `createAppApiCollection` and its own `contextPath`; a
+  collection serves only one project, so never add a code workflow to the visual project's collection. Then add the
+  endpoint with `createAppApiEndpoint` and run the collection's `bindCommand`. An `unresolved` or `arming failed`
+  result is handled as in the API endpoint steps.
+- **A schedule**: `deployProject` with the scheduled workflow's uuid in `enabledWorkflows`.
+- **A Call-workflow run**: `deployProject`, then run the `bytechef automation app bind workflow` command it prints.
+
+To change a code workflow: edit the file, deploy again, and take the new `PUBLISHED` version from `getProject`. Then run
+`updateAppApiCollectionVersion` for an endpoint, or `deployProject` for a schedule or a Call-workflow run. If
+`updateAppApiCollectionVersion` refuses because an endpoint's workflow is missing, a workflow `name` changed: restore it
+in the file and deploy again. Never pass `removeMissingEndpoints` to get past that refusal, since it deletes the
+endpoint the app calls. Never change a code project with a workflow tool (`buildWorkflow`, `updateWorkflow`,
+`createProjectWorkflow`, `deleteWorkflow`, `updateScriptComponentCode` or `publishProject`), even when a `deployProject`
+result suggests `draftWorkflowId`. The next deploy overwrites or publishes that edit, so the file is the only source.
+
 ## tools: listProjects, createProject, createProjectWorkflow
 Check whether the target project already exists with `listProjects`. If not, create it with
 `createProject`. Either way, create the workflow inside it with `createProjectWorkflow` — its
