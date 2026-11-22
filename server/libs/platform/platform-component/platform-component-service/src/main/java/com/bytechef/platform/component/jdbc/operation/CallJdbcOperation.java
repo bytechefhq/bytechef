@@ -30,6 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
@@ -152,60 +153,61 @@ public class CallJdbcOperation implements JdbcOperation<Map<String, Object>> {
     }
 
     private static List<SqlParameter> createDeclaredParameters(
-        List<SqlParameter> placeholders, Map<String, ?> parameterValues,
-        Map<String, ResolvedOutputParameter> outputParameters) {
+        List<SqlParameter> sqlParameters, Map<String, ?> parameterValues,
+        Map<String, ResolvedOutputParameter> nameResolvedOutputParameters) {
 
-        Set<String> placeholderNames = placeholders.stream()
+        Set<String> sqlParameterNames = sqlParameters.stream()
             .map(SqlParameter::getName)
             .collect(Collectors.toSet());
 
-        for (String outputParameterName : outputParameters.keySet()) {
-            if (!placeholderNames.contains(outputParameterName)) {
+        for (String resolvedOutputParameterName : nameResolvedOutputParameters.keySet()) {
+            if (!sqlParameterNames.contains(resolvedOutputParameterName)) {
                 throw new ConfigurationException(
-                    "Output parameter :" + outputParameterName + " is not used in the call statement.",
+                    "Output parameter :" + resolvedOutputParameterName + " is not used in the call statement.",
                     ComponentErrorType.INVALID_CALL_PARAMETER);
             }
         }
 
         List<SqlParameter> declaredParameters = new ArrayList<>();
-        Set<String> declaredOutputParameterNames = new HashSet<>();
+        Set<String> createdOutputParameterNames = new HashSet<>();
 
-        for (SqlParameter placeholder : placeholders) {
-            String name = placeholder.getName();
+        for (SqlParameter sqlParameter : sqlParameters) {
+            String sqlParameterName = Objects.requireNonNull(sqlParameter.getName());
 
-            ResolvedOutputParameter outputParameter = outputParameters.get(name);
+            ResolvedOutputParameter resolvedOutputParameter = nameResolvedOutputParameters.get(sqlParameterName);
 
-            if (outputParameter == null) {
-                if (!parameterValues.containsKey(name)) {
+            if (resolvedOutputParameter == null) {
+                if (!parameterValues.containsKey(sqlParameterName)) {
                     throw new ConfigurationException(
-                        "No value for input parameter :" + name + ". Add it to Parameters or declare it as an " +
-                            "output parameter.",
+                        "No value for input parameter :" + sqlParameterName + ". Add it to Parameters or declare it " +
+                            "as an output parameter.",
                         ComponentErrorType.INVALID_CALL_PARAMETER);
                 }
 
-                Object value = parameterValues.get(name);
+                Object parameterValue = parameterValues.get(sqlParameterName);
 
-                if (value instanceof Collection<?> || value instanceof Object[]) {
+                if (parameterValue instanceof Collection<?> || parameterValue instanceof Object[]) {
                     throw new ConfigurationException(
-                        "Input parameter :" + name + " must be a single value, not a list.",
+                        "Input parameter :" + sqlParameterName + " must be a single value, not a list.",
                         ComponentErrorType.INVALID_CALL_PARAMETER);
                 }
 
-                declaredParameters.add(new SqlParameter(name, SqlTypeValue.TYPE_UNKNOWN));
+                declaredParameters.add(new SqlParameter(sqlParameterName, SqlTypeValue.TYPE_UNKNOWN));
 
                 continue;
             }
 
-            if (!declaredOutputParameterNames.add(name)) {
+            if (!createdOutputParameterNames.add(sqlParameterName)) {
                 throw new ConfigurationException(
-                    "Output parameter :" + name + " is used more than once in the call statement.",
+                    "Output parameter :" + sqlParameterName + " is used more than once in the call statement.",
                     ComponentErrorType.INVALID_CALL_PARAMETER);
             }
 
-            if (outputParameter.inOut()) {
-                declaredParameters.add(new SqlInOutParameter(name, outputParameter.jdbcTypeNumber()));
+            if (resolvedOutputParameter.inOut()) {
+                declaredParameters
+                    .add(new SqlInOutParameter(sqlParameterName, resolvedOutputParameter.jdbcTypeNumber()));
             } else {
-                declaredParameters.add(new SqlOutParameter(name, outputParameter.jdbcTypeNumber()));
+                declaredParameters.add(new SqlOutParameter(sqlParameterName, resolvedOutputParameter.jdbcTypeNumber()));
             }
         }
 
