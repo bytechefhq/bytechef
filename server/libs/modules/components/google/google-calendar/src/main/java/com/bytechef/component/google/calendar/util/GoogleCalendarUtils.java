@@ -191,24 +191,35 @@ public class GoogleCalendarUtils {
     public static List<CustomEvent> getCustomEvents(Parameters inputParameters, Parameters connectionParameters) {
         Calendar calendar = GoogleServices.getCalendar(connectionParameters);
 
-        List<Event> items;
-        try {
-            items = calendar.events()
-                .list(inputParameters.getRequiredString(CALENDAR_ID))
-                .setEventTypes(inputParameters.getList(EVENT_TYPE, String.class, List.of()))
-                .setMaxResults(inputParameters.getInteger(MAX_RESULTS))
-                .setQ(inputParameters.getString(Q))
-                .execute()
-                .getItems();
-        } catch (IOException e) {
-            throw translateGoogleIOException(e);
-        }
-
         String calendarTimezone = getCalendarTimezone(calendar);
         Map<String, LocalDateTime> timePeriod = inputParameters.getMap(DATE_RANGE, LocalDateTime.class, Map.of());
 
         LocalDateTime from = timePeriod.get(FROM);
         LocalDateTime to = timePeriod.get(TO);
+
+        List<Event> items;
+        try {
+            Calendar.Events.List eventsList = calendar.events()
+                .list(inputParameters.getRequiredString(CALENDAR_ID))
+                .setEventTypes(inputParameters.getList(EVENT_TYPE, String.class, List.of()))
+                .setMaxResults(inputParameters.getInteger(MAX_RESULTS))
+                .setQ(inputParameters.getString(Q))
+                .setSingleEvents(true)
+                .setOrderBy("startTime");
+
+            if (from != null) {
+                eventsList.setTimeMin(new DateTime(convertLocalDateTimeToDateInTimezone(from, calendarTimezone)));
+            }
+
+            if (to != null) {
+                eventsList.setTimeMax(new DateTime(convertLocalDateTimeToDateInTimezone(to, calendarTimezone)));
+            }
+
+            items = eventsList.execute()
+                .getItems();
+        } catch (IOException e) {
+            throw translateGoogleIOException(e);
+        }
 
         return convertToCustomEvents(filterEvents(from, to, items, calendarTimezone), calendarTimezone);
     }

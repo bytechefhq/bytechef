@@ -75,6 +75,8 @@ import org.mockito.MockedStatic;
  */
 class GoogleCalendarUtilsTest {
 
+    private final ArgumentCaptor<Boolean> booleanArgumentCaptor = forClass(Boolean.class);
+    private final ArgumentCaptor<DateTime> dateTimeArgumentCaptor = forClass(DateTime.class);
     private final ArgumentCaptor<Event> eventArgumentCaptor = forClass(Event.class);
     private final ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
     @SuppressWarnings("rawtypes")
@@ -328,6 +330,14 @@ class GoogleCalendarUtilsTest {
                 .thenReturn(mockedEventsList);
             when(mockedEventsList.setQ(stringArgumentCaptor.capture()))
                 .thenReturn(mockedEventsList);
+            when(mockedEventsList.setSingleEvents(booleanArgumentCaptor.capture()))
+                .thenReturn(mockedEventsList);
+            when(mockedEventsList.setOrderBy(stringArgumentCaptor.capture()))
+                .thenReturn(mockedEventsList);
+            when(mockedEventsList.setTimeMin(dateTimeArgumentCaptor.capture()))
+                .thenReturn(mockedEventsList);
+            when(mockedEventsList.setTimeMax(dateTimeArgumentCaptor.capture()))
+                .thenReturn(mockedEventsList);
             when(mockedEventsList.execute())
                 .thenReturn(new Events().setItems(List.of(e1, e2, e3, e4, e5, e6, e7, e8, e9)));
 
@@ -353,14 +363,23 @@ class GoogleCalendarUtilsTest {
                     createCustomEvent(e4, timezone), createCustomEvent(e9, timezone)),
                 result);
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
-            assertEquals(List.of(10, 250), integerArgumentCaptor.getAllValues());
+            assertEquals(List.of(250, 10), integerArgumentCaptor.getAllValues());
             assertEquals(eventTypes, listArgumentCaptor.getValue());
+            assertEquals(true, booleanArgumentCaptor.getValue());
+            assertEquals(
+                List.of(
+                    new DateTime(
+                        convertLocalDateTimeToDateInTimezone(LocalDateTime.of(2024, 9, 3, 12, 0), timezone)),
+                    new DateTime(
+                        convertLocalDateTimeToDateInTimezone(LocalDateTime.of(2024, 9, 5, 10, 0), timezone))),
+                dateTimeArgumentCaptor.getAllValues());
 
             List<String> strings = new ArrayList<>();
 
+            strings.add(null);
             strings.add("calendarId");
             strings.add("q");
-            strings.add(null);
+            strings.add("startTime");
 
             assertEquals(strings, stringArgumentCaptor.getAllValues());
         }
