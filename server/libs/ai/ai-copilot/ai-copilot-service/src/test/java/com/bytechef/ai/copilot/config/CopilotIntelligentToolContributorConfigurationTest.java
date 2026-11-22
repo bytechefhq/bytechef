@@ -635,6 +635,7 @@ final class CopilotIntelligentToolContributorConfigurationTest {
             connectionListerProvider, mock(WorkspaceConnectionFacade.class), propertyOptionsResolver);
 
         return new CopilotConfiguration(
+            promptResource, promptResource,
             promptResource, promptResource, promptResource, promptResource, promptResource, promptResource,
             promptResource, promptResource, promptResource, promptResource, promptResource, workflowValidatorTools,
             workflowInstructionTools,

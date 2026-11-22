@@ -34,6 +34,8 @@ public enum CopilotAgentType implements AgentType {
     CONVERTER_BUILD(Source.CONVERTER, Mode.BUILD),
     SKILLS_ASK(Source.SKILLS, Mode.ASK),
     SKILLS_BUILD(Source.SKILLS, Mode.BUILD),
+    JSON_SCHEMA_BUILDER_ASK(Source.JSON_SCHEMA_BUILDER, Mode.ASK),
+    JSON_SCHEMA_BUILDER_BUILD(Source.JSON_SCHEMA_BUILDER, Mode.BUILD),
     MCP_SERVER_BUILD(Source.MCP_SERVER, Mode.BUILD),
     SKILLS("skills"),
     CONFIGURE_CLUSTER_ELEMENT("configureClusterElement"),
