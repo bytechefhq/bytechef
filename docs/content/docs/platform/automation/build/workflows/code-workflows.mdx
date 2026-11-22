@@ -103,7 +103,7 @@ ByteChef re-evaluates the file for every task run, so top-level code should only
 
 | Member | Type | Required | |
 |---|---|---|---|
-| `name` | string | Yes | The project's identity. Deploying again under the same name updates the project. |
+| `name` | string | Yes | The project's identity. Deploying again under the same name updates the project; a name already used by a visual project is refused. |
 | `version` | string | No | Defaults to `0.0.1`. |
 | `description` | string | No | |
 | `workflows` | list of workflows | No | |
@@ -1083,7 +1083,9 @@ What the endpoint does:
   deployed version becomes the published one. An upload replaces any unpublished editor changes.
 - **It upserts by name.** The project is matched on the `name` in the definition within the workspace. The first
   deploy creates the project; every deploy after that publishes a new version of it, and each workflow keeps its
-  identity by name.
+  identity by name. A deploy whose name matches a visual project (one not created from code) is refused with a
+  name clash and changes nothing; rename the project in the source or the visual project, then deploy again. The
+  caller must also be allowed to edit and publish the matched project.
 - **Without `enable`, deployments don't move.** Existing deployments keep running the version they are on until you
   move them in the UI.
 - **`enable=true` makes it live in the request's environment.** When the project has no deployment there, ByteChef
