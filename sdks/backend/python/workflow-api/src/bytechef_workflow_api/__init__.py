@@ -9,6 +9,7 @@ from typing import Any, Callable, Dict, List, Literal, Protocol, TypedDict, Unio
 __all__ = [
     "ClusterElement",
     "ClusterElements",
+    "ComponentTaskDefinition",
     "ConnectionRequirement",
     "ConnectionSpec",
     "ForkJoinTaskDefinition",
@@ -105,9 +106,25 @@ class TaskDefinition(_TaskDefinitionRequired, total=False):
     label: str
 
 
+class _ComponentTaskDefinitionRequired(TypedDict):
+    name: str
+    type: str
+
+
+class ComponentTaskDefinition(_ComponentTaskDefinitionRequired, total=False):
+    """A task that runs a component action, as the same task in a visual workflow does. ``type`` names the action as
+    ``<component>/v<version>/<action>``; ``parameters`` are the action's inputs, and string values may hold ``${...}``
+    expressions such as ``${fetch_orders}``. It has no ``perform`` and no ``connections``: the deployment supplies the
+    component's connection."""
+
+    description: str
+    label: str
+    parameters: Dict[str, Any]
+
+
 class _ParallelTaskDefinitionRequired(TypedDict):
     name: str
-    tasks: List[TaskDefinition]
+    tasks: List[Union[TaskDefinition, ComponentTaskDefinition]]
     type: Literal["parallel"]
 
 
@@ -119,7 +136,7 @@ class ParallelTaskDefinition(_ParallelTaskDefinitionRequired, total=False):
 
 
 class _ForkJoinTaskDefinitionRequired(TypedDict):
-    branches: List[List[TaskDefinition]]
+    branches: List[List[Union[TaskDefinition, ComponentTaskDefinition]]]
     name: str
     type: Literal["forkJoin"]
 
@@ -131,7 +148,7 @@ class ForkJoinTaskDefinition(_ForkJoinTaskDefinitionRequired, total=False):
     label: str
 
 
-WorkflowTask = Union[TaskDefinition, ParallelTaskDefinition, ForkJoinTaskDefinition]
+WorkflowTask = Union[TaskDefinition, ComponentTaskDefinition, ParallelTaskDefinition, ForkJoinTaskDefinition]
 """An entry of a workflow's ``tasks``. A group can't contain another group."""
 
 

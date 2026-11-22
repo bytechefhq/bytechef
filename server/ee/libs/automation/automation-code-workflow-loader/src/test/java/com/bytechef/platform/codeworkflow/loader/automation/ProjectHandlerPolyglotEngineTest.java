@@ -342,6 +342,32 @@ class ProjectHandlerPolyglotEngineTest {
     }
 
     @Test
+    void testLoadsThePythonApiEndpointExample() throws Exception {
+        String source = Files.readString(
+            Path.of(System.getProperty("bytechef.sdks.dir"), "backend/python/workflow-api/examples/api_endpoint.py"),
+            StandardCharsets.UTF_8);
+
+        ProjectDefinition projectDefinition = ProjectHandlerPolyglotEngine.load("python", source)
+            .getDefinition();
+
+        WorkflowDefinition workflowDefinition = projectDefinition.getWorkflows()
+            .getFirst();
+
+        assertEquals(
+            "apiPlatform/v1/newApiRequest", workflowDefinition.getTriggers()
+                .orElseThrow()
+                .getFirst()
+                .getType());
+
+        List<? extends WorkflowTaskDefinition> tasks = workflowDefinition.getTasks()
+            .orElseThrow();
+
+        ComponentTaskDefinition respondTask = assertInstanceOf(ComponentTaskDefinition.class, tasks.getLast());
+
+        assertEquals("apiPlatform/v1/responseToAPIRequest", respondTask.getType());
+    }
+
+    @Test
     void testLoadsAProjectWithoutWorkflows() {
         ProjectDefinition projectDefinition = ProjectHandlerPolyglotEngine.load("js", "({name: 'empty'})")
             .getDefinition();

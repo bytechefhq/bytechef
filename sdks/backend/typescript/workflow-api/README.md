@@ -45,6 +45,28 @@ file. `satisfies` and the directive leave nothing behind, so the
 output is the plain object literal ByteChef expects. Plain JavaScript files get the same checks through `// @ts-check`
 and a JSDoc `@type {ByteChef.ProjectDefinition}` annotation.
 
+## Component tasks
+
+A task with a `type` of the form `<component>/v<version>/<action>` runs that component action, the same way the task
+runs in a visual workflow. Give it `parameters` instead of a `perform`; string values may hold `${...}` expressions that
+read workflow inputs and earlier task outputs by name. It declares no `connections`: the deployment supplies the
+component's connection. A component task can stand at the top level or inside a `parallel` or `forkJoin` group.
+
+This is how a code workflow backs an API Platform endpoint: an `apiPlatform/v1/newApiRequest` trigger, `perform` tasks
+for the logic, and a final `apiPlatform/v1/responseToAPIRequest` component task that returns the response
+(see [`examples/api-endpoint.ts`](examples/api-endpoint.ts)):
+
+```ts
+{
+    name: 'respond',
+    parameters: {response: {success: '${fetch_orders}'}, responseType: 'SUCCESS'},
+    type: 'apiPlatform/v1/responseToAPIRequest',
+}
+```
+
+ByteChef checks at deploy time that the component, its version and the action exist, and rejects the deploy with a
+message naming the task when one doesn't.
+
 ## Types
 
 | Type | Describes |
@@ -53,11 +75,11 @@ and a JSDoc `@type {ByteChef.ProjectDefinition}` annotation.
 | `IntegrationDefinition` | An embedded code integration, identified by `componentName` and `componentVersion` |
 | `WorkflowDefinition` | A workflow: `inputs`, `outputs`, `triggers` and `tasks` |
 | `InputDefinition` | A workflow input; `componentName`, `componentVersion` and `groupName` take its options from a component's declared input, such as Slack's `channel` |
-| `TaskDefinition`, `ParallelTaskDefinition`, `ForkJoinTaskDefinition` | A task, and the two task groups |
+| `TaskDefinition`, `ComponentTaskDefinition`, `ParallelTaskDefinition`, `ForkJoinTaskDefinition` | A `perform` task, a component task, and the two task groups |
 | `TaskContext`, `TaskInput`, `TaskConnections` | The `context`, `input` and `connection` passed to `perform`; `context` carries `component` and `log` |
 | `ConnectionRequirement`, `ClusterElement` | A task's declared connections, and cluster elements composed at a call site |
 
-See [`examples/`](examples) for a project and an integration.
+See [`examples/`](examples) for a project, an API endpoint and an integration.
 
 ## Install
 

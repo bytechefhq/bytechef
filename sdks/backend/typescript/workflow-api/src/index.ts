@@ -102,13 +102,29 @@ export interface TaskDefinition {
 }
 
 /**
+ * A task that runs a component action, as the same task in a visual workflow does. `type` names the action as
+ * `<component>/v<version>/<action>`; `parameters` are the action's inputs, and string values may hold `${...}`
+ * expressions such as `${fetch_orders}`. It has no `perform`, and no `connections`: the deployment supplies the
+ * component's connection.
+ */
+export interface ComponentTaskDefinition {
+    connections?: never;
+    description?: string;
+    label?: string;
+    name: string;
+    parameters?: Record<string, unknown>;
+    perform?: never;
+    type: `${string}/v${number}/${string}`;
+}
+
+/**
  * A group whose tasks all start at the same time. They can't read each other's output.
  */
 export interface ParallelTaskDefinition {
     description?: string;
     label?: string;
     name: string;
-    tasks: TaskDefinition[];
+    tasks: (TaskDefinition | ComponentTaskDefinition)[];
     type: 'parallel';
 }
 
@@ -116,7 +132,7 @@ export interface ParallelTaskDefinition {
  * A group whose branches run at the same time. The tasks within a branch run in order.
  */
 export interface ForkJoinTaskDefinition {
-    branches: TaskDefinition[][];
+    branches: (TaskDefinition | ComponentTaskDefinition)[][];
     description?: string;
     label?: string;
     name: string;
@@ -126,7 +142,7 @@ export interface ForkJoinTaskDefinition {
 /**
  * An entry of a workflow's `tasks`. A group can't contain another group.
  */
-export type WorkflowTask = TaskDefinition | ParallelTaskDefinition | ForkJoinTaskDefinition;
+export type WorkflowTask = TaskDefinition | ComponentTaskDefinition | ParallelTaskDefinition | ForkJoinTaskDefinition;
 
 export type InputType = 'BOOLEAN' | 'DATE' | 'DATE_TIME' | 'FIELD_MAPPING' | 'INTEGER' | 'NUMBER' | 'STRING' | 'TIME';
 
@@ -211,6 +227,7 @@ declare global {
         type ClusterElement = import('./index.js').ClusterElement;
         type ClusterElements = import('./index.js').ClusterElements;
         type ComponentAction = import('./index.js').ComponentAction;
+        type ComponentTaskDefinition = import('./index.js').ComponentTaskDefinition;
         type ConnectionRequirement = import('./index.js').ConnectionRequirement;
         type ForkJoinTaskDefinition = import('./index.js').ForkJoinTaskDefinition;
         type InputConnectionContextPerformFunction = import('./index.js').InputConnectionContextPerformFunction;
