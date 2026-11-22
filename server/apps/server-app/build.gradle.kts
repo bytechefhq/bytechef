@@ -113,6 +113,7 @@ dependencies {
     implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-tool"))
     implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-tool"))
+    implementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-tool"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-repository:platform-ai-auto-memory-repository-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-repository:platform-ai-auto-memory-repository-file-storage"))

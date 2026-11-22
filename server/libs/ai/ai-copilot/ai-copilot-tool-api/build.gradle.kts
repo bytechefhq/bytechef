@@ -1,6 +1,5 @@
 dependencies {
     implementation("org.slf4j:slf4j-api")
-    implementation(libs.org.springaicommunity.spring.ai.agent.utils)
     implementation("org.springframework.security:spring-security-core")
     implementation("org.springframework.ai:spring-ai-client-chat")
     implementation("org.springframework.ai:spring-ai-model")

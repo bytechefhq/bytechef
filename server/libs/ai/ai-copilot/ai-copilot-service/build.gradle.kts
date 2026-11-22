@@ -105,6 +105,7 @@ spotless {
 
 dependencies {
     implementation(libs.com.github.mizosoft.methanol)
+    implementation(libs.org.springaicommunity.spring.ai.agent.utils)
     implementation("com.openai:openai-java-client-okhttp")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.ai:spring-ai-commons")
