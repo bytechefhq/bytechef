@@ -27,10 +27,12 @@ import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolContributor;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolScope;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.copilot.tool.catalog.SimpleIntelligentToolDefinition;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import java.util.List;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -44,42 +46,72 @@ class CopilotIntelligentToolContributorConfiguration {
 
     @Bean
     IntelligentToolContributor copilotIntelligentToolContributor(
-        @Qualifier("workflowEditorBuildSubAgentChatClientFactory") ObjectProvider<IntelligentToolChatClientFactory> workflowEditorBuildFactoryProvider,
-        @Qualifier("converterBuildSubAgentChatClientFactory") ObjectProvider<IntelligentToolChatClientFactory> converterBuildFactoryProvider,
-        @Qualifier("clusterElementBuildSubAgentChatClientFactory") ObjectProvider<IntelligentToolChatClientFactory> clusterElementBuildFactoryProvider,
-        @Qualifier("codeEditorBuildSubAgentChatClientFactory") ObjectProvider<IntelligentToolChatClientFactory> codeEditorBuildFactoryProvider,
-        @Qualifier("skillsBuildSubAgentChatClientFactory") ObjectProvider<IntelligentToolChatClientFactory> skillsBuildFactoryProvider,
-        @Qualifier("workflowExecutionBuildSubAgentChatClientFactory") ObjectProvider<IntelligentToolChatClientFactory> workflowExecutionBuildFactoryProvider,
+        @Qualifier("workflowEditorAskSubAgentChatClientFactory") //
+        ObjectProvider<IntelligentToolChatClientFactory> workflowEditorAskFactoryProvider,
+        @Qualifier("workflowEditorBuildSubAgentChatClientFactory") //
+        ObjectProvider<IntelligentToolChatClientFactory> workflowEditorBuildFactoryProvider,
+        @Qualifier("converterBuildSubAgentChatClientFactory") //
+        ObjectProvider<IntelligentToolChatClientFactory> converterBuildFactoryProvider,
+        @Qualifier("clusterElementAskSubAgentChatClientFactory") //
+        ObjectProvider<IntelligentToolChatClientFactory> clusterElementAskFactoryProvider,
+        @Qualifier("clusterElementBuildSubAgentChatClientFactory") //
+        ObjectProvider<IntelligentToolChatClientFactory> clusterElementBuildFactoryProvider,
+        @Qualifier("codeEditorAskSubAgentChatClientFactory") //
+        ObjectProvider<IntelligentToolChatClientFactory> codeEditorAskFactoryProvider,
+        @Qualifier("codeEditorBuildSubAgentChatClientFactory") //
+        ObjectProvider<IntelligentToolChatClientFactory> codeEditorBuildFactoryProvider,
+        @Qualifier("skillsAskSubAgentChatClientFactory") //
+        ObjectProvider<IntelligentToolChatClientFactory> skillsAskFactoryProvider,
+        @Qualifier("skillsBuildSubAgentChatClientFactory") //
+        ObjectProvider<IntelligentToolChatClientFactory> skillsBuildFactoryProvider,
+        @Qualifier("workflowExecutionBuildSubAgentChatClientFactory") //
+        ObjectProvider<IntelligentToolChatClientFactory> workflowExecutionBuildFactoryProvider,
         ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider) {
 
         SubAgentChatModelResolver chatModelResolver = chatModelResolverProvider.getIfAvailable();
 
         List<IntelligentToolDefinition> definitions = List.of(
             new SimpleIntelligentToolDefinition(
-                "buildWorkflow", CopilotAgentType.BUILD_WORKFLOW.key(), Set.of(IntelligentToolScope.PROJECT),
-                variant -> workflowEditorBuildFactoryProvider.getIfAvailable(),
+                "buildWorkflow", CopilotAgentType.BUILD_WORKFLOW,
+                Set.of(IntelligentToolScope.PROJECT),
+                variant -> factoryForVariant(
+                    variant, workflowEditorAskFactoryProvider, workflowEditorBuildFactoryProvider),
                 chatClientFactory -> new ProjectWorkflowAgentToolCallback(chatClientFactory, chatModelResolver)),
             new SimpleIntelligentToolDefinition(
-                "importWorkflow", CopilotAgentType.IMPORT_WORKFLOW.key(), Set.of(IntelligentToolScope.PROJECT),
-                variant -> converterBuildFactoryProvider.getIfAvailable(),
+                "importWorkflow", CopilotAgentType.IMPORT_WORKFLOW, Set.of(IntelligentToolScope.PROJECT),
+                variant -> variant == IntelligentToolVariant.BUILD
+                    ? converterBuildFactoryProvider.getIfAvailable() : null,
                 chatClientFactory -> new ConverterAgentToolCallback(chatClientFactory, chatModelResolver)),
             new SimpleIntelligentToolDefinition(
-                "configureClusterElement", CopilotAgentType.CONFIGURE_CLUSTER_ELEMENT.key(), Set.of(),
-                variant -> clusterElementBuildFactoryProvider.getIfAvailable(),
+                "configureClusterElement", CopilotAgentType.CONFIGURE_CLUSTER_ELEMENT, Set.of(),
+                variant -> factoryForVariant(
+                    variant, clusterElementAskFactoryProvider, clusterElementBuildFactoryProvider),
                 chatClientFactory -> new ClusterElementAgentToolCallback(chatClientFactory, chatModelResolver)),
             new SimpleIntelligentToolDefinition(
-                "writeScript", CopilotAgentType.WRITE_SCRIPT.key(), Set.of(),
-                variant -> codeEditorBuildFactoryProvider.getIfAvailable(),
+                "writeScript", CopilotAgentType.WRITE_SCRIPT, Set.of(),
+                variant -> factoryForVariant(variant, codeEditorAskFactoryProvider, codeEditorBuildFactoryProvider),
                 chatClientFactory -> new CodeEditorAgentToolCallback(chatClientFactory, chatModelResolver)),
             new SimpleIntelligentToolDefinition(
-                "authorSkill", CopilotAgentType.SKILLS.key(), Set.of(),
-                variant -> skillsBuildFactoryProvider.getIfAvailable(),
+                "authorSkill", CopilotAgentType.SKILLS, Set.of(),
+                variant -> factoryForVariant(variant, skillsAskFactoryProvider, skillsBuildFactoryProvider),
                 chatClientFactory -> new SkillsAgentToolCallback(chatClientFactory, chatModelResolver)),
             new SimpleIntelligentToolDefinition(
-                "debugWorkflowExecution", CopilotAgentType.DEBUG_WORKFLOW_EXECUTION.key(), Set.of(),
-                variant -> workflowExecutionBuildFactoryProvider.getIfAvailable(),
+                "debugWorkflowExecution", CopilotAgentType.DEBUG_WORKFLOW_EXECUTION, Set.of(),
+                variant -> variant == IntelligentToolVariant.BUILD
+                    ? workflowExecutionBuildFactoryProvider.getIfAvailable() : null,
                 chatClientFactory -> new WorkflowExecutionAgentToolCallback(chatClientFactory, chatModelResolver)));
 
         return () -> definitions;
+    }
+
+    @Nullable
+    private static IntelligentToolChatClientFactory factoryForVariant(
+        IntelligentToolVariant variant, ObjectProvider<IntelligentToolChatClientFactory> askProvider,
+        ObjectProvider<IntelligentToolChatClientFactory> buildProvider) {
+
+        return switch (variant) {
+            case ASK -> askProvider.getIfAvailable();
+            case BUILD -> buildProvider.getIfAvailable();
+        };
     }
 }

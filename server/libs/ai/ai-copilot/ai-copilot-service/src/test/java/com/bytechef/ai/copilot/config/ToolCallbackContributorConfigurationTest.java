@@ -23,10 +23,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.agent.tool.AgentType;
+import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolContributor;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolScope;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -47,6 +50,7 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.mcp.domain.McpServer;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Nested;
@@ -312,7 +316,7 @@ class ToolCallbackContributorConfigurationTest {
                 .build());
 
         return new FakeIntelligentToolDefinition(
-            name, Map.of(IntelligentToolVariant.BUILD, (IntelligentToolChatClientFactory) () -> chatClient),
+            name, Map.of(IntelligentToolVariant.BUILD, (IntelligentToolChatClientFactory) chatModel -> chatClient),
             toolCallback);
     }
 
@@ -356,6 +360,16 @@ class ToolCallbackContributorConfigurationTest {
         @Override
         public String name() {
             return name;
+        }
+
+        @Override
+        public AgentType agentType() {
+            return CopilotAgentType.BUILD_WORKFLOW;
+        }
+
+        @Override
+        public Set<IntelligentToolScope> panelScopes() {
+            return Set.of();
         }
 
         @Override
