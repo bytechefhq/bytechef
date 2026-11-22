@@ -63,4 +63,14 @@ describe('WorkflowEditorLayout post-turn invalidation', () => {
 
         expect(invalidateQueries).toHaveBeenCalledWith({queryKey: ['workflowTestConfigurations']});
     });
+
+    it('invalidates workflow test configurations after a Copilot turn in the embedded editor', () => {
+        routeParams.current = {integrationId: '1', integrationWorkflowId: '2'};
+
+        renderLayout();
+
+        useCopilotPostTurnRegistry.getState().runFor(Source.WORKFLOW_EDITOR_EMBEDDED);
+
+        expect(invalidateQueries).toHaveBeenCalledWith({queryKey: ['workflowTestConfigurations']});
+    });
 });
