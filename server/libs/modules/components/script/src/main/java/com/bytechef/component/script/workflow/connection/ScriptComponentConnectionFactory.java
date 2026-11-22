@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -92,6 +92,6 @@ class ScriptComponentConnectionFactory
     @Override
     public Optional<ComponentConnectionFactory> resolve(ComponentDefinition componentDefinition) {
         return Optional.ofNullable(
-            StringUtils.startsWith(componentDefinition.getName(), ScriptComponentDefinition.SCRIPT) ? this : null);
+            Strings.CS.startsWith(componentDefinition.getName(), ScriptComponentDefinition.SCRIPT) ? this : null);
     }
 }
