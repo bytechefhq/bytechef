@@ -23,8 +23,10 @@ import com.bytechef.automation.ai.mcp.tool.config.McpServerMcpContributorConfigu
 import com.bytechef.automation.ai.tool.config.CopilotAgentMcpContributorConfiguration;
 import com.bytechef.automation.configuration.tool.ProjectWorkflowTools;
 import com.bytechef.automation.configuration.tool.config.DeploymentMcpContributorConfiguration;
+import com.bytechef.automation.connection.tool.config.WorkflowAuthoringMcpContributorConfiguration;
 import com.bytechef.automation.knowledgebase.tool.config.KnowledgeBaseMcpContributorConfiguration;
 import com.bytechef.ee.ai.hub.config.AiHubConfiguration;
+import com.bytechef.ee.embedded.configuration.tool.config.EmbeddedCopilotMcpContributorConfiguration;
 import java.lang.reflect.Executable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -37,8 +39,8 @@ import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * Guards the one-path-per-capability rule for workflow content across every surface that registers the
- * {@code buildWorkflow} intelligent tool: the management MCP server, the Copilot tool contributors that feed it, and
- * the AI Hub BUILD agent.
+ * {@code buildWorkflow} intelligent tool: the management MCP server, the Copilot and embedded tool contributors that
+ * feed it, and the AI Hub BUILD agent.
  *
  * <p>
  * {@link ProjectWorkflowTools} exposes {@code updateWorkflow} and a {@code createProjectWorkflow} that accepts a
@@ -55,7 +57,8 @@ class WorkflowContentSinglePathTest {
     private static final List<Class<?>> BUILD_WORKFLOW_SURFACES = List.of(
         ManagementMcpServerConfiguration.class, CopilotAgentMcpContributorConfiguration.class,
         McpServerMcpContributorConfiguration.class, DeploymentMcpContributorConfiguration.class,
-        KnowledgeBaseMcpContributorConfiguration.class, AiHubConfiguration.class);
+        WorkflowAuthoringMcpContributorConfiguration.class, KnowledgeBaseMcpContributorConfiguration.class,
+        EmbeddedCopilotMcpContributorConfiguration.class, AiHubConfiguration.class);
 
     @Test
     void testNoBuildWorkflowSurfaceInjectsProjectWorkflowTools() {

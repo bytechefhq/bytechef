@@ -107,6 +107,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-tool"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-agent-api"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-agent:automation-ai-agent-tool"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-tool"))
@@ -408,6 +409,7 @@ dependencies {
 
     testImplementation(project(":sdks:backend:java:component-api"))
     testImplementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))
+    testImplementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-tool"))
     testImplementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     testImplementation(project(":server:libs:test:test-int-support"))
