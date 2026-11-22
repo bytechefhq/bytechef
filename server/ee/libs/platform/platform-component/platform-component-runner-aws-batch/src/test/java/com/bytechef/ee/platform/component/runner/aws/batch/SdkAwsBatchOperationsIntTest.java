@@ -49,6 +49,7 @@ class SdkAwsBatchOperationsIntTest {
     private static URI endpoint;
 
     @BeforeAll
+    @Timeout(value = 5, unit = TimeUnit.MINUTES)
     static void startLocalStack() {
         assumeTrue(
             DockerClientFactory.instance()
