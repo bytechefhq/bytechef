@@ -37,11 +37,15 @@ export async function createWorkflow(page: Page, projectId: string, workflowName
 
     await projectsPage.waitForPageLoad();
 
-    const projectItem = page.getByLabel(projectId, {exact: true});
+    const projectRow = page.locator(`[data-project-id="${projectId}"]`);
 
-    await expect(projectItem).toBeVisible({timeout: 60000});
+    await expect(projectRow).toBeVisible({timeout: 60000});
 
-    const createWorkflowButton = projectItem.getByRole('button', {name: 'Create Workflow'});
+    const createWorkflowButton = projectRow.getByRole('button', {exact: true, name: 'Create Workflow'}).first();
+
+    if (!(await createWorkflowButton.isVisible())) {
+        await projectRow.getByRole('button', {name: 'Toggle project'}).click();
+    }
 
     await createWorkflowButton.click();
 
