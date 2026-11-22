@@ -265,6 +265,31 @@ class ProjectCodeWorkflowFacadeIntTest {
         assertThat(project.getWorkspaceId()).isEqualTo(WORKSPACE_ID);
     }
 
+    @Test
+    void testSaveOfASourceThatFailsToLoadIsAConfigurationException() {
+        authenticate(AuthorityConstants.ADMIN);
+
+        String loaderMessage = "SyntaxError: Expected an operand but found export";
+
+        try (MockedStatic<ProjectHandlerLoader> projectHandlerLoader = mockStatic(ProjectHandlerLoader.class)) {
+            projectHandlerLoader
+                .when(() -> ProjectHandlerLoader.loadProjectHandler(any(), any(), any(), any()))
+                .thenThrow(new IllegalStateException(loaderMessage));
+
+            assertThatThrownBy(() -> projectCodeWorkflowFacade.save(WORKSPACE_ID, new byte[0], Language.JAVASCRIPT))
+                .isInstanceOf(ConfigurationException.class)
+                .hasMessageContaining(loaderMessage)
+                .satisfies(thrown -> {
+                    ConfigurationException configurationException = (ConfigurationException) thrown;
+
+                    assertThat(configurationException.getErrorKey()).isEqualTo(104);
+                });
+        }
+
+        verify(projectService, never()).create(any());
+        verify(projectService, never()).update(any());
+    }
+
     private void saveProjectNamed(String name) {
         ProjectDefinition projectDefinition = mock(ProjectDefinition.class);
 

@@ -117,7 +117,15 @@ public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjec
                 CodeWorkflowErrorType.JAVA_CODE_WORKFLOW_UPLOAD_DISABLED);
         }
 
-        ProjectDefinition projectDefinition = loadProjectDefinition(language, bytes);
+        ProjectDefinition projectDefinition;
+
+        try {
+            projectDefinition = loadProjectDefinition(language, bytes);
+        } catch (RuntimeException exception) {
+            throw new ConfigurationException(
+                "Failed to load code workflow source: " + exception.getMessage(),
+                CodeWorkflowErrorType.SOURCE_LOAD_FAILED);
+        }
 
         long projectId = automationProjectFacade.fetchProjectIdByName(projectDefinition.getName())
             .orElseGet(() -> automationProjectFacade.createProject(

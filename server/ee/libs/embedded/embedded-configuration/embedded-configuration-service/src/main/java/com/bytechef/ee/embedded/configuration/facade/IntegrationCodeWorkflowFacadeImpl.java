@@ -500,8 +500,9 @@ public class IntegrationCodeWorkflowFacadeImpl implements IntegrationCodeWorkflo
 
         try {
             integrationDefinition = loadIntegrationDefinition(language, bytes);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new ConfigurationException(
+                "Failed to load code workflow source: " + e.getMessage(), CodeWorkflowErrorType.SOURCE_LOAD_FAILED);
         }
 
         Integration integration = resolveUploadTarget(integrationDefinition);

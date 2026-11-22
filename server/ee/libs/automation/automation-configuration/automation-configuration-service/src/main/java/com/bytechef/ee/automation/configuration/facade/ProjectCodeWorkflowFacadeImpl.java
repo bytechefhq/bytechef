@@ -397,8 +397,9 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
 
         try {
             projectDefinition = loadProjectDefinition(language, bytes);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new ConfigurationException(
+                "Failed to load code workflow source: " + e.getMessage(), CodeWorkflowErrorType.SOURCE_LOAD_FAILED);
         }
 
         Project project = projectService.fetchProject(projectDefinition.getName(), workspaceId)
