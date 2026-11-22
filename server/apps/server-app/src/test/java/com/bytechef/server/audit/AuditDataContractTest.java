@@ -168,6 +168,7 @@ class AuditDataContractTest {
         Map.entry("PropertyCopilotFacadeImpl.generatePropertyValue", SUGGESTION),
         Map.entry("TaskDispatcherDefinitionFacadeImpl.executeOutput", OUTPUT_PREVIEW),
         Map.entry("WebSearchProviderFacadeImpl.testWebSearchProvider", CONNECTIVITY_CHECK),
+        Map.entry("WorkflowDescriptionCopilotFacadeImpl.generateWorkflowDescription", SUGGESTION),
         Map.entry("WorkspaceApiKeyFacadeImpl.create", DELEGATES),
         Map.entry("WorkspaceApiKeyFacadeImpl.delete", DELEGATES),
         Map.entry("WorkspaceDataTableFacadeImpl.addColumn", DELEGATES),
