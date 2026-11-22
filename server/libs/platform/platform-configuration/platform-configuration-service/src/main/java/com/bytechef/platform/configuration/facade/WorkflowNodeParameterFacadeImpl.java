@@ -43,6 +43,7 @@ import com.bytechef.platform.configuration.dto.ParameterResultDTO;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -61,6 +62,7 @@ import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
@@ -107,6 +109,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_EDIT', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     public ParameterResultDTO deleteClusterElementParameter(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, String parameterPath, long environmentId) {
@@ -156,6 +160,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_EDIT', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     public ParameterResultDTO deleteWorkflowNodeParameter(
         String workflowId, String workflowNodeName, String parameterPath,
         long environmentId) {
@@ -238,6 +244,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             "", structureOperationType, parameters, Map.of(), Map.of(), properties, false, Map.of());
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
     @Override
     public DisplayConditionResultDTO getClusterElementDisplayConditions(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
@@ -268,6 +275,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             displayConditionMap, new ArrayList<>(workflowNodeStructure.missingRequiredProperties));
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_VIEW', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     @Override
     public Set<String> getClusterElementMissingRequiredProperties(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
@@ -283,6 +292,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         return Set.copyOf(workflowNodeStructure.missingRequiredProperties);
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
     @Override
     public DisplayConditionResultDTO getWorkflowNodeDisplayConditions(
         String workflowId, String workflowNodeName, long environmentId) {
@@ -316,6 +326,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             displayConditionMap, new ArrayList<>(workflowNodeStructure.missingRequiredProperties));
     }
 
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_VIEW', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     @Override
     public Set<String> getWorkflowNodeMissingRequiredProperties(String workflowId, String workflowNodeName) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -332,6 +344,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_EDIT', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     public ParameterResultDTO updateClusterElementParameter(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, String parameterPath, Object value, String type,
@@ -384,6 +398,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_EDIT', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     public ParameterResultDTO updateWorkflowNodeParameter(
         String workflowId, String workflowNodeName, String parameterPath, Object value, String type,
         boolean includeInMetadata, long environmentId) {
@@ -755,8 +771,10 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         Workflow workflow, String workflowNodeName,
         WorkflowNodeStructure.OperationType operationType, long environmentId) {
 
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
         Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflow.getId(), environmentId);
+            workflow.getId(), effectiveEnvironmentId);
 
         Map<String, ?> previousOutputs = Map.of();
 
@@ -768,7 +786,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
             if (workflowTask != null) {
                 previousOutputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-                    workflow.getId(), workflowTask.getName(), environmentId);
+                    workflow.getId(), workflowTask.getName(), effectiveEnvironmentId);
             }
         }
 

@@ -11,6 +11,7 @@ import static com.bytechef.ee.component.apiplatform.constant.ApiPlatformConstant
 import static com.bytechef.ee.component.apiplatform.constant.ApiPlatformConstants.RESPONSE_TO_API_REQUEST;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,10 @@ import org.springframework.stereotype.Component;
 @Component(API_PLATFORM + "/v1/" + RESPONSE_TO_API_REQUEST)
 public class ApiPlatformResponseToApiRequestActionTaskHandler extends AbstractTaskHandler {
 
-    public ApiPlatformResponseToApiRequestActionTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(API_PLATFORM, 1, RESPONSE_TO_API_REQUEST, actionDefinitionFacade);
+    public ApiPlatformResponseToApiRequestActionTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(API_PLATFORM, 1, RESPONSE_TO_API_REQUEST, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }

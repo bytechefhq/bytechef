@@ -2,9 +2,27 @@ import {getCookie} from '@/shared/util/cookie-utils';
 
 import {endpointUrl, fetchParams} from './config';
 
-export class GraphQLResponseError extends Error {
-    constructor(message: string) {
+interface GraphQlRequestErrorOptionsI {
+    classification?: string;
+    status?: number;
+}
+
+export class GraphQlRequestError extends Error {
+    classification?: string;
+    status?: number;
+
+    constructor(message: string, {classification, status}: GraphQlRequestErrorOptionsI = {}) {
         super(message);
+
+        this.classification = classification;
+        this.name = 'GraphQlRequestError';
+        this.status = status;
+    }
+}
+
+export class GraphQLResponseError extends GraphQlRequestError {
+    constructor(message: string, options: GraphQlRequestErrorOptionsI = {}) {
+        super(message, options);
 
         this.name = 'GraphQLResponseError';
     }
@@ -28,20 +46,24 @@ export function fetcher<TData, TVariables>(
         if (!res.ok) {
             const errorJson = await res.json().catch(() => null);
             const serverMessage = errorJson?.errors?.[0]?.message;
+            const classification = errorJson?.errors?.[0]?.extensions?.classification;
 
             if (serverMessage) {
-                throw new GraphQLResponseError(serverMessage);
+                throw new GraphQLResponseError(serverMessage, {classification, status: res.status});
             }
 
-            throw new Error(`GraphQL request failed with status ${res.status}`);
+            throw new GraphQlRequestError(`GraphQL request failed with status ${res.status}`, {
+                classification,
+                status: res.status,
+            });
         }
 
         const json = await res.json();
 
         if (json.errors) {
-            const {message} = json.errors[0];
+            const {extensions, message} = json.errors[0];
 
-            throw new GraphQLResponseError(message);
+            throw new GraphQLResponseError(message, {classification: extensions?.classification});
         }
 
         return json.data;

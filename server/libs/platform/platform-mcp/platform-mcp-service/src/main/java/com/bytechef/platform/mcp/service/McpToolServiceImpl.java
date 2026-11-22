@@ -23,8 +23,10 @@ import com.bytechef.platform.mcp.audit.McpComponentAuditMapper;
 import com.bytechef.platform.mcp.audit.McpToolAuditEvents;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.repository.McpToolRepository;
+import com.bytechef.platform.security.web.authentication.NonPlatformUserAuthentication;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,7 +89,8 @@ public class McpToolServiceImpl implements McpToolService {
         @AuditData(key = "mcpComponentId", value = "#mcpTool.mcpComponentId"),
         @AuditData(key = "name", value = "#mcpTool.name")
     })
-    @PreAuthorize("hasPermission(#mcpTool.id, 'McpTool', 'MCP_EDIT')")
+    @PreAuthorize("hasPermission(#mcpTool.id, 'McpTool', 'MCP_EDIT') or " +
+        "hasPermission(#mcpTool.id, 'McpTool', 'MCP_DELETE')")
     public void delete(McpTool mcpTool) {
         mcpToolRepository.delete(mcpTool);
     }
@@ -101,6 +104,10 @@ public class McpToolServiceImpl implements McpToolService {
     @Override
     @PreAuthorize("isTenantAdmin()")
     public List<McpTool> getMcpTools() {
+        if (NonPlatformUserAuthentication.isCurrent()) {
+            throw new AccessDeniedException("A connected user may not list every MCP tool");
+        }
+
         return mcpToolRepository.findAll();
     }
 

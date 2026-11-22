@@ -10,8 +10,10 @@ package com.bytechef.ee.embedded.connected.user.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
@@ -302,12 +304,23 @@ class ConnectedUserFacadeIntTest {
     }
 
     @Test
-    void testEveryFacadeMethodRequiresTenantAdmin() throws NoSuchMethodException {
+    void testEveryFacadeMethodCarriesItsEmbeddedScopeGate() throws NoSuchMethodException {
         Method[] facadeMethods = ConnectedUserFacade.class.getMethods();
 
         assertThat(facadeMethods).isNotEmpty();
 
-        List<String> ungatedMethodNames = new ArrayList<>();
+        Map<String, String> expectedExpressions = Map.of(
+            "createConnectedUser", "hasEmbeddedScopeInEnvironment('CONNECTED_USER_MANAGE', #environment)",
+            "deleteConnectedUser", "hasPermission(#id, 'ConnectedUser', 'CONNECTED_USER_DELETE')",
+            "enableConnectedUser", "hasPermission(#id, 'ConnectedUser', 'CONNECTED_USER_MANAGE')",
+            "getConnectedUser", "hasPermission(#id, 'ConnectedUser', 'CONNECTED_USER_VIEW')",
+            "getConnectedUserDTO", "hasPermission(#id, 'ConnectedUser', 'CONNECTED_USER_VIEW')",
+            "getConnectedUserDTOs", "hasEmbeddedScopeInEnvironmentId('CONNECTED_USER_VIEW', #environmentId)",
+            "getConnectedUsers", "hasEmbeddedScopeInEnvironmentId('CONNECTED_USER_VIEW', #environmentId)",
+            "importConnectedUsers", "hasEmbeddedScopeInEnvironment('CONNECTED_USER_MANAGE', #environment)",
+            "updateConnectedUser", "hasPermission(#id, 'ConnectedUser', 'CONNECTED_USER_MANAGE')");
+
+        List<String> wrongGates = new ArrayList<>();
 
         for (Method facadeMethod : facadeMethods) {
             Method implementationMethod = ConnectedUserFacadeImpl.class.getDeclaredMethod(
@@ -315,13 +328,17 @@ class ConnectedUserFacadeIntTest {
 
             PreAuthorize preAuthorize = implementationMethod.getAnnotation(PreAuthorize.class);
 
-            if (preAuthorize == null || !"isTenantAdmin()".equals(preAuthorize.value())) {
-                ungatedMethodNames.add(implementationMethod.toGenericString());
+            String expectedExpression = expectedExpressions.get(facadeMethod.getName());
+
+            if (preAuthorize == null || !preAuthorize.value()
+                .equals(expectedExpression)) {
+
+                wrongGates.add(implementationMethod.toGenericString());
             }
         }
 
-        assertThat(ungatedMethodNames)
-            .as("ConnectedUserFacadeImpl methods without @PreAuthorize(\"isTenantAdmin()\")")
+        assertThat(wrongGates)
+            .as("ConnectedUserFacadeImpl methods without their embedded scope gate")
             .isEmpty();
     }
 
@@ -345,9 +362,9 @@ class ConnectedUserFacadeIntTest {
         deleteOrder.verify(connectedUserConnectionService)
             .getConnectionIds(connectedUser.getId());
         deleteOrder.verify(connectionFacade)
-            .delete(8L);
+            .delete(eq(8L), any());
 
-        verify(connectionFacade, never()).delete(7L);
+        verify(connectionFacade, never()).delete(eq(7L), any());
 
         assertThat(connectedUserRepository.findById(connectedUser.getId())).isEmpty();
     }

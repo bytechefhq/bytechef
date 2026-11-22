@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {InfoIcon, PlusIcon, ShieldCheckIcon} from 'lucide-react';
 
 import AiAgentTool from './AiAgentTool';
@@ -9,6 +10,7 @@ import useAiAgentTools from './hooks/useAiAgentTools';
 
 export default function AiAgentTools() {
     const {configuredConnectionKeys, rootWorkflowNodeName, toolGroups, tools} = useAiAgentTools();
+    const readOnly = useWorkflowEditorReadOnly();
 
     return (
         <div className="space-y-2">
@@ -28,7 +30,7 @@ export default function AiAgentTools() {
                     </Tooltip>
                 </div>
 
-                {rootWorkflowNodeName && (
+                {rootWorkflowNodeName && !readOnly && (
                     <WorkflowNodesPopoverMenu
                         clusterElementType="tools"
                         hideActionComponents
@@ -44,7 +46,9 @@ export default function AiAgentTools() {
 
             {tools.length === 0 && toolGroups.length === 0 && (
                 <p className="text-xs text-muted-foreground">
-                    No tools added yet. Click &quot;Add tool&quot; to give your agent capabilities.
+                    {readOnly
+                        ? 'No tools added yet.'
+                        : 'No tools added yet. Click "Add tool" to give your agent capabilities.'}
                 </p>
             )}
 
@@ -72,16 +76,18 @@ export default function AiAgentTools() {
                         </div>
 
                         <div className="flex items-center">
-                            <WorkflowNodesPopoverMenu
-                                clusterElementType="tools"
-                                hideActionComponents
-                                hideTaskDispatchers
-                                hideTriggerComponents
-                                multipleClusterElementsNode
-                                sourceNodeId={toolGroup.name}
-                            >
-                                <Button icon={<PlusIcon />} label="Add Tool" size="sm" variant="ghost" />
-                            </WorkflowNodesPopoverMenu>
+                            {!readOnly && (
+                                <WorkflowNodesPopoverMenu
+                                    clusterElementType="tools"
+                                    hideActionComponents
+                                    hideTaskDispatchers
+                                    hideTriggerComponents
+                                    multipleClusterElementsNode
+                                    sourceNodeId={toolGroup.name}
+                                >
+                                    <Button icon={<PlusIcon />} label="Add Tool" size="sm" variant="ghost" />
+                                </WorkflowNodesPopoverMenu>
+                            )}
 
                             <AiAgentToolDropdownMenu tool={toolGroup.tool} />
                         </div>
@@ -104,16 +110,18 @@ export default function AiAgentTools() {
                             {toolGroup.channels.length ? 'Channels:' : 'Channels: chat (default)'}
                         </span>
 
-                        <WorkflowNodesPopoverMenu
-                            clusterElementType="approvalChannels"
-                            hideActionComponents
-                            hideTaskDispatchers
-                            hideTriggerComponents
-                            multipleClusterElementsNode
-                            sourceNodeId={toolGroup.name}
-                        >
-                            <Button icon={<PlusIcon />} label="Add Channel" size="sm" variant="ghost" />
-                        </WorkflowNodesPopoverMenu>
+                        {!readOnly && (
+                            <WorkflowNodesPopoverMenu
+                                clusterElementType="approvalChannels"
+                                hideActionComponents
+                                hideTaskDispatchers
+                                hideTriggerComponents
+                                multipleClusterElementsNode
+                                sourceNodeId={toolGroup.name}
+                            >
+                                <Button icon={<PlusIcon />} label="Add Channel" size="sm" variant="ghost" />
+                            </WorkflowNodesPopoverMenu>
+                        )}
                     </div>
 
                     {toolGroup.channels.map((channel, channelIndex) => (

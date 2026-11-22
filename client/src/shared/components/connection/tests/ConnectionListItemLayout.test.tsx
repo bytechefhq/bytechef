@@ -106,7 +106,7 @@ describe('ConnectionListItemLayout', () => {
 
         renderLayout({onEditClick});
 
-        await userEvent.click(screen.getByRole('button', {name: ''}));
+        await userEvent.click(screen.getByRole('button', {name: 'Connection actions'}));
 
         expect(screen.getByText('Custom menu item')).toBeInTheDocument();
 

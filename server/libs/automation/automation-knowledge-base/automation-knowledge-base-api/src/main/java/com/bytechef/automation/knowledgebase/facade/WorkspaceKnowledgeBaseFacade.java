@@ -80,20 +80,25 @@ public interface WorkspaceKnowledgeBaseFacade {
     void updateKnowledgeBaseTags(long knowledgeBaseId, List<Tag> tags);
 
     /**
-     * Retrieves the distinct tags assigned to the knowledge bases of the specified workspace.
+     * Retrieves the distinct tags assigned to the knowledge bases of the specified workspace and environment.
      *
-     * @param workspaceId the unique identifier of the workspace
-     * @return the tags used by the workspace's knowledge bases
+     * @param workspaceId   the unique identifier of the workspace
+     * @param environmentId the environment ordinal
+     *                      ({@link com.bytechef.platform.configuration.domain.Environment#ordinal()}) to filter by
+     * @return the tags used by the workspace's knowledge bases in the environment
      */
-    List<Tag> getWorkspaceKnowledgeBaseTags(long workspaceId);
+    List<Tag> getWorkspaceKnowledgeBaseTags(long workspaceId, long environmentId);
 
     /**
-     * Retrieves a mapping from knowledge base id to its tags, for the knowledge bases of the specified workspace.
+     * Retrieves a mapping from knowledge base id to its tags, for the knowledge bases of the specified workspace and
+     * environment.
      *
-     * @param workspaceId the unique identifier of the workspace
+     * @param workspaceId   the unique identifier of the workspace
+     * @param environmentId the environment ordinal
+     *                      ({@link com.bytechef.platform.configuration.domain.Environment#ordinal()}) to filter by
      * @return a map where keys are the workspace's knowledge base ids and values are their tags
      */
-    Map<Long, List<Tag>> getWorkspaceKnowledgeBaseTagsByKnowledgeBaseId(long workspaceId);
+    Map<Long, List<Tag>> getWorkspaceKnowledgeBaseTagsByKnowledgeBaseId(long workspaceId, long environmentId);
 
     /**
      * Creates a new knowledge base and assigns it to the specified workspace.

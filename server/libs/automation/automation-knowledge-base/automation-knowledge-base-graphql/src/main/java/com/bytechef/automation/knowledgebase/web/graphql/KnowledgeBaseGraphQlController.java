@@ -68,12 +68,12 @@ class KnowledgeBaseGraphQlController {
     }
 
     @QueryMapping
-    KnowledgeBase knowledgeBase(@Argument Long id) {
+    public KnowledgeBase knowledgeBase(@Argument Long id) {
         return workspaceKnowledgeBaseFacade.getKnowledgeBase(id);
     }
 
     @QueryMapping
-    List<KnowledgeBaseDocumentChunk> searchKnowledgeBase(
+    public List<KnowledgeBaseDocumentChunk> searchKnowledgeBase(
         @Argument Long id, @Argument String query, @Argument String metadataFilters) {
 
         return workspaceKnowledgeBaseFacade.searchKnowledgeBase(id, query, metadataFilters);
@@ -89,7 +89,7 @@ class KnowledgeBaseGraphQlController {
     }
 
     @MutationMapping
-    KnowledgeBase updateKnowledgeBase(@Argument Long id, @Argument KnowledgeBase knowledgeBase) {
+    public KnowledgeBase updateKnowledgeBase(@Argument Long id, @Argument KnowledgeBase knowledgeBase) {
         return workspaceKnowledgeBaseFacade.updateKnowledgeBase(id, knowledgeBase);
     }
 

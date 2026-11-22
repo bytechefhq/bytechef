@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
-import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -49,7 +49,7 @@ class KnowledgeBaseDocumentChunkOwnershipResolverTest {
 
     @Test
     void testResolveOwnerOfAMissingChunkIsUnknown() {
-        when(knowledgeBaseDocumentChunkService.getKnowledgeBaseDocumentChunks(List.of(1303L))).thenReturn(List.of());
+        when(knowledgeBaseDocumentChunkService.fetchKnowledgeBaseDocumentChunk(1303L)).thenReturn(Optional.empty());
 
         assertThat(knowledgeBaseDocumentChunkOwnershipResolver.resolveOwner(1303L))
             .isEqualTo(ResourceOwner.unknown());
@@ -59,8 +59,8 @@ class KnowledgeBaseDocumentChunkOwnershipResolverTest {
 
     @Test
     void testResolveOwnerOfAChunkWithoutADocumentIsUnknown() {
-        when(knowledgeBaseDocumentChunkService.getKnowledgeBaseDocumentChunks(List.of(1303L)))
-            .thenReturn(List.of(new KnowledgeBaseDocumentChunk()));
+        when(knowledgeBaseDocumentChunkService.fetchKnowledgeBaseDocumentChunk(1303L))
+            .thenReturn(Optional.of(new KnowledgeBaseDocumentChunk()));
 
         assertThat(knowledgeBaseDocumentChunkOwnershipResolver.resolveOwner(1303L))
             .isEqualTo(ResourceOwner.unknown());
@@ -74,8 +74,8 @@ class KnowledgeBaseDocumentChunkOwnershipResolverTest {
 
         knowledgeBaseDocumentChunk.setKnowledgeBaseDocumentId(1302L);
 
-        when(knowledgeBaseDocumentChunkService.getKnowledgeBaseDocumentChunks(List.of(1303L)))
-            .thenReturn(List.of(knowledgeBaseDocumentChunk));
+        when(knowledgeBaseDocumentChunkService.fetchKnowledgeBaseDocumentChunk(1303L))
+            .thenReturn(Optional.of(knowledgeBaseDocumentChunk));
         when(knowledgeBaseDocumentOwnershipResolver.resolveOwner(1302L)).thenReturn(ResourceOwner.ofWorkspace(7L));
 
         assertThat(knowledgeBaseDocumentChunkOwnershipResolver.resolveOwner(1303L))

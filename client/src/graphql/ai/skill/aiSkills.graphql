@@ -3,6 +3,7 @@ query aiSkills {
         id
         name
         description
+        createdBy
         tags {
             id
             name

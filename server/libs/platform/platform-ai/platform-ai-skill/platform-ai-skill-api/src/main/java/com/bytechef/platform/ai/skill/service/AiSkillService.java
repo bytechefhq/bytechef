@@ -19,6 +19,7 @@ package com.bytechef.platform.ai.skill.service;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -31,6 +32,8 @@ public interface AiSkillService {
     void deleteAiSkill(long id);
 
     boolean existsByName(String name);
+
+    Optional<AiSkill> fetchAiSkill(long id);
 
     AiSkill getAiSkill(long id);
 

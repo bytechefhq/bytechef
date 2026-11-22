@@ -19,16 +19,13 @@ package com.bytechef.automation.knowledgebase.security;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
-import com.bytechef.platform.knowledgebase.exception.KnowledgeBaseDocumentNotFoundException;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Optional;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
- * Resolves a knowledge base document id to the workspace of its knowledge base, for
- * {@code hasPermission(#id, 'KnowledgeBaseDocument', ...)}.
- *
  * @author Ivica Cardic
  */
 @Component
@@ -54,13 +51,14 @@ public class KnowledgeBaseDocumentOwnershipResolver implements ResourceOwnership
 
     @Override
     public ResourceOwner resolveOwner(long id) {
-        KnowledgeBaseDocument knowledgeBaseDocument;
+        Optional<KnowledgeBaseDocument> knowledgeBaseDocumentOptional =
+            knowledgeBaseDocumentService.fetchKnowledgeBaseDocument(id);
 
-        try {
-            knowledgeBaseDocument = knowledgeBaseDocumentService.getKnowledgeBaseDocument(id);
-        } catch (KnowledgeBaseDocumentNotFoundException knowledgeBaseDocumentNotFoundException) {
+        if (knowledgeBaseDocumentOptional.isEmpty()) {
             return ResourceOwner.unknown();
         }
+
+        KnowledgeBaseDocument knowledgeBaseDocument = knowledgeBaseDocumentOptional.get();
 
         Long knowledgeBaseId = knowledgeBaseDocument.getKnowledgeBaseId();
 

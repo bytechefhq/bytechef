@@ -217,13 +217,43 @@ class ProjectCodeWorkflowFacadeIntTest {
     }
 
     @Test
-    void testSaveIsAdminOnly() {
-        assertRequiresAdminAuthority(() -> projectCodeWorkflowFacade.save(WORKSPACE_ID, new byte[0], Language.JAVA));
+    void testSaveNeedsProjectCreateAndProjectPublishInTheWorkspace() {
+        ThrowingCallable save = () -> projectCodeWorkflowFacade.save(WORKSPACE_ID, new byte[0], Language.JAVA);
+
+        assertDenied(save);
+
+        when(permissionService.hasResourceScope(WORKSPACE_ID, "Workspace", "PROJECT_CREATE")).thenReturn(true);
+
+        assertDenied(save);
+
+        when(permissionService.hasResourceScope(WORKSPACE_ID, "Workspace", "PROJECT_PUBLISH")).thenReturn(true);
+
+        assertNotDenied(save);
+    }
+
+    @Test
+    void testSaveWithEnableAlsoNeedsDeploymentCreateAndDeploymentEditInTheEnvironment() {
+        ThrowingCallable save = () -> projectCodeWorkflowFacade.save(
+            WORKSPACE_ID, new byte[0], Language.JAVA, Environment.STAGING, true);
+
+        allowSave();
+
+        assertDenied(save);
+
+        when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "DEPLOYMENT_CREATE", Environment.STAGING))
+            .thenReturn(true);
+
+        assertDenied(save);
+
+        when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "DEPLOYMENT_EDIT", Environment.STAGING))
+            .thenReturn(true);
+
+        assertNotDenied(save);
     }
 
     @Test
     void testSaveUpdatesTheSameNamedProjectOfTheCallerWorkspace() {
-        authenticate(AuthorityConstants.ADMIN);
+        allowSave();
 
         Project project = new Project();
 
@@ -243,7 +273,7 @@ class ProjectCodeWorkflowFacadeIntTest {
 
     @Test
     void testSaveCreatesAProjectInTheCallerWorkspaceWhenItHasNoProjectOfThatName() {
-        authenticate(AuthorityConstants.ADMIN);
+        allowSave();
 
         Project createdProject = new Project();
 
@@ -287,7 +317,7 @@ class ProjectCodeWorkflowFacadeIntTest {
 
     @Test
     void testSaveWithoutEnableLeavesDeploymentsAlone() {
-        authenticate(AuthorityConstants.ADMIN);
+        allowSave();
 
         stubPublishOfNewProject();
 
@@ -300,7 +330,7 @@ class ProjectCodeWorkflowFacadeIntTest {
 
     @Test
     void testSaveWithEnableCreatesAnEnabledDeploymentOfThePublishedVersion() {
-        authenticate(AuthorityConstants.ADMIN);
+        allowSaveAndEnable(Environment.STAGING);
 
         stubPublishOfNewProject();
         stubDeploymentCreation();
@@ -325,7 +355,7 @@ class ProjectCodeWorkflowFacadeIntTest {
 
     @Test
     void testSaveWithEnableLeavesAWorkflowThatNeedsAConnectionDisabled() {
-        authenticate(AuthorityConstants.ADMIN);
+        allowSaveAndEnable(Environment.STAGING);
 
         stubPublishOfNewProject();
         stubDeploymentCreation();
@@ -347,7 +377,7 @@ class ProjectCodeWorkflowFacadeIntTest {
 
     @Test
     void testSaveWithEnableLeavesAWorkflowThatNeedsARequiredInputDisabled() {
-        authenticate(AuthorityConstants.ADMIN);
+        allowSaveAndEnable(Environment.STAGING);
 
         stubPublishOfNewProject();
         stubDeploymentCreation();
@@ -367,7 +397,7 @@ class ProjectCodeWorkflowFacadeIntTest {
 
     @Test
     void testSaveWithEnableMovesTheExistingDeploymentToThePublishedVersion() {
-        authenticate(AuthorityConstants.ADMIN);
+        allowSaveAndEnable(Environment.STAGING);
 
         stubMoveToVersionTwo();
 
@@ -405,7 +435,7 @@ class ProjectCodeWorkflowFacadeIntTest {
 
     @Test
     void testSaveWithEnableLeavesANewWorkflowThatNeedsAConnectionDisabledWhenMoving() {
-        authenticate(AuthorityConstants.ADMIN);
+        allowSaveAndEnable(Environment.STAGING);
 
         stubMoveToVersionTwo();
 
@@ -425,7 +455,7 @@ class ProjectCodeWorkflowFacadeIntTest {
 
     @Test
     void testSaveWithEnableCarriesAWorkflowWhoseNewVersionAddsARequiredInputForwardDisabled() {
-        authenticate(AuthorityConstants.ADMIN);
+        allowSaveAndEnable(Environment.STAGING);
 
         stubMoveToVersionTwo();
 
@@ -451,7 +481,7 @@ class ProjectCodeWorkflowFacadeIntTest {
 
     @Test
     void testSaveWithEnableKeepsACarriedWorkflowEnabledWhenItsRequiredInputIsAlreadySet() {
-        authenticate(AuthorityConstants.ADMIN);
+        allowSaveAndEnable(Environment.STAGING);
 
         stubMoveToVersionTwo();
 
@@ -472,7 +502,7 @@ class ProjectCodeWorkflowFacadeIntTest {
 
     @Test
     void testSaveWithEnableCarriesAWorkflowWhoseNewVersionAddsARequiredConnectionForwardDisabled() {
-        authenticate(AuthorityConstants.ADMIN);
+        allowSaveAndEnable(Environment.STAGING);
 
         stubMoveToVersionTwo();
 
@@ -494,7 +524,7 @@ class ProjectCodeWorkflowFacadeIntTest {
 
     @Test
     void testSaveWithEnableKeepsACarriedWorkflowEnabledWhenItsRequiredConnectionIsAlreadySet() {
-        authenticate(AuthorityConstants.ADMIN);
+        allowSaveAndEnable(Environment.STAGING);
 
         stubMoveToVersionTwo(List.of(new ProjectDeploymentWorkflowConnection(41L, "slack", "slack_1")));
 
@@ -529,7 +559,7 @@ class ProjectCodeWorkflowFacadeIntTest {
 
     @Test
     void testFirstUploadAddsEveryWorkflowToTheDraftAndPublishesIt() {
-        authenticate(AuthorityConstants.ADMIN);
+        allowSave();
 
         when(projectService.create(any(Project.class))).thenAnswer(invocation -> newProject());
 
@@ -554,7 +584,7 @@ class ProjectCodeWorkflowFacadeIntTest {
 
     @Test
     void testReUploadKeepsWorkflowIdsByNameDropsRemovedWorkflowsAndAddsNewOnes() {
-        authenticate(AuthorityConstants.ADMIN);
+        allowSave();
 
         Project project = publishedProject(1);
 
@@ -906,16 +936,19 @@ class ProjectCodeWorkflowFacadeIntTest {
         stubCodeWorkflowContainer();
     }
 
-    private void assertRequiresAdminAuthority(ThrowingCallable call) {
-        authenticate(AuthorityConstants.USER);
+    private void allowSave() {
+        when(permissionService.hasResourceScope(WORKSPACE_ID, "Workspace", "PROJECT_CREATE")).thenReturn(true);
+        when(permissionService.hasResourceScope(WORKSPACE_ID, "Workspace", "PROJECT_PUBLISH")).thenReturn(true);
+    }
 
-        assertDenied(call);
+    private void allowSaveAndEnable(Environment environment) {
+        allowSave();
 
-        authenticate(AuthorityConstants.ADMIN);
-
-        assertNotDenied(call);
-
-        authenticate(AuthorityConstants.USER);
+        when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "DEPLOYMENT_CREATE", environment)).thenReturn(true);
+        when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "DEPLOYMENT_EDIT", environment)).thenReturn(true);
+        when(permissionService.hasResourceScope(anyLong(), anyString(), eq("DEPLOYMENT_CREATE"))).thenReturn(true);
+        when(permissionService.hasResourceScope(anyLong(), anyString(), eq("DEPLOYMENT_EDIT"))).thenReturn(true);
+        when(permissionService.canUseConnectionInWorkflow(anyLong(), anyString(), any())).thenReturn(true);
     }
 
     private static void assertDenied(ThrowingCallable call) {

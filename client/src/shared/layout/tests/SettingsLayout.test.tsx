@@ -6,6 +6,15 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import SettingsLayout from '../SettingsLayout';
 
+vi.mock('@/shared/hooks/useHasEmbeddedScope', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/hooks/useHasEmbeddedScope')>()),
+    useHasEmbeddedScope: () => true,
+}));
+
+vi.mock('@/shared/hooks/useIsTenantAdmin', () => ({
+    useIsTenantAdmin: () => true,
+}));
+
 vi.mock('@/shared/layout/Header', () => ({
     default: () => null,
 }));

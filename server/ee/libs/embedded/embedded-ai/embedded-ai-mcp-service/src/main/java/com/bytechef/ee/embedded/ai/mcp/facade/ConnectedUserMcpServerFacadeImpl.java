@@ -145,7 +145,7 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
             @AuditData(key = "connectedUserId", value = "#connectedUserId"),
             @AuditData(key = "mcpServerId", value = "#mcpServerId")
         })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_DELETE')")
     public boolean deleteConnectedUserMcpServer(long connectedUserId, long mcpServerId) {
         Map<Long, McpComponent> mcpComponentCache = new HashMap<>();
         boolean deleted = false;
@@ -204,7 +204,7 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         @AuditData(key = "mcpServerId", value = "#mcpServerId"),
         @AuditData(key = "enabled", value = "#enable")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
     public void enableConnectedUserMcpServer(long connectedUserId, long mcpServerId, boolean enable) {
         Map<Long, McpComponent> mcpComponentCache = new HashMap<>();
 
@@ -258,7 +258,7 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         @AuditData(key = "mcpConnectedUserProjectWorkflowId", value = "#mcpConnectedUserProjectWorkflowId"),
         @AuditData(key = "enabled", value = "#enable")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'MCP_EDIT')")
     public ConnectedUserMcpServerAutomationDTO enableMcpAutomation(
         long connectedUserId, long mcpConnectedUserProjectWorkflowId, boolean enable) {
 
@@ -274,7 +274,7 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         @AuditData(key = "mcpIntegrationInstanceToolId", value = "#mcpIntegrationInstanceToolId"),
         @AuditData(key = "enabled", value = "#enable")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpIntegrationInstanceToolId, 'McpIntegrationInstanceTool', 'MCP_EDIT')")
     public void enableMcpTool(long mcpIntegrationInstanceToolId, boolean enable) {
         mcpIntegrationInstanceToolService.updateEnabled(mcpIntegrationInstanceToolId, enable);
     }
@@ -284,14 +284,14 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         @AuditData(key = "mcpIntegrationInstanceWorkflowId", value = "#mcpIntegrationInstanceWorkflowId"),
         @AuditData(key = "enabled", value = "#enable")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpIntegrationInstanceWorkflowId, 'McpIntegrationInstanceWorkflow', 'MCP_EDIT')")
     public void enableMcpWorkflow(long mcpIntegrationInstanceWorkflowId, boolean enable) {
         mcpIntegrationInstanceWorkflowService.updateEnabled(mcpIntegrationInstanceWorkflowId, enable);
     }
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'MCP_VIEW')")
     public List<ConnectedUserMcpServerDTO> getConnectedUserMcpServers(long connectedUserId) {
         List<IntegrationInstance> integrationInstances = integrationInstanceService
             .getConnectedUserIntegrationInstances(connectedUserId);
@@ -376,7 +376,7 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW')")
     public List<ProvisionableConnectedUserMcpServerDTO> getProvisionableMcpServers(long connectedUserId) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
 
@@ -419,7 +419,7 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         @AuditData(key = "connectedUserId", value = "#connectedUserId"),
         @AuditData(key = "mcpServerId", value = "#mcpServerId")
     })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_MANAGE')")
     public void provisionMcpServer(long connectedUserId, long mcpServerId) {
         ProvisionableConnectedUserMcpServerDTO provisionableMcpServer = getProvisionableMcpServers(connectedUserId)
             .stream()

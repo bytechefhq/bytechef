@@ -34,6 +34,7 @@ import com.bytechef.automation.configuration.dto.ProjectDeploymentWorkflowDTO;
 import com.bytechef.automation.configuration.exception.ProjectDeploymentErrorType;
 import com.bytechef.automation.configuration.listener.ProjectDeploymentDeleteEventListener;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
@@ -76,9 +77,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -102,6 +105,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     private final JobFacade jobFacade;
     private final JobService jobService;
     private final List<ProjectDeploymentDeleteEventListener> projectDeploymentDeleteEventListeners;
+    private final PermissionService permissionService;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectOwnershipService projectOwnershipService;
@@ -125,7 +129,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         ProjectWorkflowService projectWorkflowService, TagService tagService,
         TriggerDefinitionService triggerDefinitionService, TriggerExecutionService triggerExecutionService,
         TriggerLifecycleFacade triggerLifecycleFacade, ApplicationProperties applicationProperties,
-        ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService,
+        ComponentConnectionFacade componentConnectionFacade, PermissionService permissionService,
+        WorkflowService workflowService,
         List<ProjectDeploymentDeleteEventListener> projectDeploymentDeleteEventListeners) {
 
         this.connectionService = connectionService;
@@ -136,6 +141,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         this.jobFacade = jobFacade;
         this.jobService = jobService;
         this.projectDeploymentDeleteEventListeners = projectDeploymentDeleteEventListeners;
+        this.permissionService = permissionService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectOwnershipService = projectOwnershipService;
@@ -156,7 +162,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         @AuditData(key = "projectId", value = "#projectDeploymentDTO.projectId"),
         @AuditData(key = "name", value = "#projectDeploymentDTO.name")
     })
-    @PreAuthorize("hasPermission(#projectDeploymentDTO.projectId(), 'Project', 'DEPLOYMENT_PUSH')")
+    // The whole DTO, not its projectId: the evaluator reads the target environment off it so that the role
+    // checked is the one held in the environment being deployed into.
+    @PreAuthorize("hasPermission(#projectDeploymentDTO, 'DEPLOYMENT_CREATE')")
     public long createProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO) {
         return createProjectDeployment(
             projectDeploymentDTO.toProjectDeployment(), CollectionUtils.map(
@@ -172,7 +180,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         @AuditData(key = "name", value = "#projectDeployment.name"),
         @AuditData(key = "workflowId", value = "#workflowId")
     })
-    @PreAuthorize("hasPermission(#projectDeployment.projectId, 'Project', 'DEPLOYMENT_PUSH')")
+    @PreAuthorize("hasPermission(#projectDeployment.projectId, 'Project', 'DEPLOYMENT_CREATE')")
     public long createProjectDeployment(
         ProjectDeployment projectDeployment, String workflowId, List<ProjectDeploymentWorkflowConnection> connections) {
 
@@ -192,7 +200,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         @AuditData(key = "projectId", value = "#projectDeployment.projectId"),
         @AuditData(key = "name", value = "#projectDeployment.name")
     })
-    @PreAuthorize("hasPermission(#projectDeployment.projectId, 'Project', 'DEPLOYMENT_PUSH')")
+    @PreAuthorize("hasPermission(#projectDeployment.projectId, 'Project', 'DEPLOYMENT_CREATE')")
     public long createProjectDeployment(
         ProjectDeployment projectDeployment, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows,
         List<Tag> tags) {
@@ -224,12 +232,16 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         return projectDeployment.getId();
     }
 
+    // Starts a job in the deployment's environment, so a VIEWER must not reach it: an on-demand run of a Production
+    // deployment is a write to the outside world. The deployment id is resolved server-side, which is what makes the
+    // environment half of the check trustworthy — the caller does not get to say which environment they are judged in.
     @Override
     @Audited(event = ProjectDeploymentAuditEvents.DEPLOYMENT_WORKFLOW_RUN, data = {
         @AuditData(key = "projectDeploymentId", value = "#id"),
         @AuditData(key = "workflowId", value = "#workflowId"),
         @AuditData(key = "jobId", value = "#result")
     })
+    @PreAuthorize("hasPermission(#id, 'ProjectDeployment', 'DEPLOYMENT_EDIT')")
     @Transactional(propagation = Propagation.NEVER)
     public long createProjectDeploymentWorkflowJob(Long id, String workflowId) {
         ProjectDeploymentWorkflow projectDeploymentWorkflow =
@@ -245,10 +257,13 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             id, PlatformType.AUTOMATION);
     }
 
+    // Guarded here rather than beneath: ProjectDeploymentServiceImpl.delete carries no guard, and the triggers,
+    // jobs and deployment workflows are torn down before it is reached.
     @Override
     @Audited(event = ProjectDeploymentAuditEvents.DEPLOYMENT_DELETED, data = {
         @AuditData(key = "projectDeploymentId", value = "#id")
     })
+    @PreAuthorize("hasPermission(#id, 'ProjectDeployment', 'DEPLOYMENT_DELETE')")
     public void deleteProjectDeployment(long id) {
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(id);
 
@@ -292,11 +307,19 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 //            .forEach(tagService::delete);
     }
 
+    // Enabling installs the deployment's triggers with its own connections, so unattended repeating execution of a
+    // Production workflow is obtainable here — strictly more than the single on-demand run the job guard denies.
+    // Disabling is the first half of deleteProjectDeployment's tear-down and is reachable on its own, so without this a
+    // member refused delete could still take a Production deployment's live triggers down. Nothing beneath closes
+    // either: ProjectDeploymentServiceImpl.updateEnabled has no guard of its own. deleteProjectDeployment reaches this
+    // by self-invocation, which does not cross the proxy, so deleting needs DEPLOYMENT_DELETE and not DEPLOYMENT_EDIT
+    // as well.
     @Override
     @Audited(event = ProjectDeploymentAuditEvents.DEPLOYMENT_ENABLED_UPDATED, data = {
         @AuditData(key = "projectDeploymentId", value = "#projectDeploymentId"),
         @AuditData(key = "enabled", value = "#enable")
     })
+    @PreAuthorize("hasPermission(#projectDeploymentId, 'ProjectDeployment', 'DEPLOYMENT_EDIT')")
     public void enableProjectDeployment(long projectDeploymentId, boolean enable) {
         List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = projectDeploymentWorkflowService
             .getProjectDeploymentWorkflows(projectDeploymentId);
@@ -316,12 +339,16 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         projectDeploymentService.updateEnabled(projectDeploymentId, enable);
     }
 
+    // Same reasoning as enableProjectDeployment, one level down: enabling reaches enableWorkflowTriggers and disabling
+    // also calls stopRunningJobs, which kills the started jobs of this one workflow. The row acted on is looked up from
+    // (projectDeploymentId, workflowId), so the id the guard keys on is the id the write is selected by.
     @Override
     @Audited(event = ProjectDeploymentAuditEvents.DEPLOYMENT_WORKFLOW_ENABLED_UPDATED, data = {
         @AuditData(key = "projectDeploymentId", value = "#projectDeploymentId"),
         @AuditData(key = "workflowId", value = "#workflowId"),
         @AuditData(key = "enabled", value = "#enable")
     })
+    @PreAuthorize("hasPermission(#projectDeploymentId, 'ProjectDeployment', 'DEPLOYMENT_EDIT')")
     public void enableProjectDeploymentWorkflow(long projectDeploymentId, String workflowId, boolean enable) {
         ProjectDeploymentWorkflow projectDeploymentWorkflow = doEnableProjectDeploymentWorkflow(
             projectDeploymentId, workflowId, enable);
@@ -329,6 +356,12 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         projectDeploymentWorkflowService.updateEnabled(projectDeploymentWorkflow.getId(), enable);
     }
 
+    // Needs its own annotation: it reaches the overload above by self-invocation, which does not cross the proxy, so
+    // that guard never fires for this entry point. The check is environment-blind on purpose rather than by oversight —
+    // no SpEL built-in reaches PermissionService.hasWorkspaceScopeForProject(long, String, Environment), which does
+    // exist and is implemented; AutomationMethodSecurityExpressionRoot simply exposes no passthrough for it, so writing
+    // an environment-aware expression here would mean adding one. Its only production caller is the embedded
+    // connected-user facade, which resolves the project and the environment from the same request.
     @Override
     @Audited(event = ProjectDeploymentAuditEvents.DEPLOYMENT_WORKFLOW_ENABLED_UPDATED, data = {
         @AuditData(key = "projectId", value = "#projectId"),
@@ -336,12 +369,22 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         @AuditData(key = "environment", value = "#environment"),
         @AuditData(key = "enabled", value = "#enable")
     })
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'DEPLOYMENT_EDIT')")
     public void enableProjectDeploymentWorkflow(
         long projectId, String workflowId, boolean enable, Environment environment) {
 
         long projectDeploymentId = projectDeploymentService.getProjectDeploymentId(projectId, environment);
 
         enableProjectDeploymentWorkflow(projectDeploymentId, workflowId, enable);
+    }
+
+    @Override
+    @PreAuthorize("hasWorkspaceScopeInEnvironment(#workspaceId, 'DEPLOYMENT_VIEW', #environment)")
+    @Transactional(readOnly = true)
+    public List<ProjectDeployment> getProjectDeployments(
+        long workspaceId, Environment environment, @Nullable Long projectId, @Nullable Long tagId) {
+
+        return projectDeploymentService.getProjectDeployments(false, environment, projectId, tagId, workspaceId);
     }
 
     @Override
@@ -353,6 +396,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'ProjectDeployment', 'DEPLOYMENT_VIEW')")
     @Transactional(readOnly = true)
     public ProjectDeploymentDTO getProjectDeployment(long id) {
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(id);
@@ -376,11 +420,22 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectDeploymentId, 'ProjectDeployment', 'DEPLOYMENT_VIEW')")
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
-    public List<Tag> getProjectDeploymentTags(long workspaceId) {
+    public ProjectDeploymentWorkflow getProjectDeploymentWorkflow(long projectDeploymentId, String workflowUuid) {
+        String workflowId = projectWorkflowService.getProjectWorkflowWorkflowId(projectDeploymentId, workflowUuid);
+
+        return projectDeploymentWorkflowService.getProjectDeploymentWorkflow(projectDeploymentId, workflowId);
+    }
+
+    @Override
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#id, 'DEPLOYMENT_VIEW', #environmentId)")
+    @Transactional(readOnly = true)
+    public List<Tag> getProjectDeploymentTags(long id, Long environmentId) {
+        Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
+
         List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(
-            false, null, null, null, workspaceId);
+            false, environment, null, null, id);
 
         return tagService.getTags(
             projectDeployments.stream()
@@ -390,6 +445,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#id, 'DEPLOYMENT_VIEW', #environmentId)")
     public List<ProjectDeploymentDTO> getWorkspaceProjectDeployments(
         long id, Long environmentId, Long projectId, Long tagId, boolean includeAllFields) {
 
@@ -448,13 +504,19 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         }
     }
 
+    // The deployment's id rather than the whole DTO, which is where this deliberately parts company with the sibling
+    // createProjectDeployment. On create the DTO's environment IS the environment the row lands in, so reading it off
+    // the DTO is sound. On update the environment is immutable — ProjectDeploymentServiceImpl.update copies onto the
+    // persisted row and never touches it — so a DTO-supplied environment would let a caller name the environment they
+    // are judged in and edit a Production deployment with a Development role. Keyed on the id, both the workspace and
+    // the environment come from the stored row.
     @Override
     @Audited(event = ProjectDeploymentAuditEvents.DEPLOYMENT_UPDATED, data = {
         @AuditData(key = "projectDeploymentId", value = "#projectDeploymentDTO.id"),
         @AuditData(key = "projectId", value = "#projectDeploymentDTO.projectId"),
         @AuditData(key = "name", value = "#projectDeploymentDTO.name")
     })
-    @PreAuthorize("hasPermission(#projectDeploymentDTO.projectId(), 'Project', 'DEPLOYMENT_PUSH')")
+    @PreAuthorize("hasPermission(#projectDeploymentDTO.id, 'ProjectDeployment', 'DEPLOYMENT_CREATE')")
     public void updateProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO) {
         updateProjectDeployment(
             projectDeploymentDTO.toProjectDeployment(),
@@ -471,7 +533,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         @AuditData(key = "workflowUuid", value = "#workflowUuid"),
         @AuditData(key = "environmentId", value = "#environmentId")
     })
-    @PreAuthorize("hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'DEPLOYMENT_CREATE')")
     public void updateProjectDeployment(
         long projectId, int projectVersion, String workflowUuid,
         List<ProjectDeploymentWorkflowConnection> connections, Long environmentId) {
@@ -527,7 +589,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         @AuditData(key = "projectId", value = "#projectDeployment.projectId"),
         @AuditData(key = "name", value = "#projectDeployment.name")
     })
-    @PreAuthorize("hasPermission(#projectDeployment.projectId, 'Project', 'DEPLOYMENT_PUSH')")
+    @PreAuthorize("hasPermission(#projectDeployment.id, 'ProjectDeployment', 'DEPLOYMENT_CREATE')")
     public void updateProjectDeployment(
         ProjectDeployment projectDeployment, List<ProjectDeploymentWorkflow> projectDeploymentWorkflows,
         List<Tag> tags) {
@@ -546,12 +608,23 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             projectWorkflowService.getProjectWorkflows(projectDeployment.getProjectId()));
     }
 
+    // The tag-only ProjectDeploymentServiceImpl.update(long, List) overload carries no guard — only
+    // update(ProjectDeployment) does — so this was reachable by any authenticated caller.
     @Override
+    @PreAuthorize("hasPermission(#id, 'ProjectDeployment', 'DEPLOYMENT_EDIT')")
     public void updateProjectDeploymentTags(long id, List<Tag> tags) {
         projectDeploymentService.update(id, CollectionUtils.map(checkTags(tags), Tag::getId));
     }
 
+    // Repoints a deployed workflow's connections and inputs, and ProjectDeploymentWorkflowServiceImpl.update carries no
+    // guard. Keyed on the row's own id, because that is what the write selects by — update() looks the row up by
+    // getId() and neither reads nor copies the argument's projectDeploymentId. Keying on projectDeploymentId instead
+    // would check a deployment the write never touches: the REST path
+    // /project-deployments/{id}/project-deployment-workflows/{projectDeploymentWorkflowId} supplies the two
+    // independently, so a member who is editor in Development and viewer in Production could satisfy a
+    // projectDeploymentId-keyed check against Development while repointing a Production row.
     @Override
+    @PreAuthorize("hasPermission(#projectDeploymentWorkflow.id, 'ProjectDeploymentWorkflow', 'DEPLOYMENT_EDIT')")
     public void updateProjectDeploymentWorkflow(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
         ProjectDeploymentWorkflow oldProjectDeploymentWorkflow =
             projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
@@ -560,6 +633,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
             oldProjectDeploymentWorkflow.getProjectDeploymentId());
 
+        checkProjectDeploymentWorkflowConnectionUsage(
+            projectDeploymentWorkflow.getConnections(), oldProjectDeploymentWorkflow.getWorkflowId(),
+            projectDeployment.getEnvironment());
         validateProjectDeploymentWorkflow(projectDeployment, projectDeploymentWorkflow);
 
         ProjectDeploymentWorkflow updatedProjectDeploymentWorkflow = projectDeploymentWorkflowService.update(
@@ -644,6 +720,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 }
             }
 
+            checkProjectDeploymentWorkflowConnectionUsage(
+                projectDeploymentWorkflow.getConnections(), projectDeploymentWorkflow.getWorkflowId(),
+                projectDeployment.getEnvironment());
             validateProjectDeploymentWorkflow(projectDeployment, projectDeploymentWorkflow);
 
             if (oldProjectDeploymentWorkflow == null) {
@@ -1025,6 +1104,20 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 projectDeploymentWorkflow.getProjectDeploymentId(),
                 projectDeploymentWorkflow.getWorkflowId()),
             workflowUuid);
+    }
+
+    private void checkProjectDeploymentWorkflowConnectionUsage(
+        List<ProjectDeploymentWorkflowConnection> projectDeploymentWorkflowConnections, String workflowId,
+        Environment environment) {
+
+        for (ProjectDeploymentWorkflowConnection projectDeploymentWorkflowConnection : projectDeploymentWorkflowConnections) {
+            long connectionId = projectDeploymentWorkflowConnection.getConnectionId();
+
+            if (!permissionService.canUseConnectionInWorkflow(connectionId, workflowId, environment)) {
+                throw new AccessDeniedException(
+                    "Connection id=%s cannot be used by workflow id=%s".formatted(connectionId, workflowId));
+            }
+        }
     }
 
     private void validateProjectDeploymentWorkflow(

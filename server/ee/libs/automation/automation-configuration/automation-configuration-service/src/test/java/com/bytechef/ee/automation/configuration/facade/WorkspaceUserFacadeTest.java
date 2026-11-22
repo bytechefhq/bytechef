@@ -9,7 +9,6 @@ package com.bytechef.ee.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -20,8 +19,7 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.ee.automation.configuration.service.WorkspaceUserService;
-import com.bytechef.exception.ConfigurationException;
-import java.util.Optional;
+import com.bytechef.platform.configuration.domain.Environment;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,6 +29,8 @@ import org.junit.jupiter.api.Test;
  */
 class WorkspaceUserFacadeTest {
 
+    private static final long CUSTOM_ROLE_ID = 7L;
+    private static final String EMAIL = "member@example.com";
     private static final long USER_ID = 2L;
     private static final long WORKSPACE_ID = 1L;
 
@@ -43,12 +43,46 @@ class WorkspaceUserFacadeTest {
     void testAddWorkspaceUserEvictsTheScopeCache() {
         WorkspaceUser workspaceUser = WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER);
 
-        when(workspaceUserService.addWorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER))
+        when(workspaceUserService.addWorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER, null))
             .thenReturn(workspaceUser);
 
-        assertThat(workspaceUserFacade.addWorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER))
+        assertThat(workspaceUserFacade.addWorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER, null))
             .isSameAs(workspaceUser);
 
+        verify(permissionService).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
+    }
+
+    @Test
+    void testAssignCustomRoleEvictsTheScopeCache() {
+        WorkspaceUser workspaceUser = WorkspaceUser.forCustomRole(USER_ID, WORKSPACE_ID, CUSTOM_ROLE_ID);
+
+        when(workspaceUserService.assignCustomRole(USER_ID, WORKSPACE_ID, CUSTOM_ROLE_ID))
+            .thenReturn(workspaceUser);
+
+        assertThat(workspaceUserFacade.assignCustomRole(USER_ID, WORKSPACE_ID, CUSTOM_ROLE_ID))
+            .isSameAs(workspaceUser);
+
+        verify(permissionService).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
+    }
+
+    @Test
+    void testInviteWorkspaceUserEvictsTheScopeCacheOfTheInvitedUser() {
+        WorkspaceUser workspaceUser = WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR);
+
+        when(workspaceUserService.inviteWorkspaceUser(WORKSPACE_ID, EMAIL, WorkspaceRole.EDITOR, null))
+            .thenReturn(workspaceUser);
+
+        assertThat(workspaceUserFacade.inviteWorkspaceUser(WORKSPACE_ID, EMAIL, WorkspaceRole.EDITOR, null))
+            .isSameAs(workspaceUser);
+
+        verify(permissionService).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
+    }
+
+    @Test
+    void testRemoveEnvironmentRoleEvictsTheScopeCache() {
+        workspaceUserFacade.removeEnvironmentRole(USER_ID, WORKSPACE_ID, Environment.PRODUCTION);
+
+        verify(workspaceUserService).removeEnvironmentRole(USER_ID, WORKSPACE_ID, Environment.PRODUCTION);
         verify(permissionService).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
     }
 
@@ -73,11 +107,26 @@ class WorkspaceUserFacadeTest {
     }
 
     @Test
+    void testSetEnvironmentRoleEvictsTheScopeCache() {
+        WorkspaceUser workspaceUser = WorkspaceUser.forRole(
+            USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER, Environment.STAGING);
+
+        when(workspaceUserService.setEnvironmentRole(
+            USER_ID, WORKSPACE_ID, Environment.STAGING, WorkspaceRole.VIEWER, null))
+                .thenReturn(workspaceUser);
+
+        assertThat(
+            workspaceUserFacade.setEnvironmentRole(
+                USER_ID, WORKSPACE_ID, Environment.STAGING, WorkspaceRole.VIEWER, null))
+                    .isSameAs(workspaceUser);
+
+        verify(permissionService).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
+    }
+
+    @Test
     void testUpdateWorkspaceUserRoleEvictsTheScopeCache() {
         WorkspaceUser workspaceUser = WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR);
 
-        when(workspaceUserService.fetchWorkspaceUser(USER_ID, WORKSPACE_ID))
-            .thenReturn(Optional.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER)));
         when(workspaceUserService.updateWorkspaceUserRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR))
             .thenReturn(workspaceUser);
 
@@ -88,32 +137,14 @@ class WorkspaceUserFacadeTest {
     }
 
     @Test
-    void testUpdateWorkspaceUserRoleRefusesSelfDemotionOfAnAdmin() {
-        when(workspaceUserService.fetchWorkspaceUser(USER_ID, WORKSPACE_ID))
-            .thenReturn(Optional.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN)));
-        when(permissionService.isCurrentUser(USER_ID)).thenReturn(true);
+    void testUpdateWorkspaceUserRoleDoesNotEvictWhenTheServiceRefuses() {
+        when(workspaceUserService.updateWorkspaceUserRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR))
+            .thenThrow(new IllegalStateException("self-demotion"));
 
         assertThatThrownBy(
             () -> workspaceUserFacade.updateWorkspaceUserRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR))
-                .isInstanceOf(ConfigurationException.class);
+                .isInstanceOf(IllegalStateException.class);
 
-        verify(workspaceUserService, never()).updateWorkspaceUserRole(
-            anyLong(), anyLong(), any(WorkspaceRole.class));
         verify(permissionService, never()).evictWorkspaceScopeCache(anyLong(), anyLong());
-    }
-
-    @Test
-    void testUpdateWorkspaceUserRoleAllowsATenantAdminToDemoteThemselves() {
-        WorkspaceUser workspaceUser = WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR);
-
-        when(workspaceUserService.fetchWorkspaceUser(USER_ID, WORKSPACE_ID))
-            .thenReturn(Optional.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN)));
-        when(permissionService.isTenantAdmin()).thenReturn(true);
-        when(permissionService.isCurrentUser(USER_ID)).thenReturn(true);
-        when(workspaceUserService.updateWorkspaceUserRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR))
-            .thenReturn(workspaceUser);
-
-        assertThat(workspaceUserFacade.updateWorkspaceUserRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR))
-            .isSameAs(workspaceUser);
     }
 }

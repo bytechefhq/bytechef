@@ -2,8 +2,11 @@ import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useWorkflowExecutionDetailQueries} from '@/shared/components/workflow-executions/providers/workflowExecutionDetailQueriesProvider';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {PanelRightIcon} from 'lucide-react';
 import {useState} from 'react';
 
@@ -12,14 +15,26 @@ import WorkflowExecutionSheetWorkflowPanel from './WorkflowExecutionSheetWorkflo
 import useWorkflowExecutionDetail from './hooks/useWorkflowExecutionDetail';
 
 interface WorkflowExecutionDetailProps {
+    embedded?: boolean;
     enabled?: boolean;
     workflowExecutionId: number;
 }
 
-const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: WorkflowExecutionDetailProps) => {
+const WorkflowExecutionDetail = ({
+    embedded = false,
+    enabled = true,
+    workflowExecutionId,
+}: WorkflowExecutionDetailProps) => {
     const [workflowPanelVisible, setWorkflowPanelVisible] = useState(false);
 
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
     const {useGetComponentDefinitionsQuery} = useWorkflowExecutionDetailQueries();
+
+    const hasWorkspaceExecutionDetailsScope = useHasWorkspaceScope(currentWorkspaceId, 'EXECUTION_DETAILS_VIEW');
+    const hasEmbeddedExecutionDetailsScope = useHasEmbeddedScope('EXECUTION_DETAILS_VIEW');
+
+    const canViewExecutionDetails = embedded ? hasEmbeddedExecutionDetailsScope : hasWorkspaceExecutionDetailsScope;
 
     const {
         activeTab,
@@ -46,7 +61,7 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
         workflowExecutionError,
         workflowExecutionLoading,
         workflowExecutionRefetchError,
-    } = useWorkflowExecutionDetail(workflowExecutionId, enabled);
+    } = useWorkflowExecutionDetail(workflowExecutionId, enabled, canViewExecutionDetails);
 
     if (workflowExecutionLoading) {
         return (
@@ -89,6 +104,7 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
                     {(job || triggerExecution) && (
                         <WorkflowExecutionSheetContent
                             activeTab={activeTab}
+                            embedded={embedded}
                             focusedExecution={focusedExecution}
                             focusedTaskExecutionError={focusedTaskExecutionError}
                             handleBreadcrumbNavigate={handleBreadcrumbNavigate}

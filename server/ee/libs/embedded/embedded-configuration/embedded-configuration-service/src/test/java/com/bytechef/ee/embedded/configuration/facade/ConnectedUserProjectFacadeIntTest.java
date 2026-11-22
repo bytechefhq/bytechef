@@ -69,6 +69,7 @@ import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWork
 import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException;
 import com.bytechef.ee.embedded.configuration.listener.AutomationProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
+import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionReader;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
@@ -254,7 +255,7 @@ class ConnectedUserProjectFacadeIntTest {
     private ComponentDefinitionService componentDefinitionService;
 
     @MockitoSpyBean
-    private ConnectedUserConnectionFacade connectedUserConnectionFacade;
+    private ConnectedUserConnectionReader connectedUserConnectionReader;
 
     @Autowired
     private ConnectedUserConnectionService connectedUserConnectionService;
@@ -941,7 +942,7 @@ class ConnectedUserProjectFacadeIntTest {
         String secondWorkflowTemplateUuid = addAutomation(
             automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         AutomationProjectConfiguration configurationA = automationProjectConfigurationService.create(
             automationProjectId, Environment.PRODUCTION.ordinal(), "A", null, 1, true, true);
@@ -958,7 +959,7 @@ class ConnectedUserProjectFacadeIntTest {
 
         automationProjectFacade.updateProjectWorkflow(secondWorkflowTemplateUuid, "Version two", "");
 
-        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId, null);
 
         automationProjectConfigurationService.create(
             automationProjectId, Environment.PRODUCTION.ordinal(), "B", null, 2, true, true);
@@ -1484,7 +1485,7 @@ class ConnectedUserProjectFacadeIntTest {
         when(connectionDTO.id()).thenReturn(connectionId);
         when(connectionDTO.componentName()).thenReturn("slack");
         doReturn(List.of(connectionDTO))
-            .when(connectedUserConnectionFacade)
+            .when(connectedUserConnectionReader)
             .getConnections(anyLong(), eq("slack"), eq(List.of()));
         when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class))).thenReturn(List.of(slot));
         when(componentConnectionFacade.getComponentConnection(anyString(), eq("postMessage1"), eq("slack")))
@@ -1505,7 +1506,7 @@ class ConnectedUserProjectFacadeIntTest {
 
         @BeforeEach
         void setUpProvisioning() {
-            reset(connectedUserConnectionFacade);
+            reset(connectedUserConnectionReader);
 
             SecurityContextHolder.getContext()
                 .setAuthentication(new UsernamePasswordAuthenticationToken(ADMIN_LOGIN, null, List.of()));
@@ -1590,7 +1591,7 @@ class ConnectedUserProjectFacadeIntTest {
 
             long unconfiguredProjectId = createProjectWithWorkflows("Provisionable Unconfigured", 1);
 
-            automationProjectFacade.publishProject(unconfiguredProjectId);
+            automationProjectFacade.publishProject(unconfiguredProjectId, null);
 
             long configuredProjectId = createProjectWithWorkflows("Provisionable Configured", 1);
 

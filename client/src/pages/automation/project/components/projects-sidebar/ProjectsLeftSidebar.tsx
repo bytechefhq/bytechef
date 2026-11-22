@@ -20,7 +20,10 @@ import {CODE_WORKFLOW_SORT_OPTIONS, SORT_OPTIONS, SOURCE_ORDER_SORT_OPTION} from
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useCodeWorkflowSourceQuery} from '@/shared/middleware/graphql';
 import {useImportProjectMutation} from '@/shared/mutations/automation/projects.mutations';
-import {useGetProjectWorkflowsQuery, useGetWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
+import {
+    useGetProjectWorkflowsQuery,
+    useGetWorkspaceWorkflowsQuery,
+} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -53,18 +56,19 @@ const ProjectsLeftSidebar = ({
     const projectFileInputRef = useRef<HTMLInputElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
 
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
     const {data: eachProjectWorkflows, isLoading: projectWorkflowsLoading} = useGetProjectWorkflowsQuery(
         selectedProjectId,
         selectedProjectId !== 0
     );
-    const {data: allProjectsWorkflows, isLoading: allProjectsWorkflowsLoading} = useGetWorkflowsQuery(
-        selectedProjectId === 0
+    const {data: allProjectsWorkflows, isLoading: allProjectsWorkflowsLoading} = useGetWorkspaceWorkflowsQuery(
+        currentWorkspaceId!,
+        selectedProjectId === 0 && !!currentWorkspaceId
     );
     const workflows = eachProjectWorkflows || allProjectsWorkflows;
 
     const {calculateTimeDifference, getFilteredWorkflows, getWorkflowsProjectId} = useProjectsLeftSidebar();
-
-    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {
         data: projects,

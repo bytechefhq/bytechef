@@ -79,7 +79,8 @@ class McpAutomationWorkflowFacadeImpl implements McpAutomationWorkflowFacade {
         @AuditData(key = "workflowUuid", value = "#workflowUuid"),
         @AuditData(key = "enabled", value = "#enable")
     })
-    @PreAuthorize("isTenantAdmin() or isConnectedUser()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_MANAGE') " +
+        "or isCurrentConnectedUser(#connectedUserId)")
     public void enableMcpAutomationWorkflow(long connectedUserId, String workflowUuid, boolean enable) {
         if (ConnectedUserAuthentications.fetchCurrent()
             .isPresent() && !ConnectedUserAuthentications.isCurrentConnectedUser(connectedUserId)) {
@@ -110,7 +111,8 @@ class McpAutomationWorkflowFacadeImpl implements McpAutomationWorkflowFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin() or isConnectedUser()")
+    @PreAuthorize("hasPermission(#connectedUserId, 'ConnectedUser', 'CONNECTED_USER_VIEW') " +
+        "or isCurrentConnectedUser(#connectedUserId)")
     public Map<String, Boolean> getMcpEnabledByAutomationUuid(long connectedUserId) {
         Map<Long, Boolean> enabledByReferenceId = new HashMap<>();
         Map<Long, Boolean> offeredByLinkWorkflowId = new HashMap<>();

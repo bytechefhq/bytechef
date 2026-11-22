@@ -1,4 +1,5 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
+import {WorkflowEditorReadOnlyContext} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {
     getCompletionContext,
     unregisterCompletionContext,
@@ -112,34 +113,40 @@ vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
         hoisted.editorOptions.current = options;
 
         return (
-            <button
-                data-testid="mount-btn"
-                onClick={() =>
-                    onMount({
-                        focus: hoisted.editorFocus,
-                        getModel: () => ({uri: {toString: () => 'inmemory://test'}}),
-                    })
-                }
-                type="button"
-            >
-                Mount
-            </button>
+            <>
+                <span data-testid="workflow-code-editor-read-only">{String(options?.readOnly)}</span>
+
+                <button
+                    data-testid="mount-btn"
+                    onClick={() =>
+                        onMount({
+                            focus: hoisted.editorFocus,
+                            getModel: () => ({uri: {toString: () => 'inmemory://test'}}),
+                        })
+                    }
+                    type="button"
+                >
+                    Mount
+                </button>
+            </>
         );
     },
 }));
 
-const renderSheet = (workflow: Partial<Workflow>) =>
+const renderSheet = (workflow: Partial<Workflow>, readOnly = false) =>
     render(
-        <TooltipProvider>
-            <WorkflowCodeEditorSheet
-                invalidateWorkflowQueries={vi.fn()}
-                onSheetOpenClose={vi.fn()}
-                runDisabled={false}
-                sheetOpen
-                testConfigurationDisabled={false}
-                workflow={{definition: '{}', id: 'workflow-1', ...workflow} as Workflow}
-            />
-        </TooltipProvider>
+        <WorkflowEditorReadOnlyContext.Provider value={readOnly}>
+            <TooltipProvider>
+                <WorkflowCodeEditorSheet
+                    invalidateWorkflowQueries={vi.fn()}
+                    onSheetOpenClose={vi.fn()}
+                    runDisabled={false}
+                    sheetOpen
+                    testConfigurationDisabled={false}
+                    workflow={{definition: '{}', id: 'workflow-1', ...workflow} as Workflow}
+                />
+            </TooltipProvider>
+        </WorkflowEditorReadOnlyContext.Provider>
     );
 
 describe('WorkflowCodeEditorSheet', () => {
@@ -147,6 +154,7 @@ describe('WorkflowCodeEditorSheet', () => {
         windowResizeObserver();
         hoisted.editorState.includeComponents = undefined;
         hoisted.editorState.platformType = 'AUTOMATION';
+        hoisted.sheetState.workflowIsRunning = false;
     });
 
     afterEach(() => {
@@ -225,5 +233,31 @@ describe('WorkflowCodeEditorSheet', () => {
         fireEvent.click(await screen.findByTestId('mount-btn'));
 
         expect(hoisted.editorFocus).toHaveBeenCalled();
+    });
+
+    it('offers Save, Test and an editable definition when the editor is editable', async () => {
+        renderSheet({format: WorkflowFormat.Json, label: 'Workflow One'});
+
+        expect(await screen.findByTestId('workflow-code-editor-read-only')).toHaveTextContent('false');
+        expect(screen.getByRole('button', {name: 'Save current workflow'})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Test'})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Test Configuration'})).toBeEnabled();
+    });
+
+    it('shows a read-only definition without Save or Test in read-only mode', async () => {
+        renderSheet({format: WorkflowFormat.Json, label: 'Workflow One'}, true);
+
+        expect(await screen.findByTestId('workflow-code-editor-read-only')).toHaveTextContent('true');
+        expect(screen.queryByRole('button', {name: 'Save current workflow'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Test'})).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Test Configuration'})).toBeDisabled();
+    });
+
+    it('still offers Stop for a running test in read-only mode', async () => {
+        hoisted.sheetState.workflowIsRunning = true;
+
+        renderSheet({format: WorkflowFormat.Json, label: 'Workflow One'}, true);
+
+        expect(await screen.findByRole('button', {name: 'Stop'})).toBeInTheDocument();
     });
 });

@@ -1,4 +1,5 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {renderHook, waitFor} from '@testing-library/react';
 import {ReactNode} from 'react';
@@ -26,12 +27,14 @@ describe('connections.queries', () => {
 
         queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
 
+        environmentStore.setState({currentEnvironmentId: 2});
         useWorkspaceStore.setState({currentWorkspaceId: 7});
     });
 
-    it('keys the cache by workspace, so two workspaces cannot share an entry', () => {
-        expect(ConnectionKeys.workspaceConnectionTags(1)).toEqual(['automation_connectionTags', 1]);
-        expect(ConnectionKeys.workspaceConnectionTags(1)).not.toEqual(ConnectionKeys.workspaceConnectionTags(2));
+    it('keys the cache by workspace and environment, so two workspaces cannot share an entry', () => {
+        expect(ConnectionKeys.workspaceConnectionTags(1, 2)).toEqual(['automation_connectionTags', 1, 2]);
+        expect(ConnectionKeys.workspaceConnectionTags(1, 2)).not.toEqual(ConnectionKeys.workspaceConnectionTags(2, 2));
+        expect(ConnectionKeys.workspaceConnectionTags(1, 1)).not.toEqual(ConnectionKeys.workspaceConnectionTags(1, 2));
     });
 
     it('asks for the tags of the current workspace', async () => {
@@ -41,9 +44,9 @@ describe('connections.queries', () => {
 
         await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-        expect(getConnectionTagsMock).toHaveBeenCalledWith({id: 7});
+        expect(getConnectionTagsMock).toHaveBeenCalledWith({environmentId: 2, id: 7});
         expect(result.current.data).toEqual([{id: 10, name: 'billing'}]);
-        expect(queryClient.getQueryData(ConnectionKeys.workspaceConnectionTags(7))).toEqual([
+        expect(queryClient.getQueryData(ConnectionKeys.workspaceConnectionTags(7, 2))).toEqual([
             {id: 10, name: 'billing'},
         ]);
     });

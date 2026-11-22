@@ -36,6 +36,7 @@ import TagList from '@/shared/components/TagList';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {UNION_ENVIRONMENT_ID, useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import getCodeWorkflowLanguageLabel, {isJavaCodeWorkflow} from '@/shared/util/codeWorkflowLanguage-utils';
 import {useQueryClient} from '@tanstack/react-query';
@@ -87,6 +88,17 @@ const IntegrationListItem = ({
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
     const {captureIntegrationWorkflowCreated, captureIntegrationWorkflowImported} = useAnalytics();
+
+    const canCreateConfiguration = useHasEmbeddedScope(
+        'INTEGRATION_INSTANCE_CONFIGURATION_CREATE',
+        DEVELOPMENT_ENVIRONMENT
+    );
+    const canCreateWorkflow = useHasEmbeddedScope('WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
+    const canDeleteIntegration = useHasEmbeddedScope('INTEGRATION_DELETE', UNION_ENVIRONMENT_ID);
+    const canEditIntegration = useHasEmbeddedScope('WORKFLOW_EDIT', UNION_ENVIRONMENT_ID);
+    const canPublishIntegrationScope = useHasEmbeddedScope('INTEGRATION_PUBLISH', UNION_ENVIRONMENT_ID);
+
+    const canPublishIntegration = canEditIntegration && canPublishIntegrationScope;
 
     const {
         actions: componentActions,
@@ -295,6 +307,7 @@ const IntegrationListItem = ({
                                                 },
                                             })}
                                             id={integration.id!}
+                                            readOnly={!canEditIntegration}
                                             remainingTags={remainingTags}
                                             tags={integration.tags}
                                             updateTagsMutation={updateIntegrationTagsMutation}
@@ -370,32 +383,40 @@ const IntegrationListItem = ({
 
                             <DropdownMenuContent align="end">
                                 <DropdownMenuGroup aria-label="Integration Actions">
-                                    <DropdownMenuItem
-                                        icon={<EditIcon />}
-                                        label="Edit"
-                                        onClick={() => setShowEditDialog(true)}
-                                    />
+                                    {canEditIntegration && (
+                                        <DropdownMenuItem
+                                            icon={<EditIcon />}
+                                            label="Edit"
+                                            onClick={() => setShowEditDialog(true)}
+                                        />
+                                    )}
 
-                                    <IntegrationListItemPublishMenuItem
-                                        canPublish={hasWorkflows}
-                                        onClick={() => setShowPublishIntegrationDialog(true)}
-                                    />
+                                    {canPublishIntegration && (
+                                        <IntegrationListItemPublishMenuItem
+                                            canPublish={hasWorkflows}
+                                            onClick={() => setShowPublishIntegrationDialog(true)}
+                                        />
+                                    )}
                                 </DropdownMenuGroup>
 
                                 <DropdownMenuSeparator />
 
                                 <DropdownMenuGroup aria-label="Workflow Actions">
-                                    <DropdownMenuItem
-                                        icon={<PlusIcon />}
-                                        label="New Workflow"
-                                        onSelect={() => setShowWorkflowDialog(true)}
-                                    />
+                                    {canCreateWorkflow && (
+                                        <>
+                                            <DropdownMenuItem
+                                                icon={<PlusIcon />}
+                                                label="New Workflow"
+                                                onSelect={() => setShowWorkflowDialog(true)}
+                                            />
 
-                                    <DropdownMenuItem
-                                        icon={<UploadIcon />}
-                                        label="Import Workflow"
-                                        onSelect={() => hiddenFileInputRef.current?.click()}
-                                    />
+                                            <DropdownMenuItem
+                                                icon={<UploadIcon />}
+                                                label="Import Workflow"
+                                                onSelect={() => hiddenFileInputRef.current?.click()}
+                                            />
+                                        </>
+                                    )}
 
                                     {workflowCount > 0 && (
                                         <DropdownMenuItem
@@ -410,37 +431,47 @@ const IntegrationListItem = ({
                                     )}
                                 </DropdownMenuGroup>
 
-                                <DropdownMenuSeparator />
+                                {canCreateConfiguration && (
+                                    <>
+                                        <DropdownMenuSeparator />
 
-                                <DropdownMenuGroup aria-label="Configuration Actions">
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <span className="block">
-                                                <DropdownMenuItem
-                                                    disabled={!isConfigurable}
-                                                    icon={<Settings2Icon />}
-                                                    label="New Configuration"
-                                                    onSelect={() => setShowIntegrationInstanceConfigurationDialog(true)}
-                                                />
-                                            </span>
-                                        </TooltipTrigger>
+                                        <DropdownMenuGroup aria-label="Configuration Actions">
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <span className="block">
+                                                        <DropdownMenuItem
+                                                            disabled={!isConfigurable}
+                                                            icon={<Settings2Icon />}
+                                                            label="New Configuration"
+                                                            onSelect={() =>
+                                                                setShowIntegrationInstanceConfigurationDialog(true)
+                                                            }
+                                                        />
+                                                    </span>
+                                                </TooltipTrigger>
 
-                                        {!isConfigurable && (
-                                            <TooltipContent>
-                                                Publish the integration before configuring it.
-                                            </TooltipContent>
-                                        )}
-                                    </Tooltip>
-                                </DropdownMenuGroup>
+                                                {!isConfigurable && (
+                                                    <TooltipContent>
+                                                        Publish the integration before configuring it.
+                                                    </TooltipContent>
+                                                )}
+                                            </Tooltip>
+                                        </DropdownMenuGroup>
+                                    </>
+                                )}
 
-                                <DropdownMenuSeparator />
+                                {canDeleteIntegration && (
+                                    <>
+                                        <DropdownMenuSeparator />
 
-                                <DropdownMenuItem
-                                    icon={<Trash2Icon />}
-                                    label="Delete"
-                                    onClick={() => setShowDeleteDialog(true)}
-                                    variant="destructive"
-                                />
+                                        <DropdownMenuItem
+                                            icon={<Trash2Icon />}
+                                            label="Delete"
+                                            onClick={() => setShowDeleteDialog(true)}
+                                            variant="destructive"
+                                        />
+                                    </>
+                                )}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -451,7 +482,7 @@ const IntegrationListItem = ({
                 <IntegrationListItemTabs
                     actionCount={componentActions?.length}
                     actions={
-                        activeTab === 'workflows' && workflowCount > 0 ? (
+                        activeTab === 'workflows' && workflowCount > 0 && canCreateWorkflow ? (
                             <ButtonGroup aria-label="Workflow Creation Actions">
                                 <Button
                                     aria-label="Create Workflow"
@@ -495,7 +526,10 @@ const IntegrationListItem = ({
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </ButtonGroup>
-                        ) : activeTab === 'configurations' && isConfigurable && configurationCount !== 0 ? (
+                        ) : activeTab === 'configurations' &&
+                          canCreateConfiguration &&
+                          isConfigurable &&
+                          configurationCount !== 0 ? (
                             <IntegrationInstanceConfigurationDialog
                                 integrationInstanceConfiguration={
                                     {

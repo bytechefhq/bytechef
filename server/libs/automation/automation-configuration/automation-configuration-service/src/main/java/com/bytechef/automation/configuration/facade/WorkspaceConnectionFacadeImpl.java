@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.automation.configuration.audit.WorkspaceConnectionAuditEvents;
 import com.bytechef.automation.configuration.domain.WorkspaceConnection;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.commons.util.CollectionUtils;
@@ -27,13 +28,16 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.security.ConnectionSecrets;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.web.authentication.NonPlatformUserAuthentication;
 import com.bytechef.platform.tag.domain.Tag;
-import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -48,31 +52,43 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade {
 
+    private static final String CONNECTION_EDIT = "CONNECTION_EDIT";
+    private static final String CONNECTION_TYPE = "Connection";
+
     private final ConnectionFacade connectionFacade;
     private final ConnectionLifecycleFacade connectionLifecycleFacade;
     private final ConnectionService connectionService;
+    private final PermissionService permissionService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
-    private final TagService tagService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkspaceConnectionService workspaceConnectionService;
 
     @SuppressFBWarnings("EI")
     public WorkspaceConnectionFacadeImpl(
         ConnectionFacade connectionFacade, ConnectionLifecycleFacade connectionLifecycleFacade,
-        ConnectionService connectionService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        TagService tagService, WorkflowTestConfigurationService workflowTestConfigurationService,
+        ConnectionService connectionService, PermissionService permissionService,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkspaceConnectionService workspaceConnectionService) {
 
         this.connectionFacade = connectionFacade;
         this.connectionLifecycleFacade = connectionLifecycleFacade;
         this.connectionService = connectionService;
+        this.permissionService = permissionService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
-        this.tagService = tagService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workspaceConnectionService = workspaceConnectionService;
     }
 
     @Override
+    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_CREATED, data = {
+        @AuditData(key = "workspaceId", value = "#workspaceId"),
+        @AuditData(key = "connectionId", value = "#result"),
+        @AuditData(key = "name", value = "#connectionDTO.name"),
+        @AuditData(key = "componentName", value = "#connectionDTO.componentName"),
+        @AuditData(key = "environmentId", value = "#connectionDTO.environmentId")
+    })
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'CONNECTION_CREATE', #connectionDTO.environmentId)")
     public long create(long workspaceId, ConnectionDTO connectionDTO) {
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
 
@@ -82,8 +98,12 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_DELETED, data = {
+        @AuditData(key = "connectionId", value = "#connectionId")
+    })
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE')")
     public void delete(long connectionId) {
-        requireAutomationConnection(connectionId);
+        requireAutomationConnectionUnlessConnectedUser(connectionId);
 
         workspaceConnectionService.deleteWorkspaceConnection(connectionId);
 
@@ -103,14 +123,20 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_VIEW')")
     @Transactional(readOnly = true)
     public ConnectionDTO getConnection(long connectionId) {
-        requireAutomationConnection(connectionId);
+        requireAutomationConnectionUnlessConnectedUser(connectionId);
 
-        return connectionFacade.getConnection(connectionId);
+        ConnectionDTO connectionDTO = connectionFacade.getConnection(connectionId);
+
+        return canSeeCredentials(
+            connectionDTO, permissionService.hasResourceScope(connectionId, CONNECTION_TYPE, CONNECTION_EDIT))
+                ? connectionDTO : connectionDTO.withoutCredentials();
     }
 
     @Override
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'CONNECTION_VIEW', #environmentId)")
     public List<ConnectionDTO> getConnections(
         long workspaceId, String componentName, Integer connectionVersion, Long environmentId, Long tagId) {
 
@@ -121,14 +147,29 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
             return List.of();
         }
 
-        return connectionFacade.getConnections(
+        List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(
             componentName, connectionVersion, connectionIds, tagId, environmentId, PlatformType.AUTOMATION);
+
+        Map<Integer, Boolean> canEditByEnvironmentId = new HashMap<>();
+        List<ConnectionDTO> redactedConnectionDTOs = new ArrayList<>();
+
+        for (ConnectionDTO connectionDTO : connectionDTOs) {
+            boolean canEdit = canEditByEnvironmentId.computeIfAbsent(
+                connectionDTO.environmentId(),
+                connectionEnvironmentId -> permissionService.hasResourceScope(
+                    connectionDTO.id(), CONNECTION_TYPE, CONNECTION_EDIT));
+
+            redactedConnectionDTOs.add(
+                canSeeCredentials(connectionDTO, canEdit) ? connectionDTO : connectionDTO.withoutCredentials());
+        }
+
+        return redactedConnectionDTOs;
     }
 
     @Override
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'CONNECTION_VIEW', #environmentId)")
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
-    public List<Tag> getConnectionTags(long workspaceId) {
+    public List<Tag> getConnectionTags(long workspaceId, Long environmentId) {
         List<Long> connectionIds = CollectionUtils.map(
             workspaceConnectionService.getWorkspaceConnections(workspaceId), WorkspaceConnection::getConnectionId);
 
@@ -136,24 +177,32 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
             return List.of();
         }
 
-        List<Connection> connections = connectionService.getConnections(connectionIds);
-
-        return tagService.getTags(
-            connections.stream()
-                .filter(connection -> connection.getType() == PlatformType.AUTOMATION)
-                .flatMap(connection -> CollectionUtils.stream(connection.getTagIds()))
-                .distinct()
-                .toList());
+        return connectionFacade.getConnections(null, null, connectionIds, null, environmentId, PlatformType.AUTOMATION)
+            .stream()
+            .flatMap(connectionDTO -> connectionDTO.tags()
+                .stream())
+            .distinct()
+            .toList();
     }
 
     @Override
+    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_UPDATED, data = {
+        @AuditData(key = "connectionId", value = "#connectionId"),
+        @AuditData(key = "name", value = "#name")
+    })
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT')")
     public void update(long connectionId, String name, List<Tag> tags, int version) {
-        requireAutomationConnection(connectionId);
+        requireAutomationConnectionUnlessConnectedUser(connectionId);
 
         connectionFacade.update(connectionId, name, tags, version);
     }
 
     @Override
+    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_UPDATED, data = {
+        @AuditData(key = "connectionId", value = "#connectionId"),
+        @AuditData(key = "name", value = "#name")
+    })
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT')")
     public void update(
         long connectionId, String name, Map<String, ?> connectionParameters, List<Tag> tags, int version) {
 
@@ -163,8 +212,9 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT')")
     public void updateConnectionTags(long connectionId, List<Tag> tags) {
-        requireAutomationConnection(connectionId);
+        requireAutomationConnectionUnlessConnectedUser(connectionId);
 
         connectionFacade.update(connectionId, tags);
     }
@@ -180,11 +230,28 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         connectionFacade.updateCredentials(connectionId, parameters, version);
     }
 
+    private static boolean canSeeCredentials(ConnectionDTO connectionDTO, boolean canEdit) {
+        if (!canEdit) {
+            return false;
+        }
+
+        return NonPlatformUserAuthentication.isCurrent() ||
+            ConnectionSecrets.isCurrentUserCreator(connectionDTO.createdBy());
+    }
+
     private void requireAutomationConnection(long connectionId) {
         Connection connection = connectionService.getConnection(connectionId);
 
         if (connection.getType() != PlatformType.AUTOMATION) {
             throw new NoSuchElementException("Connection does not exist for id=" + connectionId);
         }
+    }
+
+    private void requireAutomationConnectionUnlessConnectedUser(long connectionId) {
+        if (NonPlatformUserAuthentication.isCurrent()) {
+            return;
+        }
+
+        requireAutomationConnection(connectionId);
     }
 }

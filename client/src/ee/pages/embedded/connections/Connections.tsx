@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import EmptyFilterResult from '@/components/EmptyFilterResult';
+import EmptyList from '@/components/EmptyList';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import JourneySteps from '@/components/JourneySteps/JourneySteps';
 import PageLoader from '@/components/PageLoader';
@@ -18,9 +19,11 @@ import {
     useGetConnectionTagsQuery,
     useGetConnectionsQuery,
 } from '@/ee/shared/queries/embedded/connections.queries';
+import {PlatformType} from '@/pages/home/stores/usePlatformTypeStore';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionsLeftSidebarNav from '@/shared/components/connection/ConnectionsLeftSidebarNav';
 import {useEnvironmentScopeNote} from '@/shared/hooks/useEnvironmentScopeNote';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -48,6 +51,8 @@ export const Connections = () => {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const environmentScopeNote = useEnvironmentScopeNote('Connections');
+
+    const canCreateConnection = useHasEmbeddedScope('CONNECTION_CREATE');
 
     const componentName = searchParams.get('componentName');
     const tagId = searchParams.get('tagId');
@@ -194,6 +199,7 @@ export const Connections = () => {
                     position="main"
                     right={
                         !connectedUserView &&
+                        canCreateConnection &&
                         connections &&
                         connections.length > 0 &&
                         componentDefinitions && (
@@ -206,6 +212,7 @@ export const Connections = () => {
                                 }
                                 connectionTagsQueryKey={ConnectionKeys.connectionTags}
                                 connectionsQueryKey={ConnectionKeys.connections}
+                                platformType={PlatformType.EMBEDDED}
                                 showSharedOption
                                 triggerNode={<Button label="New Connection" />}
                                 useCreateConnectionMutation={useCreateConnectionMutation}
@@ -280,6 +287,12 @@ export const Connections = () => {
                     )
                 ) : hasActiveFilter ? (
                     <EmptyFilterResult entityName="connections" entityTitle="Connections" />
+                ) : !canCreateConnection ? (
+                    <EmptyList
+                        icon={<Link2Icon className="size-24 text-stroke-neutral-tertiary" />}
+                        message="There are no connections yet."
+                        title="No Connections"
+                    />
                 ) : (
                     <EmptyState
                         actions={
@@ -293,6 +306,7 @@ export const Connections = () => {
                                     }
                                     connectionTagsQueryKey={ConnectionKeys.connectionTags}
                                     connectionsQueryKey={ConnectionKeys.connections}
+                                    platformType={PlatformType.EMBEDDED}
                                     showSharedOption
                                     triggerNode={<Button label="Create Connection" />}
                                     useCreateConnectionMutation={useCreateConnectionMutation}

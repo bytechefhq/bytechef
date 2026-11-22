@@ -33,10 +33,11 @@ import org.springframework.stereotype.Repository;
 public interface WorkflowNodeTestOutputRepository
     extends ListCrudRepository<WorkflowNodeTestOutput, Long> {
 
-    boolean existsByWorkflowIdAndWorkflowNodeName(String workflowId, String workflowNodeName);
+    boolean existsByWorkflowIdAndWorkflowNodeNameAndEnvironmentId(
+        String workflowId, String workflowNodeName, long environmentId);
 
-    boolean existsByWorkflowIdAndWorkflowNodeNameAndLastModifiedDateAfter(
-        String workflowId, String workflowNodeName, Instant lastModifiedDate);
+    boolean existsByWorkflowIdAndWorkflowNodeNameAndEnvironmentIdAndLastModifiedDateAfter(
+        String workflowId, String workflowNodeName, long environmentId, Instant lastModifiedDate);
 
     List<WorkflowNodeTestOutput> findByWorkflowId(String workflowId);
 

@@ -15,6 +15,7 @@ import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ListGroupHeader from '@/shared/components/ListGroupHeader';
 import OpenInButton from '@/shared/components/OpenInButton';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -47,6 +48,8 @@ const IntegrationInstanceConfigurations = () => {
         id: integrationId ? parseInt(integrationId) : tagId ? parseInt(tagId) : undefined,
         type: tagId ? Type.Tag : Type.Integration,
     };
+
+    const canCreateConfiguration = useHasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_CREATE');
 
     const ff_743 = useFeatureFlagsStore()('ff-743');
 
@@ -127,6 +130,7 @@ const IntegrationInstanceConfigurations = () => {
                     centerTitle={true}
                     position="main"
                     right={
+                        canCreateConfiguration &&
                         integrationInstanceConfigurations &&
                         integrationInstanceConfigurations?.length > 0 && (
                             <IntegrationInstanceConfigurationDialog
@@ -305,8 +309,14 @@ const IntegrationInstanceConfigurations = () => {
                         message="No instance configurations match the selected filter."
                         title="No Matching Instance Configurations"
                     />
-                ) : (
+                ) : canCreateConfiguration ? (
                     <IntegrationInstanceConfigurationsEmptyState />
+                ) : (
+                    <EmptyList
+                        icon={<Settings2Icon className="size-24 text-stroke-neutral-tertiary" />}
+                        message="There are no instance configurations yet."
+                        title="No Instance Configurations"
+                    />
                 )}
             </PageLoader>
         </LayoutContainer>

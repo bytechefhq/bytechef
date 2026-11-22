@@ -7,12 +7,18 @@ import {fireEvent, render, screen, within} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
+    canCreateDeployment: true,
     error: null as Error | null,
     isLoading: false,
     navigate: vi.fn(),
     projectDeployments: [] as ProjectDeployment[] | undefined,
+    queryRequests: [] as unknown[],
     refetch: vi.fn(),
     savedEnvironmentId: 0,
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => hoisted.canCreateDeployment,
 }));
 
 vi.mock('react-router-dom', async (importOriginal) => ({
@@ -21,13 +27,17 @@ vi.mock('react-router-dom', async (importOriginal) => ({
 }));
 
 vi.mock('@/shared/queries/automation/projectDeployments.queries', () => ({
-    useGetWorkspaceProjectDeploymentsQuery: () => ({
-        data: hoisted.projectDeployments,
-        error: hoisted.error,
-        isFetching: false,
-        isLoading: hoisted.isLoading,
-        refetch: hoisted.refetch,
-    }),
+    useGetWorkspaceProjectDeploymentsQuery: (request: unknown) => {
+        hoisted.queryRequests.push(request);
+
+        return {
+            data: hoisted.projectDeployments,
+            error: hoisted.error,
+            isFetching: false,
+            isLoading: hoisted.isLoading,
+            refetch: hoisted.refetch,
+        };
+    },
 }));
 
 vi.mock('@/shared/queries/automation/componentDefinitions.queries', () => ({
@@ -144,6 +154,8 @@ const renderProjectDeploymentsPanel = (
 
 describe('ProjectDeploymentsPanel', () => {
     beforeEach(() => {
+        hoisted.canCreateDeployment = true;
+        hoisted.queryRequests = [];
         hoisted.error = null;
         hoisted.isLoading = false;
         hoisted.navigate.mockReset();
@@ -217,6 +229,14 @@ describe('ProjectDeploymentsPanel', () => {
         expect(screen.queryByRole('status', {name: 'Loading deployments'})).not.toBeInTheDocument();
     });
 
+    it('asks only for the deployments of the current environment', () => {
+        environmentStore.setState({currentEnvironmentId: 2});
+
+        renderProjectDeploymentsPanel();
+
+        expect(hoisted.queryRequests.at(-1)).toMatchObject({environmentId: 2});
+    });
+
     it('shows only the deployments of the current environment', () => {
         renderProjectDeploymentsPanel();
 
@@ -281,6 +301,15 @@ describe('ProjectDeploymentsPanel', () => {
         fireEvent.click(screen.getByText('Save deployment'));
 
         expect(onProjectDeploymentSaved).toHaveBeenCalledWith(3);
+    });
+
+    it('hides Deploy from the empty state without DEPLOYMENT_CREATE', () => {
+        hoisted.canCreateDeployment = false;
+        hoisted.projectDeployments = [];
+
+        renderProjectDeploymentsPanel();
+
+        expect(screen.queryByText('Save deployment')).not.toBeInTheDocument();
     });
 
     it('asks to publish an unpublished project', () => {

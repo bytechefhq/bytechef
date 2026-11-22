@@ -1,5 +1,6 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useUpdateKnowledgeBaseTagsMutation} from '@/shared/middleware/graphql';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -12,7 +13,7 @@ interface MutationCallbacksI {
     }) => Promise<{previous?: unknown}>;
 }
 
-const CURRENT_WORKSPACE_KEY = ['knowledgeBaseTagsByKnowledgeBase', {workspaceId: '7'}];
+const CURRENT_WORKSPACE_KEY = ['knowledgeBaseTagsByKnowledgeBase', {environmentId: '2', workspaceId: '7'}];
 
 const hoisted = vi.hoisted(() => {
     return {
@@ -51,6 +52,7 @@ describe('useKnowledgeBaseListItemTagList', () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
+        environmentStore.setState({currentEnvironmentId: 2});
         useWorkspaceStore.setState({currentWorkspaceId: 7});
     });
 

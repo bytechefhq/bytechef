@@ -9,11 +9,13 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
@@ -28,6 +30,7 @@ import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl;
@@ -224,6 +227,15 @@ class ConnectedUserConnectionFacadeIntTest {
                 .filter(Objects::nonNull)
                 .toList();
         });
+
+        doAnswer(invocation -> {
+            Runnable releaseReferences = invocation.getArgument(1);
+
+            releaseReferences.run();
+
+            return null;
+        }).when(connectionFacade)
+            .delete(anyLong(), any());
     }
 
     @AfterEach
@@ -399,7 +411,7 @@ class ConnectedUserConnectionFacadeIntTest {
             () -> connectedUserConnectionFacade.reauthorizeConnectedUserConnection(
                 connectedUserId, 82452L, parameters));
 
-        verify(connectionFacade, never()).delete(any());
+        verify(connectionFacade, never()).delete(any(), any());
         verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), any());
 
         assertThat(connectedUserConnectionService.getConnectionIds(connectedUserId)).contains(82452L);
@@ -423,7 +435,7 @@ class ConnectedUserConnectionFacadeIntTest {
             NoSuchElementException.class,
             () -> connectedUserConnectionFacade.deleteConnectedUserConnection(connectedUserId, 82512L));
 
-        verify(connectionFacade, never()).delete(any());
+        verify(connectionFacade, never()).delete(any(), any());
     }
 
     @Test
@@ -578,7 +590,9 @@ class ConnectedUserConnectionFacadeIntTest {
         verify(connectionFacade).getConnections(captor.capture(), eq(PlatformType.EMBEDDED));
 
         assertThat(captor.getValue()).containsExactlyInAnyOrder(83001L, 83002L, 83003L);
-        assertThat(connectionDTOs).containsExactlyInAnyOrder(slackConnection, hubspotConnection, githubConnection);
+        assertThat(connectionDTOs)
+            .extracting(ConnectionDTO::id, ConnectionDTO::componentName)
+            .containsExactlyInAnyOrder(tuple(83001L, "slack"), tuple(83002L, "hubspot"), tuple(83003L, "github"));
     }
 
     @Test
@@ -654,8 +668,22 @@ class ConnectedUserConnectionFacadeIntTest {
 
         stubConnectionsWithCredentials();
 
-        List<ConnectionDTO> connectionDTOs = connectedUserConnectionFacade.getConnectedUserConnections(
-            connectedUserId, null, List.of());
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new EmbeddedApiKeyAuthenticationToken(
+                    Environment.PRODUCTION.ordinal(), connectedUserId,
+                    new User(connectedUser.getExternalId(), "", List.of()), false));
+
+        List<ConnectionDTO> connectionDTOs;
+
+        try {
+            connectionDTOs = connectedUserConnectionFacade.getConnectedUserConnections(
+                connectedUserId, null, List.of());
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
 
         assertThat(connectionDTOs).hasSize(1);
 
@@ -725,7 +753,7 @@ class ConnectedUserConnectionFacadeIntTest {
 
         assertThat(connectedUserConnectionService.getConnectionIds(connectedUserId)).containsExactly(83101L);
 
-        verify(connectionFacade, never()).delete(any());
+        verify(connectionFacade, never()).delete(any(), any());
     }
 
     @Test
@@ -740,17 +768,21 @@ class ConnectedUserConnectionFacadeIntTest {
         doAnswer(invocation -> {
             connectionIdsSeenOnDelete.add(connectedUserConnectionService.getConnectionIds(connectedUserId));
 
+            Runnable releaseReferences = invocation.getArgument(1);
+
+            releaseReferences.run();
+
+            connectionIdsSeenOnDelete.add(connectedUserConnectionService.getConnectionIds(connectedUserId));
+
             return null;
         }).when(connectionFacade)
-            .delete(83201L);
+            .delete(eq(83201L), any());
 
         connectedUserConnectionFacade.deleteConnectedUserConnection(connectedUserId, 83201L);
 
-        verify(connectionFacade).delete(83201L);
+        verify(connectionFacade).delete(eq(83201L), any());
 
-        assertThat(connectionIdsSeenOnDelete)
-            .singleElement()
-            .satisfies(connectionIds -> assertThat(connectionIds).isEmpty());
+        assertThat(connectionIdsSeenOnDelete).containsExactly(List.of(83201L), List.of());
         assertThat(connectedUserConnectionService.getConnectionIds(connectedUserId)).isEmpty();
         assertThat(findSingleConnectionEvent(ConnectionAuditEvents.CONNECTION_DELETED, 83201L).getData())
             .containsEntry("result", "SUCCESS")
@@ -1098,7 +1130,7 @@ class ConnectedUserConnectionFacadeIntTest {
             NoSuchElementException.class,
             () -> connectedUserConnectionFacade.deleteConnectedUserConnection(connectedUserId, 83550L));
 
-        verify(connectionFacade, never()).delete(any());
+        verify(connectionFacade, never()).delete(any(), any());
     }
 
     @Test
@@ -1596,7 +1628,7 @@ class ConnectedUserConnectionFacadeIntTest {
                     connectedUserBId, CONNECTED_USER_B_CONNECTION_ID))
                         .isInstanceOf(AccessDeniedException.class);
 
-            verify(connectionFacade, never()).delete(any());
+            verify(connectionFacade, never()).delete(any(), any());
 
             assertThat(connectedUserConnectionService.getConnectionIds(connectedUserBId))
                 .containsExactly(CONNECTED_USER_B_CONNECTION_ID);
@@ -1611,7 +1643,7 @@ class ConnectedUserConnectionFacadeIntTest {
                     connectedUserAId, CONNECTED_USER_A_CONNECTION_ID))
                         .isInstanceOf(AccessDeniedException.class);
 
-            verify(connectionFacade, never()).delete(any());
+            verify(connectionFacade, never()).delete(any(), any());
 
             assertThat(connectedUserConnectionService.getConnectionIds(connectedUserAId))
                 .containsExactly(CONNECTED_USER_A_CONNECTION_ID);
@@ -1626,7 +1658,7 @@ class ConnectedUserConnectionFacadeIntTest {
                     connectedUserAId, CONNECTED_USER_A_CONNECTION_ID))
                         .isInstanceOf(AccessDeniedException.class);
 
-            verify(connectionFacade, never()).delete(any());
+            verify(connectionFacade, never()).delete(any(), any());
 
             assertThat(connectedUserConnectionService.getConnectionIds(connectedUserAId))
                 .containsExactly(CONNECTED_USER_A_CONNECTION_ID);
@@ -1639,7 +1671,7 @@ class ConnectedUserConnectionFacadeIntTest {
             connectedUserConnectionFacade.deleteConnectedUserConnection(
                 connectedUserAId, CONNECTED_USER_A_CONNECTION_ID);
 
-            verify(connectionFacade).delete(CONNECTED_USER_A_CONNECTION_ID);
+            verify(connectionFacade).delete(eq(CONNECTED_USER_A_CONNECTION_ID), any());
 
             assertThat(connectedUserConnectionService.getConnectionIds(connectedUserAId)).isEmpty();
         }
@@ -1651,7 +1683,7 @@ class ConnectedUserConnectionFacadeIntTest {
             connectedUserConnectionFacade.deleteConnectedUserConnection(
                 connectedUserBId, CONNECTED_USER_B_CONNECTION_ID);
 
-            verify(connectionFacade).delete(CONNECTED_USER_B_CONNECTION_ID);
+            verify(connectionFacade).delete(eq(CONNECTED_USER_B_CONNECTION_ID), any());
 
             assertThat(connectedUserConnectionService.getConnectionIds(connectedUserBId)).isEmpty();
         }
@@ -1915,6 +1947,8 @@ class ConnectedUserConnectionFacadeIntTest {
         }
 
         private Authentication createTenantAdminAuthentication() {
+            when(permissionService.hasResourceScope(anyLong(), eq("ConnectedUser"), anyString())).thenReturn(true);
+            when(permissionService.hasEmbeddedScope(anyString())).thenReturn(true);
             when(permissionService.isTenantAdmin()).thenReturn(true);
 
             return new UsernamePasswordAuthenticationToken(
@@ -1930,8 +1964,12 @@ class ConnectedUserConnectionFacadeIntTest {
                 @Lazy PermissionService permissionService,
                 ObjectProvider<MethodSecurityExpressionContributor> methodSecurityExpressionContributorProvider) {
 
-                return new AutomationMethodSecurityExpressionHandler(
+                AutomationMethodSecurityExpressionHandler handler = new AutomationMethodSecurityExpressionHandler(
                     permissionService, methodSecurityExpressionContributorProvider);
+
+                handler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
+
+                return handler;
             }
         }
     }

@@ -3,6 +3,7 @@ import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import {useHasEmbeddedScope} from '@/shared/hooks/useHasEmbeddedScope';
 import {
     AutomationProjectsQuery,
     ConnectedUserMcpServerAutomation,
@@ -53,6 +54,7 @@ const ConnectedUserMcpServerListItemAutomationRow = ({
             workflowTriggerComponentNames: templateTriggers.map((templateTrigger) => templateTrigger.name),
         };
     }, [workflowTemplate]);
+    const canEditMcpServer = useHasEmbeddedScope('MCP_EDIT');
 
     const lastExecutionDate = automation.lastExecutionDate
         ? new Date(Date.parse(automation.lastExecutionDate))
@@ -125,7 +127,7 @@ const ConnectedUserMcpServerListItemAutomationRow = ({
                                 <Switch
                                     aria-label={`Enable ${automation.name}`}
                                     checked={automation.enabled}
-                                    disabled={switchDisabled}
+                                    disabled={!canEditMcpServer || switchDisabled}
                                     onCheckedChange={(value) => {
                                         enableConnectedUserMcpAutomationMutation.mutate({
                                             connectedUserId: connectedUserId.toString(),

@@ -7,18 +7,24 @@
 
 package com.bytechef.ee.embedded.ai.mcp.facade;
 
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.ai.mcp.audit.McpIntegrationInstanceConfigurationAuditEvents;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.dto.WorkflowToolParametersDTO;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.service.McpServerService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +33,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,25 +48,33 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegrationInstanceConfigurationFacade {
 
+    private final EmbeddedMcpReader embeddedMcpReader;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
     private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
     private final McpIntegrationInstanceRowFacade mcpIntegrationInstanceRowFacade;
+    private final McpServerService mcpServerService;
+    private final PermissionService permissionService;
 
     @SuppressFBWarnings("EI")
     public McpIntegrationInstanceConfigurationFacadeImpl(
+        EmbeddedMcpReader embeddedMcpReader,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
-        McpIntegrationInstanceRowFacade mcpIntegrationInstanceRowFacade) {
+        McpIntegrationInstanceRowFacade mcpIntegrationInstanceRowFacade, McpServerService mcpServerService,
+        @Lazy PermissionService permissionService) {
 
+        this.embeddedMcpReader = embeddedMcpReader;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.mcpIntegrationInstanceConfigurationService = mcpIntegrationInstanceConfigurationService;
         this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
         this.mcpIntegrationInstanceRowFacade = mcpIntegrationInstanceRowFacade;
+        this.mcpServerService = mcpServerService;
+        this.permissionService = permissionService;
     }
 
     @Override
@@ -70,7 +85,9 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
             @AuditData(key = "integrationInstanceConfigurationId", value = "#integrationInstanceConfigurationId"),
             @AuditData(key = "workflowIds", value = "#selectedWorkflowIds")
         })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT') and " +
+        "hasPermission(#integrationInstanceConfigurationId, 'IntegrationInstanceConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_CREATE')")
     public McpIntegrationInstanceConfiguration createMcpIntegrationInstanceConfiguration(
         long mcpServerId, long integrationInstanceConfigurationId, List<String> selectedWorkflowIds) {
 
@@ -86,13 +103,18 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
             @AuditData(key = "integrationInstanceConfigurationId", value = "#integrationInstanceConfigurationId"),
             @AuditData(key = "workflowIds", value = "#selectedWorkflowIds")
         })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT') and " +
+        "hasPermission(#integrationInstanceConfigurationId, 'IntegrationInstanceConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_CREATE')")
     public McpIntegrationInstanceConfiguration createMcpIntegrationInstanceConfiguration(
         long mcpServerId, long integrationInstanceConfigurationId, List<String> selectedWorkflowIds,
         List<WorkflowToolParametersDTO> toolParameters) {
 
-        integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
-            integrationInstanceConfigurationId);
+        IntegrationInstanceConfiguration integrationInstanceConfiguration =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationId);
+
+        checkSameEnvironment(mcpServerId, integrationInstanceConfiguration);
 
         List<IntegrationInstanceConfigurationWorkflow> existingWorkflows =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
@@ -138,7 +160,8 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
         event = McpIntegrationInstanceConfigurationAuditEvents.MCP_INTEGRATION_INSTANCE_CONFIGURATION_DELETED, data = {
             @AuditData(key = "mcpIntegrationInstanceConfigurationId", value = "#mcpIntegrationInstanceConfigurationId")
         })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpIntegrationInstanceConfigurationId, 'McpIntegrationInstanceConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_DELETE')")
     public void deleteMcpIntegrationInstanceConfiguration(long mcpIntegrationInstanceConfigurationId) {
         mcpIntegrationInstanceConfigurationService
             .fetchMcpIntegrationInstanceConfiguration(mcpIntegrationInstanceConfigurationId)
@@ -165,7 +188,8 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
             @AuditData(key = "mcpServerId", value = "#result?.mcpServerId"),
             @AuditData(key = "workflowIds", value = "#selectedWorkflowIds")
         })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpIntegrationInstanceConfigurationId, 'McpIntegrationInstanceConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public McpIntegrationInstanceConfiguration updateMcpIntegrationInstanceConfiguration(
         long mcpIntegrationInstanceConfigurationId, List<String> selectedWorkflowIds) {
 
@@ -180,7 +204,8 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
             @AuditData(key = "mcpServerId", value = "#result?.mcpServerId"),
             @AuditData(key = "workflowIds", value = "#selectedWorkflowIds")
         })
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpIntegrationInstanceConfigurationId, 'McpIntegrationInstanceConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_EDIT')")
     public McpIntegrationInstanceConfiguration updateMcpIntegrationInstanceConfiguration(
         long mcpIntegrationInstanceConfigurationId, List<String> selectedWorkflowIds,
         List<WorkflowToolParametersDTO> toolParameters) {
@@ -271,20 +296,33 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#id, 'McpIntegrationInstanceConfiguration', " +
+        "'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public McpIntegrationInstanceConfiguration getMcpIntegrationInstanceConfiguration(long id) {
         return mcpIntegrationInstanceConfigurationService.fetchMcpIntegrationInstanceConfiguration(id)
             .orElse(null);
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasEmbeddedScope('INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public List<McpIntegrationInstanceConfiguration> getMcpIntegrationInstanceConfigurations() {
-        return mcpIntegrationInstanceConfigurationService.getMcpIntegrationInstanceConfigurations();
+        Map<Long, Environment> environmentsByMcpServerId = new HashMap<>();
+
+        for (McpServer mcpServer : mcpServerService.getMcpServers(PlatformType.EMBEDDED)) {
+            environmentsByMcpServerId.put(mcpServer.getId(), mcpServer.getEnvironment());
+        }
+
+        return mcpIntegrationInstanceConfigurationService.getMcpIntegrationInstanceConfigurations()
+            .stream()
+            .filter(
+                mcpIntegrationInstanceConfiguration -> permissionService.hasEmbeddedScope(
+                    "INTEGRATION_INSTANCE_CONFIGURATION_VIEW",
+                    environmentsByMcpServerId.get(mcpIntegrationInstanceConfiguration.getMcpServerId())))
+            .toList();
     }
 
     @Override
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'INTEGRATION_INSTANCE_CONFIGURATION_VIEW')")
     public List<McpIntegrationInstanceConfiguration> getMcpServerMcpIntegrationInstanceConfigurations(
         long mcpServerId) {
 
@@ -310,6 +348,20 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
         if (parameters != null) {
             mcpIntegrationInstanceConfigurationWorkflowService.updateParameters(
                 Objects.requireNonNull(mcpIntegrationInstanceConfigurationWorkflow.getId()), parameters);
+        }
+    }
+
+    private void checkSameEnvironment(
+        long mcpServerId, IntegrationInstanceConfiguration integrationInstanceConfiguration) {
+
+        McpServer mcpServer = embeddedMcpReader.getMcpServer(mcpServerId);
+
+        if (mcpServer.getEnvironment() != integrationInstanceConfiguration.getEnvironment()) {
+            throw new IllegalArgumentException(
+                "MCP server %s (%s) and integration instance configuration %s (%s) are in different environments"
+                    .formatted(
+                        mcpServerId, mcpServer.getEnvironment(), integrationInstanceConfiguration.getId(),
+                        integrationInstanceConfiguration.getEnvironment()));
         }
     }
 

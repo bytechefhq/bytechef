@@ -8,12 +8,12 @@ import {
     Tag,
 } from '@/shared/middleware/automation/configuration';
 import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQuery} from '@tanstack/react-query';
 
 export const ConnectionKeys = {
     connection: (id: number) => [...ConnectionKeys.connections, id],
     connectionTags: ['automation_connectionTags'],
-    workspaceConnectionTags: (workspaceId: number) => [...ConnectionKeys.connectionTags, workspaceId],
     connections: ['automation_connections'],
     filteredConnections: (filters: {
         id?: number;
@@ -21,14 +21,21 @@ export const ConnectionKeys = {
         connectionVersion?: number;
         tagId?: number;
     }) => [...ConnectionKeys.connections, filters],
+    workspaceConnectionTags: (workspaceId: number, environmentId?: number) => [
+        ...ConnectionKeys.connectionTags,
+        workspaceId,
+        environmentId,
+    ],
 };
 
 export const useGetConnectionTagsQuery = () => {
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     return useQuery<Tag[], Error>({
-        queryKey: ConnectionKeys.workspaceConnectionTags(currentWorkspaceId!),
-        queryFn: () => new ConnectionTagApi().getConnectionTags({id: currentWorkspaceId!}),
+        queryKey: ConnectionKeys.workspaceConnectionTags(currentWorkspaceId!, currentEnvironmentId),
+        queryFn: () =>
+            new ConnectionTagApi().getConnectionTags({environmentId: currentEnvironmentId, id: currentWorkspaceId!}),
         enabled: currentWorkspaceId !== undefined,
     });
 };

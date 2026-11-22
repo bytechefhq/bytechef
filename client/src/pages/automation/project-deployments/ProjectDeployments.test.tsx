@@ -8,6 +8,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import ProjectDeployments from './ProjectDeployments';
 
 const hoisted = vi.hoisted(() => ({
+    grantedScopes: undefined as string[] | undefined,
     projectDeployments: [] as ProjectDeployment[],
     projectDeploymentsIsFetching: false,
     refetchProjectDeployments: vi.fn(),
@@ -20,6 +21,11 @@ const publishedProject: Project = {
     projectWorkflowIds: [41],
     workspaceId: 1,
 };
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) =>
+        hoisted.grantedScopes === undefined || hoisted.grantedScopes.includes(scope),
+}));
 
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
     useWorkspaceStore: (selector: (state: {currentWorkspaceId: number}) => unknown) =>
@@ -98,6 +104,7 @@ const renderProjectDeployments = (initialEntries: InitialEntry[] = ['/']) =>
 
 describe('ProjectDeployments empty states', () => {
     beforeEach(() => {
+        hoisted.grantedScopes = undefined;
         hoisted.projectDeployments = [];
     });
 
@@ -132,8 +139,25 @@ describe('ProjectDeployments expanded deployment', () => {
             },
         ];
 
+        hoisted.grantedScopes = undefined;
         hoisted.projectDeploymentsIsFetching = false;
         hoisted.refetchProjectDeployments.mockClear();
+    });
+
+    it('should offer a new deployment to a member holding DEPLOYMENT_CREATE alone', () => {
+        hoisted.grantedScopes = ['DEPLOYMENT_CREATE'];
+
+        renderProjectDeployments();
+
+        expect(screen.getByRole('button', {name: 'New Deployment'})).toBeInTheDocument();
+    });
+
+    it('should hide the new deployment action without DEPLOYMENT_CREATE', () => {
+        hoisted.grantedScopes = ['DEPLOYMENT_VIEW', 'WORKFLOW_EDIT'];
+
+        renderProjectDeployments();
+
+        expect(screen.queryByRole('button', {name: 'New Deployment'})).not.toBeInTheDocument();
     });
 
     it('should expand nothing when no deployment is handed over', () => {

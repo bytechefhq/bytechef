@@ -60,7 +60,7 @@ class WorkspaceDataTableTagFacadeImplTest {
         when(dataTableTagService.getTagIds(List.of(1L, 2L))).thenReturn(List.of(10L, 11L));
         when(tagService.getTags(List.of(10L, 11L))).thenReturn(List.of(new Tag("a"), new Tag("b")));
 
-        List<Tag> tags = workspaceDataTableFacade.getDataTableTags(5L);
+        List<Tag> tags = workspaceDataTableFacade.getDataTableTags(5L, 0L);
 
         assertThat(tags).hasSize(2);
 
@@ -72,7 +72,7 @@ class WorkspaceDataTableTagFacadeImplTest {
         when(dataTableService.getWorkspaceDataTables(5L)).thenReturn(List.of(new DataTable(1L, "orders")));
         when(dataTableTagService.getTagIds(List.of(1L))).thenReturn(List.of());
 
-        List<Tag> tags = workspaceDataTableFacade.getDataTableTags(5L);
+        List<Tag> tags = workspaceDataTableFacade.getDataTableTags(5L, 0L);
 
         assertThat(tags).isEmpty();
 
@@ -90,7 +90,7 @@ class WorkspaceDataTableTagFacadeImplTest {
             .thenReturn(List.of(new DataTable(1L, "orders"), new DataTable(2L, "customers")));
         when(tagService.getTags(List.of(10L, 11L))).thenReturn(List.of(firstTag, secondTag));
 
-        Map<Long, List<Tag>> tagsByTableId = workspaceDataTableFacade.getTagsByTableId(5L);
+        Map<Long, List<Tag>> tagsByTableId = workspaceDataTableFacade.getTagsByTableId(5L, 0L);
 
         assertThat(tagsByTableId).containsOnlyKeys(1L, 2L);
         assertThat(tagsByTableId.get(1L)).containsExactly(firstTag, secondTag);

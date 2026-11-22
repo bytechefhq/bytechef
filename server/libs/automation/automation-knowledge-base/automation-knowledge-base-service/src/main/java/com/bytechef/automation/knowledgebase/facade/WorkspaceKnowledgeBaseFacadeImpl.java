@@ -81,30 +81,24 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'KNOWLEDGE_BASE_VIEW')")
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'KNOWLEDGE_BASE_VIEW', #environmentId)")
     public List<KnowledgeBase> getWorkspaceKnowledgeBases(Long workspaceId, long environmentId) {
-        List<WorkspaceKnowledgeBase> workspaceKnowledgeBases =
-            workspaceKnowledgeBaseService.getWorkspaceKnowledgeBases(workspaceId);
-
-        return workspaceKnowledgeBases.stream()
-            .map(workspaceKnowledgeBase -> knowledgeBaseService.getKnowledgeBase(
-                workspaceKnowledgeBase.getKnowledgeBaseId()))
-            .filter(knowledgeBase -> knowledgeBase.getEnvironmentId() == environmentId)
-            .toList();
+        return getKnowledgeBases(workspaceId, environmentId);
     }
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'KNOWLEDGE_BASE_VIEW')")
-    public List<Tag> getWorkspaceKnowledgeBaseTags(long workspaceId) {
-        return knowledgeBaseTagFacade.getTags(getWorkspaceKnowledgeBaseIds(workspaceId));
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'KNOWLEDGE_BASE_VIEW', #environmentId)")
+    public List<Tag> getWorkspaceKnowledgeBaseTags(long workspaceId, long environmentId) {
+        return knowledgeBaseTagFacade.getTags(getWorkspaceKnowledgeBaseIds(workspaceId, environmentId));
     }
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'KNOWLEDGE_BASE_VIEW')")
-    public Map<Long, List<Tag>> getWorkspaceKnowledgeBaseTagsByKnowledgeBaseId(long workspaceId) {
-        return knowledgeBaseTagFacade.getTagsByKnowledgeBaseId(getWorkspaceKnowledgeBaseIds(workspaceId));
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'KNOWLEDGE_BASE_VIEW', #environmentId)")
+    public Map<Long, List<Tag>> getWorkspaceKnowledgeBaseTagsByKnowledgeBaseId(long workspaceId, long environmentId) {
+        return knowledgeBaseTagFacade.getTagsByKnowledgeBaseId(
+            getWorkspaceKnowledgeBaseIds(workspaceId, environmentId));
     }
 
     @Override
@@ -114,7 +108,7 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
         @AuditData(key = "workspaceId", value = "#workspaceId"),
         @AuditData(key = "environmentId", value = "#environmentId")
     })
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'KNOWLEDGE_BASE_CREATE')")
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'KNOWLEDGE_BASE_CREATE', #environmentId)")
     public KnowledgeBase createWorkspaceKnowledgeBase(
         KnowledgeBase knowledgeBase, Long workspaceId, long environmentId) {
 
@@ -141,7 +135,7 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
         @AuditData(key = "workspaceId", value = "#workspaceId"),
         @AuditData(key = "environmentId", value = "#targetEnvironmentId")
     })
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'KNOWLEDGE_BASE_CREATE')")
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'KNOWLEDGE_BASE_CREATE', #targetEnvironmentId)")
     public KnowledgeBase cloneWorkspaceKnowledgeBase(
         Long knowledgeBaseId, Long workspaceId, long targetEnvironmentId, @Nullable String newName) {
 
@@ -193,7 +187,7 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     @Audited(event = KnowledgeBaseAuditEvents.KB_DELETED, data = {
         @AuditData(key = "knowledgeBaseId", value = "#knowledgeBaseId")
     })
-    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_EDIT')")
+    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_DELETE')")
     public void deleteWorkspaceKnowledgeBase(Long knowledgeBaseId) {
         knowledgeBaseService.getKnowledgeBase(knowledgeBaseId);
 
@@ -216,6 +210,10 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     }
 
     @Override
+    @Audited(event = KnowledgeBaseAuditEvents.KB_UPDATED, data = {
+        @AuditData(key = "knowledgeBaseId", value = "#knowledgeBaseId"),
+        @AuditData(key = "name", value = "#result?.name")
+    })
     @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_EDIT')")
     public KnowledgeBase updateKnowledgeBase(long knowledgeBaseId, KnowledgeBase knowledgeBase) {
         return knowledgeBaseService.updateKnowledgeBase(knowledgeBaseId, knowledgeBase);
@@ -242,10 +240,22 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
         return knowledgeBaseStorageService.getUsage();
     }
 
-    private List<Long> getWorkspaceKnowledgeBaseIds(long workspaceId) {
-        return workspaceKnowledgeBaseService.getWorkspaceKnowledgeBases(workspaceId)
-            .stream()
-            .map(WorkspaceKnowledgeBase::getKnowledgeBaseId)
+    private List<KnowledgeBase> getKnowledgeBases(Long workspaceId, long environmentId) {
+        List<WorkspaceKnowledgeBase> workspaceKnowledgeBases =
+            workspaceKnowledgeBaseService.getWorkspaceKnowledgeBases(workspaceId);
+
+        return workspaceKnowledgeBases.stream()
+            .map(workspaceKnowledgeBase -> knowledgeBaseService.getKnowledgeBase(
+                workspaceKnowledgeBase.getKnowledgeBaseId()))
+            .filter(knowledgeBase -> knowledgeBase.getEnvironmentId() == environmentId)
+            .toList();
+    }
+
+    private List<Long> getWorkspaceKnowledgeBaseIds(long workspaceId, long environmentId) {
+        List<KnowledgeBase> knowledgeBases = getKnowledgeBases(workspaceId, environmentId);
+
+        return knowledgeBases.stream()
+            .map(KnowledgeBase::getId)
             .toList();
     }
 }

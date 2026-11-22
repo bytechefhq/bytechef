@@ -55,7 +55,7 @@ public class DataTableApiController extends AbstractDataTableApiController imple
 
         long environmentId = support.environmentId(xEnvironment);
 
-        Map<Long, List<Tag>> tagsByTableId = workspaceDataTableFacade.getTagsByTableId(workspaceId);
+        Map<Long, List<Tag>> tagsByTableId = workspaceDataTableFacade.getTagsByTableId(workspaceId, environmentId);
 
         List<DataTableModel> dataTableModels = workspaceDataTableFacade.listTables(workspaceId, environmentId)
             .stream()
@@ -186,7 +186,7 @@ public class DataTableApiController extends AbstractDataTableApiController imple
     private DataTableModel table(long dataTableId, long workspaceId, long environmentId) {
         DataTableInfo dataTableInfo = workspaceDataTableFacade.getTable(dataTableId, environmentId);
 
-        List<Tag> tags = workspaceDataTableFacade.getTagsByTableId(workspaceId)
+        List<Tag> tags = workspaceDataTableFacade.getTagsByTableId(workspaceId, environmentId)
             .getOrDefault(dataTableId, List.of());
 
         return DataTableModelMapper.toModel(dataTableInfo, tags);

@@ -76,7 +76,7 @@ export class ProjectTagApi extends runtime.BaseAPI {
 
     /**
      * Get project tags for a workspace.
-     * Get project tags for a workspace.
+     * Get project tags.
      */
     async getProjectTagsRaw(requestParameters: GetProjectTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Tag>>> {
         const requestOptions = await this.getProjectTagsRequestOpts(requestParameters);
@@ -87,7 +87,7 @@ export class ProjectTagApi extends runtime.BaseAPI {
 
     /**
      * Get project tags for a workspace.
-     * Get project tags for a workspace.
+     * Get project tags.
      */
     async getProjectTags(requestParameters: GetProjectTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Tag>> {
         const response = await this.getProjectTagsRaw(requestParameters, initOverrides);

@@ -37,7 +37,9 @@ describe('projectTags.queries', () => {
     it('asks for the tags of the current workspace', async () => {
         getProjectTagsMock.mockResolvedValue([{id: 10, name: 'billing'}]);
 
-        const {result} = renderHook(() => useGetProjectTagsQuery(), {wrapper: Wrapper});
+        const {result} = renderHook(() => useGetProjectTagsQuery(useWorkspaceStore.getState().currentWorkspaceId!), {
+            wrapper: Wrapper,
+        });
 
         await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
@@ -49,7 +51,9 @@ describe('projectTags.queries', () => {
     it('does not fetch while no workspace is selected', () => {
         useWorkspaceStore.getState().clearCurrentWorkspaceId();
 
-        const {result} = renderHook(() => useGetProjectTagsQuery(), {wrapper: Wrapper});
+        const {result} = renderHook(() => useGetProjectTagsQuery(useWorkspaceStore.getState().currentWorkspaceId!), {
+            wrapper: Wrapper,
+        });
 
         expect(result.current.fetchStatus).toBe('idle');
         expect(getProjectTagsMock).not.toHaveBeenCalled();
