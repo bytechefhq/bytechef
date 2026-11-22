@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Property;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -40,8 +39,9 @@ public class DateProperty extends ValueProperty<LocalDate> implements OptionsDat
         super(dateProperty);
 
         this.options = CollectionUtils.map(dateProperty.getOptions(), Option::new);
-        this.optionsDataSource = OptionalUtils.mapOrElse(
-            dateProperty.getOptionsDataSource(), OptionsDataSource::new, null);
+        this.optionsDataSource = dateProperty.getOptionsDataSource()
+            .map(OptionsDataSource::new)
+            .orElse(null);
     }
 
     @Override

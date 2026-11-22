@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -45,8 +44,9 @@ public class ObjectProperty extends ValueProperty<Map<String, ?>> implements Opt
             objectProperty.getAdditionalProperties(), valueProperty -> (ValueProperty<?>) toProperty(valueProperty));
         this.multipleValues = objectProperty.getMultipleValues();
         this.options = CollectionUtils.map(objectProperty.getOptions(), Option::new);
-        this.optionsDataSource = OptionalUtils.mapOrElse(
-            objectProperty.getOptionsDataSource(), OptionsDataSource::new, null);
+        this.optionsDataSource = objectProperty.getOptionsDataSource()
+            .map(OptionsDataSource::new)
+            .orElse(null);
         this.properties = CollectionUtils.map(
             objectProperty.getProperties(), valueProperty -> (ValueProperty<?>) toProperty(valueProperty));
     }

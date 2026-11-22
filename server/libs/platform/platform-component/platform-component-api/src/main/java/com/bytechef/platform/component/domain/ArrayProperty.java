@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
@@ -43,12 +42,15 @@ public class ArrayProperty extends ValueProperty<List<?>> implements OptionsData
 
         this.items = CollectionUtils.map(
             arrayProperty.getItems(), valueProperty -> (ValueProperty<?>) toProperty(valueProperty));
-        this.maxItems = OptionalUtils.orElse(arrayProperty.getMaxItems(), null);
-        this.minItems = OptionalUtils.orElse(arrayProperty.getMinItems(), null);
+        this.maxItems = arrayProperty.getMaxItems()
+            .orElse(null);
+        this.minItems = arrayProperty.getMinItems()
+            .orElse(null);
         this.multipleValues = arrayProperty.getMultipleValues();
         this.options = CollectionUtils.map(arrayProperty.getOptions(), Option::new);
-        this.optionsDataSource = OptionalUtils.mapOrElse(
-            arrayProperty.getOptionsDataSource(), OptionsDataSource::new, null);
+        this.optionsDataSource = arrayProperty.getOptionsDataSource()
+            .map(OptionsDataSource::new)
+            .orElse(null);
     }
 
     @Override

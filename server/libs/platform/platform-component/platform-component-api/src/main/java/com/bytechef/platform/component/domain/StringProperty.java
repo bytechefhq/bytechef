@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Property;
 import java.util.Collections;
 import java.util.List;
@@ -43,13 +42,18 @@ public class StringProperty extends ValueProperty<String> implements OptionsData
     public StringProperty(Property.StringProperty stringProperty) {
         super(stringProperty);
 
-        this.languageId = OptionalUtils.orElse(stringProperty.getLanguageId(), null);
-        this.maxLength = OptionalUtils.orElse(stringProperty.getMaxLength(), null);
-        this.minLength = OptionalUtils.orElse(stringProperty.getMinLength(), null);
-        this.regex = OptionalUtils.orElse(stringProperty.getRegex(), null);
+        this.languageId = stringProperty.getLanguageId()
+            .orElse(null);
+        this.maxLength = stringProperty.getMaxLength()
+            .orElse(null);
+        this.minLength = stringProperty.getMinLength()
+            .orElse(null);
+        this.regex = stringProperty.getRegex()
+            .orElse(null);
         this.options = CollectionUtils.map(stringProperty.getOptions(), Option::new);
-        this.optionsDataSource = OptionalUtils.mapOrElse(
-            stringProperty.getOptionsDataSource(), OptionsDataSource::new, null);
+        this.optionsDataSource = stringProperty.getOptionsDataSource()
+            .map(OptionsDataSource::new)
+            .orElse(null);
         this.optionsLoadedDynamically = stringProperty.getOptionsLoadedDynamically();
     }
 

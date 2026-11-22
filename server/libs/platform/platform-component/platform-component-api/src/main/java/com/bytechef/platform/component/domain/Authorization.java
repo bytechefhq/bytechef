@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -43,7 +42,8 @@ public final class Authorization {
     }
 
     public Authorization(com.bytechef.component.definition.Authorization authorization) {
-        this.description = OptionalUtils.orElse(authorization.getDescription(), null);
+        this.description = authorization.getDescription()
+            .orElse(null);
         this.detectOn = authorization.getDetectOn();
         this.properties = CollectionUtils.map(
             authorization.getProperties(),
@@ -53,7 +53,8 @@ public final class Authorization {
 
         this.name = StringUtils.lowerCase(type.name());
 
-        this.title = OptionalUtils.orElse(authorization.getTitle(), name);
+        this.title = authorization.getTitle()
+            .orElse(name);
 
         this.refreshOn = authorization.getRefreshOn();
     }
