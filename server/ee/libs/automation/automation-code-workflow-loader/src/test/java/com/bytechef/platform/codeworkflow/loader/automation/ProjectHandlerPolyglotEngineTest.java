@@ -8,6 +8,7 @@
 package com.bytechef.platform.codeworkflow.loader.automation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,6 +17,7 @@ import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.automation.project.definition.ProjectDefinition;
 import com.bytechef.platform.component.polyglot.PolyglotSandbox;
 import com.bytechef.platform.component.polyglot.PolyglotSandboxSettings;
+import com.bytechef.workflow.definition.ComponentTaskDefinition;
 import com.bytechef.workflow.definition.CompositeTaskDefinition;
 import com.bytechef.workflow.definition.ConnectionRequirement;
 import com.bytechef.workflow.definition.Input;
@@ -822,7 +824,7 @@ class ProjectHandlerPolyglotEngineTest {
         assertEquals(
             List.of("customer", "inventory"), parallelTask.getTasks()
                 .stream()
-                .map(TaskDefinition::getName)
+                .map(WorkflowTaskDefinition::getName)
                 .toList());
 
         CompositeTaskDefinition forkJoinTask = (CompositeTaskDefinition) tasks.get(2);
@@ -834,7 +836,7 @@ class ProjectHandlerPolyglotEngineTest {
             List.of("slack", "record"), forkJoinTask.getBranches()
                 .getFirst()
                 .stream()
-                .map(TaskDefinition::getName)
+                .map(WorkflowTaskDefinition::getName)
                 .toList());
     }
 
@@ -860,7 +862,7 @@ class ProjectHandlerPolyglotEngineTest {
 
         CompositeTaskDefinition forkJoinTask = (CompositeTaskDefinition) loadTasks("js", source).getFirst();
 
-        TaskDefinition nestedTask = forkJoinTask.getBranches()
+        TaskDefinition nestedTask = (TaskDefinition) forkJoinTask.getBranches()
             .getFirst()
             .getFirst();
 
@@ -886,6 +888,176 @@ class ProjectHandlerPolyglotEngineTest {
         assertGroupRejected("{name: 'a', type: 'parallel', tasks: []}", "non-empty tasks list");
 
         assertGroupRejected("{name: 'a', type: 'forkJoin', branches: [[]]}", "non-empty list of tasks");
+    }
+
+    @Test
+    void testLoadsAComponentTaskForJavaScript() {
+        String source = """
+            ({
+                name: 'test-project',
+                workflows: [
+                    {
+                        name: 'my-workflow',
+                        tasks: [
+                            {name: 'fetch', perform: () => 'x'},
+                            {
+                                name: 'respond',
+                                label: 'Respond',
+                                type: 'apiPlatform/v1/responseToAPIRequest',
+                                parameters: {responseType: 'SUCCESS', response: {success: '${fetch}'}}
+                            }
+                        ]
+                    }
+                ]
+            })
+            """;
+
+        List<? extends WorkflowTaskDefinition> tasks = loadTasks("js", source);
+
+        ComponentTaskDefinition componentTaskDefinition = assertInstanceOf(
+            ComponentTaskDefinition.class, tasks.get(1));
+
+        assertEquals("respond", componentTaskDefinition.getName());
+        assertEquals("apiPlatform/v1/responseToAPIRequest", componentTaskDefinition.getType());
+        assertEquals(Optional.of("Respond"), componentTaskDefinition.getLabel());
+
+        Map<String, ?> parameters = componentTaskDefinition.getParameters();
+
+        assertEquals("SUCCESS", parameters.get("responseType"));
+
+        Map<?, ?> response = (Map<?, ?>) parameters.get("response");
+
+        assertEquals("${fetch}", response.get("success"));
+    }
+
+    @Test
+    void testLoadsAComponentTaskForPython() {
+        String source = """
+            def fetch(input, context):
+                return "x"
+
+
+            project = {
+                "name": "test-project",
+                "workflows": [
+                    {
+                        "name": "my-workflow",
+                        "tasks": [
+                            {"name": "fetch", "perform": fetch},
+                            {
+                                "name": "respond",
+                                "type": "apiPlatform/v1/responseToAPIRequest",
+                                "parameters": {
+                                    "responseType": "SUCCESS",
+                                    "response": {"success": {"items": [{"id": "y"}]}},
+                                },
+                            },
+                        ],
+                    }
+                ],
+            }
+
+            project
+            """;
+
+        List<? extends WorkflowTaskDefinition> tasks = loadTasks("python", source);
+
+        ComponentTaskDefinition componentTaskDefinition = assertInstanceOf(
+            ComponentTaskDefinition.class, tasks.get(1));
+
+        Map<String, ?> parameters = componentTaskDefinition.getParameters();
+
+        Map<?, ?> response = assertInstanceOf(Map.class, parameters.get("response"));
+
+        Map<?, ?> success = assertInstanceOf(Map.class, response.get("success"));
+
+        List<?> items = assertInstanceOf(List.class, success.get("items"));
+
+        Map<?, ?> item = assertInstanceOf(Map.class, items.getFirst());
+
+        assertEquals("y", item.get("id"));
+    }
+
+    @Test
+    void testLoadsComponentTasksNestedInGroups() {
+        String source = """
+            ({
+                name: 'test-project',
+                workflows: [
+                    {
+                        name: 'my-workflow',
+                        tasks: [
+                            {
+                                name: 'enrich',
+                                type: 'parallel',
+                                tasks: [
+                                    {name: 'customer', perform: () => 'c'},
+                                    {name: 'log', type: 'logger/v1/info', parameters: {text: 'x'}}
+                                ]
+                            },
+                            {
+                                name: 'notify',
+                                type: 'forkJoin',
+                                branches: [
+                                    [{name: 'slack', perform: () => 's'}],
+                                    [{name: 'record', type: 'logger/v1/info', parameters: {text: 'y'}}]
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            })
+            """;
+
+        List<? extends WorkflowTaskDefinition> tasks = loadTasks("js", source);
+
+        CompositeTaskDefinition parallelTask = (CompositeTaskDefinition) tasks.getFirst();
+
+        ComponentTaskDefinition nestedInParallel = assertInstanceOf(
+            ComponentTaskDefinition.class, parallelTask.getTasks()
+                .get(1));
+
+        assertEquals("logger/v1/info", nestedInParallel.getType());
+
+        CompositeTaskDefinition forkJoinTask = (CompositeTaskDefinition) tasks.get(1);
+
+        List<? extends List<? extends WorkflowTaskDefinition>> branches = forkJoinTask.getBranches();
+
+        ComponentTaskDefinition nestedInBranch = assertInstanceOf(
+            ComponentTaskDefinition.class, branches.get(1)
+                .getFirst());
+
+        assertEquals("record", nestedInBranch.getName());
+    }
+
+    @Test
+    void testLoadRejectsInvalidComponentTasks() {
+        assertGroupRejected(
+            "{name: 'a', type: 'logger/v1/info', perform: () => 1}", "cannot declare a perform");
+
+        assertGroupRejected(
+            "{name: 'a', type: 'logger/v1/info', connections: [{componentName: 'x', name: 'x'}]}",
+            "cannot declare connections");
+
+        assertGroupRejected("{name: 'a', type: 'logger/v1/info', parameters: 'x'}", "parameters as a map");
+
+        assertGroupRejected(
+            "{name: 'a', type: 'apiPlatform/responseToAPIRequest'}", "<component>/v<version>/<action>");
+
+        assertGroupRejected("{name: 'a', type: 'logger/v01/info'}", "<component>/v<version>/<action>");
+
+        assertGroupRejected("{name: 'a', type: 'logger/v1234567890/info'}", "<component>/v<version>/<action>");
+
+        assertGroupRejected(
+            "{name: 'a', type: 'logger/v1/info', tasks: [{name: 'b', perform: () => 1}]}",
+            "cannot declare tasks or branches");
+
+        assertGroupRejected(
+            "{name: 'a', type: 'logger/v1/info', branches: [[{name: 'b', perform: () => 1}]]}",
+            "cannot declare tasks or branches");
+
+        assertGroupRejected(
+            "{name: 'a', perform: () => 1}, {name: 'a', type: 'logger/v1/info'}", "declared more than once");
     }
 
     private static void assertGroupRejected(String taskSource, String expectedMessage) {
