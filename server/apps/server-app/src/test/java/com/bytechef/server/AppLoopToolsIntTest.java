@@ -20,9 +20,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
+import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
 import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
+import com.bytechef.automation.ai.tool.model.ProjectDetailInfo;
+import com.bytechef.automation.ai.tool.model.ProjectInfo;
+import com.bytechef.automation.ai.tool.model.ProjectVersionInfo;
+import com.bytechef.automation.ai.tool.model.WorkflowInfo;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
@@ -37,14 +42,19 @@ import com.bytechef.ee.automation.app.domain.App;
 import com.bytechef.ee.automation.app.domain.AppHostingTarget;
 import com.bytechef.ee.automation.app.domain.AppInstance;
 import com.bytechef.ee.automation.app.dto.AppWorkflowBindingDTO;
+import com.bytechef.ee.automation.app.facade.AppApiCollectionFacade;
 import com.bytechef.ee.automation.app.facade.AppFacade;
 import com.bytechef.ee.automation.app.facade.AppWorkflowFacade;
 import com.bytechef.ee.automation.app.service.AppInstanceService;
 import com.bytechef.ee.automation.app.service.AppService;
+import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowFacade;
+import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -105,10 +115,42 @@ class AppLoopToolsIntTest {
               ]
             }
             """;
+    private static final String CODE_PROJECT =
+        """
+            ({
+                name: "%s",
+                version: "1",
+                workflows: [
+                    {
+                        name: "listOrders",
+                        label: "List Orders",
+                        triggers: [{name: "request", type: "apiPlatform/v1/newApiRequest", parameters: {request: {}}}],
+                        tasks: [
+                            {
+                                name: "fetchOrders",
+                                perform: function (input, context) {
+                                    const orders = [{id: 1, total: 42}, {id: 2, total: 17}];
+
+                                    return {orders: orders, count: orders.length};
+                                }
+                            },
+                            {
+                                name: "respond",
+                                type: "apiPlatform/v1/responseToAPIRequest",
+                                parameters: {responseType: "SUCCESS", response: {success: "${fetchOrders}"}}
+                            }
+                        ]
+                    }
+                ]
+            })
+            """;
     private static final String MANUAL_DEFINITION = """
         {"label": "Greet", "inputs": [],
          "triggers": [{"label": "Manual", "name": "trigger_1", "type": "manual/v1/manual"}], "tasks": []}""";
     private static final String WORKFLOW_KEY = "greet";
+
+    @Autowired
+    private AppApiCollectionFacade appApiCollectionFacade;
 
     @Autowired
     private AppFacade appFacade;
@@ -138,10 +180,16 @@ class AppLoopToolsIntTest {
     private int port;
 
     @Autowired
+    private ProjectCodeWorkflowFacade projectCodeWorkflowFacade;
+
+    @Autowired
     private ProjectDeploymentFacade projectDeploymentFacade;
 
     @Autowired
     private ProjectFacade projectFacade;
+
+    @Autowired
+    private ProjectTools projectTools;
 
     @Autowired
     private ProjectWorkflowFacade projectWorkflowFacade;
@@ -247,6 +295,92 @@ class AppLoopToolsIntTest {
     }
 
     @Test
+    void testCreateAppApiEndpointAcceptsACodeWorkflowEndpoint() {
+        String projectName = "App loop code " + UUID.randomUUID();
+        String projectSource = CODE_PROJECT.replace("%s", projectName);
+
+        projectCodeWorkflowFacade.save(
+            Workspace.DEFAULT_WORKSPACE_ID, projectSource.getBytes(StandardCharsets.UTF_8), Language.JAVASCRIPT,
+            Environment.DEVELOPMENT, false);
+
+        ToolContext toolContext = developmentToolContext();
+
+        List<ProjectInfo> projectInfos = projectTools.listProjects(Workspace.DEFAULT_WORKSPACE_ID, toolContext);
+
+        long projectId = projectInfos.stream()
+            .filter(projectInfo -> projectName.equals(projectInfo.name()))
+            .map(ProjectInfo::id)
+            .findFirst()
+            .orElseThrow();
+
+        ProjectDetailInfo projectDetailInfo = projectTools.getProject(
+            projectId, Workspace.DEFAULT_WORKSPACE_ID, toolContext);
+
+        List<ProjectVersionInfo> projectVersionInfos = projectDetailInfo.versions();
+
+        int projectVersion = projectVersionInfos.stream()
+            .filter(projectVersionInfo -> "PUBLISHED".equals(projectVersionInfo.status()))
+            .mapToInt(ProjectVersionInfo::version)
+            .max()
+            .orElseThrow();
+
+        List<WorkflowInfo> workflowInfos = projectWorkflowTools.listWorkflows(
+            projectId, Workspace.DEFAULT_WORKSPACE_ID, toolContext);
+
+        WorkflowInfo workflowInfo = workflowInfos.stream()
+            .filter(curWorkflowInfo -> "List Orders".equals(curWorkflowInfo.name()))
+            .findFirst()
+            .orElseThrow();
+
+        String contextPath = "orders-" + UUID.randomUUID();
+
+        JsonNode apiCollectionNode = callAppLoopTool(
+            "createAppApiCollection",
+            Map.of(
+                "projectId", projectId, "projectVersion", projectVersion, "name", "Orders " + contextPath,
+                "contextPath", contextPath));
+
+        assertThat(textField(apiCollectionNode, "status")).isEqualTo("deployed");
+
+        JsonNode apiCollectionIdNode = apiCollectionNode.get("apiCollectionId");
+
+        long apiCollectionId = apiCollectionIdNode.asLong();
+
+        JsonNode apiEndpointNode = callAppLoopTool(
+            "createAppApiEndpoint",
+            Map.of(
+                "apiCollectionId", apiCollectionId, "name", "listOrders", "httpMethod", "GET", "path", "/orders",
+                "workflowUuid", workflowInfo.workflowUuid()));
+
+        assertThat(textField(apiEndpointNode, "status")).isEqualTo("deployed");
+
+        App app = appService.create(newApp());
+
+        long appId = Objects.requireNonNull(app.getId());
+
+        AppInstanceService.CreatedAppInstance createdAppInstance = appInstanceService.create(newAppInstance(appId));
+
+        AppInstance appInstance = createdAppInstance.appInstance();
+
+        long appInstanceId = Objects.requireNonNull(appInstance.getId());
+
+        appApiCollectionFacade.bindApiCollection(appInstanceId, apiCollectionId);
+
+        RestClient restClient = appRestClient(createdAppInstance.secretKey());
+
+        String body = restClient.get()
+            .uri("/api/app/v1/api/v1/" + contextPath + "/orders")
+            .retrieve()
+            .body(String.class);
+
+        JsonNode ordersNode = jsonMapper.readTree(body);
+
+        JsonNode countNode = ordersNode.get("count");
+
+        assertThat(countNode.asInt()).isEqualTo(2);
+    }
+
+    @Test
     void testTheRegisteredContributorOffersTheAppLoopTools() {
         assertThat(appLoopMcpContributor.getToolCallbacks())
             .extracting(toolCallback -> toolCallback.getToolDefinition()
@@ -255,6 +389,34 @@ class AppLoopToolsIntTest {
                 "deployProject", "listConnections", "listAppCallableWorkflows", "createAppApiCollection",
                 "createAppApiEndpoint", "updateAppApiCollectionVersion", "listAppApiCollections",
                 "createAppDataTable");
+    }
+
+    private JsonNode callAppLoopTool(String toolName, Map<String, Object> arguments) {
+        List<ToolCallback> toolCallbacks = appLoopMcpContributor.getToolCallbacks();
+
+        ToolCallback toolCallback = toolCallbacks.stream()
+            .filter(curToolCallback -> {
+                ToolDefinition toolDefinition = curToolCallback.getToolDefinition();
+
+                return toolName.equals(toolDefinition.name());
+            })
+            .findFirst()
+            .orElseThrow();
+
+        Map<String, Object> toolInput = new HashMap<>(arguments);
+
+        toolInput.put("environment", Environment.DEVELOPMENT.name());
+        toolInput.put("workspaceId", Workspace.DEFAULT_WORKSPACE_ID);
+
+        String result = toolCallback.call(jsonMapper.writeValueAsString(toolInput), null);
+
+        return jsonMapper.readTree(result);
+    }
+
+    private static String textField(JsonNode jsonNode, String fieldName) {
+        JsonNode fieldNode = jsonNode.get(fieldName);
+
+        return fieldNode.asString();
     }
 
     private static String callableDefinition(String greeting) {
