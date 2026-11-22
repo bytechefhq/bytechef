@@ -21,12 +21,73 @@ export enum Source {
     SKILLS = 'SKILLS',
     WORKFLOW_CODE_EDITOR = 'WORKFLOW_CODE_EDITOR',
     MCP_SERVER = 'MCP_SERVER',
+    JSON_SCHEMA_BUILDER = 'JSON_SCHEMA_BUILDER',
+    SAMPLE_OUTPUT = 'SAMPLE_OUTPUT',
+    CODE_WORKFLOW = 'CODE_WORKFLOW',
+    CODE_WORKFLOW_EMBEDDED = 'CODE_WORKFLOW_EMBEDDED',
+    CUSTOM_COMPONENT = 'CUSTOM_COMPONENT',
+    WORKFLOW_EDITOR_EMBEDDED = 'WORKFLOW_EDITOR_EMBEDDED',
+    WORKFLOW_EXECUTION_EMBEDDED = 'WORKFLOW_EXECUTION_EMBEDDED',
+    KNOWLEDGE_BASE = 'KNOWLEDGE_BASE',
+    DATA_TABLE = 'DATA_TABLE',
+    AI_AGENT = 'AI_AGENT',
+    DEPLOYMENT = 'DEPLOYMENT',
+    PROJECT = 'PROJECT',
+    PROJECT_DEPLOYMENT = 'PROJECT_DEPLOYMENT',
+    API_COLLECTION = 'API_COLLECTION',
+    ASSET_FILE = 'ASSET_FILE',
+    COMPONENT_RULE = 'COMPONENT_RULE',
 }
 
+export interface CodeEditorCopilotParametersI {
+    language: string;
+}
+
+export interface ClusterElementCopilotParametersI {
+    taskName?: string;
+}
+
+export interface IntentCopilotParametersI {
+    intent: string;
+}
+
+export interface WorkflowCodeEditorCopilotParametersI {
+    format: string;
+}
+
+export interface WorkflowEditorCopilotParametersI {
+    integrationId?: string;
+    workflowId?: string;
+}
+
+export interface WorkflowExecutionCopilotParametersI {
+    environmentId?: number;
+    workflowExecutionId?: number;
+    workflowId?: string;
+    workspaceId?: number;
+}
+
+export interface WorkflowNodeCopilotParametersI {
+    propertyPath?: string;
+    title?: string;
+    workflowId?: string;
+    workflowNodeName?: string;
+}
+
+export type CopilotContextParametersType =
+    | Record<string, never>
+    | CodeEditorCopilotParametersI
+    | ClusterElementCopilotParametersI
+    | IntentCopilotParametersI
+    | WorkflowCodeEditorCopilotParametersI
+    | WorkflowEditorCopilotParametersI
+    | WorkflowExecutionCopilotParametersI
+    | WorkflowNodeCopilotParametersI;
+
 export type ContextType = {
+    environmentId?: number;
     source: Source;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    parameters: Record<string, any>;
+    parameters: CopilotContextParametersType;
     mode: MODE;
     workflowExecutionError?: {
         errorMessage?: string;
@@ -37,6 +98,7 @@ export type ContextType = {
 };
 
 interface ConversationSnapshotI {
+    composerPlaceholder: string | undefined;
     context: ContextType;
     conversationId: string | undefined;
     messages: ThreadMessageLike[];
@@ -51,6 +113,9 @@ interface CopilotStateI {
 
     context: ContextType;
     setContext: (context: ContextType | undefined) => void;
+
+    composerPlaceholder: string | undefined;
+    setComposerPlaceholder: (composerPlaceholder: string | undefined) => void;
 
     setWorkflowExecutionError: (
         workflowExecutionError:
@@ -103,6 +168,9 @@ export const useCopilotStore = create<CopilotStateI>()(
                     context,
                 };
             }),
+
+        composerPlaceholder: undefined,
+        setComposerPlaceholder: (composerPlaceholder) => set({composerPlaceholder}),
 
         setWorkflowExecutionError: (error) =>
             set((state) => {
@@ -181,6 +249,7 @@ export const useCopilotStore = create<CopilotStateI>()(
 
             set((state) => {
                 const snapshot: ConversationSnapshotI = {
+                    composerPlaceholder: state.composerPlaceholder,
                     context: state.context,
                     conversationId: state.conversationId,
                     messages: state.messages,
@@ -221,6 +290,7 @@ export const useCopilotStore = create<CopilotStateI>()(
 
                 return {
                     ...state,
+                    composerPlaceholder: snapshot.composerPlaceholder,
                     context: snapshot.context,
                     conversationId: snapshot.conversationId,
                     conversationStack: nextStack,

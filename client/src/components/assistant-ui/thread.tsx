@@ -89,6 +89,7 @@ export type ThreadProps = {
    * Ask/Build mode switch or the workflow-test mic button.
    */
   composerActions?: ReactNode | undefined;
+  composerPlaceholder?: string | undefined;
   /**
    * Registry mapping data-part names (e.g. "select-connection") to the
    * component that renders them. When provided, assistant messages render their
@@ -131,6 +132,7 @@ const isNewChatView = (s: AssistantState) =>
 export const Thread: FC<ThreadProps> = ({
   components = EMPTY_COMPONENTS,
   composerActions,
+  composerPlaceholder,
   dataComponents,
   leadingComposerActions,
   transparent,
@@ -142,6 +144,7 @@ export const Thread: FC<ThreadProps> = ({
       <ThreadDataComponentsContext.Provider value={dataComponents}>
         <ThreadRoot
           composerActions={composerActions}
+          composerPlaceholder={composerPlaceholder}
           isEmpty={isEmpty}
           leadingComposerActions={leadingComposerActions}
           transparent={transparent}
@@ -153,10 +156,17 @@ export const Thread: FC<ThreadProps> = ({
 
 const ThreadRoot: FC<{
   composerActions?: ReactNode | undefined;
+  composerPlaceholder?: string | undefined;
   isEmpty: boolean;
   leadingComposerActions?: ReactNode | undefined;
   transparent?: boolean | undefined;
-}> = ({ composerActions, isEmpty, leadingComposerActions, transparent }) => {
+}> = ({
+  composerActions,
+  composerPlaceholder,
+  isEmpty,
+  leadingComposerActions,
+  transparent,
+}) => {
   const { Welcome = ThreadWelcome } = useContext(ThreadComponentsContext);
 
   const surfaceClassName = transparent ? "bg-background" : "bg-surface-main";
@@ -209,6 +219,7 @@ const ThreadRoot: FC<{
             <ThreadScrollToBottom />
             <Composer
               composerActions={composerActions}
+              composerPlaceholder={composerPlaceholder}
               leadingComposerActions={leadingComposerActions}
             />
             <AuiIf condition={isNewChatView}>
@@ -291,11 +302,13 @@ const ThreadSuggestionItem: FC = () => {
 
 type ComposerActionProps = {
   composerActions?: ReactNode | undefined;
+  composerPlaceholder?: string | undefined;
   leadingComposerActions?: ReactNode | undefined;
 };
 
 const Composer: FC<ComposerActionProps> = ({
   composerActions,
+  composerPlaceholder,
   leadingComposerActions,
 }) => {
   return (
@@ -307,7 +320,7 @@ const Composer: FC<ComposerActionProps> = ({
         >
           <ComposerAttachments />
           <ComposerPrimitive.Input
-            placeholder="Send a message..."
+            placeholder={composerPlaceholder ?? "Send a message..."}
             className="aui-composer-input placeholder:text-muted-foreground/80 max-h-32 min-h-10 w-full resize-none border-0 bg-transparent px-2.5 py-1 text-base shadow-none outline-none focus:border-0 focus:shadow-none focus:ring-0 focus-visible:ring-0"
             rows={1}
             autoFocus
