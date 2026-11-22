@@ -16,6 +16,8 @@ dependencies {
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool"))
 
+    implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-api"))
+
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.mockito:mockito-core")
