@@ -69,6 +69,15 @@ administrator returns `403`.
 each with its `name`, its `kind` (`REFERENCE` for a code project, `COPY` for a visual one) and the labels of its
 workflow templates.
 
+## Component tasks
+
+A catalog code project follows the automation project contract, so its tasks can also be
+[component tasks](/platform/automation/build/workflows/code-workflows#component-tasks): a `type` of the form
+`<component>/v<version>/<action>` with the action's inputs as `parameters`, run by the engine like the same task in a
+visual workflow. A component task has no `perform` and declares no `connections`. It is stored as an ordinary workflow
+task, so its connection is wired as the same task's would be in a visual [automation
+workflow](/platform/embedded/build/automations/automation-workflows).
+
 ## Sample projects
 
 | Language | Sample |
