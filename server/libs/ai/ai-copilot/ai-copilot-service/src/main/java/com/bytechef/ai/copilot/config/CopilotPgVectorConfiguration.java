@@ -76,21 +76,20 @@ public class CopilotPgVectorConfiguration {
     @ConditionalOnProperty(prefix = "bytechef.ai.copilot.embedding", name = "provider")
     public VectorStore copilotDocsLoaderVectorStore(
         @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate,
-        PgVectorStoreProperties properties, ObjectProvider<ObservationRegistry> observationRegistry,
+        @Qualifier("copilotEmbeddingModel") EmbeddingModel copilotEmbeddingModel, PgVectorStoreProperties properties,
+        ObjectProvider<ObservationRegistry> observationRegistry,
         ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
-        BatchingStrategy batchingStrategy, ApplicationProperties applicationProperties) {
-
-        EmbeddingModel copilotDocsEmbeddingModel = copilotDocsEmbeddingModel(applicationProperties);
+        BatchingStrategy batchingStrategy) {
 
         PgVectorSchemaUtils.initializeSchema(
             () -> buildVectorStore(
-                pgVectorJdbcTemplate, copilotDocsEmbeddingModel, properties, observationRegistry,
+                pgVectorJdbcTemplate, copilotEmbeddingModel, properties, observationRegistry,
                 customObservationConvention, batchingStrategy, true)
                     .afterPropertiesSet());
 
         return buildVectorStore(
-            pgVectorJdbcTemplate, copilotDocsEmbeddingModel, properties, observationRegistry,
-            customObservationConvention, batchingStrategy, false);
+            pgVectorJdbcTemplate, copilotEmbeddingModel, properties, observationRegistry, customObservationConvention,
+            batchingStrategy, false);
     }
 
     private static PgVectorStore buildVectorStore(
@@ -116,7 +115,9 @@ public class CopilotPgVectorConfiguration {
             .build();
     }
 
-    static EmbeddingModel copilotDocsEmbeddingModel(ApplicationProperties applicationProperties) {
+    @Bean(defaultCandidate = false)
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.embedding", name = "provider")
+    public EmbeddingModel copilotEmbeddingModel(ApplicationProperties applicationProperties) {
         ApplicationProperties.Ai ai = applicationProperties.getAi();
 
         ApplicationProperties.Ai.Copilot.Embedding embedding = ai.getCopilot()
@@ -160,7 +161,7 @@ public class CopilotPgVectorConfiguration {
 
         if (apiKey == null || apiKey.isBlank()) {
             throw new IllegalStateException(
-                "Copilot docs embedding provider is set to OPENAI but 'bytechef.ai.copilot.embedding.api-key' " +
+                "Copilot embedding provider is set to OPENAI but 'bytechef.ai.copilot.embedding.api-key' " +
                     "is not configured");
         }
 
