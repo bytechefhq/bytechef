@@ -43,6 +43,7 @@ class CopilotAgentTypeTest {
         assertThat(CopilotAgentType.WORKFLOW_CODE_EDITOR_ASK.key())
             .isEqualTo(Source.WORKFLOW_CODE_EDITOR.agentId(Mode.ASK))
             .isEqualTo("workflow_code_editor_ask");
+        assertThat(CopilotAgentType.WORKFLOW_EDITOR_EMBEDDED_BUILD.key()).isEqualTo("workflow_editor_embedded_build");
         assertThat(CopilotAgentType.CONVERTER_BUILD.key()).isEqualTo(Source.CONVERTER.agentId(Mode.ASK));
     }
 
