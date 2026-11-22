@@ -5,6 +5,7 @@ import {AI_HUB_PATH, overrideAiApplicationInfo, prepareAiHub} from '../../utils/
 
 export const test = mergeTests(loginTest());
 
+const GETTING_STARTED_PATH = '/automation/getting-started';
 const PROJECTS_PATH = '/automation/projects';
 
 test.describe('AI Hub navigation', () => {
@@ -19,7 +20,10 @@ test.describe('AI Hub navigation', () => {
 
         const mainNavigation = page.getByRole('navigation', {name: 'Main navigation'});
 
-        await expect(mainNavigation.getByRole('link').first()).toHaveAttribute('href', AI_HUB_PATH);
+        await expect(mainNavigation.locator(`a:not([href="${GETTING_STARTED_PATH}"])`).first()).toHaveAttribute(
+            'href',
+            AI_HUB_PATH
+        );
 
         await expect(mainNavigation.getByRole('link', {name: 'AI Hub'})).toBeVisible();
     });
@@ -31,7 +35,7 @@ test.describe('AI Hub navigation', () => {
 
         await page.goto('/automation');
 
-        await page.waitForURL((url) => url.pathname === PROJECTS_PATH);
+        await page.waitForURL((url) => [GETTING_STARTED_PATH, PROJECTS_PATH].includes(url.pathname));
 
         const mainNavigation = page.getByRole('navigation', {name: 'Main navigation'});
 
