@@ -1,0 +1,17 @@
+dependencies {
+    implementation("org.apache.commons:commons-lang3")
+    implementation("org.slf4j:slf4j-api")
+    implementation("org.springframework.ai:spring-ai-model")
+    implementation("org.springframework.security:spring-security-core")
+    implementation("org.springframework:spring-context")
+    implementation("org.springframework:spring-tx")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
+    implementation(project(":server:libs:ai:ai-api"))
+    implementation(project(":server:libs:core:exception:exception-api"))
+    implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-api"))
+    testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
+    testImplementation(project(":server:libs:test:test-support"))
+}
