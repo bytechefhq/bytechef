@@ -23,6 +23,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
@@ -123,7 +124,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class), mock(ProjectOwnershipService.class));
+            mock(WorkflowService.class), mock(ProjectOwnershipService.class), mock(PermissionService.class));
 
         Project project = projectCodeWorkflowFacade.createEmptyCodeWorkflow(1L, "my-code-project", Language.JAVASCRIPT);
 
@@ -160,7 +161,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class), mock(ProjectOwnershipService.class));
+            mock(WorkflowService.class), mock(ProjectOwnershipService.class), mock(PermissionService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.createEmptyCodeWorkflow(1L, "my-code-project", language))
             .isInstanceOf(ConfigurationException.class)
@@ -194,7 +195,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class), mock(ProjectOwnershipService.class));
+            mock(WorkflowService.class), mock(ProjectOwnershipService.class), mock(PermissionService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.createEmptyCodeWorkflow(
             1L, "my-code-project", Language.JAVASCRIPT))
@@ -251,7 +252,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class), mock(ProjectOwnershipService.class));
+            mock(WorkflowService.class), mock(ProjectOwnershipService.class), mock(PermissionService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.createEmptyCodeWorkflow(1L, name, Language.JAVASCRIPT))
             .isInstanceOf(ConfigurationException.class)
