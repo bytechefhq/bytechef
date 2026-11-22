@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.component.domain;
 
-import com.bytechef.commons.util.OptionalUtils;
 import java.util.Objects;
 
 /**
@@ -34,7 +33,8 @@ public class DynamicPropertiesProperty extends Property {
         com.bytechef.component.definition.Property.DynamicPropertiesProperty property) {
         super(property);
 
-        this.header = OptionalUtils.orElse(property.getHeader(), null);
+        this.header = property.getHeader()
+            .orElse(null);
         this.propertiesDataSource = new PropertiesDataSource(property.getDynamicPropertiesDataSource());
     }
 

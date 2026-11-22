@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.component.definition;
 
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.OutputDefinition;
@@ -57,19 +56,26 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
         this.beforeTimeoutResumeFunction = actionDefinition.getBeforeTimeoutResume()
             .orElse(null);
         this.deprecated = actionDefinition.getDeprecated();
-        this.description = OptionalUtils.orElse(actionDefinition.getDescription(), null);
-        this.processErrorResponseFunction = OptionalUtils.orElse(actionDefinition.getProcessErrorResponse(), null);
-        this.help = OptionalUtils.orElse(actionDefinition.getHelp(), null);
+        this.description = actionDefinition.getDescription()
+            .orElse(null);
+        this.processErrorResponseFunction = actionDefinition.getProcessErrorResponse()
+            .orElse(null);
+        this.help = actionDefinition.getHelp()
+            .orElse(null);
         this.metadata = actionDefinition.getMetadata();
         this.name = actionDefinition.getName();
-        this.outputSchemaFunction = OptionalUtils.orElse(actionDefinition.getOutputDefinition(), null);
-        this.performFunction = OptionalUtils.orElse(actionDefinition.getPerform(), null);
+        this.outputSchemaFunction = actionDefinition.getOutputDefinition()
+            .orElse(null);
+        this.performFunction = actionDefinition.getPerform()
+            .orElse(null);
         this.properties = actionDefinition.getProperties();
         this.resumePerformFunction = actionDefinition.getResumePerform()
             .orElse(null);
-        this.title = OptionalUtils.orElse(actionDefinition.getTitle(), null);
+        this.title = actionDefinition.getTitle()
+            .orElse(null);
         this.workflowNodeDescriptionFunction =
-            OptionalUtils.orElse(actionDefinition.getWorkflowNodeDescription(), null);
+            actionDefinition.getWorkflowNodeDescription()
+                .orElse(null);
     }
 
     @Override

@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.component.domain;
 
-import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -29,8 +28,9 @@ public class OptionsDataSource {
 
     private final List<String> optionsLookupDependsOn;
 
-    public OptionsDataSource(com.bytechef.component.definition.OptionsDataSource optionsDataSource) {
-        this.optionsLookupDependsOn = OptionalUtils.orElse(optionsDataSource.getOptionsLookupDependsOn(), List.of());
+    public OptionsDataSource(com.bytechef.component.definition.OptionsDataSource<?> optionsDataSource) {
+        this.optionsLookupDependsOn = optionsDataSource.getOptionsLookupDependsOn()
+            .orElse(List.of());
     }
 
     public List<String> getOptionsLookupDependsOn() {

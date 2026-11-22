@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.component.definition;
 
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentCategory;
@@ -60,20 +59,27 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     public AbstractComponentDefinitionWrapper(ComponentDefinition componentDefinition) {
         this.actions = componentDefinition.getActions();
         this.componentCategories = componentDefinition.getComponentCategories();
-        this.connection = OptionalUtils.orElse(componentDefinition.getConnection(), null);
+        this.connection = componentDefinition.getConnection()
+            .orElse(null);
         this.customAction = componentDefinition.getCustomAction();
-        this.customActionHelp = OptionalUtils.orElse(componentDefinition.getCustomActionHelp(), null);
+        this.customActionHelp = componentDefinition.getCustomActionHelp()
+            .orElse(null);
         this.clusterElements = componentDefinition.getClusterElements();
-        this.description = OptionalUtils.orElse(componentDefinition.getDescription(), null);
-        this.icon = OptionalUtils.orElse(componentDefinition.getIcon(), null);
+        this.description = componentDefinition.getDescription()
+            .orElse(null);
+        this.icon = componentDefinition.getIcon()
+            .orElse(null);
         this.tags = componentDefinition.getTags();
         this.metadata = componentDefinition.getMetadata();
         this.name = componentDefinition.getName();
         this.inputs = componentDefinition.getInputs();
-        this.resources = OptionalUtils.orElse(componentDefinition.getResources(), null);
-        this.title = OptionalUtils.orElse(componentDefinition.getTitle(), null);
+        this.resources = componentDefinition.getResources()
+            .orElse(null);
+        this.title = componentDefinition.getTitle()
+            .orElse(null);
         this.triggers = componentDefinition.getTriggers();
-        this.unifiedApi = OptionalUtils.orElse(componentDefinition.getUnifiedApi(), null);
+        this.unifiedApi = componentDefinition.getUnifiedApi()
+            .orElse(null);
         this.version = componentDefinition.getVersion();
     }
 

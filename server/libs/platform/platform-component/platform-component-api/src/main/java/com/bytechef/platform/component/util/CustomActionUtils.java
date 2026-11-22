@@ -32,7 +32,6 @@ import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.component.definition.Context.Http;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -49,6 +48,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -184,13 +184,15 @@ public class CustomActionUtils {
             .output()
             .perform(CustomActionUtils::perform);
 
+        Optional<Help> customActionHelp = componentDefinition.getCustomActionHelp();
+
         return customActionDefinition.help(
-            OptionalUtils.mapOrElse(componentDefinition.getCustomActionHelp(), Help::getBody, null),
-            OptionalUtils.orElse(
-                OptionalUtils.mapOptional(
-                    componentDefinition.getCustomActionHelp(),
-                    help -> OptionalUtils.orElse(help.getLearnMoreUrl(), null)),
-                null));
+            customActionHelp
+                .map(Help::getBody)
+                .orElse(null),
+            customActionHelp
+                .flatMap(Help::getLearnMoreUrl)
+                .orElse(null));
     }
 
     protected static Object perform(

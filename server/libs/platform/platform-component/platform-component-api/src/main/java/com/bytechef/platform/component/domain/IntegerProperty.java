@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Property;
 import java.util.Collections;
 import java.util.List;
@@ -40,11 +39,14 @@ public class IntegerProperty extends ValueProperty<Long> implements OptionsDataS
     public IntegerProperty(Property.IntegerProperty integerProperty) {
         super(integerProperty);
 
-        this.maxValue = OptionalUtils.orElse(integerProperty.getMaxValue(), null);
-        this.minValue = OptionalUtils.orElse(integerProperty.getMinValue(), null);
+        this.maxValue = integerProperty.getMaxValue()
+            .orElse(null);
+        this.minValue = integerProperty.getMinValue()
+            .orElse(null);
         this.options = CollectionUtils.map(integerProperty.getOptions(), Option::new);
-        this.optionsDataSource = OptionalUtils.mapOrElse(
-            integerProperty.getOptionsDataSource(), OptionsDataSource::new, null);
+        this.optionsDataSource = integerProperty.getOptionsDataSource()
+            .map(OptionsDataSource::new)
+            .orElse(null);
     }
 
     @Override

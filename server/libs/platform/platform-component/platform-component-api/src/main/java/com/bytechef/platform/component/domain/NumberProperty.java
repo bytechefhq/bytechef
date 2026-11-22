@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Property;
 import java.util.Collections;
 import java.util.List;
@@ -43,14 +42,20 @@ public class NumberProperty extends ValueProperty<Double> implements OptionsData
     public NumberProperty(Property.NumberProperty numberProperty) {
         super(numberProperty);
 
-        this.maxNumberPrecision = OptionalUtils.orElse(numberProperty.getMaxNumberPrecision(), null);
-        this.maxValue = OptionalUtils.orElse(numberProperty.getMaxValue(), null);
-        this.minNumberPrecision = OptionalUtils.orElse(numberProperty.getMinNumberPrecision(), null);
-        this.minValue = OptionalUtils.orElse(numberProperty.getMinValue(), null);
-        this.numberPrecision = OptionalUtils.orElse(numberProperty.getNumberPrecision(), null);
+        this.maxNumberPrecision = numberProperty.getMaxNumberPrecision()
+            .orElse(null);
+        this.maxValue = numberProperty.getMaxValue()
+            .orElse(null);
+        this.minNumberPrecision = numberProperty.getMinNumberPrecision()
+            .orElse(null);
+        this.minValue = numberProperty.getMinValue()
+            .orElse(null);
+        this.numberPrecision = numberProperty.getNumberPrecision()
+            .orElse(null);
         this.options = CollectionUtils.map(numberProperty.getOptions(), Option::new);
-        this.optionsDataSource = OptionalUtils.mapOrElse(
-            numberProperty.getOptionsDataSource(), OptionsDataSource::new, null);
+        this.optionsDataSource = numberProperty.getOptionsDataSource()
+            .map(OptionsDataSource::new)
+            .orElse(null);
     }
 
     @Override
