@@ -10,6 +10,7 @@ package com.bytechef.ee.ai.hub.toolsearch;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -102,5 +103,34 @@ class CatalogToolIndexTest {
 
         assertThat(filterExpression).contains(CATALOG_SESSION_ID)
             .doesNotContain("conversation-1");
+    }
+
+    @Test
+    void testSearchLooksUpAToolNameInTheQueryByName() {
+        CatalogToolIndex catalogToolIndex = new CatalogToolIndex(vectorStore, Set.of(CATALOG_SESSION_ID));
+
+        when(vectorStore.similaritySearch(any(SearchRequest.class))).thenReturn(List.<Document>of());
+
+        catalogToolIndex.search(new ToolSearchRequest("conversation-1", "createProjectDeployment", 5, null));
+
+        ArgumentCaptor<SearchRequest> searchRequestCaptor = ArgumentCaptor.forClass(SearchRequest.class);
+
+        verify(vectorStore, times(2)).similaritySearch(searchRequestCaptor.capture());
+
+        SearchRequest exactNameSearchRequest = searchRequestCaptor.getAllValues()
+            .getFirst();
+
+        assertThat(String.valueOf(exactNameSearchRequest.getFilterExpression())).contains("createProjectDeployment")
+            .contains(CATALOG_SESSION_ID);
+    }
+
+    @Test
+    void testIdentifierTokensKeepOnlyToolShapedWords() {
+        assertThat(CatalogToolIndex.identifierTokens("createProjectDeployment")).containsExactly(
+            "createProjectDeployment");
+        assertThat(CatalogToolIndex.identifierTokens("wrike_createProject, listProjects or listProjects"))
+            .containsExactly("wrike_createProject", "listProjects");
+        assertThat(CatalogToolIndex.identifierTokens("create a project deployment")).isEmpty();
+        assertThat(CatalogToolIndex.identifierTokens(null)).isEmpty();
     }
 }

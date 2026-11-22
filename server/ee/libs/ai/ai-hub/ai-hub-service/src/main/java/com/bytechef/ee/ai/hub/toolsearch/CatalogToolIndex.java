@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,8 @@ public class CatalogToolIndex implements ToolIndex {
 
     private static final Logger log = LoggerFactory.getLogger(CatalogToolIndex.class);
 
+    private static final double EXACT_NAME_SCORE = 1.0;
+    private static final Pattern NON_IDENTIFIER = Pattern.compile("[^A-Za-z0-9_]+");
     private static final double SIMILARITY_THRESHOLD = 0.2;
 
     private final VectorStore vectorStore;
@@ -92,19 +95,10 @@ public class CatalogToolIndex implements ToolIndex {
                     .build())
             .build();
 
-        List<Document> documents = vectorStore.similaritySearch(searchRequest);
-
         Map<String, ToolReference> bestByToolName = new LinkedHashMap<>();
 
-        if (documents != null) {
-            for (Document document : documents) {
-                ToolReference toolReference = toToolReference(document);
-
-                bestByToolName.merge(
-                    toolReference.toolName(), toolReference,
-                    (existing, candidate) -> score(candidate) > score(existing) ? candidate : existing);
-            }
-        }
+        mergeBest(bestByToolName, exactNameDocuments(toolSearchRequest.query(), sessionIds), EXACT_NAME_SCORE);
+        mergeBest(bestByToolName, vectorStore.similaritySearch(searchRequest), null);
 
         List<ToolReference> merged = new ArrayList<>(bestByToolName.values());
 
@@ -117,12 +111,85 @@ public class CatalogToolIndex implements ToolIndex {
         return new ToolSearchResponse(merged, merged.size(), null);
     }
 
-    private static ToolReference toToolReference(Document document) {
+    private @Nullable List<Document> exactNameDocuments(String query, List<String> sessionIds) {
+        List<String> toolNames = identifierTokens(query);
+
+        if (toolNames.isEmpty()) {
+            return null;
+        }
+
+        FilterExpressionBuilder filterExpressionBuilder = new FilterExpressionBuilder();
+
+        SearchRequest searchRequest = SearchRequest.builder()
+            .query(query)
+            .topK(toolNames.size() * sessionIds.size())
+            .similarityThresholdAll()
+            .filterExpression(
+                filterExpressionBuilder.and(
+                    filterExpressionBuilder.in(METADATA_SESSION_ID, sessionIds.toArray()),
+                    filterExpressionBuilder.in(VectorToolIndex.METADATA_TOOL_NAME, toolNames.toArray()))
+                    .build())
+            .build();
+
+        return vectorStore.similaritySearch(searchRequest);
+    }
+
+    static List<String> identifierTokens(@Nullable String query) {
+        if (query == null) {
+            return List.of();
+        }
+
+        List<String> identifierTokens = new ArrayList<>();
+
+        for (String token : NON_IDENTIFIER.split(query)) {
+            if (looksLikeToolName(token) && !identifierTokens.contains(token)) {
+                identifierTokens.add(token);
+            }
+        }
+
+        return identifierTokens;
+    }
+
+    private static boolean looksLikeToolName(String token) {
+        if (token.isEmpty() || !Character.isLetter(token.charAt(0))) {
+            return false;
+        }
+
+        if (token.indexOf('_') >= 0) {
+            return true;
+        }
+
+        for (int index = 1; index < token.length(); index++) {
+            if (Character.isUpperCase(token.charAt(index))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static void mergeBest(
+        Map<String, ToolReference> bestByToolName, @Nullable List<Document> documents, @Nullable Double score) {
+
+        if (documents == null) {
+            return;
+        }
+
+        for (Document document : documents) {
+            ToolReference toolReference = toToolReference(document, score);
+
+            bestByToolName.merge(
+                toolReference.toolName(), toolReference,
+                (existing, candidate) -> score(candidate) > score(existing) ? candidate : existing);
+        }
+    }
+
+    private static ToolReference toToolReference(Document document, @Nullable Double score) {
         Map<String, Object> metadata = document.getMetadata();
 
         return ToolReference.builder()
             .toolName((String) Objects.requireNonNull(metadata.get(VectorToolIndex.METADATA_TOOL_NAME)))
-            .relevanceScore(Objects.requireNonNullElse(document.getScore(), 0.0))
+            .relevanceScore(score == null ? Objects.requireNonNullElse(document.getScore(), 0.0) : score)
             .summary((String) Objects.requireNonNull(metadata.get(VectorToolIndex.METADATA_TOOL_DESCRIPTION)))
             .build();
     }

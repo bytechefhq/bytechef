@@ -173,6 +173,28 @@ class ToolSearchCatalogFeederIntTest {
     }
 
     @Test
+    void testSearchingForAToolNameRanksThatToolFirst() {
+        newFeeder().populateGlobalTools(
+            ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID,
+            List.of(
+                toolCallback("wrike_createProject", "Create a project in Wrike"),
+                toolCallback("linear_createProject", "Create a project in Linear"),
+                toolCallback("createProjectDeployment", "Deploy a published version to an environment")));
+
+        CatalogToolIndex catalogToolIndex = new CatalogToolIndex(
+            pgVectorStore, Set.of(ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID));
+
+        List<String> toolNames = catalogToolIndex.search(
+            new ToolSearchRequest("conversation-1", "createProjectDeployment", 1, null))
+            .toolReferences()
+            .stream()
+            .map(ToolReference::toolName)
+            .toList();
+
+        assertThat(toolNames).containsExactly("createProjectDeployment");
+    }
+
+    @Test
     void testTheCatalogIsIndexedWithTheLoaderModelAndSearchedWithTheQueryModel() {
         RecordingEmbeddingModel loaderEmbeddingModel = new RecordingEmbeddingModel();
         RecordingEmbeddingModel queryEmbeddingModel = new RecordingEmbeddingModel();
