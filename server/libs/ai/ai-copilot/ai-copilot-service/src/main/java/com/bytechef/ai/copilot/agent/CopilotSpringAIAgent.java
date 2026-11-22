@@ -62,8 +62,14 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
     }
 
     @Override
-    protected void run(RunAgentInput input, AgentSubscriber subscriber) {
-        runWithTenant(input, () -> runWithEnvironment(input, () -> super.run(input, subscriber)));
+    protected final void run(RunAgentInput input, AgentSubscriber subscriber) {
+        AgentSubscriber decoratedSubscriber = decorateSubscriber(subscriber);
+
+        runWithTenant(input, () -> runWithEnvironment(input, () -> super.run(input, decoratedSubscriber)));
+    }
+
+    protected AgentSubscriber decorateSubscriber(AgentSubscriber subscriber) {
+        return subscriber;
     }
 
     void runWithTenant(RunAgentInput input, Runnable action) {
