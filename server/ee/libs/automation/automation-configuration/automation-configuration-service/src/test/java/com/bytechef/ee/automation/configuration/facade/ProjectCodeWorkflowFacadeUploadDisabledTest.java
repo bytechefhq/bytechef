@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
@@ -58,7 +59,7 @@ class ProjectCodeWorkflowFacadeUploadDisabledTest {
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class), mock(ProjectOwnershipService.class));
+            mock(WorkflowService.class), mock(ProjectOwnershipService.class), mock(PermissionService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.save(1L, new byte[0], Language.JAVA))
             .isInstanceOf(ConfigurationException.class)
@@ -89,7 +90,7 @@ class ProjectCodeWorkflowFacadeUploadDisabledTest {
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class), mock(ProjectOwnershipService.class));
+            mock(WorkflowService.class), mock(ProjectOwnershipService.class), mock(PermissionService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.save(1L, new byte[0], Language.JAVASCRIPT))
             .isInstanceOf(ConfigurationException.class)
@@ -116,7 +117,7 @@ class ProjectCodeWorkflowFacadeUploadDisabledTest {
                 projectWorkflowService, mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class), mock(ProjectOwnershipService.class));
+            mock(WorkflowService.class), mock(ProjectOwnershipService.class), mock(PermissionService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.save(1L, new byte[0], Language.RUBY))
             .isInstanceOf(ConfigurationException.class)

@@ -19,6 +19,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
@@ -132,7 +133,7 @@ class ProjectCodeWorkflowFacadeListTest {
                 projectCodeWorkflowService, mock(ProjectWorkflowService.class), mock(WorkflowService.class), List.of()),
             mock(TagService.class), mock(ProjectDeploymentFacade.class), mock(ProjectDeploymentService.class),
             mock(ProjectDeploymentWorkflowService.class), mock(ComponentConnectionFacade.class),
-            mock(WorkflowService.class), projectOwnershipService);
+            mock(WorkflowService.class), projectOwnershipService, mock(PermissionService.class));
     }
 
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {

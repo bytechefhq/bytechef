@@ -53,6 +53,7 @@ import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.automation.project.definition.ProjectDefinition;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
+import com.bytechef.ee.automation.configuration.exception.CodeWorkflowErrorType;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.automation.configuration.service.WorkspaceService;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
@@ -94,6 +95,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -231,8 +233,13 @@ class ProjectCodeWorkflowFacadeIntTest {
         project.setName("Orders");
         project.setWorkspaceId(WORKSPACE_ID);
 
+        project.publish(null);
+
         when(projectService.fetchProject("Orders", WORKSPACE_ID)).thenReturn(Optional.of(project));
         when(projectService.update(project)).thenReturn(project);
+
+        allowDeployIntoProject();
+        stubPublishedProjectCodeWorkflow(Map.of());
 
         saveProjectNamed("Orders");
 
@@ -288,6 +295,82 @@ class ProjectCodeWorkflowFacadeIntTest {
 
         verify(projectService, never()).create(any());
         verify(projectService, never()).update(any());
+    }
+
+    @Test
+    void testSaveRefusesASameNamedProjectTheCallerCannotEditAndPublish() {
+        authenticate(AuthorityConstants.ADMIN);
+
+        Project project = sameNamedProject("Orders");
+
+        stubCodeProject(project);
+
+        when(permissionService.hasResourceScope(5L, "Project", "WORKFLOW_EDIT")).thenReturn(false);
+        when(permissionService.hasResourceScope(5L, "Project", "DEPLOYMENT_PUSH")).thenReturn(true);
+
+        assertThatThrownBy(() -> saveProjectNamed("Orders")).isInstanceOf(AccessDeniedException.class);
+
+        verify(projectService, never()).update(any());
+        verify(projectService, never()).create(any());
+        verify(projectCodeWorkflowService, never()).create(any(), any());
+        verify(projectFacade, never()).publishProject(anyLong(), any(), anyBoolean());
+    }
+
+    @Test
+    void testSaveRefusesASameNamedProjectTheCallerCannotPublish() {
+        authenticate(AuthorityConstants.ADMIN);
+
+        Project project = sameNamedProject("Orders");
+
+        stubCodeProject(project);
+
+        when(permissionService.hasResourceScope(5L, "Project", "WORKFLOW_EDIT")).thenReturn(true);
+        when(permissionService.hasResourceScope(5L, "Project", "DEPLOYMENT_PUSH")).thenReturn(false);
+
+        assertThatThrownBy(() -> saveProjectNamed("Orders")).isInstanceOf(AccessDeniedException.class);
+
+        verify(projectService, never()).update(any());
+        verify(projectCodeWorkflowService, never()).create(any(), any());
+        verify(projectFacade, never()).publishProject(anyLong(), any(), anyBoolean());
+    }
+
+    @Test
+    void testSaveRefusesASameNamedProjectThatIsNotACodeProject() {
+        authenticate(AuthorityConstants.ADMIN);
+
+        sameNamedProject("Orders");
+
+        when(permissionService.hasResourceScope(eq(5L), eq("Project"), anyString())).thenReturn(true);
+        when(projectCodeWorkflowService.fetchProjectCodeWorkflow(5L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> saveProjectNamed("Orders"))
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("Orders")
+            .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
+            .isEqualTo(CodeWorkflowErrorType.CODE_WORKFLOW_ALREADY_EXISTS.getErrorKey());
+
+        verify(projectService, never()).update(any());
+        verify(projectService, never()).create(any());
+        verify(projectCodeWorkflowService, never()).create(any(), any());
+        verify(projectFacade, never()).publishProject(anyLong(), any(), anyBoolean());
+    }
+
+    private Project sameNamedProject(String name) {
+        Project project = new Project();
+
+        project.setId(5L);
+        project.setName(name);
+        project.setWorkspaceId(WORKSPACE_ID);
+
+        when(projectService.fetchProject(name, WORKSPACE_ID)).thenReturn(Optional.of(project));
+        when(projectService.update(project)).thenReturn(project);
+
+        return project;
+    }
+
+    private void stubCodeProject(Project project) {
+        when(projectCodeWorkflowService.fetchProjectCodeWorkflow(Objects.requireNonNull(project.getId())))
+            .thenReturn(Optional.of(mock(ProjectCodeWorkflow.class)));
     }
 
     private void saveProjectNamed(String name) {
@@ -589,6 +672,7 @@ class ProjectCodeWorkflowFacadeIntTest {
         UUID keptWorkflowUuid = UUID.randomUUID();
         UUID removedWorkflowUuid = UUID.randomUUID();
 
+        allowDeployIntoProject();
         stubPublishedProjectCodeWorkflow(
             Map.of("kept-workflow", "published-kept", "removed-workflow", "published-removed"));
 
@@ -799,6 +883,11 @@ class ProjectCodeWorkflowFacadeIntTest {
         when(permissionService.hasResourceScope(any(), eq("Project"), eq("DEPLOYMENT_PUSH"))).thenReturn(true);
     }
 
+    private void allowDeployIntoProject() {
+        when(permissionService.hasResourceScope(any(), eq("Project"), eq("WORKFLOW_EDIT"))).thenReturn(true);
+        when(permissionService.hasResourceScope(any(), eq("Project"), eq("DEPLOYMENT_PUSH"))).thenReturn(true);
+    }
+
     private void stubPublishedProjectCodeWorkflow(Map<String, String> publishedWorkflowNameIds) {
         ProjectCodeWorkflow publishedProjectCodeWorkflow = mock(ProjectCodeWorkflow.class);
 
@@ -887,6 +976,8 @@ class ProjectCodeWorkflowFacadeIntTest {
         when(projectService.getProject(PROJECT_ID)).thenAnswer(invocation -> publishedProject(2));
 
         stubCodeWorkflowContainer();
+        allowDeployIntoProject();
+        stubPublishedProjectCodeWorkflow(Map.of());
 
         UUID carriedWorkflowUuid = UUID.randomUUID();
 

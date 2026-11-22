@@ -18,6 +18,7 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
@@ -65,6 +66,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.cache.CacheManager;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,6 +85,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         Set.of(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT);
 
     private final CacheManager cacheManager;
+    private final PermissionService permissionService;
     private final ProjectOwnershipService projectOwnershipService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
@@ -110,9 +113,10 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         ProjectDeploymentFacade projectDeploymentFacade, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService,
-        ProjectOwnershipService projectOwnershipService) {
+        ProjectOwnershipService projectOwnershipService, PermissionService permissionService) {
 
         this.cacheManager = cacheManager;
+        this.permissionService = permissionService;
         this.projectOwnershipService = projectOwnershipService;
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
@@ -402,13 +406,44 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
                 "Failed to load code workflow source: " + e.getMessage(), CodeWorkflowErrorType.SOURCE_LOAD_FAILED);
         }
 
-        Project project = projectService.fetchProject(projectDefinition.getName(), workspaceId)
-            .map(curProject -> updateProject(curProject, projectDefinition))
-            .orElseGet(() -> createProject(workspaceId, projectDefinition));
+        Optional<Project> sameNamedProjectOptional = projectService.fetchProject(
+            projectDefinition.getName(), workspaceId);
+
+        Project project;
+
+        if (sameNamedProjectOptional.isPresent()) {
+            Project sameNamedProject = sameNamedProjectOptional.get();
+
+            validateDeployTarget(sameNamedProject);
+
+            project = updateProject(sameNamedProject, projectDefinition);
+        } else {
+            project = createProject(workspaceId, projectDefinition);
+        }
 
         int projectVersion = deployInto(project, projectDefinition, bytes, language);
 
         return new PublishedProject(project, projectVersion);
+    }
+
+    private void validateDeployTarget(Project project) {
+        long projectId = Objects.requireNonNull(project.getId());
+
+        if (!permissionService.hasResourceScope(projectId, "Project", "WORKFLOW_EDIT") ||
+            !permissionService.hasResourceScope(projectId, "Project", "DEPLOYMENT_PUSH")) {
+
+            throw new AccessDeniedException(
+                "Not allowed to edit and publish the project named '" + project.getName() + "'");
+        }
+
+        Optional<ProjectCodeWorkflow> projectCodeWorkflowOptional =
+            projectCodeWorkflowService.fetchProjectCodeWorkflow(projectId);
+
+        if (projectCodeWorkflowOptional.isEmpty()) {
+            throw new ConfigurationException(
+                "A project named '" + project.getName() + "' already exists and is not a code workflow project",
+                CodeWorkflowErrorType.CODE_WORKFLOW_ALREADY_EXISTS);
+        }
     }
 
     private Project renameProject(Project project, String name) {
