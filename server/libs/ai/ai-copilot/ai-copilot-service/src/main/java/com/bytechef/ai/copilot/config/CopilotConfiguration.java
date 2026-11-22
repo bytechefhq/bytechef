@@ -27,6 +27,7 @@ import com.bytechef.ai.copilot.agent.McpServerSpringAIAgent;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.agent.SampleOutputSpringAIAgent;
 import com.bytechef.ai.copilot.agent.SkillsSpringAIAgent;
+import com.bytechef.ai.copilot.agent.WorkflowCodeEditorSpringAIAgent;
 import com.bytechef.ai.copilot.agent.WorkflowEditorSpringAIAgent;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ai.copilot.tool.ConfigureMcpServerToolCallback;
@@ -172,6 +173,8 @@ public class CopilotConfiguration {
     private final Resource promptWorkflowEditorBuildResource;
     private final Resource promptCodeEditorAskResource;
     private final Resource promptCodeEditorBuildResource;
+    private final Resource promptWorkflowCodeEditorAskResource;
+    private final Resource promptWorkflowCodeEditorBuildResource;
     private final Resource promptConverterBuildResource;
     private final Resource promptClusterElementAskResource;
     private final Resource promptClusterElementBuildResource;
@@ -215,6 +218,8 @@ public class CopilotConfiguration {
         @Value("classpath:prompt_workflow_editor_build_sub_agent.txt") Resource promptWorkflowEditorBuildSubAgentResource,
         @Value("classpath:prompt_code_editor_ask.txt") Resource promptCodeEditorAskResource,
         @Value("classpath:prompt_code_editor_build.txt") Resource promptCodeEditorBuildResource,
+        @Value("classpath:prompt_workflow_code_editor_ask.txt") Resource promptWorkflowCodeEditorAskResource,
+        @Value("classpath:prompt_workflow_code_editor_build.txt") Resource promptWorkflowCodeEditorBuildResource,
         @Value("classpath:prompt_converter_build.txt") Resource promptConverterBuildResource,
         @Value("classpath:prompt_cluster_element_ask.txt") Resource promptClusterElementAskResource,
         @Value("classpath:prompt_cluster_element_build.txt") Resource promptClusterElementBuildResource,
@@ -245,6 +250,8 @@ public class CopilotConfiguration {
         this.promptWorkflowEditorBuildResource = promptWorkflowEditorBuildResource;
         this.promptCodeEditorAskResource = promptCodeEditorAskResource;
         this.promptCodeEditorBuildResource = promptCodeEditorBuildResource;
+        this.promptWorkflowCodeEditorAskResource = promptWorkflowCodeEditorAskResource;
+        this.promptWorkflowCodeEditorBuildResource = promptWorkflowCodeEditorBuildResource;
         this.promptConverterBuildResource = promptConverterBuildResource;
         this.promptClusterElementAskResource = promptClusterElementAskResource;
         this.promptClusterElementBuildResource = promptClusterElementBuildResource;
@@ -314,6 +321,60 @@ public class CopilotConfiguration {
             .state(state)
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
+    }
+
+    @Bean
+    WorkflowCodeEditorSpringAIAgent workflowCodeEditorAskSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowTools readProjectWorkflowTools,
+        ComponentTools componentTools, TaskTools taskTools, WebSearchToolCallbackProvider webSearchToolCallbackProvider,
+        SecurityContextRehydrator securityContextRehydrator,
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) throws AGUIException {
+
+        List<Object> tools = new ArrayList<>(
+            List.of(
+                readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools,
+                workflowInstructionTools));
+
+        WorkflowCodeEditorSpringAIAgent springAIAgent = WorkflowCodeEditorSpringAIAgent.builder()
+            .agentId(CopilotAgentType.WORKFLOW_CODE_EDITOR_ASK.key())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(getSystemPrompt(promptWorkflowCodeEditorAskResource))
+            .toolCallbacks(wrapTools(securityContextRehydrator, tools))
+            .state(state)
+            .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
+            .build();
+
+        springAIAgent.setWebSearchToolCallbackProvider(webSearchToolCallbackProvider);
+
+        return springAIAgent;
+    }
+
+    @Bean
+    WorkflowCodeEditorSpringAIAgent workflowCodeEditorBuildSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowTools readProjectWorkflowTools,
+        ComponentTools componentTools, TaskTools taskTools, WebSearchToolCallbackProvider webSearchToolCallbackProvider,
+        SecurityContextRehydrator securityContextRehydrator,
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) throws AGUIException {
+
+        List<Object> tools = new ArrayList<>(
+            List.of(
+                readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools,
+                workflowInstructionTools));
+
+        WorkflowCodeEditorSpringAIAgent springAIAgent = WorkflowCodeEditorSpringAIAgent.builder()
+            .agentId(CopilotAgentType.WORKFLOW_CODE_EDITOR_BUILD.key())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(getSystemPrompt(promptWorkflowCodeEditorBuildResource))
+            .toolCallbacks(wrapTools(securityContextRehydrator, tools))
+            .state(state)
+            .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
+            .build();
+
+        springAIAgent.setWebSearchToolCallbackProvider(webSearchToolCallbackProvider);
+
+        return springAIAgent;
     }
 
     @Bean

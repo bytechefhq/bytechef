@@ -91,7 +91,7 @@ class CopilotConfigurationTest {
     private static final Resource PROMPT_RESOURCE = new ByteArrayResource("prompt".getBytes(StandardCharsets.UTF_8));
 
     private final CopilotConfiguration copilotConfiguration = new CopilotConfiguration(
-        PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE,
+        PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE,
         PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE,
         PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE,
         mock(WorkflowValidatorTools.class), mock(WorkflowInstructionTools.class),
@@ -128,10 +128,10 @@ class CopilotConfigurationTest {
         }
 
         assertThat(agentIds)
-            .hasSize(14)
+            .hasSize(16)
             .doesNotHaveDuplicates()
             .allSatisfy(agentId -> assertThat(copilotAgentTypeKeys).contains(agentId))
-            .contains("code_editor_ask", "code_editor_build", "converter_build", "mcp_server_build");
+            .contains("workflow_code_editor_ask", "workflow_code_editor_build", "converter_build", "mcp_server_build");
     }
 
     @Test
@@ -316,7 +316,7 @@ class CopilotConfigurationTest {
         return new CopilotConfiguration(
             PROMPT_RESOURCE, new ClassPathResource("prompt_workflow_editor_build.txt"),
             new ClassPathResource("prompt_workflow_editor_build_sub_agent.txt"), PROMPT_RESOURCE, PROMPT_RESOURCE,
-            PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE,
+            PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE,
             PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE,
             mock(WorkflowValidatorTools.class), mock(WorkflowInstructionTools.class),
             mock(InteractivePickerToolCallbacks.class), mock(ActionDefinitionService.class),

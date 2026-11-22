@@ -40,9 +40,9 @@ class CopilotAgentTypeTest {
 
     @Test
     void testChatAgentKeysAreDerivedFromTheSourceAndMode() {
-        assertThat(CopilotAgentType.CLUSTER_ELEMENT_ASK.key())
-            .isEqualTo(Source.CLUSTER_ELEMENT.agentId(Mode.ASK))
-            .isEqualTo("cluster_element_ask");
+        assertThat(CopilotAgentType.WORKFLOW_CODE_EDITOR_ASK.key())
+            .isEqualTo(Source.WORKFLOW_CODE_EDITOR.agentId(Mode.ASK))
+            .isEqualTo("workflow_code_editor_ask");
         assertThat(CopilotAgentType.CONVERTER_BUILD.key()).isEqualTo(Source.CONVERTER.agentId(Mode.ASK));
     }
 
