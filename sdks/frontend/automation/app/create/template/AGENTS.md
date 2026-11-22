@@ -15,7 +15,12 @@ ByteChef which API collections, connections, actions, tools, proxy methods and w
 
    Periodic work is a scheduled ByteChef workflow writing to a data table; the app reads the results through an API
    endpoint. Business logic in a ByteChef workflow can be changed, disabled and reused without redeploying the app;
-   the same logic as a chain of actions in this app's code cannot.
+   the same logic as a chain of actions in this app's code cannot. A code workflow builds any of these workflows
+   when `buildWorkflow` cannot express the logic or the human asks for code (step 6 of "Setting up the app with
+   ByteChef"). When a workflow needs an API no ByteChef component covers, always ask the human, even if they said
+   earlier to just proceed: the HTTP Client component keeps the call inside that one workflow, while a custom component
+   is visible to and reusable by every workflow on the instance and needs an admin API key to publish, which this
+   app's automation profile does not hold.
 2. **Every third-party system goes through `@bytechef/app`.** Never add an API key, OAuth client or vendor SDK for a
    system this app reaches through a ByteChef binding, and never call such a system's API directly.
 3. **Discover before building.** Run `npm run -s bytechef:status` and use only the operations it lists. Its
@@ -126,31 +131,92 @@ is managed with the `bytechef` CLI, workflows with the ByteChef management MCP s
    `deployProject` prints; the workflow key is the key your code passes to `workflows.execute`. To change a workflow:
    `buildWorkflow` naming the `draftWorkflowId` from the last `deployProject` result → `publishProject` →
    `deployProject`; the binding stays valid.
-6. **Direct actions, tools and the proxy, only when needed** (say why).
+6. **Code workflows, when `buildWorkflow` cannot express the logic or the human asks for code.** Write the project in
+   `bytechef/workflows/<project>.ts` (TypeScript, or `.py` when the human asks), commit it with the app, and give it a
+   project `name` that `listProjects` shows no other project using. Deploy matches that name case-insensitively and
+   writes into any project with it, a visual one included, publishing that project's unpublished edits too; on a later
+   deploy of the same file the match is this file's own project, so keep the name. Keep that name and every workflow's
+   `name` fixed afterwards, because a renamed workflow gets a new uuid. The file is a bare `({ ... })` expression (never
+   `export` it: deploy answers HTTP 500); every workflow has a unique `label`; a task is a `perform(input, context)`
+   function or a component task (`type: "<component>/v<version>/<action>"` with `parameters`, where `${task}` reads an
+   earlier task's output); a trigger's output is `input.<triggerName>`; an endpoint workflow ends in an
+   `apiPlatform/v1/responseToAPIRequest` component task, which nothing checks for; a Call-workflow workflow has the
+   `workflow/v1/newWorkflowCall` trigger with `inputSchema` as a JSON-Schema string, and returns only its `outputs`
+   (`[{name, value: "${task}"}]`), else `{}`; `dataTable/v1/createRecords` takes `records: {values: [...]}`. Read
+   trigger and action parameters with `getTriggerDefinition` and `getActionDefinition`, since deploy does not check
+   them. Deploy with
+   `bytechef automation project deploy --project-file bytechef/workflows/dist/orders.js --workspace-id <id>` after
+   `npm run build:workflows` compiles the `.ts` to `bytechef/workflows/dist/`; deploy the compiled `.js`, never the
+   `.ts`, and never `import` or `export` in the `.ts`. The deploy publishes a new version; a `401` or `403` means the
+   profile's key cannot deploy, so stop and ask a person. Find the ids with `listProjects` (the project `id`),
+   `getProject` (the highest `PUBLISHED` entry of `versions`) and `listWorkflows` (each `workflow_uuid`, by label; its
+   `version` is not the project version). Then bind as in steps 3 to 5, with these ids in place of `buildWorkflow` and
+   `publishProject`: an endpoint gets a collection of its own for this project (`createAppApiCollection` with its own
+   `contextPath`), a schedule goes into `deployProject`'s `enabledWorkflows`, and a Call-workflow run is bound with the
+   command `deployProject` prints. To change it, edit the `.ts`, compile and deploy again, and run
+   `updateAppApiCollectionVersion` or `deployProject` with the new version. If `updateAppApiCollectionVersion` refuses
+   because a workflow is missing, a workflow `name` changed: restore it and deploy again, and never pass
+   `removeMissingEndpoints`, which deletes the endpoint. Never change a code project with a workflow tool
+   (`buildWorkflow`, `updateWorkflow`, `createProjectWorkflow`, `deleteWorkflow`, `updateScriptComponentCode` or
+   `publishProject`); the next deploy overwrites or publishes that edit.
+
+   ```typescript
+   // bytechef/workflows/orders.ts
+   ({
+       name: "Orders API",
+       version: "1",
+       workflows: [
+           {
+               name: "listOrders",
+               label: "List Orders",
+               triggers: [{name: "request", type: "apiPlatform/v1/newApiRequest", parameters: {request: {}}}],
+               tasks: [
+                   {
+                       name: "fetchOrders",
+                       perform: function (input, context) {
+                           const orders: Array<{id: number; total: number}> = [
+                               {id: 1, total: 42},
+                               {id: 2, total: 17},
+                           ];
+
+                           return {orders: orders, count: orders.length};
+                       }
+                   },
+                   {
+                       name: "respond",
+                       type: "apiPlatform/v1/responseToAPIRequest",
+                       parameters: {responseType: "SUCCESS", response: {success: "${fetchOrders}"}}
+                   }
+               ]
+           }
+       ]
+   })
+   ```
+7. **Direct actions, tools and the proxy, only when needed** (say why).
    `bytechef automation connection list --component-name hubspot` lists the connections; those with
    `"usable": true` can be bound.
    `bytechef automation app bind connection --binding-key crm --component-name hubspot --actions createContact --tools searchContacts`
    binds one: actions for this app's code, tools for this app's own AI. The binding becomes exactly what the command
    names, so repeat every action and tool you still want when you change it. With several usable connections, pass
    `--connection-id`.
-7. **Check.** `npm run -s bytechef:status` shows what the app may now call; `bytechef automation app status` shows the
+8. **Check.** `npm run -s bytechef:status` shows what the app may now call; `bytechef automation app status` shows the
    bindings as ByteChef sees them, API collections included. If `buildWorkflow` is missing from the MCP server, ask a
    ByteChef admin to enable Copilot.
-8. **Use it from the app** with the recipes below: API endpoints and workflows from server functions; actions only
+9. **Use it from the app** with the recipes below: API endpoints and workflows from server functions; actions only
    for a single operation; tools, and optionally workflows, for an in-app agent through `toAiSdkTools`.
-9. **Loop rules.** Never print or echo `BYTECHEF_APP_KEY`: the CLI writes it to `.env.local` and never prints it, and
-   `bytechef automation app key rotate` replaces it the same way. Stay in DEVELOPMENT: writes (create, link, key
-   rotate, bind, unbind, instance create, instance update, `instance deployment-settings set|clear`) work only there,
-   while reads (`app list`, `app status`, `app instance list`, `instance deployment-settings get`) and the version and
-   deployment commands (`version create|list`, `deployment deploy|rollback|cancel|record|list`) work in every
-   environment; deploying outside DEVELOPMENT stays a person's decision. Ask a person to create sign-in connections. Without a configured CLI, rule 6 under "Rules" applies: ask a ByteChef admin for the binding.
-   `bytechef automation app unbind api-collection --api-collection-id <id>`,
-   `bytechef automation app unbind connection --binding-key crm` and
-   `bytechef automation app unbind workflow --workflow-key onboard-customer` remove bindings;
-   `bytechef automation app list` lists the workspace's apps. Where an app has several instances,
-   `bytechef automation app instance list --app-id <id>` lists them, and `--instance-id <id>` on `app status`,
-   `app key rotate`, `app link` and the bind and unbind commands picks one; without it they use the instance in
-   `.bytechef/app.json`.
+10. **Loop rules.** Never print or echo `BYTECHEF_APP_KEY`: the CLI writes it to `.env.local` and never prints it, and
+    `bytechef automation app key rotate` replaces it the same way. Stay in DEVELOPMENT: writes (create, link, key
+    rotate, bind, unbind, instance create, instance update, `instance deployment-settings set|clear`) work only there,
+    while reads (`app list`, `app status`, `app instance list`, `instance deployment-settings get`) and the version and
+    deployment commands (`version create|list`, `deployment deploy|rollback|cancel|record|list`) work in every
+    environment; deploying outside DEVELOPMENT stays a person's decision. Ask a person to create sign-in connections. Without a configured CLI, rule 6 under "Rules" applies: ask a ByteChef admin for the binding.
+    `bytechef automation app unbind api-collection --api-collection-id <id>`,
+    `bytechef automation app unbind connection --binding-key crm` and
+    `bytechef automation app unbind workflow --workflow-key onboard-customer` remove bindings;
+    `bytechef automation app list` lists the workspace's apps. Where an app has several instances,
+    `bytechef automation app instance list --app-id <id>` lists them, and `--instance-id <id>` on `app status`,
+    `app key rotate`, `app link` and the bind and unbind commands picks one; without it they use the instance in
+    `.bytechef/app.json`.
 
 ## Recipes
 
