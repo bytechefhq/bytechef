@@ -22,6 +22,7 @@ export interface ApplicationInfoI {
         postHog: {
             apiKey: string | undefined;
             host: string | undefined;
+            uiHost?: string;
         };
     };
     application: {
