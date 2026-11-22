@@ -42,6 +42,7 @@ subprojects {
             dependency("org.testcontainers:localstack:${rootProject.libs.versions.testcontainers.get()}")
             dependency("org.testcontainers:mongodb:${rootProject.libs.versions.testcontainers.get()}")
             dependency("org.testcontainers:mysql:${rootProject.libs.versions.testcontainers.get()}")
+            dependency("org.testcontainers:oracle-free:${rootProject.libs.versions.testcontainers.get()}")
             dependency("org.testcontainers:postgresql:${rootProject.libs.versions.testcontainers.get()}")
         }
     }
