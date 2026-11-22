@@ -290,7 +290,7 @@ section and its "Reading the trigger and the call input" section.
 **The file.** `bytechef/workflows/<project>.ts` (or `.py`), committed with the app. One project per file.
 
 - TypeScript: the file is a bare `({ ... })` expression. Never `import` or `export` anything: either one makes the
-  file a module, and an `export` in the deployed file makes deploy answer HTTP 500.
+  file a module, and an `export` in the deployed file makes deploy answer HTTP 400 with a `SyntaxError`.
 - Compile it before every deploy with `npm run build:workflows` (`tsc -p bytechef/workflows`), which writes
   `bytechef/workflows/dist/<project>.js`. Deploy that `.js`, never the `.ts`: the server runs JavaScript. An app
   without the script gets the template's `bytechef/workflows/tsconfig.json` and the script. The config doesn't
@@ -314,11 +314,11 @@ section and its "Reading the trigger and the call input" section.
 <!-- transport: mcp uses: createAppApiCollection, deployProject edition: ee -->
 A code project is a project deployed from a file with `bytechef automation project deploy`, and it is a project of its
 own. Before its first deploy, run `listProjects` and pick a project `name` no other project in the workspace uses.
-Deploy matches that name case-insensitively and writes into any project with it, a visual one included. It adds the
-file's workflows to that project and publishes it, together with the visual project's unpublished edits. On a later
-deploy of the same file, `listProjects` shows the project under that name: that match is this file's own project, so
-keep the name. Afterwards that `name`, and each workflow's `name`, stay fixed. A renamed workflow gets a new uuid, which
-breaks the endpoint or binding that points at it.
+Deploy matches that name case-insensitively. When the match is a visual project, one not deployed from a file, deploy
+refuses it with a name clash and writes nothing: pick another name and deploy again. On a later deploy of the same file,
+`listProjects` shows the project under that name: that match is this file's own project, so keep the name. Afterwards
+that `name`, and each workflow's `name`, stay fixed. A renamed workflow gets a new uuid, which breaks the endpoint or
+binding that points at it.
 <!-- /transport -->
 
 <!-- transport: cli uses: automation project deploy -->

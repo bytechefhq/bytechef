@@ -34,7 +34,7 @@ Deploy resolves the target by the identity member (case-insensitive): an existin
 
 ByteChef evaluates the file and reads the value it evaluates to:
 
-- **JavaScript**: the file is one parenthesized object expression, `({ ... })`. Keep it a bare expression: never `export` it or wrap it in `module.exports`, which hides the object from the server. An `export` makes the deploy answer HTTP 500, and only the server log names the `SyntaxError`.
+- **JavaScript**: the file is one parenthesized object expression, `({ ... })`. Keep it a bare expression: never `export` it or wrap it in `module.exports`, which hides the object from the server. An `export` makes the deploy answer HTTP 400 with the loader's `SyntaxError` in the message.
 - **Python**: define each `perform` with `def`, build the definition as a `dict`, and end the file with the variable alone on its last line. A `types.SimpleNamespace` works too. This differs from a Python **custom component**, which must be a `types.SimpleNamespace`.
 
 `workflows` is a list of raw entries: `{name, label, description, inputs, outputs, triggers, tasks}`. Give **every workflow a `label`**, unique within the project: tools that look a workflow up by name (`listWorkflows`, for example) report its label, and two workflows without one break that lookup. ByteChef re-evaluates the file for every task run, so top-level code should only build the definition.

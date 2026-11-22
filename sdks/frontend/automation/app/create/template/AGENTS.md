@@ -79,7 +79,20 @@ ByteChef which API collections, connections, actions, tools, proxy methods and w
      in every sign-in mode including `NONE`.
    - On a local ByteChef server, sign-in redirects to the Studio client dev server, which must be running (step 2
      of "Setting up the app with ByteChef").
-10. **Finish with `npm run check`.** Typecheck, build and the leak check must pass. Vercel deploys run it as their
+10. **Switch at once, and show a spinner in place of the data that is loading.** A click shows its result straight
+    away: the clicked item turns selected, and every card whose data it reloads shows `<Spinner />` from
+    `src/components/ui/spinner.tsx` instead of its old content until the new data arrives. Never keep stale data on
+    screen with a spinner over it, never put a spinner in a button, and never cover the whole page; cards the click
+    does not reload keep what they show. For a call a component makes itself (a button, a form, polling a run), keep
+    a pending state, disable the control and render the spinner where the result will appear, as the "Run" button in
+    `src/components/overview.tsx` does. For a link that reloads a route's loader, read where the router is going and
+    render the page from that search while it loads:
+
+    ```tsx
+    const pendingSearch = useRouterState({select: (state) => (state.isLoading ? state.location.search : null)});
+    ```
+
+11. **Finish with `npm run check`.** Typecheck, build and the leak check must pass. Vercel deploys run it as their
     build command (`vercel.json`) and the Docker build runs the leak check, but run it locally before you hand work
     back.
 
@@ -134,17 +147,17 @@ is managed with the `bytechef` CLI, workflows with the ByteChef management MCP s
 6. **Code workflows, when `buildWorkflow` cannot express the logic or the human asks for code.** Write the project in
    `bytechef/workflows/<project>.ts` (TypeScript, or `.py` when the human asks), commit it with the app, and give it a
    project `name` that `listProjects` shows no other project using. Deploy matches that name case-insensitively and
-   writes into any project with it, a visual one included, publishing that project's unpublished edits too; on a later
-   deploy of the same file the match is this file's own project, so keep the name. Keep that name and every workflow's
-   `name` fixed afterwards, because a renamed workflow gets a new uuid. The file is a bare `({ ... })` expression (never
-   `export` it: deploy answers HTTP 500); every workflow has a unique `label`; a task is a `perform(input, context)`
-   function or a component task (`type: "<component>/v<version>/<action>"` with `parameters`, where `${task}` reads an
-   earlier task's output); a trigger's output is `input.<triggerName>`; an endpoint workflow ends in an
-   `apiPlatform/v1/responseToAPIRequest` component task, which nothing checks for; a Call-workflow workflow has the
-   `workflow/v1/newWorkflowCall` trigger with `inputSchema` as a JSON-Schema string, and returns only its `outputs`
-   (`[{name, value: "${task}"}]`), else `{}`; `dataTable/v1/createRecords` takes `records: {values: [...]}`. Read
-   trigger and action parameters with `getTriggerDefinition` and `getActionDefinition`, since deploy does not check
-   them. Deploy with
+   refuses a visual project, one not deployed from a file, with a name clash that writes nothing (pick another name); on
+   a later deploy of the same file the match is this file's own project, so keep the name. Keep that name and every
+   workflow's `name` fixed afterwards, because a renamed workflow gets a new uuid. The file is a bare `({ ... })`
+   expression (never `export` it: deploy answers HTTP 400 with a `SyntaxError`); every workflow has a unique `label`; a
+   task is a `perform(input, context)` function or a component task (`type: "<component>/v<version>/<action>"` with
+   `parameters`, where `${task}` reads an earlier task's output); a trigger's output is `input.<triggerName>`; an
+   endpoint workflow ends in an `apiPlatform/v1/responseToAPIRequest` component task, which nothing checks for; a
+   Call-workflow workflow has the `workflow/v1/newWorkflowCall` trigger with `inputSchema` as a JSON-Schema string, and
+   returns only its `outputs` (`[{name, value: "${task}"}]`), else `{}`; `dataTable/v1/createRecords` takes
+   `records: {values: [...]}`. Read trigger and action parameters with `getTriggerDefinition` and `getActionDefinition`,
+   since deploy does not check them. Deploy with
    `bytechef automation project deploy --project-file bytechef/workflows/dist/orders.js --workspace-id <id>` after
    `npm run build:workflows` compiles the `.ts` to `bytechef/workflows/dist/`; deploy the compiled `.js`, never the
    `.ts`, and never `import` or `export` in the `.ts`. The deploy publishes a new version; a `401` or `403` means the
