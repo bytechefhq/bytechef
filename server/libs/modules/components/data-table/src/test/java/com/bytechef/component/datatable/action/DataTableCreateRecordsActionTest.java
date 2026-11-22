@@ -18,6 +18,7 @@ package com.bytechef.component.datatable.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -27,15 +28,38 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Property;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
 class DataTableCreateRecordsActionTest extends AbstractDataTableActionTest {
+
+    @Test
+    void testDefinitionDescribesTheRecordsShape() {
+        ModifiableActionDefinition actionDefinition = DataTableCreateRecordsAction.of(
+            dataTableService, dataTableRowService, dataTableWorkspaceResolver);
+
+        List<? extends Property> properties = actionDefinition.getProperties();
+
+        Property recordsProperty = properties.stream()
+            .filter(property -> "records".equals(property.getName()))
+            .findFirst()
+            .orElseThrow();
+
+        Optional<String> description = recordsProperty.getDescription();
+
+        assertTrue(description.isPresent());
+
+        String descriptionText = description.get();
+
+        assertTrue(descriptionText.contains("{\"values\": ["), descriptionText);
+    }
 
     @Test
     void testPerformInsertsEveryRecordInOneStepAndEmitsFlatRows() throws Exception {
