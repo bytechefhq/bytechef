@@ -22,7 +22,6 @@ import {useWorkflowNodeOutputsForCompletion} from '@/shared/components/monaco/co
 import {PlatformType} from '@/shared/middleware/graphql';
 import {Workflow, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {
     AlertTriangleIcon,
     ChevronDownIcon,
@@ -96,7 +95,6 @@ const WorkflowCodeEditorSheet = ({
         workflowTestExecution,
     } = useWorkflowCodeEditorSheet({invalidateWorkflowQueries, onSheetOpenClose, workflow});
 
-    const ff_4076 = useFeatureFlagsStore()('ff-4076');
     const showBottomPanel = useWorkflowEditorStore((state) => state.showBottomPanel);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
@@ -222,7 +220,7 @@ const WorkflowCodeEditorSheet = ({
                                 )}
                             </ButtonGroup>
 
-                            {ff_4076 && copilotEnabled && (
+                            {copilotEnabled && (
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button
