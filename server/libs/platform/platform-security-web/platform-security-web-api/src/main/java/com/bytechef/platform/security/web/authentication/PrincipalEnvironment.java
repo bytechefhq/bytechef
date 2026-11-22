@@ -39,7 +39,7 @@ public final class PrincipalEnvironment {
             return Optional.empty();
         }
 
-        return apiKeyAuthenticationToken.fetchEnvironmentId();
+        return Optional.of(apiKeyAuthenticationToken.getEnvironmentId());
     }
 
     public static @Nullable Long resolveEffectiveEnvironmentId(@Nullable Long requestedEnvironmentId) {
