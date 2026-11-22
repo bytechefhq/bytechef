@@ -53,7 +53,7 @@ server does, and deploy instructions. Start from one of them: clone it, run its 
 | Embedded code integration | [java](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-java) | [javascript](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-javascript) | [python](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-python) |
 
 The three automation project samples define the same project, named "Sample Code Project JavaScript", "Sample Code
-Project Python" or "Sample Code Project Java", with four workflows:
+Project Python" or "Sample Code Project Java", with five workflows:
 
 - `sampleWorkflow1` takes a required `name` input and returns `Hello, <name>!` as its `greeting` output.
 - `summarizeNewEmail` starts with the Gmail **New Email** polling trigger (`googleMail/v1/newEmailPolling`) and returns a
@@ -62,6 +62,8 @@ Project Python" or "Sample Code Project Java", with four workflows:
   `gmail` connection.
 - `notifySlackOnNewEmail` posts each new email to Slack through a declared `slack` connection. Its `channel` input takes
   its options from Slack's own `channel` input.
+- `listOrders` starts with the API Platform **New API Request** trigger. Its `fetchOrders` task returns a list of
+  orders, and its `respond` [component task](#component-tasks) answers the API caller with them.
 
 To check a sample locally and find the file to deploy:
 
@@ -126,10 +128,12 @@ A [code integration](/platform/embedded/build/code-integrations) is identified b
 | Member | Type | Required | |
 |---|---|---|---|
 | `name` | string | Yes | Unique across the workflow, nesting included: the engine keys the task's output by it. |
-| `perform` | function | Yes | Called with `(input, context)` or `(input, connection, context)` when the task runs; see [The task context](#the-task-context). Its return value is the task's output. |
+| `perform` | function | Yes, unless the task is a [component task](#component-tasks) | Called with `(input, context)` or `(input, connection, context)` when the task runs; see [The task context](#the-task-context). Its return value is the task's output. |
 | `label` | string | No | |
 | `description` | string | No | |
-| `connections` | list or map | No | See [Declaring connections](#declaring-connections). |
+| `connections` | list or map | No | See [Declaring connections](#declaring-connections). Not allowed on a component task. |
+| `type` | string | No | `parallel` or `forkJoin` for a [group](#running-tasks-concurrently), or `<component>/v<version>/<action>` for a [component task](#component-tasks). |
+| `parameters` | map | No | A component task's action inputs. |
 
 ### A complete example
 
@@ -477,11 +481,149 @@ task after the group reads all of their outputs normally. Tasks within one fork/
 they can read each other.
 
 Two more rules, both checked when the source is saved or uploaded rather than when it runs: task names are flat and
-must be unique across the whole workflow, nesting included, and a group cannot contain another group. A group has no
+must be unique across the whole workflow, nesting included, and a group cannot contain another group (a
+[component task](#component-tasks) inside a group is fine). A group has no
 `perform` of its own, and its `type` is either `parallel` or `forkJoin` (`fork-join` and `fork_join` are accepted too).
 
 Concurrency has to come from these groups rather than from threads inside a `perform` - script tasks run in a strict
 sandbox with thread creation off, and work a task spawns itself would be invisible to the engine.
+
+## Component tasks
+
+A task can also run a component action directly, the same way the task runs in a visual workflow. Give it a `type`
+that names the action as `<component>/v<version>/<action>` and the action's inputs as `parameters`, instead of a
+`perform`:
+
+```javascript tab="JavaScript"
+{
+    name: "respond",
+    type: "apiPlatform/v1/responseToAPIRequest",
+    parameters: {responseType: "SUCCESS", response: {success: "${fetch_orders}"}}
+}
+```
+
+```python tab="Python"
+{
+    "name": "respond",
+    "type": "apiPlatform/v1/responseToAPIRequest",
+    "parameters": {"responseType": "SUCCESS", "response": {"success": "${fetch_orders}"}},
+}
+```
+
+```java tab="Java"
+componentTask("respond", "apiPlatform/v1/responseToAPIRequest")
+    .parameters(Map.of("responseType", "SUCCESS", "response", Map.of("success", "${fetch_orders}")))
+```
+
+- **Parameters are passed as written.** A string value may hold a `${...}` expression, which the engine evaluates when
+  the task runs, exactly as in a visual workflow: `${fetch_orders}` is the output of the task named `fetch_orders`, and
+  a workflow input is read by its name. A task whose output you reference this way needs a name that is a valid
+  identifier, such as `fetch_orders` rather than `fetch-orders`.
+- **No `perform` and no `connections`.** The task's connection is its component's, supplied by the deployment the same
+  way as for that task in a visual workflow; a deploy with `enable=true` leaves the workflow disabled while a required
+  connection is missing.
+- **Anywhere a task can stand.** A component task may sit at the top level or inside a `parallel` group or a
+  `forkJoin` branch. Its name counts toward the unique task names.
+- **Checked when the source is saved or deployed.** A malformed `type`, a component or component version the instance
+  doesn't have, or an action the component doesn't have rejects the save with a message naming the task.
+
+**Component task or `context.component`?** Inside a `perform`, `context.component.<component>.<action>(...)` calls an
+action as part of your own logic, and its result is yours to shape. A component task is a step of its own: the engine
+runs it, shows it in the execution, and evaluates its parameters. Use one where a step must be a real workflow task,
+such as the response of an API endpoint.
+
+### An API endpoint in code
+
+An [API Platform](/platform/automation/deploy/api-platform) endpoint serves a workflow that starts with an
+`apiPlatform/v1/newApiRequest` trigger. Write the logic as `perform` tasks and answer the caller with an
+`apiPlatform/v1/responseToAPIRequest` component task. Its `responseType` picks the status (`SUCCESS` answers 200,
+`INVALID_INPUT` 400, `INTERNAL_ERROR` 500, `FORBIDDEN` 403), and `response` holds the body under the matching key
+(`success`, `invalidInput`, `internalError` or `forbidden`):
+
+```javascript tab="JavaScript"
+({
+    name: "orders-api",
+    workflows: [
+        {
+            name: "list_orders",
+            triggers: [{name: "request", type: "apiPlatform/v1/newApiRequest", parameters: {request: {}}}],
+            tasks: [
+                {
+                    name: "fetch_orders",
+                    connections: [{componentName: "httpClient", name: "orders_api"}],
+                    perform: (input, connection, context) =>
+                        context.component.httpClient.get({uri: "https://api.example.com/orders"}, "orders_api")
+                },
+                {
+                    name: "respond",
+                    type: "apiPlatform/v1/responseToAPIRequest",
+                    parameters: {responseType: "SUCCESS", response: {success: "${fetch_orders}"}}
+                }
+            ]
+        }
+    ]
+})
+```
+
+```typescript tab="TypeScript"
+/// <reference types="@bytechef/workflow-api" />
+
+({
+    name: 'orders-api',
+    workflows: [
+        {
+            name: 'list_orders',
+            tasks: [
+                {
+                    connections: [{componentName: 'httpClient', name: 'orders_api'}],
+                    name: 'fetch_orders',
+                    perform: (input, connection, context) =>
+                        context.component.httpClient.get({uri: 'https://api.example.com/orders'}, 'orders_api'),
+                },
+                {
+                    name: 'respond',
+                    parameters: {response: {success: '${fetch_orders}'}, responseType: 'SUCCESS'},
+                    type: 'apiPlatform/v1/responseToAPIRequest',
+                },
+            ],
+            triggers: [{name: 'request', parameters: {request: {}}, type: 'apiPlatform/v1/newApiRequest'}],
+        },
+    ],
+}) satisfies ByteChef.ProjectDefinition;
+```
+
+```python tab="Python"
+def fetch_orders(input, context):
+    return context.component.httpClient.get({"uri": "https://api.example.com/orders"}, "orders_api")
+
+
+project = {
+    "name": "orders-api",
+    "workflows": [
+        {
+            "name": "list_orders",
+            "triggers": [{"name": "request", "type": "apiPlatform/v1/newApiRequest", "parameters": {"request": {}}}],
+            "tasks": [
+                {
+                    "name": "fetch_orders",
+                    "connections": [{"componentName": "httpClient", "name": "orders_api"}],
+                    "perform": fetch_orders,
+                },
+                {
+                    "name": "respond",
+                    "type": "apiPlatform/v1/responseToAPIRequest",
+                    "parameters": {"responseType": "SUCCESS", "response": {"success": "${fetch_orders}"}},
+                },
+            ],
+        }
+    ],
+}
+
+project
+```
+
+Compile the TypeScript file with `tsc` and deploy the emitted `.js`; see [Typed authoring](#typed-authoring). Then add
+the deployed workflow to an API collection as an endpoint, as you would a visual one.
 
 ## Declaring connections
 

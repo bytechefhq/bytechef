@@ -309,6 +309,28 @@ connectionName)`, and what it declares depends on the component:
 See [Declaring connections](/platform/automation/build/workflows/code-workflows#declaring-connections) for the syntax in
 each language.
 
+## Component tasks
+
+A task in a code integration can run a component action directly instead of calling it from a `perform`: give it a
+`type` of the form `<component>/v<version>/<action>` and the action's inputs as `parameters`. It takes the same
+`${...}` expressions and follows the same rules as in an automation project; see
+[Component tasks](/platform/automation/build/workflows/code-workflows#component-tasks).
+
+```javascript
+tasks: [
+    {name: "fetch_emails", perform: (input, context) => context.component.googleMail.searchEmail({maxResults: 10})},
+    {
+        name: "notify",
+        type: "slack/v1/sendChannelMessage",
+        parameters: {channel: "${channel}", text: "${fetch_emails}"}
+    }
+]
+```
+
+A component task declares no `connections` and doesn't receive the integration's implicit connection the way a
+`perform` task does. It is stored as an ordinary workflow task, so its connection is wired as the same task's would be
+in a visual integration workflow.
+
 ## Inputs with component options
 
 An input can take its options from an input a component declares, so the connected user picks a value from a list
