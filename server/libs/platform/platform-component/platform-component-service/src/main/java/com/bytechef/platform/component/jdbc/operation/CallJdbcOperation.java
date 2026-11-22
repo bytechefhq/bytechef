@@ -46,19 +46,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterUtils;
 import org.springframework.jdbc.core.namedparam.ParsedSql;
 
 /**
- * Calls a stored procedure or function through a {@link java.sql.CallableStatement}.
- *
- * <p>
- * The statement uses the same {@code :name} placeholders as the other JDBC actions, so it can be written in the JDBC
- * escape syntax ({@code {:result = call balance(:accountId)}}, {@code {call transfer(:from, :to, :status)}}) or as a
- * vendor block ({@code BEGIN :result := balance(:accountId); END;}). A placeholder is an IN parameter unless it is
- * declared in the output parameters list, where it is registered as OUT or IN_OUT with the declared JDBC type. Values
- * for IN and IN_OUT parameters come from the parameters map.
- *
- * <p>
- * The result is a map of the OUT and IN_OUT parameter values keyed by parameter name. Result sets and update counts the
- * call returns without a declared parameter are skipped.
- *
  * @author Igor Beslic
  */
 public class CallJdbcOperation implements JdbcOperation<Map<String, Object>> {
@@ -66,10 +53,6 @@ public class CallJdbcOperation implements JdbcOperation<Map<String, Object>> {
     public static final String MODE_IN_OUT = "IN_OUT";
     public static final String MODE_OUT = "OUT";
 
-    /**
-     * JDBC types an output parameter can be registered with. Kept to the scalar types that every supported driver
-     * returns as a JSON-friendly value.
-     */
     public static final List<JDBCType> OUTPUT_PARAMETER_TYPES = List.of(
         JDBCType.BIGINT, JDBCType.BOOLEAN, JDBCType.CHAR, JDBCType.DATE, JDBCType.DECIMAL, JDBCType.DOUBLE,
         JDBCType.FLOAT, JDBCType.INTEGER, JDBCType.NUMERIC, JDBCType.NVARCHAR, JDBCType.REAL, JDBCType.SMALLINT,
@@ -129,11 +112,6 @@ public class CallJdbcOperation implements JdbcOperation<Map<String, Object>> {
         }
     }
 
-    /**
-     * Binds fractional numbers as {@link BigDecimal}. A {@link Double} is sent as double precision, which PostgreSQL
-     * does not implicitly cast to a numeric routine argument, so the routine is not found; numeric casts implicitly to
-     * every other numeric type, and Oracle NUMBER takes it natively.
-     */
     private static Map<String, @Nullable Object> getParameterValues(Map<String, ?> inputParameters) {
         Map<String, ?> parameters = MapUtils.getMap(inputParameters, JdbcConstants.PARAMETERS, Map.of());
 
@@ -256,9 +234,6 @@ public class CallJdbcOperation implements JdbcOperation<Map<String, Object>> {
         return outputParameters;
     }
 
-    /**
-     * An OUT or IN_OUT parameter declaration: the placeholder name, its JDBC type name and its mode.
-     */
     public record OutputParameter(@Nullable String name, @Nullable String type, @Nullable String mode) {
     }
 
