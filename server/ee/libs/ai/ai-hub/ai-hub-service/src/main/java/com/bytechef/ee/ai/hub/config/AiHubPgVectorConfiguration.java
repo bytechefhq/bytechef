@@ -37,8 +37,8 @@ public class AiHubPgVectorConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(AiHubPgVectorConfiguration.class);
 
-    @Bean("toolSearchPgVectorStore")
-    public @Nullable VectorStore toolSearchPgVectorStore(
+    @Bean("toolSearchLoaderPgVectorStore")
+    public @Nullable VectorStore toolSearchLoaderPgVectorStore(
         @Qualifier("pgVectorJdbcTemplate") ObjectProvider<JdbcTemplate> pgVectorJdbcTemplateProvider,
         @Qualifier("copilotEmbeddingModel") ObjectProvider<EmbeddingModel> copilotEmbeddingModelProvider,
         PgVectorStoreProperties properties,
@@ -69,6 +69,32 @@ public class AiHubPgVectorConfiguration {
         return buildToolSearchVectorStore(
             pgVectorJdbcTemplate, copilotEmbeddingModel, properties, observationRegistry, customObservationConvention,
             batchingStrategy, false);
+    }
+
+    @Bean("toolSearchPgVectorStore")
+    public @Nullable VectorStore toolSearchPgVectorStore(
+        @Qualifier("pgVectorJdbcTemplate") ObjectProvider<JdbcTemplate> pgVectorJdbcTemplateProvider,
+        @Qualifier("toolSearchLoaderPgVectorStore") ObjectProvider<VectorStore> toolSearchLoaderPgVectorStoreProvider,
+        @Qualifier("copilotQueryEmbeddingModel") ObjectProvider<EmbeddingModel> copilotQueryEmbeddingModelProvider,
+        PgVectorStoreProperties properties,
+        ObjectProvider<ObservationRegistry> observationRegistry,
+        ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
+        ObjectProvider<BatchingStrategy> batchingStrategyProvider) {
+
+        JdbcTemplate pgVectorJdbcTemplate = pgVectorJdbcTemplateProvider.getIfAvailable();
+        VectorStore toolSearchLoaderPgVectorStore = toolSearchLoaderPgVectorStoreProvider.getIfAvailable();
+        EmbeddingModel copilotQueryEmbeddingModel = copilotQueryEmbeddingModelProvider.getIfAvailable();
+        BatchingStrategy batchingStrategy = batchingStrategyProvider.getIfAvailable();
+
+        if (pgVectorJdbcTemplate == null || toolSearchLoaderPgVectorStore == null ||
+            copilotQueryEmbeddingModel == null || batchingStrategy == null) {
+
+            return null;
+        }
+
+        return buildToolSearchVectorStore(
+            pgVectorJdbcTemplate, copilotQueryEmbeddingModel, properties, observationRegistry,
+            customObservationConvention, batchingStrategy, false);
     }
 
     public static String vectorTableName(PgVectorStoreProperties properties) {

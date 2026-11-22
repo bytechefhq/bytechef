@@ -66,23 +66,23 @@ public class ToolSearchAdvisorConfiguration {
     @Nullable
     ToolSearchCatalogFeeder toolSearchCatalogFeeder(
         ObjectProvider<ClusterElementDefinitionService> clusterElementDefinitionServiceProvider,
-        @Qualifier("toolSearchPgVectorStore") ObjectProvider<VectorStore> toolSearchPgVectorStoreProvider,
+        @Qualifier("toolSearchLoaderPgVectorStore") ObjectProvider<VectorStore> toolSearchLoaderPgVectorStoreProvider,
         @Qualifier("pgVectorJdbcTemplate") ObjectProvider<JdbcTemplate> pgVectorJdbcTemplateProvider,
         PgVectorStoreProperties properties, ObjectProvider<ApplicationProperties> applicationPropertiesProvider) {
 
         ClusterElementDefinitionService clusterElementDefinitionService =
             clusterElementDefinitionServiceProvider.getIfAvailable();
-        VectorStore toolSearchPgVectorStore = toolSearchPgVectorStoreProvider.getIfAvailable();
+        VectorStore toolSearchLoaderPgVectorStore = toolSearchLoaderPgVectorStoreProvider.getIfAvailable();
         JdbcTemplate pgVectorJdbcTemplate = pgVectorJdbcTemplateProvider.getIfAvailable();
 
-        if (clusterElementDefinitionService == null || toolSearchPgVectorStore == null ||
+        if (clusterElementDefinitionService == null || toolSearchLoaderPgVectorStore == null ||
             pgVectorJdbcTemplate == null) {
 
             return null;
         }
 
         return new ToolSearchCatalogFeeder(
-            clusterElementDefinitionService, new VectorToolIndex(toolSearchPgVectorStore),
+            clusterElementDefinitionService, new VectorToolIndex(toolSearchLoaderPgVectorStore),
             embeddingModelIdentity(applicationPropertiesProvider.getIfAvailable(), properties), pgVectorJdbcTemplate,
             properties.getSchemaName(), AiHubPgVectorConfiguration.vectorTableName(properties));
     }

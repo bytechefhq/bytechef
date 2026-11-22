@@ -173,6 +173,36 @@ class ToolSearchCatalogFeederIntTest {
     }
 
     @Test
+    void testTheCatalogIsIndexedWithTheLoaderModelAndSearchedWithTheQueryModel() {
+        RecordingEmbeddingModel loaderEmbeddingModel = new RecordingEmbeddingModel();
+        RecordingEmbeddingModel queryEmbeddingModel = new RecordingEmbeddingModel();
+
+        new ToolSearchCatalogFeeder(
+            mock(ClusterElementDefinitionService.class),
+            new VectorToolIndex(toolSearchVectorStore(loaderEmbeddingModel)),
+            "OPENAI:text-embedding-3-small:4", jdbcTemplate, properties.getSchemaName(),
+            AiHubPgVectorConfiguration.vectorTableName(properties))
+                .populateGlobalTools(
+                    ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID,
+                    List.of(toolCallback("listComponents", "List every component")));
+
+        CatalogToolIndex catalogToolIndex = new CatalogToolIndex(
+            toolSearchVectorStore(queryEmbeddingModel), Set.of(ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID));
+
+        List<String> toolNames = catalogToolIndex.search(
+            new ToolSearchRequest("conversation-1", "component", 5, null))
+            .toolReferences()
+            .stream()
+            .map(ToolReference::toolName)
+            .toList();
+
+        assertThat(toolNames).containsExactly("listComponents");
+        assertThat(loaderEmbeddingModel.texts()).isNotEmpty()
+            .doesNotContain("component");
+        assertThat(queryEmbeddingModel.texts()).containsExactly("component");
+    }
+
+    @Test
     void testChangedEmbeddingModelReindexesAnUnchangedCatalog() {
         List<ToolCallback> toolCallbacks = List.of(toolCallback("listComponents", "List every component"));
 
@@ -261,6 +291,12 @@ class ToolSearchCatalogFeederIntTest {
             mock(ClusterElementDefinitionService.class), new VectorToolIndex(pgVectorStore), embeddingModelIdentity,
             jdbcTemplate, properties.getSchemaName(),
             AiHubPgVectorConfiguration.vectorTableName(properties));
+    }
+
+    private static PgVectorStore toolSearchVectorStore(EmbeddingModel embeddingModel) {
+        return AiHubPgVectorConfiguration.buildToolSearchVectorStore(
+            jdbcTemplate, embeddingModel, properties, provider(ObservationRegistry.NOOP), provider(null), singleBatch(),
+            false);
     }
 
     private static String qualifiedVectorTableName() {
@@ -352,6 +388,42 @@ class ToolSearchCatalogFeederIntTest {
         @Override
         public int dimensions() {
             return KEYWORDS.length;
+        }
+    }
+
+    private static final class RecordingEmbeddingModel implements EmbeddingModel {
+
+        private final KeywordEmbeddingModel keywordEmbeddingModel = new KeywordEmbeddingModel();
+        private final List<String> texts = new ArrayList<>();
+
+        @Override
+        public EmbeddingResponse call(EmbeddingRequest request) {
+            texts.addAll(request.getInstructions());
+
+            return keywordEmbeddingModel.call(request);
+        }
+
+        @Override
+        public float[] embed(Document document) {
+            texts.add(document.getText());
+
+            return keywordEmbeddingModel.embed(document);
+        }
+
+        @Override
+        public float[] embed(String text) {
+            texts.add(text);
+
+            return keywordEmbeddingModel.embed(text);
+        }
+
+        @Override
+        public int dimensions() {
+            return keywordEmbeddingModel.dimensions();
+        }
+
+        List<String> texts() {
+            return List.copyOf(texts);
         }
     }
 }

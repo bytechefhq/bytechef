@@ -21,6 +21,7 @@ import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +35,9 @@ public class CopilotConfiguration {
 
     @Bean
     Advisor questionAnswerAdvisor(
-        VectorStore copilotPgVectorStore, EmbeddingProviderStatusProvider embeddingProviderStatusProvider) {
+        VectorStore copilotPgVectorStore,
+        @Qualifier("copilotEmbeddingProviderStatusProvider") //
+        EmbeddingProviderStatusProvider embeddingProviderStatusProvider) {
 
         return new EnvironmentAwareQuestionAnswerAdvisor(
             copilotPgVectorStore, embeddingProviderStatusProvider, CopilotConstants.STATE_ENVIRONMENT_ID);
