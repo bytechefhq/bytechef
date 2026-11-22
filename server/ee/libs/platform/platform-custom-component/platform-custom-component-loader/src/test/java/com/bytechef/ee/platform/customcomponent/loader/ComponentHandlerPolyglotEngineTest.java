@@ -52,6 +52,7 @@ import java.util.Optional;
 import org.graalvm.polyglot.PolyglotException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
@@ -61,6 +62,7 @@ import org.mockito.ArgumentCaptor;
  * @author Ivica Cardic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
+@Timeout(120)
 class ComponentHandlerPolyglotEngineTest {
 
     @AfterEach
