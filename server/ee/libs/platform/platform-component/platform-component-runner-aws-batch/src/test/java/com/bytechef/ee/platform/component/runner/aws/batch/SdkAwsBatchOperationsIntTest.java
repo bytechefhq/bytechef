@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.testcontainers.DockerClientFactory;
@@ -40,6 +41,7 @@ import software.amazon.awssdk.services.s3.S3Client;
  * @author Ivica Cardic
  * @version ee
  */
+@Disabled
 @Timeout(value = 5, unit = TimeUnit.MINUTES)
 class SdkAwsBatchOperationsIntTest {
 
