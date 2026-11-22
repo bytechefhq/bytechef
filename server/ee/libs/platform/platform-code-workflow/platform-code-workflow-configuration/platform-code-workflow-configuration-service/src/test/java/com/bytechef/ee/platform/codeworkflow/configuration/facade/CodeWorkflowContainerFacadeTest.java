@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.codeworkflow.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -25,14 +26,18 @@ import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowCo
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.component.domain.ActionDefinition;
+import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowInput;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import com.bytechef.workflow.definition.LeafTaskDefinition;
 import com.bytechef.workflow.definition.WorkflowDefinition;
 import com.bytechef.workflow.definition.WorkflowDsl;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,6 +57,8 @@ import tools.jackson.databind.ObjectMapper;
     MockitoExtension.class, ObjectMapperSetupExtension.class
 })
 class CodeWorkflowContainerFacadeTest {
+
+    private static final UUID COMPONENT_TASK_WORKFLOW_ID = UUID.randomUUID();
 
     @Mock
     private CodeWorkflowContainerService codeWorkflowContainerService;
@@ -626,6 +633,219 @@ class CodeWorkflowContainerFacadeTest {
             .isInternalOnly()).isTrue();
         assertThat(workflowInputs.get(1)
             .isInternalOnly()).isFalse();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testUpdateEmitsAComponentTaskAsAWorkflowTask() {
+        stubComponent("apiPlatform", 1, "responseToAPIRequest");
+
+        Workflow parsedWorkflow = updateAndCaptureWorkflow(
+            newFacadeWithComponentDefinitionService(),
+            WorkflowDsl.workflow("wf-a")
+                .tasks(
+                    WorkflowDsl.task("fetch")
+                        .perform((input, context) -> "orders"),
+                    WorkflowDsl.componentTask("respond", "apiPlatform/v1/responseToAPIRequest")
+                        .label("Respond")
+                        .parameters(Map.of("response", Map.of("body", "${fetch}", "statusCode", 200)))));
+
+        List<WorkflowTask> workflowTasks = parsedWorkflow.getTasks();
+
+        WorkflowTask respondTask = workflowTasks.get(1);
+
+        assertThat(respondTask.getType()).isEqualTo("apiPlatform/v1/responseToAPIRequest");
+        assertThat(respondTask.getLabel()).isEqualTo("Respond");
+
+        Map<String, ?> respondParameters = respondTask.getParameters();
+
+        Map<String, Object> response = (Map<String, Object>) respondParameters.get("response");
+
+        assertThat(response).containsEntry("body", "${fetch}")
+            .containsEntry("statusCode", 200);
+
+        Map<String, Object> respondTaskMap = respondTask.toMap();
+
+        assertThat(respondTaskMap).doesNotContainKey("connections");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testUpdateEmitsComponentTasksNestedInGroups() {
+        stubComponent("logger", 1, "info");
+
+        Workflow parsedWorkflow = updateAndCaptureWorkflow(
+            newFacadeWithComponentDefinitionService(),
+            WorkflowDsl.workflow("wf-a")
+                .tasks(
+                    WorkflowDsl.parallel("enrich")
+                        .tasks(
+                            WorkflowDsl.task("customer")
+                                .perform((input, context) -> "c"),
+                            WorkflowDsl.componentTask("log", "logger/v1/info")
+                                .parameters(Map.of("text", "x")))));
+
+        List<WorkflowTask> workflowTasks = parsedWorkflow.getTasks();
+
+        WorkflowTask parallelTask = workflowTasks.getFirst();
+
+        Map<String, ?> parallelParameters = parallelTask.getParameters();
+
+        List<Map<String, Object>> parallelTasks = (List<Map<String, Object>>) parallelParameters.get("tasks");
+
+        assertThat(parallelTasks.get(1)).containsEntry("type", "logger/v1/info")
+            .containsEntry("name", "log");
+    }
+
+    @Test
+    void testUpdateRejectsAComponentTaskWithAnUnknownComponent() {
+        when(componentDefinitionService.fetchComponentDefinition("noSuchComponent", 1)).thenReturn(Optional.empty());
+
+        assertComponentTaskRejected("noSuchComponent/v1/doIt", "respond", "does not have");
+    }
+
+    @Test
+    void testUpdateRejectsAComponentTaskWithAnUnknownVersion() {
+        when(componentDefinitionService.fetchComponentDefinition("apiPlatform", 9)).thenReturn(Optional.empty());
+
+        assertComponentTaskRejected("apiPlatform/v9/responseToAPIRequest", "respond", "version 9");
+    }
+
+    @Test
+    void testUpdateRejectsAComponentTaskWithAnUnknownAction() {
+        stubComponent("apiPlatform", 1, "responseToAPIRequest");
+
+        assertComponentTaskRejected("apiPlatform/v1/noSuchAction", "respond", "noSuchAction");
+    }
+
+    @Test
+    void testUpdateRejectsAComponentTaskWithAMalformedType() {
+        assertComponentTaskRejected("apiPlatform/1/responseToAPIRequest", "respond", "<component>/v<version>/<action>");
+    }
+
+    @Test
+    void testUpdateRejectsAComponentTaskWithALeadingZeroVersion() {
+        assertComponentTaskRejected("logger/v01/info", "respond", "<component>/v<version>/<action>");
+    }
+
+    @Test
+    void testUpdateRejectsAnUnsupportedTaskInAGroup() {
+        LeafTaskDefinition unsupportedTaskDefinition = new LeafTaskDefinition() {
+
+            @Override
+            public Optional<String> getDescription() {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<String> getLabel() {
+                return Optional.empty();
+            }
+
+            @Override
+            public String getName() {
+                return "odd";
+            }
+        };
+
+        CodeWorkflowContainer codeWorkflowContainer = newComponentTaskContainer();
+
+        List<WorkflowDefinition> workflowDefinitions = List.of(
+            WorkflowDsl.workflow("wf-a")
+                .tasks(
+                    WorkflowDsl.parallel("enrich")
+                        .tasks(unsupportedTaskDefinition)));
+
+        assertThatThrownBy(
+            () -> codeWorkflowContainerFacade.update(
+                codeWorkflowContainer, "v2", workflowDefinitions, "content".getBytes(), PlatformType.AUTOMATION))
+                    .cause()
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContainingAll("Task odd", "unsupported task type");
+    }
+
+    @Test
+    void testUpdateSkipsComponentTaskValidationWithoutComponentDefinitionService() {
+        Workflow parsedWorkflow = updateAndCaptureWorkflow(
+            codeWorkflowContainerFacade,
+            WorkflowDsl.workflow("wf-a")
+                .tasks(WorkflowDsl.componentTask("respond", "apiPlatform/v1/responseToAPIRequest")));
+
+        List<WorkflowTask> workflowTasks = parsedWorkflow.getTasks();
+
+        WorkflowTask respondTask = workflowTasks.getFirst();
+
+        assertThat(respondTask.getType()).isEqualTo("apiPlatform/v1/responseToAPIRequest");
+    }
+
+    private void assertComponentTaskRejected(String type, String... expectedMessageParts) {
+        CodeWorkflowContainerFacadeImpl facade = newFacadeWithComponentDefinitionService();
+
+        CodeWorkflowContainer codeWorkflowContainer = newComponentTaskContainer();
+
+        List<WorkflowDefinition> workflowDefinitions = List.of(
+            WorkflowDsl.workflow("wf-a")
+                .tasks(WorkflowDsl.componentTask("respond", type)));
+
+        assertThatThrownBy(
+            () -> facade.update(
+                codeWorkflowContainer, "v2", workflowDefinitions, "content".getBytes(), PlatformType.AUTOMATION))
+                    .cause()
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContainingAll(expectedMessageParts);
+    }
+
+    private CodeWorkflowContainer newComponentTaskContainer() {
+        CodeWorkflowContainer codeWorkflowContainer = new CodeWorkflowContainer(UUID.randomUUID());
+
+        codeWorkflowContainer.addCodeWorkflow(COMPONENT_TASK_WORKFLOW_ID, "wf-a");
+        codeWorkflowContainer.setLanguage(Language.JAVASCRIPT);
+        codeWorkflowContainer.setName("container");
+        codeWorkflowContainer.setExternalVersion("v1");
+
+        return codeWorkflowContainer;
+    }
+
+    private CodeWorkflowContainerFacadeImpl newFacadeWithComponentDefinitionService() {
+        when(componentDefinitionServiceProvider.getIfAvailable()).thenReturn(componentDefinitionService);
+
+        return new CodeWorkflowContainerFacadeImpl(
+            codeWorkflowContainerService, codeWorkflowFileStorage, componentDefinitionServiceProvider,
+            new ObjectMapper(), workflowService);
+    }
+
+    private void stubComponent(String componentName, int componentVersion, String actionName) {
+        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getName()).thenReturn(actionName);
+        when(componentDefinition.getActions()).thenReturn(List.of(actionDefinition));
+        when(componentDefinitionService.fetchComponentDefinition(componentName, componentVersion))
+            .thenReturn(Optional.of(componentDefinition));
+    }
+
+    private Workflow updateAndCaptureWorkflow(
+        CodeWorkflowContainerFacadeImpl facade, WorkflowDefinition workflowDefinition) {
+
+        CodeWorkflowContainer codeWorkflowContainer = newComponentTaskContainer();
+
+        Workflow existingWorkflow = mock(Workflow.class);
+
+        when(existingWorkflow.getVersion()).thenReturn(3);
+        when(workflowService.getWorkflow(COMPONENT_TASK_WORKFLOW_ID.toString())).thenReturn(existingWorkflow);
+        when(codeWorkflowFileStorage.storeCodeWorkflowFile(anyString(), any()))
+            .thenReturn(new FileEntry("container.js", "file://container.js"));
+        when(codeWorkflowContainerService.update(codeWorkflowContainer)).thenReturn(codeWorkflowContainer);
+
+        facade.update(
+            codeWorkflowContainer, "v2", List.of(workflowDefinition), "content".getBytes(), PlatformType.AUTOMATION);
+
+        ArgumentCaptor<String> definitionCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(workflowService).update(
+            eq(COMPONENT_TASK_WORKFLOW_ID.toString()), definitionCaptor.capture(), eq(3));
+
+        return new Workflow(definitionCaptor.getValue(), Workflow.Format.JSON);
     }
 
     private static WorkflowDefinition workflowDefinition(String name) {
