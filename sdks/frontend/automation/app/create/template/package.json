@@ -5,6 +5,7 @@
     "scripts": {
         "dev": "vite dev --port 3000",
         "build": "vite build",
+        "build:workflows": "tsc -p bytechef/workflows",
         "start": "node .output/server/index.mjs",
         "check": "tsc --noEmit && vite build && node scripts/check-bundle.mjs",
         "bytechef:status": "node scripts/bytechef-status.mjs",

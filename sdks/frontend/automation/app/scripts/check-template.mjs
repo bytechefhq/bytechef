@@ -13,6 +13,7 @@ import {
 import {createServer} from 'node:net';
 import {tmpdir} from 'node:os';
 import {delimiter, join, resolve} from 'node:path';
+import {runInNewContext} from 'node:vm';
 
 import {installDrift, lockfilePinProblems} from './template-lockfile.mjs';
 
@@ -548,6 +549,30 @@ try {
 
     run('npx', ['tsc', '--noEmit', '-p', 'tsconfig.json'], {cwd: appDir, label: 'typecheck the AGENTS.md recipes'});
     rmSync(recipes.recipeDir, {force: true, recursive: true});
+
+    step('the AGENTS.md code workflow compiles to a bare expression');
+    const workflowsDir = join(appDir, 'bytechef/workflows');
+    const workflowBlock = readFileSync(join(appDir, 'AGENTS.md'), 'utf8').match(/```typescript\n([\s\S]*?)```/);
+
+    assert(workflowBlock, 'AGENTS.md has its TypeScript code workflow example');
+    writeFileSync(join(workflowsDir, 'orders.ts'), workflowBlock[1].replace(/^ {3}/gm, ''));
+    run('npm', ['run', 'build:workflows'], {cwd: appDir, label: 'build the AGENTS.md code workflow'});
+
+    const compiledWorkflow = readFileSync(join(workflowsDir, 'dist/orders.js'), 'utf8');
+
+    assert(
+        !/\b(import|export)\b|use strict/.test(compiledWorkflow),
+        `the compiled code workflow is a bare expression: ${compiledWorkflow.slice(0, 200)}`
+    );
+
+    const workflowDefinition = runInNewContext(compiledWorkflow);
+
+    assert(
+        workflowDefinition?.name === 'Orders API' && workflowDefinition.workflows?.length === 1,
+        'the compiled code workflow evaluates to its project definition'
+    );
+    rmSync(join(workflowsDir, 'orders.ts'));
+    rmSync(join(workflowsDir, 'dist'), {force: true, recursive: true});
 
     step('ready-made server functions fail the check');
     const readyMadeRoute = join(appDir, 'src/routes/ready-made.tsx');
