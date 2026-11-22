@@ -1,18 +1,20 @@
 ---
 name: ByteChef Code Workflow Builder
-description: This skill should be used when the user asks to "create a code workflow", "write a workflow as code", "deploy a code-native project", "build a code workflow integration", "author a ByteChef project in JavaScript/Python/Ruby/Java", or wants whole ByteChef projects (automation) or integrations (embedded) defined in code and deployed to a running instance.
+description: This skill should be used when the user asks to "create a code workflow", "write a workflow as code", "deploy a code-native project", "build a code workflow integration", "author a ByteChef project in JavaScript/Python/Java", or wants whole ByteChef projects (automation) or integrations (embedded) defined in code and deployed to a running instance.
 transports:
   required: [local, cli]
 ---
 
 # ByteChef Code Workflow Builder
 
-A **code workflow** is a whole ByteChef *project* (automation) or *integration* (embedded) authored as code and deployed as one artifact. JavaScript/Python/Ruby use a **single source file**; Java uses a **JAR** built against the ByteChef SDK. Deploying creates (or updates) the project/integration and registers its workflows.
+A **code workflow** is a whole ByteChef *project* (automation) or *integration* (embedded) authored as code and deployed as one artifact. JavaScript and Python use a **single source file**; Java uses a **JAR** built against the ByteChef SDK. Deploying creates (or updates) the project/integration and registers its workflows.
 
 ## Connecting to ByteChef
 
-1. `BYTECHEF_BASE_URL` + `BYTECHEF_API_KEY` (an **admin** API key) environment variables; otherwise ask the user.
-2. Deployment is an **EE, admin-only** operation on both surfaces.
+1. `BYTECHEF_BASE_URL` + `BYTECHEF_API_KEY` environment variables; otherwise ask the user.
+2. Deployment is an **EE** operation. The key must match the surface:
+   - Automation (`/api/automation/v1`): an **automation API key** of the workspace (Settings → Current Workspace → API Keys), created in the environment you deploy to. Its user must be allowed to create and publish projects in the workspace. An Admin API key or an Embedded API key is rejected with `401`.
+   - Embedded (`/api/embedded/v1`): an **Embedded API key** whose owning user holds the admin authority; see each deploy section below.
 
 ## Two surfaces, two contracts — pick the right one
 
@@ -24,57 +26,156 @@ A **code workflow** is a whole ByteChef *project* (automation) or *integration* 
 | Java SDK module | `sdks/backend/automation/project-api` (+ `workflow-api`) | `sdks/backend/embedded/integration-api` (+ `workflow-api`) |
 | ServiceLoader file | `META-INF/services/com.bytechef.automation.project.ProjectHandler` | `META-INF/services/com.bytechef.embedded.integration.IntegrationHandler` |
 | Deploy endpoint | `POST /api/automation/v1/projects/deploy` | `POST /api/embedded/internal/integrations/deploy` |
-| Multipart fields | `projectFile` (binary) + optional `workspaceId` (int64 form field) | `integrationFile` (binary) |
+| Multipart fields | `projectFile` (binary) + `workspaceId` (int64, required) | `integrationFile` (binary) |
 
 Deploy resolves the target by the identity member (case-insensitive): an existing project/integration of that name is **updated** (a new version of its artifact), otherwise one is **created**. The identity member cannot change on later deploys — a renamed source is treated as a different project/integration.
 
-## The single-file contract (JavaScript / Python / Ruby)
+## The single-file contract (JavaScript / Python)
 
-Plain-script evaluation; the **completion value** must expose **members** (same rules as custom components: JS bare `({...})`; Python `types.SimpleNamespace` — NOT a raw dict; Ruby core `Struct` — NOT a hash, NOT OpenStruct). `workflows` is a list of raw map entries: `{name, label, description, tasks: [{name, label, description, connections, perform}]}` — **workflow/task entries stay raw dicts/hashes**.
+ByteChef evaluates the file and reads the value it evaluates to:
 
-`perform` is called with a **context** (a legacy zero-arg perform still works — the engine always passes exactly one argument and the SDK's default ignores it):
+- **JavaScript**: the file is one parenthesized object expression, `({ ... })`. Keep it a bare expression: never `export` it or wrap it in `module.exports`, which hides the object from the server. An `export` makes the deploy answer HTTP 500, and only the server log names the `SyntaxError`.
+- **Python**: define each `perform` with `def`, build the definition as a `dict`, and end the file with the variable alone on its last line. A `types.SimpleNamespace` works too. This differs from a Python **custom component**, which must be a `types.SimpleNamespace`.
 
-- `context.component.<componentName>.<actionName>(input, connectionName)` — invoke any built-in component action.
-- `context.input()` — the workflow's inputs plus every completed task's output, each under its own name in ONE namespace (so an input and a task cannot share a name). `context.input(name)` reads one entry and **throws** on an unknown name; use `context.input()[name]` when absence is legitimate. This is the only way to read prior output — a `${...}` expression cannot reach a task name that is not a plain identifier.
-- `context.parameters()` — the task's own declared `parameters`, `${...}` already evaluated; separate from `input()`.
-- `context.connection(name)` — a wired connection's parameters, for building a request yourself. It carries credentials; never log it.
-- `context.log(level, message)` — `"trace" | "debug" | "info" | "warn" | "error"`, case-insensitive; any other string throws. Java tasks pass the `TaskContext.LogLevel` enum.
+`workflows` is a list of raw entries: `{name, label, description, inputs, outputs, triggers, tasks}`. Give **every workflow a `label`**, unique within the project: tools that look a workflow up by name (`listWorkflows`, for example) report its label, and two workflows without one break that lookup. ByteChef re-evaluates the file for every task run, so top-level code should only build the definition.
+
+`perform` is called as `perform(input, context)`, or `perform(input, connection, context)` when the task reads its connections' parameters:
+
+- `input` holds the workflow's inputs, each trigger's output and every finished task's output, each under its own name in one namespace (so an input and a task cannot share a name). Read a name that is not an identifier as `input["fetch-orders"]`. A task that has not run yet is absent.
+- `connection` maps each [declared connection](#declaring-connections) by name to its parameters. It carries credentials; never log it.
+- `context.component.<componentName>.<actionName>(input, connectionName)` invokes any built-in component action.
+- `context.log(level, message)`: `"trace" | "debug" | "info" | "warn" | "error"`, case-insensitive; any other string throws. Java tasks pass the `TaskContext.LogLevel` enum.
+
+The context offers nothing else: there is no `context.input()`, `context.parameters()` or `context.connection(name)`.
 
 ### Declaring connections
 
 A task declares the connections its perform uses, so the platform can wire them and the editor can prompt for them:
 
-```js
+```javascript
 {
-    name: "my-task",
+    name: "my_task",
     connections: [
-        {componentName: "httpClient", name: "billing-api"},
-        {componentName: "slack", componentVersion: 1, name: "slack-prod"}
+        {componentName: "httpClient", name: "billing_api"},
+        {componentName: "slack", componentVersion: 1, name: "slack_prod"}
     ],
-    perform: function (context) { ... }
+    perform: function (input, connection, context) { /* ... */ }
 }
 ```
 
-A map keyed by connection name parses too. In Java: `.connections(connection("slack", "slack-prod"))`. A name that is not wired fails at run time exactly like the script component's.
+A map keyed by connection name parses too. In Java: `.connections(connection("slack", "slack_prod"))`. The declared `name` is the `connectionName` a `context.component` call passes and the key in `connection`. A name that is not wired fails at run time.
 
 ### Running tasks concurrently
 
 Tasks run in order. Group them to run at the same time — `type: "parallel"` with a `tasks` list dispatches them all at once, `type: "forkJoin"` with a `branches` list of task lists runs the branches concurrently and each branch in order:
 
-```js
+```javascript
 {name: "enrich", type: "parallel", tasks: [
-    {name: "fetch-customer", perform: (context) => ...},
-    {name: "fetch-inventory", perform: (context) => ...}
+    {name: "fetch_customer", perform: (input, context) => ...},
+    {name: "fetch_inventory", perform: (input, context) => ...}
 ]}
 ```
 
 In Java: `parallel("enrich").tasks(...)` and `forkJoin("notify").branches(branch(...), branch(...))`.
 
-A group declares no `perform` of its own. Task names are flat and must be unique across the whole workflow, nesting included; a group inside a group is rejected. Both are checked at save time. **Tasks in one parallel group cannot read each other** — they start together, so `context.input(sibling)` throws; put shared work before the group. Never spawn threads inside a `perform`: the sandbox forbids it, and self-spawned work is invisible to the engine.
+A group declares no `perform` of its own. Task names are flat and must be unique across the whole workflow, nesting included; a group inside a group is rejected. Both are checked at save time. **Tasks in one parallel group cannot read each other**: they start together, so a sibling is absent from `input`; put shared work before the group. Never spawn threads inside a `perform`: the sandbox forbids it, and self-spawned work is invisible to the engine.
+
+## Component tasks
+
+A task can run a component action directly, as the same task does in a visual workflow. Give it a `type` of the form `<component>/v<version>/<action>` and the action's inputs as `parameters`. It has no `perform`, `connections`, `tasks` or `branches`:
+
+```javascript
+{
+    name: "respond",
+    type: "apiPlatform/v1/responseToAPIRequest",
+    parameters: {responseType: "SUCCESS", response: {success: "${fetchOrders}"}}
+}
+```
+
+- **Deploy checks the type.** A malformed `type`, or a component, version or action the instance doesn't have, rejects the deploy with an error naming the task.
+- **Deploy does not check the parameters**, of an action or of a trigger. Read the action with `getActionDefinition` (and a trigger with `getTriggerDefinition`) before writing them, and use the property names and types it reports.
+- **`${...}` is evaluated by the engine when the task runs.** `${fetchOrders}` is the whole output of the task `fetchOrders`, `${fetchOrders.count}` one field, `${fetchOrders.orders[0].id}` a list element, and `"Found ${fetchOrders.count} orders"` interpolates into text. A workflow input is read by its name. A task you reference this way needs an identifier name: `fetchOrders`, never `fetch-orders`. Deploy accepts `${fetch-orders}`; the run then fails with `Invalid expression: ${fetch-orders}`, which an endpoint answers as a 422.
+- **Anywhere a task can stand**: at the top level or inside a `parallel` group or a `forkJoin` branch. Its name counts toward the unique task names.
+- **Its connection is its component's**, wired by the deployment the same way as for that task in a visual workflow.
+
+Prefer a component task when the step must be a real workflow task the engine runs and shows, such as the response of an API endpoint. Use `context.component` inside a `perform` when the call is part of your own logic and you shape its result.
+
+An API Platform endpoint in code, JavaScript:
+
+```javascript
+({
+    name: "Orders API",
+    version: "1",
+    workflows: [
+        {
+            name: "listOrders",
+            label: "List Orders",
+            triggers: [{name: "request", type: "apiPlatform/v1/newApiRequest", parameters: {request: {}}}],
+            tasks: [
+                {
+                    name: "fetchOrders",
+                    perform: function (input, context) {
+                        const orders = [{id: 1, total: 42}, {id: 2, total: 17}];
+
+                        return {orders: orders, count: orders.length};
+                    }
+                },
+                {
+                    name: "respond",
+                    type: "apiPlatform/v1/responseToAPIRequest",
+                    parameters: {responseType: "SUCCESS", response: {success: "${fetchOrders}"}}
+                }
+            ]
+        }
+    ]
+})
+```
+
+Python:
+
+```python
+def fetch_orders(input, context):
+    orders = [{"id": 1, "total": 42}, {"id": 2, "total": 17}]
+
+    return {"orders": orders, "count": len(orders)}
+
+
+project = {
+    "name": "Orders API",
+    "version": "1",
+    "workflows": [
+        {
+            "name": "listOrders",
+            "label": "List Orders",
+            "triggers": [{"name": "request", "type": "apiPlatform/v1/newApiRequest", "parameters": {"request": {}}}],
+            "tasks": [
+                {"name": "fetchOrders", "perform": fetch_orders},
+                {
+                    "name": "respond",
+                    "type": "apiPlatform/v1/responseToAPIRequest",
+                    "parameters": {"responseType": "SUCCESS", "response": {"success": "${fetchOrders}"}},
+                },
+            ],
+        }
+    ],
+}
+
+project
+```
+
+In Java: `componentTask("respond", "apiPlatform/v1/responseToAPIRequest").parameters(Map.of(...))`.
+
+Nothing checks that an endpoint workflow ends in a `responseToAPIRequest` task: one without it deploys, binds and answers 200 with an empty body, dropping its tasks' output, so add it yourself.
+
+## Reading the trigger and the call input
+
+- A trigger's output is in `input` under the **trigger's name**. For the `apiPlatform/v1/newApiRequest` trigger above, named `request`, `input.request` holds the call's `method`, `headers`, `parameters` (the query and path parameters) and `body`.
+- A Call-workflow trigger (`workflow/v1/newWorkflowCall`) declares its input as `inputSchema`, a **string** holding a JSON Schema: `JSON.stringify({type: "object", properties: {...}})` in JavaScript, `json.dumps({...})` in Python. A map there is not accepted. The run's result is the workflow's `outputs`, a list of `{name, value}` such as `outputs: [{name: "summary", value: "${summary}"}]`; a workflow without `outputs` returns `{}`.
+- A schedule trigger's parameters come from `getTriggerDefinition`, like any other trigger's.
 
 ### Automation project (JavaScript)
 
-```js
+```javascript
 ({
     name: "my-code-project",
     version: "1",
@@ -84,19 +185,18 @@ A group declares no `perform` of its own. Task names are flat and must be unique
             name: "my-workflow",
             label: "My Workflow",
             tasks: [
-                { name: "my-task", label: "My Task", perform: function (context) { return "hello"; } }
+                {name: "my_task", label: "My Task", perform: function (input, context) { return "hello"; }}
             ]
         }
     ]
 })
 ```
 
-Python: `types.SimpleNamespace(name="my-code-project", version="1", description="...", workflows=[{...raw dicts, "perform": lambda *args: "hello"...}])`.
-Ruby: `Struct.new(:name, :version, :description, :workflows).new("my-code-project", "1", "...", [ { "name" => ..., "perform" => lambda { |*args| "hello" } } ])`.
+Python: the same members in a `dict`, with `"perform": my_task` pointing at a `def my_task(input, context)`, and the variable alone on the last line.
 
 ### Embedded integration (JavaScript)
 
-```js
+```javascript
 ({
     componentName: "my-integration",
     componentVersion: 1,
@@ -107,14 +207,14 @@ Ruby: `Struct.new(:name, :version, :description, :workflows).new("my-code-projec
             name: "my-workflow",
             label: "My Workflow",
             tasks: [
-                { name: "my-task", label: "My Task", perform: function (context) { return "hello"; } }
+                {name: "my_task", label: "My Task", perform: function (input, context) { return "hello"; }}
             ]
         }
     ]
 })
 ```
 
-(Python/Ruby analogous with `componentName`/`componentVersion` members on the top-level namespace/Struct.)
+(Python is analogous, with `componentName`/`componentVersion` keys in the definition `dict`.)
 
 ## The Java contract (JAR)
 
@@ -128,7 +228,7 @@ public class MyProjectHandler implements ProjectHandler {
             .workflows(
                 WorkflowDsl.workflow("my-workflow")
                     .label("My Workflow")
-                    .tasks(WorkflowDsl.task("my-task").label("My Task").perform(context -> "hello")));
+                    .tasks(WorkflowDsl.task("my_task").label("My Task").perform((input, context) -> "hello")));
     }
 }
 ```
@@ -143,7 +243,7 @@ Java deploy availability can be restricted by server configuration.
 
 <!-- transport: cli uses: automation project deploy -->
 ```bash
-# Automation project — via the CLI (workspaceId optional; defaults server-side)
+# Automation project, via the CLI
 bytechef automation project deploy --project-file my-code-project.js --workspace-id 1049
 ```
 <!-- /transport -->
@@ -153,9 +253,12 @@ No CLI available? Same endpoint over curl:
 ```bash
 curl -sf -X POST "$BYTECHEF_BASE_URL/api/automation/v1/projects/deploy" \
   -H "Authorization: Bearer $BYTECHEF_API_KEY" \
+  -H "X-ENVIRONMENT: DEVELOPMENT" \
   -F "workspaceId=1049" \
   -F "projectFile=@my-code-project.js"
 ```
+
+Each automation deploy publishes a new version of the project. A workflow keeps its uuid across deploys as long as its `name` stays the same.
 
 <!-- transport: cli uses: embedded integration deploy -->
 ```bash
@@ -173,8 +276,8 @@ existing one to the new version and enables it.
 The admin console's `POST /api/embedded/internal/integrations/deploy` accepts
 only an admin browser session (cookie + X-XSRF-TOKEN), never a bearer token.
 
-- File extension selects the language: `.jar`/`.js`/`.py`/`.rb`. Success: `204 No Content`.
-- The automation `/api/automation/v1/**` surface accepts admin API keys (Bearer) and is CSRF-exempt.
+- File extension selects the language: `.jar`/`.js`/`.py`. Success: `204 No Content`.
+- The automation `/api/automation/v1/**` surface accepts automation API keys (Bearer) and is CSRF-exempt. The key is looked up in the environment `X-ENVIRONMENT` names (`PRODUCTION` when absent).
 
 ## Bridge: serving a code workflow to embedded connected users
 
