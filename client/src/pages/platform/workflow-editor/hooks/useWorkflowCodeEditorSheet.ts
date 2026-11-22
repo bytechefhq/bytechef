@@ -10,7 +10,6 @@ import {WorkflowTestApi, WorkflowTestExecution} from '@/shared/middleware/platfo
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {WorkflowDefinitionType} from '@/shared/types';
 import {getTestWorkflowAttachRequest, getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
 import {useQueryClient} from '@tanstack/react-query';
@@ -100,9 +99,7 @@ const useWorkflowCodeEditorSheet = ({
         }))
     );
 
-    const ff_1570 = useFeatureFlagsStore()('ff-1570');
-
-    const copilotEnabled = ai.copilot.enabled && ff_1570;
+    const copilotEnabled = ai.copilot.enabled;
 
     const {getPersistedJobId, persistJobId} = usePersistJobId(workflow.id, currentEnvironmentId);
     const {close: closeWorkflowTestStream, setStreamRequest} = useWorkflowTestStream({

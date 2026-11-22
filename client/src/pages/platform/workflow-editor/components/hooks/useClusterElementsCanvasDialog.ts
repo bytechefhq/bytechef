@@ -10,7 +10,6 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import {isDataStreamSimpleModeAvailable as computeIsDataStreamSimpleModeAvailable} from '@/pages/platform/workflow-editor/utils/isDataStreamSimpleModeAvailable';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useCallback, useEffect, useMemo, useRef} from 'react';
 
 interface UseClusterElementsCanvasDialogProps {
@@ -49,9 +48,7 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
     const ai = useApplicationInfoStore((state) => state.ai);
     const setContext = useCopilotStore((state) => state.setContext);
 
-    const ff_1570 = useFeatureFlagsStore()('ff-1570');
-
-    const copilotEnabled = ai.copilot.enabled && ff_1570;
+    const copilotEnabled = ai.copilot.enabled;
 
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
