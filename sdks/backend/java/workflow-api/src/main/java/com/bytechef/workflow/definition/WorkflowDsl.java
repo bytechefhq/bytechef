@@ -17,6 +17,7 @@
 package com.bytechef.workflow.definition;
 
 import java.util.AbstractMap;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,8 +46,13 @@ public class WorkflowDsl {
         return new ModifiableCompositeTaskDefinition(name, CompositeTaskDefinition.Type.FORK_JOIN);
     }
 
-    public static List<ModifiableTaskDefinition> branch(ModifiableTaskDefinition... tasks) {
+    @SafeVarargs
+    public static <T extends LeafTaskDefinition> List<T> branch(T... tasks) {
         return List.of(tasks);
+    }
+
+    public static ModifiableComponentTaskDefinition componentTask(String name, String type) {
+        return new ModifiableComponentTaskDefinition(name, type);
     }
 
     public static ModifiableTriggerDefinition trigger(String name, String type) {
@@ -367,11 +373,11 @@ public class WorkflowDsl {
 
     public static class ModifiableCompositeTaskDefinition implements CompositeTaskDefinition {
 
-        private List<List<ModifiableTaskDefinition>> branches = List.of();
+        private List<List<? extends LeafTaskDefinition>> branches = List.of();
         private String description;
         private String label;
         private final String name;
-        private List<ModifiableTaskDefinition> tasks = List.of();
+        private List<LeafTaskDefinition> tasks = List.of();
         private final Type type;
 
         private ModifiableCompositeTaskDefinition(String name, Type type) {
@@ -380,7 +386,7 @@ public class WorkflowDsl {
         }
 
         @SafeVarargs
-        public final ModifiableCompositeTaskDefinition branches(List<ModifiableTaskDefinition>... branches) {
+        public final ModifiableCompositeTaskDefinition branches(List<? extends LeafTaskDefinition>... branches) {
             this.branches = List.of(branches);
 
             return this;
@@ -398,14 +404,14 @@ public class WorkflowDsl {
             return this;
         }
 
-        public ModifiableCompositeTaskDefinition tasks(ModifiableTaskDefinition... tasks) {
+        public ModifiableCompositeTaskDefinition tasks(LeafTaskDefinition... tasks) {
             this.tasks = List.of(tasks);
 
             return this;
         }
 
         @Override
-        public List<? extends List<? extends TaskDefinition>> getBranches() {
+        public List<? extends List<? extends LeafTaskDefinition>> getBranches() {
             return branches;
         }
 
@@ -425,12 +431,70 @@ public class WorkflowDsl {
         }
 
         @Override
-        public List<? extends TaskDefinition> getTasks() {
+        public List<? extends LeafTaskDefinition> getTasks() {
             return tasks;
         }
 
         @Override
         public Type getType() {
+            return type;
+        }
+
+    }
+
+    public static class ModifiableComponentTaskDefinition implements ComponentTaskDefinition {
+
+        private String description;
+        private String label;
+        private final String name;
+        private Map<String, ?> parameters = Map.of();
+        private final String type;
+
+        private ModifiableComponentTaskDefinition(String name, String type) {
+            this.name = name;
+            this.type = type;
+        }
+
+        public ModifiableComponentTaskDefinition description(String description) {
+            this.description = description;
+
+            return this;
+        }
+
+        public ModifiableComponentTaskDefinition label(String label) {
+            this.label = label;
+
+            return this;
+        }
+
+        public ModifiableComponentTaskDefinition parameters(Map<String, ?> parameters) {
+            this.parameters = parameters == null ? Map.of() : new LinkedHashMap<>(parameters);
+
+            return this;
+        }
+
+        @Override
+        public Optional<String> getDescription() {
+            return Optional.ofNullable(description);
+        }
+
+        @Override
+        public Optional<String> getLabel() {
+            return Optional.ofNullable(label);
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public Map<String, ?> getParameters() {
+            return Collections.unmodifiableMap(parameters);
+        }
+
+        @Override
+        public String getType() {
             return type;
         }
 

@@ -23,9 +23,9 @@ import java.util.List;
  */
 public interface CompositeTaskDefinition extends WorkflowTaskDefinition {
 
-    List<? extends List<? extends TaskDefinition>> getBranches();
+    List<? extends List<? extends LeafTaskDefinition>> getBranches();
 
-    List<? extends TaskDefinition> getTasks();
+    List<? extends LeafTaskDefinition> getTasks();
 
     Type getType();
 

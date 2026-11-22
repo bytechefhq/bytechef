@@ -23,7 +23,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public interface TaskDefinition extends WorkflowTaskDefinition {
+public interface TaskDefinition extends LeafTaskDefinition {
 
     default Optional<List<? extends ConnectionRequirement>> getConnections() {
         return Optional.empty();
