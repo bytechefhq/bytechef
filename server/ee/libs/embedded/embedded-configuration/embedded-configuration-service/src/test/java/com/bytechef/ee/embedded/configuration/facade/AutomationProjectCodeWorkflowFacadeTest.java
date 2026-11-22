@@ -258,6 +258,18 @@ class AutomationProjectCodeWorkflowFacadeTest {
     }
 
     @Test
+    void testSaveRejectsAnUnloadableSource() {
+        byte[] source = "export default ({name: \"x\", version: \"1\", workflows: []})".getBytes(
+            StandardCharsets.UTF_8);
+
+        assertErrorKey(
+            () -> facade().save(source, Language.JAVASCRIPT, Environment.PRODUCTION, false),
+            CodeWorkflowErrorType.SOURCE_LOAD_FAILED);
+
+        verify(automationProjectFacade, never()).publishProject(anyLong());
+    }
+
+    @Test
     void testCodeWorkflowSourceOfAVisualCatalogProjectFailsCleanly() {
         when(automationProjectFacade.getProject(8L)).thenReturn(mock(AutomationProjectDTO.class));
         when(projectCodeWorkflowService.fetchProjectCodeWorkflow(8L)).thenReturn(Optional.empty());

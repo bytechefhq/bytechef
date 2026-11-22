@@ -92,7 +92,12 @@ class ProjectCodeWorkflowFacadeUploadDisabledTest {
             mock(WorkflowService.class), mock(ProjectOwnershipService.class));
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.save(1L, new byte[0], Language.JAVASCRIPT))
-            .isNotInstanceOf(ConfigurationException.class);
+            .isInstanceOf(ConfigurationException.class)
+            .satisfies(thrown -> {
+                ConfigurationException configurationException = (ConfigurationException) thrown;
+
+                assertThat(configurationException.getErrorKey()).isEqualTo(104);
+            });
     }
 
     @Test
