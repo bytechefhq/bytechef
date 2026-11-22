@@ -109,15 +109,15 @@ public class CodeWorkflowTaskExecutor {
                     return nestedTask;
                 }
 
-                for (List<? extends TaskDefinition> branch : compositeTask.getBranches()) {
+                for (List<? extends WorkflowTaskDefinition> branch : compositeTask.getBranches()) {
                     TaskDefinition branchTask = findTaskDefinition(branch, taskName);
 
                     if (branchTask != null) {
                         return branchTask;
                     }
                 }
-            } else if (Objects.equals(task.getName(), taskName)) {
-                return (TaskDefinition) task;
+            } else if (task instanceof TaskDefinition taskDefinition && Objects.equals(task.getName(), taskName)) {
+                return taskDefinition;
             }
         }
 

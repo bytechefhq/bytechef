@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.codeworkflow.loader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -17,6 +18,7 @@ import com.bytechef.embedded.integration.IntegrationHandler;
 import com.bytechef.embedded.integration.definition.IntegrationDefinition;
 import com.bytechef.platform.component.polyglot.PolyglotSandbox;
 import com.bytechef.platform.component.polyglot.PolyglotSandboxSettings;
+import com.bytechef.workflow.definition.ComponentTaskDefinition;
 import com.bytechef.workflow.definition.ConnectionRequirement;
 import com.bytechef.workflow.definition.Input;
 import com.bytechef.workflow.definition.TaskContext;
@@ -590,6 +592,54 @@ class IntegrationHandlerPolyglotEngineTest {
             String.valueOf(exception.getMessage())
                 .contains("componentName, componentVersion and groupName together"),
             exception.getMessage());
+    }
+
+    @Test
+    void testLoadsAComponentTaskForJavaScript() {
+        String source = """
+            ({
+                componentName: 'test-component',
+                componentVersion: 1,
+                workflows: [
+                    {
+                        name: 'my-workflow',
+                        tasks: [
+                            {name: 'fetch', perform: () => 'x'},
+                            {
+                                name: 'respond',
+                                type: 'apiPlatform/v1/responseToAPIRequest',
+                                parameters: {responseType: 'SUCCESS', response: {success: '${fetch}'}}
+                            }
+                        ]
+                    }
+                ]
+            })
+            """;
+
+        IntegrationHandler integrationHandler = IntegrationHandlerPolyglotEngine.load("js", source);
+
+        IntegrationDefinition integrationDefinition = integrationHandler.getDefinition();
+
+        List<WorkflowDefinition> workflows = integrationDefinition.getWorkflows()
+            .orElseThrow();
+
+        WorkflowDefinition workflowDefinition = workflows.getFirst();
+
+        List<? extends WorkflowTaskDefinition> tasks = workflowDefinition.getTasks()
+            .orElseThrow();
+
+        ComponentTaskDefinition componentTaskDefinition = assertInstanceOf(
+            ComponentTaskDefinition.class, tasks.get(1));
+
+        assertEquals("apiPlatform/v1/responseToAPIRequest", componentTaskDefinition.getType());
+
+        Map<String, ?> parameters = componentTaskDefinition.getParameters();
+
+        assertEquals("SUCCESS", parameters.get("responseType"));
+
+        Map<?, ?> response = (Map<?, ?>) parameters.get("response");
+
+        assertEquals("${fetch}", response.get("success"));
     }
 
     private static TaskDefinition loadSingleTask(String languageId, String source) {

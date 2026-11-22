@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 import com.bytechef.workflow.definition.CompositeTaskDefinition;
 import com.bytechef.workflow.definition.ConnectionRequirement;
 import com.bytechef.workflow.definition.Input;
+import com.bytechef.workflow.definition.LeafTaskDefinition;
 import com.bytechef.workflow.definition.Output;
 import com.bytechef.workflow.definition.TaskDefinition;
 import com.bytechef.workflow.definition.TriggerDefinition;
@@ -59,6 +60,25 @@ final class IntegrationImplicitConnections {
         return workflowTaskDefinition;
     }
 
+    private static LeafTaskDefinition toLeafTaskDefinition(
+        LeafTaskDefinition leafTaskDefinition, ImplicitConnectionRequirement implicitConnectionRequirement) {
+
+        if (leafTaskDefinition instanceof TaskDefinition taskDefinition) {
+            return toTaskDefinition(taskDefinition, implicitConnectionRequirement);
+        }
+
+        return leafTaskDefinition;
+    }
+
+    private static List<LeafTaskDefinition> toLeafTaskDefinitions(
+        List<? extends LeafTaskDefinition> leafTaskDefinitions,
+        ImplicitConnectionRequirement implicitConnectionRequirement) {
+
+        return leafTaskDefinitions.stream()
+            .map(leafTaskDefinition -> toLeafTaskDefinition(leafTaskDefinition, implicitConnectionRequirement))
+            .toList();
+    }
+
     private static boolean isOwnConnection(
         ConnectionRequirement connectionRequirement, ImplicitConnectionRequirement implicitConnectionRequirement) {
 
@@ -86,14 +106,6 @@ final class IntegrationImplicitConnections {
         connectionRequirements.add(implicitConnectionRequirement);
 
         return new ImplicitConnectionTaskDefinition(taskDefinition, List.copyOf(connectionRequirements));
-    }
-
-    private static List<TaskDefinition> toTaskDefinitions(
-        List<? extends TaskDefinition> taskDefinitions, ImplicitConnectionRequirement implicitConnectionRequirement) {
-
-        return taskDefinitions.stream()
-            .map(taskDefinition -> toTaskDefinition(taskDefinition, implicitConnectionRequirement))
-            .toList();
     }
 
     private record ImplicitConnectionRequirement(String componentName, int componentVersion)
@@ -150,10 +162,10 @@ final class IntegrationImplicitConnections {
         implements CompositeTaskDefinition {
 
         @Override
-        public List<? extends List<? extends TaskDefinition>> getBranches() {
+        public List<? extends List<? extends LeafTaskDefinition>> getBranches() {
             return compositeTaskDefinition.getBranches()
                 .stream()
-                .map(branch -> toTaskDefinitions(branch, implicitConnectionRequirement))
+                .map(branch -> toLeafTaskDefinitions(branch, implicitConnectionRequirement))
                 .toList();
         }
 
@@ -173,8 +185,8 @@ final class IntegrationImplicitConnections {
         }
 
         @Override
-        public List<? extends TaskDefinition> getTasks() {
-            return toTaskDefinitions(compositeTaskDefinition.getTasks(), implicitConnectionRequirement);
+        public List<? extends LeafTaskDefinition> getTasks() {
+            return toLeafTaskDefinitions(compositeTaskDefinition.getTasks(), implicitConnectionRequirement);
         }
 
         @Override

@@ -260,8 +260,9 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
 
             ArrayNode tasksNode = objectMapper.createArrayNode();
 
-            for (TaskDefinition taskDefinition : compositeTaskDefinition.getTasks()) {
-                tasksNode.add(toTaskNode(codeWorkflowContainerUuid, workflowDefinition, taskDefinition, type));
+            for (WorkflowTaskDefinition taskDefinition : compositeTaskDefinition.getTasks()) {
+                tasksNode.add(
+                    toTaskNode(codeWorkflowContainerUuid, workflowDefinition, (TaskDefinition) taskDefinition, type));
             }
 
             parametersNode.set("tasks", tasksNode);
@@ -270,11 +271,13 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
 
             ArrayNode branchesNode = objectMapper.createArrayNode();
 
-            for (List<? extends TaskDefinition> branch : compositeTaskDefinition.getBranches()) {
+            for (List<? extends WorkflowTaskDefinition> branch : compositeTaskDefinition.getBranches()) {
                 ArrayNode branchNode = objectMapper.createArrayNode();
 
-                for (TaskDefinition taskDefinition : branch) {
-                    branchNode.add(toTaskNode(codeWorkflowContainerUuid, workflowDefinition, taskDefinition, type));
+                for (WorkflowTaskDefinition taskDefinition : branch) {
+                    branchNode.add(
+                        toTaskNode(
+                            codeWorkflowContainerUuid, workflowDefinition, (TaskDefinition) taskDefinition, type));
                 }
 
                 branchesNode.add(branchNode);

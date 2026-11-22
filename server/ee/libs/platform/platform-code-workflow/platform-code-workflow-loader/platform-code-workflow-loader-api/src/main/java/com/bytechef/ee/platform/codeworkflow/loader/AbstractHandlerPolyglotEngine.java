@@ -13,9 +13,11 @@ import com.bytechef.platform.component.polyglot.ComponentProxyObject;
 import com.bytechef.platform.component.polyglot.GuestFunctions;
 import com.bytechef.platform.component.polyglot.PolyglotSandbox;
 import com.bytechef.platform.component.polyglot.PolyglotValues;
+import com.bytechef.workflow.definition.ComponentTaskDefinition;
 import com.bytechef.workflow.definition.CompositeTaskDefinition;
 import com.bytechef.workflow.definition.ConnectionRequirement;
 import com.bytechef.workflow.definition.Input;
+import com.bytechef.workflow.definition.LeafTaskDefinition;
 import com.bytechef.workflow.definition.Output;
 import com.bytechef.workflow.definition.TaskContext;
 import com.bytechef.workflow.definition.TaskDefinition;
@@ -30,6 +32,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.graalvm.polyglot.Value;
 import org.graalvm.polyglot.proxy.ProxyExecutable;
 import org.graalvm.polyglot.proxy.ProxyObject;
@@ -40,6 +44,8 @@ import org.graalvm.polyglot.proxy.ProxyObject;
  * @author Ivica Cardic
  */
 public abstract class AbstractHandlerPolyglotEngine<H> {
+
+    private static final Pattern COMPONENT_TASK_TYPE_PATTERN = Pattern.compile("[^/\\s]+/v[1-9]\\d{0,8}/[^/\\s]+");
 
     public H loadHandler(String languageId, String script) {
         return PolyglotSandbox.call(languageId, polyglotContext -> {
@@ -223,9 +229,11 @@ public abstract class AbstractHandlerPolyglotEngine<H> {
 
             if (type == null) {
                 taskDefinitions.add(toLeafTaskDefinition(workflowName, task, languageId, script, names));
-            } else {
+            } else if (isCompositeType(String.valueOf(type))) {
                 taskDefinitions.add(
                     toCompositeTaskDefinition(workflowName, task, String.valueOf(type), languageId, script, names));
+            } else {
+                taskDefinitions.add(toComponentTaskDefinition(task, String.valueOf(type), names));
             }
         }
 
@@ -246,8 +254,8 @@ public abstract class AbstractHandlerPolyglotEngine<H> {
 
         CompositeTaskDefinition.Type compositeType = toCompositeType(name, type);
 
-        List<TaskDefinition> tasks = new ArrayList<>();
-        List<List<TaskDefinition>> branches = new ArrayList<>();
+        List<LeafTaskDefinition> tasks = new ArrayList<>();
+        List<List<LeafTaskDefinition>> branches = new ArrayList<>();
 
         if (compositeType == CompositeTaskDefinition.Type.PARALLEL) {
             Object nestedTasks = task.get("tasks");
@@ -274,7 +282,7 @@ public abstract class AbstractHandlerPolyglotEngine<H> {
                         "Each branch of fork/join task %s must be a non-empty list of tasks".formatted(name));
                 }
 
-                List<TaskDefinition> branchTaskDefinitions = new ArrayList<>();
+                List<LeafTaskDefinition> branchTaskDefinitions = new ArrayList<>();
 
                 for (Object branchTask : branchTasks) {
                     branchTaskDefinitions.add(
@@ -289,9 +297,19 @@ public abstract class AbstractHandlerPolyglotEngine<H> {
             name, (String) task.get("label"), (String) task.get("description"), compositeType, tasks, branches);
     }
 
-    private static CompositeTaskDefinition.Type toCompositeType(String name, String type) {
-        String normalizedType = type.replace("-", "")
+    private static boolean isCompositeType(String type) {
+        String normalizedType = normalizeCompositeType(type);
+
+        return "parallel".equalsIgnoreCase(normalizedType) || "forkjoin".equalsIgnoreCase(normalizedType);
+    }
+
+    private static String normalizeCompositeType(String type) {
+        return type.replace("-", "")
             .replace("_", "");
+    }
+
+    private static CompositeTaskDefinition.Type toCompositeType(String name, String type) {
+        String normalizedType = normalizeCompositeType(type);
 
         if ("parallel".equalsIgnoreCase(normalizedType)) {
             return CompositeTaskDefinition.Type.PARALLEL;
@@ -305,18 +323,71 @@ public abstract class AbstractHandlerPolyglotEngine<H> {
             "Task %s declares type %s; a task's type may only be parallel or forkJoin".formatted(name, type));
     }
 
-    private static TaskDefinition toNestedTaskDefinition(
+    @SuppressWarnings("unchecked")
+    private static ComponentTaskDefinition toComponentTaskDefinition(
+        Map<?, ?> task, String type, Set<String> names) {
+
+        String name = (String) task.get("name");
+
+        addName(names, name);
+
+        Matcher matcher = COMPONENT_TASK_TYPE_PATTERN.matcher(type);
+
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException(
+                ("Task %s declares type %s; a task's type may only be parallel or forkJoin, or a component action " +
+                    "written <component>/v<version>/<action>, e.g. apiPlatform/v1/responseToAPIRequest")
+                        .formatted(name, type));
+        }
+
+        if (task.get("perform") != null) {
+            throw new IllegalArgumentException(
+                "Task %s runs component action %s, so it cannot declare a perform".formatted(name, type));
+        }
+
+        if (task.get("connections") != null) {
+            throw new IllegalArgumentException(
+                ("Task %s runs component action %s; its connection comes from the component through the " +
+                    "deployment, so it cannot declare connections").formatted(name, type));
+        }
+
+        if (task.get("tasks") != null || task.get("branches") != null) {
+            throw new IllegalArgumentException(
+                ("Task %s runs component action %s, so it cannot declare tasks or branches; only a parallel or " +
+                    "forkJoin task groups other tasks").formatted(name, type));
+        }
+
+        Object parameters = task.get("parameters");
+        Map<String, ?> componentParameters = Map.of();
+
+        if (parameters instanceof Map<?, ?> parameterMap) {
+            componentParameters = (Map<String, ?>) PolyglotValues.copyFromPolyglotContext(parameterMap);
+        } else if (parameters != null) {
+            throw new IllegalArgumentException("Task %s must declare parameters as a map".formatted(name));
+        }
+
+        return new PolyglotComponentTaskDefinition(
+            name, (String) task.get("label"), (String) task.get("description"), type, componentParameters);
+    }
+
+    private static LeafTaskDefinition toNestedTaskDefinition(
         String workflowName, Object nestedTask, String languageId, String script, Set<String> names) {
 
         Map<?, ?> task = (Map<?, ?>) nestedTask;
 
-        if (task.get("type") != null) {
+        Object type = task.get("type");
+
+        if (type == null) {
+            return toLeafTaskDefinition(workflowName, task, languageId, script, names);
+        }
+
+        if (isCompositeType(String.valueOf(type))) {
             throw new IllegalArgumentException(
                 "Task %s is nested inside a group, and a group inside a group is not supported"
                     .formatted(task.get("name")));
         }
 
-        return toLeafTaskDefinition(workflowName, task, languageId, script, names);
+        return toComponentTaskDefinition(task, String.valueOf(type), names);
     }
 
     private static TaskDefinition toLeafTaskDefinition(
@@ -403,12 +474,12 @@ public abstract class AbstractHandlerPolyglotEngine<H> {
 
     @SuppressFBWarnings("EI")
     private record PolyglotCompositeTaskDefinition(
-        String name, String label, String description, Type type, List<TaskDefinition> tasks,
-        List<List<TaskDefinition>> branches)
+        String name, String label, String description, Type type, List<LeafTaskDefinition> tasks,
+        List<List<LeafTaskDefinition>> branches)
         implements CompositeTaskDefinition {
 
         @Override
-        public List<? extends List<? extends TaskDefinition>> getBranches() {
+        public List<? extends List<? extends LeafTaskDefinition>> getBranches() {
             return branches;
         }
 
@@ -428,12 +499,43 @@ public abstract class AbstractHandlerPolyglotEngine<H> {
         }
 
         @Override
-        public List<? extends TaskDefinition> getTasks() {
+        public List<? extends LeafTaskDefinition> getTasks() {
             return tasks;
         }
 
         @Override
         public Type getType() {
+            return type;
+        }
+    }
+
+    @SuppressFBWarnings("EI")
+    private record PolyglotComponentTaskDefinition(
+        String name, String label, String description, String type, Map<String, ?> parameters)
+        implements ComponentTaskDefinition {
+
+        @Override
+        public Optional<String> getDescription() {
+            return Optional.ofNullable(description);
+        }
+
+        @Override
+        public Optional<String> getLabel() {
+            return Optional.ofNullable(label);
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public Map<String, ?> getParameters() {
+            return parameters;
+        }
+
+        @Override
+        public String getType() {
             return type;
         }
     }

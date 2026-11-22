@@ -686,13 +686,13 @@ class IntegrationCodeWorkflowFacadeDraftTest {
 
             for (WorkflowTaskDefinition workflowTaskDefinition : workflowTaskDefinitions) {
                 if (workflowTaskDefinition instanceof CompositeTaskDefinition compositeTaskDefinition) {
-                    for (TaskDefinition taskDefinition : compositeTaskDefinition.getTasks()) {
-                        putTaskConnections(taskConnections, taskDefinition);
+                    for (WorkflowTaskDefinition nestedTaskDefinition : compositeTaskDefinition.getTasks()) {
+                        putTaskConnections(taskConnections, (TaskDefinition) nestedTaskDefinition);
                     }
 
-                    for (List<? extends TaskDefinition> branch : compositeTaskDefinition.getBranches()) {
-                        for (TaskDefinition taskDefinition : branch) {
-                            putTaskConnections(taskConnections, taskDefinition);
+                    for (List<? extends WorkflowTaskDefinition> branch : compositeTaskDefinition.getBranches()) {
+                        for (WorkflowTaskDefinition branchTaskDefinition : branch) {
+                            putTaskConnections(taskConnections, (TaskDefinition) branchTaskDefinition);
                         }
                     }
                 } else {
