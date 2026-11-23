@@ -1,9 +1,17 @@
 import Badge from '@/components/Badge/Badge';
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
+import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import ConnectionListItemDropdownMenu from '@/shared/components/connection/ConnectionListItemDropdownMenu';
+import isCollapsibleRowClick, {
+    ROW_INTERACTIVE_SELECTORS,
+} from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
 import {ComponentIcon} from 'lucide-react';
 import {ReactNode} from 'react';
+import {twMerge} from 'tailwind-merge';
+
+const INTERACTIVE_SELECTORS = [...ROW_INTERACTIVE_SELECTORS, '[role="menu"]', 'textarea'];
 
 interface ConnectionListItemLayoutProps {
     active?: boolean;
@@ -11,11 +19,15 @@ interface ConnectionListItemLayoutProps {
     children?: ReactNode;
     createdDate?: Date;
     credentialStatus?: string;
+    expandableContent?: ReactNode;
+    expandLabel?: string;
     icon?: string;
     id?: number;
     menuItems?: ReactNode;
     name: string;
     onEditClick?: () => void;
+    onOpenChange?: (open: boolean) => void;
+    open?: boolean;
     tagList?: ReactNode;
 }
 
@@ -25,96 +37,128 @@ const ConnectionListItemLayout = ({
     children,
     createdDate,
     credentialStatus,
+    expandLabel = 'Expand',
+    expandableContent,
     icon,
     id,
     menuItems,
     name,
     onEditClick,
+    onOpenChange,
+    open,
     tagList,
 }: ConnectionListItemLayoutProps) => (
     <li className="mb-2 rounded border border-border/50" key={id}>
-        <div className="group flex items-center rounded-md bg-surface-neutral-primary px-3 hover:bg-surface-neutral-primary-hover">
-            <div className="flex flex-1 items-center py-3">
-                <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                        <div className="relative flex items-center gap-2">
-                            {icon ? (
-                                <LazyLoadSVG className="size-5 flex-none" preloader={<ComponentIcon />} src={icon} />
-                            ) : (
-                                <ComponentIcon className="size-5 flex-none" />
-                            )}
+        <Collapsible onOpenChange={onOpenChange} open={open}>
+            <div
+                className={twMerge(
+                    'group flex items-center rounded-md bg-surface-neutral-primary px-3 hover:bg-surface-neutral-primary-hover',
+                    expandableContent && 'cursor-pointer'
+                )}
+                onClick={
+                    expandableContent && onOpenChange
+                        ? (event) => {
+                              if (isCollapsibleRowClick(event, INTERACTIVE_SELECTORS)) {
+                                  onOpenChange(!open);
+                              }
+                          }
+                        : undefined
+                }
+                role="presentation"
+            >
+                {expandableContent && <ListItemExpandButton label={expandLabel} />}
 
-                            <span className="text-base font-semibold">{name}</span>
-                        </div>
-                    </div>
+                <div className="flex flex-1 items-center py-3">
+                    <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                            <div className="relative flex items-center gap-2">
+                                {icon ? (
+                                    <LazyLoadSVG
+                                        className="size-5 flex-none"
+                                        preloader={<ComponentIcon />}
+                                        src={icon}
+                                    />
+                                ) : (
+                                    <ComponentIcon className="size-5 flex-none" />
+                                )}
 
-                    {tagList && (
-                        <div
-                            className="mt-2 sm:flex sm:items-center sm:justify-between"
-                            data-testid="connection-list-item-tags"
-                        >
-                            <div className="flex items-center">{tagList}</div>
-                        </div>
-                    )}
-                </div>
-
-                <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
-                    {badges && <div className="flex items-center gap-2">{badges}</div>}
-
-                    <div className="flex min-w-52 flex-col items-end gap-y-4">
-                        <div className="flex flex-wrap items-center justify-end gap-2">
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    {credentialStatus === 'VALID' ? (
-                                        <Badge
-                                            className="border-transparent uppercase"
-                                            label={active ? 'Active' : 'Not Active'}
-                                            styleType={active ? 'success-outline' : 'secondary-outline'}
-                                            weight="semibold"
-                                        />
-                                    ) : (
-                                        <Badge
-                                            className="border-transparent uppercase"
-                                            label={credentialStatus ?? 'INVALID'}
-                                            styleType="destructive-outline"
-                                            weight="semibold"
-                                        />
-                                    )}
-                                </TooltipTrigger>
-
-                                <TooltipContent>
-                                    {credentialStatus === 'VALID'
-                                        ? active
-                                            ? 'A deployed or tested workflow uses this connection'
-                                            : 'No workflow uses this connection yet'
-                                        : 'The credentials no longer work. Edit the connection to reconnect'}
-                                </TooltipContent>
-                            </Tooltip>
+                                <span className="text-base font-semibold">{name}</span>
+                            </div>
                         </div>
 
-                        {createdDate && (
-                            <Tooltip>
-                                <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary sm:mt-0">
-                                    <span className="text-xs">
-                                        {`Created at ${createdDate.toLocaleDateString()} ${createdDate.toLocaleTimeString()}`}
-                                    </span>
-                                </TooltipTrigger>
-
-                                <TooltipContent>Created Date</TooltipContent>
-                            </Tooltip>
+                        {tagList && (
+                            <div
+                                className="mt-2 sm:flex sm:items-center sm:justify-between"
+                                data-interactive
+                                data-testid="connection-list-item-tags"
+                            >
+                                <div className="flex items-center">{tagList}</div>
+                            </div>
                         )}
                     </div>
 
-                    {onEditClick ? (
-                        <ConnectionListItemDropdownMenu onEditClick={onEditClick}>
-                            {menuItems}
-                        </ConnectionListItemDropdownMenu>
-                    ) : (
-                        <div aria-hidden="true" className="size-9 shrink-0" />
-                    )}
+                    <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
+                        {badges && <div className="flex items-center gap-2">{badges}</div>}
+
+                        <div className="flex min-w-52 flex-col items-end gap-y-4">
+                            <div className="flex flex-wrap items-center justify-end gap-2">
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        {credentialStatus === 'VALID' ? (
+                                            <Badge
+                                                className="border-transparent uppercase"
+                                                label={active ? 'Active' : 'Not Active'}
+                                                styleType={active ? 'success-outline' : 'secondary-outline'}
+                                                weight="semibold"
+                                            />
+                                        ) : (
+                                            <Badge
+                                                className="border-transparent uppercase"
+                                                label={credentialStatus ?? 'INVALID'}
+                                                styleType="destructive-outline"
+                                                weight="semibold"
+                                            />
+                                        )}
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>
+                                        {credentialStatus === 'VALID'
+                                            ? active
+                                                ? 'A deployed or tested workflow uses this connection'
+                                                : 'No workflow uses this connection yet'
+                                            : 'The credentials no longer work. Edit the connection to reconnect'}
+                                    </TooltipContent>
+                                </Tooltip>
+                            </div>
+
+                            {createdDate && (
+                                <Tooltip>
+                                    <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary sm:mt-0">
+                                        <span className="text-xs">
+                                            {`Created at ${createdDate.toLocaleDateString()} ${createdDate.toLocaleTimeString()}`}
+                                        </span>
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>Created Date</TooltipContent>
+                                </Tooltip>
+                            )}
+                        </div>
+
+                        {onEditClick ? (
+                            <ConnectionListItemDropdownMenu onEditClick={onEditClick}>
+                                {menuItems}
+                            </ConnectionListItemDropdownMenu>
+                        ) : (
+                            <div aria-hidden="true" className="size-9 shrink-0" />
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
+
+            {expandableContent && (
+                <CollapsibleContent className="mt-1 mr-3 mb-3 ml-11">{expandableContent}</CollapsibleContent>
+            )}
+        </Collapsible>
 
         {children}
     </li>
