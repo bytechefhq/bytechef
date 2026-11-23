@@ -2,19 +2,6 @@ import { readFile } from 'node:fs/promises';
 import { parse as parseYaml } from 'yaml';
 import { SPECS } from './specs.ts';
 
-// Every spec is grouped by the tags it declares, so the sidebar mirrors the grouping the specs
-// themselves express rather than one this file invents. Group ids are `<schemaId>-<tag>`, except
-// that a spec declaring a single tag stays one group under its own id -- `custom-components` rather
-// than `custom-components-custom-component`. Retagging an operation moves it between groups without
-// touching this file; adding a tag needs a GROUP_META entry, and the build says so if you forget.
-//
-// Groups split again by audience, so the two ways into the same resource are documented apart
-// rather than interleaved. An operation reachable only with a Signing Key JWT is browser-facing and
-// lands in `<group>-frontend`; one that accepts an API Key is callable from your backend and keeps
-// the bare id. The specs declare this: a JWT resolves the user from the token's `sub` claim, so
-// those paths carry no `{externalUserId}` segment, while an API Key needs that segment to know whom
-// it is acting for.
-
 export const GROUP_META: Record<
   string,
   {
@@ -90,7 +77,6 @@ export const GROUP_META: Record<
     navTitle: 'MCP Workflows',
     description: "Turn a connected user's workflow on or off as a tool for AI agents.",
   },
-  // One entry per tag in the automation spec -- see SPLIT_BY_TAG. The keys are `automation-<tag>`.
   'embedded-webhook-app-event-trigger': {
     title: 'Embedded App Events',
     navTitle: 'App Events',
@@ -110,9 +96,7 @@ export const GROUP_META: Record<
     title: 'Automation Git',
     navTitle: 'Git',
     description: "Pull a project from its configured git repository.",
-    // Deliberately not comingSoon: settings/git-configuration is not flagged.
   },
-  // One entry per tag in the automation-data-tables spec -- the keys are `automation-data-tables-<tag>`.
   'automation-data-tables-data-table': {
     title: 'Automation Data Tables',
     navTitle: 'Tables',
@@ -124,7 +108,6 @@ export const GROUP_META: Record<
     description:
       'Query, write, batch, import and export the rows of a data table, and upsert them by external ID.',
   },
-  // Browser-facing twins: same resources, reached with a Signing Key JWT.
   'embedded-configuration-integration-frontend': {
     title: 'Embedded Integrations (Frontend)',
     navTitle: 'Integrations',
@@ -187,11 +170,6 @@ export interface Operation {
   frontend: boolean;
 }
 
-/**
- * Reads the tag and audience of every operation in a spec, keyed `<METHOD> <path>` -- the only
- * identity fumadocs-openapi hands `groupBy`, which receives
- * `{ schemaId, info, item: { path, method } }` and neither tags nor security.
- */
 export async function readOperations(schemaId: keyof typeof SPECS) {
   const document = parseYaml(await readFile(SPECS[schemaId], 'utf8'));
   const operations = new Map<string, Operation>();
@@ -208,9 +186,6 @@ export async function readOperations(schemaId: keyof typeof SPECS) {
         );
       }
 
-      // An operation that accepts an API Key is backend-callable. One left undeclared is treated as
-      // backend too: the automation and platform specs carry no security block, and both take an
-      // API Key.
       const schemes = (operation.security ?? []).map((requirement) => Object.keys(requirement)[0]);
       const frontend = schemes.length > 0 && !schemes.includes('bearerAuth');
 
@@ -229,7 +204,6 @@ export interface OperationGroup {
 
 export async function planGroups() {
   const operationsBySchema = new Map<string, Map<string, Operation>>();
-  // A single-tag spec is already one group; adding its tag would only repeat its own id.
   const taggedSchemas = new Set<string>();
 
   for (const schemaId of Object.keys(SPECS) as (keyof typeof SPECS)[]) {
@@ -242,15 +216,11 @@ export async function planGroups() {
     }
   }
 
-  // GROUP_META stays keyed by a flat name, so a group keeps its entry wherever it is filed.
   const metaKeyOf = (schemaId: string, { tag, frontend }: Operation) =>
     [schemaId, taggedSchemas.has(schemaId) ? tag : null, frontend ? 'frontend' : null]
       .filter(Boolean)
       .join('-');
 
-  // Ids double as output paths, so nesting them nests the sidebar: the embedded specs land under
-  // `<audience>/`, so the sidebar carries a Backend and a Frontend folder under one separator. Other
-  // specs stay flat until there is a second audience to separate them from.
   const idOf = (schemaId: string, operation: Operation) => {
     const group = [schemaId, taggedSchemas.has(schemaId) ? operation.tag : null]
       .filter(Boolean)
@@ -272,8 +242,6 @@ export async function planGroups() {
     return idOf(entry.schemaId, operation);
   };
 
-  // Each group remembers the spec it came from, because the generator's `context.generatedEntries` is keyed by
-  // schema id rather than by the group ids groupBy produces.
   const groups: OperationGroup[] = Object.keys(SPECS).flatMap((schemaId) => {
     const operations = operationsBySchema.get(schemaId) ?? new Map<string, Operation>();
     const seen = new Map<string, string>();
