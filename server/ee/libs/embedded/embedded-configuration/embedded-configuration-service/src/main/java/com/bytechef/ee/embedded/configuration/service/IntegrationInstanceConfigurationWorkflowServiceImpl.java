@@ -78,6 +78,14 @@ public class IntegrationInstanceConfigurationWorkflowServiceImpl
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<IntegrationInstanceConfigurationWorkflow> getConnectionIntegrationInstanceConfigurationWorkflows(
+        long connectionId) {
+
+        return integrationInstanceConfigurationWorkflowRepository.findAllByConnectionId(connectionId);
+    }
+
+    @Override
     public IntegrationInstanceConfigurationWorkflow getIntegrationInstanceConfigurationWorkflow(long id) {
         return integrationInstanceConfigurationWorkflowRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Integration instance configuration workflow not found"));

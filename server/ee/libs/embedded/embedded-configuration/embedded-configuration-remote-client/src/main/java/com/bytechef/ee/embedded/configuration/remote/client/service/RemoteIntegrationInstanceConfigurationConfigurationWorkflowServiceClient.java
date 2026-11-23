@@ -145,6 +145,13 @@ public class RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceC
     }
 
     @Override
+    public List<IntegrationInstanceConfigurationWorkflow> getConnectionIntegrationInstanceConfigurationWorkflows(
+        long connectionId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean isConnectionUsed(long connectionId) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder

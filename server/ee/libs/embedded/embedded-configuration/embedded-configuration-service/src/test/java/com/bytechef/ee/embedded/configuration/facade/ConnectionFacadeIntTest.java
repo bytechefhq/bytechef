@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -22,13 +23,38 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.embedded.configuration.audit.ConnectionAuditEvents;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
+import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
+import com.bytechef.ee.embedded.configuration.dto.IntegrationConnectionWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceConfigurationRepository;
+import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceConfigurationWorkflowRepository;
+import com.bytechef.ee.embedded.configuration.repository.IntegrationRepository;
+import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
+import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
@@ -38,6 +64,8 @@ import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -46,12 +74,15 @@ import com.bytechef.platform.security.web.expression.MethodSecurityExpressionCon
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -102,6 +133,9 @@ class ConnectionFacadeIntTest {
 
     @MockitoBean
     private ConnectedUserConnectionService connectedUserConnectionService;
+
+    @MockitoBean
+    private ConnectedUserProjectService connectedUserProjectService;
 
     @MockitoBean
     private IntegrationInstanceService integrationInstanceService;
@@ -520,6 +554,325 @@ class ConnectionFacadeIntTest {
 
         private void stubEmbedded(long id) {
             when(connectionService.fetchConnection(id)).thenReturn(Optional.of(connection(id, PlatformType.EMBEDDED)));
+        }
+    }
+
+    @Nested
+    class ConnectionWorkflows {
+
+        private static final long CONNECTION_ID = 8080L;
+
+        private final List<ConnectedUser> connectedUsers = new ArrayList<>();
+        private final List<Workflow> workflows = new ArrayList<>();
+
+        @Autowired
+        private ConnectedUserService connectedUserService;
+
+        @Autowired
+        private IntegrationInstanceConfigurationRepository integrationInstanceConfigurationRepository;
+
+        @Autowired
+        private IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
+
+        @Autowired
+        private IntegrationInstanceConfigurationWorkflowRepository integrationInstanceConfigurationWorkflowRepository;
+
+        @Autowired
+        private IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
+
+        @Autowired
+        private IntegrationRepository integrationRepository;
+
+        @Autowired
+        private IntegrationService integrationService;
+
+        @Autowired
+        private IntegrationWorkflowRepository integrationWorkflowRepository;
+
+        @Autowired
+        private IntegrationWorkflowService integrationWorkflowService;
+
+        @Autowired
+        private ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+
+        @Autowired
+        private ProjectWorkflowService projectWorkflowService;
+
+        @Autowired
+        private WorkflowService workflowService;
+
+        @Autowired
+        private WorkflowTestConfigurationService workflowTestConfigurationService;
+
+        @BeforeEach
+        void beforeEach() {
+            authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    "admin", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+
+            when(permissionService.isTenantAdmin()).thenReturn(true);
+            when(connectionService.fetchConnection(CONNECTION_ID))
+                .thenReturn(Optional.of(connection(CONNECTION_ID, PlatformType.EMBEDDED)));
+            when(connectedUserService.getConnectedUsers(anyList()))
+                .thenAnswer(invocation -> filterById(connectedUsers, invocation.getArgument(0), ConnectedUser::getId));
+            when(workflowService.getWorkflows(anyList()))
+                .thenAnswer(invocation -> filterById(workflows, invocation.getArgument(0), Workflow::getId));
+        }
+
+        @AfterEach
+        void afterEach() {
+            integrationInstanceConfigurationWorkflowRepository.deleteAll();
+            integrationInstanceConfigurationRepository.deleteAll();
+            integrationWorkflowRepository.deleteAll();
+            integrationRepository.deleteAll();
+        }
+
+        @Test
+        void testGetConnectionWorkflowsListsDeployedAndEditorIntegrationWorkflows() {
+            Integration integration = createIntegration("HubSpot Sync");
+
+            Workflow deployedWorkflow = addWorkflow(integration, "Push contacts");
+            Workflow editorWorkflow = addWorkflow(integration, "Pull deals");
+
+            IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+                createIntegrationInstanceConfigurationWorkflow(integration, deployedWorkflow, CONNECTION_ID);
+
+            createIntegrationInstanceConfigurationWorkflow(integration, editorWorkflow, 9090L);
+
+            WorkflowTestConfiguration editorTestConfiguration = workflowTestConfiguration(77L, editorWorkflow.getId());
+
+            when(workflowTestConfigurationService.getConnectionWorkflowTestConfigurations(CONNECTION_ID))
+                .thenReturn(
+                    List.of(editorTestConfiguration, workflowTestConfiguration(78L, "workflow-outside-integration")));
+
+            IntegrationWorkflow deployedIntegrationWorkflow =
+                integrationWorkflowService.getWorkflowIntegrationWorkflow(deployedWorkflow.getId());
+            IntegrationWorkflow editorIntegrationWorkflow =
+                integrationWorkflowService.getWorkflowIntegrationWorkflow(editorWorkflow.getId());
+
+            List<IntegrationConnectionWorkflowDTO> integrationConnectionWorkflowDTOs =
+                connectionFacade.getConnectionWorkflows(CONNECTION_ID);
+
+            assertThat(integrationConnectionWorkflowDTOs)
+                .extracting(
+                    IntegrationConnectionWorkflowDTO::id, IntegrationConnectionWorkflowDTO::parentId,
+                    IntegrationConnectionWorkflowDTO::parentName, IntegrationConnectionWorkflowDTO::parentType,
+                    IntegrationConnectionWorkflowDTO::parentVersion, IntegrationConnectionWorkflowDTO::usage,
+                    IntegrationConnectionWorkflowDTO::workflowId, IntegrationConnectionWorkflowDTO::workflowName,
+                    IntegrationConnectionWorkflowDTO::workflowUuid)
+                .containsExactly(
+                    tuple(
+                        77L, integration.getId(), "HubSpot Sync",
+                        IntegrationConnectionWorkflowDTO.ParentType.INTEGRATION,
+                        1, IntegrationConnectionWorkflowDTO.Usage.EDITOR, editorWorkflow.getId(), "Pull deals",
+                        editorIntegrationWorkflow.getUuidAsString()),
+                    tuple(
+                        integrationInstanceConfigurationWorkflow.getId(), integration.getId(), "HubSpot Sync",
+                        IntegrationConnectionWorkflowDTO.ParentType.INTEGRATION, 1,
+                        IntegrationConnectionWorkflowDTO.Usage.DEPLOYMENT, deployedWorkflow.getId(), "Push contacts",
+                        deployedIntegrationWorkflow.getUuidAsString()));
+        }
+
+        @Test
+        void testGetConnectionWorkflowsListsEditorWorkflowsOfConnectedUserProjects() {
+            Workflow namedUserWorkflow = workflow("Route invoice emails");
+            Workflow unnamedUserWorkflow = workflow("Archive receipts");
+            Workflow anonymousUserWorkflow = workflow("Tag expenses");
+
+            when(workflowTestConfigurationService.getConnectionWorkflowTestConfigurations(CONNECTION_ID))
+                .thenReturn(
+                    List.of(
+                        workflowTestConfiguration(81L, namedUserWorkflow.getId()),
+                        workflowTestConfiguration(82L, namedUserWorkflow.getId()),
+                        workflowTestConfiguration(83L, unnamedUserWorkflow.getId()),
+                        workflowTestConfiguration(85L, anonymousUserWorkflow.getId()),
+                        workflowTestConfiguration(84L, "workflow-of-a-plain-project")));
+            when(projectWorkflowService.getWorkflowProjectWorkflows(anyList()))
+                .thenReturn(
+                    List.of(
+                        new ProjectWorkflow(1114L, 4, namedUserWorkflow.getId()),
+                        new ProjectWorkflow(1115L, 2, unnamedUserWorkflow.getId()),
+                        new ProjectWorkflow(1117L, 3, anonymousUserWorkflow.getId()),
+                        new ProjectWorkflow(1116L, 1, "workflow-of-a-plain-project")));
+            when(connectedUserProjectService.fetchProjectConnectedUserProject(1114L))
+                .thenReturn(Optional.of(new ConnectedUserProject(1050L, 1L, 1114L, 0)));
+            when(connectedUserProjectService.fetchProjectConnectedUserProject(1115L))
+                .thenReturn(Optional.of(new ConnectedUserProject(1051L, 2L, 1115L, 0)));
+            when(connectedUserProjectService.fetchProjectConnectedUserProject(1116L)).thenReturn(Optional.empty());
+            when(connectedUserProjectService.fetchProjectConnectedUserProject(1117L))
+                .thenReturn(Optional.of(new ConnectedUserProject(1052L, 3L, 1117L, 0)));
+            connectedUsers.add(connectedUser(1050L, "Jane Doe", "jane@example.com", "jane-1"));
+            connectedUsers.add(connectedUser(1051L, null, "john@example.com", "user-2"));
+            connectedUsers.add(connectedUser(1052L, " ", null, "user-3"));
+
+            List<IntegrationConnectionWorkflowDTO> integrationConnectionWorkflowDTOs =
+                connectionFacade.getConnectionWorkflows(CONNECTION_ID);
+
+            assertThat(integrationConnectionWorkflowDTOs)
+                .extracting(
+                    IntegrationConnectionWorkflowDTO::id, IntegrationConnectionWorkflowDTO::parentId,
+                    IntegrationConnectionWorkflowDTO::parentName, IntegrationConnectionWorkflowDTO::parentType,
+                    IntegrationConnectionWorkflowDTO::parentVersion, IntegrationConnectionWorkflowDTO::usage,
+                    IntegrationConnectionWorkflowDTO::workflowName)
+                .containsExactlyInAnyOrder(
+                    tuple(
+                        81L, 1050L, "Jane Doe", IntegrationConnectionWorkflowDTO.ParentType.CONNECTED_USER, 4,
+                        IntegrationConnectionWorkflowDTO.Usage.EDITOR, "Route invoice emails"),
+                    tuple(
+                        82L, 1050L, "Jane Doe", IntegrationConnectionWorkflowDTO.ParentType.CONNECTED_USER, 4,
+                        IntegrationConnectionWorkflowDTO.Usage.EDITOR, "Route invoice emails"),
+                    tuple(
+                        83L, 1051L, "john@example.com", IntegrationConnectionWorkflowDTO.ParentType.CONNECTED_USER, 2,
+                        IntegrationConnectionWorkflowDTO.Usage.EDITOR, "Archive receipts"),
+                    tuple(
+                        85L, 1052L, "user-3", IntegrationConnectionWorkflowDTO.ParentType.CONNECTED_USER, 3,
+                        IntegrationConnectionWorkflowDTO.Usage.EDITOR, "Tag expenses"));
+        }
+
+        @Test
+        void testGetConnectionWorkflowsRejectsAConnectionThatIsNotEmbedded() {
+            when(connectionService.fetchConnection(CONNECTION_ID))
+                .thenReturn(Optional.of(connection(CONNECTION_ID, PlatformType.AUTOMATION)));
+
+            assertThatThrownBy(() -> connectionFacade.getConnectionWorkflows(CONNECTION_ID))
+                .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @Test
+        void testGetConnectionWorkflowsIsTenantAdminOnly() {
+            authenticate(
+                new UsernamePasswordAuthenticationToken("user", "n/a",
+                    List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+
+            when(permissionService.isTenantAdmin()).thenReturn(false);
+
+            assertThatThrownBy(() -> connectionFacade.getConnectionWorkflows(CONNECTION_ID))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetConnectionWorkflowsListsDeployedWorkflowsOfConnectedUserProjects() {
+            Workflow publishedWorkflow = workflow("Route invoice emails");
+
+            when(projectDeploymentWorkflowService.getConnectionProjectDeploymentWorkflows(CONNECTION_ID))
+                .thenReturn(
+                    List.of(
+                        projectDeploymentWorkflow(91L, publishedWorkflow.getId()),
+                        projectDeploymentWorkflow(92L, "workflow-of-a-plain-project")));
+            when(projectWorkflowService.getWorkflowProjectWorkflows(anyList()))
+                .thenReturn(
+                    List.of(
+                        new ProjectWorkflow(1114L, 2, publishedWorkflow.getId()),
+                        new ProjectWorkflow(1116L, 1, "workflow-of-a-plain-project")));
+            when(connectedUserProjectService.fetchProjectConnectedUserProject(1114L))
+                .thenReturn(Optional.of(new ConnectedUserProject(1050L, 1L, 1114L, 0)));
+            when(connectedUserProjectService.fetchProjectConnectedUserProject(1116L)).thenReturn(Optional.empty());
+            connectedUsers.add(connectedUser(1050L, "Jane Doe", "jane@example.com", "jane-1"));
+
+            List<IntegrationConnectionWorkflowDTO> integrationConnectionWorkflowDTOs =
+                connectionFacade.getConnectionWorkflows(CONNECTION_ID);
+
+            assertThat(integrationConnectionWorkflowDTOs)
+                .extracting(
+                    IntegrationConnectionWorkflowDTO::id, IntegrationConnectionWorkflowDTO::parentId,
+                    IntegrationConnectionWorkflowDTO::parentName, IntegrationConnectionWorkflowDTO::parentType,
+                    IntegrationConnectionWorkflowDTO::parentVersion, IntegrationConnectionWorkflowDTO::usage,
+                    IntegrationConnectionWorkflowDTO::workflowName)
+                .containsExactly(
+                    tuple(
+                        91L, 1050L, "Jane Doe", IntegrationConnectionWorkflowDTO.ParentType.CONNECTED_USER, 2,
+                        IntegrationConnectionWorkflowDTO.Usage.DEPLOYMENT, "Route invoice emails"));
+        }
+
+        private Workflow addWorkflow(Integration integration, String label) {
+            Workflow workflow = new Workflow(
+                String.valueOf(UUID.randomUUID()), "{\"label\": \"%s\", \"tasks\": []}".formatted(label),
+                Workflow.Format.JSON);
+
+            workflows.add(workflow);
+
+            integrationWorkflowService.addWorkflow(integration.getId(), 1, workflow.getId());
+
+            return workflow;
+        }
+
+        private static <T> List<T> filterById(List<T> items, List<?> ids, Function<T, ?> idFunction) {
+            return items.stream()
+                .filter(item -> ids.contains(idFunction.apply(item)))
+                .toList();
+        }
+
+        private static ConnectedUser connectedUser(
+            long id, @Nullable String name, @Nullable String email, String externalId) {
+
+            return new ConnectedUser(Map.of(), email, true, externalId, id, name, 0);
+        }
+
+        private Integration createIntegration(String name) {
+            Integration integration = new Integration();
+
+            integration.setComponentName("componentName");
+            integration.setName(name);
+
+            return integrationService.create(integration);
+        }
+
+        private IntegrationInstanceConfigurationWorkflow createIntegrationInstanceConfigurationWorkflow(
+            Integration integration, Workflow workflow, long connectionId) {
+
+            IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
+
+            integrationInstanceConfiguration.setAuthorizationType(AuthorizationType.API_KEY);
+            integrationInstanceConfiguration.setConnectionParameters(Map.of("key", "admin-value"));
+            integrationInstanceConfiguration.setEnvironment(Environment.STAGING);
+            integrationInstanceConfiguration.setIntegrationId(integration.getId());
+            integrationInstanceConfiguration.setIntegrationVersion(1);
+            integrationInstanceConfiguration.setName("instance-configuration-" + UUID.randomUUID());
+
+            integrationInstanceConfiguration = integrationInstanceConfigurationService.create(
+                integrationInstanceConfiguration);
+
+            IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+                new IntegrationInstanceConfigurationWorkflow();
+
+            integrationInstanceConfigurationWorkflow.setConnections(
+                List.of(
+                    new IntegrationInstanceConfigurationWorkflowConnection(connectionId, "connection", "trigger_1")));
+            integrationInstanceConfigurationWorkflow.setEnabled(true);
+            integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
+                integrationInstanceConfiguration.getId());
+            integrationInstanceConfigurationWorkflow.setWorkflowId(workflow.getId());
+
+            return integrationInstanceConfigurationWorkflowService.create(integrationInstanceConfigurationWorkflow);
+        }
+
+        private Workflow workflow(String label) {
+            Workflow workflow = new Workflow(
+                String.valueOf(UUID.randomUUID()), "{\"label\": \"%s\", \"tasks\": []}".formatted(label),
+                Workflow.Format.JSON);
+
+            workflows.add(workflow);
+
+            return workflow;
+        }
+
+        private static ProjectDeploymentWorkflow projectDeploymentWorkflow(long id, String workflowId) {
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+            projectDeploymentWorkflow.setId(id);
+            projectDeploymentWorkflow.setWorkflowId(workflowId);
+
+            return projectDeploymentWorkflow;
+        }
+
+        private static WorkflowTestConfiguration workflowTestConfiguration(long id, String workflowId) {
+            WorkflowTestConfiguration workflowTestConfiguration = new WorkflowTestConfiguration();
+
+            workflowTestConfiguration.setId(id);
+            workflowTestConfiguration.setEnvironmentId(1L);
+            workflowTestConfiguration.setWorkflowId(workflowId);
+
+            return workflowTestConfiguration;
         }
     }
 
