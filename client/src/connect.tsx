@@ -1,3 +1,4 @@
+import {guardDomAgainstTranslation} from '@/shared/util/guardDomAgainstTranslation';
 import {useConnectDialog} from '@bytechef/embedded';
 import {useEffect, useRef, useState} from 'react';
 import {createRoot} from 'react-dom/client';
@@ -186,6 +187,8 @@ function ConnectPage() {
         </>
     );
 }
+
+guardDomAgainstTranslation();
 
 const rootElement = document.getElementById('connect-root');
 

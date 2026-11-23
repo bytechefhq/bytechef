@@ -8,9 +8,12 @@ import WorkflowBuilder from '@/ee/pages/embedded/workflow-builder/WorkflowBuilde
 import I18n from '@/i18n';
 import {ThemeProvider} from '@/shared/providers/theme-provider';
 import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {guardDomAgainstTranslation} from '@/shared/util/guardDomAgainstTranslation';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {StrictMode} from 'react';
 import {RouterProvider, createHashRouter} from 'react-router-dom';
+
+guardDomAgainstTranslation();
 
 const container = document.getElementById('root') as HTMLDivElement;
 const root = createRoot(container);

@@ -1,11 +1,23 @@
 import {guardDomAgainstTranslation} from '@/shared/util/guardDomAgainstTranslation';
-import {beforeAll, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+const originalRemoveChild = Node.prototype.removeChild;
+const originalInsertBefore = Node.prototype.insertBefore;
 
 describe('guardDomAgainstTranslation', () => {
-    beforeAll(() => {
-        guardDomAgainstTranslation();
+    let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
 
-        vi.spyOn(console, 'warn').mockImplementation(() => {});
+    beforeEach(() => {
+        consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+        guardDomAgainstTranslation();
+    });
+
+    afterEach(() => {
+        Node.prototype.removeChild = originalRemoveChild;
+        Node.prototype.insertBefore = originalInsertBefore;
+
+        vi.restoreAllMocks();
     });
 
     it('removes a child that is still under its parent', () => {
@@ -15,9 +27,10 @@ describe('guardDomAgainstTranslation', () => {
         parent.removeChild(child);
 
         expect(child.parentNode).toBeNull();
+        expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
 
-    it('does not throw when a translator moved the child to another parent', () => {
+    it('skips removing a child that a translator moved to another parent', () => {
         const parent = document.createElement('div');
         const translatorWrapper = document.createElement('font');
         const child = parent.appendChild(document.createTextNode('text'));
@@ -27,6 +40,7 @@ describe('guardDomAgainstTranslation', () => {
 
         expect(() => parent.removeChild(child)).not.toThrow();
         expect(child.parentNode).toBe(translatorWrapper);
+        expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
     });
 
     it('inserts before a reference node that is still under its parent', () => {
@@ -48,14 +62,28 @@ describe('guardDomAgainstTranslation', () => {
         expect(parent.lastChild).toBe(newNode);
     });
 
-    it('does not throw when a translator moved the reference node to another parent', () => {
+    it('appends the new node when a translator moved the reference node to another parent', () => {
         const parent = document.createElement('div');
         const translatorWrapper = document.createElement('font');
         const referenceNode = parent.appendChild(document.createTextNode('reference'));
+        const newNode = document.createElement('span');
 
         translatorWrapper.appendChild(referenceNode);
         parent.appendChild(translatorWrapper);
 
-        expect(() => parent.insertBefore(document.createElement('span'), referenceNode)).not.toThrow();
+        expect(() => parent.insertBefore(newNode, referenceNode)).not.toThrow();
+        expect(newNode.parentNode).toBe(parent);
+        expect(parent.lastChild).toBe(newNode);
+        expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not wrap the methods again when called a second time', () => {
+        const guardedRemoveChild = Node.prototype.removeChild;
+        const guardedInsertBefore = Node.prototype.insertBefore;
+
+        guardDomAgainstTranslation();
+
+        expect(Node.prototype.removeChild).toBe(guardedRemoveChild);
+        expect(Node.prototype.insertBefore).toBe(guardedInsertBefore);
     });
 });
