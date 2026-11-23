@@ -116,6 +116,26 @@ class IsolatingClassLoaderTest {
     }
 
     @Test
+    void testGetResourceTakesJdkClassFileOutsideJavaPackagesFromPlatform() throws IOException {
+        TestIsolatingClassLoader testIsolatingClassLoader = new TestIsolatingClassLoader(
+            directoryUrl, new ConcurrentMapCacheManager());
+
+        String resourceName = "javax/net/ssl/SSLPeerUnverifiedException.class";
+
+        assertThat(testIsolatingClassLoader.getResource(resourceName)).isNotNull();
+        assertThat(testIsolatingClassLoader.getResources(resourceName)
+            .hasMoreElements()).isTrue();
+    }
+
+    @Test
+    void testGetResourceKeepsApplicationResourcesIsolated() {
+        TestIsolatingClassLoader testIsolatingClassLoader = new TestIsolatingClassLoader(
+            directoryUrl, new ConcurrentMapCacheManager());
+
+        assertThat(testIsolatingClassLoader.getResource("org/assertj/core/api/Assertions.class")).isNull();
+    }
+
+    @Test
     void testLoadClassKeepsApplicationClassesIsolated() {
         TestIsolatingClassLoader testIsolatingClassLoader = new TestIsolatingClassLoader(
             directoryUrl, new ConcurrentMapCacheManager());
