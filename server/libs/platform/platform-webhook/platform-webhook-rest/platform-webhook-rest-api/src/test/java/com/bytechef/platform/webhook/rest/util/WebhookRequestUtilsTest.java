@@ -28,6 +28,9 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockMultipartHttpServletRequest;
+import org.springframework.mock.web.MockPart;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 /**
  * @author Ivica Cardic
@@ -78,6 +81,33 @@ class WebhookRequestUtilsTest {
         assertThatThrownBy(() -> getWebhookRequest("application/xml", "<order><id>1001</order>"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageStartingWith("Invalid XML request body");
+    }
+
+    @Test
+    void testMultipartTextPartUpToOneMegabyteIsRead() throws Exception {
+        String text = "a".repeat(1024 * 1024);
+
+        WebhookRequest webhookRequest = getMultipartWebhookRequest(new MockPart("note", text.getBytes()));
+
+        assertThat(webhookRequest.body()
+            .getContent()).isEqualTo(Map.of("note", text));
+    }
+
+    @Test
+    void testMultipartTextPartOverOneMegabyteIsRejectedAsTooLarge() {
+        MockPart mockPart = new MockPart("note", new byte[1024 * 1024 + 1]);
+
+        assertThatThrownBy(() -> getMultipartWebhookRequest(mockPart))
+            .isInstanceOf(MaxUploadSizeExceededException.class);
+    }
+
+    private WebhookRequest getMultipartWebhookRequest(MockPart mockPart) throws Exception {
+        MockMultipartHttpServletRequest mockMultipartHttpServletRequest = new MockMultipartHttpServletRequest();
+
+        mockMultipartHttpServletRequest.setContentType("multipart/form-data; boundary=test");
+        mockMultipartHttpServletRequest.addPart(mockPart);
+
+        return WebhookRequestUtils.getWebhookRequest(mockMultipartHttpServletRequest, tempFileStorage);
     }
 
     private WebhookRequest getWebhookRequest(String contentType, String content) throws Exception {

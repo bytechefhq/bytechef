@@ -56,6 +56,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 /**
  * Verifies that {@link GlobalResponseEntityExceptionHandler#handleAnyException} silently drops client disconnects and
@@ -98,6 +99,16 @@ class GlobalResponseEntityExceptionHandlerTest {
 
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+    }
+
+    @Test
+    void testHandleAnyExceptionReturnsPayloadTooLargeOnWrappedMaxUploadSizeExceeded() {
+        Throwable throwable = new RuntimeException(new MaxUploadSizeExceededException(1024));
+
+        ResponseEntity<ProblemDetail> responseEntity = exceptionHandler.handleAnyException(throwable, newRequest());
+
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.CONTENT_TOO_LARGE, responseEntity.getStatusCode());
     }
 
     @Test

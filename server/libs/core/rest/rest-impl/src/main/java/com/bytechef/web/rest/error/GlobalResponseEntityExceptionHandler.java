@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.util.DisconnectedClientHelper;
 
 /**
@@ -177,6 +178,14 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
 
         if (exception instanceof IllegalArgumentException) {
             return handleIllegalArgumentExceptionException((IllegalArgumentException) exception, request);
+        }
+
+        if (exception instanceof MaxUploadSizeExceededException maxUploadSizeExceededException) {
+            return ResponseEntity
+                .of(createProblemDetail(
+                    maxUploadSizeExceededException, HttpStatus.CONTENT_TOO_LARGE,
+                    maxUploadSizeExceededException.getMessage(), null, null, request))
+                .build();
         }
 
         log.error(throwable.getMessage(), throwable);
