@@ -30,10 +30,6 @@ const captureException = async (error: Error, errorInfo: ErrorInfo) => {
     }
 };
 
-/**
- * Error boundary component to catch JavaScript errors in its child component tree.
- * Displays a fallback UI instead of crashing the whole app.
- */
 class ErrorBoundary extends Component<Props, StateI> {
     constructor(props: Props) {
         super(props);
