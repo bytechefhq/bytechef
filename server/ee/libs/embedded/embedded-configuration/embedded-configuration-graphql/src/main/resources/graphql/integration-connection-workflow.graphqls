@@ -1,0 +1,25 @@
+extend type Query {
+    integrationConnectionWorkflows(connectionId: ID!): [IntegrationConnectionWorkflow!]!
+}
+
+type IntegrationConnectionWorkflow {
+    id: ID!
+    parentId: ID!
+    parentName: String!
+    parentType: IntegrationConnectionWorkflowParentType!
+    parentVersion: Int!
+    usage: IntegrationConnectionWorkflowUsage!
+    workflowId: String!
+    workflowName: String!
+    workflowUuid: String
+}
+
+enum IntegrationConnectionWorkflowParentType {
+    CONNECTED_USER
+    INTEGRATION
+}
+
+enum IntegrationConnectionWorkflowUsage {
+    DEPLOYMENT
+    EDITOR
+}

@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.ee.embedded.configuration.dto.IntegrationConnectionWorkflowDTO;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
@@ -32,6 +33,8 @@ public interface ConnectionFacade {
         @Nullable Long tagId);
 
     List<Tag> getConnectionTags();
+
+    List<IntegrationConnectionWorkflowDTO> getConnectionWorkflows(long id);
 
     Set<Long> getSharedConnectionIds();
 
