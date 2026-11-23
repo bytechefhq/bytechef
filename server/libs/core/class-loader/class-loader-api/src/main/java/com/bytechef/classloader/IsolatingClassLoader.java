@@ -123,6 +123,8 @@ public abstract class IsolatingClassLoader<T> extends URLClassLoader {
 
         if (stream.anyMatch(name::startsWith)) {
             return getParent().getResource(name);
+        } else if (isPlatformResource(name)) {
+            return PLATFORM_CLASS_LOADER.getResource(name);
         } else {
             return findResource(name);
         }
@@ -134,6 +136,8 @@ public abstract class IsolatingClassLoader<T> extends URLClassLoader {
 
         if (stream.anyMatch(name::startsWith)) {
             return getParent().getResources(name);
+        } else if (isPlatformResource(name)) {
+            return PLATFORM_CLASS_LOADER.getResources(name);
         } else {
             return findResources(name);
         }
@@ -211,6 +215,19 @@ public abstract class IsolatingClassLoader<T> extends URLClassLoader {
         int lastDotIndex = className.lastIndexOf('.');
 
         return lastDotIndex > 0 && PLATFORM_PACKAGES.contains(className.substring(0, lastDotIndex));
+    }
+
+    private static boolean isPlatformResource(String resourceName) {
+        int lastSlashIndex = resourceName.lastIndexOf('/');
+
+        if (lastSlashIndex <= 0) {
+            return false;
+        }
+
+        String packageName = resourceName.substring(0, lastSlashIndex)
+            .replace('/', '.');
+
+        return PLATFORM_PACKAGES.contains(packageName);
     }
 
     public interface ClassLoaderOwner {
