@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {AlertCircle} from 'lucide-react';
 import {Component, ErrorInfo, ReactNode} from 'react';
 
@@ -12,6 +13,22 @@ interface StateI {
     hasError: boolean;
     error?: Error;
 }
+
+const captureException = async (error: Error, errorInfo: ErrorInfo) => {
+    if (!applicationInfoStore.getState().analytics.enabled) {
+        return;
+    }
+
+    try {
+        const {default: posthog} = await import('posthog-js');
+
+        if (posthog.__loaded) {
+            posthog.captureException(error, {componentStack: errorInfo.componentStack, source: 'error_boundary'});
+        }
+    } catch (captureError) {
+        console.warn('ErrorBoundary could not report the error:', captureError);
+    }
+};
 
 /**
  * Error boundary component to catch JavaScript errors in its child component tree.
@@ -30,6 +47,8 @@ class ErrorBoundary extends Component<Props, StateI> {
 
     componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
         console.error('ErrorBoundary caught an error:', error, errorInfo);
+
+        void captureException(error, errorInfo);
     }
 
     handleReset = (): void => {

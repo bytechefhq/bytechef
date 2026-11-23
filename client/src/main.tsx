@@ -9,6 +9,7 @@ import {ConditionalPostHogProvider} from '@/shared/providers/conditional-posthog
 import {ThemeProvider} from '@/shared/providers/theme-provider';
 import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {guardDomAgainstTranslation} from '@/shared/util/guardDomAgainstTranslation';
 import {getLegacyEmbeddedWorkflowBuilderUrl} from '@/shared/util/legacyEmbeddedWorkflowBuilderUrl';
 import {registerStaleChunkReload} from '@/shared/util/reloadOnStaleChunk';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
@@ -20,6 +21,8 @@ import {initUserGuiding} from './hooks/useUserGuiding';
 import {getRouter as getMainRouter} from './routes';
 
 registerStaleChunkReload();
+
+guardDomAgainstTranslation();
 
 const legacyEmbeddedWorkflowBuilderUrl = getLegacyEmbeddedWorkflowBuilderUrl(window.location);
 
