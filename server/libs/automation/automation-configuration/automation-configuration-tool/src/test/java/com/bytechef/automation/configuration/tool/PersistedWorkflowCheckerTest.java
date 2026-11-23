@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.copilot.tool;
+package com.bytechef.automation.configuration.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.automation.configuration.tool.PersistedWorkflowChecker;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
@@ -35,7 +34,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-class EditorPersistedWorkflowCheckerTest {
+class PersistedWorkflowCheckerTest {
 
     private final WorkflowValidatorFacade workflowValidatorFacade = mock(WorkflowValidatorFacade.class);
 
@@ -61,7 +60,7 @@ class EditorPersistedWorkflowCheckerTest {
                     new NodeValidationIssue(
                         "loop_1", null, WorkflowIssueKind.OTHER, WorkflowIssueSeverity.WARNING, "Just a warning"))));
 
-        List<PersistedWorkflowChecker.Issue> issues = new EditorPersistedWorkflowChecker(workflowValidatorFacade)
+        List<PersistedWorkflowChecker.Issue> issues = new PersistedWorkflowChecker(workflowValidatorFacade)
             .check("wf-1");
 
         assertThat(issues).containsExactly(
@@ -76,6 +75,6 @@ class EditorPersistedWorkflowCheckerTest {
         when(workflowValidatorFacade.validateWorkflowById("wf-1", Environment.DEVELOPMENT.ordinal()))
             .thenReturn(new WorkflowValidationResult(List.of(), List.of()));
 
-        assertThat(new EditorPersistedWorkflowChecker(workflowValidatorFacade).check("wf-1")).isEmpty();
+        assertThat(new PersistedWorkflowChecker(workflowValidatorFacade).check("wf-1")).isEmpty();
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.copilot.agent;
+package com.bytechef.platform.ai.skill.tool.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -31,47 +31,11 @@ import org.springframework.ai.chat.model.ChatModel;
 /**
  * @author Ivica Cardic
  */
-class CopilotAgentToolContextTest {
-
-    @Test
-    void testCodeEditorAgentPublishesCallerIdentity() throws Exception {
-        CodeEditorSpringAIAgent agent = CodeEditorSpringAIAgent.builder()
-            .agentId("test")
-            .chatModel(mock(ChatModel.class))
-            .systemMessage("system")
-            .state(new State(new HashMap<>()))
-            .build();
-
-        assertPublishesUserId(agent.toolContext(newInputWithUserId()));
-    }
-
-    @Test
-    void testClusterElementAgentPublishesCallerIdentity() throws Exception {
-        ClusterElementSpringAIAgent agent = ClusterElementSpringAIAgent.builder()
-            .agentId("test")
-            .chatModel(mock(ChatModel.class))
-            .systemMessage("system")
-            .state(new State(new HashMap<>()))
-            .build();
-
-        assertPublishesUserId(agent.toolContext(newInputWithUserId()));
-    }
+class SkillsSpringAIAgentToolContextTest {
 
     @Test
     void testSkillsAgentPublishesCallerIdentity() throws Exception {
         SkillsSpringAIAgent agent = SkillsSpringAIAgent.builder()
-            .agentId("test")
-            .chatModel(mock(ChatModel.class))
-            .systemMessage("system")
-            .state(new State(new HashMap<>()))
-            .build();
-
-        assertPublishesUserId(agent.toolContext(newInputWithUserId()));
-    }
-
-    @Test
-    void testConverterAgentPublishesCallerIdentity() throws Exception {
-        ConverterSpringAIAgent agent = ConverterSpringAIAgent.builder()
             .agentId("test")
             .chatModel(mock(ChatModel.class))
             .systemMessage("system")

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.copilot.config;
+package com.bytechef.automation.connection.tool.config;
 
 import com.bytechef.ai.copilot.connection.CopilotConnectionLister;
 import com.bytechef.ai.copilot.tool.AskUserQuestionToolCallback;

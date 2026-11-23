@@ -29,6 +29,10 @@ dependencies {
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-rest"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-service"))
     implementation(project(":server:ee:libs:config:observability-config"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-tool"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-tool"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-tool"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-tool"))
 
     runtimeOnly("com.zaxxer:HikariCP")
     runtimeOnly("org.postgresql:postgresql")

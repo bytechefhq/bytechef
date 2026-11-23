@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.copilot.agent;
+package com.bytechef.automation.configuration.tool.agent;
 
 import com.agui.core.agent.AgentSubscriber;
 import com.agui.core.agent.AgentSubscriberParams;
@@ -46,6 +46,8 @@ import com.agui.core.type.EventType;
 import com.agui.server.EventFactory;
 import com.agui.server.LocalAgent;
 import com.agui.spring.ai.SpringAIAgent;
+import com.bytechef.ai.copilot.agent.CopilotSpringAIAgent;
+import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.util.CopilotToolContextUtils;
 import java.util.List;
 import java.util.Map;

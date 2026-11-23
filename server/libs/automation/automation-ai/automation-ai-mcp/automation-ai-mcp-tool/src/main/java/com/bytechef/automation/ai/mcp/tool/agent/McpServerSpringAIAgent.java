@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.copilot.agent;
+package com.bytechef.automation.ai.mcp.tool.agent;
 
 import com.agui.core.agent.RunAgentInput;
 import com.agui.core.context.Context;
@@ -24,6 +24,8 @@ import com.agui.core.message.SystemMessage;
 import com.agui.core.state.State;
 import com.agui.server.LocalAgent;
 import com.agui.spring.ai.SpringAIAgent;
+import com.bytechef.ai.copilot.agent.CopilotSpringAIAgent;
+import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.util.CopilotToolContextUtils;
 import java.util.List;
 import java.util.Map;
@@ -39,17 +41,9 @@ import org.springframework.ai.tool.ToolCallback;
 /**
  * @author Ivica Cardic
  */
-public class SkillsSpringAIAgent extends CopilotSpringAIAgent {
+public class McpServerSpringAIAgent extends CopilotSpringAIAgent {
 
-    private static final String ADDITIONAL_RULES =
-        """
-            ## Additional Rules
-
-            - The assistant must not produce visual representations of any kind, including diagrams, charts, UI sketches, images, or pseudo-visuals.
-            - If state.workflowExecutionError is not empty, there is an error and you must instruct the user on how to fix it. The user can't modify the code, only the input parameters. If it's impossible to fix the error, instruct the user to raise an issue on our GitHub https://github.com/bytechefhq/bytechef/issues.
-            """;
-
-    protected SkillsSpringAIAgent(final Builder builder) throws AGUIException {
+    protected McpServerSpringAIAgent(final Builder builder) throws AGUIException {
         super(builder, builder.overrideChatClientResolver);
     }
 
@@ -71,8 +65,8 @@ public class SkillsSpringAIAgent extends CopilotSpringAIAgent {
         String resolvedMessage = Objects.nonNull(this.systemMessageProvider)
             ? this.systemMessageProvider.apply(this) : this.systemMessage;
 
-        String message = "%s%n%s%n%nState:%n%s%n%nContext:%n%s%n".formatted(
-            resolvedMessage, ADDITIONAL_RULES, state, String.join("\n", contextStrings));
+        String message = "%s%n%nState:%n%s%n%nContext:%n%s%n".formatted(
+            resolvedMessage, state, String.join("\n", contextStrings));
 
         SystemMessage systemMessage = new SystemMessage();
 
@@ -170,9 +164,9 @@ public class SkillsSpringAIAgent extends CopilotSpringAIAgent {
             return this;
         }
 
-        public SkillsSpringAIAgent build() throws AGUIException {
+        public McpServerSpringAIAgent build() throws AGUIException {
 
-            return new SkillsSpringAIAgent(this);
+            return new McpServerSpringAIAgent(this);
         }
     }
 }

@@ -242,7 +242,7 @@ class ProjectWorkflowAgentToolCallbackTest {
         ChatClient chatClient = savingChatClient("built");
 
         ProjectWorkflowAgentToolCallback callback = new ProjectWorkflowAgentToolCallback(
-            chatModel -> chatClient, null, workflowId -> List.of());
+            chatModel -> chatClient, null, mock(PersistedWorkflowChecker.class));
 
         String result = callback.call("{\"request\":\"build it\"}");
 
@@ -280,10 +280,13 @@ class ProjectWorkflowAgentToolCallbackTest {
     void testCallAsksForConnectionsWithoutSendingTheSpecialistBack() {
         ChatClient chatClient = savingChatClient("built");
 
+        PersistedWorkflowChecker persistedWorkflowChecker = mock(PersistedWorkflowChecker.class);
+
+        when(persistedWorkflowChecker.check("wf-1")).thenReturn(
+            List.of(new PersistedWorkflowChecker.Issue("searchEmail_1", "Missing required connection: Gmail", true)));
+
         ProjectWorkflowAgentToolCallback callback = new ProjectWorkflowAgentToolCallback(
-            chatModel -> chatClient, null,
-            workflowId -> List.of(
-                new PersistedWorkflowChecker.Issue("searchEmail_1", "Missing required connection: Gmail", true)));
+            chatModel -> chatClient, null, persistedWorkflowChecker);
 
         String result = callback.call("{\"request\":\"build it\"}");
 
@@ -297,10 +300,12 @@ class ProjectWorkflowAgentToolCallbackTest {
     void testCallKeepsTheResultWhenValidationFails() {
         ChatClient chatClient = savingChatClient("built");
 
+        PersistedWorkflowChecker persistedWorkflowChecker = mock(PersistedWorkflowChecker.class);
+
+        when(persistedWorkflowChecker.check("wf-1")).thenThrow(new IllegalStateException("validator down"));
+
         ProjectWorkflowAgentToolCallback callback = new ProjectWorkflowAgentToolCallback(
-            chatModel -> chatClient, null, workflowId -> {
-                throw new IllegalStateException("validator down");
-            });
+            chatModel -> chatClient, null, persistedWorkflowChecker);
 
         String result = callback.call("{\"request\":\"build it\"}");
 

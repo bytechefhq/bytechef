@@ -55,9 +55,6 @@ public class TaskTools {
 
     private static final Logger log = LoggerFactory.getLogger(TaskTools.class);
 
-    public static final String TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY =
-        AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY;
-
     private static final String INVALID_TASK_TYPE =
         "Invalid task type. Must be 'action', 'trigger', 'taskDispatcher', or 'clusterElement'";
 

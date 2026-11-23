@@ -28,7 +28,7 @@ import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestSharedMocks;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestTestConfiguration;
-import com.bytechef.platform.component.tool.TaskTools;
+import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import java.util.Map;
@@ -146,7 +146,7 @@ public class ConnectedUserCopilotApiControllerIntTest {
         assertThat(stateMap).containsEntry(
             CopilotConstants.STATE_ENVIRONMENT_ID, (long) Environment.PRODUCTION.ordinal());
         assertThat(stateMap).containsEntry(CopilotConstants.STATE_SCOPED_PROJECT_ID, 1114L);
-        assertThat(stateMap.get(TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY))
+        assertThat(stateMap.get(AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY))
             .isEqualTo(Set.of("slack"));
     }
 
@@ -172,9 +172,10 @@ public class ConnectedUserCopilotApiControllerIntTest {
     @WithMockUser(username = "ext-user-1")
     public void testCopilotChatDropsClientSuppliedAllowedComponentNames() throws Exception {
         Map<String, Object> stateMap = runWithClientState(
-            "{\"" + TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY + "\":[\"salesforce\"]}", Set.of());
+            "{\"" + AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY + "\":[\"salesforce\"]}",
+            Set.of());
 
-        assertThat(stateMap).doesNotContainKey(TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY);
+        assertThat(stateMap).doesNotContainKey(AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY);
     }
 
     @Test
@@ -204,7 +205,7 @@ public class ConnectedUserCopilotApiControllerIntTest {
             CopilotConstants.STATE_CONVERSATION_SCOPE, CopilotConstants.STATE_ENVIRONMENT_ID,
             CopilotConstants.STATE_SCOPED_PROJECT_ID,
             CopilotConstants.STATE_AUTHENTICATION, CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT,
-            TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY);
+            AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY);
     }
 
     @Test

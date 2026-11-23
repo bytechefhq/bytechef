@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.copilot.agent;
+package com.bytechef.platform.component.tool.agent;
 
 import com.agui.core.agent.RunAgentInput;
 import com.agui.core.context.Context;
@@ -24,6 +24,8 @@ import com.agui.core.message.SystemMessage;
 import com.agui.core.state.State;
 import com.agui.server.LocalAgent;
 import com.agui.spring.ai.SpringAIAgent;
+import com.bytechef.ai.copilot.agent.CopilotSpringAIAgent;
+import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.util.CopilotToolContextUtils;
 import java.util.List;
 import java.util.Map;
@@ -39,9 +41,17 @@ import org.springframework.ai.tool.ToolCallback;
 /**
  * @author Ivica Cardic
  */
-public class McpServerSpringAIAgent extends CopilotSpringAIAgent {
+public class ClusterElementSpringAIAgent extends CopilotSpringAIAgent {
 
-    protected McpServerSpringAIAgent(final Builder builder) throws AGUIException {
+    private static final String ADDITIONAL_RULES =
+        """
+            ## Additional Rules
+
+            - The assistant must not produce visual representations of any kind, including diagrams, charts, UI sketches, images, or pseudo-visuals.
+            - If state.workflowExecutionError is not empty, there is an error and you must instruct the user on how to fix it. The user can't modify the code, only the input parameters. If it's impossible to fix the error, instruct the user to raise an issue on our GitHub https://github.com/bytechefhq/bytechef/issues.
+            """;
+
+    protected ClusterElementSpringAIAgent(final Builder builder) throws AGUIException {
         super(builder, builder.overrideChatClientResolver);
     }
 
@@ -56,6 +66,11 @@ public class McpServerSpringAIAgent extends CopilotSpringAIAgent {
 
     @Override
     protected SystemMessage createSystemMessage(State state, List<Context> contexts) {
+        Map<?, ?> parameters = (Map<?, ?>) state.get("parameters");
+
+        String taskName = "Name of the task that is to be modified: " + parameters.get("taskName")
+            .toString();
+
         List<String> contextStrings = contexts.stream()
             .map(Context::toString)
             .toList();
@@ -63,8 +78,8 @@ public class McpServerSpringAIAgent extends CopilotSpringAIAgent {
         String resolvedMessage = Objects.nonNull(this.systemMessageProvider)
             ? this.systemMessageProvider.apply(this) : this.systemMessage;
 
-        String message = "%s%n%nState:%n%s%n%nContext:%n%s%n".formatted(
-            resolvedMessage, state, String.join("\n", contextStrings));
+        String message = "%s%n%s%n%s%n%nState:%n%s%n%nContext:%n%s%n".formatted(
+            resolvedMessage, taskName, ADDITIONAL_RULES, state, String.join("\n", contextStrings));
 
         SystemMessage systemMessage = new SystemMessage();
 
@@ -162,9 +177,9 @@ public class McpServerSpringAIAgent extends CopilotSpringAIAgent {
             return this;
         }
 
-        public McpServerSpringAIAgent build() throws AGUIException {
+        public ClusterElementSpringAIAgent build() throws AGUIException {
 
-            return new McpServerSpringAIAgent(this);
+            return new ClusterElementSpringAIAgent(this);
         }
     }
 }

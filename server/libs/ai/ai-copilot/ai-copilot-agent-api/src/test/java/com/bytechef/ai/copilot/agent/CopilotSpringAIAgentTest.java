@@ -37,6 +37,7 @@ import com.agui.core.state.State;
 import com.agui.spring.ai.SpringAIAgent;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ai.copilot.tool.WebSearchToolCallbacks;
+import com.bytechef.automation.configuration.tool.agent.ConverterSpringAIAgent;
 import com.bytechef.platform.ai.llm.NoChatProviderActivatedException;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;

@@ -44,11 +44,18 @@ import com.bytechef.automation.configuration.tool.ReadProjectTools;
 import com.bytechef.automation.configuration.tool.ReadProjectWorkflowTools;
 import com.bytechef.automation.configuration.tool.ScriptTools;
 import com.bytechef.automation.configuration.tool.WorkflowIntelligentToolContributorConfiguration;
+import com.bytechef.automation.configuration.tool.config.ClusterElementAgentConfiguration;
+import com.bytechef.automation.configuration.tool.config.CodeEditorAgentConfiguration;
+import com.bytechef.automation.configuration.tool.config.ConverterAgentConfiguration;
+import com.bytechef.automation.configuration.tool.config.SkillsAgentConfiguration;
 import com.bytechef.automation.configuration.tool.model.ProjectWorkflowInfo;
+import com.bytechef.automation.connection.tool.config.InteractivePickerToolCallbacksImpl;
 import com.bytechef.automation.data.table.tool.DataTableTools;
 import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionAgentType;
 import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionIntelligentToolContributorConfiguration;
 import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionTools;
+import com.bytechef.automation.workflow.execution.tool.config.WorkflowEditorAgentConfiguration;
+import com.bytechef.automation.workflow.execution.tool.config.WorkflowExecutionAgentConfiguration;
 import com.bytechef.platform.ai.skill.tool.ReadSkillsTools;
 import com.bytechef.platform.ai.skill.tool.SkillAgentType;
 import com.bytechef.platform.ai.skill.tool.SkillsIntelligentToolContributorConfiguration;
@@ -68,8 +75,6 @@ import com.bytechef.platform.component.tool.PlatformComponentAgentType;
 import com.bytechef.platform.component.tool.PropertyOptionsResolver;
 import com.bytechef.platform.component.tool.ScopedConnectionGuard;
 import com.bytechef.platform.component.tool.TaskTools;
-import com.bytechef.platform.configuration.context.EnvironmentContext;
-import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.workflow.tool.CodeEditorIntelligentToolContributorConfiguration;
 import com.bytechef.platform.workflow.tool.PlatformWorkflowAgentType;
 import com.bytechef.platform.workflow.tool.WorkflowInstructionTools;
@@ -98,7 +103,7 @@ import org.springframework.core.io.Resource;
  * @author Ivica Cardic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
-final class IntelligentToolContributorConfigurationTest {
+class IntelligentToolContributorConfigurationTest {
 
     private static final List<DelegateCase> DELEGATE_CASES = List.of(
         new DelegateCase("buildWorkflow", IntelligentToolVariant.ASK, "workflowEditorAsk"),
@@ -320,69 +325,6 @@ final class IntelligentToolContributorConfigurationTest {
         }
     }
 
-    @Test
-    void testTheAskFactoryAddsTheWebSearchToolsOfTheCurrentEnvironment() {
-        CopilotConfiguration copilotConfiguration = realCopilotConfiguration();
-        ChatModel chatModel = mock(ChatModel.class);
-        ComponentTools componentTools = mock(ComponentTools.class);
-        ReadProjectWorkflowTools readProjectWorkflowTools = mock(ReadProjectWorkflowTools.class);
-        WebSearchToolCallbackProvider webSearchToolCallbackProvider = mock(WebSearchToolCallbackProvider.class);
-
-        when(webSearchToolCallbackProvider.getToolCallbacks(Environment.STAGING.ordinal()))
-            .thenReturn(List.of(mock(ToolCallback.class)));
-
-        ChatClient beanClient = copilotConfiguration.codeEditorAskSubAgentChatClient(
-            chatModel, readProjectWorkflowTools, componentTools);
-
-        IntelligentToolChatClientFactory factory = copilotConfiguration.codeEditorAskSubAgentChatClientFactory(
-            beanClient, chatModel, readProjectWorkflowTools, componentTools, webSearchToolCallbackProvider);
-
-        EnvironmentContext.set(Environment.STAGING);
-
-        try {
-            assertThat(factory.get(null)).isNotSameAs(beanClient);
-        } finally {
-            EnvironmentContext.clear();
-        }
-
-        assertThat(factory.get(null)).isSameAs(beanClient);
-
-        verify(webSearchToolCallbackProvider).getToolCallbacks(Environment.STAGING.ordinal());
-    }
-
-    @Test
-    void testTheBuildWorkflowFactoryAddsTheWebSearchToolsOfTheCurrentEnvironment() {
-        CopilotConfiguration copilotConfiguration = realCopilotConfiguration();
-        ChatModel chatModel = mock(ChatModel.class);
-        ProjectWorkflowTools projectWorkflowTools = mock(ProjectWorkflowTools.class);
-        ScriptTools scriptTools = mock(ScriptTools.class);
-        TaskTools taskTools = mock(TaskTools.class);
-        WebSearchToolCallbackProvider webSearchToolCallbackProvider = mock(WebSearchToolCallbackProvider.class);
-        ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider = emptySubAgentAskRelayProvider();
-
-        when(webSearchToolCallbackProvider.getToolCallbacks(Environment.PRODUCTION.ordinal()))
-            .thenReturn(List.of(mock(ToolCallback.class)));
-
-        ChatClient beanClient = copilotConfiguration.workflowEditorBuildSubAgentChatClient(
-            chatModel, projectWorkflowTools, taskTools, scriptTools, mock(ComponentTools.class),
-            subAgentAskRelayProvider);
-
-        IntelligentToolChatClientFactory factory = copilotConfiguration.workflowEditorBuildSubAgentChatClientFactory(
-            beanClient, chatModel, projectWorkflowTools, taskTools, scriptTools, mock(ComponentTools.class),
-            subAgentAskRelayProvider,
-            webSearchToolCallbackProvider);
-
-        EnvironmentContext.set(Environment.PRODUCTION);
-
-        try {
-            assertThat(factory.get(null)).isNotSameAs(beanClient);
-        } finally {
-            EnvironmentContext.clear();
-        }
-
-        assertThat(factory.get(null)).isSameAs(beanClient);
-    }
-
     private List<IntelligentToolDefinition> definitionsWithAllProvidersPresent() {
         List<IntelligentToolDefinition> definitions = contributedDefinitions(
             workflowIntelligentToolContributor(
@@ -403,19 +345,23 @@ final class IntelligentToolContributorConfigurationTest {
     }
 
     private RealDefinitions buildRealDefinitions() {
-        CopilotConfiguration copilotConfiguration = realCopilotConfiguration();
         ChatModel defaultChatModel = mock(ChatModel.class);
 
-        DelegateFixture workflowEditorAsk = workflowEditorAskFixture(copilotConfiguration, defaultChatModel);
-        DelegateFixture workflowEditorBuild = workflowEditorBuildFixture(copilotConfiguration, defaultChatModel);
-        DelegateFixture converterBuild = converterBuildFixture(copilotConfiguration, defaultChatModel);
-        DelegateFixture clusterElementAsk = clusterElementAskFixture(copilotConfiguration, defaultChatModel);
-        DelegateFixture clusterElementBuild = clusterElementBuildFixture(copilotConfiguration, defaultChatModel);
-        DelegateFixture codeEditorAsk = codeEditorAskFixture(copilotConfiguration, defaultChatModel);
-        DelegateFixture codeEditorBuild = codeEditorBuildFixture(copilotConfiguration, defaultChatModel);
-        DelegateFixture skillsAsk = skillsAskFixture(copilotConfiguration, defaultChatModel);
-        DelegateFixture skillsBuild = skillsBuildFixture(copilotConfiguration, defaultChatModel);
-        DelegateFixture workflowExecutionBuild = workflowExecutionBuildFixture(copilotConfiguration, defaultChatModel);
+        DelegateFixture workflowEditorAsk =
+            workflowEditorAskFixture(realWorkflowEditorAgentConfiguration(), defaultChatModel);
+        DelegateFixture workflowEditorBuild =
+            workflowEditorBuildFixture(realWorkflowEditorAgentConfiguration(), defaultChatModel);
+        DelegateFixture converterBuild = converterBuildFixture(realConverterAgentConfiguration(), defaultChatModel);
+        DelegateFixture clusterElementAsk =
+            clusterElementAskFixture(realClusterElementAgentConfiguration(), defaultChatModel);
+        DelegateFixture clusterElementBuild =
+            clusterElementBuildFixture(realClusterElementAgentConfiguration(), defaultChatModel);
+        DelegateFixture codeEditorAsk = codeEditorAskFixture(realCodeEditorAgentConfiguration(), defaultChatModel);
+        DelegateFixture codeEditorBuild = codeEditorBuildFixture(realCodeEditorAgentConfiguration(), defaultChatModel);
+        DelegateFixture skillsAsk = skillsAskFixture(realSkillsAgentConfiguration(), defaultChatModel);
+        DelegateFixture skillsBuild = skillsBuildFixture(realSkillsAgentConfiguration(), defaultChatModel);
+        DelegateFixture workflowExecutionBuild =
+            workflowExecutionBuildFixture(realWorkflowExecutionAgentConfiguration(), defaultChatModel);
 
         List<IntelligentToolDefinition> definitions = contributedDefinitions(
             workflowIntelligentToolContributor(present(workflowEditorAsk.factory()),
@@ -443,7 +389,7 @@ final class IntelligentToolContributorConfigurationTest {
     }
 
     private static DelegateFixture workflowEditorAskFixture(
-        CopilotConfiguration copilotConfiguration, ChatModel chatModel) {
+        WorkflowEditorAgentConfiguration copilotConfiguration, ChatModel chatModel) {
 
         ReadProjectTools readProjectTools = mock(ReadProjectTools.class);
         ReadProjectWorkflowTools readProjectWorkflowTools = mock(ReadProjectWorkflowTools.class);
@@ -463,7 +409,7 @@ final class IntelligentToolContributorConfigurationTest {
     }
 
     private static DelegateFixture workflowEditorBuildFixture(
-        CopilotConfiguration copilotConfiguration, ChatModel chatModel) {
+        WorkflowEditorAgentConfiguration copilotConfiguration, ChatModel chatModel) {
 
         ProjectWorkflowTools projectWorkflowTools = mock(ProjectWorkflowTools.class);
         TaskTools taskTools = mock(TaskTools.class);
@@ -483,19 +429,8 @@ final class IntelligentToolContributorConfigurationTest {
         return new DelegateFixture(beanClient, factory);
     }
 
-    @Test
-    void testTheBuildWorkflowSubAgentGetsOnlyTheClusterElementLookups() {
-        List<String> toolNames = CopilotConfiguration.clusterElementLookupToolCallbacks(mock(ComponentTools.class))
-            .stream()
-            .map(toolCallback -> toolCallback.getToolDefinition()
-                .name())
-            .toList();
-
-        assertThat(toolNames).containsExactlyInAnyOrder("getAction", "getClusterElement", "searchClusterElements");
-    }
-
     private static DelegateFixture converterBuildFixture(
-        CopilotConfiguration copilotConfiguration, ChatModel chatModel) {
+        ConverterAgentConfiguration copilotConfiguration, ChatModel chatModel) {
 
         ProjectWorkflowTools projectWorkflowTools = mock(ProjectWorkflowTools.class);
         TaskTools taskTools = mock(TaskTools.class);
@@ -512,7 +447,7 @@ final class IntelligentToolContributorConfigurationTest {
     }
 
     private static DelegateFixture clusterElementAskFixture(
-        CopilotConfiguration copilotConfiguration, ChatModel chatModel) {
+        ClusterElementAgentConfiguration copilotConfiguration, ChatModel chatModel) {
 
         ReadProjectWorkflowTools readProjectWorkflowTools = mock(ReadProjectWorkflowTools.class);
         ComponentTools componentTools = mock(ComponentTools.class);
@@ -529,7 +464,7 @@ final class IntelligentToolContributorConfigurationTest {
     }
 
     private static DelegateFixture clusterElementBuildFixture(
-        CopilotConfiguration copilotConfiguration, ChatModel chatModel) {
+        ClusterElementAgentConfiguration copilotConfiguration, ChatModel chatModel) {
 
         ClusterElementTools clusterElementTools = mock(ClusterElementTools.class);
         ReadProjectWorkflowTools readProjectWorkflowTools = mock(ReadProjectWorkflowTools.class);
@@ -546,7 +481,7 @@ final class IntelligentToolContributorConfigurationTest {
     }
 
     private static DelegateFixture codeEditorAskFixture(
-        CopilotConfiguration copilotConfiguration, ChatModel chatModel) {
+        CodeEditorAgentConfiguration copilotConfiguration, ChatModel chatModel) {
 
         ReadProjectWorkflowTools readProjectWorkflowTools = mock(ReadProjectWorkflowTools.class);
         ComponentTools componentTools = mock(ComponentTools.class);
@@ -562,7 +497,7 @@ final class IntelligentToolContributorConfigurationTest {
     }
 
     private static DelegateFixture codeEditorBuildFixture(
-        CopilotConfiguration copilotConfiguration, ChatModel chatModel) {
+        CodeEditorAgentConfiguration copilotConfiguration, ChatModel chatModel) {
 
         ScriptTools scriptTools = mock(ScriptTools.class);
         ReadProjectWorkflowTools readProjectWorkflowTools = mock(ReadProjectWorkflowTools.class);
@@ -577,7 +512,8 @@ final class IntelligentToolContributorConfigurationTest {
         return new DelegateFixture(beanClient, factory);
     }
 
-    private static DelegateFixture skillsAskFixture(CopilotConfiguration copilotConfiguration, ChatModel chatModel) {
+    private static DelegateFixture
+        skillsAskFixture(SkillsAgentConfiguration copilotConfiguration, ChatModel chatModel) {
         ReadProjectTools readProjectTools = mock(ReadProjectTools.class);
         ReadProjectWorkflowTools readProjectWorkflowTools = mock(ReadProjectWorkflowTools.class);
         ReadSkillsTools readSkillsTools = mock(ReadSkillsTools.class);
@@ -594,7 +530,7 @@ final class IntelligentToolContributorConfigurationTest {
     }
 
     private static DelegateFixture skillsBuildFixture(
-        CopilotConfiguration copilotConfiguration, ChatModel chatModel) {
+        SkillsAgentConfiguration copilotConfiguration, ChatModel chatModel) {
 
         ReadProjectTools readProjectTools = mock(ReadProjectTools.class);
         ReadProjectWorkflowTools readProjectWorkflowTools = mock(ReadProjectWorkflowTools.class);
@@ -611,7 +547,7 @@ final class IntelligentToolContributorConfigurationTest {
     }
 
     private static DelegateFixture workflowExecutionBuildFixture(
-        CopilotConfiguration copilotConfiguration, ChatModel chatModel) {
+        WorkflowExecutionAgentConfiguration copilotConfiguration, ChatModel chatModel) {
 
         WorkflowExecutionTools workflowExecutionTools = mock(WorkflowExecutionTools.class);
         ProjectWorkflowTools projectWorkflowTools = mock(ProjectWorkflowTools.class);
@@ -626,36 +562,6 @@ final class IntelligentToolContributorConfigurationTest {
                 beanClient, workflowExecutionTools, projectWorkflowTools, scriptTools, taskTools);
 
         return new DelegateFixture(beanClient, factory);
-    }
-
-    private static CopilotConfiguration realCopilotConfiguration() {
-        Resource promptResource = new ByteArrayResource("prompt".getBytes(StandardCharsets.UTF_8));
-
-        WorkflowValidatorTools workflowValidatorTools = mock(WorkflowValidatorTools.class);
-        WorkflowInstructionTools workflowInstructionTools = mock(WorkflowInstructionTools.class);
-        ConnectionDefinitionService connectionDefinitionService = mock(ConnectionDefinitionService.class);
-        WorkspaceConnectionFacade workspaceConnectionFacade = mock(WorkspaceConnectionFacade.class);
-        ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
-        ActionDefinitionService actionDefinitionService = mock(ActionDefinitionService.class);
-        ActionDefinitionFacade actionDefinitionFacade = mock(ActionDefinitionFacade.class);
-        TriggerDefinitionService triggerDefinitionService = mock(TriggerDefinitionService.class);
-        TriggerDefinitionFacade triggerDefinitionFacade = mock(TriggerDefinitionFacade.class);
-        PropertyOptionsResolver propertyOptionsResolver = mock(PropertyOptionsResolver.class);
-        ObjectProvider<CopilotConnectionLister> connectionListerProvider = emptyProvider();
-        ScopedConnectionGuard scopedConnectionGuard =
-            new ScopedConnectionGuard(connectionListerProvider, emptyProvider());
-
-        return new CopilotConfiguration(
-            promptResource, promptResource, promptResource, promptResource, promptResource, promptResource,
-            promptResource, promptResource, promptResource, promptResource, promptResource, workflowValidatorTools,
-            workflowInstructionTools,
-            new InteractivePickerToolCallbacksImpl(
-                connectionDefinitionService, workspaceConnectionFacade, componentDefinitionService,
-                actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
-                mock(ClusterElementDefinitionService.class), mock(ClusterElementDefinitionFacade.class),
-                propertyOptionsResolver, connectionListerProvider, scopedConnectionGuard),
-            actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
-            propertyOptionsResolver, scopedConnectionGuard, emptyDataTableToolsProvider());
     }
 
     private static List<IntelligentToolDefinition> contributedDefinitions(
@@ -781,5 +687,82 @@ final class IntelligentToolContributorConfigurationTest {
                 .stream())
             .sorted(Comparator.comparingInt(definition -> order.indexOf(definition.name())))
             .toList();
+    }
+
+    private static ClusterElementAgentConfiguration realClusterElementAgentConfiguration() {
+        Resource promptResource = new ByteArrayResource("prompt".getBytes(StandardCharsets.UTF_8));
+
+        WorkflowValidatorTools workflowValidatorTools = mock(WorkflowValidatorTools.class);
+        WorkflowInstructionTools workflowInstructionTools = mock(WorkflowInstructionTools.class);
+
+        return new ClusterElementAgentConfiguration(promptResource, promptResource, workflowValidatorTools,
+            workflowInstructionTools);
+    }
+
+    private static CodeEditorAgentConfiguration realCodeEditorAgentConfiguration() {
+        Resource promptResource = new ByteArrayResource("prompt".getBytes(StandardCharsets.UTF_8));
+
+        WorkflowValidatorTools workflowValidatorTools = mock(WorkflowValidatorTools.class);
+        WorkflowInstructionTools workflowInstructionTools = mock(WorkflowInstructionTools.class);
+
+        return new CodeEditorAgentConfiguration(promptResource, promptResource, workflowValidatorTools,
+            workflowInstructionTools);
+    }
+
+    private static ConverterAgentConfiguration realConverterAgentConfiguration() {
+        Resource promptResource = new ByteArrayResource("prompt".getBytes(StandardCharsets.UTF_8));
+
+        WorkflowValidatorTools workflowValidatorTools = mock(WorkflowValidatorTools.class);
+        WorkflowInstructionTools workflowInstructionTools = mock(WorkflowInstructionTools.class);
+
+        return new ConverterAgentConfiguration(promptResource, workflowValidatorTools, workflowInstructionTools,
+            emptyDataTableToolsProvider());
+    }
+
+    private static SkillsAgentConfiguration realSkillsAgentConfiguration() {
+        Resource promptResource = new ByteArrayResource("prompt".getBytes(StandardCharsets.UTF_8));
+
+        WorkflowValidatorTools workflowValidatorTools = mock(WorkflowValidatorTools.class);
+        WorkflowInstructionTools workflowInstructionTools = mock(WorkflowInstructionTools.class);
+
+        return new SkillsAgentConfiguration(promptResource, promptResource, workflowValidatorTools,
+            workflowInstructionTools);
+    }
+
+    private static WorkflowEditorAgentConfiguration realWorkflowEditorAgentConfiguration() {
+        Resource promptResource = new ByteArrayResource("prompt".getBytes(StandardCharsets.UTF_8));
+
+        WorkflowValidatorTools workflowValidatorTools = mock(WorkflowValidatorTools.class);
+        WorkflowInstructionTools workflowInstructionTools = mock(WorkflowInstructionTools.class);
+        ConnectionDefinitionService connectionDefinitionService = mock(ConnectionDefinitionService.class);
+        WorkspaceConnectionFacade workspaceConnectionFacade = mock(WorkspaceConnectionFacade.class);
+        ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
+        ActionDefinitionService actionDefinitionService = mock(ActionDefinitionService.class);
+        ActionDefinitionFacade actionDefinitionFacade = mock(ActionDefinitionFacade.class);
+        TriggerDefinitionService triggerDefinitionService = mock(TriggerDefinitionService.class);
+        TriggerDefinitionFacade triggerDefinitionFacade = mock(TriggerDefinitionFacade.class);
+        PropertyOptionsResolver propertyOptionsResolver = mock(PropertyOptionsResolver.class);
+        ObjectProvider<CopilotConnectionLister> connectionListerProvider = emptyProvider();
+        ScopedConnectionGuard scopedConnectionGuard =
+            new ScopedConnectionGuard(connectionListerProvider, emptyProvider());
+
+        return new WorkflowEditorAgentConfiguration(promptResource, promptResource, promptResource,
+            workflowValidatorTools, workflowInstructionTools, new InteractivePickerToolCallbacksImpl(
+                connectionDefinitionService, workspaceConnectionFacade, componentDefinitionService,
+                actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
+                mock(ClusterElementDefinitionService.class), mock(ClusterElementDefinitionFacade.class),
+                propertyOptionsResolver, connectionListerProvider, scopedConnectionGuard),
+            actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
+            propertyOptionsResolver, scopedConnectionGuard, emptyDataTableToolsProvider());
+    }
+
+    private static WorkflowExecutionAgentConfiguration realWorkflowExecutionAgentConfiguration() {
+        Resource promptResource = new ByteArrayResource("prompt".getBytes(StandardCharsets.UTF_8));
+
+        WorkflowValidatorTools workflowValidatorTools = mock(WorkflowValidatorTools.class);
+        WorkflowInstructionTools workflowInstructionTools = mock(WorkflowInstructionTools.class);
+
+        return new WorkflowExecutionAgentConfiguration(promptResource, workflowValidatorTools,
+            workflowInstructionTools);
     }
 }
