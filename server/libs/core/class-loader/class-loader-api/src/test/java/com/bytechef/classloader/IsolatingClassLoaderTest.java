@@ -17,6 +17,7 @@
 package com.bytechef.classloader;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -101,6 +102,26 @@ class IsolatingClassLoaderTest {
         assertThat(cache).isNotNull();
         assertThat(cache.get("key")).isNull();
         assertThat(testIsolatingClassLoader.getResource(MARKER_RESOURCE)).isNull();
+    }
+
+    @Test
+    void testLoadClassTakesJdkClassOutsideJavaPackagesFromPlatform() throws ClassNotFoundException {
+        TestIsolatingClassLoader testIsolatingClassLoader = new TestIsolatingClassLoader(
+            directoryUrl, new ConcurrentMapCacheManager());
+
+        Class<?> sslPeerUnverifiedExceptionClass = testIsolatingClassLoader.loadClass(
+            "javax.net.ssl.SSLPeerUnverifiedException");
+
+        assertThat(sslPeerUnverifiedExceptionClass).isSameAs(javax.net.ssl.SSLPeerUnverifiedException.class);
+    }
+
+    @Test
+    void testLoadClassKeepsApplicationClassesIsolated() {
+        TestIsolatingClassLoader testIsolatingClassLoader = new TestIsolatingClassLoader(
+            directoryUrl, new ConcurrentMapCacheManager());
+
+        assertThatThrownBy(() -> testIsolatingClassLoader.loadClass("org.assertj.core.api.Assertions"))
+            .isInstanceOf(ClassNotFoundException.class);
     }
 
     @SuppressFBWarnings("EI_EXPOSE_REP")

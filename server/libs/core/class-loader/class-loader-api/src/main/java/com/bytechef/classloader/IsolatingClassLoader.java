@@ -23,9 +23,11 @@ import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -37,6 +39,24 @@ public abstract class IsolatingClassLoader<T> extends URLClassLoader {
 
     private static final String ISOLATING_CLASS_LOADER_CACHE =
         IsolatingClassLoader.class.getName() + ".isolatingClassLoader";
+    private static final ClassLoader PLATFORM_CLASS_LOADER = getPlatformClassLoader();
+
+    /**
+     * Packages of the JDK's boot and platform modules. They are not all named {@code java.*}: {@code javax.net.ssl},
+     * {@code javax.crypto} and {@code javax.xml} are JDK packages too, and a component JAR cannot supply them.
+     */
+    private static final Set<String> PLATFORM_PACKAGES = ModuleLayer.boot()
+        .modules()
+        .stream()
+        .filter(module -> {
+            ClassLoader classLoader = module.getClassLoader();
+
+            return classLoader == null || classLoader == PLATFORM_CLASS_LOADER;
+        })
+        .flatMap(module -> module.getPackages()
+            .stream())
+        .collect(Collectors.toUnmodifiableSet());
+
     private static final String[] PACKAGE_PREFIXES = {
         "java.", "jdk.", "com.bytechef."
     };
@@ -172,6 +192,8 @@ public abstract class IsolatingClassLoader<T> extends URLClassLoader {
 
                 if (stream.anyMatch(name::startsWith)) {
                     clazz = getParent().loadClass(name);
+                } else if (isPlatformClass(name)) {
+                    clazz = PLATFORM_CLASS_LOADER.loadClass(name);
                 } else {
                     clazz = findClass(name);
                 }
@@ -183,6 +205,12 @@ public abstract class IsolatingClassLoader<T> extends URLClassLoader {
 
             return clazz;
         }
+    }
+
+    private static boolean isPlatformClass(String className) {
+        int lastDotIndex = className.lastIndexOf('.');
+
+        return lastDotIndex > 0 && PLATFORM_PACKAGES.contains(className.substring(0, lastDotIndex));
     }
 
     public interface ClassLoaderOwner {
