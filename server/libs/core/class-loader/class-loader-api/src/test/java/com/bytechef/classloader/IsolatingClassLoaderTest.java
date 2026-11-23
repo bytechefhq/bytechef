@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -128,6 +129,48 @@ class IsolatingClassLoaderTest {
     }
 
     @Test
+    void testLoadClassIgnoresJarCopyOfJdkPackage() throws IOException {
+        writeJarEntry("org/w3c/dom/BundledNode.class", "not a class");
+
+        TestIsolatingClassLoader testIsolatingClassLoader = new TestIsolatingClassLoader(
+            directoryUrl, new ConcurrentMapCacheManager());
+
+        assertThatThrownBy(() -> testIsolatingClassLoader.loadClass("org.w3c.dom.BundledNode"))
+            .isInstanceOf(ClassNotFoundException.class);
+    }
+
+    @Test
+    void testGetResourceIgnoresJarCopyOfJdkPackage() throws IOException {
+        writeJarEntry("org/w3c/dom/bundled.txt", "bundled");
+
+        TestIsolatingClassLoader testIsolatingClassLoader = new TestIsolatingClassLoader(
+            directoryUrl, new ConcurrentMapCacheManager());
+
+        assertThat(testIsolatingClassLoader.getResource("org/w3c/dom/bundled.txt")).isNull();
+    }
+
+    @Test
+    void testLoadClassTakesNonJdkJavaxPackageFromJar() throws IOException {
+        writeJarEntry("javax/annotation/Bundled.class", "not a class");
+
+        TestIsolatingClassLoader testIsolatingClassLoader = new TestIsolatingClassLoader(
+            directoryUrl, new ConcurrentMapCacheManager());
+
+        assertThatThrownBy(() -> testIsolatingClassLoader.loadClass("javax.annotation.Bundled"))
+            .isInstanceOf(ClassFormatError.class);
+    }
+
+    @Test
+    void testGetResourceTakesNonJdkJavaxPackageFromJar() throws IOException {
+        writeJarEntry("javax/annotation/bundled.txt", "bundled");
+
+        TestIsolatingClassLoader testIsolatingClassLoader = new TestIsolatingClassLoader(
+            directoryUrl, new ConcurrentMapCacheManager());
+
+        assertThat(testIsolatingClassLoader.getResource("javax/annotation/bundled.txt")).isNotNull();
+    }
+
+    @Test
     void testGetResourceKeepsApplicationResourcesIsolated() {
         TestIsolatingClassLoader testIsolatingClassLoader = new TestIsolatingClassLoader(
             directoryUrl, new ConcurrentMapCacheManager());
@@ -142,6 +185,14 @@ class IsolatingClassLoaderTest {
 
         assertThatThrownBy(() -> testIsolatingClassLoader.loadClass("org.assertj.core.api.Assertions"))
             .isInstanceOf(ClassNotFoundException.class);
+    }
+
+    private void writeJarEntry(String name, String content) throws IOException {
+        Path path = tempDirectory.resolve(name);
+
+        Files.createDirectories(Objects.requireNonNull(path.getParent()));
+
+        Files.writeString(path, content);
     }
 
     @SuppressFBWarnings("EI_EXPOSE_REP")
