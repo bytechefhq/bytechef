@@ -24,10 +24,12 @@ import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -46,6 +48,7 @@ public class OracleCallJdbcOperationIntTest {
     private static JdbcTemplate jdbcTemplate;
 
     @BeforeAll
+    @Timeout(value = 5, unit = TimeUnit.MINUTES)
     public static void beforeAll() {
         ORACLE_CONTAINER.start();
 
