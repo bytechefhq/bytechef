@@ -1063,6 +1063,23 @@ export type ConnectionSearchResult = SearchResult & {
   type: SearchAssetType;
 };
 
+export type ConnectionWorkflow = {
+  __typename?: 'ConnectionWorkflow';
+  id: Scalars['ID']['output'];
+  projectId: Scalars['ID']['output'];
+  projectName: Scalars['String']['output'];
+  projectVersion: Scalars['Int']['output'];
+  usage: ConnectionWorkflowUsage;
+  workflowId: Scalars['String']['output'];
+  workflowName: Scalars['String']['output'];
+  workflowUuid?: Maybe<Scalars['String']['output']>;
+};
+
+export enum ConnectionWorkflowUsage {
+  Deployment = 'DEPLOYMENT',
+  Editor = 'EDITOR'
+}
+
 export enum ControlType {
   ArrayBuilder = 'ARRAY_BUILDER',
   CodeEditor = 'CODE_EDITOR',
@@ -1750,6 +1767,29 @@ export type Integration = {
   permissionExpression?: Maybe<Scalars['String']['output']>;
 };
 
+export type IntegrationConnectionWorkflow = {
+  __typename?: 'IntegrationConnectionWorkflow';
+  id: Scalars['ID']['output'];
+  parentId: Scalars['ID']['output'];
+  parentName: Scalars['String']['output'];
+  parentType: IntegrationConnectionWorkflowParentType;
+  parentVersion: Scalars['Int']['output'];
+  usage: IntegrationConnectionWorkflowUsage;
+  workflowId: Scalars['String']['output'];
+  workflowName: Scalars['String']['output'];
+  workflowUuid?: Maybe<Scalars['String']['output']>;
+};
+
+export enum IntegrationConnectionWorkflowParentType {
+  ConnectedUser = 'CONNECTED_USER',
+  Integration = 'INTEGRATION'
+}
+
+export enum IntegrationConnectionWorkflowUsage {
+  Deployment = 'DEPLOYMENT',
+  Editor = 'EDITOR'
+}
+
 export type IntegrationInstanceConfigurationWorkflow = {
   __typename?: 'IntegrationInstanceConfigurationWorkflow';
   connections: Array<IntegrationInstanceConfigurationWorkflowConnection>;
@@ -2217,6 +2257,8 @@ export type Mutation = {
   deleteWorkspaceApiKey: Scalars['Boolean']['output'];
   deleteWorkspaceMcpServer?: Maybe<Scalars['Boolean']['output']>;
   disconnectConnection: Scalars['Boolean']['output'];
+  /** Remove a connection from one workflow that uses it. The id is the one returned by connectionWorkflows. */
+  disconnectConnectionFromWorkflow: Scalars['Boolean']['output'];
   dropDataTable: Scalars['Boolean']['output'];
   duplicateAutomationProject: Scalars['ID']['output'];
   duplicateAutomationProjectWorkflow: Scalars['ID']['output'];
@@ -2826,6 +2868,13 @@ export type MutationDeleteWorkspaceMcpServerArgs = {
 
 export type MutationDisconnectConnectionArgs = {
   connectionId: Scalars['ID']['input'];
+};
+
+
+export type MutationDisconnectConnectionFromWorkflowArgs = {
+  connectionId: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
+  usage: ConnectionWorkflowUsage;
 };
 
 
@@ -3919,6 +3968,8 @@ export type Query = {
   connectionComponentDefinition: ComponentDefinition;
   connectionDefinition: ConnectionDefinition;
   connectionDefinitions: Array<ConnectionDefinition>;
+  /** The workflows that use a connection, through a deployment or through the workflow editor. */
+  connectionWorkflows: Array<ConnectionWorkflow>;
   customComponent?: Maybe<CustomComponent>;
   customComponentDefinition?: Maybe<CustomComponentDefinition>;
   customComponentSource: Scalars['String']['output'];
@@ -3957,6 +4008,7 @@ export type Query = {
   identityProvider?: Maybe<IdentityProviderType>;
   identityProviders: Array<Maybe<IdentityProviderType>>;
   integrationCodeWorkflowSource: Scalars['String']['output'];
+  integrationConnectionWorkflows: Array<IntegrationConnectionWorkflow>;
   integrationVersionWorkflowChange: VersionWorkflowChange;
   integrationVersionWorkflowChanges: VersionWorkflowChanges;
   integrationWorkflows: Array<IntegrationWorkflow>;
@@ -4519,6 +4571,11 @@ export type QueryConnectionDefinitionsArgs = {
 };
 
 
+export type QueryConnectionWorkflowsArgs = {
+  connectionId: Scalars['ID']['input'];
+};
+
+
 export type QueryCustomComponentArgs = {
   id: Scalars['ID']['input'];
 };
@@ -4670,6 +4727,11 @@ export type QueryIdentityProviderArgs = {
 
 export type QueryIntegrationCodeWorkflowSourceArgs = {
   integrationId: Scalars['ID']['input'];
+};
+
+
+export type QueryIntegrationConnectionWorkflowsArgs = {
+  connectionId: Scalars['ID']['input'];
 };
 
 
