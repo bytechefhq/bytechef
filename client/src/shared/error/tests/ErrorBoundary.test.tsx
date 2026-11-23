@@ -50,7 +50,7 @@ describe('ErrorBoundary', () => {
         });
     });
 
-    it('does not report the caught error when analytics is disabled', () => {
+    it('does not report the caught error when analytics is disabled', async () => {
         enableAnalytics(false);
 
         render(
@@ -60,6 +60,9 @@ describe('ErrorBoundary', () => {
         );
 
         expect(screen.getByText('Something went wrong')).toBeInTheDocument();
+
+        await vi.dynamicImportSettled();
+
         expect(mockedPosthog.captureException).not.toHaveBeenCalled();
     });
 });

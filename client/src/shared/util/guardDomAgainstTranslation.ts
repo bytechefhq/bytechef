@@ -1,4 +1,10 @@
+const guardedMethods = new WeakSet<object>();
+
 export const guardDomAgainstTranslation = (nodePrototype: Node = Node.prototype) => {
+    if (guardedMethods.has(nodePrototype.removeChild) && guardedMethods.has(nodePrototype.insertBefore)) {
+        return;
+    }
+
     const originalRemoveChild = nodePrototype.removeChild;
     const originalInsertBefore = nodePrototype.insertBefore;
 
@@ -14,11 +20,16 @@ export const guardDomAgainstTranslation = (nodePrototype: Node = Node.prototype)
 
     nodePrototype.insertBefore = function <T extends Node>(this: Node, newNode: T, referenceNode: Node | null): T {
         if (referenceNode && referenceNode.parentNode !== this) {
-            console.warn('Skipped insertBefore for a node that was moved outside React, for example by a translator');
+            console.warn(
+                'Appended a node whose insertBefore reference was moved outside React, for example by a translator'
+            );
 
-            return newNode;
+            return originalInsertBefore.call(this, newNode, null) as T;
         }
 
         return originalInsertBefore.call(this, newNode, referenceNode) as T;
     };
+
+    guardedMethods.add(nodePrototype.removeChild);
+    guardedMethods.add(nodePrototype.insertBefore);
 };

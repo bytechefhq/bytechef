@@ -1,4 +1,16 @@
+import {captureRenderError} from '@/shared/error/captureRenderError';
+import {useEffect} from 'react';
+import {useRouteError} from 'react-router-dom';
+
 export default function ErrorPage() {
+    const routeError = useRouteError();
+
+    useEffect(() => {
+        if (routeError instanceof Error) {
+            void captureRenderError(routeError, {source: 'route_error_page'});
+        }
+    }, [routeError]);
+
     return (
         <div className="flex size-full flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-md text-center">
