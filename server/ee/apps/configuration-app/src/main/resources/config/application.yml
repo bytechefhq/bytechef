@@ -10,6 +10,10 @@ spring:
     import: optional:configserver:http://localhost:6111
   profiles:
     active: #spring.profiles.active#
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
   mail:
     host: http://127.0.0.1
     port: 8080
