@@ -1,11 +1,3 @@
-/**
- * Stops browser translators (Edge, Chrome) from crashing React. A translator moves or wraps the text nodes that React
- * rendered, so React later calls removeChild or insertBefore with a node that is no longer a child of the parent, and
- * the DOM throws "Failed to execute 'removeChild' on 'Node'". The route error boundary then replaces the whole page.
- * With this guard, React skips the call for a node that something outside React moved.
- *
- * See https://github.com/facebook/react/issues/11538.
- */
 export const guardDomAgainstTranslation = (nodePrototype: Node = Node.prototype) => {
     const originalRemoveChild = nodePrototype.removeChild;
     const originalInsertBefore = nodePrototype.insertBefore;
