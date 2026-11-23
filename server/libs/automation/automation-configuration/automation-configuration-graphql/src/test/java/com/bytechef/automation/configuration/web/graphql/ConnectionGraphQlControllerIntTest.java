@@ -21,10 +21,13 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.dto.ConnectionWorkflowDTO;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlTestConfiguration;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,6 +102,78 @@ public class ConnectionGraphQlControllerIntTest {
             .isEqualTo(true);
 
         verify(workspaceConnectionFacade).disconnectConnection(connectionId);
+    }
+
+    @Test
+    void testDisconnectConnectionFromWorkflow() {
+        this.graphQlTester
+            .document("""
+                mutation {
+                    disconnectConnectionFromWorkflow(connectionId: 321, id: 654, usage: EDITOR)
+                }
+                """)
+            .execute()
+            .path("disconnectConnectionFromWorkflow")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(workspaceConnectionFacade).disconnectConnection(321L, ConnectionWorkflowDTO.Usage.EDITOR, 654L);
+    }
+
+    @Test
+    void testConnectionWorkflows() {
+        when(workspaceConnectionFacade.getConnectionWorkflows(321L))
+            .thenReturn(
+                List.of(
+                    new ConnectionWorkflowDTO(
+                        7L, 11L, "CRM Sync", 3, ConnectionWorkflowDTO.Usage.DEPLOYMENT, "workflow-1", "Push contacts",
+                        "uuid-1"),
+                    new ConnectionWorkflowDTO(
+                        8L, 11L, "CRM Sync", 4, ConnectionWorkflowDTO.Usage.EDITOR, "workflow-2", "Pull deals",
+                        null)));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    connectionWorkflows(connectionId: 321) {
+                        id
+                        projectId
+                        projectName
+                        projectVersion
+                        usage
+                        workflowId
+                        workflowName
+                        workflowUuid
+                    }
+                }
+                """)
+            .execute()
+            .path("connectionWorkflows[0].id")
+            .entity(String.class)
+            .isEqualTo("7")
+            .path("connectionWorkflows[0].projectId")
+            .entity(String.class)
+            .isEqualTo("11")
+            .path("connectionWorkflows[0].projectName")
+            .entity(String.class)
+            .isEqualTo("CRM Sync")
+            .path("connectionWorkflows[0].projectVersion")
+            .entity(Integer.class)
+            .isEqualTo(3)
+            .path("connectionWorkflows[0].usage")
+            .entity(String.class)
+            .isEqualTo("DEPLOYMENT")
+            .path("connectionWorkflows[0].workflowName")
+            .entity(String.class)
+            .isEqualTo("Push contacts")
+            .path("connectionWorkflows[0].workflowUuid")
+            .entity(String.class)
+            .isEqualTo("uuid-1")
+            .path("connectionWorkflows[1].usage")
+            .entity(String.class)
+            .isEqualTo("EDITOR")
+            .path("connectionWorkflows[1].workflowUuid")
+            .valueIsNull();
     }
 
     @Test

@@ -57,6 +57,16 @@ public class RemoteProjectDeploymentWorkflowServiceClient implements ProjectDepl
     }
 
     @Override
+    public void deleteProjectDeploymentWorkflowConnection(long projectDeploymentWorkflowId, long connectionId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ProjectDeploymentWorkflow> getConnectionProjectDeploymentWorkflows(long connectionId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void disableProjectDeploymentWorkflowByConnectionId(long connectionId) {
         throw new UnsupportedOperationException();
     }

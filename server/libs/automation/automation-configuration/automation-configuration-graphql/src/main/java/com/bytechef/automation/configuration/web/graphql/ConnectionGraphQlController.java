@@ -17,11 +17,14 @@
 package com.bytechef.automation.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.automation.configuration.dto.ConnectionWorkflowDTO;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Map;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -43,6 +46,20 @@ public class ConnectionGraphQlController {
         workspaceConnectionFacade.disconnectConnection(connectionId);
 
         return true;
+    }
+
+    @MutationMapping(name = "disconnectConnectionFromWorkflow")
+    public Boolean disconnectConnectionFromWorkflow(
+        @Argument long connectionId, @Argument long id, @Argument ConnectionWorkflowDTO.Usage usage) {
+
+        workspaceConnectionFacade.disconnectConnection(connectionId, usage, id);
+
+        return true;
+    }
+
+    @QueryMapping(name = "connectionWorkflows")
+    public List<ConnectionWorkflowDTO> connectionWorkflows(@Argument long connectionId) {
+        return workspaceConnectionFacade.getConnectionWorkflows(connectionId);
     }
 
     @MutationMapping(name = "updateConnectionCredentials")

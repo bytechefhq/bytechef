@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -33,8 +34,10 @@ import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.domain.WorkspaceConnection;
+import com.bytechef.automation.configuration.dto.ConnectionWorkflowDTO;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
@@ -62,6 +65,8 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import org.apache.commons.lang3.Validate;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -300,6 +305,146 @@ public class WorkspaceConnectionFacadeIntTest {
     }
 
     @Test
+    public void testGetConnectionWorkflowsListsDeployedAndEditorWorkflows() {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        ProjectDeploymentDTO projectDeploymentDTO =
+            projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), projectDTO);
+
+        long connectionId = 4242L;
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = saveProjectDeploymentWorkflowConnections(
+            projectDeploymentDTO.id(), List.of(connectionId));
+
+        WorkflowTestConfiguration editorTestConfiguration = saveWorkflowTestConfiguration(
+            projectDeploymentWorkflow.getWorkflowId(), connectionId);
+
+        saveWorkflowTestConfiguration("workflow-outside-any-project", connectionId);
+
+        when(connectionService.getConnection(connectionId)).thenReturn(createConnection(ConnectionStatus.ACTIVE, 3));
+
+        Optional<ProjectWorkflow> projectWorkflowOptional =
+            projectWorkflowRepository.findByWorkflowId(projectDeploymentWorkflow.getWorkflowId());
+
+        ProjectWorkflow projectWorkflow = projectWorkflowOptional.orElseThrow();
+
+        List<ConnectionWorkflowDTO> connectionWorkflowDTOs =
+            workspaceConnectionFacade.getConnectionWorkflows(connectionId);
+
+        assertThat(connectionWorkflowDTOs)
+            .extracting(
+                ConnectionWorkflowDTO::id, ConnectionWorkflowDTO::projectId, ConnectionWorkflowDTO::projectName,
+                ConnectionWorkflowDTO::projectVersion, ConnectionWorkflowDTO::usage, ConnectionWorkflowDTO::workflowId,
+                ConnectionWorkflowDTO::workflowName, ConnectionWorkflowDTO::workflowUuid)
+            .containsExactly(
+                tuple(
+                    projectDeploymentWorkflow.getId(), projectDTO.id(), projectDTO.name(),
+                    projectDeploymentDTO.projectVersion(), ConnectionWorkflowDTO.Usage.DEPLOYMENT,
+                    projectDeploymentWorkflow.getWorkflowId(), "Test Workflow", projectWorkflow.getUuidAsString()),
+                tuple(
+                    editorTestConfiguration.getId(), projectDTO.id(), projectDTO.name(),
+                    projectDeploymentDTO.projectVersion(), ConnectionWorkflowDTO.Usage.EDITOR,
+                    projectDeploymentWorkflow.getWorkflowId(), "Test Workflow", projectWorkflow.getUuidAsString()));
+    }
+
+    @Test
+    public void testDisconnectConnectionFromOneDeploymentWorkflowKeepsEveryOtherUse() {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        ProjectDeploymentDTO projectDeploymentDTO =
+            projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), projectDTO);
+
+        long connectionId = 5151L;
+        long otherConnectionId = 5252L;
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = saveProjectDeploymentWorkflowConnections(
+            projectDeploymentDTO.id(), List.of(connectionId, otherConnectionId));
+
+        WorkflowTestConfiguration workflowTestConfiguration = saveWorkflowTestConfiguration(
+            projectDeploymentWorkflow.getWorkflowId(), connectionId);
+
+        when(connectionService.getConnection(connectionId)).thenReturn(createConnection(ConnectionStatus.ACTIVE, 3));
+
+        workspaceConnectionFacade.disconnectConnection(
+            connectionId, ConnectionWorkflowDTO.Usage.DEPLOYMENT,
+            Validate.notNull(projectDeploymentWorkflow.getId(), "id"));
+
+        ProjectDeploymentWorkflow disconnectedProjectDeploymentWorkflow = findProjectDeploymentWorkflow(
+            Validate.notNull(projectDeploymentWorkflow.getId(), "id"));
+
+        assertThat(disconnectedProjectDeploymentWorkflow.getConnections())
+            .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
+            .containsExactly(otherConnectionId);
+
+        WorkflowTestConfiguration untouchedWorkflowTestConfiguration = findWorkflowTestConfiguration(
+            Validate.notNull(workflowTestConfiguration.getId(), "id"));
+
+        assertThat(untouchedWorkflowTestConfiguration.getConnections())
+            .extracting(WorkflowTestConfigurationConnection::getConnectionId)
+            .containsExactly(connectionId);
+    }
+
+    @Test
+    public void testDisconnectConnectionFromOneEditorWorkflowKeepsTheOtherEditorWorkflows() {
+        long connectionId = 6161L;
+
+        WorkflowTestConfiguration firstWorkflowTestConfiguration = saveWorkflowTestConfiguration(
+            "first-workflow-id", connectionId);
+        WorkflowTestConfiguration secondWorkflowTestConfiguration = saveWorkflowTestConfiguration(
+            "second-workflow-id", connectionId);
+
+        when(connectionService.getConnection(connectionId)).thenReturn(createConnection(ConnectionStatus.ACTIVE, 3));
+
+        workspaceConnectionFacade.disconnectConnection(
+            connectionId, ConnectionWorkflowDTO.Usage.EDITOR,
+            Validate.notNull(firstWorkflowTestConfiguration.getId(), "id"));
+
+        WorkflowTestConfiguration disconnectedWorkflowTestConfiguration = findWorkflowTestConfiguration(
+            Validate.notNull(firstWorkflowTestConfiguration.getId(), "id"));
+        WorkflowTestConfiguration untouchedWorkflowTestConfiguration = findWorkflowTestConfiguration(
+            Validate.notNull(secondWorkflowTestConfiguration.getId(), "id"));
+
+        assertThat(disconnectedWorkflowTestConfiguration.getConnections()).isEmpty();
+        assertThat(untouchedWorkflowTestConfiguration.getConnections())
+            .extracting(WorkflowTestConfigurationConnection::getConnectionId)
+            .containsExactly(connectionId);
+    }
+
+    @Test
+    public void testDisconnectConnectionRejectsAWorkflowThatDoesNotUseTheConnection() {
+        long connectionId = 6262L;
+
+        WorkflowTestConfiguration workflowTestConfiguration = saveWorkflowTestConfiguration(
+            "unrelated-workflow-id", 6363L);
+
+        when(connectionService.getConnection(connectionId)).thenReturn(createConnection(ConnectionStatus.ACTIVE, 3));
+
+        long workflowTestConfigurationId = Validate.notNull(workflowTestConfiguration.getId(), "id");
+
+        assertThatThrownBy(
+            () -> workspaceConnectionFacade.disconnectConnection(
+                connectionId, ConnectionWorkflowDTO.Usage.EDITOR, workflowTestConfigurationId))
+                    .isInstanceOf(NoSuchElementException.class);
+
+        WorkflowTestConfiguration untouchedWorkflowTestConfiguration =
+            findWorkflowTestConfiguration(workflowTestConfigurationId);
+
+        assertThat(untouchedWorkflowTestConfiguration.getConnections())
+            .extracting(WorkflowTestConfigurationConnection::getConnectionId)
+            .containsExactly(6363L);
+    }
+
+    @Test
+    public void testGetConnectionWorkflowsRejectsEmbeddedConnection() {
+        long connectionId = 7171L;
+
+        when(connectionService.getConnection(connectionId)).thenReturn(createEmbeddedConnection());
+
+        assertThatThrownBy(() -> workspaceConnectionFacade.getConnectionWorkflows(connectionId))
+            .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
     public void testDisconnectConnectionRejectsUnknownConnection() {
         long unknownConnectionId = 11111L;
 
@@ -485,6 +630,36 @@ public class WorkspaceConnectionFacadeIntTest {
         verify(connectionFacade, never()).update(anyLong(), anyList());
     }
 
+    private ProjectDeploymentWorkflow saveProjectDeploymentWorkflowConnections(
+        long projectDeploymentId, List<Long> connectionIds) {
+
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows =
+            projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(projectDeploymentId);
+
+        assertThat(projectDeploymentWorkflows).hasSize(1);
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflows.getFirst();
+
+        projectDeploymentWorkflow.setConnections(
+            connectionIds.stream()
+                .map(connectionId -> new ProjectDeploymentWorkflowConnection(
+                    connectionId, "connectionKey" + connectionId, "nodeName"))
+                .toList());
+
+        return projectDeploymentWorkflowRepository.save(projectDeploymentWorkflow);
+    }
+
+    private WorkflowTestConfiguration saveWorkflowTestConfiguration(String workflowId, long connectionId) {
+        WorkflowTestConfiguration workflowTestConfiguration = new WorkflowTestConfiguration();
+
+        workflowTestConfiguration.setEnvironmentId(1L);
+        workflowTestConfiguration.setWorkflowId(workflowId);
+        workflowTestConfiguration.setConnections(
+            List.of(new WorkflowTestConfigurationConnection(connectionId, "connectionKey", "nodeName")));
+
+        return workflowTestConfigurationRepository.save(workflowTestConfiguration);
+    }
+
     private static Connection createConnection(ConnectionStatus status, int version) {
         Connection connection = new Connection();
 
@@ -501,6 +676,20 @@ public class WorkspaceConnectionFacadeIntTest {
         connection.setType(PlatformType.EMBEDDED);
 
         return connection;
+    }
+
+    private ProjectDeploymentWorkflow findProjectDeploymentWorkflow(long id) {
+        Optional<ProjectDeploymentWorkflow> projectDeploymentWorkflowOptional =
+            projectDeploymentWorkflowRepository.findById(id);
+
+        return projectDeploymentWorkflowOptional.orElseThrow();
+    }
+
+    private WorkflowTestConfiguration findWorkflowTestConfiguration(long id) {
+        Optional<WorkflowTestConfiguration> workflowTestConfigurationOptional =
+            workflowTestConfigurationRepository.findById(id);
+
+        return workflowTestConfigurationOptional.orElseThrow();
     }
 
     @Nested
@@ -525,6 +714,24 @@ public class WorkspaceConnectionFacadeIntTest {
         @Test
         void testDisconnectIsAdminOnly() {
             assertRequiresAdminAuthority(() -> workspaceConnectionFacade.disconnectConnection(1L));
+        }
+
+        @Test
+        void testDisconnectFromOneWorkflowIsAdminOnly() {
+            assertRequiresAdminAuthority(
+                () -> workspaceConnectionFacade.disconnectConnection(1L, ConnectionWorkflowDTO.Usage.EDITOR, 1L));
+        }
+
+        @Test
+        void testGetConnectionWorkflowsDeniesAUserWithoutWorkflowViewOnTheConnectionWorkspace() {
+            assertDenied(() -> workspaceConnectionFacade.getConnectionWorkflows(1L));
+        }
+
+        @Test
+        void testGetConnectionWorkflowsAdmitsAUserWithWorkflowViewOnTheConnectionWorkspace() {
+            when(permissionService.hasResourceScope(1L, "Connection", "WORKFLOW_VIEW")).thenReturn(true);
+
+            assertNotDenied(() -> workspaceConnectionFacade.getConnectionWorkflows(1L));
         }
 
         @Test

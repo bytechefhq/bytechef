@@ -16,13 +16,24 @@
 
 package com.bytechef.automation.configuration.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.audit.WorkspaceConnectionAuditEvents;
+import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.WorkspaceConnection;
+import com.bytechef.automation.configuration.dto.ConnectionWorkflowDTO;
+import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
@@ -34,9 +45,16 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,23 +69,33 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     private final ConnectionFacade connectionFacade;
     private final ConnectionLifecycleFacade connectionLifecycleFacade;
     private final ConnectionService connectionService;
+    private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+    private final ProjectService projectService;
+    private final ProjectWorkflowService projectWorkflowService;
     private final TagService tagService;
+    private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkspaceConnectionService workspaceConnectionService;
 
     @SuppressFBWarnings("EI")
     public WorkspaceConnectionFacadeImpl(
         ConnectionFacade connectionFacade, ConnectionLifecycleFacade connectionLifecycleFacade,
-        ConnectionService connectionService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
-        TagService tagService, WorkflowTestConfigurationService workflowTestConfigurationService,
+        ConnectionService connectionService, ProjectDeploymentService projectDeploymentService,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
+        ProjectWorkflowService projectWorkflowService, TagService tagService, WorkflowService workflowService,
+        WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkspaceConnectionService workspaceConnectionService) {
 
         this.connectionFacade = connectionFacade;
         this.connectionLifecycleFacade = connectionLifecycleFacade;
         this.connectionService = connectionService;
+        this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
+        this.projectService = projectService;
+        this.projectWorkflowService = projectWorkflowService;
         this.tagService = tagService;
+        this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workspaceConnectionService = workspaceConnectionService;
     }
@@ -100,6 +128,23 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
         projectDeploymentWorkflowService.deleteProjectDeploymentWorkflowConnection(connectionId);
         workflowTestConfigurationService.deleteWorkflowTestConfigurationConnection(connectionId);
+    }
+
+    @Override
+    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_DISCONNECTED, data = {
+        @AuditData(key = "connectionId", value = "#connectionId"),
+        @AuditData(key = "usage", value = "#usage"),
+        @AuditData(key = "id", value = "#id")
+    })
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public void disconnectConnection(long connectionId, ConnectionWorkflowDTO.Usage usage, long id) {
+        requireAutomationConnection(connectionId);
+
+        if (usage == ConnectionWorkflowDTO.Usage.DEPLOYMENT) {
+            projectDeploymentWorkflowService.deleteProjectDeploymentWorkflowConnection(id, connectionId);
+        } else {
+            workflowTestConfigurationService.deleteWorkflowTestConfigurationConnection(id, connectionId);
+        }
     }
 
     @Override
@@ -147,6 +192,95 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'WORKFLOW_VIEW')")
+    public List<ConnectionWorkflowDTO> getConnectionWorkflows(long connectionId) {
+        requireAutomationConnection(connectionId);
+
+        List<ConnectionWorkflowDTO> connectionWorkflowDTOs = new ArrayList<>();
+
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows =
+            projectDeploymentWorkflowService.getConnectionProjectDeploymentWorkflows(connectionId);
+        List<WorkflowTestConfiguration> workflowTestConfigurations =
+            workflowTestConfigurationService.getConnectionWorkflowTestConfigurations(connectionId);
+
+        List<String> workflowIds = new ArrayList<>(
+            CollectionUtils.map(projectDeploymentWorkflows, ProjectDeploymentWorkflow::getWorkflowId));
+
+        workflowIds.addAll(CollectionUtils.map(workflowTestConfigurations, WorkflowTestConfiguration::getWorkflowId));
+
+        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getWorkflowProjectWorkflows(workflowIds);
+
+        Map<String, ProjectWorkflow> projectWorkflowMap = projectWorkflows.stream()
+            .collect(Collectors.toMap(ProjectWorkflow::getWorkflowId, Function.identity(), (first, second) -> first));
+
+        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(
+            CollectionUtils.map(projectDeploymentWorkflows, ProjectDeploymentWorkflow::getProjectDeploymentId));
+
+        Map<Long, ProjectDeployment> projectDeploymentMap = projectDeployments.stream()
+            .collect(Collectors.toMap(ProjectDeployment::getId, Function.identity()));
+
+        List<Long> projectIds =
+            new ArrayList<>(CollectionUtils.map(projectDeployments, ProjectDeployment::getProjectId));
+
+        projectIds.addAll(CollectionUtils.map(projectWorkflows, ProjectWorkflow::getProjectId));
+
+        Map<Long, Project> projectMap = getProjectMap(projectIds);
+        Map<String, Workflow> workflowMap = getWorkflowMap(workflowIds);
+
+        for (ProjectDeploymentWorkflow projectDeploymentWorkflow : projectDeploymentWorkflows) {
+            ProjectDeployment projectDeployment =
+                projectDeploymentMap.get(projectDeploymentWorkflow.getProjectDeploymentId());
+
+            if (projectDeployment == null) {
+                continue;
+            }
+
+            Project project = projectMap.get(projectDeployment.getProjectId());
+            Workflow workflow = workflowMap.get(projectDeploymentWorkflow.getWorkflowId());
+
+            if (project == null || workflow == null) {
+                continue;
+            }
+
+            connectionWorkflowDTOs.add(
+                toConnectionWorkflowDTO(
+                    Validate.notNull(projectDeploymentWorkflow.getId(), "id"), project,
+                    projectDeployment.getProjectVersion(), ConnectionWorkflowDTO.Usage.DEPLOYMENT, workflow,
+                    getWorkflowUuid(projectWorkflowMap.get(projectDeploymentWorkflow.getWorkflowId()))));
+        }
+
+        for (WorkflowTestConfiguration workflowTestConfiguration : workflowTestConfigurations) {
+            ProjectWorkflow projectWorkflow = projectWorkflowMap.get(workflowTestConfiguration.getWorkflowId());
+
+            if (projectWorkflow == null) {
+                continue;
+            }
+
+            Project project = projectMap.get(projectWorkflow.getProjectId());
+            Workflow workflow = workflowMap.get(workflowTestConfiguration.getWorkflowId());
+
+            if (project == null || workflow == null) {
+                continue;
+            }
+
+            connectionWorkflowDTOs.add(
+                toConnectionWorkflowDTO(
+                    Validate.notNull(workflowTestConfiguration.getId(), "id"), project,
+                    projectWorkflow.getProjectVersion(), ConnectionWorkflowDTO.Usage.EDITOR, workflow,
+                    getWorkflowUuid(projectWorkflow)));
+        }
+
+        connectionWorkflowDTOs.sort(
+            Comparator.comparing(ConnectionWorkflowDTO::projectName, String.CASE_INSENSITIVE_ORDER)
+                .thenComparing(ConnectionWorkflowDTO::workflowName, String.CASE_INSENSITIVE_ORDER)
+                .thenComparing(ConnectionWorkflowDTO::projectVersion, Comparator.reverseOrder())
+                .thenComparing(ConnectionWorkflowDTO::usage));
+
+        return connectionWorkflowDTOs;
+    }
+
+    @Override
     public void update(long connectionId, String name, List<Tag> tags, int version) {
         requireAutomationConnection(connectionId);
 
@@ -178,6 +312,45 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         requireAutomationConnection(connectionId);
 
         connectionFacade.updateCredentials(connectionId, parameters, version);
+    }
+
+    private static @Nullable String getWorkflowUuid(@Nullable ProjectWorkflow projectWorkflow) {
+        if (projectWorkflow == null) {
+            return null;
+        }
+
+        return projectWorkflow.getUuidAsString();
+    }
+
+    private Map<Long, Project> getProjectMap(List<Long> projectIds) {
+        if (projectIds.isEmpty()) {
+            return Map.of();
+        }
+
+        List<Project> projects = projectService.getProjects(List.copyOf(new LinkedHashSet<>(projectIds)));
+
+        return projects.stream()
+            .collect(Collectors.toMap(Project::getId, Function.identity()));
+    }
+
+    private Map<String, Workflow> getWorkflowMap(List<String> workflowIds) {
+        if (workflowIds.isEmpty()) {
+            return Map.of();
+        }
+
+        List<Workflow> workflows = workflowService.getWorkflows(List.copyOf(new LinkedHashSet<>(workflowIds)));
+
+        return workflows.stream()
+            .collect(Collectors.toMap(Workflow::getId, Function.identity()));
+    }
+
+    private static ConnectionWorkflowDTO toConnectionWorkflowDTO(
+        long id, Project project, int projectVersion, ConnectionWorkflowDTO.Usage usage, Workflow workflow,
+        @Nullable String workflowUuid) {
+
+        return new ConnectionWorkflowDTO(
+            id, Validate.notNull(project.getId(), "projectId"), project.getName(), projectVersion, usage,
+            workflow.getId(), workflow.getLabel(), workflowUuid);
     }
 
     private void requireAutomationConnection(long connectionId) {

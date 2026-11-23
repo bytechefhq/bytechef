@@ -24,6 +24,7 @@ import com.bytechef.platform.configuration.repository.WorkflowTestConfigurationR
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -112,6 +113,35 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     }
 
     @Override
+    public void deleteWorkflowTestConfigurationConnection(long workflowTestConfigurationId, long connectionId) {
+        Optional<WorkflowTestConfiguration> workflowTestConfigurationOptional =
+            workflowTestConfigurationRepository.findById(workflowTestConfigurationId);
+
+        if (workflowTestConfigurationOptional.isEmpty()) {
+            throw new NoSuchElementException(
+                "Workflow test configuration id=%s does not exist".formatted(workflowTestConfigurationId));
+        }
+
+        WorkflowTestConfiguration workflowTestConfiguration = workflowTestConfigurationOptional.get();
+
+        List<WorkflowTestConfigurationConnection> connections = workflowTestConfiguration.getConnections();
+
+        List<WorkflowTestConfigurationConnection> filteredConnections = connections.stream()
+            .filter(connection -> !Objects.equals(connection.getConnectionId(), connectionId))
+            .toList();
+
+        if (filteredConnections.size() == connections.size()) {
+            throw new NoSuchElementException(
+                "Workflow test configuration id=%s does not use connection id=%s".formatted(
+                    workflowTestConfigurationId, connectionId));
+        }
+
+        workflowTestConfiguration.setConnections(filteredConnections);
+
+        workflowTestConfigurationRepository.save(workflowTestConfiguration);
+    }
+
+    @Override
     public void deleteWorkflowTestConfigurationConnection(
         String workflowId, String workflowNodeName, String key, long environmentId) {
 
@@ -155,6 +185,14 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
 
         return workflowTestConfigurationConnectionRepository.findByWorkflowIdAndWorkflowNodeNameAndEnvironmentId(
             workflowId, workflowNodeName, environmentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<WorkflowTestConfiguration> getConnectionWorkflowTestConfigurations(long connectionId) {
+        return workflowTestConfigurationRepository.findAllById(
+            workflowTestConfigurationConnectionRepository.findAllWorkflowTestConfigurationIdsByConnectionId(
+                connectionId));
     }
 
     @Override

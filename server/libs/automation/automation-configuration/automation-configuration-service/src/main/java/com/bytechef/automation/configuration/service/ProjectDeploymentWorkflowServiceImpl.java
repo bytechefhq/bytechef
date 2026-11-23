@@ -22,6 +22,7 @@ import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflo
 import com.bytechef.commons.util.OptionalUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -77,6 +78,27 @@ public class ProjectDeploymentWorkflowServiceImpl implements ProjectDeploymentWo
         });
     }
 
+    @Override
+    public void deleteProjectDeploymentWorkflowConnection(long projectDeploymentWorkflowId, long connectionId) {
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = getProjectDeploymentWorkflow(projectDeploymentWorkflowId);
+
+        List<ProjectDeploymentWorkflowConnection> connections = projectDeploymentWorkflow.getConnections();
+
+        List<ProjectDeploymentWorkflowConnection> filteredConnections = connections.stream()
+            .filter(connection -> !Objects.equals(connection.getConnectionId(), connectionId))
+            .toList();
+
+        if (filteredConnections.size() == connections.size()) {
+            throw new NoSuchElementException(
+                "Project deployment workflow id=%s does not use connection id=%s".formatted(
+                    projectDeploymentWorkflowId, connectionId));
+        }
+
+        projectDeploymentWorkflow.setConnections(filteredConnections);
+
+        projectDeploymentWorkflowRepository.save(projectDeploymentWorkflow);
+    }
+
     public void disableProjectDeploymentWorkflowByConnectionId(long connectionId) {
         List<ProjectDeploymentWorkflow> projectDeploymentWorkflows =
             projectDeploymentWorkflowRepository.findAllByProjectDeploymentWorkflowConnectionId(connectionId);
@@ -111,6 +133,12 @@ public class ProjectDeploymentWorkflowServiceImpl implements ProjectDeploymentWo
                 .equals(projectDeploymentWorkflowConnection.getWorkflowNodeName(), workflowNodeName) &&
                 Objects.equals(projectDeploymentWorkflowConnection.getWorkflowConnectionKey(), workflowConnectionKey))
             .findFirst();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProjectDeploymentWorkflow> getConnectionProjectDeploymentWorkflows(long connectionId) {
+        return projectDeploymentWorkflowRepository.findAllByProjectDeploymentWorkflowConnectionId(connectionId);
     }
 
     @Override
