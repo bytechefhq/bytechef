@@ -1,0 +1,3 @@
+mutation DisconnectConnectionFromWorkflow($connectionId: ID!, $id: ID!, $usage: ConnectionWorkflowUsage!) {
+    disconnectConnectionFromWorkflow(connectionId: $connectionId, id: $id, usage: $usage)
+}
