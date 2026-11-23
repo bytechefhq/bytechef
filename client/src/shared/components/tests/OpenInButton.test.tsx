@@ -32,7 +32,7 @@ describe('OpenInButton', () => {
 
         const button = screen.getByRole('button', {name: 'Open project'});
 
-        expect(button).toHaveClass('[&_svg]:size-3');
-        expect(button.querySelector('svg')).toHaveClass('size-3');
+        expect(button).toHaveClass('[&_svg]:size-2.5');
+        expect(button.querySelector('svg')).toHaveClass('size-2.5');
     });
 });

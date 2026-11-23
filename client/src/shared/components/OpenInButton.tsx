@@ -20,8 +20,8 @@ const OpenInButton = ({label, onClick}: OpenInButtonProps) => {
             <TooltipTrigger asChild>
                 <Button
                     aria-label={label}
-                    className="relative z-10 -ml-1.5 size-5 shrink-0 [&_svg]:size-3"
-                    icon={<SquareArrowOutUpRightIcon className="size-3" />}
+                    className="relative z-10 -ml-1.5 size-5 shrink-0 [&_svg]:size-2.5"
+                    icon={<SquareArrowOutUpRightIcon className="size-2.5" />}
                     onClick={handleClick}
                     size="icon"
                     variant="ghost"
