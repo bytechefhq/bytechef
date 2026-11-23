@@ -34,10 +34,6 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.testcontainers.oracle.OracleContainer;
 
 /**
- * Runs the Call Procedure action against a real Oracle database, covering the PL/SQL forms from issue 7671: a function
- * return value in JDBC escape syntax, the same value registered as FLOAT, IN OUT and OUT procedure arguments, and an
- * anonymous PL/SQL block.
- *
  * @author Igor Beslic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
