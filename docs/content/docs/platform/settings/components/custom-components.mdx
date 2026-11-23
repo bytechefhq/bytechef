@@ -654,9 +654,11 @@ What the loader requires of the jar:
   `assets/<name>.svg` and then `assets/sample.svg`. A jar with no icon at all still loads; the component just has no
   icon.
 - **Everything except the ByteChef API and the JDK inside the jar.** Classes in `com.bytechef.*` and in the JDK's own
-  packages come from the server. The JDK's packages are `java.*` and `jdk.*`, and also the JDK packages outside them,
-  such as `javax.net.ssl`, `javax.crypto`, `javax.xml`, `org.w3c.dom` and `sun.*`. Every other class is loaded only
-  from your jar, with no fallback to the server's class path. Build against the ByteChef `component-api` and
+  packages come from the server. The JDK's packages are those of its runtime modules: `java.*`, most of `jdk.*`, and
+  JDK packages outside them, such as `javax.net.ssl`, `javax.crypto`, `javax.xml`, `org.w3c.dom` and `sun.misc`. The
+  JDK's tool modules are not among them, so the server does not provide the compiler, attach or debugger APIs
+  (`com.sun.tools.javac`, `com.sun.tools.attach`, `com.sun.jdi`). Every other class is loaded only from your jar, with
+  no fallback to the server's class path. Build against the ByteChef `component-api` and
   `definition-api` without bundling them, and bundle every other runtime dependency (a fat or shaded jar). Do not put
   your own classes in a `com.bytechef` package or in a JDK package. A jar's copy of a JDK package, such as an
   `xml-apis` jar's `org.w3c.dom`, is ignored in favor of the JDK's. `javax.*` packages the JDK does not have, such as
