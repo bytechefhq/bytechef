@@ -994,7 +994,8 @@ nothing else from the platform. A code integration implements `IntegrationHandle
 `sdks/backend/java/embedded/integration-api` instead.
 
 Each loaded jar gets its own isolating class loader, so two code workflows can depend on different versions of the
-same library without colliding.
+same library without colliding. Only `com.bytechef.*` and the JDK's own packages (`java.*`, `jdk.*`, and JDK packages
+such as `javax.net.ssl` and `org.w3c.dom`) come from the server; bundle every other dependency in the jar.
 
 ---
 
