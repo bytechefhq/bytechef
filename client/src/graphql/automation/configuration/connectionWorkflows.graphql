@@ -1,0 +1,12 @@
+query ConnectionWorkflows($connectionId: ID!) {
+    connectionWorkflows(connectionId: $connectionId) {
+        id
+        projectId
+        projectName
+        projectVersion
+        usage
+        workflowId
+        workflowName
+        workflowUuid
+    }
+}

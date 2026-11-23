@@ -1,0 +1,13 @@
+query IntegrationConnectionWorkflows($connectionId: ID!) {
+    integrationConnectionWorkflows(connectionId: $connectionId) {
+        id
+        parentId
+        parentName
+        parentType
+        parentVersion
+        usage
+        workflowId
+        workflowName
+        workflowUuid
+    }
+}
