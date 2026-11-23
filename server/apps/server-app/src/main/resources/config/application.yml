@@ -300,6 +300,10 @@ spring:
     password: ${bytechef.rabbitmq.password}
     port: ${bytechef.rabbitmq.port}
     username: ${bytechef.rabbitmq.username}
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
   shell:
     interactive:
       enabled: false
