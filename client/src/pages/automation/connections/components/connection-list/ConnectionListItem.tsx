@@ -1,10 +1,17 @@
 import AlertDialog from '@/components/AlertDialog';
 import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
+import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import TagList from '@/shared/components/TagList';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionListItemLayout from '@/shared/components/connection/ConnectionListItemLayout';
+import ConnectionWorkflowList, {type ConnectionWorkflowI} from '@/shared/components/connection/ConnectionWorkflowList';
 import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {Connection, Tag} from '@/shared/middleware/automation/configuration';
+import {
+    ConnectionWorkflowUsage,
+    useConnectionWorkflowsQuery,
+    useDisconnectConnectionFromWorkflowMutation,
+} from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useUpdateConnectionTagsMutation} from '@/shared/mutations/automation/connectionTags.mutations';
 import {
@@ -21,6 +28,8 @@ import {Link2OffIcon, Trash2Icon} from 'lucide-react';
 import {memo, useMemo, useState} from 'react';
 import {toast} from 'sonner';
 
+const CONNECTION_WORKFLOWS_QUERY_KEY = ['ConnectionWorkflows'];
+
 interface ConnectionListItemProps {
     componentDefinitions: ComponentDefinitionBasic[];
     connection: Connection;
@@ -31,11 +40,19 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showDisconnectDialog, setShowDisconnectDialog] = useState(false);
+    const [connectionWorkflowToDisconnect, setConnectionWorkflowToDisconnect] = useState<ConnectionWorkflowI>();
+    const [workflowsOpen, setWorkflowsOpen] = useState(false);
 
     const currentUserLogin = useAuthenticationStore((state) => state.account?.login);
 
     const isTenantAdmin = useIsTenantAdmin();
     const queryClient = useQueryClient();
+    const {openProjectWorkflow} = useOpenInProject();
+
+    const {data: connectionWorkflowsData, isLoading: connectionWorkflowsLoading} = useConnectionWorkflowsQuery(
+        {connectionId: String(connection.id)},
+        {enabled: workflowsOpen && connection.id !== undefined}
+    );
 
     const deleteConnectionMutation = useDeleteConnectionMutation({
         onSuccess: () => {
@@ -69,10 +86,31 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
             void queryClient.invalidateQueries({
                 queryKey: ConnectionKeys.connectionTags,
             });
+            void queryClient.invalidateQueries({
+                queryKey: CONNECTION_WORKFLOWS_QUERY_KEY,
+            });
 
             setShowDisconnectDialog(false);
 
             toast(`"${connection.name}" was successfully disconnected from all workflows.`);
+        },
+    });
+
+    const disconnectConnectionFromWorkflowMutation = useDisconnectConnectionFromWorkflowMutation({
+        onSettled: () => {
+            setConnectionWorkflowToDisconnect(undefined);
+        },
+        onSuccess: () => {
+            void queryClient.invalidateQueries({
+                queryKey: ConnectionKeys.connections,
+            });
+            void queryClient.invalidateQueries({
+                queryKey: CONNECTION_WORKFLOWS_QUERY_KEY,
+            });
+
+            toast(
+                `"${connection.name}" was disconnected from the "${connectionWorkflowToDisconnect?.workflowName}" workflow.`
+            );
         },
     });
 
@@ -101,6 +139,26 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
         );
     }, [componentDefinitions, connection.componentName]);
 
+    const connectionWorkflows = useMemo<ConnectionWorkflowI[] | undefined>(
+        () =>
+            connectionWorkflowsData?.connectionWorkflows.map((connectionWorkflow) => ({
+                id: connectionWorkflow.id,
+                onOpenClick: connectionWorkflow.workflowUuid
+                    ? () =>
+                          void openProjectWorkflow(
+                              Number(connectionWorkflow.projectId),
+                              connectionWorkflow.workflowUuid ?? undefined
+                          )
+                    : undefined,
+                openLabel: 'Open in project',
+                parentName: connectionWorkflow.projectName,
+                usage: connectionWorkflow.usage,
+                version: connectionWorkflow.projectVersion,
+                workflowName: connectionWorkflow.workflowName,
+            })),
+        [connectionWorkflowsData, openProjectWorkflow]
+    );
+
     const canReplaceCredentials =
         isTenantAdmin || (!!connection.createdBy && connection.createdBy === currentUserLogin);
 
@@ -116,11 +174,32 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
         }
     };
 
+    const handleDisconnectFromWorkflowClick = () => {
+        if (connection.id && connectionWorkflowToDisconnect) {
+            disconnectConnectionFromWorkflowMutation.mutate({
+                connectionId: String(connection.id),
+                id: connectionWorkflowToDisconnect.id,
+                usage:
+                    connectionWorkflowToDisconnect.usage === 'DEPLOYMENT'
+                        ? ConnectionWorkflowUsage.Deployment
+                        : ConnectionWorkflowUsage.Editor,
+            });
+        }
+    };
+
     return (
         <ConnectionListItemLayout
             active={connection.active}
             createdDate={connection.createdDate}
             credentialStatus={connection.credentialStatus}
+            expandLabel="Workflows"
+            expandableContent={
+                <ConnectionWorkflowList
+                    connectionWorkflows={connectionWorkflows}
+                    isLoading={connectionWorkflowsLoading}
+                    onDisconnectClick={isTenantAdmin ? setConnectionWorkflowToDisconnect : undefined}
+                />
+            }
             icon={componentDefinition?.icon}
             id={connection.id}
             menuItems={
@@ -152,6 +231,8 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
             }
             name={connection.name}
             onEditClick={() => setShowEditDialog(true)}
+            onOpenChange={setWorkflowsOpen}
+            open={workflowsOpen}
             tagList={
                 connection.tags && (
                     <TagList
@@ -186,6 +267,21 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                 onConfirm={handleDisconnectFromAllClick}
                 open={showDisconnectDialog}
                 title={`Disconnect ${connection.name} from all workflows?`}
+            />
+
+            <AlertDialog
+                confirmIcon={<Link2OffIcon />}
+                confirmLabel="Disconnect"
+                description={
+                    connectionWorkflowToDisconnect?.usage === 'DEPLOYMENT'
+                        ? 'The deployed workflow keeps running without this connection, so its steps that need it will fail until you pick another one.'
+                        : 'The workflow editor will no longer use this connection when testing the workflow.'
+                }
+                isPending={disconnectConnectionFromWorkflowMutation.isPending}
+                onCancel={() => setConnectionWorkflowToDisconnect(undefined)}
+                onConfirm={handleDisconnectFromWorkflowClick}
+                open={!!connectionWorkflowToDisconnect}
+                title={`Disconnect ${connection.name} from ${connectionWorkflowToDisconnect?.workflowName}?`}
             />
 
             {showEditDialog && componentDefinitions && (

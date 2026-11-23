@@ -7,6 +7,43 @@ import ConnectionListItem from '../ConnectionListItem';
 
 const hoisted = vi.hoisted(() => ({
     deleteConnectionMutate: vi.fn(),
+    integrationConnectionWorkflows: [
+        {
+            id: '31',
+            parentId: '5',
+            parentName: 'HubSpot Sync',
+            parentType: 'INTEGRATION',
+            parentVersion: 3,
+            usage: 'DEPLOYMENT',
+            workflowId: 'workflow-3',
+            workflowName: 'Push contacts',
+            workflowUuid: 'uuid-3',
+        },
+        {
+            id: '32',
+            parentId: '1050',
+            parentName: 'Jane Doe',
+            parentType: 'CONNECTED_USER',
+            parentVersion: 4,
+            usage: 'EDITOR',
+            workflowId: 'workflow-4',
+            workflowName: 'Route invoice emails',
+            workflowUuid: 'uuid-4',
+        },
+    ],
+    openIntegrationWorkflow: vi.fn(),
+}));
+
+vi.mock('@/shared/middleware/graphql', () => ({
+    IntegrationConnectionWorkflowParentType: {ConnectedUser: 'CONNECTED_USER', Integration: 'INTEGRATION'},
+    useIntegrationConnectionWorkflowsQuery: (variables: unknown, options: {enabled: boolean}) => ({
+        data: options.enabled ? {integrationConnectionWorkflows: hoisted.integrationConnectionWorkflows} : undefined,
+        isLoading: false,
+    }),
+}));
+
+vi.mock('@/ee/pages/embedded/shared/useOpenInEmbeddedEditor', () => ({
+    default: () => ({openIntegrationWorkflow: hoisted.openIntegrationWorkflow}),
 }));
 
 vi.mock('@/components/LazyLoadSVG/LazyLoadSVG', () => ({
@@ -71,8 +108,7 @@ const renderConnectionListItem = () =>
     );
 
 const openMenu = async () => {
-    // The ellipsis trigger has no accessible name and the item renders no other button (no tags, dialogs closed)
-    await userEvent.click(screen.getByRole('button'));
+    await userEvent.click(screen.getByRole('button', {name: ''}));
 };
 
 beforeEach(() => {
@@ -133,5 +169,31 @@ describe('ConnectionListItem', () => {
         await userEvent.click(screen.getByRole('menuitem', {name: 'Edit'}));
 
         expect(screen.getByTestId('connection-dialog')).toHaveAttribute('data-has-credentials-mutation', 'true');
+    });
+
+    it('lists the integration and connected user workflows that use the connection, without a menu', async () => {
+        renderConnectionListItem();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Workflows'}));
+
+        const rows = within(screen.getByTestId('connection-workflows-list')).getAllByRole('listitem');
+
+        expect(rows).toHaveLength(2);
+        expect(rows[0]).toHaveTextContent('Push contacts');
+        expect(rows[0]).toHaveTextContent('HubSpot Sync');
+        expect(within(rows[0]).queryByRole('img', {name: 'Connected user'})).not.toBeInTheDocument();
+        expect(rows[0]).toHaveTextContent('V3');
+        expect(rows[0]).toHaveTextContent('Deployed');
+        expect(rows[1]).toHaveTextContent('Route invoice emails');
+        expect(rows[1]).toHaveTextContent('Jane Doe');
+        expect(within(rows[1]).getByRole('img', {name: 'Connected user'})).toBeInTheDocument();
+        expect(within(rows[1]).queryByRole('button', {name: 'Open in integration'})).not.toBeInTheDocument();
+
+        await userEvent.click(within(rows[0]).getByRole('button', {name: 'Open in integration'}));
+
+        expect(hoisted.openIntegrationWorkflow).toHaveBeenCalledWith(5, 'uuid-3');
+        expect(rows[1]).not.toHaveTextContent('V4');
+        expect(rows[1]).toHaveTextContent('Editor');
+        expect(screen.queryByRole('button', {name: 'Workflow actions'})).not.toBeInTheDocument();
     });
 });

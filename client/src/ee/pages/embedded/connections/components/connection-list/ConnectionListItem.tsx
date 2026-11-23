@@ -2,6 +2,7 @@ import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import useOpenInEmbeddedEditor from '@/ee/pages/embedded/shared/useOpenInEmbeddedEditor';
 import {Connection, Tag} from '@/ee/shared/middleware/embedded/configuration';
 import {useUpdateConnectionTagsMutation} from '@/ee/shared/mutations/embedded/connectionTags.mutations';
 import {
@@ -13,6 +14,11 @@ import {ConnectionKeys, useGetConnectionTagsQuery} from '@/ee/shared/queries/emb
 import TagList from '@/shared/components/TagList';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionListItemLayout from '@/shared/components/connection/ConnectionListItemLayout';
+import ConnectionWorkflowList, {type ConnectionWorkflowI} from '@/shared/components/connection/ConnectionWorkflowList';
+import {
+    IntegrationConnectionWorkflowParentType,
+    useIntegrationConnectionWorkflowsQuery,
+} from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {
     ComponentDefinitionKeys,
@@ -20,7 +26,7 @@ import {
 } from '@/shared/queries/platform/componentDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {Trash2Icon} from 'lucide-react';
-import {ReactNode, useState} from 'react';
+import {ReactNode, useMemo, useState} from 'react';
 
 interface ConnectionListItemProps {
     badges?: ReactNode;
@@ -32,13 +38,21 @@ interface ConnectionListItemProps {
 const ConnectionListItem = ({badges, componentDefinitions, connection, remainingTags}: ConnectionListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [workflowsOpen, setWorkflowsOpen] = useState(false);
 
     const {data: componentDefinition} = useGetConnectionComponentDefinitionQuery({
         componentName: connection.componentName,
         connectionVersion: connection.connectionVersion,
     });
 
+    const {data: connectionWorkflowsData, isLoading: connectionWorkflowsLoading} =
+        useIntegrationConnectionWorkflowsQuery(
+            {connectionId: String(connection.id)},
+            {enabled: workflowsOpen && connection.id !== undefined}
+        );
+
     const queryClient = useQueryClient();
+    const {openIntegrationWorkflow} = useOpenInEmbeddedEditor();
 
     const deleteConnectionMutation = useDeleteConnectionMutation({
         onSuccess: () => {
@@ -64,6 +78,31 @@ const ConnectionListItem = ({badges, componentDefinitions, connection, remaining
             });
         },
     });
+
+    const connectionWorkflows = useMemo<ConnectionWorkflowI[] | undefined>(
+        () =>
+            connectionWorkflowsData?.integrationConnectionWorkflows.map((connectionWorkflow) => {
+                const parentConnectedUser =
+                    connectionWorkflow.parentType === IntegrationConnectionWorkflowParentType.ConnectedUser;
+
+                const workflowUuid = connectionWorkflow.workflowUuid;
+
+                return {
+                    id: connectionWorkflow.id,
+                    onOpenClick:
+                        !parentConnectedUser && workflowUuid
+                            ? () => void openIntegrationWorkflow(Number(connectionWorkflow.parentId), workflowUuid)
+                            : undefined,
+                    openLabel: 'Open in integration',
+                    parentConnectedUser,
+                    parentName: connectionWorkflow.parentName,
+                    usage: connectionWorkflow.usage,
+                    version: parentConnectedUser ? undefined : connectionWorkflow.parentVersion,
+                    workflowName: connectionWorkflow.workflowName,
+                };
+            }),
+        [connectionWorkflowsData, openIntegrationWorkflow]
+    );
 
     const handleAlertDeleteDialogClick = () => {
         if (connection.id) {
@@ -101,6 +140,13 @@ const ConnectionListItem = ({badges, componentDefinitions, connection, remaining
             }
             createdDate={connection.createdDate}
             credentialStatus={connection.credentialStatus}
+            expandLabel="Workflows"
+            expandableContent={
+                <ConnectionWorkflowList
+                    connectionWorkflows={connectionWorkflows}
+                    isLoading={connectionWorkflowsLoading}
+                />
+            }
             icon={componentDefinition.icon}
             id={connection.id}
             menuItems={
@@ -113,6 +159,8 @@ const ConnectionListItem = ({badges, componentDefinitions, connection, remaining
             }
             name={connection.name}
             onEditClick={() => setShowEditDialog(true)}
+            onOpenChange={setWorkflowsOpen}
+            open={workflowsOpen}
             tagList={
                 connection.tags && (
                     <TagList

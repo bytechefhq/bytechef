@@ -114,4 +114,73 @@ describe('ConnectionListItemLayout', () => {
 
         expect(onEditClick).toHaveBeenCalledTimes(1);
     });
+
+    it('toggles the expandable content when the row itself is clicked', async () => {
+        const onOpenChange = vi.fn();
+
+        renderLayout({
+            expandLabel: 'Workflows',
+            expandableContent: <div>workflow list</div>,
+            onOpenChange,
+            open: false,
+        });
+
+        await userEvent.click(screen.getByText('My Connection'));
+
+        expect(onOpenChange).toHaveBeenCalledWith(true);
+    });
+
+    it('collapses the open expandable content when the row is clicked again', async () => {
+        const onOpenChange = vi.fn();
+
+        renderLayout({expandLabel: 'Workflows', expandableContent: <div>workflow list</div>, onOpenChange, open: true});
+
+        expect(screen.getByText('workflow list')).toBeInTheDocument();
+
+        await userEvent.click(screen.getByText('My Connection'));
+
+        expect(onOpenChange).toHaveBeenCalledWith(false);
+    });
+
+    it('does not toggle the row when a control inside it is clicked', async () => {
+        const onOpenChange = vi.fn();
+
+        renderLayout({
+            expandLabel: 'Workflows',
+            expandableContent: <div>workflow list</div>,
+            onOpenChange,
+            open: false,
+            tagList: <button type="button">Add tag</button>,
+        });
+
+        await userEvent.click(screen.getByRole('button', {name: 'Add tag'}));
+
+        expect(onOpenChange).not.toHaveBeenCalled();
+    });
+
+    it('does not toggle the row when a plain element inside the tag list is clicked', async () => {
+        const onOpenChange = vi.fn();
+
+        renderLayout({
+            expandLabel: 'Workflows',
+            expandableContent: <div>workflow list</div>,
+            onOpenChange,
+            open: false,
+            tagList: <div>Select tags</div>,
+        });
+
+        await userEvent.click(screen.getByText('Select tags'));
+
+        expect(onOpenChange).not.toHaveBeenCalled();
+    });
+
+    it('does not make the row clickable without expandable content', async () => {
+        const onOpenChange = vi.fn();
+
+        renderLayout({onOpenChange});
+
+        await userEvent.click(screen.getByText('My Connection'));
+
+        expect(onOpenChange).not.toHaveBeenCalled();
+    });
 });

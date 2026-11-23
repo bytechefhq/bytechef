@@ -10,10 +10,39 @@ const hoisted = vi.hoisted(() => ({
         account: {authorities: ['ROLE_USER'], login: 'owner@localhost.com'},
         authenticated: true,
     },
+    connectionWorkflows: [
+        {
+            id: '11',
+            projectId: '3',
+            projectName: 'Sales Ops',
+            projectVersion: 2,
+            usage: 'DEPLOYMENT',
+            workflowId: 'workflow-1',
+            workflowName: 'Sync leads',
+            workflowUuid: 'uuid-1',
+        },
+        {
+            id: '21',
+            projectId: '4',
+            projectName: 'Support',
+            projectVersion: 1,
+            usage: 'EDITOR',
+            workflowId: 'workflow-2',
+            workflowName: 'Route tickets',
+            workflowUuid: null,
+        },
+    ],
+    connectionWorkflowsQueryOptions: vi.fn(),
     deleteConnectionMutate: vi.fn(),
+    disconnectConnectionFromWorkflowMutate: vi.fn(),
     disconnectConnectionMutate: vi.fn(),
+    openProjectWorkflow: vi.fn(),
     updateConnectionCredentialsMutation: vi.fn(),
     updateConnectionTagsMutate: vi.fn(),
+}));
+
+vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => ({
+    default: () => ({openProjectWorkflow: hoisted.openProjectWorkflow}),
 }));
 
 vi.mock('@/shared/components/connection/ConnectionDialog', () => ({
@@ -46,6 +75,22 @@ vi.mock('@/shared/mutations/automation/connections.mutations', () => ({
     useDisconnectConnectionMutation: () => ({isPending: false, mutate: hoisted.disconnectConnectionMutate}),
     useUpdateConnectionCredentialsMutation: hoisted.updateConnectionCredentialsMutation,
     useUpdateConnectionMutation: vi.fn(),
+}));
+
+vi.mock('@/shared/middleware/graphql', () => ({
+    ConnectionWorkflowUsage: {Deployment: 'DEPLOYMENT', Editor: 'EDITOR'},
+    useConnectionWorkflowsQuery: (variables: unknown, options: {enabled: boolean}) => {
+        hoisted.connectionWorkflowsQueryOptions(variables, options);
+
+        return {
+            data: options.enabled ? {connectionWorkflows: hoisted.connectionWorkflows} : undefined,
+            isLoading: false,
+        };
+    },
+    useDisconnectConnectionFromWorkflowMutation: () => ({
+        isPending: false,
+        mutate: hoisted.disconnectConnectionFromWorkflowMutate,
+    }),
 }));
 
 vi.mock('@/shared/stores/useAuthenticationStore', () => ({
@@ -84,8 +129,18 @@ const renderConnectionListItem = (connection: Connection) =>
     );
 
 const openMenu = async () => {
-    // The ellipsis trigger has no accessible name and the item renders no other button (no tags, dialogs closed)
-    await userEvent.click(screen.getByRole('button'));
+    await userEvent.click(screen.getByRole('button', {name: ''}));
+};
+
+const openWorkflows = async () => {
+    await userEvent.click(screen.getByRole('button', {name: 'Workflows'}));
+};
+
+const loginAsTenantAdmin = () => {
+    hoisted.authenticationState = {
+        account: {authorities: ['ROLE_ADMIN'], login: 'admin@localhost.com'},
+        authenticated: true,
+    };
 };
 
 const openEditDialog = async () => {
@@ -254,6 +309,115 @@ describe('ConnectionListItem', () => {
         expect(hoisted.updateConnectionTagsMutate).toHaveBeenCalledWith({
             id: 7,
             updateTagsRequest: {tags: [{id: 2, name: 'second'}]},
+        });
+    });
+
+    it('should not load the workflows until the Workflows section is opened', async () => {
+        renderConnectionListItem(activeConnection);
+
+        expect(hoisted.connectionWorkflowsQueryOptions).toHaveBeenLastCalledWith({connectionId: '7'}, {enabled: false});
+        expect(screen.queryByTestId('connection-workflows-list')).not.toBeInTheDocument();
+
+        await openWorkflows();
+
+        expect(hoisted.connectionWorkflowsQueryOptions).toHaveBeenLastCalledWith({connectionId: '7'}, {enabled: true});
+    });
+
+    it('should list each workflow with its project, version and usage', async () => {
+        renderConnectionListItem(activeConnection);
+
+        await openWorkflows();
+
+        const rows = within(screen.getByTestId('connection-workflows-list')).getAllByRole('listitem');
+
+        expect(rows).toHaveLength(2);
+        expect(rows[0]).toHaveTextContent('Sync leads');
+        expect(rows[0]).toHaveTextContent('Sales Ops');
+        expect(rows[0]).toHaveTextContent('V2');
+        expect(rows[0]).toHaveTextContent('Deployed');
+        expect(rows[1]).toHaveTextContent('Route tickets');
+        expect(rows[1]).toHaveTextContent('Support');
+        expect(rows[1]).toHaveTextContent('V1');
+        expect(rows[1]).toHaveTextContent('Editor');
+    });
+
+    it('should show the Workflows heading above the list', async () => {
+        renderConnectionListItem(activeConnection);
+
+        await openWorkflows();
+
+        expect(screen.getByRole('heading', {name: 'Workflows'})).toBeInTheDocument();
+    });
+
+    it('should open the workflow in its project from the row link', async () => {
+        renderConnectionListItem(activeConnection);
+
+        await openWorkflows();
+
+        const rows = within(screen.getByTestId('connection-workflows-list')).getAllByRole('listitem');
+
+        await userEvent.click(within(rows[0]).getByRole('button', {name: 'Open in project'}));
+
+        expect(hoisted.openProjectWorkflow).toHaveBeenCalledWith(3, 'uuid-1');
+    });
+
+    it('should not offer the link when the workflow has no uuid', async () => {
+        renderConnectionListItem(activeConnection);
+
+        await openWorkflows();
+
+        const rows = within(screen.getByTestId('connection-workflows-list')).getAllByRole('listitem');
+
+        expect(within(rows[1]).queryByRole('button', {name: 'Open in project'})).not.toBeInTheDocument();
+    });
+
+    it('should say so when no workflow uses the connection', async () => {
+        const connectionWorkflows = hoisted.connectionWorkflows;
+
+        hoisted.connectionWorkflows = [];
+
+        try {
+            renderConnectionListItem(inactiveConnection);
+
+            await openWorkflows();
+
+            expect(screen.getByText('No workflow uses this connection.')).toBeInTheDocument();
+        } finally {
+            hoisted.connectionWorkflows = connectionWorkflows;
+        }
+    });
+
+    it('should not offer Disconnect on a workflow to a user who is not a tenant admin', async () => {
+        renderConnectionListItem(activeConnection);
+
+        await openWorkflows();
+
+        expect(screen.queryByRole('button', {name: 'Workflow actions'})).not.toBeInTheDocument();
+    });
+
+    it('should disconnect the connection from one workflow after confirming', async () => {
+        loginAsTenantAdmin();
+
+        renderConnectionListItem(activeConnection);
+
+        await openWorkflows();
+
+        const rows = within(screen.getByTestId('connection-workflows-list')).getAllByRole('listitem');
+
+        await userEvent.click(within(rows[1]).getByRole('button', {name: 'Workflow actions'}));
+
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Disconnect'}));
+
+        const dialog = screen.getByRole('alertdialog');
+
+        expect(dialog).toHaveTextContent('Disconnect My Slack from Route tickets?');
+
+        await userEvent.click(within(dialog).getByRole('button', {name: 'Disconnect'}));
+
+        expect(hoisted.disconnectConnectionFromWorkflowMutate).toHaveBeenCalledWith({
+            connectionId: '7',
+            id: '21',
+            usage: 'EDITOR',
         });
     });
 });
