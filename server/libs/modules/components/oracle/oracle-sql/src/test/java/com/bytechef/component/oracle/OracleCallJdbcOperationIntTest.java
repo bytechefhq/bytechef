@@ -22,6 +22,7 @@ import com.bytechef.platform.component.jdbc.constant.JdbcConstants;
 import com.bytechef.platform.component.jdbc.operation.CallJdbcOperation;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -42,13 +43,14 @@ import org.testcontainers.oracle.OracleContainer;
 public class OracleCallJdbcOperationIntTest {
 
     private static final OracleContainer ORACLE_CONTAINER = new OracleContainer(
-        "gvenzl/oracle-free:23.26.4-slim-faststart");
+        "gvenzl/oracle-free:23.26.4-slim-faststart")
+            .withStartupTimeout(Duration.ofMinutes(4));
 
     private static DriverManagerDataSource dataSource;
     private static JdbcTemplate jdbcTemplate;
 
     @BeforeAll
-    @Timeout(value = 5, unit = TimeUnit.MINUTES)
+    @Timeout(value = 10, unit = TimeUnit.MINUTES)
     public static void beforeAll() {
         ORACLE_CONTAINER.start();
 
