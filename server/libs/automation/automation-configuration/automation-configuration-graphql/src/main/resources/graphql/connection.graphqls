@@ -1,5 +1,12 @@
+extend type Query {
+    """The workflows that use a connection, through a deployment or through the workflow editor."""
+    connectionWorkflows(connectionId: ID!): [ConnectionWorkflow!]!
+}
+
 extend type Mutation {
     disconnectConnection(connectionId: ID!): Boolean!
+    """Remove a connection from one workflow that uses it. The id is the one returned by connectionWorkflows."""
+    disconnectConnectionFromWorkflow(connectionId: ID!, id: ID!, usage: ConnectionWorkflowUsage!): Boolean!
     """Replace an existing connection's authorization parameters. A parameter that is not submitted is cleared.
     Succeeding means the values were stored, not that they work."""
     updateConnectionCredentials(input: UpdateConnectionCredentialsInput!): Boolean!
@@ -9,4 +16,20 @@ input UpdateConnectionCredentialsInput {
     connectionId: ID!
     parameters: Map!
     version: Int!
+}
+
+type ConnectionWorkflow {
+    id: ID!
+    projectId: ID!
+    projectName: String!
+    projectVersion: Int!
+    usage: ConnectionWorkflowUsage!
+    workflowId: String!
+    workflowName: String!
+    workflowUuid: String
+}
+
+enum ConnectionWorkflowUsage {
+    DEPLOYMENT
+    EDITOR
 }

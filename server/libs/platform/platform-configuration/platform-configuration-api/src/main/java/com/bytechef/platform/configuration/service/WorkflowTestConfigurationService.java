@@ -37,6 +37,8 @@ public interface WorkflowTestConfigurationService {
 
     void deleteWorkflowTestConfigurationConnection(long connectionId);
 
+    void deleteWorkflowTestConfigurationConnection(long workflowTestConfigurationId, long connectionId);
+
     Optional<WorkflowTestConfiguration> fetchWorkflowTestConfiguration(String workflowId, long environmentId);
 
     Optional<Long> fetchWorkflowTestConfigurationConnectionId(
@@ -44,6 +46,8 @@ public interface WorkflowTestConfigurationService {
 
     List<WorkflowTestConfigurationConnection> getWorkflowTestConfigurationConnections(
         String workflowId, String workflowNodeName, long environmentId);
+
+    List<WorkflowTestConfiguration> getConnectionWorkflowTestConfigurations(long connectionId);
 
     List<WorkflowTestConfiguration> getWorkflowTestConfigurations(String workflowId);
 

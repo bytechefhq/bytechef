@@ -43,6 +43,8 @@ public interface ProjectDeploymentWorkflowService {
 
     void deleteProjectDeploymentWorkflowConnection(long connectionId);
 
+    void deleteProjectDeploymentWorkflowConnection(long projectDeploymentWorkflowId, long connectionId);
+
     void disableProjectDeploymentWorkflowByConnectionId(long connectionId);
 
     @Transactional(readOnly = true)
@@ -50,6 +52,8 @@ public interface ProjectDeploymentWorkflowService {
 
     Optional<ProjectDeploymentWorkflowConnection> fetchProjectDeploymentWorkflowConnection(
         long projectDeploymentOd, String workflowId, String workflowNodeName, String workflowConnectionKey);
+
+    List<ProjectDeploymentWorkflow> getConnectionProjectDeploymentWorkflows(long connectionId);
 
     ProjectDeploymentWorkflow getProjectDeploymentWorkflow(long projectDeploymentWorkflowId);
 
