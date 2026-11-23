@@ -225,27 +225,39 @@ public class TriggerCoordinator {
         WorkflowExecutionId workflowExecutionId = triggerWebhookEvent.getWorkflowExecutionId();
 
         TenantContext.runWithTenantId(workflowExecutionId.getTenantId(), () -> {
+            WorkflowTrigger workflowTrigger;
+
             try {
-                TriggerExecution triggerExecution = TriggerExecution.builder()
-                    .metadata(Map.of(WebhookRequest.WEBHOOK_REQUEST, triggerWebhookEvent.getWebhookRequest()))
-                    .workflowExecutionId(workflowExecutionId)
-                    .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
-                    .build();
-
-                dispatch(triggerExecution);
-
-                if (log.isDebugEnabled()) {
-                    log.debug(
-                        "Webhook trigger id={}, type='{}', name='{}', workflowExecutionId='{}' dispatched",
-                        triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
-                        triggerExecution.getWorkflowExecutionId());
-                }
+                workflowTrigger = getWorkflowTrigger(workflowExecutionId);
             } catch (IllegalArgumentException | ConfigurationException exception) {
                 log.warn(
                     "Cancelling orphaned dynamic webhook trigger refresh for workflowExecutionId='{}': {}",
                     workflowExecutionId, exception.getMessage());
 
                 triggerScheduler.cancelDynamicWebhookTriggerRefresh(workflowExecutionId.toString());
+
+                return;
+            }
+
+            TriggerExecution triggerExecution = TriggerExecution.builder()
+                .metadata(Map.of(WebhookRequest.WEBHOOK_REQUEST, triggerWebhookEvent.getWebhookRequest()))
+                .workflowExecutionId(workflowExecutionId)
+                .workflowTrigger(workflowTrigger)
+                .build();
+
+            try {
+                dispatch(triggerExecution);
+            } catch (RuntimeException exception) {
+                failWebhookTriggerExecution(triggerExecution, exception);
+
+                return;
+            }
+
+            if (log.isDebugEnabled()) {
+                log.debug(
+                    "Webhook trigger id={}, type='{}', name='{}', workflowExecutionId='{}' dispatched",
+                    triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
+                    triggerExecution.getWorkflowExecutionId());
             }
         });
     }
@@ -273,6 +285,24 @@ public class TriggerCoordinator {
         }
     }
 
+    private void failWebhookTriggerExecution(TriggerExecution triggerExecution, RuntimeException exception) {
+        log.error(
+            "Webhook trigger for workflowExecutionId='{}' failed to start", triggerExecution.getWorkflowExecutionId(),
+            exception);
+
+        try {
+            if (triggerExecution.getId() == null) {
+                triggerExecution = triggerExecutionService.create(triggerExecution);
+            }
+
+            publishTriggerError(triggerExecution, exception);
+        } catch (RuntimeException recordException) {
+            log.error(
+                "Failed to record the failed webhook trigger for workflowExecutionId='{}'",
+                triggerExecution.getWorkflowExecutionId(), recordException);
+        }
+    }
+
     private void handleTriggerExecutionCompletion(TriggerExecution triggerExecution) {
         try {
             triggerCompletionHandler.handle(triggerExecution);
@@ -283,6 +313,7 @@ public class TriggerCoordinator {
 
     private void publishTriggerError(TriggerExecution triggerExecution, Exception e) {
         triggerExecution.setError(new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
+        triggerExecution.setStatus(TriggerExecution.Status.FAILED);
 
         eventPublisher.publishEvent(new TriggerExecutionErrorEvent(triggerExecution));
     }

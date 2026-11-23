@@ -16,19 +16,31 @@
 
 package com.bytechef.platform.workflow.coordinator;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.exception.WorkflowErrorType;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.platform.workflow.coordinator.event.TriggerExecutionErrorEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerListenerEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerPollEvent;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
@@ -36,14 +48,18 @@ import com.bytechef.platform.workflow.coordinator.trigger.completion.TriggerComp
 import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDispatcher;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
+import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.facade.TriggerStateFacade;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
@@ -51,7 +67,9 @@ import org.springframework.context.ApplicationEventPublisher;
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({
+    MockitoExtension.class, ObjectMapperSetupExtension.class
+})
 class TriggerCoordinatorTest {
 
     @Mock
@@ -224,5 +242,106 @@ class TriggerCoordinatorTest {
 
         verify(triggerScheduler).cancelDynamicWebhookTriggerRefresh(workflowExecutionId.toString());
         verifyNoInteractions(triggerDispatcher);
+    }
+
+    @Test
+    void testOnTriggerWebhookEventRecordsFailedTriggerExecutionWhenStartFails() {
+        TenantContext.setCurrentTenantId("test-tenant");
+
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            PlatformType.AUTOMATION, 1L, "workflow-uuid", "trigger1");
+
+        stubWebhookWorkflowTrigger();
+
+        when(jobPrincipalAccessor.getInputMap(1L, "workflow-uuid"))
+            .thenThrow(new IllegalArgumentException("Invalid expression"));
+        when(triggerExecutionService.create(any(TriggerExecution.class)))
+            .thenAnswer(invocation -> {
+                TriggerExecution triggerExecution = invocation.getArgument(0);
+
+                triggerExecution.setId(10L);
+
+                return triggerExecution;
+            });
+
+        triggerCoordinator.onTriggerWebhookEvent(
+            new TriggerWebhookEvent(new TriggerWebhookEvent.WebhookParameters(workflowExecutionId, webhookRequest)));
+
+        ArgumentCaptor<Object> eventArgumentCaptor = ArgumentCaptor.forClass(Object.class);
+
+        verify(eventPublisher).publishEvent(eventArgumentCaptor.capture());
+
+        TriggerExecutionErrorEvent triggerExecutionErrorEvent =
+            (TriggerExecutionErrorEvent) eventArgumentCaptor.getValue();
+
+        TriggerExecution triggerExecution = triggerExecutionErrorEvent.getTriggerExecution();
+        ExecutionError executionError = triggerExecutionErrorEvent.getError();
+
+        assertThat(triggerExecution.getId()).isEqualTo(10L);
+        assertThat(triggerExecution.getStatus()).isEqualTo(TriggerExecution.Status.FAILED);
+        assertThat(executionError).isNotNull();
+        assertThat(executionError.getMessage()).isEqualTo("Invalid expression");
+
+        verify(triggerScheduler, never()).cancelDynamicWebhookTriggerRefresh(anyString());
+        verifyNoInteractions(triggerDispatcher);
+    }
+
+    @Test
+    void testOnTriggerWebhookEventRecordsFailedTriggerExecutionWhenStateLookupFails() {
+        TenantContext.setCurrentTenantId("test-tenant");
+
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            PlatformType.AUTOMATION, 1L, "workflow-uuid", "trigger1");
+
+        stubWebhookWorkflowTrigger();
+
+        when(jobPrincipalAccessor.getInputMap(1L, "workflow-uuid"))
+            .thenReturn(Map.of());
+        when(evaluator.evaluate(anyMap(), anyMap()))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+        when(triggerExecutionService.create(any(TriggerExecution.class)))
+            .thenAnswer(invocation -> {
+                TriggerExecution triggerExecution = invocation.getArgument(0);
+
+                triggerExecution.setId(10L);
+
+                return triggerExecution;
+            });
+        when(triggerStateFacade.fetchValue(workflowExecutionId))
+            .thenThrow(new IllegalStateException("Data Storage unavailable"));
+
+        triggerCoordinator.onTriggerWebhookEvent(
+            new TriggerWebhookEvent(new TriggerWebhookEvent.WebhookParameters(workflowExecutionId, webhookRequest)));
+
+        ArgumentCaptor<Object> eventArgumentCaptor = ArgumentCaptor.forClass(Object.class);
+
+        verify(eventPublisher).publishEvent(eventArgumentCaptor.capture());
+
+        TriggerExecutionErrorEvent triggerExecutionErrorEvent =
+            (TriggerExecutionErrorEvent) eventArgumentCaptor.getValue();
+
+        TriggerExecution triggerExecution = triggerExecutionErrorEvent.getTriggerExecution();
+
+        assertThat(triggerExecution.getId()).isEqualTo(10L);
+        assertThat(triggerExecution.getStatus()).isEqualTo(TriggerExecution.Status.FAILED);
+
+        verify(triggerExecutionService, times(1)).create(any(TriggerExecution.class));
+        verify(triggerScheduler, never()).cancelDynamicWebhookTriggerRefresh(anyString());
+        verifyNoInteractions(triggerDispatcher);
+    }
+
+    private void stubWebhookWorkflowTrigger() {
+        Workflow workflow = mock(Workflow.class);
+        WorkflowTrigger workflowTrigger = new WorkflowTrigger(
+            Map.of("name", "trigger1", "type", "webhook/v1/autoRespondWithHTTP200"));
+
+        when(jobPrincipalAccessorRegistry.getJobPrincipalAccessor(PlatformType.AUTOMATION))
+            .thenReturn(jobPrincipalAccessor);
+        when(jobPrincipalAccessor.getWorkflowId(1L, "workflow-uuid"))
+            .thenReturn("workflow-id");
+        when(workflowService.getWorkflow("workflow-id"))
+            .thenReturn(workflow);
+        when(workflow.getExtensions(WorkflowExtConstants.TRIGGERS, WorkflowTrigger.class, List.of()))
+            .thenReturn(List.of(workflowTrigger));
     }
 }
