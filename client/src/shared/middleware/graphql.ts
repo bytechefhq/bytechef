@@ -483,6 +483,13 @@ export type AutomationGettingStartedCompletedQueryVariables = Exact<{
 
 export type AutomationGettingStartedCompletedQuery = { automationGettingStartedCompleted: boolean };
 
+export type ConnectionWorkflowsQueryVariables = Exact<{
+  connectionId: string | number;
+}>;
+
+
+export type ConnectionWorkflowsQuery = { connectionWorkflows: Array<{ id: string, projectId: string, projectName: string, projectVersion: number, usage: Types.ConnectionWorkflowUsage, workflowId: string, workflowName: string, workflowUuid: string | null }> };
+
 export type CreateA2aProjectMutationVariables = Exact<{
   input: Types.CreateA2aProjectInput;
 }>;
@@ -582,6 +589,15 @@ export type DisconnectConnectionMutationVariables = Exact<{
 
 
 export type DisconnectConnectionMutation = { disconnectConnection: boolean };
+
+export type DisconnectConnectionFromWorkflowMutationVariables = Exact<{
+  connectionId: string | number;
+  id: string | number;
+  usage: Types.ConnectionWorkflowUsage;
+}>;
+
+
+export type DisconnectConnectionFromWorkflowMutation = { disconnectConnectionFromWorkflow: boolean };
 
 export type ExportSharedProjectMutationVariables = Exact<{
   id: string | number;
@@ -1827,6 +1843,13 @@ export type EnableConnectedUserProjectWorkflowMutationVariables = Exact<{
 
 
 export type EnableConnectedUserProjectWorkflowMutation = { enableConnectedUserProjectWorkflow: boolean | null };
+
+export type IntegrationConnectionWorkflowsQueryVariables = Exact<{
+  connectionId: string | number;
+}>;
+
+
+export type IntegrationConnectionWorkflowsQuery = { integrationConnectionWorkflows: Array<{ id: string, parentId: string, parentName: string, parentType: Types.IntegrationConnectionWorkflowParentType, parentVersion: number, usage: Types.IntegrationConnectionWorkflowUsage, workflowId: string, workflowName: string, workflowUuid: string | null }> };
 
 export type IntegrationVersionWorkflowChangeQueryVariables = Exact<{
   integrationId: string | number;
@@ -4846,6 +4869,37 @@ export const useAutomationGettingStartedCompletedQuery = <
   }
     )};
 
+export const ConnectionWorkflowsDocument = new TypedDocumentString(`
+    query ConnectionWorkflows($connectionId: ID!) {
+  connectionWorkflows(connectionId: $connectionId) {
+    id
+    projectId
+    projectName
+    projectVersion
+    usage
+    workflowId
+    workflowName
+    workflowUuid
+  }
+}
+    `);
+
+export const useConnectionWorkflowsQuery = <
+      TData = ConnectionWorkflowsQuery,
+      TError = unknown
+    >(
+      variables: ConnectionWorkflowsQueryVariables,
+      options?: Omit<UseQueryOptions<ConnectionWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ConnectionWorkflowsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ConnectionWorkflowsQuery, TError, TData>(
+      {
+    queryKey: ['ConnectionWorkflows', variables],
+    queryFn: fetcher<ConnectionWorkflowsQuery, ConnectionWorkflowsQueryVariables>(ConnectionWorkflowsDocument, variables),
+    ...options
+  }
+    )};
+
 export const CreateA2aProjectDocument = new TypedDocumentString(`
     mutation createA2aProject($input: CreateA2aProjectInput!) {
   createA2aProject(input: $input) {
@@ -5127,6 +5181,29 @@ export const useDisconnectConnectionMutation = <
       {
     mutationKey: ['DisconnectConnection'],
     mutationFn: (variables?: DisconnectConnectionMutationVariables) => fetcher<DisconnectConnectionMutation, DisconnectConnectionMutationVariables>(DisconnectConnectionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DisconnectConnectionFromWorkflowDocument = new TypedDocumentString(`
+    mutation DisconnectConnectionFromWorkflow($connectionId: ID!, $id: ID!, $usage: ConnectionWorkflowUsage!) {
+  disconnectConnectionFromWorkflow(
+    connectionId: $connectionId
+    id: $id
+    usage: $usage
+  )
+}
+    `);
+
+export const useDisconnectConnectionFromWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DisconnectConnectionFromWorkflowMutation, TError, DisconnectConnectionFromWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<DisconnectConnectionFromWorkflowMutation, TError, DisconnectConnectionFromWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['DisconnectConnectionFromWorkflow'],
+    mutationFn: (variables?: DisconnectConnectionFromWorkflowMutationVariables) => fetcher<DisconnectConnectionFromWorkflowMutation, DisconnectConnectionFromWorkflowMutationVariables>(DisconnectConnectionFromWorkflowDocument, variables)(),
     ...options
   }
     )};
@@ -9531,6 +9608,38 @@ export const useEnableConnectedUserProjectWorkflowMutation = <
       {
     mutationKey: ['enableConnectedUserProjectWorkflow'],
     mutationFn: (variables?: EnableConnectedUserProjectWorkflowMutationVariables) => fetcher<EnableConnectedUserProjectWorkflowMutation, EnableConnectedUserProjectWorkflowMutationVariables>(EnableConnectedUserProjectWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const IntegrationConnectionWorkflowsDocument = new TypedDocumentString(`
+    query IntegrationConnectionWorkflows($connectionId: ID!) {
+  integrationConnectionWorkflows(connectionId: $connectionId) {
+    id
+    parentId
+    parentName
+    parentType
+    parentVersion
+    usage
+    workflowId
+    workflowName
+    workflowUuid
+  }
+}
+    `);
+
+export const useIntegrationConnectionWorkflowsQuery = <
+      TData = IntegrationConnectionWorkflowsQuery,
+      TError = unknown
+    >(
+      variables: IntegrationConnectionWorkflowsQueryVariables,
+      options?: Omit<UseQueryOptions<IntegrationConnectionWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<IntegrationConnectionWorkflowsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<IntegrationConnectionWorkflowsQuery, TError, TData>(
+      {
+    queryKey: ['IntegrationConnectionWorkflows', variables],
+    queryFn: fetcher<IntegrationConnectionWorkflowsQuery, IntegrationConnectionWorkflowsQueryVariables>(IntegrationConnectionWorkflowsDocument, variables),
     ...options
   }
     )};
