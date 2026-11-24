@@ -75,8 +75,8 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
 });
 
 vi.mock('@/shared/queries/automation/datatables.queries', () => ({
-    useDataTableRowsInfiniteQuery: (variables: unknown) => {
-        hoisted.rowsQuerySpy(variables);
+    useDataTableRowsInfiniteQuery: (variables: unknown, options: unknown) => {
+        hoisted.rowsQuerySpy(variables, options);
 
         return hoisted.rowsQueryResult;
     },
@@ -175,14 +175,30 @@ describe('useDataTable', () => {
             renderUseDataTable();
 
             expect(hoisted.rowsQuerySpy).toHaveBeenLastCalledWith(
-                expect.objectContaining({expand: ['customer'], tableId: 'table-1'})
+                expect.objectContaining({expand: ['customer'], tableId: 'table-1'}),
+                {enabled: true}
             );
         });
 
         it('should request an empty expansion when the table has no link columns', () => {
             renderUseDataTable();
 
-            expect(hoisted.rowsQuerySpy).toHaveBeenLastCalledWith(expect.objectContaining({expand: []}));
+            expect(hoisted.rowsQuerySpy).toHaveBeenLastCalledWith(expect.objectContaining({expand: []}), {
+                enabled: true,
+            });
+        });
+    });
+
+    describe('environment scope', () => {
+        it('should never request rows of a table missing from the current environment', () => {
+            useCurrentDataTableStore.setState({dataTable: {...hoisted.dataTable, id: 'table-other'}} as never);
+
+            renderHook(() => useDataTable({tableId: 'table-other'}));
+
+            for (const [variables, options] of hoisted.rowsQuerySpy.mock.calls) {
+                expect(variables).toEqual(expect.objectContaining({tableId: ''}));
+                expect(options).toEqual({enabled: false});
+            }
         });
     });
 

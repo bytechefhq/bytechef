@@ -331,12 +331,26 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
     const isDraftInsertPendingRef = useRef(false);
 
     const {setOpen: setAddColumnDialogOpen} = useAddDataTableColumnDialogStore();
-    const {dataTable, setDataTable} = useCurrentDataTableStore();
+    const {setDataTable} = useCurrentDataTableStore();
     const {setColumnToDelete} = useDeleteDataTableColumnDialogStore();
     const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const {setColumnToRename} = useRenameDataTableColumnDialogStore();
     const {selectedRows, setSelectedRows} = useSelectedRowsStore();
     const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const {
+        data: tablesData,
+        error: tablesError,
+        isLoading: tablesLoading,
+    } = useDataTablesQuery({
+        environmentId: String(environmentId),
+        workspaceId: String(workspaceId),
+    });
+
+    const dataTable = useMemo(
+        () => tablesData?.dataTables?.find((tableItem) => tableId != null && tableItem.id === tableId),
+        [tablesData, tableId]
+    );
 
     const linkColumnNames = useMemo(
         () => (dataTable?.columns ?? []).filter((column) => column.type === 'LINK').map((column) => column.name),
@@ -376,15 +390,6 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
     }, [draftRow, localRows]);
 
     const queryClient = useQueryClient();
-
-    const {
-        data: tablesData,
-        error: tablesError,
-        isLoading: tablesLoading,
-    } = useDataTablesQuery({
-        environmentId: String(environmentId),
-        workspaceId: String(workspaceId),
-    });
 
     const invalidateRows = useCallback(() => {
         void queryClient.invalidateQueries({queryKey: ['dataTableRowsPage']});
@@ -698,10 +703,8 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
     );
 
     useEffect(() => {
-        const selectedTable = tablesData?.dataTables?.find((tableItem) => tableId != null && tableItem.id === tableId);
-
-        setDataTable(selectedTable);
-    }, [tablesData, tableId, setDataTable]);
+        setDataTable(dataTable);
+    }, [dataTable, setDataTable]);
 
     useEffect(() => {
         handleSelectedRowsChange(new Set());

@@ -1,3 +1,4 @@
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {act, render, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';
 import {type ReactNode} from 'react';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
@@ -54,12 +55,16 @@ const renderDataTable = () =>
         <MemoryRouter initialEntries={['/automation/datatables/table-1']}>
             <Routes>
                 <Route element={<DataTable />} path="/automation/datatables/:id" />
+
+                <Route element={<div>Data Tables List</div>} path="/automation/datatables" />
             </Routes>
         </MemoryRouter>
     );
 
 beforeEach(() => {
     windowResizeObserver();
+
+    environmentStore.setState({currentEnvironmentId: 0});
 });
 
 afterEach(() => {
@@ -88,5 +93,15 @@ describe('DataTable', () => {
         });
 
         expect(screen.getAllByText('Rename Table')).toHaveLength(1);
+    });
+
+    it('should return to the data tables list when the environment changes', () => {
+        renderDataTable();
+
+        act(() => {
+            environmentStore.getState().setCurrentEnvironmentId(1);
+        });
+
+        expect(screen.getByText('Data Tables List')).toBeInTheDocument();
     });
 });
