@@ -53,9 +53,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  * @author Ivica Cardic
  */
 @SpringBootTest(
-    classes = CurrentUserResolverIntTest.Config.class, properties = "spring.liquibase.contexts=mono,dev")
+    classes = CurrentUserResolverImplIntTest.Config.class, properties = "spring.liquibase.contexts=mono,dev")
 @Import(PostgreSQLContainerConfiguration.class)
-class CurrentUserResolverIntTest {
+class CurrentUserResolverImplIntTest {
 
     @Autowired
     private PlatformTransactionManager platformTransactionManager;
@@ -102,7 +102,7 @@ class CurrentUserResolverIntTest {
 
         transactionTemplate.setReadOnly(true);
 
-        CurrentUserResolver currentUserResolver = new CurrentUserResolver(userService);
+        CurrentUserResolver currentUserResolver = new CurrentUserResolverImpl(userService);
 
         return transactionTemplate.execute(transactionStatus -> currentUserResolver.fetchCurrentUserId());
     }
@@ -115,7 +115,7 @@ class CurrentUserResolverIntTest {
     @EnableAutoConfiguration
     @Import({
         LiquibaseConfiguration.class, UserCallback.class,
-        CurrentUserResolverIntTest.Config.UserJdbcConfiguration.class
+        CurrentUserResolverImplIntTest.Config.UserJdbcConfiguration.class
     })
     static class Config {
 

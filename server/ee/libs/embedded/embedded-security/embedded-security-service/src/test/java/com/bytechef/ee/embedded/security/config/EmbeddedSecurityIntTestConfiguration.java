@@ -7,7 +7,8 @@
 
 package com.bytechef.ee.embedded.security.config;
 
-import com.bytechef.automation.configuration.service.CurrentUserResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolverImpl;
+import com.bytechef.automation.configuration.service.ProjectServiceImpl;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
 import com.bytechef.ee.embedded.security.facade.SigningKeyFacadeImpl;
 import com.bytechef.ee.embedded.security.service.SigningKeyServiceImpl;
@@ -26,8 +27,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @EnableAutoConfiguration
 @EnableMethodSecurity
 @Import({
-    EmbeddedOwnerContributorsTestConfiguration.class, CurrentUserResolver.class, PermissionServiceImpl.class,
-    SigningKeyFacadeImpl.class, SigningKeyServiceImpl.class
+    EmbeddedOwnerContributorsTestConfiguration.class, CurrentUserResolverImpl.class, PermissionServiceImpl.class,
+    ProjectServiceImpl.class, SigningKeyFacadeImpl.class, SigningKeyServiceImpl.class
 })
 @Configuration
 public class EmbeddedSecurityIntTestConfiguration {

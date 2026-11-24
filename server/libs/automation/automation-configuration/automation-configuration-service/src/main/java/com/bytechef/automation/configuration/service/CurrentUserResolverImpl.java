@@ -35,17 +35,18 @@ import org.springframework.web.context.request.RequestContextHolder;
  * @author Ivica Cardic
  */
 @Service
-public class CurrentUserResolver {
+public class CurrentUserResolverImpl implements CurrentUserResolver {
 
-    private static final Logger log = LoggerFactory.getLogger(CurrentUserResolver.class);
+    private static final Logger log = LoggerFactory.getLogger(CurrentUserResolverImpl.class);
 
     private final UserService userService;
 
     @SuppressFBWarnings("EI")
-    public CurrentUserResolver(UserService userService) {
+    public CurrentUserResolverImpl(UserService userService) {
         this.userService = userService;
     }
 
+    @Override
     public OptionalLong fetchCurrentUserId() {
         Optional<String> login = SecurityUtils.fetchCurrentUserLogin();
 

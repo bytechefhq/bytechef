@@ -9,7 +9,8 @@ package com.bytechef.ee.automation.configuration.config;
 
 import com.bytechef.automation.configuration.callback.ProjectCallback;
 import com.bytechef.automation.configuration.callback.ProjectWorkflowCallback;
-import com.bytechef.automation.configuration.service.CurrentUserResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolverImpl;
+import com.bytechef.automation.configuration.service.ProjectServiceImpl;
 import com.bytechef.cache.config.CacheConfiguration;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
@@ -60,10 +61,11 @@ import tools.jackson.databind.ObjectMapper;
 @EnableMethodSecurity
 @Import({
     A2aPermissionScopeProvider.class, ApiKeyPermissionScopeProvider.class, CacheConfiguration.class,
-    CurrentUserResolver.class, DeploymentPermissionScopeProvider.class,
+    CurrentUserResolverImpl.class, DeploymentPermissionScopeProvider.class,
     EmbeddedOwnerContributorsTestConfiguration.class, LiquibaseConfiguration.class, McpPermissionScopeProvider.class,
     PermissionScopeRegistry.class, PermissionServiceImpl.class, PostgreSQLContainerConfiguration.class,
-    ProjectCallback.class, ProjectPermissionScopeProvider.class, ProjectWorkflowCallback.class,
+    ProjectCallback.class, ProjectPermissionScopeProvider.class, ProjectServiceImpl.class,
+    ProjectWorkflowCallback.class,
     WorkflowPermissionScopeProvider.class,
     WorkspacePermissionIntTestConfiguration.WorkspacePermissionJdbcConfiguration.class,
     WorkspaceScopeCache.class, WorkspaceUserAuditMapper.class
