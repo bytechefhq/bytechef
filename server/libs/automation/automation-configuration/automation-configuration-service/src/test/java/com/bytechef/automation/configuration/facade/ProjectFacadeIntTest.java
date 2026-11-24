@@ -1187,6 +1187,10 @@ public class ProjectFacadeIntTest {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
         try (ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+            zipOutputStream.putNextEntry(new ZipEntry("project.json"));
+            zipOutputStream.write("{\"name\":\"missing template\"}".getBytes(StandardCharsets.UTF_8));
+            zipOutputStream.closeEntry();
+
             ZipEntry zipEntry = new ZipEntry("workflow-test.json");
 
             zipOutputStream.putNextEntry(zipEntry);
@@ -1215,9 +1219,9 @@ public class ProjectFacadeIntTest {
             .thenReturn(sharedTemplate);
 
         RuntimeException exception = Assertions.assertThrows(
-            RuntimeException.class, () -> projectFacade.importProjectTemplate(projectUuid, workspace.getId(), true));
+            RuntimeException.class, () -> projectFacade.getProjectTemplate(projectUuid, true));
 
-        assertThat(exception.getMessage()).contains("Missing files in a shared project file");
+        assertThat(exception.getMessage()).contains("The template.json entry is missing");
     }
 
     @Test
