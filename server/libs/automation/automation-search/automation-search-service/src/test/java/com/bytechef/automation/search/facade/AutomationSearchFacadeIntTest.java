@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacadeImpl;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
-import com.bytechef.automation.configuration.service.CurrentUserResolver;
+import com.bytechef.automation.configuration.service.CurrentUserResolverImpl;
 import com.bytechef.automation.configuration.service.PermissionServiceImpl;
 import com.bytechef.automation.configuration.service.WorkspaceServiceImpl;
 import com.bytechef.automation.search.SearchAssetProvider;
@@ -214,7 +214,7 @@ class AutomationSearchFacadeIntTest {
     @Configuration
     @EnableAutoConfiguration
     @Import({
-        AutomationSearchFacadeImpl.class, CacheConfiguration.class, CurrentUserResolver.class,
+        AutomationSearchFacadeImpl.class, CacheConfiguration.class, CurrentUserResolverImpl.class,
         LiquibaseConfiguration.class,
         PermissionServiceImpl.class, PostgreSQLContainerConfiguration.class, UserCallback.class, UserServiceImpl.class,
         WorkspaceFacadeImpl.class, WorkspaceServiceImpl.class

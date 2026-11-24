@@ -8,11 +8,11 @@
 package com.bytechef.ee.automation.configuration.service;
 
 import com.bytechef.automation.configuration.domain.Project;
-import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -48,7 +48,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     private final CurrentUserResolver currentUserResolver;
     private final PermissionScopeRegistry permissionScopeRegistry;
-    private final ProjectRepository projectRepository;
+    private final ProjectService projectService;
     private final WorkspaceScopeCache workspaceScopeCache;
     private final WorkspaceUserRepository workspaceUserRepository;
     private final Map<String, ResourceOwnershipResolver> resourceOwnershipResolvers;
@@ -58,13 +58,13 @@ public class PermissionServiceImpl implements PermissionService {
     })
     public PermissionServiceImpl(
         CurrentUserResolver currentUserResolver, PermissionScopeRegistry permissionScopeRegistry,
-        ProjectRepository projectRepository, WorkspaceScopeCache workspaceScopeCache,
+        ProjectService projectService, WorkspaceScopeCache workspaceScopeCache,
         WorkspaceUserRepository workspaceUserRepository,
         List<ResourceOwnershipResolver> resourceOwnershipResolvers) {
 
         this.currentUserResolver = currentUserResolver;
         this.permissionScopeRegistry = permissionScopeRegistry;
-        this.projectRepository = projectRepository;
+        this.projectService = projectService;
         this.workspaceScopeCache = workspaceScopeCache;
         this.workspaceUserRepository = workspaceUserRepository;
         this.resourceOwnershipResolvers = resourceOwnershipResolvers.stream()
@@ -146,7 +146,7 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        Long workspaceId = projectRepository.findById(projectId)
+        Long workspaceId = projectService.fetchProject(projectId)
             .map(Project::getWorkspaceId)
             .orElse(null);
 
@@ -241,7 +241,7 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         }
 
-        Long workspaceId = projectRepository.findByWorkflowId(workflowId)
+        Long workspaceId = projectService.fetchWorkflowProject(workflowId)
             .map(Project::getWorkspaceId)
             .orElse(null);
 

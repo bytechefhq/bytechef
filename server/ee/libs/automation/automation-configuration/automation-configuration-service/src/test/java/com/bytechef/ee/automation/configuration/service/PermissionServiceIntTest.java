@@ -21,6 +21,7 @@ import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.ee.automation.configuration.config.WorkspacePermissionIntTestConfiguration;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceRepository;
@@ -73,6 +74,9 @@ class PermissionServiceIntTest {
 
     @Autowired
     private ProjectRepository projectRepository;
+
+    @Autowired
+    private ProjectService projectService;
 
     @Autowired
     private ProjectWorkflowRepository projectWorkflowRepository;
@@ -503,7 +507,7 @@ class PermissionServiceIntTest {
 
     private PermissionService createPermissionService(ResourceOwnershipResolver resourceOwnershipResolver) {
         return new PermissionServiceImpl(
-            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCache,
+            currentUserResolver, permissionScopeRegistry, projectService, workspaceScopeCache,
             workspaceUserRepository, List.of(resourceOwnershipResolver));
     }
 
