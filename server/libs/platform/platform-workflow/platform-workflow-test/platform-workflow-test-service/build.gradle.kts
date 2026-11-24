@@ -1,7 +1,7 @@
 dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
-    implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
+    implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-impl"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-memory"))
@@ -39,6 +39,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-converter"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
+    testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     testImplementation(project(":server:libs:config:app-config"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
