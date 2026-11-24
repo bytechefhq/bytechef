@@ -17,7 +17,9 @@ import {ApiCollectionEndpoint} from '@/ee/shared/middleware/automation/api-platf
 import {useDeleteApiCollectionEndpointMutation} from '@/ee/shared/mutations/automation/apiCollectionEndpoints.mutations';
 import {ApiCollectionKeys} from '@/ee/shared/mutations/automation/apiCollections.queries';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
+import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
+import OpenInButton from '@/shared/components/OpenInButton';
 import {ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
 import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
@@ -56,6 +58,8 @@ const ApiCollectionEndpointListItem = ({
     const [showEditApiCollectionEndpointDialog, setShowEditApiCollectionEndpointDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
+
+    const {openProjectWorkflow} = useOpenInProject();
 
     const openProjectDeploymentWorkflowSheet = useProjectDeploymentWorkflowSheetStore(
         (state) => state.openProjectDeploymentWorkflowSheet
@@ -105,6 +109,10 @@ const ApiCollectionEndpointListItem = ({
         if (workflow) {
             openProjectDeploymentWorkflowSheet({projectDeploymentId, projectId, projectVersion, workflow});
         }
+    };
+
+    const handleOpenInProjectClick = () => {
+        void openProjectWorkflow(projectId, workflow.workflowUuid);
     };
 
     const method = apiCollectionEndpoint.httpMethod;
@@ -164,7 +172,11 @@ const ApiCollectionEndpointListItem = ({
                 />
 
                 <div className="flex flex-1 cursor-pointer items-center">
-                    <div className="w-4/12 text-sm">{apiCollectionEndpoint.name}</div>
+                    <div className="flex w-4/12 items-center gap-2 text-sm">
+                        {apiCollectionEndpoint.name}
+
+                        {workflow && <OpenInButton label="Open in project" onClick={handleOpenInProjectClick} />}
+                    </div>
 
                     <div className="w-4/12 text-sm font-semibold">
                         {getApiCollectionEndpointPath(collectionVersion, contextPath, apiCollectionEndpoint.path)}
