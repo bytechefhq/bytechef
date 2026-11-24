@@ -26,6 +26,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-job-sync"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-api"))
-    implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
+    implementation(project(":server:libs:core:file-storage:file-storage-base64-impl"))
     implementation(project(":server:libs:test:test-int-support"))
 }

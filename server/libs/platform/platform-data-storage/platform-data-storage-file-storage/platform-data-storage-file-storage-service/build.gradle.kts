@@ -6,7 +6,7 @@ dependencies {
     implementation(project(":server:libs:core:file-storage:file-storage-api"))
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-file-storage:platform-data-storage-file-storage-api"))
 
-    testImplementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
+    testImplementation(project(":server:libs:core:file-storage:file-storage-filesystem-impl"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
 }

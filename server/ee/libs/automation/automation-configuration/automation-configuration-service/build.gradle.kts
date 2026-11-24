@@ -29,7 +29,7 @@ dependencies {
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:core:commons:commons-data"))
     testImplementation(project(":server:libs:core:evaluator:evaluator-api"))
-    testImplementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
+    testImplementation(project(":server:libs:core:file-storage:file-storage-filesystem-impl"))
     testImplementation(project(":server:libs:platform:platform-category:platform-category-api"))
     testImplementation(project(":server:libs:platform:platform-category:platform-category-service"))
     testImplementation(project(":server:libs:platform:platform-component:platform-component-api"))

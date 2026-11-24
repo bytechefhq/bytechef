@@ -25,7 +25,7 @@ dependencies {
     testImplementation(project(":server:libs:config:jackson-config"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:core:commons:commons-data"))
-    testImplementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
+    testImplementation(project(":server:libs:core:file-storage:file-storage-filesystem-impl"))
     testImplementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-file-storage:platform-data-storage-file-storage-api"))
     testImplementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-file-storage:platform-data-storage-file-storage-service"))
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-token-service"))
