@@ -7,9 +7,9 @@ import ApiCollectionDialog from '@/ee/pages/automation/api-platform/api-collecti
 import ApiCollectionsFilterTitle from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionsFilterTitle';
 import {useGetApiCollectionTagsQuery} from '@/ee/shared/mutations/automation/apiCollectionTags.queries';
 import {useGetApiCollectionsQuery} from '@/ee/shared/mutations/automation/apiCollections.queries';
+import ProjectDeploymentWorkflowExecutionsSheet from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowExecutionsSheet';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
@@ -119,7 +119,7 @@ const ApiCollections = () => {
                         >
                             <ApiCollectionList apiCollections={apiCollections} tags={tags} />
 
-                            <ReadOnlyWorkflowSheet />
+                            <ProjectDeploymentWorkflowExecutionsSheet />
                         </WorkflowReadOnlyProvider>
                     </div>
                 ) : isFiltered ? (

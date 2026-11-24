@@ -12,11 +12,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ApiCollectionEndpointDialog from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionEndpointDialog';
+import {getApiCollectionEndpointPath} from '@/ee/pages/automation/api-platform/api-collections/utils/getApiCollectionEndpointPath';
 import {ApiCollectionEndpoint} from '@/ee/shared/middleware/automation/api-platform';
 import {useDeleteApiCollectionEndpointMutation} from '@/ee/shared/mutations/automation/apiCollectionEndpoints.mutations';
 import {ApiCollectionKeys} from '@/ee/shared/mutations/automation/apiCollections.queries';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
-import useReadOnlyWorkflow from '@/shared/components/read-only-workflow-editor/hooks/useReadOnlyWorkflow';
+import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
 import {ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
 import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
@@ -56,7 +57,9 @@ const ApiCollectionEndpointListItem = ({
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
 
-    const {openReadOnlyWorkflowSheet} = useReadOnlyWorkflow();
+    const openProjectDeploymentWorkflowSheet = useProjectDeploymentWorkflowSheetStore(
+        (state) => state.openProjectDeploymentWorkflowSheet
+    );
 
     const workflow = workflows.filter((workflow) => workflow.workflowUuid === apiCollectionEndpoint.workflowUuid)[0];
 
@@ -100,7 +103,7 @@ const ApiCollectionEndpointListItem = ({
 
     const handleWorkflowClick = () => {
         if (workflow) {
-            openReadOnlyWorkflowSheet(workflow);
+            openProjectDeploymentWorkflowSheet({projectDeploymentId, projectId, projectVersion, workflow});
         }
     };
 
@@ -164,7 +167,7 @@ const ApiCollectionEndpointListItem = ({
                     <div className="w-4/12 text-sm">{apiCollectionEndpoint.name}</div>
 
                     <div className="w-4/12 text-sm font-semibold">
-                        {`/v${collectionVersion}/${contextPath}/${apiCollectionEndpoint.path}`}
+                        {getApiCollectionEndpointPath(collectionVersion, contextPath, apiCollectionEndpoint.path)}
                     </div>
                 </div>
             </div>
