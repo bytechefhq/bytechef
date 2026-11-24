@@ -139,15 +139,15 @@ public class ProjectApiController implements ProjectApi {
     public ResponseEntity<Long> importProject(
         @PathVariable("workspaceId") Long workspaceId, @RequestParam("file") MultipartFile file) {
 
+        byte[] projectData;
+
         try {
-            byte[] projectData = file.getBytes();
-
-            long projectId = projectFacade.importProject(projectData, workspaceId);
-
-            return ResponseEntity.ok(projectId);
+            projectData = file.getBytes();
         } catch (IOException e) {
             throw new UncheckedIOException("Failed to read the project file", e);
         }
+
+        return ResponseEntity.ok(projectFacade.importProject(projectData, workspaceId));
     }
 
     @Override

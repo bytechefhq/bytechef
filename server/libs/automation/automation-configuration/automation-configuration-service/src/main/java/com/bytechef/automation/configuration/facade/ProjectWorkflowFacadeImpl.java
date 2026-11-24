@@ -713,10 +713,6 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         }
     }
 
-    /**
-     * Returns the workflow definition as JSON. A JSON definition is returned unchanged, a YAML definition is converted
-     * to JSON.
-     */
     static String toJsonDefinition(String definition) {
         String trimmedDefinition = StringUtils.trimToEmpty(definition);
 
@@ -732,11 +728,8 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
                 return definition;
             }
 
-            Map<String, Object> workflowMap = YAML_MAPPER.readValue(trimmedDefinition, new TypeReference<>() {});
-
-            if (workflowMap == null) {
-                throw new IllegalArgumentException("The YAML definition is not an object");
-            }
+            Map<String, Object> workflowMap = Objects.requireNonNull(
+                YAML_MAPPER.readValue(trimmedDefinition, new TypeReference<>() {}));
 
             return JsonUtils.write(workflowMap);
         } catch (RuntimeException e) {
