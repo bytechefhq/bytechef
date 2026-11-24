@@ -14,8 +14,6 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-external-invocation-log:platform-external-invocation-log-api"))
     implementation("org.springframework.security:spring-security-core")
 
-    runtimeOnly(project(":server:libs:platform:platform-external-invocation:platform-external-invocation-service"))
-
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.springframework:spring-test")

@@ -73,6 +73,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-security:platform-security-service"))
     implementation(project(":server:libs:platform:platform-swagger"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-token-service"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-rest"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-service"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-service"))
