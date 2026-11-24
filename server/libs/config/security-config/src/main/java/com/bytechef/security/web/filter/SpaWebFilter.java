@@ -26,12 +26,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * @author Ivica Cardic
  */
 public class SpaWebFilter extends OncePerRequestFilter {
+
+    /**
+     * A file request ends in a short alphanumeric extension ({@code app.js}, {@code font.woff2}). A signed resume token
+     * also contains periods, but its last part is a 43-character signature, so it stays a client route.
+     */
+    private static final Pattern FILE_EXTENSION_PATTERN = Pattern.compile("\\.[A-Za-z0-9]{1,8}$");
 
     private final List<String> nonSpaPathPrefixes = new ArrayList<>();
 
@@ -46,14 +54,15 @@ public class SpaWebFilter extends OncePerRequestFilter {
 
     /**
      * Forwards any HTTP request with an unmapped path (i.e., not handled by other controllers or static resources),
-     * except those containing a period (indicating a file extension), to the client {@code index.html}.
+     * except those whose last path segment ends in a file extension, to the client {@code index.html}.
      *
      * <p>
      * This is commonly used in Single Page Application (SPA) setups where client-side routing handles navigation. If
      * the requested path is:
      * <ul>
      * <li>Not matching a predefined server route or static resource</li>
-     * <li>Does NOT contain a period (to exclude direct file requests, such as images or scripts)</li>
+     * <li>Does NOT end in a file extension (to exclude direct file requests, such as images or scripts); a period
+     * elsewhere, as in a signed token, does not make it a file request</li>
      * <li>Matches the pattern {@code /(.*)} (i.e., is a valid root-relative path)</li>
      * </ul>
      * then the method forwards the request internally to {@code /index.html}. This allows the front-end application to
@@ -77,7 +86,7 @@ public class SpaWebFilter extends OncePerRequestFilter {
 
         String path = requestURI.substring(contextPath.length());
 
-        if (isNonSpaPath(path) && !path.contains(".") && path.matches("/(.*)")) {
+        if (isNonSpaPath(path) && !isFileRequest(path) && path.matches("/(.*)")) {
             RequestDispatcher requestDispatcher = request.getRequestDispatcher("/index.html");
 
             requestDispatcher.forward(request, response);
@@ -86,6 +95,14 @@ public class SpaWebFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private static boolean isFileRequest(String path) {
+        String lastSegment = path.substring(path.lastIndexOf('/') + 1);
+
+        Matcher matcher = FILE_EXTENSION_PATTERN.matcher(lastSegment);
+
+        return matcher.find();
     }
 
     private boolean isNonSpaPath(String path) {
