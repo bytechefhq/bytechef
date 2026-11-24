@@ -27,6 +27,8 @@ import com.bytechef.automation.configuration.web.rest.model.ProjectStatusModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectVersionModel;
 import com.bytechef.automation.configuration.web.rest.model.PublishProjectRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.ConversionService;
@@ -143,8 +145,8 @@ public class ProjectApiController implements ProjectApi {
             long projectId = projectFacade.importProject(projectData, workspaceId);
 
             return ResponseEntity.ok(projectId);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to import project", e);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to read the project file", e);
         }
     }
 

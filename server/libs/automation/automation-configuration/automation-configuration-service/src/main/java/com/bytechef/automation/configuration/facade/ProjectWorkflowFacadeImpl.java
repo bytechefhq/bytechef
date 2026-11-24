@@ -91,6 +91,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.type.TypeReference;
+import tools.jackson.dataformat.yaml.YAMLMapper;
 
 /**
  * @author Ivica Cardic
@@ -100,6 +101,8 @@ import tools.jackson.core.type.TypeReference;
 public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
     private static final Logger log = LoggerFactory.getLogger(ProjectWorkflowFacadeImpl.class);
+
+    private static final YAMLMapper YAML_MAPPER = new YAMLMapper();
 
     private final ComponentDefinitionHelper componentDefinitionHelper;
     private final EnvironmentService environmentService;
@@ -158,12 +161,14 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     })
     @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_CREATE')")
     public ProjectWorkflow addWorkflow(long projectId, String definition) {
-        workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
-        workflowValidatorFacade.validateHasEnabledTrigger(definition);
+        String jsonDefinition = toJsonDefinition(definition);
+
+        workflowValidatorFacade.validateNoDuplicateNodeNames(jsonDefinition);
+        workflowValidatorFacade.validateHasEnabledTrigger(jsonDefinition);
 
         Project project = projectService.getProject(projectId);
 
-        Workflow workflow = workflowService.create(definition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
+        Workflow workflow = workflowService.create(jsonDefinition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.addWorkflow(
             projectId, project.getLastProjectVersion(), workflow.getId());
@@ -705,6 +710,38 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
             return new TemplateFiles(templateJson, workflowJson);
         } catch (IOException e) {
             throw new RuntimeException("Failed to import shared workflow", e);
+        }
+    }
+
+    /**
+     * Returns the workflow definition as JSON. A JSON definition is returned unchanged, a YAML definition is converted
+     * to JSON.
+     */
+    static String toJsonDefinition(String definition) {
+        String trimmedDefinition = StringUtils.trimToEmpty(definition);
+
+        if (trimmedDefinition.isEmpty()) {
+            throw new ConfigurationException(
+                "The workflow definition is empty.", ProjectErrorType.INVALID_WORKFLOW_DEFINITION);
+        }
+
+        try {
+            if (trimmedDefinition.startsWith("{")) {
+                JsonUtils.readTree(trimmedDefinition);
+
+                return definition;
+            }
+
+            Map<String, Object> workflowMap = YAML_MAPPER.readValue(trimmedDefinition, new TypeReference<>() {});
+
+            if (workflowMap == null) {
+                throw new IllegalArgumentException("The YAML definition is not an object");
+            }
+
+            return JsonUtils.write(workflowMap);
+        } catch (RuntimeException e) {
+            throw new ConfigurationException(
+                "The workflow definition is not valid JSON or YAML.", ProjectErrorType.INVALID_WORKFLOW_DEFINITION);
         }
     }
 
