@@ -91,11 +91,6 @@ const automationNavigation: NavigationType[] = [
         name: 'Project Deployments',
     },
     {
-        href: '/automation/api-platform',
-        icon: LayoutTemplateIcon,
-        name: 'API Collections',
-    },
-    {
         group: serversNavigationGroup,
         href: '/automation/mcp-servers',
         icon: ServerIcon,
@@ -106,6 +101,11 @@ const automationNavigation: NavigationType[] = [
         href: '/automation/a2a-servers',
         icon: NetworkIcon,
         name: 'A2A Servers',
+    },
+    {
+        href: '/automation/api-platform',
+        icon: LayoutTemplateIcon,
+        name: 'API Collections',
     },
     {
         group: executionsNavigationGroup,
