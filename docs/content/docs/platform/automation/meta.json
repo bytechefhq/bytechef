@@ -18,6 +18,7 @@
     "deploy/mcp-servers",
     "deploy/a2a-servers",
     "deploy/api-platform",
+    "deploy/apps",
     "--- Monitor ---",
     "monitor/workflow-executions",
     "monitor/external-invocations",

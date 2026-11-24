@@ -1,0 +1,225 @@
+---
+title: Apps
+description: Manage apps built outside ByteChef, and see what an administrator does in the UI and what a coding agent does with the CLI and the MCP server.
+ee: true
+---
+
+An app is a web application built outside ByteChef, often by a coding agent, that reaches third-party systems only
+through ByteChef. The app never holds a credential: it calls ByteChef with the secret key of its instance, and ByteChef
+runs the actions, tools, API endpoints and workflows the instance is bound to.
+
+An app has one or more **instances**. Each instance has its own environment, URL, secret key, sign-in mode, hosting
+target and bindings, so one app can run in Development, Staging and Production with different connections in each.
+Members open apps from the **App Portal**, in the ByteChef logo menu at the top of the sidebar, below **Approval Tasks**.
+
+Apps are managed in two places:
+
+- **The ByteChef UI**, under **Apps** in the left sidebar, by workspace members.
+- **The `bytechef` CLI and the ByteChef management MCP server**, by a coding agent working in the app's repository.
+  The app template's `AGENTS.md` tells the agent which commands to run.
+
+## Who can do what
+
+Access is decided per instance. Each instance has four scopes, and a member holds them through their workspace role
+in the instance's environment:
+
+| Scope | Granted from | Allows |
+|---|---|---|
+| `APP_VIEW` | Viewer | Seeing the instance, its bindings, deployments and activity |
+| `APP_USE` | Viewer | Opening the app from the App Portal |
+| `APP_DEPLOY` | Editor | Creating versions, and deploying, rolling back, cancelling and recording deployments |
+| `APP_MANAGE` | Admin | Everything else: instances, bindings, configuration, deployment settings, sharing, keys |
+
+A role applies to one environment, so the same member can manage an instance in Development and only view one in
+Production. A coding agent acts with the rights of the user who owns its API key.
+
+<Callout title="The agent stays in Development">
+    The CLI refuses writes outside Development: creating and linking apps, creating and updating instances, binding and
+    unbinding, rotating keys and changing deployment settings. Reads and the version and deployment commands work in
+    every environment. The app template tells the agent that deploying outside Development is a person's decision.
+</Callout>
+
+## The app page
+
+Open **Apps** and select an app. The header holds the **Active** switch and the actions menu (**Edit**, **Delete**),
+both shown only with `APP_MANAGE`.
+
+The **Connections**, **API Collections**, **Workflows**, **Deployments** and **Activity** tabs belong to one instance.
+When the app has more than one instance, an instance selector appears next to the tabs. Each instance also has its own
+page, opened from the **Instances** tab, with the same tabs and **Configure**, **Deployment** and **Share** in its
+header.
+
+### New App and Edit
+
+The dialog sets the app's name, description, hosting target (**Vercel** or **Self-hosted**), the sign-in mode of its
+first instance and **Show in App Portal**. An app appears in the App Portal only when it is active and has an instance
+the member can open.
+
+| Sign-in | Meaning |
+|---|---|
+| **None** | Anyone who reaches the app's URL uses it; it calls ByteChef with its instance key only. |
+| **Optional** | A user may sign in with ByteChef; the app can act for them when they do. |
+| **Required** | Every user signs in with ByteChef before using the app. |
+
+When the authorization server is off, sign-in is unavailable and the instance is created with **None**.
+
+- **Administrator:** creates, edits and deletes apps, and switches them active. Switching an app off stops every one
+  of its instances at once; suspending an instance stops only that instance.
+- **Agent:** `bytechef automation app create --name <name>` creates the app and its first instance, writes
+  `BYTECHEF_URL` and `BYTECHEF_APP_KEY` into `.env.local` and the ids into `.bytechef/app.json`. For an app that
+  already exists, `bytechef automation app link --app-id <id>`. The agent cannot edit, suspend or delete an app.
+
+### Overview
+
+The app's description, owner and status. It is read-only. The agent reads the same information with
+`bytechef automation app status`.
+
+### Instances
+
+Lists the app's instances with their environment, URL, key hint and hosting target. Instances of the app in other
+workspaces are listed read-only, without their key or bindings.
+
+The actions menu of an instance offers:
+
+| Action | What it does | Agent equivalent |
+|---|---|---|
+| **Suspend** / **Activate** | Stops or resumes every call the instance makes | None |
+| **Edit** | Name, URL, hosting target, sign-in mode | `app instance update --url <url>` |
+| **Configure** | Non-secret JSON settings the app reads | None |
+| **Deployment settings** | The connection and settings a hosting provider deploys with | `app instance deployment-settings set`, `get`, `clear` |
+| **Share** | Who in the workspace may use the instance | None |
+| **Rotate key** | Replaces the secret key | `app key rotate` |
+| **Delete** | Removes the instance | None |
+
+**New Instance** adds an instance; the agent uses `bytechef automation app instance create`, and
+`app instance list --app-id <id>` to list them. Set the instance URL before the first sign-in: a sign-in client is
+created only once the URL is set, and sign-in returns to `<URL>/auth/callback`.
+
+#### Configure
+
+A JSON object of at most 64 KB that the app reads at run time. Everyone who can view the instance can see it, so it
+must not hold secrets; credentials belong in connections.
+
+#### Share
+
+Decides which members of the instance's workspace can use the instance.
+
+#### Rotate key
+
+Issues a new secret key and shows it once, with a copy button for the key and for the environment variables. The old key
+stops working, so update the variable on the host and redeploy the app. The agent's `app key rotate` writes the new key
+into `.env.local` and never prints it.
+
+### Connections
+
+Binds a connection so the app can run its actions and tools, or call its API through the proxy. The app never sees the
+credentials.
+
+**Bind Connection** sets:
+
+- **Binding key**: the name the app's code uses, for example `sales_slack`.
+- **Connection**: a connection the instance may use.
+- **Allowed actions**: actions the app's code may run.
+- **Allowed tools**: tools the app's own AI may call.
+- **Proxy** and **Allowed proxy methods**: whether the app may call the connection's API directly, and with which HTTP
+  methods.
+
+- **Administrator:** binds, edits and unbinds connections, and creates the sign-in (OAuth) connections they use.
+- **Agent:** `bytechef automation connection list --component-name <name>` lists connections; those marked `usable`
+  can be bound with `bytechef automation app bind connection --binding-key <key> --component-name <name> --actions <names> --tools <names>`.
+  A binding becomes exactly what the command names, so a change repeats every action and tool to keep. The agent
+  cannot create sign-in connections; it asks a person.
+
+### API Collections
+
+Binds an API collection so the app can call its endpoints with its secret key, at
+`v{collectionVersion}/{contextPath}/{path}`. Each binding lists its endpoints, and **Open in project** opens an
+endpoint's workflow. A collection whose deployment or project is gone or disabled is marked **Unavailable**.
+
+- **Administrator:** binds and unbinds collections. A collection or endpoint the agent created may come back
+  disabled when it could not be armed; a person enables it (`DEPLOYMENT_EDIT` on the collection, plus
+  `API_PLATFORM_EDIT` on an endpoint). Until then its calls answer 409.
+- **Agent:** builds the endpoint workflows with the MCP server, then calls `createAppApiCollection` and
+  `createAppApiEndpoint`, and runs the `bytechef automation app bind api-collection --api-collection-id <id>` command
+  the first returns. After changing a workflow it republishes and calls `updateAppApiCollectionVersion`; the binding
+  stays valid.
+
+### Workflows
+
+Binds a deployed workflow so the app can run it by its **workflow key**, for long-running, approval or background
+work. Only workflows triggered by **Call workflow** can be bound.
+
+- **Administrator:** **Bind Workflow** picks the workflow and sets its key, for example `approve_refund`.
+- **Agent:** deploys the project with the MCP server's `deployProject` and runs the
+  `bytechef automation app bind workflow --workflow-key <key> --deployment-id <id> --workflow-uuid <uuid>` command it
+  prints. The key is what the app's code passes to `workflows.execute`.
+
+### Deployments
+
+The instance's deployment history, newest first: version, status (**Queued**, **Building**, **Ready**, **Failed**,
+**Canceled**), provider, who recorded it, when it was created and finished, and its URL. See
+[Deploying an instance](#deploying-an-instance).
+
+### Activity
+
+Every call the instance made through ByteChef in its environment: actions, tools, proxy requests and workflow runs,
+with the user each call was made for. Selecting a workflow run opens its execution. The agent has no equivalent; it
+checks what the app may call with `npm run bytechef:status` and `bytechef automation app status`.
+
+## Deploying an instance
+
+ByteChef can deploy an instance through its hosting provider: Vercel for a **Vercel** instance, or a deploy hook on
+your own server or CI for a **Self-hosted** instance. A deployment made outside ByteChef can be recorded instead.
+
+### Set up the provider once
+
+A member with `APP_MANAGE` on the instance opens **Deployment settings** from the instance's actions menu, or the
+**Deployment** button on the instance page:
+
+1. Select the **Connection** that holds the provider's credential. Setting it also needs `CONNECTION_EDIT` on that
+   connection.
+2. Fill in the provider's settings, such as the Vercel **Target**, or the `deployUrl` of a deploy hook. Outside
+   Development an `http` deploy URL is refused.
+3. Click **Save**.
+
+The settings are not secret and everyone who can view the instance sees them; the credential stays in the connection.
+**Remove deployment configuration** clears both. The agent does the same in Development with
+`bytechef automation app instance deployment-settings set`.
+
+The app template's `scripts/deploy-agent.mjs` is a reference deploy hook for one app on one machine.
+
+### Deploy, roll back and cancel
+
+Everything here needs `APP_DEPLOY` on the instance, which Editors and Admins of its environment hold.
+
+| Step | In the UI | With the CLI |
+|---|---|---|
+| Create a version (a name and a commit) | Not available | `bytechef automation app version create` |
+| Deploy a version | **Deploy** on the **Deployments** tab, then pick a version | `bytechef automation app deployment deploy` |
+| Roll back | **Roll back** on an earlier **Ready** deployment | `bytechef automation app deployment rollback` |
+| Cancel a running deployment | **Cancel** on a **Queued** or **Building** deployment | `bytechef automation app deployment cancel` |
+| Record a deployment made elsewhere | Not available | `bytechef automation app deployment record --version <name> --commit <sha> --url <url>` |
+| List deployments | The **Deployments** tab | `bytechef automation app deployment list` |
+
+**Deploy** is disabled, with the reason shown below it, while:
+
+- no deployment provider exists for the instance's hosting target,
+- the instance has no deployment connection,
+- a deployment is in progress,
+- the app has no versions yet.
+
+A roll back deploys the chosen version again as a new deployment. A cancel asks the provider to stop the build.
+
+<Callout title="Who promotes to Staging and Production">
+    The agent builds and deploys in Development. Promoting the app to Staging and Production is meant for a person: from
+    the **Deployments** tab, or from CI with that person's own API key and `app deployment deploy` or
+    `app deployment record`.
+</Callout>
+
+## What only a person does
+
+- Creating sign-in (OAuth) connections.
+- Sharing an instance, and suspending or deleting an instance or the app.
+- Editing an instance's **Configure** JSON.
+- Enabling an API collection or endpoint that could not be armed.
+- Deploying outside Development.
