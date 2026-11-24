@@ -20,7 +20,7 @@ dependencies {
     testImplementation(project(":server:libs:atlas:atlas-worker:atlas-worker-config"))
     testImplementation(project(":server:libs:config:async-config"))
     testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
-    testImplementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
+    testImplementation(project(":server:libs:core:file-storage:file-storage-base64-impl"))
     testImplementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
     testImplementation(project(":server:libs:core:message:message-event:message-event-impl"))
     testImplementation(project(":server:libs:test:test-support"))

@@ -30,7 +30,7 @@ dependencies {
     testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
     testImplementation(project(":server:libs:core:commons:commons-data"))
     testImplementation(project(":server:libs:core:encryption:encryption-impl"))
-    testImplementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
+    testImplementation(project(":server:libs:core:file-storage:file-storage-base64-impl"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:platform:platform-component:platform-component-context:platform-component-context-service"))
     testImplementation(project(":server:libs:platform:platform-component:platform-component-service"))

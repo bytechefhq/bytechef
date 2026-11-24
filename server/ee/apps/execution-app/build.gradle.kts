@@ -40,7 +40,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:evaluator:evaluator-impl"))
-    implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
+    implementation(project(":server:libs:core:file-storage:file-storage-filesystem-impl"))
     implementation(project(":server:libs:core:rest:rest-impl"))
     implementation(project(":server:libs:core:tenant:tenant-single-service"))
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-file-storage:platform-data-storage-file-storage-service"))

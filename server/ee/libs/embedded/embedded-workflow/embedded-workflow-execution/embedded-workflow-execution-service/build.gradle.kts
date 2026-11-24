@@ -23,7 +23,7 @@ dependencies {
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:core:encryption:encryption-impl"))
     testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
-    testImplementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
+    testImplementation(project(":server:libs:core:file-storage:file-storage-base64-impl"))
     testImplementation(project(":server:libs:platform:platform-category:platform-category-service"))
     testImplementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
