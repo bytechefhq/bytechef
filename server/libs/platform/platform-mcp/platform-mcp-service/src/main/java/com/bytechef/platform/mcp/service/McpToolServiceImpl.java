@@ -99,6 +99,13 @@ public class McpToolServiceImpl implements McpToolService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<Long> fetchMcpToolMcpComponentId(long mcpToolId) {
+        return mcpToolRepository.findById(mcpToolId)
+            .map(McpTool::getMcpComponentId);
+    }
+
+    @Override
     @PreAuthorize("isTenantAdmin()")
     public List<McpTool> getMcpTools() {
         return mcpToolRepository.findAll();

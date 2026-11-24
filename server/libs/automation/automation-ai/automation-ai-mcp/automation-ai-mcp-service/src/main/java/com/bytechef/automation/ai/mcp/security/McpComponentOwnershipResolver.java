@@ -18,8 +18,7 @@ package com.bytechef.automation.ai.mcp.security;
 
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
-import com.bytechef.platform.mcp.domain.McpComponent;
-import com.bytechef.platform.mcp.repository.McpComponentRepository;
+import com.bytechef.platform.mcp.service.McpComponentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
@@ -29,14 +28,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class McpComponentOwnershipResolver implements ResourceOwnershipResolver {
 
-    private final McpComponentRepository mcpComponentRepository;
+    private final McpComponentService mcpComponentService;
     private final WorkspaceMcpServerService workspaceMcpServerService;
 
     @SuppressFBWarnings("EI")
     public McpComponentOwnershipResolver(
-        McpComponentRepository mcpComponentRepository, WorkspaceMcpServerService workspaceMcpServerService) {
+        McpComponentService mcpComponentService, WorkspaceMcpServerService workspaceMcpServerService) {
 
-        this.mcpComponentRepository = mcpComponentRepository;
+        this.mcpComponentService = mcpComponentService;
         this.workspaceMcpServerService = workspaceMcpServerService;
     }
 
@@ -47,8 +46,7 @@ public class McpComponentOwnershipResolver implements ResourceOwnershipResolver 
 
     @Override
     public ResourceOwner resolveOwner(long id) {
-        return mcpComponentRepository.findById(id)
-            .map(McpComponent::getMcpServerId)
+        return mcpComponentService.fetchMcpComponentMcpServerId(id)
             .flatMap(workspaceMcpServerService::fetchMcpServerWorkspaceId)
             .map(ResourceOwner::ofWorkspace)
             .orElseGet(ResourceOwner::unknown);

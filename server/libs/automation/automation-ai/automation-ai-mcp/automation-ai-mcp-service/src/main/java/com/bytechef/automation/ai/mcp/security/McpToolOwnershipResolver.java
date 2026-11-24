@@ -18,10 +18,8 @@ package com.bytechef.automation.ai.mcp.security;
 
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
-import com.bytechef.platform.mcp.domain.McpComponent;
-import com.bytechef.platform.mcp.domain.McpTool;
-import com.bytechef.platform.mcp.repository.McpComponentRepository;
-import com.bytechef.platform.mcp.repository.McpToolRepository;
+import com.bytechef.platform.mcp.service.McpComponentService;
+import com.bytechef.platform.mcp.service.McpToolService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
@@ -31,17 +29,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class McpToolOwnershipResolver implements ResourceOwnershipResolver {
 
-    private final McpComponentRepository mcpComponentRepository;
-    private final McpToolRepository mcpToolRepository;
+    private final McpComponentService mcpComponentService;
+    private final McpToolService mcpToolService;
     private final WorkspaceMcpServerService workspaceMcpServerService;
 
     @SuppressFBWarnings("EI")
     public McpToolOwnershipResolver(
-        McpComponentRepository mcpComponentRepository, McpToolRepository mcpToolRepository,
+        McpComponentService mcpComponentService, McpToolService mcpToolService,
         WorkspaceMcpServerService workspaceMcpServerService) {
 
-        this.mcpComponentRepository = mcpComponentRepository;
-        this.mcpToolRepository = mcpToolRepository;
+        this.mcpComponentService = mcpComponentService;
+        this.mcpToolService = mcpToolService;
         this.workspaceMcpServerService = workspaceMcpServerService;
     }
 
@@ -52,10 +50,8 @@ public class McpToolOwnershipResolver implements ResourceOwnershipResolver {
 
     @Override
     public ResourceOwner resolveOwner(long id) {
-        return mcpToolRepository.findById(id)
-            .map(McpTool::getMcpComponentId)
-            .flatMap(mcpComponentRepository::findById)
-            .map(McpComponent::getMcpServerId)
+        return mcpToolService.fetchMcpToolMcpComponentId(id)
+            .flatMap(mcpComponentService::fetchMcpComponentMcpServerId)
             .flatMap(workspaceMcpServerService::fetchMcpServerWorkspaceId)
             .map(ResourceOwner::ofWorkspace)
             .orElseGet(ResourceOwner::unknown);

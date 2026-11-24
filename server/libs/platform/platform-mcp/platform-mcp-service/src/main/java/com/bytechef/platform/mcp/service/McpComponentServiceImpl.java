@@ -28,6 +28,7 @@ import com.bytechef.platform.mcp.repository.McpToolRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.springframework.dao.DuplicateKeyException;
@@ -139,6 +140,13 @@ public class McpComponentServiceImpl implements McpComponentService {
         mcpToolRepository.deleteAll(mcpToolRepository.findAllByMcpComponentId(mcpComponent.getId()));
 
         mcpComponentRepository.delete(mcpComponent);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Long> fetchMcpComponentMcpServerId(long mcpComponentId) {
+        return mcpComponentRepository.findById(mcpComponentId)
+            .map(McpComponent::getMcpServerId);
     }
 
     @Override

@@ -57,6 +57,8 @@ public interface McpToolService {
      */
     Optional<McpTool> fetchMcpTool(long mcpToolId);
 
+    Optional<Long> fetchMcpToolMcpComponentId(long mcpToolId);
+
     /**
      * Gets all MCP tools.
      *
