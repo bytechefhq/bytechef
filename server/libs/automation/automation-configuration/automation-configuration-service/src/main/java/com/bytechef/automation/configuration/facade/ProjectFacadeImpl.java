@@ -911,7 +911,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private long importProjectTemplate(byte[] projectData, long workspaceId) {
         TemplateFiles templateFiles = readTemplate(projectData, false);
 
-        ProjectInfo projectInfo = JsonUtils.read(templateFiles.projectJson, ProjectInfo.class);
+        ProjectInfo projectInfo = readProjectFileEntry(templateFiles.projectJson, ProjectInfo.class, "project.json");
+
+        if (projectInfo == null || StringUtils.isBlank(projectInfo.name())) {
+            throw new ConfigurationException(
+                "The project file is not valid. The project.json entry has no project name.",
+                ProjectErrorType.INVALID_PROJECT_FILE);
+        }
 
         Project project = new Project();
 
@@ -930,7 +936,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         }
 
         for (String workflowJson : templateFiles.workflowJsons) {
-            String definition = JsonUtils.read(workflowJson, String.class);
+            String definition = readProjectFileEntry(workflowJson, String.class, "workflow");
 
             projectWorkflowFacade.addWorkflow(projectId, definition);
         }
@@ -966,16 +972,33 @@ public class ProjectFacadeImpl implements ProjectFacade {
                 zipInputStream.closeEntry();
             }
 
-            if (projectJson == null || sharedTemplate && (templateJson == null)
-                || workflowJsons.isEmpty() && codeWorkflowSource == null) {
+            if (projectJson == null) {
+                throw new ConfigurationException(
+                    "The project file is not valid. Use a .zip file that you exported from a project.",
+                    ProjectErrorType.INVALID_PROJECT_FILE);
+            }
 
-                throw new RuntimeException("Missing files in a shared project file");
+            if (sharedTemplate && templateJson == null) {
+                throw new ConfigurationException(
+                    "The project template is not valid. The template.json entry is missing.",
+                    ProjectErrorType.INVALID_PROJECT_FILE);
             }
 
             return new TemplateFiles(templateJson, projectJson, workflowJsons, codeWorkflowLanguage,
                 codeWorkflowSource);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to read shared project", e);
+            throw new ConfigurationException(
+                "The project file is not a valid .zip file.", ProjectErrorType.INVALID_PROJECT_FILE);
+        }
+    }
+
+    private static <T> T readProjectFileEntry(String json, Class<T> valueType, String entryName) {
+        try {
+            return JsonUtils.read(json, valueType);
+        } catch (RuntimeException e) {
+            throw new ConfigurationException(
+                "The project file is not valid. The %s entry is not valid JSON.".formatted(entryName),
+                ProjectErrorType.INVALID_PROJECT_FILE);
         }
     }
 
