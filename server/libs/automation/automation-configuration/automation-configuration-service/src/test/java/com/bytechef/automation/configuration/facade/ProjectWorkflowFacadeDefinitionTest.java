@@ -17,7 +17,7 @@
 package com.bytechef.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.bytechef.automation.configuration.exception.ProjectErrorType;
 import com.bytechef.commons.util.JsonUtils;
@@ -85,9 +85,9 @@ class ProjectWorkflowFacadeDefinitionTest {
     }
 
     private static void assertInvalidWorkflowDefinition(String definition) {
-        assertThatThrownBy(() -> ProjectWorkflowFacadeImpl.toJsonDefinition(definition))
-            .isInstanceOf(ConfigurationException.class)
-            .satisfies(exception -> assertThat(((ConfigurationException) exception).getErrorKey())
-                .isEqualTo(ProjectErrorType.INVALID_WORKFLOW_DEFINITION.getErrorKey()));
+        assertThatExceptionOfType(ConfigurationException.class)
+            .isThrownBy(() -> ProjectWorkflowFacadeImpl.toJsonDefinition(definition))
+            .extracting(ConfigurationException::getErrorKey)
+            .isEqualTo(ProjectErrorType.INVALID_WORKFLOW_DEFINITION.getErrorKey());
     }
 }

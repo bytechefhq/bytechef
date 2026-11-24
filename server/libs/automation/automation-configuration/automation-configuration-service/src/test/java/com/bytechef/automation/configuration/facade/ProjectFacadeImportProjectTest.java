@@ -17,7 +17,7 @@
 package com.bytechef.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import org.assertj.core.api.ThrowableAssertAlternative;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -106,52 +107,39 @@ class ProjectFacadeImportProjectTest {
 
     @Test
     void testImportProjectRejectsAFileThatIsNotAZipArchive() {
-        byte[] projectData = "not a zip file".getBytes(StandardCharsets.UTF_8);
-
-        assertThatThrownBy(() -> projectFacade.importProject(projectData, 1L))
-            .isInstanceOf(ConfigurationException.class)
-            .satisfies(exception -> assertInvalidProjectFile((ConfigurationException) exception));
-
-        verify(projectService, never()).create(any(Project.class));
+        assertImportRejected("not a zip file".getBytes(StandardCharsets.UTF_8));
     }
 
     @Test
     void testImportProjectRejectsAnArchiveWithoutProjectJson() throws IOException {
-        byte[] projectData = projectArchive(Map.of("workflow-1.json", "\"{}\""));
-
-        assertThatThrownBy(() -> projectFacade.importProject(projectData, 1L))
-            .isInstanceOf(ConfigurationException.class)
-            .satisfies(exception -> assertInvalidProjectFile((ConfigurationException) exception));
-
-        verify(projectService, never()).create(any(Project.class));
+        assertImportRejected(projectArchive(Map.of("workflow-1.json", "\"{}\"")));
     }
 
     @Test
     void testImportProjectRejectsAProjectJsonThatIsNotValidJson() throws IOException {
-        byte[] projectData = projectArchive(Map.of("project.json", "{name"));
-
-        assertThatThrownBy(() -> projectFacade.importProject(projectData, 1L))
-            .isInstanceOf(ConfigurationException.class)
-            .hasMessageContaining("project.json")
-            .satisfies(exception -> assertInvalidProjectFile((ConfigurationException) exception));
-
-        verify(projectService, never()).create(any(Project.class));
+        assertImportRejected(projectArchive(Map.of("project.json", "{name")))
+            .withMessageContaining("project.json");
     }
 
     @Test
     void testImportProjectRejectsAProjectJsonWithoutName() throws IOException {
-        byte[] projectData = projectArchive(Map.of("project.json", "{\"description\":\"no name\"}"));
-
-        assertThatThrownBy(() -> projectFacade.importProject(projectData, 1L))
-            .isInstanceOf(ConfigurationException.class)
-            .satisfies(exception -> assertInvalidProjectFile((ConfigurationException) exception));
-
-        verify(projectService, never()).create(any(Project.class));
+        assertImportRejected(projectArchive(Map.of("project.json", "{\"description\":\"no name\"}")));
     }
 
-    private static void assertInvalidProjectFile(ConfigurationException configurationException) {
-        assertThat(configurationException.getErrorKey()).isEqualTo(ProjectErrorType.INVALID_PROJECT_FILE.getErrorKey());
-        assertThat(configurationException.getCause()).isNull();
+    private ThrowableAssertAlternative<ConfigurationException> assertImportRejected(byte[] projectData) {
+        ThrowableAssertAlternative<ConfigurationException> throwableAssert =
+            assertThatExceptionOfType(ConfigurationException.class)
+                .isThrownBy(() -> projectFacade.importProject(projectData, 1L));
+
+        throwableAssert.satisfies(configurationException -> {
+            assertThat(configurationException.getErrorKey())
+                .isEqualTo(ProjectErrorType.INVALID_PROJECT_FILE.getErrorKey());
+            assertThat(configurationException.getCause()).isNull();
+        });
+
+        verify(projectService, never()).create(any(Project.class));
+
+        return throwableAssert;
     }
 
     private static byte[] projectArchive(Map<String, String> entries) throws IOException {
