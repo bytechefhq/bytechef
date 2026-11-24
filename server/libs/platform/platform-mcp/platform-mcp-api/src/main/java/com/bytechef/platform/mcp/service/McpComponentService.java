@@ -19,6 +19,7 @@ package com.bytechef.platform.mcp.service;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpTool;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
@@ -49,6 +50,8 @@ public interface McpComponentService {
      * @param mcpComponentId the ID of the MCP component to delete
      */
     void delete(long mcpComponentId);
+
+    Optional<Long> fetchMcpComponentMcpServerId(long mcpComponentId);
 
     /**
      * Retrieves an MCP component by its ID.
