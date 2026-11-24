@@ -347,3 +347,49 @@ val testIntegrationReport by tasks.registering(TestReport::class) {
     destinationDirectory.set(file("${layout.buildDirectory.get()}/reports/tests"))
     testResults.from(testIntegration)
 }
+
+if (project.name.endsWith("-service")) {
+    val allowedServiceDependencies = setOf(
+        ":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-service -> " +
+            ":server:libs:atlas:atlas-execution:atlas-execution-service"
+    )
+    val projectPath = project.path
+
+    val serviceDependencyViolations = provider {
+        listOf("api", "compileOnly", "implementation", "runtimeOnly")
+            .mapNotNull { configurationName -> configurations.findByName(configurationName) }
+            .flatMap { configuration ->
+                configuration.dependencies
+                    .withType<ProjectDependency>()
+                    .map { projectDependency -> configuration.name to projectDependency.path }
+            }
+            .filter { (_, dependencyPath) -> dependencyPath.endsWith("-service") }
+            .filter { (_, dependencyPath) -> "$projectPath -> $dependencyPath" !in allowedServiceDependencies }
+            .map { (configurationName, dependencyPath) -> "$configurationName(project(\"$dependencyPath\"))" }
+            .sorted()
+    }
+
+    val checkServiceDependencies by tasks.registering {
+        group = "verification"
+        description = "Fails when a service module depends on another service module outside the test configurations."
+
+        val violations = serviceDependencyViolations
+
+        inputs.property("violations", violations)
+
+        doLast {
+            val dependencies = violations.get()
+
+            if (dependencies.isNotEmpty()) {
+                throw GradleException(
+                    "$projectPath must not depend on other service modules outside the test configurations; " +
+                        "depend on their -api modules instead and let the app module provide the beans:\n  " +
+                        dependencies.joinToString("\n  "))
+            }
+        }
+    }
+
+    tasks.named("check") {
+        dependsOn(checkServiceDependencies)
+    }
+}
