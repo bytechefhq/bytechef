@@ -30,6 +30,7 @@ import {
     useGetProjectWorkflowQuery,
     useGetProjectWorkflowsQuery,
 } from '@/shared/queries/automation/projectWorkflows.queries';
+import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
 import {GetComponentDefinitionsRequestI} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -151,6 +152,8 @@ export const useProject = () => {
             void queryClient.invalidateQueries({
                 queryKey: ProjectWorkflowKeys.workflows,
             });
+
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.project(+projectId!)});
 
             setShowEditWorkflowDialog(false);
         },

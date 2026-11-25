@@ -8,6 +8,7 @@ import {
 } from '@/shared/mutations/platform/workflowNodeParameters.mutations';
 import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workflows.mutations';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
+import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {act, renderHook} from '@testing-library/react';
 import {ReactNode} from 'react';
@@ -163,5 +164,19 @@ describe('useProject', () => {
             {id: 'workflow-a', version: 1},
             {id: 'workflow-b', version: 4},
         ]);
+    });
+
+    it('refetches the project after the Edit Workflow dialog saves, so Publish sees the new unpublished changes', () => {
+        const queryClient = renderUseProjectWithCachedWorkflows();
+
+        const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+        const editWorkflowMutationOptions = vi.mocked(useUpdatePlatformWorkflowMutation).mock.calls[1][0];
+
+        act(() => {
+            editWorkflowMutationOptions.onSuccess?.({id: 'workflow-b', version: 2} as Workflow);
+        });
+
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ProjectKeys.project(PROJECT_ID)});
     });
 });
