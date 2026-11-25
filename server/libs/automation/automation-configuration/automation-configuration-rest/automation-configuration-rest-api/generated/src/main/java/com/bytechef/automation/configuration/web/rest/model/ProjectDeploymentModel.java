@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectDeployment", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectDeployment")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T14:37:43.821704+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-25T10:59:01.405908+01:00[Europe/Belgrade]", comments = "Generator version: 7.27.0")
 public class ProjectDeploymentModel {
 
   private @Nullable String createdBy;
@@ -47,6 +47,9 @@ public class ProjectDeploymentModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime lastExecutionDate;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private @Nullable OffsetDateTime lastExecutionStartDate;
 
   private @Nullable String lastModifiedBy;
 
@@ -223,6 +226,27 @@ public class ProjectDeploymentModel {
   @JsonProperty("lastExecutionDate")
   public void setLastExecutionDate(@Nullable OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
+  }
+
+  public ProjectDeploymentModel lastExecutionStartDate(@Nullable OffsetDateTime lastExecutionStartDate) {
+    this.lastExecutionStartDate = lastExecutionStartDate;
+    return this;
+  }
+
+  /**
+   * The start date of the last execution.
+   * @return lastExecutionStartDate
+   */
+  @Valid 
+  @Schema(name = "lastExecutionStartDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The start date of the last execution.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastExecutionStartDate")
+  public @Nullable OffsetDateTime getLastExecutionStartDate() {
+    return lastExecutionStartDate;
+  }
+
+  @JsonProperty("lastExecutionStartDate")
+  public void setLastExecutionStartDate(@Nullable OffsetDateTime lastExecutionStartDate) {
+    this.lastExecutionStartDate = lastExecutionStartDate;
   }
 
   public ProjectDeploymentModel lastModifiedBy(@Nullable String lastModifiedBy) {
@@ -446,6 +470,7 @@ public class ProjectDeploymentModel {
         Objects.equals(this.environmentId, projectDeployment.environmentId) &&
         Objects.equals(this.id, projectDeployment.id) &&
         Objects.equals(this.lastExecutionDate, projectDeployment.lastExecutionDate) &&
+        Objects.equals(this.lastExecutionStartDate, projectDeployment.lastExecutionStartDate) &&
         Objects.equals(this.lastModifiedBy, projectDeployment.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, projectDeployment.lastModifiedDate) &&
         Objects.equals(this.name, projectDeployment.name) &&
@@ -459,7 +484,7 @@ public class ProjectDeploymentModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, enabled, environmentId, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, projectId, projectVersion, project, projectDeploymentWorkflows, tags, version);
+    return Objects.hash(createdBy, createdDate, description, enabled, environmentId, id, lastExecutionDate, lastExecutionStartDate, lastModifiedBy, lastModifiedDate, name, projectId, projectVersion, project, projectDeploymentWorkflows, tags, version);
   }
 
   @Override
@@ -473,6 +498,7 @@ public class ProjectDeploymentModel {
     sb.append("    environmentId: ").append(toIndentedString(environmentId)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
+    sb.append("    lastExecutionStartDate: ").append(toIndentedString(lastExecutionStartDate)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
