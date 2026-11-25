@@ -102,6 +102,10 @@ if (!Element.prototype.scrollTo) {
     Element.prototype.scrollTo = vi.fn();
 }
 
+if (!Selection.prototype.modify) {
+    Selection.prototype.modify = vi.fn();
+}
+
 // ProseMirror/TipTap rely on DOM geometry APIs that jsdom does not fully implement.
 // Provide minimal, test-only polyfills to avoid runtime errors like
 // "TypeError: target.getClientRects is not a function" when computing selection coords.
