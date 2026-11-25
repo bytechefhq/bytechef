@@ -236,7 +236,7 @@ public class ProjectWorkflowTools {
     }
 
     @Tool(
-        description = "Create a new workflow in a ByteChef project. The definition is validated first: if it has errors, nothing is saved and the errors are returned, so fix them and call this again with the complete definition. Returns the created workflow information including id, project id, workflow id, and reference code.")
+        description = "Create a new workflow in a ByteChef project. The definition is validated first: if it has errors, nothing is saved and the errors are returned, so fix them and call this again with the complete definition. Returns the created workflow information including id, project id, workflow id, reference code and the validation warnings of the saved definition; fix every warning with updateWorkflow before you tell the user the workflow is ready.")
     public ProjectWorkflowInfo createProjectWorkflow(
         @ToolParam(description = "The ID of the project to add the workflow to") long projectId,
         @ToolParam(
@@ -247,9 +247,10 @@ public class ProjectWorkflowTools {
         scopedProjectGuard.checkProject(projectId, ScopedProjectGuard.WORKFLOW_CREATE, toolContext,
             ProjectWorkflowErrorType.CREATE_WORKFLOW);
         checkAllowedComponents(definition, toolContext, ProjectWorkflowErrorType.CREATE_WORKFLOW);
-        validateBeforeSave(definition, null, ProjectWorkflowErrorType.CREATE_WORKFLOW);
+        List<String> warnings = validateBeforeSave(definition, null, ProjectWorkflowErrorType.CREATE_WORKFLOW);
 
-        ProjectWorkflowInfo filledProjectWorkflowInfo = fillEmptyTargetWorkflow(projectId, definition, toolContext);
+        ProjectWorkflowInfo filledProjectWorkflowInfo = fillEmptyTargetWorkflow(
+            projectId, definition, warnings, toolContext);
 
         if (filledProjectWorkflowInfo != null) {
             return filledProjectWorkflowInfo;
@@ -274,7 +275,8 @@ public class ProjectWorkflowTools {
                 projectWorkflow.getId(), projectWorkflow.getProjectId(), projectWorkflow.getProjectVersion(),
                 projectWorkflow.getWorkflowId(), projectWorkflow.getUuidAsString(),
                 projectWorkflow.getCreatedDate() != null ? projectWorkflow.getCreatedDate() : null,
-                projectWorkflow.getLastModifiedDate() != null ? projectWorkflow.getLastModifiedDate() : null);
+                projectWorkflow.getLastModifiedDate() != null ? projectWorkflow.getLastModifiedDate() : null,
+                warnings);
         } catch (Exception e) {
             log.error(
                 "createProjectWorkflow({}): Failed to create workflow for project {}", projectId, projectId, e);
@@ -289,7 +291,7 @@ public class ProjectWorkflowTools {
      * builder is creating a workflow in, so a build never leaves the caller's workflow empty next to a second one.
      */
     private @Nullable ProjectWorkflowInfo fillEmptyTargetWorkflow(
-        long projectId, String definition, @Nullable ToolContext toolContext) {
+        long projectId, String definition, List<String> warnings, @Nullable ToolContext toolContext) {
 
         String targetWorkflowId = toolContext == null
             ? null : WorkflowPersistCaptureUtils.fetchTargetWorkflowId(toolContext.getContext());
@@ -325,7 +327,7 @@ public class ProjectWorkflowTools {
         return new ProjectWorkflowInfo(
             updatedProjectWorkflowDTO.getProjectWorkflowId(), projectId, updatedProjectWorkflowDTO.getProjectVersion(),
             targetWorkflowId, updatedProjectWorkflowDTO.getWorkflowUuid(), updatedProjectWorkflowDTO.getCreatedDate(),
-            updatedProjectWorkflowDTO.getLastModifiedDate());
+            updatedProjectWorkflowDTO.getLastModifiedDate(), warnings);
     }
 
     private List<String> validateBeforeSave(
@@ -393,7 +395,7 @@ public class ProjectWorkflowTools {
     }
 
     @Tool(
-        description = "Update the workflow definition. Pass the version returned by the getWorkflow or updateWorkflow call the new definition is based on; if the workflow changed since then the update is rejected and the workflow must be re-read with getWorkflow. The definition is validated first: if it has errors, nothing is saved and the errors are returned, so fix them and call this again with the same version. Returns the updated workflow id, name, new version and any validation warnings; the saved definition is the one you sent.")
+        description = "Update the workflow definition. Pass the version returned by the getWorkflow or updateWorkflow call the new definition is based on; if the workflow changed since then the update is rejected and the workflow must be re-read with getWorkflow. The definition is validated first: if it has errors, nothing is saved and the errors are returned, so fix them and call this again with the same version. Returns the updated workflow id, name, new version and any validation warnings; the saved definition is the one you sent. Fix every warning with another updateWorkflow call before you tell the user the workflow is ready.")
     public WorkflowSaveInfo updateWorkflow(
         @ToolParam(description = "The ID of the workflow to update") String workflowId,
         @ToolParam(

@@ -213,6 +213,21 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
+        void testCreateProjectWorkflowReturnsTheWarningsOfTheSavedDefinition() {
+            String warning = "[slack_1] Property 'newIssue_1.user.login' might not exist in the output of " +
+                "'github/v1/newIssue'";
+
+            when(workflowValidatorFacade.validateWorkflow(eq(DEFINITION), any(), anyLong())).thenReturn(
+                new WorkflowValidatorFacade.WorkflowValidationResult(List.of(), List.of(warning)));
+            when(projectWorkflowFacade.addWorkflow(7L, DEFINITION)).thenReturn(buildProjectWorkflow(55L, 7L, "wf-1"));
+
+            ProjectWorkflowInfo projectWorkflowInfo = newTools(null, workflowValidatorFacade)
+                .createProjectWorkflow(7L, DEFINITION, toolContext);
+
+            assertThat(projectWorkflowInfo.warnings()).containsExactly(warning);
+        }
+
+        @Test
         void testUpdateWorkflowSavesAValidDefinitionAndReturnsItsWarnings() {
             when(projectWorkflowFacade.getProjectWorkflow("wf-uuid-2")).thenReturn(buildDto("wf-uuid-2", 88L, 3));
             when(projectWorkflowFacade.updateWorkflow("wf-uuid-2", DEFINITION, 3))

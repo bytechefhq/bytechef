@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.List;
 
 /**
  * Project workflow information record for API responses.
@@ -34,5 +35,6 @@ public record ProjectWorkflowInfo(
     @JsonProperty("workflow_id") @JsonPropertyDescription("The unique identifier of the workflow") String workflowId,
     @JsonProperty("workflow_uuid") @JsonPropertyDescription("The uuid of the workflow") String workflowUuid,
     @JsonProperty("created_date") @JsonPropertyDescription("When the workflow was created") Instant createdDate,
-    @JsonProperty("last_modified_date") @JsonPropertyDescription("When the workflow was last modified") Instant lastModifiedDate) {
+    @JsonProperty("last_modified_date") @JsonPropertyDescription("When the workflow was last modified") Instant lastModifiedDate,
+    @JsonProperty("warnings") @JsonPropertyDescription(WorkflowSaveInfo.WARNINGS_DESCRIPTION) List<String> warnings) {
 }

@@ -30,5 +30,10 @@ public record WorkflowSaveInfo(
     @JsonProperty("project_workflow_id") @JsonPropertyDescription("The unique identifier of the project workflow") Long projectWorkflowId,
     @JsonProperty("name") @JsonPropertyDescription("The name of the workflow") String name,
     @JsonProperty("version") @JsonPropertyDescription("The version of the saved workflow, to pass to the next updateWorkflow") int version,
-    @JsonProperty("warnings") @JsonPropertyDescription("Validation warnings of the saved definition; they did not block the save") List<String> warnings) {
+    @JsonProperty("warnings") @JsonPropertyDescription(WARNINGS_DESCRIPTION) List<String> warnings) {
+
+    public static final String WARNINGS_DESCRIPTION =
+        "Problems in the saved definition that did not block the save. Fix every one with updateWorkflow before " +
+            "you tell the user the workflow is ready; a property that might not exist in an output usually means " +
+            "a wrong reference, so check the trigger's or task's output with getTaskOutputProperty first";
 }
