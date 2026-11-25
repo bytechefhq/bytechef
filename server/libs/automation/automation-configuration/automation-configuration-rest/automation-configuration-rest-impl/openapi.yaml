@@ -1512,6 +1512,11 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
+        lastExecutionStartDate:
+          description: "The start date of the last execution."
+          type: "string"
+          format: "date-time"
+          readOnly: true
         lastModifiedBy:
           description: "The last modified by."
           type: "string"
@@ -1567,6 +1572,10 @@ components:
           readOnly: true
         lastExecutionDate:
           description: "The last execution date of a project deployment."
+          type: "string"
+          format: "date-time"
+        lastExecutionStartDate:
+          description: "The start date of the last execution of a project deployment."
           type: "string"
           format: "date-time"
         lastExecutionStatus:
