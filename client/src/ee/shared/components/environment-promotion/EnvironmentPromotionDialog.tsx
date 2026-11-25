@@ -33,11 +33,6 @@ export interface EnvironmentPromotionDialogProps {
     workspaceId: number;
 }
 
-const MINTS_NEW_URL_RESOURCE_TYPES: PromotionResourceType[] = [
-    PromotionResourceType.A2AServer,
-    PromotionResourceType.McpServer,
-];
-
 const TARGET_LIST_PATHS: Record<PromotionResourceType, string> = {
     [PromotionResourceType.A2AServer]: '/automation/a2a-servers',
     [PromotionResourceType.ApiCollection]: '/automation/api-platform/api-collections',
@@ -78,8 +73,6 @@ const EnvironmentPromotionDialog = ({
     };
 
     const willCreateTarget = preview ? preview.existingTargetId == null : false;
-
-    const mintsNewUrl = willCreateTarget && MINTS_NEW_URL_RESOURCE_TYPES.includes(resourceType);
 
     const handlePromoteClick = async () => {
         let result: Awaited<ReturnType<typeof handlePromote>>;
@@ -219,39 +212,16 @@ const EnvironmentPromotionDialog = ({
                                     </Alert>
                                 ))}
 
-                                {mintsNewUrl && (
-                                    <Alert variant="warning">
-                                        <AlertTriangleIcon />
-
-                                        <AlertTitle>Creates a new URL</AlertTitle>
-
-                                        <AlertDescription>
-                                            The created counterpart mints its own secret key and URL, different from the
-                                            source. The new URL is shown once the promotion completes.
-                                        </AlertDescription>
-                                    </Alert>
-                                )}
-
-                                {willCreateTarget && unresolvedConnectionCount > 0 && (
-                                    <Alert variant="warning">
-                                        <AlertTriangleIcon />
-
-                                        <AlertTitle>Will be created disabled</AlertTitle>
-
-                                        <AlertDescription>
-                                            {`${unresolvedConnectionCount} connection(s) are unresolved, so the new target starts disabled until they're bound.`}
-                                        </AlertDescription>
-                                    </Alert>
-                                )}
-
-                                {!willCreateTarget && unresolvedConnectionCount > 0 && (
+                                {unresolvedConnectionCount > 0 && (
                                     <Alert variant="warning">
                                         <AlertTriangleIcon />
 
                                         <AlertTitle>Unbound connections</AlertTitle>
 
                                         <AlertDescription>
-                                            {`${unresolvedConnectionCount} connection(s) are unresolved, so the affected nodes in the existing target are published without a connection.`}
+                                            {willCreateTarget
+                                                ? `${unresolvedConnectionCount} connection(s) are unresolved; bind them in the new target before enabling it.`
+                                                : `${unresolvedConnectionCount} connection(s) are unresolved, so the affected nodes in the existing target are published without a connection.`}
                                         </AlertDescription>
                                     </Alert>
                                 )}

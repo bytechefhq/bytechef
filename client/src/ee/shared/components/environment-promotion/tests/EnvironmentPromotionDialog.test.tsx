@@ -199,7 +199,7 @@ describe('EnvironmentPromotionDialog', () => {
         expect(await screen.findByText('Slack Staging')).toBeInTheDocument();
     });
 
-    it('warns that the target will be created disabled when a connection is left unresolved', async () => {
+    it('warns about unbound connections when a connection is left unresolved for a new target', async () => {
         vi.mocked(mockUseEnvironmentPromotionPreviewQuery).mockReturnValue({
             data: {
                 environmentPromotionPreview: makePreview({
@@ -486,8 +486,6 @@ describe('EnvironmentPromotionDialog', () => {
         render(<EnvironmentPromotionDialog {...defaultProps} resourceType={PromotionResourceType.A2AServer} />);
 
         await screen.findByText('Slack Staging');
-
-        expect(screen.getByText('Creates a new URL')).toBeInTheDocument();
 
         await user.click(screen.getByRole('button', {name: 'Promote'}));
 
