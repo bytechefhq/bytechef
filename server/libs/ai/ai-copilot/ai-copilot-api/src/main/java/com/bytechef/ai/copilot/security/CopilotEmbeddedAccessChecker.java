@@ -23,7 +23,12 @@ import org.springframework.security.core.Authentication;
  */
 public interface CopilotEmbeddedAccessChecker {
 
+    AutomationProjectScope checkAutomationProjectWorkflowAccess(String workflowId);
+
     void checkIntegrationWorkflowAccess(String workflowId);
 
     boolean isConnectedUser(Authentication authentication);
+
+    record AutomationProjectScope(long projectId, long workspaceId) {
+    }
 }

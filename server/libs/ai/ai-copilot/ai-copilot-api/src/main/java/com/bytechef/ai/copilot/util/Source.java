@@ -47,18 +47,25 @@ public enum Source {
     CODE_WORKFLOW,
     CODE_WORKFLOW_EMBEDDED(WorkflowOwner.INTEGRATION, false),
     WORKFLOW_EDITOR_EMBEDDED(WorkflowOwner.INTEGRATION, false),
-    WORKFLOW_EXECUTION_EMBEDDED(WorkflowOwner.INTEGRATION, false);
+    WORKFLOW_EXECUTION_EMBEDDED(WorkflowOwner.INTEGRATION, false),
+    WORKFLOW_EDITOR_EMBEDDED_AUTOMATION(WorkflowOwner.AUTOMATION_PROJECT, false, WORKFLOW_EDITOR);
 
     private final WorkflowOwner workflowOwner;
     private final boolean buildOnly;
+    private final @Nullable Source agentSource;
 
     Source() {
         this(WorkflowOwner.PROJECT, false);
     }
 
     Source(WorkflowOwner workflowOwner, boolean buildOnly) {
+        this(workflowOwner, buildOnly, null);
+    }
+
+    Source(WorkflowOwner workflowOwner, boolean buildOnly, @Nullable Source agentSource) {
         this.workflowOwner = workflowOwner;
         this.buildOnly = buildOnly;
+        this.agentSource = agentSource;
     }
 
     public static Optional<Source> fromId(String id) {
@@ -78,7 +85,9 @@ public enum Source {
     public String agentId(Mode mode) {
         Mode effectiveMode = resolveMode(mode);
 
-        String agentId = name() + "_" + effectiveMode.name();
+        String agentName = agentSource == null ? name() : agentSource.name();
+
+        String agentId = agentName + "_" + effectiveMode.name();
 
         return agentId.toLowerCase(Locale.ROOT);
     }
@@ -107,6 +116,8 @@ public enum Source {
 
         PROJECT,
 
-        INTEGRATION
+        INTEGRATION,
+
+        AUTOMATION_PROJECT
     }
 }

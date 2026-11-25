@@ -389,6 +389,16 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
 
     @Override
     @PreAuthorize("isTenantAdmin()")
+    public long getProjectWorkflowProjectId(String workflowId) {
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
+
+        Project project = getProjectOfAutomationProject(projectWorkflow.getProjectId());
+
+        return project.getId();
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
     public VersionWorkflowChange getProjectVersionWorkflowChange(
         long projectId, int projectVersion, String workflowUuid) {
 

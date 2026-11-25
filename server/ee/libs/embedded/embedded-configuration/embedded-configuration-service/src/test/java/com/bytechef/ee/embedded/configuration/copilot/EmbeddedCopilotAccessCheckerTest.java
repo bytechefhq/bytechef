@@ -13,6 +13,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.security.CopilotEmbeddedAccessChecker.AutomationProjectScope;
+import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
 import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentication;
 import java.util.List;
@@ -27,9 +31,42 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
  */
 class EmbeddedCopilotAccessCheckerTest {
 
+    private final AutomationProjectFacade automationProjectFacade = mock(AutomationProjectFacade.class);
     private final IntegrationWorkflowFacade integrationWorkflowFacade = mock(IntegrationWorkflowFacade.class);
+    private final ProjectService projectService = mock(ProjectService.class);
     private final EmbeddedCopilotAccessChecker embeddedCopilotAccessChecker =
-        new EmbeddedCopilotAccessChecker(integrationWorkflowFacade);
+        new EmbeddedCopilotAccessChecker(automationProjectFacade, integrationWorkflowFacade, projectService);
+
+    @Test
+    void testCheckAutomationProjectWorkflowAccessScopesTheRunToTheWorkflowProject() {
+        Project project = new Project();
+
+        project.setId(7L);
+        project.setWorkspaceId(1L);
+
+        when(automationProjectFacade.getProjectWorkflowProjectId("wf1")).thenReturn(7L);
+        when(projectService.getProject(7L)).thenReturn(project);
+
+        assertThat(embeddedCopilotAccessChecker.checkAutomationProjectWorkflowAccess("wf1"))
+            .isEqualTo(new AutomationProjectScope(7L, 1L));
+    }
+
+    @Test
+    void testCheckAutomationProjectWorkflowAccessPropagatesADenial() {
+        when(automationProjectFacade.getProjectWorkflowProjectId("wf1")).thenThrow(new AccessDeniedException("denied"));
+
+        assertThatThrownBy(() -> embeddedCopilotAccessChecker.checkAutomationProjectWorkflowAccess("wf1"))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testCheckAutomationProjectWorkflowAccessRejectsAWorkflowOutsideAnAutomationProject() {
+        when(automationProjectFacade.getProjectWorkflowProjectId("wf1"))
+            .thenThrow(new IllegalArgumentException("Project with id 7 is not an automation project"));
+
+        assertThatThrownBy(() -> embeddedCopilotAccessChecker.checkAutomationProjectWorkflowAccess("wf1"))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
 
     @Test
     void testCheckIntegrationWorkflowAccessReadsTheWorkflowThroughTheFacade() {
