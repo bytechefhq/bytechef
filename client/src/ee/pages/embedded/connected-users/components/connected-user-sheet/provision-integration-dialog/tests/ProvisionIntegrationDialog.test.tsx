@@ -11,6 +11,7 @@ import ProvisionIntegrationDialog from '../ProvisionIntegrationDialog';
 const hoisted = vi.hoisted(() => ({
     connectionDefinitionQuery: vi.fn(),
     getProvisionableIntegrations: vi.fn(),
+    integrationWorkflows: [] as Array<Record<string, unknown>>,
     provisionIntegrationInstance: vi.fn(),
     toastError: vi.fn(),
 }));
@@ -53,19 +54,7 @@ vi.mock('@/shared/queries/platform/connectionDefinitions.queries', () => ({
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrationWorkflows.queries', () => ({
-    useGetIntegrationVersionWorkflowsQuery: () => ({
-        data: [
-            {
-                id: 'wf-1',
-                inputs: [
-                    {internalOnly: false, label: 'Channel', name: 'channel', required: true, type: 'string'},
-                    {internalOnly: true, label: 'Secret', name: 'secret', type: 'string'},
-                ],
-                label: 'Notify',
-                workflowUuid: 'u-1',
-            },
-        ],
-    }),
+    useGetIntegrationVersionWorkflowsQuery: () => ({data: hoisted.integrationWorkflows}),
 }));
 
 vi.mock('@/pages/platform/workflow-editor/components/properties/Properties', () => {
@@ -126,12 +115,27 @@ vi.mock('@/shared/components/connection/OAuth2Button', () => ({
     ),
 }));
 
-const buildConfiguration = (id: number, authorizationType: string, selfServe: boolean) => ({
+const NOTIFY_WORKFLOW = {
+    id: 'wf-1',
+    inputs: [
+        {internalOnly: false, label: 'Channel', name: 'channel', required: true, type: 'string'},
+        {internalOnly: true, label: 'Secret', name: 'secret', type: 'string'},
+    ],
+    label: 'Notify',
+    workflowUuid: 'u-1',
+};
+
+const buildConfiguration = (
+    id: number,
+    authorizationType: string,
+    selfServe: boolean,
+    integrationInstanceConfigurationWorkflows = [{workflowId: 'wf-1', workflowUuid: 'u-1'}]
+) => ({
     integrationInstanceConfiguration: {
         authorizationType,
         id,
         integrationId: 1,
-        integrationInstanceConfigurationWorkflows: [{workflowId: 'wf-1', workflowUuid: 'u-1'}],
+        integrationInstanceConfigurationWorkflows,
         integrationVersion: id,
         name: `Config ${id}`,
     },
@@ -173,6 +177,8 @@ describe('ProvisionIntegrationDialog', () => {
         hoisted.provisionIntegrationInstance.mockReset();
         hoisted.toastError.mockReset();
         hoisted.connectionDefinitionQuery.mockReset();
+
+        hoisted.integrationWorkflows = [NOTIFY_WORKFLOW];
 
         hoisted.provisionIntegrationInstance.mockResolvedValue(11);
         hoisted.getProvisionableIntegrations.mockResolvedValue([
@@ -433,6 +439,55 @@ describe('ProvisionIntegrationDialog', () => {
         expect(await screen.findByText('MCP tool')).toBeInTheDocument();
         expect(screen.getByRole('switch')).toBeEnabled();
         expect(screen.queryByText(/turns on/)).not.toBeInTheDocument();
+    });
+
+    it('lists workflows by label and submits the workflow whose switch was toggled', async () => {
+        hoisted.integrationWorkflows = [
+            {id: 'wf-1', inputs: [], label: 'Zeta sync', workflowUuid: 'u-1'},
+            {id: 'wf-2', inputs: [], label: 'alpha report', workflowUuid: 'u-2'},
+        ];
+        hoisted.getProvisionableIntegrations.mockResolvedValue([
+            {
+                componentVersion: 3,
+                integration: {componentName: 'slack', id: 1, name: 'Slack'},
+                integrationInstanceConfigurations: [
+                    buildConfiguration(2, 'API_KEY', true, [
+                        {workflowId: 'wf-1', workflowUuid: 'u-1'},
+                        {workflowId: 'wf-2', workflowUuid: 'u-2'},
+                    ]),
+                ],
+            },
+        ]);
+
+        const onClose = vi.fn();
+
+        renderDialog(onClose);
+
+        await chooseIntegration();
+
+        await chooseConfiguration('Config 2');
+
+        const workflowSwitches = screen.getAllByRole('switch');
+
+        expect(workflowSwitches).toEqual([
+            screen.getByRole('switch', {name: 'alpha report'}),
+            screen.getByRole('switch', {name: 'Zeta sync'}),
+        ]);
+
+        await userEvent.type(screen.getByLabelText('apiKey'), 'k');
+        await userEvent.click(screen.getByRole('switch', {name: 'alpha report'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Provision'}));
+
+        await waitFor(() => expect(onClose).toHaveBeenCalled());
+
+        expect(hoisted.provisionIntegrationInstance).toHaveBeenCalledWith({
+            connectedUserId: 7,
+            provisionIntegrationInstanceRequest: {
+                connectionParameters: {apiKey: 'k'},
+                integrationInstanceConfigurationId: 2,
+                workflows: [{inputs: {}, workflowUuid: 'u-2'}],
+            },
+        });
     });
 
     it('hides tool-only MCP workflows', async () => {
