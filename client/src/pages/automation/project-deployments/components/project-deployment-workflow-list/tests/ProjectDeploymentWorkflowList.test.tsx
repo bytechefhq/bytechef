@@ -77,6 +77,28 @@ describe('ProjectDeploymentWorkflowList', () => {
         );
     });
 
+    it('lists workflows by label without reordering the shared query data', () => {
+        const queryWorkflows = [
+            {id: 'workflow2', label: 'Disabled workflow'},
+            {id: 'workflow1', label: 'Enabled workflow'},
+            {id: 'workflow3', label: 'Another enabled workflow'},
+        ];
+
+        hoisted.workflows = queryWorkflows;
+
+        renderWorkflowList([
+            {enabled: true, workflowId: 'workflow1'},
+            {enabled: false, workflowId: 'workflow2'},
+            {enabled: true, workflowId: 'workflow3'},
+        ] as ProjectDeploymentWorkflow[]);
+
+        expect(queryWorkflows.map((workflow) => workflow.id)).toEqual(['workflow2', 'workflow1', 'workflow3']);
+        expect(screen.getAllByRole('listitem').map((listItem) => listItem.textContent)).toEqual([
+            'Another enabled workflow',
+            'Enabled workflow',
+        ]);
+    });
+
     it('explains how to enable a workflow when none is enabled', () => {
         renderWorkflowList([{enabled: false, workflowId: 'workflow2'} as ProjectDeploymentWorkflow]);
 

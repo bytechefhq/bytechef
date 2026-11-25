@@ -70,9 +70,9 @@ const ProjectDeploymentWorkflowList = ({
         );
     }
 
-    const sortedWorkflows =
-        workflows?.sort((firstWorkflow, secondWorkflow) => firstWorkflow.label!.localeCompare(secondWorkflow.label!)) ??
-        [];
+    const sortedWorkflows = [...(workflows ?? [])].sort((firstWorkflow, secondWorkflow) =>
+        firstWorkflow.label!.localeCompare(secondWorkflow.label!)
+    );
 
     const enabledWorkflows = sortedWorkflows
         .map((workflow) => {
