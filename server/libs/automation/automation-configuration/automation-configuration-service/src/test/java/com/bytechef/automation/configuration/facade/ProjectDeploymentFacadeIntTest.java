@@ -282,7 +282,7 @@ public class ProjectDeploymentFacadeIntTest {
             "minutesToRun", 50);
 
         ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO = new ProjectDeploymentWorkflowDTO(
-            List.of(), null, null, inputs, true, null, null, null, null, null, null, null, 0,
+            List.of(), null, null, inputs, true, null, null, null, null, null, null, null, null, 0,
             publishedProjectWorkflow.getWorkflowId(), publishedProjectWorkflow.getUuidAsString());
 
         ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
@@ -371,7 +371,7 @@ public class ProjectDeploymentFacadeIntTest {
             });
 
         ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO = new ProjectDeploymentWorkflowDTO(
-            List.of(), null, null, Map.of(), true, null, null, null, null, null, null, null, 0,
+            List.of(), null, null, Map.of(), true, null, null, null, null, null, null, null, null, 0,
             publishedProjectWorkflow.getWorkflowId(), publishedProjectWorkflow.getUuidAsString());
 
         ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
@@ -1013,6 +1013,43 @@ public class ProjectDeploymentFacadeIntTest {
     }
 
     @Test
+    public void testLastExecutionStartDateOfRunningJob() {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeployment(
+            workspace.getId(), projectDTO);
+
+        long deploymentId = projectDeploymentDTO.id();
+        long runningJobId = 777L;
+        Instant startTime = Instant.parse("2026-11-25T10:50:00Z");
+
+        Job runningJob = new Job();
+
+        runningJob.setStartDate(startTime);
+        runningJob.setStatus(Job.Status.STARTED);
+
+        when(principalJobService.fetchLastJobId(deploymentId, PlatformType.AUTOMATION))
+            .thenReturn(Optional.of(runningJobId));
+        when(principalJobService.fetchLastWorkflowJobId(eq(deploymentId), anyList(), eq(PlatformType.AUTOMATION)))
+            .thenReturn(Optional.of(runningJobId));
+        when(jobService.getJob(runningJobId))
+            .thenReturn(runningJob);
+
+        ProjectDeploymentDTO result = projectDeploymentFacade.getProjectDeployment(deploymentId);
+
+        assertThat(result.lastExecutionDate()).isNull();
+        assertThat(result.lastExecutionStartDate()).isEqualTo(startTime);
+        assertThat(result.projectDeploymentWorkflows())
+            .hasSize(1)
+            .first()
+            .satisfies(workflow -> {
+                assertThat(workflow.lastExecutionDate()).isNull();
+                assertThat(workflow.lastExecutionStartDate()).isEqualTo(startTime);
+                assertThat(workflow.lastExecutionStatus()).isEqualTo(Job.Status.STARTED);
+            });
+    }
+
+    @Test
     public void testWorkflowLastExecutionDateIsolatedBetweenDeployments() {
         // Given - Create a project with a workflow
         ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
@@ -1110,7 +1147,7 @@ public class ProjectDeploymentFacadeIntTest {
         reset(triggerLifecycleFacade);
 
         ProjectDeploymentWorkflowDTO disabledWorkflowDTO = new ProjectDeploymentWorkflowDTO(
-            List.of(), null, null, Map.of(), false, null, null, null, null, null, null, null, 0, v2WorkflowId,
+            List.of(), null, null, Map.of(), false, null, null, null, null, null, null, null, null, 0, v2WorkflowId,
             workflowUuid);
 
         ProjectDeploymentDTO currentDeployment = projectDeploymentFacade.getProjectDeployment(
@@ -1174,7 +1211,7 @@ public class ProjectDeploymentFacadeIntTest {
         reset(triggerLifecycleFacade);
 
         ProjectDeploymentWorkflowDTO enabledWorkflowDTO = new ProjectDeploymentWorkflowDTO(
-            List.of(), null, null, Map.of(), true, null, null, null, null, null, null, null, 0, v2WorkflowId,
+            List.of(), null, null, Map.of(), true, null, null, null, null, null, null, null, null, 0, v2WorkflowId,
             workflowUuid);
 
         ProjectDeploymentDTO currentDeployment = projectDeploymentFacade.getProjectDeployment(
@@ -1275,7 +1312,7 @@ public class ProjectDeploymentFacadeIntTest {
         reset(triggerLifecycleFacade);
 
         ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO = new ProjectDeploymentWorkflowDTO(
-            List.of(), null, null, Map.of(), true, null, null, null, null, null, null, null, 0,
+            List.of(), null, null, Map.of(), true, null, null, null, null, null, null, null, null, 0,
             projectWorkflowV2.getWorkflowId(), projectWorkflowV2.getUuidAsString());
 
         ProjectDeploymentDTO currentProjectDeploymentDTO = projectDeploymentFacade.getProjectDeployment(
@@ -1436,7 +1473,7 @@ public class ProjectDeploymentFacadeIntTest {
             .getFirst();
 
         ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO = new ProjectDeploymentWorkflowDTO(
-            List.of(), null, null, Map.of(), true, null, null, null, null, null, null, null, 0,
+            List.of(), null, null, Map.of(), true, null, null, null, null, null, null, null, null, 0,
             publishedProjectWorkflow.getWorkflowId(), publishedProjectWorkflow.getUuidAsString());
 
         ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
@@ -1454,7 +1491,7 @@ public class ProjectDeploymentFacadeIntTest {
         ProjectDTO projectDTO, ProjectWorkflow publishedProjectWorkflow, Map<String, ?> inputs) {
 
         ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO = new ProjectDeploymentWorkflowDTO(
-            List.of(), null, null, inputs, true, null, null, null, null, null, null, null, 0,
+            List.of(), null, null, inputs, true, null, null, null, null, null, null, null, null, 0,
             publishedProjectWorkflow.getWorkflowId(), publishedProjectWorkflow.getUuidAsString());
 
         ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
@@ -1534,7 +1571,7 @@ public class ProjectDeploymentFacadeIntTest {
             .getFirst();
 
         ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO = new ProjectDeploymentWorkflowDTO(
-            connections, null, null, Map.of("cronExpression", cronExpression), true, null, null, null, null, null,
+            connections, null, null, Map.of("cronExpression", cronExpression), true, null, null, null, null, null, null,
             null, null, 0, publishedProjectWorkflow.getWorkflowId(), publishedProjectWorkflow.getUuidAsString());
 
         ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()

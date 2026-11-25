@@ -31,7 +31,8 @@ import java.util.List;
 @SuppressFBWarnings("EI")
 public record ProjectDeploymentDTO(
     String createdBy, Instant createdDate, String description, boolean enabled, Environment environment, Long id,
-    String name, Instant lastExecutionDate, String lastModifiedBy, Instant lastModifiedDate, Project project,
+    String name, Instant lastExecutionDate, Instant lastExecutionStartDate, String lastModifiedBy,
+    Instant lastModifiedDate, Project project,
     long projectId, int projectVersion, List<ProjectDeploymentWorkflowDTO> projectDeploymentWorkflows, List<Tag> tags,
     int version) {
 
@@ -39,19 +40,20 @@ public record ProjectDeploymentDTO(
         this(
             projectDeployment.getCreatedBy(), projectDeployment.getCreatedDate(), projectDeployment.getDescription(),
             projectDeployment.isEnabled(), projectDeployment.getEnvironment(), projectDeployment.getId(),
-            projectDeployment.getName(), null, projectDeployment.getLastModifiedBy(),
+            projectDeployment.getName(), null, null, projectDeployment.getLastModifiedBy(),
             projectDeployment.getLastModifiedDate(), null, projectDeployment.getProjectId(),
             projectDeployment.getProjectVersion(), List.of(), List.of(), projectDeployment.getVersion());
     }
 
     public ProjectDeploymentDTO(
         ProjectDeployment projectDeployment, List<ProjectDeploymentWorkflowDTO> projectDeploymentWorkflows,
-        Project project, Instant lastExecutionDate, List<Tag> tags) {
+        Project project, Instant lastExecutionDate, Instant lastExecutionStartDate, List<Tag> tags) {
 
         this(
             projectDeployment.getCreatedBy(), projectDeployment.getCreatedDate(), projectDeployment.getDescription(),
             projectDeployment.isEnabled(), projectDeployment.getEnvironment(), projectDeployment.getId(),
-            projectDeployment.getName(), lastExecutionDate, projectDeployment.getLastModifiedBy(),
+            projectDeployment.getName(), lastExecutionDate, lastExecutionStartDate,
+            projectDeployment.getLastModifiedBy(),
             projectDeployment.getLastModifiedDate(), project, projectDeployment.getProjectId(),
             projectDeployment.getProjectVersion(), CollectionUtils.sort(projectDeploymentWorkflows), tags,
             projectDeployment.getVersion());
@@ -86,6 +88,7 @@ public record ProjectDeploymentDTO(
         private Long id;
         private String name;
         private Instant lastExecutionDate;
+        private Instant lastExecutionStartDate;
         private String lastModifiedBy;
         private Instant lastModifiedDate;
         private Project project;
@@ -146,6 +149,12 @@ public record ProjectDeploymentDTO(
             return this;
         }
 
+        public Builder lastExecutionStartDate(Instant lastExecutionStartDate) {
+            this.lastExecutionStartDate = lastExecutionStartDate;
+
+            return this;
+        }
+
         public Builder lastModifiedBy(String lastModifiedBy) {
             this.lastModifiedBy = lastModifiedBy;
 
@@ -196,7 +205,9 @@ public record ProjectDeploymentDTO(
 
         public ProjectDeploymentDTO build() {
             return new ProjectDeploymentDTO(
-                createdBy, createdDate, description, enabled, environment, id, name, lastExecutionDate, lastModifiedBy,
+                createdBy, createdDate, description, enabled, environment, id, name, lastExecutionDate,
+                lastExecutionStartDate,
+                lastModifiedBy,
                 lastModifiedDate, project, projectId, projectVersion, projectDeploymentWorkflows, tags, version);
         }
     }

@@ -372,6 +372,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                     projectDeploymentWorkflow, projectDeployment, projectWorkflows)),
             projectService.getProject(projectDeployment.getProjectId()),
             getProjectDeploymentLastExecutionDate(Validate.notNull(projectDeployment.getId(), "id")),
+            getProjectDeploymentLastExecutionStartDate(Validate.notNull(projectDeployment.getId(), "id")),
             tagService.getTags(projectDeployment.getTagIds()));
     }
 
@@ -441,6 +442,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                                 projectDeploymentWorkflow, projectDeployment, deploymentProjectWorkflows)),
                         project,
                         getProjectDeploymentLastExecutionDate(Validate.notNull(projectDeployment.getId(), "id")),
+                        getProjectDeploymentLastExecutionStartDate(Validate.notNull(projectDeployment.getId(), "id")),
                         filterTags(tags, projectDeployment));
                 });
         } else {
@@ -909,6 +911,12 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         return job.getEndDate();
     }
 
+    private Instant getJobStartDate(Long jobId) {
+        Job job = jobService.getJob(jobId);
+
+        return job.getStartDate();
+    }
+
     private Job.Status getJobStatus(Long jobId) {
         Job job = jobService.getJob(jobId);
 
@@ -918,6 +926,12 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     private Instant getProjectDeploymentLastExecutionDate(long projectDeploymentId) {
         return principalJobService.fetchLastJobId(projectDeploymentId, PlatformType.AUTOMATION)
             .map(this::getJobEndDate)
+            .orElse(null);
+    }
+
+    private Instant getProjectDeploymentLastExecutionStartDate(long projectDeploymentId) {
+        return principalJobService.fetchLastJobId(projectDeploymentId, PlatformType.AUTOMATION)
+            .map(this::getJobStartDate)
             .orElse(null);
     }
 
@@ -986,6 +1000,12 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             .orElse(null);
     }
 
+    private Instant getWorkflowLastExecutionStartDate(long projectDeploymentId, List<String> workflowIds) {
+        return principalJobService.fetchLastWorkflowJobId(projectDeploymentId, workflowIds, PlatformType.AUTOMATION)
+            .map(this::getJobStartDate)
+            .orElse(null);
+    }
+
     private Job.Status getWorkflowLastExecutionStatus(long projectDeploymentId, List<String> workflowIds) {
         return principalJobService.fetchLastWorkflowJobId(projectDeploymentId, workflowIds, PlatformType.AUTOMATION)
             .map(this::getJobStatus)
@@ -1020,6 +1040,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         return new ProjectDeploymentWorkflowDTO(
             projectDeploymentWorkflow,
             getWorkflowLastExecutionDate(projectDeployment.getId(), workflowUuidWorkflowIds),
+            getWorkflowLastExecutionStartDate(projectDeployment.getId(), workflowUuidWorkflowIds),
             getWorkflowLastExecutionStatus(projectDeployment.getId(), workflowUuidWorkflowIds),
             getStaticWebhookUrl(
                 projectDeploymentWorkflow.getProjectDeploymentId(),

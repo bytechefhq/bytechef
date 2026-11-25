@@ -217,7 +217,7 @@ class DataStorageProjectDeploymentDeleteEventListenerIntTest {
             .getFirst();
 
         ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO = new ProjectDeploymentWorkflowDTO(
-            List.of(), null, null, Map.of(), false, null, null, null, null, null, null, null, 0,
+            List.of(), null, null, Map.of(), false, null, null, null, null, null, null, null, null, 0,
             v2ProjectWorkflow.getWorkflowId(), v2ProjectWorkflow.getUuidAsString());
 
         ProjectDeploymentDTO currentProjectDeploymentDTO = projectDeploymentFacade.getProjectDeployment(
