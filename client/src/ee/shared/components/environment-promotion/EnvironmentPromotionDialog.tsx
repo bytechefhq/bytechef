@@ -17,6 +17,7 @@ import {PromotionResourceType} from '@/shared/middleware/graphql';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {AlertTriangleIcon} from 'lucide-react';
 import {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {toast} from 'sonner';
 
 import EnvironmentPromotionConnectionRow from './EnvironmentPromotionConnectionRow';
@@ -36,6 +37,13 @@ const MINTS_NEW_URL_RESOURCE_TYPES: PromotionResourceType[] = [
     PromotionResourceType.A2AServer,
     PromotionResourceType.McpServer,
 ];
+
+const TARGET_LIST_PATHS: Record<PromotionResourceType, string> = {
+    [PromotionResourceType.A2AServer]: '/automation/a2a-servers',
+    [PromotionResourceType.ApiCollection]: '/automation/api-platform/api-collections',
+    [PromotionResourceType.McpServer]: '/automation/mcp-servers',
+    [PromotionResourceType.ProjectDeployment]: '/automation/deployments',
+};
 
 const EnvironmentPromotionDialog = ({
     onClose,
@@ -60,6 +68,8 @@ const EnvironmentPromotionDialog = ({
         targetEnvironmentOptions,
         unresolvedConnectionCount,
     } = useEnvironmentPromotionDialog({resourceType, sourceEnvironmentId, sourceId});
+
+    const navigate = useNavigate();
 
     const closeDialog = () => {
         setOpen(false);
@@ -89,7 +99,7 @@ const EnvironmentPromotionDialog = ({
 
         const descriptionLines = [
             result.created
-                ? `A new "${sourceName}" counterpart was created in ${targetLabel}.`
+                ? `A new "${sourceName}" counterpart was created disabled in ${targetLabel}; enable it after reviewing its connections.`
                 : `The existing "${sourceName}" counterpart in ${targetLabel} was updated.`,
         ];
 
@@ -98,15 +108,31 @@ const EnvironmentPromotionDialog = ({
         }
 
         if (result.unresolvedConnectionIds.length > 0) {
-            descriptionLines.push(
-                `${result.unresolvedConnectionIds.length} connections still need a binding${result.created ? ' — the counterpart was created disabled' : ''}.`
-            );
+            descriptionLines.push(`${result.unresolvedConnectionIds.length} connections still need a binding.`);
         }
+
+        const projectId = preview?.projects[0]?.projectId;
+
+        const targetListPath =
+            resourceType === PromotionResourceType.ProjectDeployment && projectId
+                ? `${TARGET_LIST_PATHS[resourceType]}?projectId=${projectId}`
+                : TARGET_LIST_PATHS[resourceType];
+
+        const targetId = result.targetId;
 
         toast.success(`Promoted to ${targetLabel}`, {
             action: {
                 label: `View in ${targetLabel}`,
-                onClick: () => environmentStore.getState().setCurrentEnvironmentId(targetEnvironmentId),
+                onClick: () => {
+                    environmentStore.getState().setCurrentEnvironmentId(targetEnvironmentId);
+
+                    navigate(targetListPath, {
+                        state:
+                            resourceType === PromotionResourceType.ProjectDeployment
+                                ? {projectDeploymentId: +targetId}
+                                : undefined,
+                    });
+                },
             },
             description: descriptionLines.join(' '),
         });

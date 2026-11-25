@@ -11,9 +11,15 @@ beforeAll(() => {
     Element.prototype.releasePointerCapture = vi.fn();
 });
 
-const {mockMutateAsync, onPromotedMock} = vi.hoisted(() => ({
+const {mockMutateAsync, mockNavigate, onPromotedMock} = vi.hoisted(() => ({
     mockMutateAsync: vi.fn(),
+    mockNavigate: vi.fn(),
     onPromotedMock: vi.fn(),
+}));
+
+vi.mock('react-router-dom', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('react-router-dom')>()),
+    useNavigate: () => mockNavigate,
 }));
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
@@ -336,6 +342,93 @@ describe('EnvironmentPromotionDialog', () => {
         action.onClick();
 
         await waitFor(() => expect(environmentStore.getState().currentEnvironmentId).toBe(1));
+
+        expect(mockNavigate).toHaveBeenCalledWith('/automation/api-platform/api-collections', {state: undefined});
+    });
+
+    it.each([
+        [PromotionResourceType.A2AServer, '/automation/a2a-servers'],
+        [PromotionResourceType.McpServer, '/automation/mcp-servers'],
+    ])('redirects a promoted %s to its list page in the target environment', async (resourceType, expectedPath) => {
+        const user = userEvent.setup();
+
+        vi.mocked(mockUseEnvironmentPromotionPreviewQuery).mockReturnValue({
+            data: {environmentPromotionPreview: makePreview({resourceType})},
+            isLoading: false,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any);
+
+        render(<EnvironmentPromotionDialog {...defaultProps} resourceType={resourceType} />);
+
+        await screen.findByText('Slack Staging');
+
+        await user.click(screen.getByRole('button', {name: 'Promote'}));
+
+        await waitFor(() => expect(mockToast.success).toHaveBeenCalledTimes(1));
+
+        const [, toastOptions] = vi.mocked(mockToast.success).mock.calls[0];
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (toastOptions as any).action.onClick();
+
+        expect(environmentStore.getState().currentEnvironmentId).toBe(1);
+        expect(mockNavigate).toHaveBeenCalledWith(expectedPath, {state: undefined});
+    });
+
+    it('redirects a promoted project deployment to the target deployments page filtered by its project', async () => {
+        const user = userEvent.setup();
+
+        vi.mocked(mockUseEnvironmentPromotionPreviewQuery).mockReturnValue({
+            data: {
+                environmentPromotionPreview: makePreview({resourceType: PromotionResourceType.ProjectDeployment}),
+            },
+            isLoading: false,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any);
+
+        mockMutateAsync.mockResolvedValue({
+            promoteToEnvironment: {
+                created: true,
+                targetId: '42',
+                targetUrl: null,
+                unresolvedConnectionIds: [],
+            },
+        });
+
+        render(<EnvironmentPromotionDialog {...defaultProps} resourceType={PromotionResourceType.ProjectDeployment} />);
+
+        await screen.findByText('Slack Staging');
+
+        await user.click(screen.getByRole('button', {name: 'Promote'}));
+
+        await waitFor(() => expect(mockToast.success).toHaveBeenCalledTimes(1));
+
+        const [, toastOptions] = vi.mocked(mockToast.success).mock.calls[0];
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (toastOptions as any).action.onClick();
+
+        expect(environmentStore.getState().currentEnvironmentId).toBe(1);
+        expect(mockNavigate).toHaveBeenCalledWith('/automation/deployments?projectId=project-1', {
+            state: {projectDeploymentId: 42},
+        });
+    });
+
+    it('tells the user a created counterpart starts disabled even when every connection is bound', async () => {
+        const user = userEvent.setup();
+
+        render(<EnvironmentPromotionDialog {...defaultProps} />);
+
+        await screen.findByText('Slack Staging');
+
+        await user.click(screen.getByRole('button', {name: 'Promote'}));
+
+        await waitFor(() => expect(mockToast.success).toHaveBeenCalledTimes(1));
+
+        const [, toastOptions] = vi.mocked(mockToast.success).mock.calls[0];
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect((toastOptions as any).description).toContain('was created disabled in STAGING');
     });
 
     it('shows the new URL in the success toast when promoting an MCP server creates a counterpart', async () => {
