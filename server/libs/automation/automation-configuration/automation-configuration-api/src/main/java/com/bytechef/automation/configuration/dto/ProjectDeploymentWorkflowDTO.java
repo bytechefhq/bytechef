@@ -30,20 +30,20 @@ import java.util.Map;
 @SuppressFBWarnings("EI")
 public record ProjectDeploymentWorkflowDTO(
     List<ProjectDeploymentWorkflowConnection> connections, String createdBy, Instant createdDate,
-    Map<String, ?> inputs, boolean enabled, Long id, Instant lastExecutionDate, Job.Status lastExecutionStatus,
-    String lastModifiedBy, Instant lastModifiedDate, Long projectDeploymentId, String staticWebhookUrl, int version,
-    String workflowId, String workflowUuid)
+    Map<String, ?> inputs, boolean enabled, Long id, Instant lastExecutionDate, Instant lastExecutionStartDate,
+    Job.Status lastExecutionStatus, String lastModifiedBy, Instant lastModifiedDate, Long projectDeploymentId,
+    String staticWebhookUrl, int version, String workflowId, String workflowUuid)
     implements Comparable<ProjectDeploymentWorkflowDTO> {
 
     public ProjectDeploymentWorkflowDTO(
-        ProjectDeploymentWorkflow projectDeploymentWorkflow, Instant lastExecutionDate, Job.Status lastExecutionStatus,
-        String staticWebhookUrl, String workflowUuid) {
+        ProjectDeploymentWorkflow projectDeploymentWorkflow, Instant lastExecutionDate,
+        Instant lastExecutionStartDate, Job.Status lastExecutionStatus, String staticWebhookUrl, String workflowUuid) {
 
         this(
             projectDeploymentWorkflow.getConnections(), projectDeploymentWorkflow.getCreatedBy(),
             projectDeploymentWorkflow.getCreatedDate(), projectDeploymentWorkflow.getInputs(),
             projectDeploymentWorkflow.isEnabled(), projectDeploymentWorkflow.getId(), lastExecutionDate,
-            lastExecutionStatus, projectDeploymentWorkflow.getLastModifiedBy(),
+            lastExecutionStartDate, lastExecutionStatus, projectDeploymentWorkflow.getLastModifiedBy(),
             projectDeploymentWorkflow.getLastModifiedDate(), projectDeploymentWorkflow.getProjectDeploymentId(),
             staticWebhookUrl, projectDeploymentWorkflow.getVersion(), projectDeploymentWorkflow.getWorkflowId(),
             workflowUuid);

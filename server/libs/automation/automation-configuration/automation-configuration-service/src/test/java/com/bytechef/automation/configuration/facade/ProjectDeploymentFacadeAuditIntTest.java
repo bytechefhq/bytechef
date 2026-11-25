@@ -430,7 +430,7 @@ class ProjectDeploymentFacadeAuditIntTest {
 
     private ProjectDeploymentDTO newProjectDeploymentDTO() {
         ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO = new ProjectDeploymentWorkflowDTO(
-            List.of(), null, null, Map.of(), true, null, null, null, null, null, null, null, 0,
+            List.of(), null, null, Map.of(), true, null, null, null, null, null, null, null, null, 0,
             publishedProjectWorkflow.getWorkflowId(), publishedProjectWorkflow.getUuidAsString());
 
         return ProjectDeploymentDTO.builder()

@@ -38,6 +38,7 @@ public class ProjectDeploymentMapper {
 
         @Mapping(target = "environmentId", source = "environment")
         @Mapping(target = "lastExecutionDate", ignore = true)
+        @Mapping(target = "lastExecutionStartDate", ignore = true)
         @Override
         ProjectDeploymentBasicModel convert(ProjectDeployment projectInstance);
     }
@@ -48,6 +49,7 @@ public class ProjectDeploymentMapper {
 
         @Mapping(target = "environmentId", source = "environment")
         @Mapping(target = "lastExecutionDate", ignore = true)
+        @Mapping(target = "lastExecutionStartDate", ignore = true)
         @Mapping(target = "project", ignore = true)
         @Mapping(target = "projectDeploymentWorkflows", ignore = true)
         @Mapping(target = "tags", ignore = true)
