@@ -864,6 +864,70 @@ describe('useSwitchChat', () => {
             expect(aiHubStore.getState().messages[0]!.content).toHaveLength(1);
         });
 
+        it('restores a persisted openWorkflowTab call where it was made, under the current workflow name', async () => {
+            const openArguments = JSON.stringify({
+                name: 'Old Name',
+                projectId: '5',
+                projectWorkflowId: 12,
+                workflowId: 'wf-1',
+            });
+
+            mockGetChatMessages.mockResolvedValue([
+                buildMessage({
+                    content: 'Build it',
+                    id: 'event-ask',
+                    role: 'USER',
+                    toolEventsJson: JSON.stringify([
+                        {arguments: openArguments, id: 'call-1', kind: 'call', name: 'openWorkflowTab'},
+                        {id: 'call-1', kind: 'result', name: 'openWorkflowTab', response: '{"opened":true}'},
+                    ]),
+                }),
+                buildMessage({content: 'Built.', id: 'event-built', role: 'ASSISTANT'}),
+                buildMessage({content: 'thanks', id: 'event-thanks', role: 'USER'}),
+            ]);
+            mockGetChatArtifacts.mockResolvedValue([buildArtifact()]);
+
+            await switchTo(buildChat());
+
+            const messages = aiHubStore.getState().messages;
+
+            expect(messages.map((message) => message.id)).toEqual([
+                'event-ask',
+                'event-ask-tools',
+                'event-built',
+                'event-thanks',
+            ]);
+            expect(messages[1]!.content).toEqual([
+                expect.objectContaining({
+                    args: {name: 'Lead Scoring', projectId: '5', projectWorkflowId: 12, workflowId: 'wf-1'},
+                    toolCallId: 'call-1',
+                    toolName: 'openWorkflowTab',
+                    type: 'tool-call',
+                }),
+            ]);
+        });
+
+        it('keeps the trailing card for a workflow whose persisted open call cannot identify it', async () => {
+            mockGetChatMessages.mockResolvedValue([
+                buildMessage({
+                    content: 'Opened.',
+                    id: 'event-opened',
+                    role: 'assistant',
+                    toolEventsJson: JSON.stringify([
+                        {arguments: '{}', id: 'call-1', kind: 'call', name: 'openWorkflowTab'},
+                    ]),
+                }),
+            ]);
+            mockGetChatArtifacts.mockResolvedValue([buildArtifact()]);
+
+            await switchTo(buildChat());
+
+            expect(aiHubStore.getState().messages.map((message) => message.id)).toEqual([
+                'event-opened',
+                'artifact-links',
+            ]);
+        });
+
         it('does not restore a persisted openWorkflowTab call twice', async () => {
             mockGetChatMessages.mockResolvedValue([
                 buildMessage({

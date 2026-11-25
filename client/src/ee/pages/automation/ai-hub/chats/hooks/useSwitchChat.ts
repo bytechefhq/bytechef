@@ -35,6 +35,10 @@ interface OpenToolCallI {
     toolName: string;
 }
 
+const ARTIFACT_OPEN_ID_ARGUMENTS: Record<string, string> = {
+    openWorkflowTab: 'workflowId',
+};
+
 const PICK_PATTERN = /^User picked: (.+) \((ID|value): .*\)$/s;
 
 const PICK_SUFFIX_DATA_PART_TYPES: Record<string, string> = {
@@ -71,6 +75,17 @@ function parseRestoredToolEvents(toolEventsJson: string | null): RestoredToolEve
 
 type RestoredPartType = Exclude<ThreadMessageLike['content'], string>[number];
 
+function artifactOpenKey(toolName: string, args: Record<string, unknown> | undefined): string | null {
+    const idArgument = ARTIFACT_OPEN_ID_ARGUMENTS[toolName];
+    const id = idArgument ? args?.[idArgument] : undefined;
+
+    if (id == null || id === '') {
+        return null;
+    }
+
+    return `${toolName}|${String(id)}`;
+}
+
 function buildRestoredToolParts(
     events: RestoredToolEventI[],
     {
@@ -93,7 +108,7 @@ function buildRestoredToolParts(
     const answeredPickers: Array<{data: object; position: number}> = [];
 
     events.forEach((event, eventIndex) => {
-        if (event.kind !== 'call' || !event.name || ARTIFACT_OPEN_TOOL_NAMES.has(event.name)) {
+        if (event.kind !== 'call' || !event.name) {
             return;
         }
 
@@ -112,6 +127,10 @@ function buildRestoredToolParts(
             } catch {
                 args = undefined;
             }
+        }
+
+        if (ARTIFACT_OPEN_TOOL_NAMES.has(event.name) && artifactOpenKey(event.name, args) === null) {
+            return;
         }
 
         let result: unknown;
@@ -428,13 +447,79 @@ function artifactToOpenToolCall(artifact: AiHubChatArtifactI): OpenToolCallI | n
     };
 }
 
-function buildArtifactLinkMessages(artifacts: AiHubChatArtifactI[]): ThreadMessageLike[] {
+function isArtifactOpenPart(
+    part: RestoredPartType
+): part is RestoredPartType & {args: Record<string, unknown>; toolName: string; type: 'tool-call'} {
+    return part.type === 'tool-call' && ARTIFACT_OPEN_TOOL_NAMES.has(part.toolName);
+}
+
+function linkRestoredArtifactCards(
+    messages: ThreadMessageLike[],
+    artifacts: AiHubChatArtifactI[]
+): {messages: ThreadMessageLike[]; restoredKeys: Set<string>} {
+    const artifactNamesByKey = new Map<string, string>();
+
+    for (const artifact of artifacts) {
+        const openCall = artifactToOpenToolCall(artifact);
+        const key = openCall ? artifactOpenKey(openCall.toolName, openCall.args) : null;
+
+        if (key) {
+            artifactNamesByKey.set(key, artifact.artifactName);
+        }
+    }
+
+    const restoredKeys = new Set<string>();
+
+    const linkedMessages = messages.map((message) => {
+        if (message.role !== 'assistant' || !Array.isArray(message.content)) {
+            return message;
+        }
+
+        let changed = false;
+
+        const content = message.content.map((part) => {
+            if (!isArtifactOpenPart(part)) {
+                return part;
+            }
+
+            const key = artifactOpenKey(part.toolName, part.args);
+
+            if (key === null) {
+                return part;
+            }
+
+            restoredKeys.add(key);
+
+            const currentName = artifactNamesByKey.get(key);
+
+            if (currentName === undefined || currentName === part.args.name) {
+                return part;
+            }
+
+            changed = true;
+
+            return {...part, args: {...part.args, name: currentName}};
+        });
+
+        return changed ? ({...message, content} as ThreadMessageLike) : message;
+    });
+
+    return {messages: linkedMessages, restoredKeys};
+}
+
+function buildArtifactLinkMessages(artifacts: AiHubChatArtifactI[], restoredKeys: Set<string>): ThreadMessageLike[] {
     const seen = new Set<string>();
 
     const parts = artifacts
         .map((artifact) => ({artifact, openCall: artifactToOpenToolCall(artifact)}))
         .filter((entry): entry is {artifact: AiHubChatArtifactI; openCall: OpenToolCallI} => entry.openCall !== null)
         .filter(({openCall}) => {
+            const openKey = artifactOpenKey(openCall.toolName, openCall.args);
+
+            if (openKey !== null && restoredKeys.has(openKey)) {
+                return false;
+            }
+
             const key = `${openCall.toolName}|${JSON.stringify(openCall.args)}`;
 
             if (seen.has(key)) {
@@ -480,13 +565,15 @@ async function loadChatTranscript({
         toolApprovals.map((approval) => [approval.id, withLapsedExpiry(approval, now)] as const)
     );
 
-    return [
-        ...applyToolApprovalStatuses(
+    const {messages: linkedMessages, restoredKeys} = linkRestoredArtifactCards(
+        applyToolApprovalStatuses(
             restoreToolApprovalCards(mapServerMessages(messages), toolApprovalsById),
             toolApprovalsById
         ),
-        ...buildArtifactLinkMessages(artifacts),
-    ];
+        artifacts
+    );
+
+    return [...linkedMessages, ...buildArtifactLinkMessages(artifacts, restoredKeys)];
 }
 
 export function useSwitchChat() {
