@@ -1068,6 +1068,47 @@ describe('useSwitchChat', () => {
             ]);
         });
 
+        it.each([
+            {
+                arguments: {customComponentId: 'component-1', name: 'Invoice Parser'},
+                artifactId: 'component-1',
+                kind: 'CUSTOM_COMPONENT_REFERENCED' as const,
+                toolName: 'openCustomComponentTab',
+            },
+            {
+                arguments: {name: 'Nightly Sync', projectId: 'project-1'},
+                artifactId: 'project-1',
+                kind: 'CODE_WORKFLOW_REFERENCED' as const,
+                toolName: 'openCodeWorkflowTab',
+            },
+        ])(
+            'restores a persisted $toolName call where it was made',
+            async ({arguments: openArguments, artifactId, kind, toolName}) => {
+                mockGetChatMessages.mockResolvedValue([
+                    buildMessage({
+                        content: 'Show it',
+                        id: 'event-ask',
+                        role: 'USER',
+                        toolEventsJson: JSON.stringify([
+                            {arguments: JSON.stringify(openArguments), id: 'call-1', kind: 'call', name: toolName},
+                        ]),
+                    }),
+                    buildMessage({content: 'Here it is.', id: 'event-shown', role: 'ASSISTANT'}),
+                ]);
+                mockGetChatArtifacts.mockResolvedValue([
+                    buildArtifact({artifactId, artifactName: openArguments.name, kind, metadataJson: null}),
+                ]);
+
+                await switchTo(buildChat());
+
+                expect(aiHubStore.getState().messages.map((message) => message.id)).toEqual([
+                    'event-ask',
+                    'event-ask-tools',
+                    'event-shown',
+                ]);
+            }
+        );
+
         it('adds the card of a workflow whose persisted open call cannot identify it to the last reply', async () => {
             mockGetChatMessages.mockResolvedValue([
                 buildMessage({

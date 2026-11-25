@@ -43,6 +43,8 @@ interface OpenToolCallI {
 
 const ARTIFACT_OPEN_ID_ARGUMENTS: Record<string, string> = {
     openAiAgentTab: 'aiAgentId',
+    openCodeWorkflowTab: 'projectId',
+    openCustomComponentTab: 'customComponentId',
     openWorkflowTab: 'workflowId',
 };
 
