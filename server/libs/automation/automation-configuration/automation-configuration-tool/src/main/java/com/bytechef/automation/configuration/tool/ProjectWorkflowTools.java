@@ -85,6 +85,12 @@ public class ProjectWorkflowTools {
         }
         """;
 
+    static final String INPUTS_FORMAT =
+        " Each entry of 'inputs' has name, label, type (boolean, date, date_time, time, integer, number or string) " +
+            "and required. A Component property input, whose value the user picks from a component's own input " +
+            "such as a Slack channel, has no type and sets componentName, componentVersion and groupName (one of " +
+            "that component's input groups) instead.";
+
     private static final String AGENT_TOOL_ENVIRONMENT_ID_KEY = "bytechef.agentTool.environmentId";
     private static final String PERSISTED_WORKFLOW_CAPTURE_KEY = "bytechef.workflowEditor.persistedWorkflows";
     private static final String DEFAULT_WORKFLOW_NAME = "Workflow";
@@ -241,7 +247,7 @@ public class ProjectWorkflowTools {
         @ToolParam(description = "The ID of the project to add the workflow to") long projectId,
         @ToolParam(
             description = "The definition for the workflow. Needs to be in JSON format similar to " +
-                DEFAULT_DEFINITION) String definition,
+                DEFAULT_DEFINITION + INPUTS_FORMAT) String definition,
         ToolContext toolContext) {
 
         scopedProjectGuard.checkProject(projectId, ScopedProjectGuard.WORKFLOW_CREATE, toolContext,
@@ -400,7 +406,7 @@ public class ProjectWorkflowTools {
         @ToolParam(description = "The ID of the workflow to update") String workflowId,
         @ToolParam(
             description = "The new definition of the workflow. Needs to be in JSON format similar to " +
-                DEFAULT_DEFINITION) String definition,
+                DEFAULT_DEFINITION + INPUTS_FORMAT) String definition,
         @ToolParam(
             description = "The version of the workflow, as returned by the getWorkflow call this definition is " +
                 "based on") int version,
