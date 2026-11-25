@@ -140,7 +140,7 @@ describe('AutomationConfigurations', () => {
         vi.clearAllMocks();
     });
 
-    it('offers opening a project that has workflows from its header', () => {
+    it('does not offer opening a project from its header even when it has workflows', () => {
         mocks.projects = [
             {
                 ...makeProject('live', 'Live Project', true, 1),
@@ -150,7 +150,8 @@ describe('AutomationConfigurations', () => {
 
         renderPage();
 
-        expect(screen.getByRole('button', {name: 'Open project'})).toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: 'Live Project'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Open project'})).not.toBeInTheDocument();
     });
 
     it('lists only the projects with configurations in the selected environment', () => {

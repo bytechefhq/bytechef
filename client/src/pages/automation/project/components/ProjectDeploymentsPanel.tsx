@@ -165,7 +165,6 @@ const ProjectDeploymentsPanel = ({
                         componentDefinitions={componentDefinitions}
                         divided
                         expandAll={expandAll}
-                        hideOpenInProject
                         hideOpenWorkflowInProject={hideOpenWorkflowInProject}
                         newlyCreatedDeploymentId={expandedProjectDeploymentId}
                         project={project}

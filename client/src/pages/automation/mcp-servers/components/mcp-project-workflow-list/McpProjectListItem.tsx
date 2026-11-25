@@ -1,11 +1,9 @@
 import Badge from '@/components/Badge/Badge';
-import Button from '@/components/Button/Button';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
-import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
-import {FolderIcon, SquareArrowOutUpRightIcon} from 'lucide-react';
+import {FolderIcon} from 'lucide-react';
 import {useState} from 'react';
 
 import McpProjectWorkflowDialog from '../McpProjectWorkflowDialog';
@@ -31,16 +29,6 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
         showEditWorkflowsDialog,
     } = useMcpProjectListItem(mcpProject);
 
-    const {openProject} = useOpenInProject();
-
-    const projectId = mcpProject.project?.id != null ? Number(mcpProject.project.id) : undefined;
-
-    const handleOpenProjectClick = () => {
-        if (projectId != null) {
-            void openProject(projectId);
-        }
-    };
-
     return (
         <>
             <Collapsible className="group" onOpenChange={setExpanded} open={expanded}>
@@ -59,23 +47,6 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
                             </span>
                         </button>
                     </CollapsibleTrigger>
-
-                    {projectId != null && (
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    aria-label="Open project"
-                                    className="relative z-10 -ml-1.5 size-5 shrink-0 [&_svg]:size-3"
-                                    icon={<SquareArrowOutUpRightIcon className="size-3" />}
-                                    onClick={handleOpenProjectClick}
-                                    size="icon"
-                                    variant="ghost"
-                                />
-                            </TooltipTrigger>
-
-                            <TooltipContent>Open project</TooltipContent>
-                        </Tooltip>
-                    )}
 
                     <div className="min-w-0 flex-1" />
 

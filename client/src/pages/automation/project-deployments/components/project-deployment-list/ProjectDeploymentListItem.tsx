@@ -5,7 +5,6 @@ import Switch from '@/components/Switch/Switch';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-list/ProjectDeploymentListItemDropdownMenu';
-import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import {useProjectDeploymentsEnabledStore} from '@/pages/automation/project-deployments/stores/useProjectDeploymentsEnabledStore';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
@@ -26,14 +25,12 @@ import TagList from '../../../../../shared/components/TagList';
 import ProjectDeploymentDialog from '../project-deployment-dialog/ProjectDeploymentDialog';
 
 interface ProjectDeploymentListItemProps {
-    hideOpenInProject?: boolean;
     projectDeployment: ProjectDeployment;
     remainingTags?: Tag[];
     showTags?: boolean;
 }
 
 const ProjectDeploymentListItem = ({
-    hideOpenInProject,
     projectDeployment,
     remainingTags,
     showTags = true,
@@ -49,8 +46,6 @@ const ProjectDeploymentListItem = ({
     );
 
     const {captureProjectDeploymentEnabled} = useAnalytics();
-
-    const {openProject} = useOpenInProject();
 
     const {data: projectVersions} = useGetProjectVersionsQuery(
         projectDeployment.projectId!,
@@ -135,14 +130,6 @@ const ProjectDeploymentListItem = ({
 
     const newerVersionAvailable =
         projectDeployment.projectVersion != null && lastPublishedProjectVersion > projectDeployment.projectVersion;
-
-    const showOpenProject = !hideOpenInProject && projectDeployment.projectId != null;
-
-    const handleOpenProjectClick = () => {
-        if (projectDeployment.projectId != null) {
-            void openProject(projectDeployment.projectId);
-        }
-    };
 
     return (
         <>
@@ -248,7 +235,6 @@ const ProjectDeploymentListItem = ({
                             onChangeProjectVersionClick={() => setShowChangeProjectVersionDialog(true)}
                             onDeleteClick={() => setShowDeleteDialog(true)}
                             onEditClick={() => setShowEditDialog(true)}
-                            onOpenProjectClick={showOpenProject ? handleOpenProjectClick : undefined}
                         />
                     </div>
                 </div>

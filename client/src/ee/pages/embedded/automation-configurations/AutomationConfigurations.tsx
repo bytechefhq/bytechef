@@ -5,9 +5,7 @@ import AutomationExecutionsSheet from '@/ee/pages/embedded/automations/component
 import AutomationProjectConfigurationDialog from '@/ee/pages/embedded/automations/components/automation-project-configuration-dialog/AutomationProjectConfigurationDialog';
 import AutomationProjectConfigurationList from '@/ee/pages/embedded/automations/components/automation-project-configuration-list/AutomationProjectConfigurationList';
 import {getEnvironmentName} from '@/ee/pages/embedded/automations/components/automation-project-configuration-list/automationProjectConfigurationList-utils';
-import useOpenInEmbeddedEditor from '@/ee/pages/embedded/shared/useOpenInEmbeddedEditor';
 import ListGroupHeader from '@/shared/components/ListGroupHeader';
-import OpenInButton from '@/shared/components/OpenInButton';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
@@ -45,8 +43,6 @@ const AutomationConfigurations = () => {
 
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-
-    const {openAutomation} = useOpenInEmbeddedEditor();
 
     const {
         data: projectsData,
@@ -127,16 +123,6 @@ const AutomationConfigurations = () => {
                         {listedProjects.map((project) => (
                             <section key={project.id}>
                                 <ListGroupHeader
-                                    action={
-                                        project.workflowTemplates.length > 0 && (
-                                            <OpenInButton
-                                                label="Open project"
-                                                onClick={() =>
-                                                    openAutomation(project.workflowTemplates[0]?.workflowUuid)
-                                                }
-                                            />
-                                        )
-                                    }
                                     icon={<FolderIcon aria-hidden="true" className="size-6 shrink-0" />}
                                     name={project.name}
                                 />

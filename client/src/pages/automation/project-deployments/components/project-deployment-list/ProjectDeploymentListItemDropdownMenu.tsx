@@ -6,20 +6,18 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
-import {EditIcon, EllipsisVerticalIcon, RefreshCcwIcon, SquareArrowOutUpRightIcon, Trash2Icon} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon, RefreshCcwIcon, Trash2Icon} from 'lucide-react';
 
 interface ProjectDeploymentListItemDropdownMenuProps {
     onChangeProjectVersionClick: () => void;
     onDeleteClick: () => void;
     onEditClick: () => void;
-    onOpenProjectClick?: () => void;
 }
 
 const ProjectDeploymentListItemDropdownMenu = ({
     onChangeProjectVersionClick,
     onDeleteClick,
     onEditClick,
-    onOpenProjectClick,
 }: ProjectDeploymentListItemDropdownMenuProps) => {
     return (
         <DropdownMenu>
@@ -29,14 +27,6 @@ const ProjectDeploymentListItemDropdownMenu = ({
 
             <DropdownMenuContent align="end">
                 <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={onEditClick} />
-
-                {onOpenProjectClick && (
-                    <DropdownMenuItem
-                        icon={<SquareArrowOutUpRightIcon />}
-                        label="Open Project"
-                        onClick={onOpenProjectClick}
-                    />
-                )}
 
                 <DropdownMenuItem
                     icon={<RefreshCcwIcon />}
