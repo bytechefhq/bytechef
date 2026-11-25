@@ -14,7 +14,6 @@ import ProjectDeploymentWorkflowExecutionsSheet from '../ProjectDeploymentWorkfl
 const {
     detailQueryMock,
     openInProjectOptionsMock,
-    openProjectMock,
     openProjectWorkflowMock,
     queryMock,
     refetchMock,
@@ -24,7 +23,6 @@ const {
         data: enabled ? {id: 5, job: {id: '5'}, projectVersion: 2} : undefined,
     })),
     openInProjectOptionsMock: vi.fn(),
-    openProjectMock: vi.fn(),
     openProjectWorkflowMock: vi.fn(),
     queryMock: vi.fn(),
     refetchMock: vi.fn(),
@@ -35,7 +33,7 @@ vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => (
     default: (options: {onBeforeNavigate?: () => void}) => {
         openInProjectOptionsMock(options);
 
-        return {openProject: openProjectMock, openProjectWorkflow: openProjectWorkflowMock};
+        return {openProjectWorkflow: openProjectWorkflowMock};
     },
 }));
 
@@ -111,7 +109,6 @@ const jobExecution = {
 describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
     beforeEach(() => {
         detailQueryMock.mockClear();
-        openProjectMock.mockReset();
         openProjectWorkflowMock.mockReset();
         queryMock.mockReset();
         refetchMock.mockReset();
@@ -184,7 +181,7 @@ describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
         );
     });
 
-    it('links the project and workflow names in the header to the project editor', async () => {
+    it('shows the project name as plain text and links the workflow name in the header to the project editor', async () => {
         const user = userEvent.setup();
 
         mockQueryResult([]);
@@ -199,11 +196,8 @@ describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
 
         renderSheet();
 
-        expect(document.querySelector('header')).toHaveTextContent('Subflow/workflow1/ V3');
-
-        await user.click(screen.getByRole('button', {name: 'Subflow'}));
-
-        expect(openProjectMock).toHaveBeenCalledWith(7);
+        expect(document.querySelector('header')).toHaveTextContent('Subflow /workflow1/ V3');
+        expect(screen.queryByRole('button', {name: 'Subflow'})).not.toBeInTheDocument();
 
         await user.click(screen.getByRole('button', {name: 'workflow1'}));
 

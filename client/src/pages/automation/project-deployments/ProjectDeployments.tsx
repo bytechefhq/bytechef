@@ -5,11 +5,9 @@ import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentFilterTitle from '@/pages/automation/project-deployments/components/ProjectDeploymentFilterTitle';
 import ProjectDeploymentWorkflowExecutionsSheet from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowExecutionsSheet';
-import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ListGroupHeader from '@/shared/components/ListGroupHeader';
-import OpenInButton from '@/shared/components/OpenInButton';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -65,8 +63,6 @@ const ProjectDeployments = () => {
 
     const location = useLocation();
     const [searchParams] = useSearchParams();
-
-    const {openProject} = useOpenInProject();
 
     const projectId = searchParams.get('projectId');
     const tagId = searchParams.get('tagId');
@@ -243,12 +239,6 @@ const ProjectDeployments = () => {
                                     tags && (
                                         <section key={projectId}>
                                             <ListGroupHeader
-                                                action={
-                                                    <OpenInButton
-                                                        label="Open project"
-                                                        onClick={() => openProject(projectId)}
-                                                    />
-                                                }
                                                 icon={<FolderIcon aria-hidden="true" className="size-6 shrink-0" />}
                                                 name={project.name}
                                             />

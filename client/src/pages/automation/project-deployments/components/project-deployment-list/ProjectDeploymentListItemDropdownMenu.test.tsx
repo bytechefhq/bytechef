@@ -7,11 +7,10 @@ const handlers = {
     onChangeProjectVersionClick: vi.fn(),
     onDeleteClick: vi.fn(),
     onEditClick: vi.fn(),
-    onOpenProjectClick: vi.fn(),
 };
 
-const openMenu = async (props: Partial<typeof handlers> = {}) => {
-    render(<ProjectDeploymentListItemDropdownMenu {...handlers} {...props} />);
+const openMenu = async () => {
+    render(<ProjectDeploymentListItemDropdownMenu {...handlers} />);
 
     await userEvent.click(screen.getByRole('button'));
 };
@@ -31,13 +30,12 @@ describe('ProjectDeploymentListItemDropdownMenu', () => {
 
         expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
         expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
-        expect(screen.getByRole('menuitem', {name: 'Open Project'})).toBeInTheDocument();
         expect(screen.getByRole('menuitem', {name: 'Change Project Version'})).toBeInTheDocument();
         expect(screen.getByRole('menuitem', {name: 'Delete'})).toHaveClass('text-content-destructive-primary');
     });
 
-    it('should omit Open Project when the project cannot be opened', async () => {
-        await openMenu({onOpenProjectClick: undefined});
+    it('should not offer opening the project', async () => {
+        await openMenu();
 
         expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
         expect(screen.queryByRole('menuitem', {name: 'Open Project'})).not.toBeInTheDocument();
@@ -45,7 +43,6 @@ describe('ProjectDeploymentListItemDropdownMenu', () => {
 
     it.each([
         ['Edit', 'onEditClick'],
-        ['Open Project', 'onOpenProjectClick'],
         ['Change Project Version', 'onChangeProjectVersionClick'],
         ['Delete', 'onDeleteClick'],
     ] as const)('should call the handler when %s is clicked', async (rowName, handlerName) => {

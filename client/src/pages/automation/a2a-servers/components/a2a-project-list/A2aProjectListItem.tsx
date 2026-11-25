@@ -13,20 +13,12 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
-import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {A2aServer, useDeleteA2aProjectMutation} from '@/shared/middleware/graphql';
 import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {
-    EditIcon,
-    EllipsisVerticalIcon,
-    FolderIcon,
-    RefreshCwIcon,
-    SquareArrowOutUpRightIcon,
-    Trash2Icon,
-} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon, FolderIcon, RefreshCwIcon, Trash2Icon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 
 import A2aServerWorkflowDialog from '../A2aServerWorkflowDialog';
@@ -85,16 +77,6 @@ const A2aProjectListItem = ({a2aProject, a2aServer}: A2aProjectListItemProps) =>
         [a2aProject.workflowIds, projectDeployment?.projectDeploymentWorkflows]
     );
 
-    const {openProject} = useOpenInProject();
-
-    const projectId = a2aProject.projectId != null ? Number(a2aProject.projectId) : undefined;
-
-    const handleOpenProjectClick = () => {
-        if (projectId != null) {
-            void openProject(projectId);
-        }
-    };
-
     const handleProjectDeploymentDialogClose = () => {
         void queryClient
             .invalidateQueries({queryKey: ['a2aProjectsByServerId']})
@@ -115,18 +97,6 @@ const A2aProjectListItem = ({a2aProject, a2aServer}: A2aProjectListItemProps) =>
                     <span className="min-w-0 truncate text-sm font-medium">
                         {projectName || `Project #${a2aProject.projectId}`}
                     </span>
-
-                    {projectId != null && (
-                        <Button
-                            aria-label="Open project"
-                            className="relative z-10 -ml-1.5 size-5 shrink-0 [&_svg]:size-3"
-                            icon={<SquareArrowOutUpRightIcon className="size-3" />}
-                            onClick={handleOpenProjectClick}
-                            size="icon"
-                            title="Open project"
-                            variant="ghost"
-                        />
-                    )}
 
                     <div className="min-w-0 flex-1" />
 

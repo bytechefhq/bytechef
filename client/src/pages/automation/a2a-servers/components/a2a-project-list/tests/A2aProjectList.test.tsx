@@ -14,7 +14,6 @@ const hoisted = vi.hoisted(() => ({
     invalidateQueries: vi.fn(),
     isError: false,
     isLoading: false,
-    openProject: vi.fn(),
     openProjectWorkflow: vi.fn(),
     updateEnabledMutate: vi.fn(),
     updateMutate: vi.fn(),
@@ -132,7 +131,7 @@ vi.mock('@/shared/queries/automation/workflows.queries', () => ({
 }));
 
 vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => ({
-    default: () => ({openProject: hoisted.openProject, openProjectWorkflow: hoisted.openProjectWorkflow}),
+    default: () => ({openProjectWorkflow: hoisted.openProjectWorkflow}),
 }));
 
 vi.mock('@/shared/hooks/useWorkflowComponentDefinitions', async (importOriginal) => ({
@@ -201,7 +200,6 @@ describe('A2aProjectList', () => {
         hoisted.invalidateQueries.mockReset();
         hoisted.isError = false;
         hoisted.isLoading = false;
-        hoisted.openProject.mockReset();
         hoisted.openProjectWorkflow.mockReset();
         hoisted.updateEnabledMutate.mockReset();
         hoisted.updateMutate.mockReset();
@@ -216,14 +214,11 @@ describe('A2aProjectList', () => {
         });
     });
 
-    it('opens the project of a server entry in the project editor', async () => {
-        const user = userEvent.setup();
-
+    it('offers no project link on a server entry', () => {
         render(<A2aProjectList a2aServer={a2aServer} />, {wrapper: TooltipProvider});
 
-        await user.click(screen.getAllByRole('button', {name: 'Open project'})[0]);
-
-        expect(hoisted.openProject).toHaveBeenCalledWith(5);
+        expect(screen.getByText('Sales project')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Open project'})).not.toBeInTheDocument();
     });
 
     it("opens a workflow's executions in the deployment sheet and the workflow in its project", async () => {
