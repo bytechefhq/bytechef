@@ -2,7 +2,7 @@ import {TooltipProvider} from '@/components/ui/tooltip';
 import AutomationProjectWorkflowListItem from '@/ee/pages/embedded/automations/components/automation-project-list/AutomationProjectWorkflowListItem';
 import {resetAll, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {act, render, screen} from '@testing-library/react';
+import {act, render, screen, waitFor} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -45,12 +45,12 @@ const workflow = {
     workflowUuid: 'wf-1',
 };
 
-const renderRow = () =>
+const renderRow = (workflowOverrides: {description?: string | null} = {}) =>
     render(
         <QueryClientProvider client={new QueryClient({defaultOptions: {queries: {retry: false}}})}>
             <TooltipProvider>
                 <ul>
-                    <AutomationProjectWorkflowListItem {...handlers} workflow={workflow} />
+                    <AutomationProjectWorkflowListItem {...handlers} workflow={{...workflow, ...workflowOverrides}} />
                 </ul>
             </TooltipProvider>
         </QueryClientProvider>
@@ -78,6 +78,22 @@ describe('AutomationProjectWorkflowListItem', () => {
         expect(screen.getByText('Mailer')).toBeInTheDocument();
         expect(screen.getByText('Manual')).toBeInTheDocument();
         expect(screen.getByText(/Modified at/)).toBeInTheDocument();
+    });
+
+    it('shows the workflow description in a tooltip on the label', async () => {
+        renderRow();
+
+        await userEvent.hover(screen.getByText('Mailer'));
+
+        await waitFor(() =>
+            expect(document.querySelector('[data-slot="tooltip-content"]')).toHaveTextContent('Sends mail')
+        );
+    });
+
+    it('does not show a tooltip on the label when the workflow has no description', () => {
+        renderRow({description: null});
+
+        expect(screen.getByText('Mailer')).not.toHaveAttribute('data-slot', 'tooltip-trigger');
     });
 
     it('underlines the label when the row is hovered', () => {

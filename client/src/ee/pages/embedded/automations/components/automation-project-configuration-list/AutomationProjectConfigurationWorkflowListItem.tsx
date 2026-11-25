@@ -10,6 +10,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useAutomationExecutionsSheetStore from '@/ee/pages/embedded/automations/stores/useAutomationExecutionsSheetStore';
 import OpenAutomationButton from '@/ee/pages/embedded/shared/OpenAutomationButton';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
+import WorkflowDescriptionTooltip from '@/shared/components/workflow/WorkflowDescriptionTooltip';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {
     AutomationProjectConfigurationsQuery,
@@ -112,7 +113,9 @@ const AutomationProjectConfigurationWorkflowListItem = ({
                         onClick={handleOpenExecutions}
                         type="button"
                     >
-                        <span className="line-clamp-1">{workflowLabel}</span>
+                        <WorkflowDescriptionTooltip description={workflowTemplate?.description ?? undefined}>
+                            <span className="line-clamp-1">{workflowLabel}</span>
+                        </WorkflowDescriptionTooltip>
                     </button>
 
                     {showOpenInProject && (
