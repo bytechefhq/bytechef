@@ -6,6 +6,7 @@ import {renderFormField} from '@/shared/components/form/renderFormField';
 import useApprovalForm from '@/shared/hooks/useApprovalForm';
 import {useEffect, useId, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
+import {twMerge} from 'tailwind-merge';
 
 interface ApprovalFormPropsI {
     id: string | undefined;
@@ -95,10 +96,10 @@ export default function ApprovalForm({
                 <h2 className="text-lg font-semibold tracking-tight">{uiDefinition.title || 'Approval requested'}</h2>
 
                 {uiDefinition.description && (
-                    <p className="mt-2 text-sm whitespace-pre-line text-muted-foreground">{uiDefinition.description}</p>
+                    <p className="mt-1 text-sm whitespace-pre-line text-muted-foreground">{uiDefinition.description}</p>
                 )}
 
-                <p className="mt-4 text-sm text-muted-foreground">
+                <p className={twMerge('mt-1 text-sm text-muted-foreground', uiDefinition.description && 'mt-3')}>
                     {presetApproved ? 'Confirm to approve this request.' : 'Confirm to discard this request.'}
                 </p>
 
@@ -162,7 +163,7 @@ export default function ApprovalForm({
                             return <div key={name}>{renderFormField(form, formInput, name)}</div>;
                         })
                     ) : (
-                        <span className="text-sm text-muted-foreground">No inputs defined.</span>
+                        <p className="text-sm text-muted-foreground">No inputs defined.</p>
                     )}
 
                     {!hasCommentField && (
