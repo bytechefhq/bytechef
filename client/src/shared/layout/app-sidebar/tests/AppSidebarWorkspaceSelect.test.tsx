@@ -41,8 +41,9 @@ vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
 
 vi.mock('@/pages/home/stores/usePlatformTypeStore', () => ({
     PlatformType: {AUTOMATION: 0, EMBEDDED: 1},
-    usePlatformTypeStore: vi.fn((selector: (state: {currentType: number; setCurrentType: () => void}) => unknown) =>
-        selector({currentType: hoisted.currentType, setCurrentType: hoisted.setCurrentTypeMock})
+    usePlatformTypeStore: vi.fn(
+        (selector: (state: {currentType: number | undefined; setCurrentType: () => void}) => unknown) =>
+            selector({currentType: hoisted.currentType, setCurrentType: hoisted.setCurrentTypeMock})
     ),
 }));
 
