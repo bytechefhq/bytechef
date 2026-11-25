@@ -6,13 +6,14 @@ interface ReadOnlyInputProps {
     className?: string;
     inlineIcon?: ReactNode;
     label: string;
+    labelClassName?: string;
     text: string;
 }
 
 const ReadOnlyInput = React.forwardRef<HTMLDivElement, ReadOnlyInputProps>(
-    ({className, inlineIcon, label, text}, ref) => (
+    ({className, inlineIcon, label, labelClassName, text}, ref) => (
         <fieldset className={twMerge('space-y-1', className)}>
-            <Label>{label}</Label>
+            <Label className={labelClassName}>{label}</Label>
 
             <div
                 className="flex h-9 w-full items-center gap-2 rounded-md border border-dashed border-input bg-surface-neutral-primary px-3 py-1 md:text-sm"
