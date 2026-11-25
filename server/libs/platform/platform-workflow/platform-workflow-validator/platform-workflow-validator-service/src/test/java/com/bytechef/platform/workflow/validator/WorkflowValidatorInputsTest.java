@@ -845,6 +845,73 @@ class WorkflowValidatorInputsTest {
         };
     }
 
+    @Test
+    void testValidateWorkflowAcceptsComponentPropertyInputWithoutType() {
+        String workflow = """
+            {
+                "label": "Test Workflow",
+                "description": "Test Description",
+                "inputs": [
+                    {
+                        "name": "slackChannel",
+                        "label": "Slack Channel",
+                        "required": false,
+                        "componentName": "slack",
+                        "componentVersion": 1,
+                        "groupName": "channel"
+                    }
+                ],
+                "triggers": [],
+                "tasks": []
+            }
+            """;
+
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        validateInputsWorkflow(workflow, errors, warnings);
+
+        assertEquals("", errors.toString());
+        assertEquals("", warnings.toString());
+    }
+
+    @Test
+    void testValidateWorkflowRequiresTypeForIncompleteComponentReference() {
+        String workflow = """
+            {
+                "label": "Test Workflow",
+                "description": "Test Description",
+                "inputs": [
+                    {
+                        "name": "slackChannel",
+                        "label": "Slack Channel",
+                        "componentName": "slack",
+                        "groupName": "channel"
+                    }
+                ],
+                "triggers": [],
+                "tasks": []
+            }
+            """;
+
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        validateInputsWorkflow(workflow, errors, warnings);
+
+        assertEquals("[slackChannel] Missing required field: type", errors.toString());
+    }
+
+    private static void validateInputsWorkflow(String workflow, StringBuilder errors, StringBuilder warnings) {
+        WorkflowValidator.TaskDefinitionProvider taskDefinitionProvider = (taskType, kind) -> List.of();
+        WorkflowValidator.TaskOutputProvider taskOutputProvider = (taskType, kind, warningsBuilder) -> null;
+        WorkflowValidator.ClusterTypesProvider clusterTypesProvider = taskType -> List.of();
+
+        WorkflowValidator.validateWorkflow(
+            workflow, taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, new HashMap<>(),
+            new HashMap<>(), new HashMap<>(), errors, warnings);
+    }
+
     private static String inputNamesWorkflow(String... inputNames) {
         StringBuilder inputs = new StringBuilder();
 
