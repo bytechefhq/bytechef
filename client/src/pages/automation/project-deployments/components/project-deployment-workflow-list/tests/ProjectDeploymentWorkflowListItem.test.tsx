@@ -142,8 +142,8 @@ describe('ProjectDeploymentWorkflowListItem', () => {
         });
 
         expect(
-            screen.getAllByText(`at ${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString()}`).length
-        ).toBeGreaterThan(0);
+            screen.getAllByText(`at ${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString()}`)
+        ).toHaveLength(2);
         expect(screen.queryByText('No executions')).not.toBeInTheDocument();
     });
 
@@ -161,9 +161,12 @@ describe('ProjectDeploymentWorkflowListItem', () => {
             } as ProjectDeploymentWorkflow,
         });
 
+        expect(screen.getAllByText(`at ${endDate.toLocaleDateString()} ${endDate.toLocaleTimeString()}`)).toHaveLength(
+            2
+        );
         expect(
-            screen.getAllByText(`at ${endDate.toLocaleDateString()} ${endDate.toLocaleTimeString()}`).length
-        ).toBeGreaterThan(0);
+            screen.queryByText(`at ${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString()}`)
+        ).not.toBeInTheDocument();
     });
 
     it('shows the trigger and components like the projects page', () => {
