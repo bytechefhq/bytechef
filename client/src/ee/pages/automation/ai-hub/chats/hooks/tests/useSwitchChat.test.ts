@@ -1033,6 +1033,41 @@ describe('useSwitchChat', () => {
             ]);
         });
 
+        it('restores a persisted openAiAgentTab call where it was made instead of after the last reply', async () => {
+            mockGetChatMessages.mockResolvedValue([
+                buildMessage({
+                    content: 'Show the agent',
+                    id: 'event-ask',
+                    role: 'USER',
+                    toolEventsJson: JSON.stringify([
+                        {
+                            arguments: JSON.stringify({aiAgentId: 'agent-1', name: 'Support Agent'}),
+                            id: 'call-1',
+                            kind: 'call',
+                            name: 'openAiAgentTab',
+                        },
+                    ]),
+                }),
+                buildMessage({content: 'Here it is.', id: 'event-shown', role: 'ASSISTANT'}),
+            ]);
+            mockGetChatArtifacts.mockResolvedValue([
+                buildArtifact({
+                    artifactId: 'agent-1',
+                    artifactName: 'Support Agent',
+                    kind: 'AI_AGENT_REFERENCED',
+                    metadataJson: null,
+                }),
+            ]);
+
+            await switchTo(buildChat());
+
+            expect(aiHubStore.getState().messages.map((message) => message.id)).toEqual([
+                'event-ask',
+                'event-ask-tools',
+                'event-shown',
+            ]);
+        });
+
         it('adds the card of a workflow whose persisted open call cannot identify it to the last reply', async () => {
             mockGetChatMessages.mockResolvedValue([
                 buildMessage({
