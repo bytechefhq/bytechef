@@ -38,6 +38,10 @@ export const useCreateProjectWorkflow = ({
             });
 
             void queryClient.invalidateQueries({
+                queryKey: ProjectKeys.project(projectId),
+            });
+
+            void queryClient.invalidateQueries({
                 queryKey: ProjectKeys.filteredProjects({
                     id: currentWorkspaceId!,
                 }),
