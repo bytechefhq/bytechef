@@ -1037,11 +1037,68 @@ public class ProjectDeploymentFacadeIntTest {
 
         ProjectDeploymentDTO result = projectDeploymentFacade.getProjectDeployment(deploymentId);
 
-        assertThat(result.lastExecutionDate()).isNull();
-        assertThat(result.lastExecutionStartDate()).isEqualTo(startTime);
-        assertThat(result.projectDeploymentWorkflows())
-            .hasSize(1)
-            .first()
+        assertRunningExecution(result, startTime);
+
+        verify(jobService, times(2)).getJob(runningJobId);
+
+        List<ProjectDeploymentDTO> workspaceProjectDeployments = projectDeploymentFacade.getWorkspaceProjectDeployments(
+            workspace.getId(), null, projectDTO.id(), null, true);
+
+        assertThat(workspaceProjectDeployments).hasSize(1);
+
+        assertRunningExecution(workspaceProjectDeployments.getFirst(), startTime);
+
+        verify(jobService, times(4)).getJob(runningJobId);
+    }
+
+    @Test
+    public void testLastExecutionDatesOfFinishedJob() {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacadeHelper.createProjectDeployment(
+            workspace.getId(), projectDTO);
+
+        long deploymentId = projectDeploymentDTO.id();
+        long finishedJobId = 778L;
+        Instant startTime = Instant.parse("2026-11-25T10:50:00Z");
+        Instant endTime = Instant.parse("2026-11-25T10:55:00Z");
+
+        Job finishedJob = new Job();
+
+        finishedJob.setEndDate(endTime);
+        finishedJob.setStartDate(startTime);
+        finishedJob.setStatus(Job.Status.COMPLETED);
+
+        when(principalJobService.fetchLastJobId(deploymentId, PlatformType.AUTOMATION))
+            .thenReturn(Optional.of(finishedJobId));
+        when(principalJobService.fetchLastWorkflowJobId(eq(deploymentId), anyList(), eq(PlatformType.AUTOMATION)))
+            .thenReturn(Optional.of(finishedJobId));
+        when(jobService.getJob(finishedJobId))
+            .thenReturn(finishedJob);
+
+        List<ProjectDeploymentDTO> workspaceProjectDeployments = projectDeploymentFacade.getWorkspaceProjectDeployments(
+            workspace.getId(), null, projectDTO.id(), null, true);
+
+        assertThat(workspaceProjectDeployments)
+            .singleElement()
+            .satisfies(projectDeployment -> {
+                assertThat(projectDeployment.lastExecutionDate()).isEqualTo(endTime);
+                assertThat(projectDeployment.lastExecutionStartDate()).isEqualTo(startTime);
+                assertThat(projectDeployment.projectDeploymentWorkflows())
+                    .singleElement()
+                    .satisfies(workflow -> {
+                        assertThat(workflow.lastExecutionDate()).isEqualTo(endTime);
+                        assertThat(workflow.lastExecutionStartDate()).isEqualTo(startTime);
+                        assertThat(workflow.lastExecutionStatus()).isEqualTo(Job.Status.COMPLETED);
+                    });
+            });
+    }
+
+    private static void assertRunningExecution(ProjectDeploymentDTO projectDeploymentDTO, Instant startTime) {
+        assertThat(projectDeploymentDTO.lastExecutionDate()).isNull();
+        assertThat(projectDeploymentDTO.lastExecutionStartDate()).isEqualTo(startTime);
+        assertThat(projectDeploymentDTO.projectDeploymentWorkflows())
+            .singleElement()
             .satisfies(workflow -> {
                 assertThat(workflow.lastExecutionDate()).isNull();
                 assertThat(workflow.lastExecutionStartDate()).isEqualTo(startTime);

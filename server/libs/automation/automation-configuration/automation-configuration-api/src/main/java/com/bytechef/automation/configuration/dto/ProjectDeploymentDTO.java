@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.configuration.dto;
 
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.commons.util.CollectionUtils;
@@ -32,9 +33,8 @@ import java.util.List;
 public record ProjectDeploymentDTO(
     String createdBy, Instant createdDate, String description, boolean enabled, Environment environment, Long id,
     String name, Instant lastExecutionDate, Instant lastExecutionStartDate, String lastModifiedBy,
-    Instant lastModifiedDate, Project project,
-    long projectId, int projectVersion, List<ProjectDeploymentWorkflowDTO> projectDeploymentWorkflows, List<Tag> tags,
-    int version) {
+    Instant lastModifiedDate, Project project, long projectId, int projectVersion,
+    List<ProjectDeploymentWorkflowDTO> projectDeploymentWorkflows, List<Tag> tags, int version) {
 
     public ProjectDeploymentDTO(ProjectDeployment projectDeployment) {
         this(
@@ -47,13 +47,13 @@ public record ProjectDeploymentDTO(
 
     public ProjectDeploymentDTO(
         ProjectDeployment projectDeployment, List<ProjectDeploymentWorkflowDTO> projectDeploymentWorkflows,
-        Project project, Instant lastExecutionDate, Instant lastExecutionStartDate, List<Tag> tags) {
+        Project project, Job lastJob, List<Tag> tags) {
 
         this(
             projectDeployment.getCreatedBy(), projectDeployment.getCreatedDate(), projectDeployment.getDescription(),
             projectDeployment.isEnabled(), projectDeployment.getEnvironment(), projectDeployment.getId(),
-            projectDeployment.getName(), lastExecutionDate, lastExecutionStartDate,
-            projectDeployment.getLastModifiedBy(),
+            projectDeployment.getName(), lastJob == null ? null : lastJob.getEndDate(),
+            lastJob == null ? null : lastJob.getStartDate(), projectDeployment.getLastModifiedBy(),
             projectDeployment.getLastModifiedDate(), project, projectDeployment.getProjectId(),
             projectDeployment.getProjectVersion(), CollectionUtils.sort(projectDeploymentWorkflows), tags,
             projectDeployment.getVersion());
@@ -206,9 +206,8 @@ public record ProjectDeploymentDTO(
         public ProjectDeploymentDTO build() {
             return new ProjectDeploymentDTO(
                 createdBy, createdDate, description, enabled, environment, id, name, lastExecutionDate,
-                lastExecutionStartDate,
-                lastModifiedBy,
-                lastModifiedDate, project, projectId, projectVersion, projectDeploymentWorkflows, tags, version);
+                lastExecutionStartDate, lastModifiedBy, lastModifiedDate, project, projectId, projectVersion,
+                projectDeploymentWorkflows, tags, version);
         }
     }
 }

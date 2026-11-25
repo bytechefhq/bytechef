@@ -107,10 +107,8 @@ public class ProjectDeploymentFacadeHelper {
             .orElseThrow();
 
         ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO =
-            new ProjectDeploymentWorkflowDTO(List.of(), null, null, Map.of(), true, null, null, null, null, null, null,
-                null,
-                null,
-                0,
+            new ProjectDeploymentWorkflowDTO(
+                List.of(), null, null, Map.of(), true, null, null, null, null, null, null, null, null, 0,
                 publishedProjectWorkflow.getWorkflowId(), publishedProjectWorkflow.getUuidAsString());
 
         ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
@@ -144,10 +142,9 @@ public class ProjectDeploymentFacadeHelper {
             .orElseThrow();
 
         ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO =
-            new ProjectDeploymentWorkflowDTO(List.of(), null, null, Map.of(), true, null, null, null, null, null, null,
-                null,
-                null,
-                0, projectWorkflow.getWorkflowId(), projectWorkflow.getUuidAsString());
+            new ProjectDeploymentWorkflowDTO(
+                List.of(), null, null, Map.of(), true, null, null, null, null, null, null, null, null, 0,
+                projectWorkflow.getWorkflowId(), projectWorkflow.getUuidAsString());
 
         ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
             .projectId(projectDTO.id())
@@ -201,10 +198,8 @@ public class ProjectDeploymentFacadeHelper {
             .orElseThrow();
 
         ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO =
-            new ProjectDeploymentWorkflowDTO(List.of(), null, null, Map.of(), true, null, null, null, null, null, null,
-                null,
-                null,
-                0,
+            new ProjectDeploymentWorkflowDTO(
+                List.of(), null, null, Map.of(), true, null, null, null, null, null, null, null, null, 0,
                 publishedProjectWorkflow.getWorkflowId(), publishedProjectWorkflow.getUuidAsString());
 
         ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
