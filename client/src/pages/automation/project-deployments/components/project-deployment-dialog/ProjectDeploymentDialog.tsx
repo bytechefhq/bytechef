@@ -362,7 +362,7 @@ const ProjectDeploymentDialog = ({
 
             void new ProjectDeploymentApi()
                 .getProjectDeployment({id: variables.id!})
-                .then((projectDeployment) => setLatestProjectDeployment(projectDeployment))
+                .then(setLatestProjectDeployment)
                 .catch(() => undefined);
         },
         onSuccess: () => onSuccessHandler(),
@@ -725,7 +725,7 @@ const ProjectDeploymentDialog = ({
     }, [isOpen, projectDeploymentsLoading, environmentProjectDeployments, changeProjectVersion, tabInitialized]);
 
     const deploymentConflictAlert = deploymentConflict && (
-        <Alert className="mt-4" variant="destructive">
+        <Alert variant="destructive">
             <AlertDescription>
                 This deployment changed after you opened this dialog. Click Save to try again.
             </AlertDescription>
