@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectDeploymentWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectDeploymentWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T14:37:43.821704+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-25T10:59:01.405908+01:00[Europe/Belgrade]", comments = "Generator version: 7.27.0")
 public class ProjectDeploymentWorkflowModel {
 
   private @Nullable String createdBy;
@@ -49,6 +49,9 @@ public class ProjectDeploymentWorkflowModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime lastExecutionDate;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private @Nullable OffsetDateTime lastExecutionStartDate;
 
   /**
    * The last execution status of a project deployment.
@@ -275,6 +278,27 @@ public class ProjectDeploymentWorkflowModel {
     this.lastExecutionDate = lastExecutionDate;
   }
 
+  public ProjectDeploymentWorkflowModel lastExecutionStartDate(@Nullable OffsetDateTime lastExecutionStartDate) {
+    this.lastExecutionStartDate = lastExecutionStartDate;
+    return this;
+  }
+
+  /**
+   * The start date of the last execution of a project deployment.
+   * @return lastExecutionStartDate
+   */
+  @Valid 
+  @Schema(name = "lastExecutionStartDate", description = "The start date of the last execution of a project deployment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastExecutionStartDate")
+  public @Nullable OffsetDateTime getLastExecutionStartDate() {
+    return lastExecutionStartDate;
+  }
+
+  @JsonProperty("lastExecutionStartDate")
+  public void setLastExecutionStartDate(@Nullable OffsetDateTime lastExecutionStartDate) {
+    this.lastExecutionStartDate = lastExecutionStartDate;
+  }
+
   public ProjectDeploymentWorkflowModel lastExecutionStatus(@Nullable LastExecutionStatusEnum lastExecutionStatus) {
     this.lastExecutionStatus = lastExecutionStatus;
     return this;
@@ -459,6 +483,7 @@ public class ProjectDeploymentWorkflowModel {
         Objects.equals(this.enabled, projectDeploymentWorkflow.enabled) &&
         Objects.equals(this.id, projectDeploymentWorkflow.id) &&
         Objects.equals(this.lastExecutionDate, projectDeploymentWorkflow.lastExecutionDate) &&
+        Objects.equals(this.lastExecutionStartDate, projectDeploymentWorkflow.lastExecutionStartDate) &&
         Objects.equals(this.lastExecutionStatus, projectDeploymentWorkflow.lastExecutionStatus) &&
         Objects.equals(this.lastModifiedBy, projectDeploymentWorkflow.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, projectDeploymentWorkflow.lastModifiedDate) &&
@@ -471,7 +496,7 @@ public class ProjectDeploymentWorkflowModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, inputs, connections, enabled, id, lastExecutionDate, lastExecutionStatus, lastModifiedBy, lastModifiedDate, projectDeploymentId, staticWebhookUrl, workflowId, workflowUuid, version);
+    return Objects.hash(createdBy, createdDate, inputs, connections, enabled, id, lastExecutionDate, lastExecutionStartDate, lastExecutionStatus, lastModifiedBy, lastModifiedDate, projectDeploymentId, staticWebhookUrl, workflowId, workflowUuid, version);
   }
 
   @Override
@@ -485,6 +510,7 @@ public class ProjectDeploymentWorkflowModel {
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
+    sb.append("    lastExecutionStartDate: ").append(toIndentedString(lastExecutionStartDate)).append("\n");
     sb.append("    lastExecutionStatus: ").append(toIndentedString(lastExecutionStatus)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
