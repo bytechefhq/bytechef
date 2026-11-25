@@ -127,23 +127,7 @@ describe('AppSidebarFooter', () => {
         expect(screen.getAllByText('user@localhost.com').length).toBeGreaterThanOrEqual(2);
     });
 
-    it('offers Approval Tasks in automation mode', async () => {
-        const user = userEvent.setup();
-
-        render(
-            <MemoryRouter>
-                <AppSidebarFooter />
-            </MemoryRouter>
-        );
-
-        await user.click(screen.getByRole('button', {name: 'User menu'}));
-
-        expect(screen.getByText('Approval Tasks')).toBeInTheDocument();
-    });
-
-    it('hides Approval Tasks in embedded mode', async () => {
-        hoisted.currentType = 1;
-
+    it('no longer offers Approval Tasks in the user menu', async () => {
         const user = userEvent.setup();
 
         render(
@@ -221,22 +205,6 @@ describe('AppSidebarFooter', () => {
         await user.click(screen.getByText('Settings'));
 
         expect(await screen.findByText('Embedded settings page')).toBeInTheDocument();
-    });
-
-    it('offers Approval Tasks on an Organization settings page when no mode is remembered', async () => {
-        hoisted.currentType = undefined as unknown as number;
-
-        const user = userEvent.setup();
-
-        render(
-            <MemoryRouter initialEntries={['/settings/users']}>
-                <AppSidebarFooter />
-            </MemoryRouter>
-        );
-
-        await user.click(screen.getByRole('button', {name: 'User menu'}));
-
-        expect(screen.getByText('Approval Tasks')).toBeInTheDocument();
     });
 
     it('opens the Help & Feedback links in a new tab', async () => {

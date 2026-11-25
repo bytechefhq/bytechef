@@ -29,7 +29,6 @@ import {
     BookOpenIcon,
     BugIcon,
     ChevronsUpDownIcon,
-    ClipboardCheckIcon,
     EyeIcon,
     EyeOffIcon,
     HelpCircleIcon,
@@ -174,19 +173,6 @@ export function AppSidebarFooter() {
                 <DropdownMenuSeparator />
 
                 <div className="space-y-1">
-                    {platformMode === PlatformType.AUTOMATION && (
-                        <DropdownMenuItem
-                            className="cursor-pointer font-semibold"
-                            onClick={() => navigate('/automation/approval-tasks')}
-                        >
-                            <div className="flex items-center space-x-1">
-                                <ClipboardCheckIcon className="size-5" />
-
-                                <span>Approval Tasks</span>
-                            </div>
-                        </DropdownMenuItem>
-                    )}
-
                     <DropdownMenuItem
                         className="cursor-pointer font-semibold"
                         onClick={() => navigate(`${platformBasePath}/settings`)}

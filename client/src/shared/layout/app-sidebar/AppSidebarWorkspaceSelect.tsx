@@ -75,6 +75,16 @@ export function AppSidebarWorkspaceSelect() {
         currentMode = PlatformType.EMBEDDED;
     }
 
+    if (!ee && currentMode === PlatformType.AUTOMATION) {
+        return (
+            <div className="flex min-w-0 flex-1 items-center gap-1 group-data-[collapsible=icon]:flex-none">
+                <AppSidebarModeSelect currentMode={currentMode} showModes={false} />
+
+                <span className="px-2 text-base font-medium group-data-[collapsible=icon]:hidden">ByteChef</span>
+            </div>
+        );
+    }
+
     if (!ee) {
         return (
             <Link className="flex min-w-0 flex-1 items-center gap-1 group-data-[collapsible=icon]:flex-none" to="/">
