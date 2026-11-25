@@ -213,6 +213,7 @@ describe('ProjectDeploymentListItem', () => {
         expect(
             screen.getByText(`Executed at ${endDate.toLocaleDateString()} ${endDate.toLocaleTimeString()}`)
         ).toBeInTheDocument();
+        expect(screen.queryByText(/^Started at/)).not.toBeInTheDocument();
     });
 
     it('does not show an environment badge for a development deployment', () => {

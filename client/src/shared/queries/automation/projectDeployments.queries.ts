@@ -23,19 +23,43 @@ export const useGetProjectDeploymentQuery = (id: number, enabled?: boolean) =>
         enabled: enabled === undefined ? true : enabled,
     });
 
-const RUNNING_EXECUTION_REFETCH_INTERVAL = 3000;
+const RUNNING_EXECUTION_REFETCH_INTERVALS = [
+    {interval: 3000, maxAge: 60 * 1000},
+    {interval: 10 * 1000, maxAge: 10 * 60 * 1000},
+    {interval: 30 * 1000, maxAge: 60 * 60 * 1000},
+];
 
-const isExecutionRunning = (execution: {lastExecutionDate?: Date; lastExecutionStartDate?: Date}) =>
-    !!execution.lastExecutionStartDate && !execution.lastExecutionDate;
+interface ExecutionDatesI {
+    lastExecutionDate?: Date;
+    lastExecutionStartDate?: Date;
+}
 
-export const getProjectDeploymentsRefetchInterval = (projectDeployments?: ProjectDeployment[]): number | false =>
-    projectDeployments?.some(
-        (projectDeployment) =>
-            isExecutionRunning(projectDeployment) ||
-            projectDeployment.projectDeploymentWorkflows?.some(isExecutionRunning)
-    )
-        ? RUNNING_EXECUTION_REFETCH_INTERVAL
-        : false;
+const getRunningExecutionStartTime = (execution: ExecutionDatesI) =>
+    execution.lastExecutionStartDate && !execution.lastExecutionDate
+        ? execution.lastExecutionStartDate.getTime()
+        : undefined;
+
+export const getProjectDeploymentsRefetchInterval = (
+    projectDeployments?: ProjectDeployment[],
+    now: number = Date.now()
+): number | false => {
+    const runningExecutionStartTimes = (projectDeployments ?? [])
+        .flatMap((projectDeployment) => [projectDeployment, ...(projectDeployment.projectDeploymentWorkflows ?? [])])
+        .map(getRunningExecutionStartTime)
+        .filter((startTime): startTime is number => startTime !== undefined);
+
+    if (!runningExecutionStartTimes.length) {
+        return false;
+    }
+
+    const youngestRunningExecutionAge = now - Math.max(...runningExecutionStartTimes);
+
+    const refetchInterval = RUNNING_EXECUTION_REFETCH_INTERVALS.find(
+        ({maxAge}) => youngestRunningExecutionAge < maxAge
+    );
+
+    return refetchInterval?.interval ?? false;
+};
 
 export const useGetWorkspaceProjectDeploymentsQuery = (
     filters: GetWorkspaceProjectDeploymentsRequest,
