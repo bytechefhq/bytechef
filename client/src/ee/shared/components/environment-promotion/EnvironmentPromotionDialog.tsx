@@ -190,6 +190,7 @@ const EnvironmentPromotionDialog = ({
                         {preview && (
                             <div className="space-y-3">
                                 <Badge
+                                    className="border-transparent"
                                     label={
                                         willCreateTarget ? 'Will create' : `Will update ${preview.existingTargetName}`
                                     }
