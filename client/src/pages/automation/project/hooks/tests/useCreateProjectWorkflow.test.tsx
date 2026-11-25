@@ -34,9 +34,9 @@ vi.mock('@/shared/mutations/automation/workflows.mutations', () => ({
 
 const renderUseCreateProjectWorkflow = (
     bottomResizablePanelRef?: {current: Pick<PanelImperativeHandle, 'resize'> | null},
-    projectId = 5
+    projectId = 5,
+    queryClient = new QueryClient()
 ) => {
-    const queryClient = new QueryClient();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
     const wrapper = ({children}: {children: ReactNode}) => (
@@ -78,6 +78,18 @@ describe('useCreateProjectWorkflow', () => {
         expect(useWorkflowEditorStore.getState().showBottomPanel).toBe(false);
         expect(resize).toHaveBeenCalledWith(0);
         expect(hoisted.navigate).toHaveBeenCalledWith('/automation/projects/5/project-workflows/42');
+    });
+
+    it('marks the cached project stale so Publish sees the added workflow', () => {
+        const queryClient = new QueryClient();
+
+        queryClient.setQueryData(ProjectKeys.project(5), {id: 5, unpublishedChanges: false});
+
+        renderUseCreateProjectWorkflow(undefined, 5, queryClient);
+
+        hoisted.mutationOptions.current?.onSuccess?.({projectWorkflowId: 42});
+
+        expect(queryClient.getQueryState(ProjectKeys.project(5))?.isInvalidated).toBe(true);
     });
 
     it('opens the created workflow without a bottom panel to collapse', () => {
