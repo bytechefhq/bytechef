@@ -7,7 +7,15 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {DownloadIcon, EditIcon, EllipsisVerticalIcon, PlusIcon, RefreshCcwIcon, Trash2Icon} from 'lucide-react';
+import {
+    DownloadIcon,
+    EditIcon,
+    EllipsisVerticalIcon,
+    PlusIcon,
+    RefreshCcwIcon,
+    RocketIcon,
+    Trash2Icon,
+} from 'lucide-react';
 
 interface ApiCollectionListItemDropdownMenuProps {
     apiCollectionId: number;
@@ -45,7 +53,7 @@ const ApiCollectionListItemDropDownMenu = ({
 
                 {showPromoteToEnvironment && (
                     <DropdownMenuItem className="dropdown-menu-item" onClick={onPromoteClick}>
-                        Promote to environment…
+                        <RocketIcon /> Promote to environment…
                     </DropdownMenuItem>
                 )}
 

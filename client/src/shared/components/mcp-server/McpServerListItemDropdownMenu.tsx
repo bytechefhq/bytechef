@@ -8,7 +8,7 @@ import {
 } from '@/components/DropdownMenu/DropdownMenu';
 import EEVersion from '@/shared/edition/EEVersion';
 import {McpServer} from '@/shared/middleware/graphql';
-import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon, RocketIcon, Trash2Icon} from 'lucide-react';
 
 interface McpServerListItemDropdownMenuProps {
     mcpServer: McpServer;
@@ -35,7 +35,11 @@ const McpServerListItemDropdownMenu = ({
 
                 {showPromoteToEnvironment && (
                     <EEVersion hidden={true}>
-                        <DropdownMenuItem label="Promote to environment…" onClick={onPromoteClick} />
+                        <DropdownMenuItem
+                            icon={<RocketIcon />}
+                            label="Promote to environment…"
+                            onClick={onPromoteClick}
+                        />
                     </EEVersion>
                 )}
 
