@@ -36,6 +36,7 @@ interface AiHubTabsStateI {
     activeTabId: string | undefined;
     /** Whether the Chats sidebar is hidden. Page-level and transient: never persisted, untouched by chat switches. */
     chatsSidebarCollapsed: boolean;
+    chatsSidebarPeeking: boolean;
     closeTab: (tabId: string) => void;
     openTabs: AiHubTabType[];
     /**
@@ -49,6 +50,7 @@ interface AiHubTabsStateI {
     setActiveChatId: (chatId: number | undefined) => void;
     setActiveTab: (tabId: string) => void;
     setChatsSidebarCollapsed: (collapsed: boolean) => void;
+    setChatsSidebarPeeking: (peeking: boolean) => void;
     setRightPanelOpen: (open: boolean) => void;
     snapshotsByChatId: Record<number, ChatTabsSnapshotI>;
 }
@@ -72,6 +74,7 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
                 activeChatId: undefined,
                 activeTabId: undefined,
                 chatsSidebarCollapsed: false,
+                chatsSidebarPeeking: false,
                 closeTab: (tabId) =>
                     set((state) => {
                         const closingIndex = state.openTabs.findIndex((tab) => tab.id === tabId);
@@ -146,6 +149,7 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
                         activeChatId: undefined,
                         activeTabId: undefined,
                         chatsSidebarCollapsed: false,
+                        chatsSidebarPeeking: false,
                         openTabs: [],
                         rightPanelOpen: false,
                         snapshotsByChatId: {},
@@ -197,7 +201,9 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
 
                         return {...state, activeTabId: tabId};
                     }),
-                setChatsSidebarCollapsed: (collapsed) => set((state) => ({...state, chatsSidebarCollapsed: collapsed})),
+                setChatsSidebarCollapsed: (collapsed) =>
+                    set((state) => ({...state, chatsSidebarCollapsed: collapsed, chatsSidebarPeeking: false})),
+                setChatsSidebarPeeking: (peeking) => set((state) => ({...state, chatsSidebarPeeking: peeking})),
                 setRightPanelOpen: (open) => set((state) => ({...state, rightPanelOpen: open})),
                 snapshotsByChatId: {},
             }),

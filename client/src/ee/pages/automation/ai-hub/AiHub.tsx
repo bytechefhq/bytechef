@@ -1,4 +1,5 @@
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
+import AiHubChatsSidebarPinButton from '@/ee/pages/automation/ai-hub/AiHubChatsSidebarPinButton';
 import AiHubChatsSidebarToggle from '@/ee/pages/automation/ai-hub/AiHubChatsSidebarToggle';
 import AiHubErrorBoundary from '@/ee/pages/automation/ai-hub/AiHubErrorBoundary';
 import AiHubHomePanel from '@/ee/pages/automation/ai-hub/AiHubHomePanel';
@@ -121,9 +122,11 @@ const AiHub = () => {
     const resetMessages = useAiHubStore((state) => state.resetMessages);
     const setMode = useAiHubStore((state) => state.setMode);
     const chatsSidebarCollapsed = useAiHubTabsStore((state) => state.chatsSidebarCollapsed);
+    const chatsSidebarPeeking = useAiHubTabsStore((state) => state.chatsSidebarPeeking);
     const hasOpenTabs = useAiHubTabsStore((state) => state.openTabs.length > 0);
     const rightPanelOpen = useAiHubTabsStore((state) => state.rightPanelOpen);
     const setActiveTabsChatId = useAiHubTabsStore((state) => state.setActiveChatId);
+    const setChatsSidebarPeeking = useAiHubTabsStore((state) => state.setChatsSidebarPeeking);
     const currentChatId = useAiHubChatsStore((state) => state.currentChatId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -155,6 +158,7 @@ const AiHub = () => {
     useRecordReferencedArtifacts(currentChatId, currentWorkspaceId);
 
     const hasActiveChat = currentChatId != null || hasMessages;
+    const peekChatsSidebar = chatsSidebarCollapsed && chatsSidebarPeeking;
     const hasResourceContent = hasActiveChat || hasOpenTabs;
     const showResourcePanel = rightPanelOpen && hasResourceContent;
     const resourcePanelMounted = hasResourceContent || resourcePanelMountedState;
@@ -328,9 +332,18 @@ const AiHub = () => {
     return (
         <LayoutContainer
             className="bg-surface-main"
+            leftSidebarAnimate={!peekChatsSidebar}
             leftSidebarBody={<AiHubChatsSidebar />}
-            leftSidebarHeader={<Header position="sidebar" title="AI Hub" />}
+            leftSidebarHeader={
+                <Header
+                    position="sidebar"
+                    right={peekChatsSidebar ? <AiHubChatsSidebarPinButton /> : undefined}
+                    title="AI Hub"
+                />
+            }
+            leftSidebarOnMouseLeave={() => setChatsSidebarPeeking(false)}
             leftSidebarOpen={!chatsSidebarCollapsed}
+            leftSidebarOverlay={peekChatsSidebar}
             leftSidebarWidth="64"
         >
             <AiHubErrorBoundary open={true}>
