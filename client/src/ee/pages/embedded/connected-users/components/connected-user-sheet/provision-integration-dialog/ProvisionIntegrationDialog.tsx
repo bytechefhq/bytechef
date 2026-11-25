@@ -22,6 +22,7 @@ import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedd
 import {useGetProvisionableIntegrationsQuery} from '@/ee/shared/queries/embedded/provisionableIntegrations.queries';
 import OAuth2Button from '@/shared/components/connection/OAuth2Button';
 import {CodePayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
+import compareWorkflowLabels from '@/shared/util/compareWorkflowLabels';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo} from 'react';
 import {Control, FieldValues, FormState, useForm} from 'react-hook-form';
@@ -80,6 +81,32 @@ const ProvisionIntegrationDialog = ({connectedUserId, onClose}: ProvisionIntegra
             onClose();
         },
     });
+
+    const workflowEntries = useMemo(
+        () =>
+            (configuration?.integrationInstanceConfigurationWorkflows ?? [])
+                .flatMap((configurationWorkflow, workflowIndex) => {
+                    if (
+                        provisionableIntegration?.toolOnlyMcpWorkflowUuids?.includes(
+                            configurationWorkflow.workflowUuid!
+                        )
+                    ) {
+                        return [];
+                    }
+
+                    const workflow = integrationWorkflows?.find(
+                        (integrationWorkflow) =>
+                            integrationWorkflow.workflowUuid === configurationWorkflow.workflowUuid ||
+                            integrationWorkflow.id === configurationWorkflow.workflowId
+                    );
+
+                    return workflow ? [{configurationWorkflow, workflow, workflowIndex}] : [];
+                })
+                .sort((workflowEntry, otherWorkflowEntry) =>
+                    compareWorkflowLabels(workflowEntry.workflow.label, otherWorkflowEntry.workflow.label)
+                ),
+        [configuration, integrationWorkflows, provisionableIntegration]
+    );
 
     const codeRequired = isOAuth2CodeAuthorizationType(configuration?.authorizationType);
 
@@ -243,44 +270,24 @@ const ProvisionIntegrationDialog = ({connectedUserId, onClose}: ProvisionIntegra
                                 </p>
                             )}
 
-                            {configuration.integrationInstanceConfigurationWorkflows?.map(
-                                (configurationWorkflow, workflowIndex) => {
-                                    if (
-                                        provisionableIntegration?.toolOnlyMcpWorkflowUuids?.includes(
+                            {workflowEntries.map(({configurationWorkflow, workflow, workflowIndex}) => (
+                                <ProvisionIntegrationDialogWorkflowItem
+                                    adminConnectionCount={configurationWorkflow.connections?.length}
+                                    control={control as unknown as Control<FieldValues>}
+                                    formState={formState as unknown as FormState<FieldValues>}
+                                    key={configurationWorkflow.workflowUuid}
+                                    mcpTool={
+                                        !!provisionableIntegration?.mcpWorkflowUuids?.includes(
                                             configurationWorkflow.workflowUuid!
                                         )
-                                    ) {
-                                        return null;
                                     }
-
-                                    const workflow = integrationWorkflows?.find(
-                                        (current) =>
-                                            current.workflowUuid === configurationWorkflow.workflowUuid ||
-                                            current.id === configurationWorkflow.workflowId
-                                    );
-
-                                    return (
-                                        workflow && (
-                                            <ProvisionIntegrationDialogWorkflowItem
-                                                adminConnectionCount={configurationWorkflow.connections?.length}
-                                                control={control as unknown as Control<FieldValues>}
-                                                formState={formState as unknown as FormState<FieldValues>}
-                                                key={configurationWorkflow.workflowUuid}
-                                                mcpTool={
-                                                    !!provisionableIntegration?.mcpWorkflowUuids?.includes(
-                                                        configurationWorkflow.workflowUuid!
-                                                    )
-                                                }
-                                                onEnabledChange={(enabled) =>
-                                                    setValue(`workflows.${workflowIndex}.enabled`, enabled)
-                                                }
-                                                workflow={workflow}
-                                                workflowIndex={workflowIndex}
-                                            />
-                                        )
-                                    );
-                                }
-                            )}
+                                    onEnabledChange={(enabled) =>
+                                        setValue(`workflows.${workflowIndex}.enabled`, enabled)
+                                    }
+                                    workflow={workflow}
+                                    workflowIndex={workflowIndex}
+                                />
+                            ))}
                         </fieldset>
                     )}
                 </div>
