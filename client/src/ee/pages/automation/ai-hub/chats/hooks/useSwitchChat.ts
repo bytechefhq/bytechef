@@ -507,10 +507,23 @@ function linkRestoredArtifactCards(
     return {messages: linkedMessages, restoredKeys};
 }
 
-function buildArtifactLinkMessages(artifacts: AiHubChatArtifactI[], restoredKeys: Set<string>): ThreadMessageLike[] {
+function toContentParts(content: ThreadMessageLike['content']): RestoredPartType[] {
+    if (typeof content !== 'string') {
+        return [...content];
+    }
+
+    return content.trim() ? [{text: content, type: 'text' as const}] : [];
+}
+
+function placeArtifactLinkCards(
+    transcript: ThreadMessageLike[],
+    serverMessages: AiHubChatMessageI[],
+    artifacts: AiHubChatArtifactI[],
+    restoredKeys: Set<string>
+): ThreadMessageLike[] {
     const seen = new Set<string>();
 
-    const parts = artifacts
+    const cards = artifacts
         .map((artifact) => ({artifact, openCall: artifactToOpenToolCall(artifact)}))
         .filter((entry): entry is {artifact: AiHubChatArtifactI; openCall: OpenToolCallI} => entry.openCall !== null)
         .filter(({openCall}) => {
@@ -531,19 +544,61 @@ function buildArtifactLinkMessages(artifacts: AiHubChatArtifactI[], restoredKeys
             return true;
         })
         .map(({artifact, openCall}) => ({
-            args: openCall.args,
-            argsText: JSON.stringify(openCall.args),
-            result: {opened: true},
-            toolCallId: `rehydrated-artifact-${artifact.id}`,
-            toolName: openCall.toolName,
-            type: 'tool-call' as const,
+            createdAt: Date.parse(artifact.createdAt),
+            part: {
+                args: openCall.args,
+                argsText: JSON.stringify(openCall.args),
+                result: {opened: true},
+                toolCallId: `rehydrated-artifact-${artifact.id}`,
+                toolName: openCall.toolName,
+                type: 'tool-call' as const,
+            } as RestoredPartType,
         }));
 
-    if (parts.length === 0) {
-        return [];
+    if (cards.length === 0) {
+        return transcript;
     }
 
-    return [{content: parts, id: 'artifact-links', role: 'assistant'} as ThreadMessageLike];
+    const userMessages = serverMessages
+        .filter((serverMessage) => mapServerRoleToClient(serverMessage.role) === 'user')
+        .map((serverMessage) => ({id: serverMessage.id, timestamp: Date.parse(serverMessage.timestamp)}));
+
+    const partsByInsertionIndex = new Map<number, RestoredPartType[]>();
+
+    for (const {createdAt, part} of cards) {
+        const nextUserMessage = userMessages.find((userMessage) => userMessage.timestamp > createdAt);
+        const nextUserMessageIndex = nextUserMessage
+            ? transcript.findIndex((message) => message.id === nextUserMessage.id)
+            : -1;
+        const insertionIndex = nextUserMessageIndex < 0 ? transcript.length : nextUserMessageIndex;
+
+        partsByInsertionIndex.set(insertionIndex, [...(partsByInsertionIndex.get(insertionIndex) ?? []), part]);
+    }
+
+    const placed = [...transcript];
+
+    const insertionIndexes = [...partsByInsertionIndex.keys()].sort((first, second) => second - first);
+
+    for (const insertionIndex of insertionIndexes) {
+        const parts = partsByInsertionIndex.get(insertionIndex) ?? [];
+        const previousMessage = placed[insertionIndex - 1];
+
+        if (previousMessage?.role === 'assistant') {
+            placed[insertionIndex - 1] = {
+                ...previousMessage,
+                content: [...toContentParts(previousMessage.content), ...parts],
+            } as ThreadMessageLike;
+        } else {
+            const id =
+                insertionIndex === transcript.length
+                    ? 'artifact-links'
+                    : `artifact-links-${transcript[insertionIndex].id ?? insertionIndex}`;
+
+            placed.splice(insertionIndex, 0, {content: parts, id, role: 'assistant'} as ThreadMessageLike);
+        }
+    }
+
+    return placed;
 }
 
 async function loadChatTranscript({
@@ -573,7 +628,7 @@ async function loadChatTranscript({
         artifacts
     );
 
-    return [...linkedMessages, ...buildArtifactLinkMessages(artifacts, restoredKeys)];
+    return placeArtifactLinkCards(linkedMessages, messages, artifacts, restoredKeys);
 }
 
 export function useSwitchChat() {

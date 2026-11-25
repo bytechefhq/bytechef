@@ -794,7 +794,6 @@ describe('useSwitchChat', () => {
             'event-pick',
             'tool-approval-4',
             'event-bound',
-            'artifact-links',
         ]);
     });
 
@@ -907,7 +906,7 @@ describe('useSwitchChat', () => {
             ]);
         });
 
-        it('keeps the trailing card for a workflow whose persisted open call cannot identify it', async () => {
+        it('adds the card of a workflow whose persisted open call cannot identify it to the last reply', async () => {
             mockGetChatMessages.mockResolvedValue([
                 buildMessage({
                     content: 'Opened.',
@@ -922,10 +921,49 @@ describe('useSwitchChat', () => {
 
             await switchTo(buildChat());
 
-            expect(aiHubStore.getState().messages.map((message) => message.id)).toEqual([
-                'event-opened',
-                'artifact-links',
+            const messages = aiHubStore.getState().messages;
+
+            expect(messages.map((message) => message.id)).toEqual(['event-opened']);
+            expect(messages[0].content).toEqual([
+                {text: 'Opened.', type: 'text'},
+                expect.objectContaining({toolCallId: 'rehydrated-artifact-1', toolName: 'openWorkflowTab'}),
             ]);
+        });
+
+        it('adds a card to the reply of the turn that made the artifact', async () => {
+            mockGetChatMessages.mockResolvedValue([
+                buildMessage({content: 'Build it', id: 'event-build', role: 'USER', timestamp: '2026-04-01T00:00:00Z'}),
+                buildMessage({
+                    content: 'Built.',
+                    id: 'event-built',
+                    role: 'ASSISTANT',
+                    timestamp: '2026-04-01T00:01:00Z',
+                }),
+                buildMessage({content: 'Thanks', id: 'event-thanks', role: 'USER', timestamp: '2026-04-01T00:02:00Z'}),
+                buildMessage({
+                    content: 'You are welcome.',
+                    id: 'event-welcome',
+                    role: 'ASSISTANT',
+                    timestamp: '2026-04-01T00:03:00Z',
+                }),
+            ]);
+            mockGetChatArtifacts.mockResolvedValue([buildArtifact({createdAt: '2026-04-01T00:00:30Z'})]);
+
+            await switchTo(buildChat());
+
+            const messages = aiHubStore.getState().messages;
+
+            expect(messages.map((message) => message.id)).toEqual([
+                'event-build',
+                'event-built',
+                'event-thanks',
+                'event-welcome',
+            ]);
+            expect(messages[1].content).toEqual([
+                {text: 'Built.', type: 'text'},
+                expect.objectContaining({toolName: 'openWorkflowTab'}),
+            ]);
+            expect(messages[3].content).toBe('You are welcome.');
         });
 
         it('does not restore a persisted openWorkflowTab call twice', async () => {
