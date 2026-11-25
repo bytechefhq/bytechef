@@ -17,6 +17,7 @@ import {
 import LoadingDots from '@/components/LoadingDots';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
+import {Alert, AlertDescription} from '@/components/ui/alert';
 import {Form} from '@/components/ui/form';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
@@ -26,8 +27,10 @@ import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import useWorkflowTestConfigurationConnections from '@/shared/hooks/useWorkflowTestConfigurationConnections';
 import {
     ProjectDeployment,
+    ProjectDeploymentApi,
     ProjectDeploymentWorkflow,
     ProjectDeploymentWorkflowConnection,
+    ResponseError,
 } from '@/shared/middleware/automation/configuration';
 import {
     useCreateProjectDeploymentMutation,
@@ -187,7 +190,9 @@ const ProjectDeploymentDialog = ({
         changeProjectVersion ? 'change-version' : 'new-deployment'
     );
     const [connectionsGrouped, setConnectionsGrouped] = useState(false);
+    const [deploymentConflict, setDeploymentConflict] = useState(false);
     const [isOpen, setIsOpen] = useState(!triggerNode);
+    const [latestProjectDeployment, setLatestProjectDeployment] = useState<ProjectDeployment | undefined>();
     const [selectedExistingDeployment, setSelectedExistingDeployment] = useState<ProjectDeployment | undefined>();
     const [tabInitialized, setTabInitialized] = useState(false);
 
@@ -344,6 +349,22 @@ const ProjectDeploymentDialog = ({
     });
 
     const updateProjectDeploymentMutation = useUpdateProjectDeploymentMutation({
+        onError: (error, variables) => {
+            if (!(error instanceof ResponseError) || error.response.status !== 409) {
+                return;
+            }
+
+            setDeploymentConflict(true);
+
+            void queryClient.invalidateQueries({
+                queryKey: ProjectDeploymentKeys.projectDeployments,
+            });
+
+            void new ProjectDeploymentApi()
+                .getProjectDeployment({id: variables.id!})
+                .then((projectDeployment) => setLatestProjectDeployment(projectDeployment))
+                .catch(() => undefined);
+        },
         onSuccess: () => onSuccessHandler(),
     });
 
@@ -380,6 +401,9 @@ const ProjectDeploymentDialog = ({
 
     const handleExistingDeploymentSelect = (deployment: ProjectDeployment) => {
         setSelectedExistingDeployment(deployment);
+
+        setDeploymentConflict(false);
+        setLatestProjectDeployment(undefined);
 
         reset({
             ...form.getValues(),
@@ -456,6 +480,9 @@ const ProjectDeploymentDialog = ({
 
             setSelectedExistingDeployment(undefined);
 
+            setDeploymentConflict(false);
+            setLatestProjectDeployment(undefined);
+
             setBasicStepTab(changeProjectVersion ? 'change-version' : 'new-deployment');
 
             if (onClose) {
@@ -518,10 +545,19 @@ const ProjectDeploymentDialog = ({
             );
 
             if (effectiveProjectDeployment?.id) {
+                const currentProjectDeployment =
+                    latestProjectDeployment?.id === effectiveProjectDeployment.id
+                        ? latestProjectDeployment
+                        : effectiveProjectDeployment;
+
+                setDeploymentConflict(false);
+
                 updateProjectDeploymentMutation.mutate({
                     ...effectiveProjectDeployment,
                     ...formData,
+                    enabled: currentProjectDeployment.enabled,
                     projectDeploymentWorkflows,
+                    version: currentProjectDeployment.version,
                 } as ProjectDeployment);
             } else {
                 createProjectDeploymentMutation.mutate({
@@ -535,6 +571,7 @@ const ProjectDeploymentDialog = ({
             createProjectDeploymentMutation,
             currentEnvironmentId,
             effectiveProjectDeployment,
+            latestProjectDeployment,
             updateProjectDeploymentMutation,
             workflows,
         ]
@@ -687,6 +724,14 @@ const ProjectDeploymentDialog = ({
         setTabInitialized(true);
     }, [isOpen, projectDeploymentsLoading, environmentProjectDeployments, changeProjectVersion, tabInitialized]);
 
+    const deploymentConflictAlert = deploymentConflict && (
+        <Alert className="mt-4" variant="destructive">
+            <AlertDescription>
+                This deployment changed after you opened this dialog. Click Save to try again.
+            </AlertDescription>
+        </Alert>
+    );
+
     const isWizard = !effectiveProjectDeployment?.id || effectiveChangeProjectVersion;
 
     const wizardTitle = effectiveChangeProjectVersion ? 'Change Project Version' : 'New Deployment';
@@ -742,6 +787,8 @@ const ProjectDeploymentDialog = ({
                                     isWorkflowsPending={isWorkflowsPending}
                                     workflowsStepContent={workflowsStepContent}
                                 />
+
+                                {deploymentConflictAlert}
                             </Form>
                         </WorkflowMockProvider>
                     </DialogWizard>
@@ -754,7 +801,11 @@ const ProjectDeploymentDialog = ({
 
                         <DialogBody>
                             <WorkflowMockProvider>
-                                <Form {...form}>{basicStepContent}</Form>
+                                <Form {...form}>
+                                    {basicStepContent}
+
+                                    {deploymentConflictAlert}
+                                </Form>
                             </WorkflowMockProvider>
                         </DialogBody>
 

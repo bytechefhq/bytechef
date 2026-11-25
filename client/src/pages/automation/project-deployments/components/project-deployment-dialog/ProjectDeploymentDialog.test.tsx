@@ -1,8 +1,8 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {PRODUCTION_ENVIRONMENT, STAGING_ENVIRONMENT} from '@/shared/constants';
-import {ProjectDeployment, Workflow} from '@/shared/middleware/automation/configuration';
+import {ProjectDeployment, ResponseError, Workflow} from '@/shared/middleware/automation/configuration';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
-import {render, screen, userEvent, waitFor} from '@/shared/util/test-utils';
+import {act, render, screen, userEvent, waitFor} from '@/shared/util/test-utils';
 import {ReactNode} from 'react';
 import {UseFormSetValue} from 'react-hook-form';
 import {MemoryRouter} from 'react-router-dom';
@@ -14,7 +14,9 @@ const hoisted = vi.hoisted(() => ({
     connections: [] as {id: number}[],
     createMutate: vi.fn(),
     findTestConnectionId: vi.fn(),
+    getProjectDeployment: vi.fn(),
     updateMutate: vi.fn(),
+    updateMutationProps: undefined as {onError?: (error: Error, variables: ProjectDeployment) => void} | undefined,
     workflows: [
         {
             id: 'workflow-v1',
@@ -41,7 +43,18 @@ vi.mock('@/shared/hooks/useWorkflowTestConfigurationConnections', () => ({
 
 vi.mock('@/shared/mutations/automation/projectDeployments.mutations', () => ({
     useCreateProjectDeploymentMutation: () => ({isPending: false, mutate: hoisted.createMutate}),
-    useUpdateProjectDeploymentMutation: () => ({isPending: false, mutate: hoisted.updateMutate}),
+    useUpdateProjectDeploymentMutation: (mutationProps: typeof hoisted.updateMutationProps) => {
+        hoisted.updateMutationProps = mutationProps;
+
+        return {isPending: false, mutate: hoisted.updateMutate};
+    },
+}));
+
+vi.mock('@/shared/middleware/automation/configuration', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/middleware/automation/configuration')>()),
+    ProjectDeploymentApi: class {
+        getProjectDeployment = hoisted.getProjectDeployment;
+    },
 }));
 
 vi.mock('@/shared/hooks/useAnalytics', () => ({
@@ -339,5 +352,84 @@ describe('ProjectDeploymentDialog', () => {
                 connections: [{connectionId: 7, workflowConnectionKey: 'googleMail', workflowNodeName: 'googleMail_1'}],
             }),
         ]);
+    });
+
+    it('reloads the deployment after a conflict and saves again with its latest version', async () => {
+        const latestProjectDeploymentPromise = Promise.resolve({...projectDeployments[1], enabled: false, version: 4});
+
+        hoisted.getProjectDeployment.mockReturnValue(latestProjectDeploymentPromise);
+
+        render(
+            <MemoryRouter>
+                <TooltipProvider>
+                    <ProjectDeploymentDialog
+                        projectDeployment={{name: 'Webhooks', projectId: 5}}
+                        projectDeployments={[{...projectDeployments[1], version: 2}]}
+                        projectDeploymentsLoading={false}
+                        showTabs
+                    />
+                </TooltipProvider>
+            </MemoryRouter>
+        );
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Select Staging'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Next'}));
+        await userEvent.click(await screen.findByRole('button', {name: 'Enable webhook1'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() => expect(hoisted.updateMutate).toHaveBeenCalledTimes(1));
+
+        const conflictedDeployment = hoisted.updateMutate.mock.calls[0][0] as ProjectDeployment;
+
+        expect(conflictedDeployment.version).toBe(2);
+
+        act(() => {
+            hoisted.updateMutationProps?.onError?.(
+                new ResponseError(new Response(null, {status: 409})),
+                conflictedDeployment
+            );
+        });
+
+        expect(
+            await screen.findByText('This deployment changed after you opened this dialog. Click Save to try again.')
+        ).toBeInTheDocument();
+        expect(hoisted.getProjectDeployment).toHaveBeenCalledWith({id: 12});
+
+        await act(async () => {
+            await latestProjectDeploymentPromise;
+        });
+
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() => expect(hoisted.updateMutate).toHaveBeenCalledTimes(2));
+
+        const retriedDeployment = hoisted.updateMutate.mock.calls[1][0] as ProjectDeployment;
+
+        expect(retriedDeployment.version).toBe(4);
+        expect(retriedDeployment.enabled).toBe(false);
+        expect(retriedDeployment.projectDeploymentWorkflows).toEqual([
+            expect.objectContaining({enabled: true, workflowId: 'workflow-v1'}),
+        ]);
+        expect(
+            screen.queryByText('This deployment changed after you opened this dialog. Click Save to try again.')
+        ).not.toBeInTheDocument();
+    });
+
+    it('does not show the conflict message for other update errors', async () => {
+        hoisted.workflows = [gmailWorkflow];
+
+        const submittedDeployment = await renderStoredDeploymentAndSave(false);
+
+        act(() => {
+            hoisted.updateMutationProps?.onError?.(
+                new ResponseError(new Response(null, {status: 500})),
+                submittedDeployment
+            );
+        });
+
+        expect(
+            screen.queryByText('This deployment changed after you opened this dialog. Click Save to try again.')
+        ).not.toBeInTheDocument();
+        expect(hoisted.getProjectDeployment).not.toHaveBeenCalled();
     });
 });
