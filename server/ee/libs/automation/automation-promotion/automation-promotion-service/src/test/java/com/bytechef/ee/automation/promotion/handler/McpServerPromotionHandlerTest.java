@@ -221,7 +221,7 @@ class McpServerPromotionHandlerTest {
                     SOURCE_CONNECTION_ID, "Sheets", "googleSheets", 1, TARGET_CONNECTION_ID,
                     List.of("Orders › googleSheets_1")),
                 new PromotionConnectionMapping(
-                    COMPONENT_CONNECTION_ID, "Api", "googleSheets", 1, null, List.of("component:googleSheets")));
+                    COMPONENT_CONNECTION_ID, "Api", "googleSheets", 1, null, List.of()));
     }
 
     @Test

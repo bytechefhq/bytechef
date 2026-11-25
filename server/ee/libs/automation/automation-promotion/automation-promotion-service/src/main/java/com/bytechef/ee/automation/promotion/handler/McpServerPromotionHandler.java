@@ -212,9 +212,7 @@ public class McpServerPromotionHandler implements EnvironmentPromotionHandler {
                 continue;
             }
 
-            List<String> usages = componentUsages.computeIfAbsent(sourceConnectionId, id -> new ArrayList<>());
-
-            usages.add("component:" + sourceMcpComponent.getComponentName());
+            componentUsages.putIfAbsent(sourceConnectionId, List.of());
 
             McpComponent targetMcpComponent = targetMcpComponentsByKey.get(componentKey(sourceMcpComponent));
 
