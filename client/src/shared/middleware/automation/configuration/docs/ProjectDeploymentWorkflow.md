@@ -14,6 +14,7 @@ Name | Type
 `enabled` | boolean
 `id` | number
 `lastExecutionDate` | Date
+`lastExecutionStartDate` | Date
 `lastExecutionStatus` | string
 `lastModifiedBy` | string
 `lastModifiedDate` | Date
@@ -37,6 +38,7 @@ const example = {
   "enabled": null,
   "id": null,
   "lastExecutionDate": null,
+  "lastExecutionStartDate": null,
   "lastExecutionStatus": null,
   "lastModifiedBy": null,
   "lastModifiedDate": null,

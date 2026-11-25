@@ -14,6 +14,7 @@ Name | Type
 `environmentId` | number
 `id` | number
 `lastExecutionDate` | Date
+`lastExecutionStartDate` | Date
 `lastModifiedBy` | string
 `lastModifiedDate` | Date
 `name` | string
@@ -34,6 +35,7 @@ const example = {
   "environmentId": null,
   "id": null,
   "lastExecutionDate": null,
+  "lastExecutionStartDate": null,
   "lastModifiedBy": null,
   "lastModifiedDate": null,
   "name": null,

@@ -56,6 +56,10 @@ export interface ProjectDeploymentWorkflow {
      */
     lastExecutionDate?: Date;
     /**
+     * The start date of the last execution of a project deployment.
+     */
+    lastExecutionStartDate?: Date;
+    /**
      * The last execution status of a project deployment.
      */
     lastExecutionStatus?: ProjectDeploymentWorkflowLastExecutionStatusEnum;
@@ -129,6 +133,7 @@ export function ProjectDeploymentWorkflowFromJSONTyped(json: any, ignoreDiscrimi
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
         'id': json['id'] == null ? undefined : json['id'],
         'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (parseDateTime(json['lastExecutionDate'])),
+        'lastExecutionStartDate': json['lastExecutionStartDate'] == null ? undefined : (parseDateTime(json['lastExecutionStartDate'])),
         'lastExecutionStatus': json['lastExecutionStatus'] == null ? undefined : json['lastExecutionStatus'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
@@ -155,6 +160,7 @@ export function ProjectDeploymentWorkflowToJSONTyped(value?: Omit<ProjectDeploym
         'connections': value['connections'] == null ? undefined : ((value['connections'] as Array<any>).map(ProjectDeploymentWorkflowConnectionToJSON)),
         'enabled': value['enabled'],
         'lastExecutionDate': value['lastExecutionDate'] == null ? value['lastExecutionDate'] : serializeDateTime(value['lastExecutionDate']),
+        'lastExecutionStartDate': value['lastExecutionStartDate'] == null ? value['lastExecutionStartDate'] : serializeDateTime(value['lastExecutionStartDate']),
         'lastExecutionStatus': value['lastExecutionStatus'],
         'projectDeploymentId': value['projectDeploymentId'],
         'staticWebhookUrl': value['staticWebhookUrl'],

@@ -63,6 +63,10 @@ export interface ProjectDeployment {
      */
     readonly lastExecutionDate?: Date;
     /**
+     * The start date of the last execution.
+     */
+    readonly lastExecutionStartDate?: Date;
+    /**
      * The last modified by.
      */
     readonly lastModifiedBy?: string;
@@ -125,6 +129,7 @@ export function ProjectDeploymentFromJSONTyped(json: any, ignoreDiscriminator: b
         'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
         'id': json['id'] == null ? undefined : json['id'],
         'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (parseDateTime(json['lastExecutionDate'])),
+        'lastExecutionStartDate': json['lastExecutionStartDate'] == null ? undefined : (parseDateTime(json['lastExecutionStartDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (parseDateTime(json['lastModifiedDate'])),
         'name': json['name'],
@@ -141,7 +146,7 @@ export function ProjectDeploymentToJSON(json: any): ProjectDeployment {
     return ProjectDeploymentToJSONTyped(json, false);
 }
 
-export function ProjectDeploymentToJSONTyped(value?: Omit<ProjectDeployment, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'project'> | null, ignoreDiscriminator: boolean = false): any {
+export function ProjectDeploymentToJSONTyped(value?: Omit<ProjectDeployment, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastExecutionStartDate'|'lastModifiedBy'|'lastModifiedDate'|'project'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
