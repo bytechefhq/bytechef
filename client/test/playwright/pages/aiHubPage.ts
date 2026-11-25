@@ -11,7 +11,6 @@ export class AiHubPage {
     readonly addResourcesButton: Locator;
     readonly assistantMessages: Locator;
     readonly buildModeSwitch: Locator;
-    readonly chatOptionsButton: Locator;
     readonly chatSearchInput: Locator;
     readonly chatTitle: Locator;
     readonly composerInput: Locator;
@@ -39,7 +38,6 @@ export class AiHubPage {
         this.addResourcesButton = page.getByRole('button', {name: 'Add resources'});
         this.assistantMessages = page.locator('[data-role="assistant"]');
         this.buildModeSwitch = page.getByRole('switch', {name: /^Build mode/});
-        this.chatOptionsButton = page.getByRole('button', {name: 'Chat options'});
         this.chatSearchInput = page.getByPlaceholder('Search chats...');
         this.chatTitle = page.getByRole('heading', {level: 2});
         this.composerInput = page.getByLabel('Message input');

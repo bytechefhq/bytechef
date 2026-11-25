@@ -73,7 +73,7 @@ describe('AiHubArtifactsCard', () => {
         mockUseAiHubChatArtifactsQuery.mockReturnValue({data: WORKFLOW_ARTIFACTS});
 
         aiHubChatsStore.setState({currentChatId: 7});
-        useAiHubSettingsStore.setState({artifactsCardCollapsed: false});
+        useAiHubSettingsStore.setState({artifactsCardCollapsed: false, artifactsCardHidden: false});
         aiHubTabsStore.setState({
             activeChatId: 7,
             activeTabId: undefined,
@@ -120,6 +120,14 @@ describe('AiHubArtifactsCard', () => {
 
         expect(screen.queryByText('Created Flow')).toBeNull();
         expect(useAiHubSettingsStore.getState().artifactsCardCollapsed).toBe(true);
+    });
+
+    it('renders nothing while hidden from the header', () => {
+        useAiHubSettingsStore.setState({artifactsCardHidden: true});
+
+        const {container} = renderCard();
+
+        expect(container).toBeEmptyDOMElement();
     });
 
     it('renders nothing while the resource panel is open', () => {

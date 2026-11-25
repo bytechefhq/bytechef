@@ -3,11 +3,13 @@ import {useAiHubChatArtifactsQuery} from '@/ee/pages/automation/ai-hub/chats/hoo
 import useCurrentAiHubChat from '@/ee/pages/automation/ai-hub/chats/hooks/useCurrentAiHubChat';
 import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
+import useAiHubSettingsStore from '@/ee/pages/automation/ai-hub/stores/useAiHubSettingsStore';
 import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 
 export interface AiHubArtifactsCardStateI {
     artifacts: AiHubChatArtifactI[];
+    available: boolean;
     visible: boolean;
     workspaceId: number | undefined;
 }
@@ -16,6 +18,7 @@ export default function useAiHubArtifactsCard(): AiHubArtifactsCardStateI {
     const rightPanelOpen = useAiHubTabsStore((state) => state.rightPanelOpen);
     const currentChatId = useAiHubChatsStore((state) => state.currentChatId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+    const artifactsCardHidden = useAiHubSettingsStore((state) => state.artifactsCardHidden);
 
     const currentChat = useCurrentAiHubChat();
 
@@ -27,9 +30,12 @@ export default function useAiHubArtifactsCard(): AiHubArtifactsCardStateI {
 
     const {data: artifacts} = useAiHubChatArtifactsQuery(currentChatId, currentWorkspaceId, enabled);
 
+    const available = enabled && !!artifacts && artifacts.length > 0;
+
     return {
         artifacts: artifacts ?? [],
-        visible: enabled && !!artifacts && artifacts.length > 0,
+        available,
+        visible: available && !artifactsCardHidden,
         workspaceId: currentWorkspaceId,
     };
 }

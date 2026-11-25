@@ -1,23 +1,15 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import AiHubChatsSidebarToggle from '@/ee/pages/automation/ai-hub/AiHubChatsSidebarToggle';
 import AiHubArtifactsCard from '@/ee/pages/automation/ai-hub/artifacts/AiHubArtifactsCard';
 import useAiHubArtifactsCard from '@/ee/pages/automation/ai-hub/artifacts/useAiHubArtifactsCard';
-import AiHubChatActionDialogs from '@/ee/pages/automation/ai-hub/chats/AiHubChatActionDialogs';
 import {getChatDisplayTitle, isWebhookBridgedChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
-import {useAiHubChatActions} from '@/ee/pages/automation/ai-hub/chats/hooks/useAiHubChatActions';
 import useCurrentAiHubChat from '@/ee/pages/automation/ai-hub/chats/hooks/useCurrentAiHubChat';
 import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import AiHubChatComposer from '@/ee/pages/automation/ai-hub/composer/AiHubChatComposer';
 import useAiHubChatLaunchers from '@/ee/pages/automation/ai-hub/hooks/useAiHubChatLaunchers';
 import AiHubThread from '@/ee/pages/automation/ai-hub/messages/AiHubThread';
+import useAiHubSettingsStore from '@/ee/pages/automation/ai-hub/stores/useAiHubSettingsStore';
 import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ModelPicker from '@/shared/components/ai/model-picker/ModelPicker';
@@ -25,7 +17,7 @@ import {writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedMo
 import {findAvailableRememberedModel} from '@/shared/components/ai/model-picker/resolveRememberedModel';
 import {useAiDefaultModelQuery, useAiProviderCatalogQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {ArchiveIcon, ArchiveRestoreIcon, MoreVerticalIcon, PanelRightIcon, PencilIcon, Trash2Icon} from 'lucide-react';
+import {ListIcon, PanelRightIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -37,6 +29,7 @@ const AiHubPanel = () => {
         currentChatId != null ? state.chatLlmSelections[currentChatId] : undefined
     );
     const setChatLlmSelection = useAiHubChatsStore((state) => state.setChatLlmSelection);
+    const setArtifactsCardHidden = useAiHubSettingsStore((state) => state.setArtifactsCardHidden);
 
     const {rightPanelOpen, setRightPanelOpen} = useAiHubTabsStore(
         useShallow((state) => ({
@@ -53,11 +46,9 @@ const AiHubPanel = () => {
 
     const currentChat = useCurrentAiHubChat();
 
-    const chatActions = useAiHubChatActions();
-
     const {onSelectWorkflowChat, workflowChats} = useAiHubChatLaunchers();
 
-    const {visible: artifactsCardVisible} = useAiHubArtifactsCard();
+    const {available: artifactsAvailable, visible: artifactsCardVisible} = useAiHubArtifactsCard();
 
     const chatTitle = currentChat ? getChatDisplayTitle(currentChat) : 'New Chat';
 
@@ -71,8 +62,6 @@ const AiHubPanel = () => {
     return (
         <div className="relative flex size-full min-h-[50vh] flex-col overflow-x-hidden">
             <AiHubArtifactsCard />
-
-            <AiHubChatActionDialogs {...chatActions} />
 
             <div className="flex items-center justify-between gap-4 p-4">
                 <div className="flex min-w-0 flex-1 items-center gap-2 self-start">
@@ -93,6 +82,26 @@ const AiHubPanel = () => {
                 </div>
 
                 <div className="flex items-center gap-1">
+                    {artifactsAvailable && (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    aria-label={artifactsCardVisible ? 'Hide artifacts' : 'Show artifacts'}
+                                    aria-pressed={artifactsCardVisible}
+                                    className={twMerge(artifactsCardVisible && 'bg-accent')}
+                                    icon={<ListIcon />}
+                                    onClick={() => setArtifactsCardHidden(artifactsCardVisible)}
+                                    size="icon"
+                                    variant="ghost"
+                                />
+                            </TooltipTrigger>
+
+                            <TooltipContent>
+                                {artifactsCardVisible ? 'Hide artifacts' : 'Show artifacts'}
+                            </TooltipContent>
+                        </Tooltip>
+                    )}
+
                     {!rightPanelOpen && (
                         <Tooltip>
                             <TooltipTrigger asChild>
@@ -107,44 +116,6 @@ const AiHubPanel = () => {
 
                             <TooltipContent>Show resources</TooltipContent>
                         </Tooltip>
-                    )}
-
-                    {currentChat?.isOwner && (
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    aria-label="Chat options"
-                                    icon={<MoreVerticalIcon />}
-                                    size="icon"
-                                    variant="ghost"
-                                />
-                            </DropdownMenuTrigger>
-
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => chatActions.requestRename(currentChat)}>
-                                    <PencilIcon /> Rename
-                                </DropdownMenuItem>
-
-                                {currentChat.status === 'ARCHIVED' ? (
-                                    <DropdownMenuItem onClick={() => chatActions.unarchiveChat(currentChat)}>
-                                        <ArchiveRestoreIcon /> Unarchive
-                                    </DropdownMenuItem>
-                                ) : (
-                                    <DropdownMenuItem onClick={() => chatActions.archiveChat(currentChat)}>
-                                        <ArchiveIcon /> Archive
-                                    </DropdownMenuItem>
-                                )}
-
-                                <DropdownMenuSeparator />
-
-                                <DropdownMenuItem
-                                    onClick={() => chatActions.requestDelete(currentChat)}
-                                    variant="destructive"
-                                >
-                                    <Trash2Icon /> Delete
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
                     )}
                 </div>
             </div>
