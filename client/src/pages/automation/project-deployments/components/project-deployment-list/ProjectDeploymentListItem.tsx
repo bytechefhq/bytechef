@@ -235,6 +235,10 @@ const ProjectDeploymentListItem = ({
                                         <span className="text-xs">
                                             {`Executed at ${projectDeployment.lastExecutionDate?.toLocaleDateString()} ${projectDeployment.lastExecutionDate?.toLocaleTimeString()}`}
                                         </span>
+                                    ) : projectDeployment.lastExecutionStartDate ? (
+                                        <span className="text-xs">
+                                            {`Started at ${projectDeployment.lastExecutionStartDate.toLocaleDateString()} ${projectDeployment.lastExecutionStartDate.toLocaleTimeString()}`}
+                                        </span>
                                     ) : (
                                         <span className="text-xs">No executions</span>
                                     )}

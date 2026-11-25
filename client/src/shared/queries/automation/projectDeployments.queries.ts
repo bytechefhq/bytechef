@@ -23,6 +23,20 @@ export const useGetProjectDeploymentQuery = (id: number, enabled?: boolean) =>
         enabled: enabled === undefined ? true : enabled,
     });
 
+const RUNNING_EXECUTION_REFETCH_INTERVAL = 3000;
+
+const isExecutionRunning = (execution: {lastExecutionDate?: Date; lastExecutionStartDate?: Date}) =>
+    !!execution.lastExecutionStartDate && !execution.lastExecutionDate;
+
+export const getProjectDeploymentsRefetchInterval = (projectDeployments?: ProjectDeployment[]): number | false =>
+    projectDeployments?.some(
+        (projectDeployment) =>
+            isExecutionRunning(projectDeployment) ||
+            projectDeployment.projectDeploymentWorkflows?.some(isExecutionRunning)
+    )
+        ? RUNNING_EXECUTION_REFETCH_INTERVAL
+        : false;
+
 export const useGetWorkspaceProjectDeploymentsQuery = (
     filters: GetWorkspaceProjectDeploymentsRequest,
     enabled?: boolean
@@ -31,4 +45,5 @@ export const useGetWorkspaceProjectDeploymentsQuery = (
         queryKey: ProjectDeploymentKeys.filteredProjectDeployments(filters),
         queryFn: () => new ProjectDeploymentApi().getWorkspaceProjectDeployments(filters),
         enabled: enabled === undefined ? true : enabled,
+        refetchInterval: (query) => getProjectDeploymentsRefetchInterval(query.state.data),
     });

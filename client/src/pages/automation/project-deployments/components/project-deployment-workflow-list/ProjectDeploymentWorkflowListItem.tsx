@@ -81,7 +81,10 @@ const ProjectDeploymentWorkflowListItem = ({
     const [_, copyToClipboard] = useCopyToClipboard();
     const queryClient = useQueryClient();
 
-    const {enabled, lastExecutionDate, lastExecutionStatus, staticWebhookUrl} = projectDeploymentWorkflow;
+    const {enabled, lastExecutionDate, lastExecutionStartDate, lastExecutionStatus, staticWebhookUrl} =
+        projectDeploymentWorkflow;
+
+    const executionDate = lastExecutionDate || lastExecutionStartDate;
 
     const formTrigger =
         workflow.triggers && workflow.triggers.findIndex((trigger) => trigger.type.includes('form/')) !== -1;
@@ -194,7 +197,7 @@ const ProjectDeploymentWorkflowListItem = ({
                     </div>
 
                     <div className="flex gap-x-6 xl:hidden">
-                        {projectDeploymentWorkflow?.lastExecutionDate ? (
+                        {executionDate ? (
                             <Tooltip>
                                 <TooltipTrigger
                                     className={twMerge(
@@ -207,7 +210,7 @@ const ProjectDeploymentWorkflowListItem = ({
                                     </span>
 
                                     <span className="text-xs">
-                                        {`at ${lastExecutionDate?.toLocaleDateString()} ${lastExecutionDate?.toLocaleTimeString()}`}
+                                        {`at ${executionDate.toLocaleDateString()} ${executionDate.toLocaleTimeString()}`}
                                     </span>
                                 </TooltipTrigger>
 
@@ -235,7 +238,7 @@ const ProjectDeploymentWorkflowListItem = ({
 
             <div className="flex shrink-0 items-center gap-x-4">
                 <div className="hidden xl:block">
-                    {projectDeploymentWorkflow?.lastExecutionDate ? (
+                    {executionDate ? (
                         <Tooltip>
                             <TooltipTrigger
                                 className={twMerge(
@@ -248,7 +251,7 @@ const ProjectDeploymentWorkflowListItem = ({
                                 </span>
 
                                 <span className="text-xs">
-                                    {`at ${lastExecutionDate?.toLocaleDateString()} ${lastExecutionDate?.toLocaleTimeString()}`}
+                                    {`at ${executionDate.toLocaleDateString()} ${executionDate.toLocaleTimeString()}`}
                                 </span>
                             </TooltipTrigger>
 

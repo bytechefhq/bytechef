@@ -4,7 +4,7 @@ import {QueryClient} from '@tanstack/react-query';
 import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import ProjectDeploymentListItem from './ProjectDeploymentListItem';
+import ProjectDeploymentListItem from '../ProjectDeploymentListItem';
 
 const hoisted = vi.hoisted(() => ({
     captureProjectDeploymentEnabledMock: vi.fn(),
@@ -193,6 +193,38 @@ describe('ProjectDeploymentListItem', () => {
 
         expect(screen.queryByRole('button', {name: 'Open project'})).not.toBeInTheDocument();
         expect(screen.queryByText('Open Project')).not.toBeInTheDocument();
+    });
+
+    it('shows when a running execution started instead of no executions', () => {
+        const startDate = new Date('2026-11-25T10:50:00Z');
+
+        render(
+            <ProjectDeploymentListItem projectDeployment={{...projectDeployment, lastExecutionStartDate: startDate}} />
+        );
+
+        expect(
+            screen.getByText(`Started at ${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString()}`)
+        ).toBeInTheDocument();
+        expect(screen.queryByText('No executions')).not.toBeInTheDocument();
+    });
+
+    it('shows when the last execution finished', () => {
+        const startDate = new Date('2026-11-25T10:50:00Z');
+        const endDate = new Date('2026-11-25T10:55:00Z');
+
+        render(
+            <ProjectDeploymentListItem
+                projectDeployment={{
+                    ...projectDeployment,
+                    lastExecutionDate: endDate,
+                    lastExecutionStartDate: startDate,
+                }}
+            />
+        );
+
+        expect(
+            screen.getByText(`Executed at ${endDate.toLocaleDateString()} ${endDate.toLocaleTimeString()}`)
+        ).toBeInTheDocument();
     });
 
     it('does not show an environment badge for a development deployment', () => {

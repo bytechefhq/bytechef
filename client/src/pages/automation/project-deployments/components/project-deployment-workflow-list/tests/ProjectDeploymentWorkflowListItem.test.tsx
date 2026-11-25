@@ -129,6 +129,43 @@ describe('ProjectDeploymentWorkflowListItem', () => {
         expect(useProjectDeploymentWorkflowSheetStore.getState().projectDeploymentWorkflowSheetOpen).toBe(true);
     });
 
+    it('shows the start date of a running execution instead of no executions', () => {
+        const startDate = new Date('2026-11-25T10:50:00Z');
+
+        renderListItem('Sales', 7, {
+            projectDeploymentWorkflow: {
+                enabled: true,
+                lastExecutionStartDate: startDate,
+                lastExecutionStatus: 'STARTED',
+                workflowId: 'workflow1',
+            } as ProjectDeploymentWorkflow,
+        });
+
+        expect(
+            screen.getAllByText(`at ${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString()}`).length
+        ).toBeGreaterThan(0);
+        expect(screen.queryByText('No executions')).not.toBeInTheDocument();
+    });
+
+    it('shows the end date once the execution has finished', () => {
+        const startDate = new Date('2026-11-25T10:50:00Z');
+        const endDate = new Date('2026-11-25T10:55:00Z');
+
+        renderListItem('Sales', 7, {
+            projectDeploymentWorkflow: {
+                enabled: true,
+                lastExecutionDate: endDate,
+                lastExecutionStartDate: startDate,
+                lastExecutionStatus: 'COMPLETED',
+                workflowId: 'workflow1',
+            } as ProjectDeploymentWorkflow,
+        });
+
+        expect(
+            screen.getAllByText(`at ${endDate.toLocaleDateString()} ${endDate.toLocaleTimeString()}`).length
+        ).toBeGreaterThan(0);
+    });
+
     it('shows the trigger and components like the projects page', () => {
         rowPropsMock.mockClear();
 
