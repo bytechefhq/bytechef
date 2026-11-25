@@ -18,7 +18,6 @@ import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useA
 import AiHubChatComposer from '@/ee/pages/automation/ai-hub/composer/AiHubChatComposer';
 import useAiHubChatLaunchers from '@/ee/pages/automation/ai-hub/hooks/useAiHubChatLaunchers';
 import AiHubThread from '@/ee/pages/automation/ai-hub/messages/AiHubThread';
-import useAiHubSettingsStore from '@/ee/pages/automation/ai-hub/stores/useAiHubSettingsStore';
 import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ModelPicker from '@/shared/components/ai/model-picker/ModelPicker';
@@ -26,15 +25,7 @@ import {writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedMo
 import {findAvailableRememberedModel} from '@/shared/components/ai/model-picker/resolveRememberedModel';
 import {useAiDefaultModelQuery, useAiProviderCatalogQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {
-    ArchiveIcon,
-    ArchiveRestoreIcon,
-    MoreVerticalIcon,
-    PanelRightIcon,
-    PencilIcon,
-    Trash2Icon,
-    WrenchIcon,
-} from 'lucide-react';
+import {ArchiveIcon, ArchiveRestoreIcon, MoreVerticalIcon, PanelRightIcon, PencilIcon, Trash2Icon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -51,13 +42,6 @@ const AiHubPanel = () => {
         useShallow((state) => ({
             rightPanelOpen: state.rightPanelOpen,
             setRightPanelOpen: state.setRightPanelOpen,
-        }))
-    );
-
-    const {setShowToolCalls, showToolCalls} = useAiHubSettingsStore(
-        useShallow((state) => ({
-            setShowToolCalls: state.setShowToolCalls,
-            showToolCalls: state.showToolCalls,
         }))
     );
 
@@ -125,48 +109,43 @@ const AiHubPanel = () => {
                         </Tooltip>
                     )}
 
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button aria-label="Chat options" icon={<MoreVerticalIcon />} size="icon" variant="ghost" />
-                        </DropdownMenuTrigger>
+                    {currentChat?.isOwner && (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    aria-label="Chat options"
+                                    icon={<MoreVerticalIcon />}
+                                    size="icon"
+                                    variant="ghost"
+                                />
+                            </DropdownMenuTrigger>
 
-                        <DropdownMenuContent align="end">
-                            {currentChat?.isOwner && (
-                                <>
-                                    <DropdownMenuItem onClick={() => chatActions.requestRename(currentChat)}>
-                                        <PencilIcon /> Rename
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => chatActions.requestRename(currentChat)}>
+                                    <PencilIcon /> Rename
+                                </DropdownMenuItem>
+
+                                {currentChat.status === 'ARCHIVED' ? (
+                                    <DropdownMenuItem onClick={() => chatActions.unarchiveChat(currentChat)}>
+                                        <ArchiveRestoreIcon /> Unarchive
                                     </DropdownMenuItem>
-
-                                    {currentChat.status === 'ARCHIVED' ? (
-                                        <DropdownMenuItem onClick={() => chatActions.unarchiveChat(currentChat)}>
-                                            <ArchiveRestoreIcon /> Unarchive
-                                        </DropdownMenuItem>
-                                    ) : (
-                                        <DropdownMenuItem onClick={() => chatActions.archiveChat(currentChat)}>
-                                            <ArchiveIcon /> Archive
-                                        </DropdownMenuItem>
-                                    )}
-                                </>
-                            )}
-
-                            <DropdownMenuItem onClick={() => setShowToolCalls(!showToolCalls)}>
-                                <WrenchIcon /> {showToolCalls ? 'Hide tool calls' : 'Show tool calls'}
-                            </DropdownMenuItem>
-
-                            {currentChat?.isOwner && (
-                                <>
-                                    <DropdownMenuSeparator />
-
-                                    <DropdownMenuItem
-                                        onClick={() => chatActions.requestDelete(currentChat)}
-                                        variant="destructive"
-                                    >
-                                        <Trash2Icon /> Delete
+                                ) : (
+                                    <DropdownMenuItem onClick={() => chatActions.archiveChat(currentChat)}>
+                                        <ArchiveIcon /> Archive
                                     </DropdownMenuItem>
-                                </>
-                            )}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                                )}
+
+                                <DropdownMenuSeparator />
+
+                                <DropdownMenuItem
+                                    onClick={() => chatActions.requestDelete(currentChat)}
+                                    variant="destructive"
+                                >
+                                    <Trash2Icon /> Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    )}
                 </div>
             </div>
 

@@ -1,10 +1,8 @@
-import {AiHubToolCallFallback} from '@/ee/pages/automation/ai-hub/messages/AiHubToolCallRenderer';
-import useAiHubSettingsStore from '@/ee/pages/automation/ai-hub/stores/useAiHubSettingsStore';
+import {AiHubToolGroupHeader} from '@/ee/pages/automation/ai-hub/messages/AiHubToolCallRenderer';
 import {aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {aiChatToolCallStore} from '@/shared/components/ai-chat/stores/useAiChatToolCallStore';
 import {type AgentSubscriber} from '@ag-ui/client';
 import {EventType} from '@ag-ui/core';
-import {type ToolCallMessagePartProps} from '@assistant-ui/react';
 import {render, screen} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -34,7 +32,6 @@ const findBuildWorkflowPart = () => {
 describe('a live AI Hub turn running buildWorkflow', () => {
     beforeEach(() => {
         aiChatToolCallStore.setState({order: [], toolCalls: {}});
-        useAiHubSettingsStore.setState({showToolCalls: false});
 
         aiHubStore.setState({
             chatId: 'thread-1',
@@ -45,7 +42,7 @@ describe('a live AI Hub turn running buildWorkflow', () => {
         });
     });
 
-    it('shows the building row while the call runs and drops it once the result arrives', () => {
+    it('labels the tool marker while the call runs and counts the call once the result arrives', () => {
         const subscriber = buildAiHubSubscriber({
             addMessage: aiHubStore.getState().addMessage,
             appendToLastAssistantMessage: aiHubStore.getState().appendToLastAssistantMessage,
@@ -69,7 +66,16 @@ describe('a live AI Hub turn running buildWorkflow', () => {
 
         expect(runningPart).toBeDefined();
 
-        const {unmount} = render(<AiHubToolCallFallback {...(runningPart as unknown as ToolCallMessagePartProps)} />);
+        const renderHeader = (part: unknown) =>
+            render(
+                <AiHubToolGroupHeader
+                    expanded={false}
+                    onToggle={() => {}}
+                    toolParts={[part as {toolCallId: string; toolName: string}]}
+                />
+            );
+
+        const {unmount} = renderHeader(runningPart);
 
         expect(screen.getByRole('status')).toHaveTextContent('Building workflow...');
 
@@ -86,11 +92,10 @@ describe('a live AI Hub turn running buildWorkflow', () => {
             },
         } as unknown as Parameters<NonNullable<AgentSubscriber['onToolCallResultEvent']>>[0]);
 
-        const {container} = render(
-            <AiHubToolCallFallback {...(findBuildWorkflowPart() as unknown as ToolCallMessagePartProps)} />
-        );
+        renderHeader(findBuildWorkflowPart());
 
-        expect(container).toBeEmptyDOMElement();
+        expect(screen.queryByRole('status')).toBeNull();
+        expect(screen.getByRole('button')).toHaveTextContent('Ran 1 tool');
     });
 
     it('keeps the text before a tool call and puts the text after it in a new bubble', () => {

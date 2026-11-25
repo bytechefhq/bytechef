@@ -6,6 +6,7 @@ import {describe, expect, it, vi} from 'vitest';
 interface MockComponentRegistryI {
     Source: (props: {title?: string; url?: string}) => ReactNode;
     Text: () => ReactNode;
+    ToolGroup: (props: {children: ReactNode; endIndex: number; startIndex: number}) => ReactNode;
     data: {by_name: Record<string, (props: {data: unknown}) => ReactNode>};
     tools: {Fallback: (props: {args?: unknown; result?: unknown; toolCallId?: string; toolName: string}) => ReactNode};
 }
@@ -51,6 +52,7 @@ vi.mock('@/ee/pages/automation/ai-hub/messages/AiHubToolCallRenderer', () => ({
     AiHubToolCallFallback: (props: {toolName: string; toolCallId?: string}) => (
         <div data-testid="tool-fallback">{`tool:${props.toolName}:${props.toolCallId}`}</div>
     ),
+    AiHubToolGroup: (props: {children: ReactNode}) => <div data-testid="tool-group">{props.children}</div>,
     default: () => null,
 }));
 
@@ -88,11 +90,12 @@ describe('AiHubMessageContent', () => {
         expect(link).toHaveAttribute('target', '_blank');
     });
 
-    it('passes a components object that exposes Text, tools.Fallback, data.by_name, and Source', () => {
+    it('passes a components object that exposes Text, ToolGroup, tools.Fallback, data.by_name, and Source', () => {
         render(<AiHubMessageContent />);
 
         expect(lastComponentsArg).not.toBeNull();
         expect(typeof lastComponentsArg!.Text).toBe('function');
+        expect(typeof lastComponentsArg!.ToolGroup).toBe('function');
         expect(typeof lastComponentsArg!.tools.Fallback).toBe('function');
         expect(typeof lastComponentsArg!.data.by_name['create-connection']).toBe('function');
         expect(typeof lastComponentsArg!.Source).toBe('function');

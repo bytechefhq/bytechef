@@ -1,6 +1,6 @@
-import useAiHubSettingsStore from '@/ee/pages/automation/ai-hub/stores/useAiHubSettingsStore';
 import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {ToolCallEntryI, useAiChatToolCallStore} from '@/shared/components/ai-chat/stores/useAiChatToolCallStore';
+import {type ToolCallMessagePartProps, useAuiState} from '@assistant-ui/react';
 import {
     AlertCircleIcon,
     CheckCircle2Icon,
@@ -8,12 +8,9 @@ import {
     ChevronRightIcon,
     Loader2Icon,
     WorkflowIcon,
-    WrenchIcon,
 } from 'lucide-react';
-import {ComponentType, ReactNode, useState} from 'react';
+import {ComponentType, PropsWithChildren, createContext, useContext, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
-
-import type {ToolCallMessagePartProps} from '@assistant-ui/react';
 
 interface StatusIconProps {
     className?: string;
@@ -60,36 +57,6 @@ const summarizeArgs = (args: Record<string, unknown> | undefined): string => {
         .join(', ');
 
     return truncate(summary, 80);
-};
-
-interface CollapsibleCardProps {
-    children: ReactNode;
-    expanded: boolean;
-    header: ReactNode;
-    onToggle: () => void;
-}
-
-const CollapsibleCard = ({children, expanded, header, onToggle}: CollapsibleCardProps) => {
-    return (
-        <div className="mt-2 flex w-full flex-col rounded-lg border border-border bg-surface-neutral-secondary text-sm">
-            <button
-                aria-expanded={expanded}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-accent/50"
-                onClick={onToggle}
-                type="button"
-            >
-                {expanded ? (
-                    <ChevronDownIcon className="size-3.5 shrink-0 text-muted-foreground" />
-                ) : (
-                    <ChevronRightIcon className="size-3.5 shrink-0 text-muted-foreground" />
-                )}
-
-                {header}
-            </button>
-
-            {expanded && <div className="border-t border-border px-3 py-2">{children}</div>}
-        </div>
-    );
 };
 
 interface JsonViewerProps {
@@ -229,28 +196,33 @@ const AiHubToolCallRenderer = ({args, argsText, isError, result, toolCallId, too
 
     const argsSummary = mergedArgs ? summarizeArgs(mergedArgs) : argsText ? truncate(argsText, 80) : '';
 
-    const header = (
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-            <WrenchIcon className="size-4 text-muted-foreground" />
-
-            <span className="truncate font-medium text-foreground">{toolName}</span>
-
-            {argsSummary && <span className="truncate text-xs text-muted-foreground">- {argsSummary}</span>}
-
-            <span className="ml-auto flex items-center gap-1">
-                <StatusIcon status={status} />
-            </span>
-        </div>
-    );
-
     return (
-        <CollapsibleCard
-            expanded={expanded}
-            header={header}
-            onToggle={() => setExpanded((previousExpanded) => !previousExpanded)}
-        >
-            <DefaultBody entry={entry} />
-        </CollapsibleCard>
+        <div className="flex w-full flex-col text-sm">
+            <button
+                aria-expanded={expanded}
+                className="flex w-full min-w-0 items-center gap-2 px-3 py-2 text-left text-muted-foreground hover:bg-accent/50"
+                onClick={() => setExpanded((previousExpanded) => !previousExpanded)}
+                type="button"
+            >
+                <span className="shrink-0 text-foreground">{toolName}</span>
+
+                {argsSummary && <span className="truncate text-xs">- {argsSummary}</span>}
+
+                {status !== 'success' && <StatusIcon className="shrink-0" status={status} />}
+
+                {expanded ? (
+                    <ChevronDownIcon className="ml-auto size-3.5 shrink-0" />
+                ) : (
+                    <ChevronRightIcon className="ml-auto size-3.5 shrink-0" />
+                )}
+            </button>
+
+            {expanded && (
+                <div className="border-t border-border px-3 py-2">
+                    <DefaultBody entry={entry} />
+                </div>
+            )}
+        </div>
     );
 };
 
@@ -259,25 +231,92 @@ const RUNNING_TOOL_CALL_LABELS: Record<string, string> = {
     importWorkflow: 'Importing workflow...',
 };
 
-interface RunningToolCallRowProps {
+export interface AiHubToolGroupPartI {
     toolCallId?: string;
     toolName: string;
 }
 
-const RunningToolCallRow = ({toolCallId, toolName}: RunningToolCallRowProps) => {
-    const isRunning = useAiChatToolCallStore((state) =>
-        toolCallId ? state.toolCalls[toolCallId]?.status === 'running' : false
+const ToolGroupExpandedContext = createContext(true);
+
+interface AiHubToolGroupHeaderProps {
+    expanded: boolean;
+    onToggle: () => void;
+    toolParts: AiHubToolGroupPartI[];
+}
+
+export const AiHubToolGroupHeader = ({expanded, onToggle, toolParts}: AiHubToolGroupHeaderProps) => {
+    const runningToolName = useAiChatToolCallStore(
+        (state) =>
+            toolParts.find(
+                (toolPart) => toolPart.toolCallId && state.toolCalls[toolPart.toolCallId]?.status === 'running'
+            )?.toolName
     );
 
-    if (!isRunning) {
-        return null;
+    const label = runningToolName
+        ? (RUNNING_TOOL_CALL_LABELS[runningToolName] ?? `Running ${runningToolName}...`)
+        : `Ran ${toolParts.length} ${toolParts.length === 1 ? 'tool' : 'tools'}`;
+
+    return (
+        <button
+            aria-expanded={expanded}
+            className="flex w-fit items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+            onClick={onToggle}
+            type="button"
+        >
+            {runningToolName && <Loader2Icon className="size-3.5 animate-spin" />}
+
+            <span role={runningToolName ? 'status' : undefined}>{label}</span>
+
+            {expanded ? <ChevronDownIcon className="size-3.5" /> : <ChevronRightIcon className="size-3.5" />}
+        </button>
+    );
+};
+
+interface AiHubToolGroupProps {
+    endIndex: number;
+    startIndex: number;
+}
+
+export const AiHubToolGroup = ({children, endIndex, startIndex}: PropsWithChildren<AiHubToolGroupProps>) => {
+    const [expanded, setExpanded] = useState(false);
+
+    const content = useAuiState((state) => state.message.content);
+
+    const toolParts = useMemo(
+        () =>
+            content
+                .slice(startIndex, endIndex + 1)
+                .filter((part) => part.type === 'tool-call' && !ARTIFACT_OPEN_META[part.toolName])
+                .map((part) => {
+                    const toolCallPart = part as AiHubToolGroupPartI;
+
+                    return {toolCallId: toolCallPart.toolCallId, toolName: toolCallPart.toolName};
+                }),
+        [content, endIndex, startIndex]
+    );
+
+    if (toolParts.length === 0) {
+        return <>{children}</>;
     }
 
     return (
-        <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground" role="status">
-            <Loader2Icon className="size-4 animate-spin" />
+        <div className="mt-2 flex flex-col">
+            <AiHubToolGroupHeader
+                expanded={expanded}
+                onToggle={() => setExpanded((previousExpanded) => !previousExpanded)}
+                toolParts={toolParts}
+            />
 
-            <span>{RUNNING_TOOL_CALL_LABELS[toolName] ?? `Running ${toolName}...`}</span>
+            <ToolGroupExpandedContext.Provider value={expanded}>
+                <div
+                    className={twMerge(
+                        expanded &&
+                            'mt-2 flex flex-col divide-y divide-border overflow-hidden rounded-lg border border-border'
+                    )}
+                >
+                    {children}
+                </div>
+            </ToolGroupExpandedContext.Provider>
         </div>
     );
 };
@@ -290,10 +329,10 @@ export const AiHubToolCallFallback = ({
     toolCallId,
     toolName,
 }: ToolCallMessagePartProps) => {
-    const showToolCalls = useAiHubSettingsStore((state) => state.showToolCalls);
+    const groupExpanded = useContext(ToolGroupExpandedContext);
 
-    if (!showToolCalls && !ARTIFACT_OPEN_META[toolName]) {
-        return <RunningToolCallRow toolCallId={toolCallId} toolName={toolName} />;
+    if (!groupExpanded && !ARTIFACT_OPEN_META[toolName]) {
+        return null;
     }
 
     return (

@@ -4,15 +4,7 @@ import useAiHubSettingsStore from '../useAiHubSettingsStore';
 
 describe('useAiHubSettingsStore', () => {
     beforeEach(() => {
-        useAiHubSettingsStore.setState({artifactsCardCollapsed: false, showToolCalls: false});
-    });
-
-    it('hides tool calls by default and toggles them', () => {
-        expect(useAiHubSettingsStore.getState().showToolCalls).toBe(false);
-
-        useAiHubSettingsStore.getState().setShowToolCalls(true);
-
-        expect(useAiHubSettingsStore.getState().showToolCalls).toBe(true);
+        useAiHubSettingsStore.setState({artifactsCardCollapsed: false});
     });
 
     it('toggles the artifacts card collapsed flag', () => {

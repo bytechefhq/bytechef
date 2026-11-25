@@ -92,6 +92,14 @@ export class AiHubPage {
         return this.page.getByRole('menuitem', {exact: true, name: label});
     }
 
+    async expandToolCalls(): Promise<void> {
+        const collapsedMarkers = this.page.getByRole('button', {expanded: false, name: /^Ran \d+ tools?/});
+
+        while ((await collapsedMarkers.count()) > 0) {
+            await collapsedMarkers.first().click();
+        }
+    }
+
     async openWorkflowChatsMenu(): Promise<void> {
         await this.workflowChatsMenuTrigger.hover();
 

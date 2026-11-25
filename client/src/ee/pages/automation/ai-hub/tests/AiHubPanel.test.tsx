@@ -2,7 +2,6 @@ import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import AiHubPanel from '@/ee/pages/automation/ai-hub/AiHubPanel';
 import {AiHubChatI} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
-import useAiHubSettingsStore from '@/ee/pages/automation/ai-hub/stores/useAiHubSettingsStore';
 import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
 import {render, screen} from '@testing-library/react';
@@ -148,7 +147,6 @@ const renderPanel = () =>
 
 beforeEach(() => {
     aiHubTabsStore.setState({rightPanelOpen: false});
-    useAiHubSettingsStore.setState({showToolCalls: false});
 });
 
 afterEach(() => {
@@ -306,30 +304,29 @@ describe('AiHubPanel chat options menu', () => {
         expect(unarchiveMutateMock).toHaveBeenCalledWith({chatId: 43, patch: {status: 'ACTIVE'}, workspaceId: 1});
     });
 
-    it('offers none of rename/archive/delete for a chat the caller does not own', async () => {
+    it('has no chat options menu for a chat the caller does not own', () => {
         mockChatsDataRef.current = [buildChat({id: 42, isOwner: false, title: 'Other chat'})];
         aiHubChatsStore.getState().setCurrentChatId(42);
 
-        await openMenu();
+        renderPanel();
 
-        expect(await screen.findByRole('menuitem', {name: 'Show tool calls'})).toBeInTheDocument();
-        expect(screen.queryByRole('menuitem', {name: 'Rename'})).not.toBeInTheDocument();
-        expect(screen.queryByRole('menuitem', {name: 'Delete'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Chat options'})).toBeNull();
     });
 
-    it('offers only the tool-call toggle when no chat is current', async () => {
-        await openMenu();
+    it('has no chat options menu when no chat is current', () => {
+        renderPanel();
 
-        expect(await screen.findByRole('menuitem', {name: 'Show tool calls'})).toBeInTheDocument();
-        expect(screen.queryByRole('menuitem', {name: 'Rename'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Chat options'})).toBeNull();
     });
 
-    it('toggles the tool-call cards', async () => {
-        const user = await openMenu();
+    it('has no tool-call toggle', async () => {
+        mockChatsDataRef.current = [buildChat({id: 41, title: 'Some chat'})];
+        aiHubChatsStore.getState().setCurrentChatId(41);
 
-        await user.click(await screen.findByRole('menuitem', {name: 'Show tool calls'}));
+        await openMenu();
 
-        expect(useAiHubSettingsStore.getState().showToolCalls).toBe(true);
+        expect(await screen.findByRole('menuitem', {name: 'Rename'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: /tool calls/})).toBeNull();
     });
 
     it('opens the rename dialog seeded with the title', async () => {
