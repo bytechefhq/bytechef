@@ -6,17 +6,6 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ProjectDeploymentListItem from './ProjectDeploymentListItem';
 
-const hoisted = vi.hoisted(() => ({
-    openProjectMock: vi.fn(),
-}));
-
-vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => ({
-    default: () => ({
-        openProject: hoisted.openProjectMock,
-        openProjectWorkflow: vi.fn(),
-    }),
-}));
-
 vi.mock('@/shared/mutations/automation/projectDeployments.mutations', () => ({
     useDeleteProjectDeploymentMutation: () => ({isPending: false, mutate: vi.fn()}),
     useEnableProjectDeploymentMutation: () => ({isPending: false, mutate: vi.fn()}),
@@ -89,9 +78,8 @@ describe('ProjectDeploymentListItem row click', () => {
 
         expect(getWorkflowsTrigger()).toHaveAttribute('aria-expanded', 'false');
 
-        await userEvent.click(screen.getByRole('menuitem', {name: 'Open Project'}));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Delete'}));
 
-        expect(hoisted.openProjectMock).toHaveBeenCalledWith(7);
         expect(getWorkflowsTrigger()).toHaveAttribute('aria-expanded', 'false');
     });
 

@@ -1,7 +1,7 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurations from '@/ee/pages/embedded/integration-instance-configurations/IntegrationInstanceConfigurations';
 import {Integration, IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
-import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {render, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';
 import {MemoryRouter} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -9,7 +9,6 @@ const hoisted = vi.hoisted(() => ({
     integrationInstanceConfigurations: [] as IntegrationInstanceConfiguration[],
     integrations: [] as Integration[],
     integrationsFilters: [] as unknown[],
-    openIntegrationMock: vi.fn(),
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrations.queries', () => ({
@@ -38,10 +37,6 @@ vi.mock('@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queri
 
 vi.mock('@/shared/queries/platform/taskDispatcherDefinitions.queries', () => ({
     useGetTaskDispatcherDefinitionsQuery: () => ({data: []}),
-}));
-
-vi.mock('@/ee/pages/embedded/shared/useOpenInEmbeddedEditor', () => ({
-    default: () => ({openIntegration: hoisted.openIntegrationMock}),
 }));
 
 vi.mock(
@@ -98,7 +93,6 @@ describe('IntegrationInstanceConfigurations', () => {
             {id: 12, integration: affinity, integrationId: 2, name: 'Affinity production'},
         ] as unknown as IntegrationInstanceConfiguration[];
         hoisted.integrationsFilters = [];
-        hoisted.openIntegrationMock.mockReset();
     });
 
     afterEach(() => {
@@ -123,17 +117,10 @@ describe('IntegrationInstanceConfigurations', () => {
         expect(screen.getByText('Gmail configurations icon=false open=true')).toBeInTheDocument();
     });
 
-    it('offers opening only the integrations that have workflows', async () => {
-        const user = userEvent.setup();
-
+    it('does not offer opening an integration from its header', () => {
         renderPage();
 
-        const openIntegrationButtons = screen.getAllByRole('button', {name: 'Open integration'});
-
-        expect(openIntegrationButtons).toHaveLength(1);
-
-        await user.click(openIntegrationButtons[0]);
-
-        expect(hoisted.openIntegrationMock).toHaveBeenCalledWith(gmail);
+        expect(screen.getByRole('heading', {name: 'Gmail'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Open integration'})).not.toBeInTheDocument();
     });
 });

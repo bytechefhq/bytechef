@@ -9,20 +9,12 @@ import ProjectDeploymentListItem from './ProjectDeploymentListItem';
 const hoisted = vi.hoisted(() => ({
     captureProjectDeploymentEnabledMock: vi.fn(),
     deleteProjectDeploymentMock: vi.fn(),
-    openProjectMock: vi.fn(),
     projectVersionsQueryMock: vi.fn(),
 }));
 
 vi.mock('@/shared/queries/automation/projectVersions.queries', () => ({
     useGetProjectVersionsQuery: (projectId: number, enabled: boolean) =>
         hoisted.projectVersionsQueryMock(projectId, enabled),
-}));
-
-vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => ({
-    default: () => ({
-        openProject: hoisted.openProjectMock,
-        openProjectWorkflow: vi.fn(),
-    }),
 }));
 
 vi.mock('@/shared/mutations/automation/projectDeployments.mutations', () => ({
@@ -101,7 +93,6 @@ describe('ProjectDeploymentListItem', () => {
     beforeEach(() => {
         hoisted.captureProjectDeploymentEnabledMock.mockReset();
         hoisted.deleteProjectDeploymentMock.mockReset();
-        hoisted.openProjectMock.mockReset();
         hoisted.projectVersionsQueryMock.mockReset();
         hoisted.projectVersionsQueryMock.mockReturnValue({data: undefined});
     });
@@ -177,15 +168,12 @@ describe('ProjectDeploymentListItem', () => {
         invalidateQueriesSpy.mockRestore();
     });
 
-    it('opens the project from the menu', async () => {
-        const user = userEvent.setup();
-
+    it('offers no open project controls even when the deployment has a project', () => {
         render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
 
-        await user.click(screen.getByText('Open Project'));
-
-        expect(hoisted.openProjectMock).toHaveBeenCalledTimes(1);
-        expect(hoisted.openProjectMock).toHaveBeenLastCalledWith(7);
+        expect(screen.getByText('Edit')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Open project'})).not.toBeInTheDocument();
+        expect(screen.queryByText('Open Project')).not.toBeInTheDocument();
     });
 
     it('hides the open project controls when the deployment has no project', () => {

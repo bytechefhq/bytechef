@@ -1,14 +1,10 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 
 import McpProjectListItem from './McpProjectListItem';
 import {McpProjectItemType} from './hooks/useMcpProjectList';
-
-const hoisted = vi.hoisted(() => ({
-    openProject: vi.fn(),
-}));
 
 vi.mock('./hooks/useMcpProjectListItem', () => ({
     default: () => ({
@@ -20,10 +16,6 @@ vi.mock('./hooks/useMcpProjectListItem', () => ({
         showChangeProjectVersionDialog: false,
         showEditWorkflowsDialog: false,
     }),
-}));
-
-vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => ({
-    default: () => ({openProject: hoisted.openProject, openProjectWorkflow: vi.fn()}),
 }));
 
 vi.mock('./McpProjectListItemDropdownMenu', () => ({default: () => <div>Project actions</div>}));
@@ -50,20 +42,14 @@ const renderListItem = (mcpProject: McpProjectItemType) =>
     );
 
 describe('McpProjectListItem', () => {
-    beforeEach(() => {
-        hoisted.openProject.mockReset();
-    });
-
-    it('opens the project in the editor from its link and lists its workflow tools when expanded', async () => {
+    it('offers no project link and lists its workflow tools when expanded', async () => {
         const user = userEvent.setup();
 
         renderListItem(createMcpProject({id: '5', name: 'Sales project'} as McpProjectItemType['project']));
 
         expect(screen.getByText('Sales project')).toBeInTheDocument();
 
-        await user.click(screen.getByRole('button', {name: 'Open project'}));
-
-        expect(hoisted.openProject).toHaveBeenCalledWith(5);
+        expect(screen.queryByRole('button', {name: 'Open project'})).not.toBeInTheDocument();
 
         await user.click(screen.getByRole('button', {name: 'Expand project'}));
 

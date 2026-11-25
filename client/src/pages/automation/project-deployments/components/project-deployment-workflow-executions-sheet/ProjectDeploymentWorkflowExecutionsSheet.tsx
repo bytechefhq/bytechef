@@ -69,7 +69,7 @@ const ProjectDeploymentWorkflowExecutionsContent = ({
         setProjectDeploymentWorkflowSheetOpen(false);
     }, [setProjectDeploymentWorkflowSheetOpen, setWorkflowExecutionSheetOpen]);
 
-    const {openProject, openProjectWorkflow} = useOpenInProject({onBeforeNavigate: closeSheets});
+    const {openProjectWorkflow} = useOpenInProject({onBeforeNavigate: closeSheets});
 
     const {data: workflowExecution} = useGetProjectWorkflowExecutionQuery(
         {id: workflowExecutionId, lazy: true},
@@ -137,27 +137,7 @@ const ProjectDeploymentWorkflowExecutionsContent = ({
                     <WorkflowIcon />
 
                     <span className="flex gap-x-1 text-base text-content-neutral-secondary">
-                        {projectName &&
-                            (showOpenInProject ? (
-                                <>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <button
-                                                className="hover:text-content-neutral-primary hover:underline"
-                                                onClick={() => openProject(projectId)}
-                                                type="button"
-                                            >
-                                                {projectName}
-                                            </button>
-                                        </TooltipTrigger>
-
-                                        <TooltipContent>Open project</TooltipContent>
-                                    </Tooltip>
-                                    /
-                                </>
-                            ) : (
-                                `${projectName} /`
-                            ))}
+                        {projectName && `${projectName} /`}
 
                         {showOpenInProject ? (
                             <Tooltip>

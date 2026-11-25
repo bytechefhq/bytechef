@@ -11,7 +11,6 @@ interface ProjectDeploymentListProps {
     componentDefinitions?: ComponentDefinitionBasic[];
     divided?: boolean;
     expandAll?: boolean;
-    hideOpenInProject?: boolean;
     hideOpenWorkflowInProject?: boolean;
     newlyCreatedDeploymentId?: number;
     project: Project;
@@ -25,7 +24,6 @@ const ProjectDeploymentList = ({
     componentDefinitions,
     divided = false,
     expandAll = false,
-    hideOpenInProject,
     hideOpenWorkflowInProject,
     newlyCreatedDeploymentId,
     project,
@@ -83,7 +81,6 @@ const ProjectDeploymentList = ({
                         open={openCollapsibles.has(projectDeployment.id!)}
                     >
                         <ProjectDeploymentListItem
-                            hideOpenInProject={hideOpenInProject}
                             key={projectDeployment.id}
                             projectDeployment={projectDeployment}
                             remainingTags={tags?.filter((tag) => !projectTagIds?.includes(tag.id))}
