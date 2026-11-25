@@ -2,6 +2,7 @@ import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowShareDialog} from '@/pages/automation/project/components/WorkflowShareDialog';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
+import WorkflowDescriptionTooltip from '@/shared/components/workflow/WorkflowDescriptionTooltip';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import WorkflowListRowDropdownMenu from '@/shared/components/workflow/WorkflowListRowDropdownMenu';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
@@ -165,15 +166,11 @@ const ProjectWorkflowListItem = ({
             >
                 <div className="flex w-80 min-w-0 shrink-0 flex-col gap-1 pr-1 text-sm font-semibold">
                     <div className="flex min-w-0 items-center gap-2">
-                        <Tooltip>
-                            <TooltipTrigger className="line-clamp-1 min-w-0 truncate text-start underline-offset-4 group-hover/row:text-content-brand-primary group-hover/row:underline">
+                        <WorkflowDescriptionTooltip description={workflow.description}>
+                            <span className="line-clamp-1 min-w-0 truncate text-start underline-offset-4 group-hover/row:text-content-brand-primary group-hover/row:underline">
                                 {workflow.label}
-                            </TooltipTrigger>
-
-                            <TooltipContent align="start" className="max-w-md break-all">
-                                {workflow.label}
-                            </TooltipContent>
-                        </Tooltip>
+                            </span>
+                        </WorkflowDescriptionTooltip>
                     </div>
 
                     <div className="flex gap-x-6">

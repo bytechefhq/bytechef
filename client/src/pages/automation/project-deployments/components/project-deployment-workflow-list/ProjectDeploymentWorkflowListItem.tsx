@@ -10,6 +10,7 @@ import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOp
 import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import OpenInButton from '@/shared/components/OpenInButton';
+import WorkflowDescriptionTooltip from '@/shared/components/workflow/WorkflowDescriptionTooltip';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {ProjectDeploymentApi, ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
@@ -173,22 +174,16 @@ const ProjectDeploymentWorkflowListItem = ({
                             onClick={handleWorkflowClick}
                             type="button"
                         >
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <span
-                                        className={twMerge(
-                                            'relative z-10 block truncate text-sm font-semibold',
-                                            !enabled && 'text-content-neutral-secondary'
-                                        )}
-                                    >
-                                        {workflow.label}
-                                    </span>
-                                </TooltipTrigger>
-
-                                <TooltipContent align="start" className="max-w-md break-all">
+                            <WorkflowDescriptionTooltip description={workflow.description}>
+                                <span
+                                    className={twMerge(
+                                        'relative z-10 block truncate text-sm font-semibold',
+                                        !enabled && 'text-content-neutral-secondary'
+                                    )}
+                                >
                                     {workflow.label}
-                                </TooltipContent>
-                            </Tooltip>
+                                </span>
+                            </WorkflowDescriptionTooltip>
                         </button>
 
                         {showOpenInProject && (

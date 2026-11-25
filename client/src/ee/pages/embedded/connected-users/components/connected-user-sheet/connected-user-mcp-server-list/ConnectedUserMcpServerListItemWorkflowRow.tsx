@@ -6,6 +6,7 @@ import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/comp
 import {useGetIntegrationInstanceQuery} from '@/ee/shared/queries/embedded/integrationInstances.queries';
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import isCollapsibleRowClick from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
+import WorkflowDescriptionTooltip from '@/shared/components/workflow/WorkflowDescriptionTooltip';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import useWorkflowComponentDefinitions, {
     getWorkflowComponentNames,
@@ -80,22 +81,16 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
             >
                 <div className="flex min-w-0 flex-1 items-center">
                     <div className="flex w-full max-w-80 min-w-0 shrink items-center gap-2 sm:w-80 sm:shrink-0">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <button
-                                    className="max-w-full truncate text-left text-sm font-medium disabled:cursor-default"
-                                    disabled={!canOpenExecutions}
-                                    onClick={handleWorkflowClick}
-                                    type="button"
-                                >
-                                    {workflowLabel}
-                                </button>
-                            </TooltipTrigger>
-
-                            <TooltipContent align="start">
-                                {canOpenExecutions ? 'Show executions' : workflowLabel}
-                            </TooltipContent>
-                        </Tooltip>
+                        <WorkflowDescriptionTooltip description={integrationWorkflow?.description}>
+                            <button
+                                className="max-w-full truncate text-left text-sm font-medium disabled:cursor-default"
+                                disabled={!canOpenExecutions}
+                                onClick={handleWorkflowClick}
+                                type="button"
+                            >
+                                {workflowLabel}
+                            </button>
+                        </WorkflowDescriptionTooltip>
                     </div>
 
                     {integrationWorkflow && (
