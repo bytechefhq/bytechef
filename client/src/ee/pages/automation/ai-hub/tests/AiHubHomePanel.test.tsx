@@ -103,7 +103,7 @@ describe('AiHubHomePanel', () => {
         expect(screen.getByTestId('ai-hub-composer')).toBeInTheDocument();
         expect(screen.getByTestId('model-picker')).toBeInTheDocument();
         expect(screen.getByTestId('suggestion-chips')).toBeInTheDocument();
-        expect(screen.getByRole('button', {name: 'Hide chats'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Hide chats'})).not.toBeInTheDocument();
     });
 
     it('offers the same Open AI Providers action as the Copilot when no provider is enabled', async () => {

@@ -40,9 +40,7 @@ const AiHubHomePanel = () => {
     return (
         <div className="relative flex size-full flex-col bg-background">
             <div className="flex items-center justify-between p-4">
-                <div className="flex h-header-height items-center self-start">
-                    <AiHubChatsSidebarToggle />
-                </div>
+                <AiHubChatsSidebarToggle className="self-start" />
             </div>
 
             <div className="flex flex-1 items-center justify-center px-4">

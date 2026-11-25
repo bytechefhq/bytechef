@@ -48,9 +48,7 @@ const AiHubChatLoading = () => (
 const AiHubChatNotFound = () => (
     <div className="flex size-full flex-col">
         <div className="flex items-center p-4">
-            <div className="flex h-header-height items-center">
-                <AiHubChatsSidebarToggle />
-            </div>
+            <AiHubChatsSidebarToggle />
         </div>
 
         <div className="flex flex-1 flex-col items-center justify-center gap-4 px-4 text-center">
@@ -336,8 +334,15 @@ const AiHub = () => {
             leftSidebarBody={<AiHubChatsSidebar />}
             leftSidebarHeader={
                 <Header
+                    className={chatsSidebarCollapsed ? undefined : 'pr-2'}
                     position="sidebar"
-                    right={peekChatsSidebar ? <AiHubChatsSidebarPinButton /> : undefined}
+                    right={
+                        peekChatsSidebar ? (
+                            <AiHubChatsSidebarPinButton />
+                        ) : (
+                            <AiHubChatsSidebarToggle placement="sidebar" />
+                        )
+                    }
                     title="AI Hub"
                 />
             }

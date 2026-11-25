@@ -6,10 +6,10 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AiHubChatsSidebarToggle, {PEEK_DELAY_MS} from '../AiHubChatsSidebarToggle';
 
-const renderToggle = () =>
+const renderToggle = (placement?: 'content' | 'sidebar') =>
     render(
         <TooltipProvider>
-            <AiHubChatsSidebarToggle />
+            <AiHubChatsSidebarToggle placement={placement} />
         </TooltipProvider>
     );
 
@@ -22,15 +22,41 @@ describe('AiHubChatsSidebarToggle', () => {
         vi.useRealTimers();
     });
 
-    it('hides the open sidebar when clicked', async () => {
+    it('hides the open sidebar when clicked in the sidebar header', async () => {
         const user = userEvent.setup();
 
-        renderToggle();
+        renderToggle('sidebar');
 
         await user.click(screen.getByRole('button', {name: 'Hide chats'}));
 
         expect(aiHubTabsStore.getState().chatsSidebarCollapsed).toBe(true);
+        expect(screen.queryByRole('button', {name: /chats/})).not.toBeInTheDocument();
+    });
+
+    it('renders in the content header only while the sidebar is hidden', () => {
+        const {rerender} = renderToggle();
+
+        expect(screen.queryByRole('button', {name: /chats/})).not.toBeInTheDocument();
+
+        act(() => {
+            aiHubTabsStore.setState({chatsSidebarCollapsed: true});
+        });
+
+        rerender(
+            <TooltipProvider>
+                <AiHubChatsSidebarToggle />
+            </TooltipProvider>
+        );
+
         expect(screen.getByRole('button', {name: 'Show chats'})).toBeInTheDocument();
+    });
+
+    it('renders in the sidebar header only while the sidebar is docked open', () => {
+        aiHubTabsStore.setState({chatsSidebarCollapsed: true});
+
+        renderToggle('sidebar');
+
+        expect(screen.queryByRole('button', {name: /chats/})).not.toBeInTheDocument();
     });
 
     it('docks the hidden sidebar open when clicked, ending any peek', async () => {
@@ -86,7 +112,7 @@ describe('AiHubChatsSidebarToggle', () => {
     it('does not peek while the sidebar is docked open', () => {
         vi.useFakeTimers();
 
-        renderToggle();
+        renderToggle('sidebar');
 
         fireEvent.mouseEnter(screen.getByRole('button', {name: 'Hide chats'}));
 

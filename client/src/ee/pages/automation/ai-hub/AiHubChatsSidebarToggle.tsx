@@ -3,10 +3,16 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tool
 import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {PanelLeftIcon} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 export const PEEK_DELAY_MS = 300;
 
-const AiHubChatsSidebarToggle = () => {
+interface AiHubChatsSidebarToggleProps {
+    className?: string;
+    placement?: 'content' | 'sidebar';
+}
+
+const AiHubChatsSidebarToggle = ({className, placement = 'content'}: AiHubChatsSidebarToggleProps) => {
     const [tooltipOpen, setTooltipOpen] = useState(false);
 
     const peekTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -42,7 +48,11 @@ const AiHubChatsSidebarToggle = () => {
 
     useEffect(() => () => clearTimeout(peekTimerRef.current), []);
 
-    return (
+    if (placement === 'sidebar' ? chatsSidebarCollapsed : !chatsSidebarCollapsed) {
+        return null;
+    }
+
+    const toggle = (
         <Tooltip onOpenChange={setTooltipOpen} open={tooltipOpen && !chatsSidebarPeeking}>
             <TooltipTrigger asChild>
                 <Button
@@ -62,6 +72,12 @@ const AiHubChatsSidebarToggle = () => {
             <TooltipContent>{label}</TooltipContent>
         </Tooltip>
     );
+
+    if (placement === 'sidebar') {
+        return toggle;
+    }
+
+    return <div className={twMerge('flex h-header-height items-center', className)}>{toggle}</div>;
 };
 
 export default AiHubChatsSidebarToggle;

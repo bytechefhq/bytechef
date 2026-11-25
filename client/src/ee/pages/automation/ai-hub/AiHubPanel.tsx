@@ -90,9 +90,7 @@ const AiHubPanel = () => {
 
             <div className="flex items-center justify-between gap-4 p-4">
                 <div className="flex min-w-0 flex-1 items-center gap-2 self-start">
-                    <div className="flex h-header-height items-center">
-                        <AiHubChatsSidebarToggle />
-                    </div>
+                    <AiHubChatsSidebarToggle />
 
                     <h2 className="min-w-0 truncate text-base font-medium" title={chatTitle}>
                         {chatTitle}
