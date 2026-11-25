@@ -155,16 +155,24 @@ describe('ProjectDeploymentWorkflowListItem', () => {
         expect(nameColumn?.nextElementSibling).toHaveClass('min-w-0');
     });
 
-    it('aligns the workflow name tooltip to the start of the name', async () => {
+    it('shows the workflow description in a tooltip aligned to the start of the name', async () => {
         const user = userEvent.setup();
 
-        renderListItem('Subflow');
+        renderListItem('Subflow', undefined, {workflow: {...workflow, description: 'Removes old bundles'}});
 
         await user.hover(screen.getByText('workflow1'));
 
         await waitFor(() =>
             expect(document.querySelector('[data-slot="tooltip-content"]')).toHaveAttribute('data-align', 'start')
         );
+
+        expect(document.querySelector('[data-slot="tooltip-content"]')).toHaveTextContent('Removes old bundles');
+    });
+
+    it('does not show a tooltip on the workflow name when the workflow has no description', () => {
+        renderListItem('Subflow');
+
+        expect(screen.getByText('workflow1')).not.toHaveAttribute('data-slot', 'tooltip-trigger');
     });
 
     it('opens the workflow in its project from the icon beside the name without opening the sheet', async () => {

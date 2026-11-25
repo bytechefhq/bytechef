@@ -6,6 +6,7 @@ import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationW
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import {WorkflowKeys, useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
+import WorkflowDescriptionTooltip from '@/shared/components/workflow/WorkflowDescriptionTooltip';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import WorkflowListRowDropdownMenu from '@/shared/components/workflow/WorkflowListRowDropdownMenu';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
@@ -168,9 +169,11 @@ const IntegrationWorkflowListItem = ({
                 to={workflowUrl}
             >
                 <div className="flex w-80 items-center gap-2 text-sm font-semibold">
-                    <span className="underline-offset-4 group-hover/row:text-content-brand-primary group-hover/row:underline">
-                        {workflow.label}
-                    </span>
+                    <WorkflowDescriptionTooltip description={workflow.description}>
+                        <span className="underline-offset-4 group-hover/row:text-content-brand-primary group-hover/row:underline">
+                            {workflow.label}
+                        </span>
+                    </WorkflowDescriptionTooltip>
                 </div>
 
                 <WorkflowTriggerAndComponentsRow

@@ -10,6 +10,7 @@ import {IntegrationInstanceConfigurationWorkflow, Workflow} from '@/ee/shared/mi
 import {useEnableIntegrationInstanceConfigurationWorkflowMutation} from '@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
 import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
+import WorkflowDescriptionTooltip from '@/shared/components/workflow/WorkflowDescriptionTooltip';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
@@ -110,7 +111,9 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
                         onClick={handleWorkflowClick}
                         type="button"
                     >
-                        <span className="line-clamp-1">{workflow.label}</span>
+                        <WorkflowDescriptionTooltip description={workflow.description}>
+                            <span className="line-clamp-1">{workflow.label}</span>
+                        </WorkflowDescriptionTooltip>
                     </button>
 
                     {showOpenInIntegration && (
