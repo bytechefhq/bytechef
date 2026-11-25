@@ -34,6 +34,8 @@ public record WorkflowSaveInfo(
 
     public static final String WARNINGS_DESCRIPTION =
         "Problems in the saved definition that did not block the save. Fix every one with updateWorkflow before " +
-            "you tell the user the workflow is ready; a property that might not exist in an output usually means " +
-            "a wrong reference, so check the trigger's or task's output with getTaskOutputProperty first";
+            "you tell the user the workflow is ready; a property that might not exist in a trigger's or task's " +
+            "output usually means a wrong reference, so check that output with getTaskOutputProperty first. Keep a " +
+            "reference into a task whose output is only known after it runs, such as a script task, and tell the " +
+            "user a test run will confirm it.";
 }
