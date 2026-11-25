@@ -612,7 +612,9 @@ public class WorkflowValidator {
         }
 
         if (!inputJsonNode.has("type")) {
-            StringUtils.appendWithNewline(prefix + "Missing required field: type", errors);
+            if (!hasComponentReference(inputJsonNode)) {
+                StringUtils.appendWithNewline(prefix + "Missing required field: type", errors);
+            }
         } else {
             JsonNode typeJsonNode = inputJsonNode.get("type");
 
@@ -623,6 +625,16 @@ public class WorkflowValidator {
                     prefix + "Field 'type' must be one of: " + String.join(", ", VALID_INPUT_TYPES), errors);
             }
         }
+    }
+
+    private static boolean hasComponentReference(JsonNode inputJsonNode) {
+        JsonNode componentNameJsonNode = inputJsonNode.get("componentName");
+        JsonNode componentVersionJsonNode = inputJsonNode.get("componentVersion");
+        JsonNode groupNameJsonNode = inputJsonNode.get("groupName");
+
+        return componentNameJsonNode != null && componentNameJsonNode.isString() &&
+            componentVersionJsonNode != null && componentVersionJsonNode.isIntegralNumber() &&
+            groupNameJsonNode != null && groupNameJsonNode.isString();
     }
 
     private static void processTriggers(
