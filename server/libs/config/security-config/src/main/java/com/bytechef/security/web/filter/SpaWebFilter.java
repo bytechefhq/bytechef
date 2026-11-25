@@ -35,10 +35,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class SpaWebFilter extends OncePerRequestFilter {
 
-    /**
-     * A file request ends in a short alphanumeric extension ({@code app.js}, {@code font.woff2}). A signed resume token
-     * also contains periods, but its last part is a 43-character signature, so it stays a client route.
-     */
     private static final Pattern FILE_EXTENSION_PATTERN = Pattern.compile("\\.[A-Za-z0-9]{1,8}$");
 
     private final List<String> nonSpaPathPrefixes = new ArrayList<>();
@@ -61,8 +57,7 @@ public class SpaWebFilter extends OncePerRequestFilter {
      * the requested path is:
      * <ul>
      * <li>Not matching a predefined server route or static resource</li>
-     * <li>Does NOT end in a file extension (to exclude direct file requests, such as images or scripts); a period
-     * elsewhere, as in a signed token, does not make it a file request</li>
+     * <li>Does NOT end in a file extension (to exclude direct file requests, such as images or scripts)</li>
      * <li>Matches the pattern {@code /(.*)} (i.e., is a valid root-relative path)</li>
      * </ul>
      * then the method forwards the request internally to {@code /index.html}. This allows the front-end application to
