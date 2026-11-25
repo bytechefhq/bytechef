@@ -130,12 +130,13 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
                         )
                     }
                     label="Component"
+                    labelClassName="leading-normal"
                     text={nodeDefinition.title}
                 />
             )}
 
             <fieldset className="space-y-1">
-                <Label>Title</Label>
+                <Label className="leading-normal">Title</Label>
 
                 <Input
                     className="bg-surface-neutral-primary shadow-none"
@@ -147,7 +148,7 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
             </fieldset>
 
             <fieldset className="space-y-1">
-                <Label>Notes</Label>
+                <Label className="leading-normal">Notes</Label>
 
                 <Textarea
                     className="bg-surface-neutral-primary shadow-none"
