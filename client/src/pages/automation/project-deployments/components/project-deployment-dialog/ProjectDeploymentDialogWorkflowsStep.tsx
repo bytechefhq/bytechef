@@ -1,7 +1,7 @@
 import ProjectDeploymentDialogWorkflowsStepItem from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItem';
 import {Connection, ProjectDeployment, Workflow} from '@/shared/middleware/automation/configuration';
 import compareWorkflowLabels from '@/shared/util/compareWorkflowLabels';
-import {Control, FormState, UseFormSetValue} from 'react-hook-form';
+import {Control, FormState, UseFormSetValue, useWatch} from 'react-hook-form';
 
 import {getReachableSubflowUuids} from './projectDeploymentDialog-utils';
 
@@ -22,6 +22,15 @@ const ProjectDeploymentDialogWorkflowsStep = ({
     setValue,
     workflows,
 }: ProjectDeploymentDialogWorkflowsStepProps) => {
+    const formWorkflows = useWatch({control, name: 'projectDeploymentWorkflows'});
+
+    const getWorkflowIndex = (workflow: Workflow) => {
+        const formWorkflowIndex =
+            formWorkflows?.findIndex((formWorkflow) => formWorkflow.workflowId === workflow.id) ?? -1;
+
+        return formWorkflowIndex === -1 ? workflows.indexOf(workflow) : formWorkflowIndex;
+    };
+
     const reachableSubflowUuids = getReachableSubflowUuids(workflows, workflows);
 
     const nonSubflowWorkflows = workflows
@@ -41,7 +50,7 @@ const ProjectDeploymentDialogWorkflowsStep = ({
                     setValue={setValue}
                     showWorkflowToggle
                     workflow={workflow}
-                    workflowIndex={workflows.indexOf(workflow)}
+                    workflowIndex={getWorkflowIndex(workflow)}
                     workflows={workflows}
                 />
             ))}
