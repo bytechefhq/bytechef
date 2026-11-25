@@ -66,7 +66,6 @@ import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -371,8 +370,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 projectDeploymentWorkflow -> toProjectDeploymentWorkflowDTO(
                     projectDeploymentWorkflow, projectDeployment, projectWorkflows)),
             projectService.getProject(projectDeployment.getProjectId()),
-            getProjectDeploymentLastExecutionDate(Validate.notNull(projectDeployment.getId(), "id")),
-            getProjectDeploymentLastExecutionStartDate(Validate.notNull(projectDeployment.getId(), "id")),
+            getProjectDeploymentLastJob(Validate.notNull(projectDeployment.getId(), "id")),
             tagService.getTags(projectDeployment.getTagIds()));
     }
 
@@ -441,8 +439,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                             projectDeploymentWorkflow -> toProjectDeploymentWorkflowDTO(
                                 projectDeploymentWorkflow, projectDeployment, deploymentProjectWorkflows)),
                         project,
-                        getProjectDeploymentLastExecutionDate(Validate.notNull(projectDeployment.getId(), "id")),
-                        getProjectDeploymentLastExecutionStartDate(Validate.notNull(projectDeployment.getId(), "id")),
+                        getProjectDeploymentLastJob(Validate.notNull(projectDeployment.getId(), "id")),
                         filterTags(tags, projectDeployment));
                 });
         } else {
@@ -905,33 +902,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             .findFirst();
     }
 
-    private Instant getJobEndDate(Long jobId) {
-        Job job = jobService.getJob(jobId);
-
-        return job.getEndDate();
-    }
-
-    private Instant getJobStartDate(Long jobId) {
-        Job job = jobService.getJob(jobId);
-
-        return job.getStartDate();
-    }
-
-    private Job.Status getJobStatus(Long jobId) {
-        Job job = jobService.getJob(jobId);
-
-        return job.getStatus();
-    }
-
-    private Instant getProjectDeploymentLastExecutionDate(long projectDeploymentId) {
+    private Job getProjectDeploymentLastJob(long projectDeploymentId) {
         return principalJobService.fetchLastJobId(projectDeploymentId, PlatformType.AUTOMATION)
-            .map(this::getJobEndDate)
-            .orElse(null);
-    }
-
-    private Instant getProjectDeploymentLastExecutionStartDate(long projectDeploymentId) {
-        return principalJobService.fetchLastJobId(projectDeploymentId, PlatformType.AUTOMATION)
-            .map(this::getJobStartDate)
+            .map(jobService::getJob)
             .orElse(null);
     }
 
@@ -994,21 +967,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         return webhookUrl.replace("{id}", workflowExecutionId.toString());
     }
 
-    private Instant getWorkflowLastExecutionDate(long projectDeploymentId, List<String> workflowIds) {
+    private Job getWorkflowLastJob(long projectDeploymentId, List<String> workflowIds) {
         return principalJobService.fetchLastWorkflowJobId(projectDeploymentId, workflowIds, PlatformType.AUTOMATION)
-            .map(this::getJobEndDate)
-            .orElse(null);
-    }
-
-    private Instant getWorkflowLastExecutionStartDate(long projectDeploymentId, List<String> workflowIds) {
-        return principalJobService.fetchLastWorkflowJobId(projectDeploymentId, workflowIds, PlatformType.AUTOMATION)
-            .map(this::getJobStartDate)
-            .orElse(null);
-    }
-
-    private Job.Status getWorkflowLastExecutionStatus(long projectDeploymentId, List<String> workflowIds) {
-        return principalJobService.fetchLastWorkflowJobId(projectDeploymentId, workflowIds, PlatformType.AUTOMATION)
-            .map(this::getJobStatus)
+            .map(jobService::getJob)
             .orElse(null);
     }
 
@@ -1039,9 +1000,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
         return new ProjectDeploymentWorkflowDTO(
             projectDeploymentWorkflow,
-            getWorkflowLastExecutionDate(projectDeployment.getId(), workflowUuidWorkflowIds),
-            getWorkflowLastExecutionStartDate(projectDeployment.getId(), workflowUuidWorkflowIds),
-            getWorkflowLastExecutionStatus(projectDeployment.getId(), workflowUuidWorkflowIds),
+            getWorkflowLastJob(projectDeployment.getId(), workflowUuidWorkflowIds),
             getStaticWebhookUrl(
                 projectDeploymentWorkflow.getProjectDeploymentId(),
                 projectDeploymentWorkflow.getWorkflowId()),

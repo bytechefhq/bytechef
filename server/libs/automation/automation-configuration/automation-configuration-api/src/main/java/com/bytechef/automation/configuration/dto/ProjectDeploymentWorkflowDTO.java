@@ -36,14 +36,15 @@ public record ProjectDeploymentWorkflowDTO(
     implements Comparable<ProjectDeploymentWorkflowDTO> {
 
     public ProjectDeploymentWorkflowDTO(
-        ProjectDeploymentWorkflow projectDeploymentWorkflow, Instant lastExecutionDate,
-        Instant lastExecutionStartDate, Job.Status lastExecutionStatus, String staticWebhookUrl, String workflowUuid) {
+        ProjectDeploymentWorkflow projectDeploymentWorkflow, Job lastJob, String staticWebhookUrl,
+        String workflowUuid) {
 
         this(
             projectDeploymentWorkflow.getConnections(), projectDeploymentWorkflow.getCreatedBy(),
             projectDeploymentWorkflow.getCreatedDate(), projectDeploymentWorkflow.getInputs(),
-            projectDeploymentWorkflow.isEnabled(), projectDeploymentWorkflow.getId(), lastExecutionDate,
-            lastExecutionStartDate, lastExecutionStatus, projectDeploymentWorkflow.getLastModifiedBy(),
+            projectDeploymentWorkflow.isEnabled(), projectDeploymentWorkflow.getId(),
+            lastJob == null ? null : lastJob.getEndDate(), lastJob == null ? null : lastJob.getStartDate(),
+            lastJob == null ? null : lastJob.getStatus(), projectDeploymentWorkflow.getLastModifiedBy(),
             projectDeploymentWorkflow.getLastModifiedDate(), projectDeploymentWorkflow.getProjectDeploymentId(),
             staticWebhookUrl, projectDeploymentWorkflow.getVersion(), projectDeploymentWorkflow.getWorkflowId(),
             workflowUuid);
