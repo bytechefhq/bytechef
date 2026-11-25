@@ -1,6 +1,7 @@
 import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
+import WorkflowDescriptionTooltip from '@/shared/components/workflow/WorkflowDescriptionTooltip';
 import WorkflowListRowDropdownMenu from '@/shared/components/workflow/WorkflowListRowDropdownMenu';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {AutomationProjectsQuery, useDuplicateAutomationProjectWorkflowMutation} from '@/shared/middleware/graphql';
@@ -103,13 +104,11 @@ const AutomationProjectWorkflowListItem = ({
                 tabIndex={0}
             >
                 <div className="flex w-80 shrink-0 items-center gap-2 pr-1 text-sm font-semibold">
-                    <Tooltip>
-                        <TooltipTrigger className="line-clamp-1 text-start underline-offset-4 group-hover/row:text-content-brand-primary group-hover/row:underline">
+                    <WorkflowDescriptionTooltip description={workflow.description ?? undefined}>
+                        <span className="line-clamp-1 text-start underline-offset-4 group-hover/row:text-content-brand-primary group-hover/row:underline">
                             {workflow.label || workflow.workflowUuid}
-                        </TooltipTrigger>
-
-                        <TooltipContent>{workflow.label || workflow.workflowUuid}</TooltipContent>
-                    </Tooltip>
+                        </span>
+                    </WorkflowDescriptionTooltip>
                 </div>
 
                 <WorkflowTriggerAndComponentsRow

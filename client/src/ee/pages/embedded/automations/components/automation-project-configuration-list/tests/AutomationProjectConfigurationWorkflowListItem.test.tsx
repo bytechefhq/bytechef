@@ -1,7 +1,7 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import useAutomationExecutionsSheetStore from '@/ee/pages/embedded/automations/stores/useAutomationExecutionsSheetStore';
 import {AutomationProjectConfigurationsQuery, AutomationProjectsQuery} from '@/shared/middleware/graphql';
-import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AutomationProjectConfigurationWorkflowListItem from '../AutomationProjectConfigurationWorkflowListItem';
@@ -144,6 +144,22 @@ describe('AutomationProjectConfigurationWorkflowListItem', () => {
     afterEach(() => {
         resetAll();
         vi.clearAllMocks();
+    });
+
+    it('shows the workflow description in a tooltip on the workflow name', async () => {
+        renderItem({workflowTemplate: {...workflowTemplate, description: 'Sends the weekly digest'}});
+
+        await userEvent.hover(screen.getByText('Mailer'));
+
+        await waitFor(() =>
+            expect(document.querySelector('[data-slot="tooltip-content"]')).toHaveTextContent('Sends the weekly digest')
+        );
+    });
+
+    it('does not show a tooltip on the workflow name when the workflow has no description', () => {
+        renderItem();
+
+        expect(screen.getByText('Mailer')).not.toHaveAttribute('data-slot', 'tooltip-trigger');
     });
 
     it('renders the workflow row as a native button', () => {
