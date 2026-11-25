@@ -499,6 +499,19 @@ describe('buildAiHubSubscriber', () => {
             expect(onWorkflowMutated).toHaveBeenNthCalledWith(1, 'Workflow updated.');
         });
 
+        it.each([
+            'updateClusterElementTask',
+            'updateScriptComponentCode',
+            'updateWorkflow',
+            'updateWorkflowRootProperties',
+        ])('notifies onWorkflowMutated after %s saves the workflow', (toolName) => {
+            const onWorkflowMutated = vi.fn();
+
+            deliverToolResult(createSubscriber({onWorkflowMutated}), 'call-update', toolName, '{"id":"wf-1"}');
+
+            expect(onWorkflowMutated).toHaveBeenCalledWith('{"id":"wf-1"}');
+        });
+
         it('notifies onWorkflowMutated when an approved call resumes in a continuation run', () => {
             const onWorkflowMutated = vi.fn();
 

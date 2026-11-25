@@ -408,6 +408,10 @@ const WORKFLOW_MUTATING_TOOL_NAMES = new Set([
     'importWorkflow',
     'publishProject',
     'saveWorkflowTestConnection',
+    'updateClusterElementTask',
+    'updateScriptComponentCode',
+    'updateWorkflow',
+    'updateWorkflowRootProperties',
 ]);
 
 export function invalidateWorkflowQueries(queryClient: QueryClient, toolResultContent?: string): void {
