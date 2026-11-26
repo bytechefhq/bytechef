@@ -1246,6 +1246,23 @@ export type UpdateKnowledgeBaseTagsMutationVariables = Exact<{
 
 export type UpdateKnowledgeBaseTagsMutation = { updateKnowledgeBaseTags: boolean };
 
+export type EnvironmentPromotionPreviewQueryVariables = Exact<{
+  resourceType: Types.PromotionResourceType;
+  sourceEnvironmentId: string | number;
+  sourceId: string | number;
+  targetEnvironmentId: string | number;
+}>;
+
+
+export type EnvironmentPromotionPreviewQuery = { environmentPromotionPreview: { destructiveChangesHash: string, existingTargetId: string | null, existingTargetName: string | null, resourceType: Types.PromotionResourceType, sourceEnvironmentId: string, sourceId: string, targetEnvironmentId: string, warnings: Array<string>, changes: Array<{ assetType: string, destructive: boolean, key: string, kind: Types.PromotionChangeKind, name: string, parentName: string | null }>, connections: Array<{ componentName: string, connectionVersion: number, sourceConnectionId: string, sourceConnectionName: string, suggestedTargetConnectionId: string | null, usedBy: Array<string>, targetCandidates: Array<{ connectionId: string, name: string }> }>, projects: Array<{ projectId: string, projectName: string, sourceProjectVersion: number, targetProjectVersion: number | null }>, schemaChanges: Array<{ columnName: string | null, destructive: boolean, fromType: string | null, kind: Types.PromotionSchemaChangeKind, tableName: string, toType: string | null }> } };
+
+export type PromoteToEnvironmentMutationVariables = Exact<{
+  input: Types.PromoteToEnvironmentInput;
+}>;
+
+
+export type PromoteToEnvironmentMutation = { promoteToEnvironment: { created: boolean, targetId: string, targetUrl: string | null, unresolvedConnectionIds: Array<string> } };
+
 export type AutomationSearchQueryVariables = Exact<{
   query: string;
   limit?: number | null | undefined;
@@ -7488,6 +7505,100 @@ export const useUpdateKnowledgeBaseTagsMutation = <
       {
     mutationKey: ['updateKnowledgeBaseTags'],
     mutationFn: (variables?: UpdateKnowledgeBaseTagsMutationVariables) => fetcher<UpdateKnowledgeBaseTagsMutation, UpdateKnowledgeBaseTagsMutationVariables>(UpdateKnowledgeBaseTagsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EnvironmentPromotionPreviewDocument = new TypedDocumentString(`
+    query environmentPromotionPreview($resourceType: PromotionResourceType!, $sourceEnvironmentId: ID!, $sourceId: ID!, $targetEnvironmentId: ID!) {
+  environmentPromotionPreview(
+    resourceType: $resourceType
+    sourceEnvironmentId: $sourceEnvironmentId
+    sourceId: $sourceId
+    targetEnvironmentId: $targetEnvironmentId
+  ) {
+    changes {
+      assetType
+      destructive
+      key
+      kind
+      name
+      parentName
+    }
+    connections {
+      componentName
+      connectionVersion
+      sourceConnectionId
+      sourceConnectionName
+      suggestedTargetConnectionId
+      targetCandidates {
+        connectionId
+        name
+      }
+      usedBy
+    }
+    destructiveChangesHash
+    existingTargetId
+    existingTargetName
+    projects {
+      projectId
+      projectName
+      sourceProjectVersion
+      targetProjectVersion
+    }
+    resourceType
+    schemaChanges {
+      columnName
+      destructive
+      fromType
+      kind
+      tableName
+      toType
+    }
+    sourceEnvironmentId
+    sourceId
+    targetEnvironmentId
+    warnings
+  }
+}
+    `);
+
+export const useEnvironmentPromotionPreviewQuery = <
+      TData = EnvironmentPromotionPreviewQuery,
+      TError = unknown
+    >(
+      variables: EnvironmentPromotionPreviewQueryVariables,
+      options?: Omit<UseQueryOptions<EnvironmentPromotionPreviewQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EnvironmentPromotionPreviewQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<EnvironmentPromotionPreviewQuery, TError, TData>(
+      {
+    queryKey: ['environmentPromotionPreview', variables],
+    queryFn: fetcher<EnvironmentPromotionPreviewQuery, EnvironmentPromotionPreviewQueryVariables>(EnvironmentPromotionPreviewDocument, variables),
+    ...options
+  }
+    )};
+
+export const PromoteToEnvironmentDocument = new TypedDocumentString(`
+    mutation promoteToEnvironment($input: PromoteToEnvironmentInput!) {
+  promoteToEnvironment(input: $input) {
+    created
+    targetId
+    targetUrl
+    unresolvedConnectionIds
+  }
+}
+    `);
+
+export const usePromoteToEnvironmentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<PromoteToEnvironmentMutation, TError, PromoteToEnvironmentMutationVariables, TContext>) => {
+    
+    return useMutation<PromoteToEnvironmentMutation, TError, PromoteToEnvironmentMutationVariables, TContext>(
+      {
+    mutationKey: ['promoteToEnvironment'],
+    mutationFn: (variables?: PromoteToEnvironmentMutationVariables) => fetcher<PromoteToEnvironmentMutation, PromoteToEnvironmentMutationVariables>(PromoteToEnvironmentDocument, variables)(),
     ...options
   }
     )};
