@@ -2,8 +2,8 @@ import {act, renderHook} from '@/shared/util/test-utils';
 import {type ReactNode} from 'react';
 import {afterEach, describe, expect, it, vi} from 'vitest';
 
-import {type DialogStepI, DialogStepsProvider, type DialogStepsProviderProps} from './DialogStepsProvider';
-import {useDialogSteps, useOptionalDialogSteps} from './hooks/useDialogSteps';
+import {type DialogStepI, DialogStepsProvider, type DialogStepsProviderProps} from '../DialogStepsProvider';
+import {useDialogSteps, useOptionalDialogSteps} from '../hooks/useDialogSteps';
 
 const steps: DialogStepI[] = [
     {id: 'basics', label: 'Basics'},
@@ -342,5 +342,102 @@ describe('DialogStepsProvider - TypeScript', () => {
         const element = <DialogStepsProvider>content</DialogStepsProvider>;
 
         expect(element).toBeTruthy();
+    });
+});
+
+describe('DialogStepsProvider - resetKey', () => {
+    function renderWithResetKey(
+        initialResetKey: number | string,
+        validateStep?: DialogStepsProviderProps['validateStep']
+    ) {
+        let resetKey = initialResetKey;
+
+        const rendered = renderHook(() => useDialogSteps(), {
+            wrapper: ({children}: {children: ReactNode}) => (
+                <DialogStepsProvider resetKey={resetKey} steps={steps} validateStep={validateStep}>
+                    {children}
+                </DialogStepsProvider>
+            ),
+        });
+
+        return {
+            ...rendered,
+            changeResetKey: (nextResetKey: number | string) => {
+                resetKey = nextResetKey;
+
+                rendered.rerender();
+            },
+        };
+    }
+
+    it('resets completed steps and returns to the first step when resetKey changes', async () => {
+        const {changeResetKey, result} = renderWithResetKey('first');
+
+        await act(async () => {
+            await result.current.goToNextStep();
+        });
+
+        await act(async () => {
+            await result.current.goToNextStep();
+        });
+
+        expect(result.current.currentStep.id).toBe('review');
+        expect(result.current.completedStepIds.size).toBe(2);
+
+        act(() => {
+            changeResetKey('second');
+        });
+
+        expect(result.current.currentStep.id).toBe('basics');
+        expect(result.current.currentStepIndex).toBe(0);
+        expect(result.current.completedStepIds.size).toBe(0);
+        expect(result.current.getStepStatus('workflows').isReachable).toBe(false);
+    });
+
+    it('keeps state when resetKey is unchanged', async () => {
+        const {changeResetKey, result} = renderWithResetKey(1);
+
+        await act(async () => {
+            await result.current.goToNextStep();
+        });
+
+        act(() => {
+            changeResetKey(1);
+        });
+
+        expect(result.current.currentStep.id).toBe('workflows');
+        expect(result.current.completedStepIds.has('basics')).toBe(true);
+    });
+
+    it('ignores a step advance that resolves after resetKey changes', async () => {
+        let resolveValidation: (isValid: boolean) => void = () => undefined;
+
+        const validateStep = vi.fn(
+            () =>
+                new Promise<boolean>((resolve) => {
+                    resolveValidation = resolve;
+                })
+        );
+
+        const {changeResetKey, result} = renderWithResetKey('first', validateStep);
+
+        let advance: Promise<void> = Promise.resolve();
+
+        act(() => {
+            advance = result.current.goToNextStep();
+        });
+
+        act(() => {
+            changeResetKey('second');
+        });
+
+        await act(async () => {
+            resolveValidation(true);
+
+            await advance;
+        });
+
+        expect(result.current.currentStep.id).toBe('basics');
+        expect(result.current.completedStepIds.size).toBe(0);
     });
 });

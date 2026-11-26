@@ -19,6 +19,23 @@ describe('graphqlFetcher', () => {
         expect(error).toHaveProperty('message', 'Workflow Notify needs a value for accountId');
     });
 
+    it('keeps the extensions of the GraphQL error so callers can match its type', async () => {
+        respondWith(200, {
+            data: null,
+            errors: [
+                {
+                    extensions: {entityClass: 'EnvironmentPromotionErrorType', errorKey: 110},
+                    message: 'The target changed since the preview',
+                },
+            ],
+        });
+
+        const error = await fetcher('query {}')().catch((caughtError: unknown) => caughtError);
+
+        expect(error).toBeInstanceOf(GraphQLResponseError);
+        expect(error).toHaveProperty('extensions', {entityClass: 'EnvironmentPromotionErrorType', errorKey: 110});
+    });
+
     it('throws a GraphQLResponseError with the server message of a failed response', async () => {
         respondWith(400, {errors: [{message: 'Configuration id=1 was not found'}]});
 

@@ -16,19 +16,34 @@ import {
     NO_OTHER_CONFIGURATION_REASON,
 } from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
+import EEVersion from '@/shared/edition/EEVersion';
 import {
     AutomationProjectConfigurationsQuery,
     AutomationProjectsQuery,
+    PromotionResourceType,
     useAutomationProjectConfigurationDeleteImpactQuery,
     useDeleteAutomationProjectConfigurationMutation,
     useEnableAutomationProjectConfigurationMutation,
+    useEnvironmentsQuery,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {EditIcon, EllipsisVerticalIcon, FolderIcon, RefreshCcwIcon, Trash2Icon, UsersIcon} from 'lucide-react';
-import {MouseEvent, useCallback, useRef, useState} from 'react';
+import {
+    EditIcon,
+    EllipsisVerticalIcon,
+    FolderIcon,
+    RefreshCcwIcon,
+    RocketIcon,
+    Trash2Icon,
+    UsersIcon,
+} from 'lucide-react';
+import {MouseEvent, Suspense, lazy, useCallback, useRef, useState} from 'react';
 
 import AutomationProjectConfigurationMoveUsersDialog from './AutomationProjectConfigurationMoveUsersDialog';
 import AutomationProjectConfigurationWorkflowList from './AutomationProjectConfigurationWorkflowList';
+
+const EnvironmentPromotionDialog = lazy(
+    () => import('@/ee/shared/components/environment-promotion/EnvironmentPromotionDialog')
+);
 
 type AutomationProjectConfigurationType =
     AutomationProjectConfigurationsQuery['automationProjectConfigurations'][number];
@@ -59,10 +74,15 @@ const AutomationProjectConfigurationListItem = ({
 }: AutomationProjectConfigurationListItemProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showMoveUsersDialog, setShowMoveUsersDialog] = useState(false);
+    const [showPromotionDialog, setShowPromotionDialog] = useState(false);
 
     const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
     const queryClient = useQueryClient();
+
+    const environmentsQuery = useEnvironmentsQuery();
+
+    const showPromoteToEnvironment = (environmentsQuery.data?.environments?.length ?? 0) >= 2;
 
     const deleteConfigurationMutation = useDeleteAutomationProjectConfigurationMutation({
         onSuccess: () => {
@@ -269,6 +289,16 @@ const AutomationProjectConfigurationListItem = ({
                                     )}
                                 </Tooltip>
 
+                                {showPromoteToEnvironment && (
+                                    <EEVersion hidden={true}>
+                                        <DropdownMenuItem
+                                            icon={<RocketIcon />}
+                                            label="Promote to environment…"
+                                            onClick={() => setShowPromotionDialog(true)}
+                                        />
+                                    </EEVersion>
+                                )}
+
                                 <DropdownMenuSeparator />
 
                                 <DropdownMenuItem
@@ -307,6 +337,25 @@ const AutomationProjectConfigurationListItem = ({
                     onClose={() => setShowMoveUsersDialog(false)}
                     targetConfigurations={moveTargetConfigurations}
                 />
+            )}
+
+            {showPromotionDialog && (
+                <EEVersion hidden={true}>
+                    <Suspense fallback={null}>
+                        <EnvironmentPromotionDialog
+                            onClose={() => setShowPromotionDialog(false)}
+                            onPromoted={() => {
+                                void queryClient.invalidateQueries({queryKey: ['automationProjectConfigurations']});
+                                void queryClient.invalidateQueries({queryKey: ['automationProjects']});
+                            }}
+                            resourceType={PromotionResourceType.AutomationConfiguration}
+                            sourceEnvironmentId={Number(configuration.environmentId)}
+                            sourceId={configuration.id}
+                            sourceName={configuration.name}
+                            targetListPath="/embedded/automation-configurations"
+                        />
+                    </Suspense>
+                </EEVersion>
             )}
         </Collapsible>
     );

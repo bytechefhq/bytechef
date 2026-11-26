@@ -9,7 +9,51 @@ import ProjectDeploymentListItem from '../ProjectDeploymentListItem';
 const hoisted = vi.hoisted(() => ({
     captureProjectDeploymentEnabledMock: vi.fn(),
     deleteProjectDeploymentMock: vi.fn(),
+    edition: 'EE',
+    environmentsResult: {
+        data: {
+            environments: [
+                {id: '0', name: 'Development'},
+                {id: '1', name: 'Staging'},
+            ],
+        },
+    } as {
+        data: {environments: {id: string; name: string}[]} | undefined;
+    },
     projectVersionsQueryMock: vi.fn(),
+    promotionDialogProps: [] as unknown[],
+}));
+
+vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@/shared/middleware/graphql')>();
+
+    return {
+        ...actual,
+        useEnvironmentsQuery: () => hoisted.environmentsResult,
+    };
+});
+
+vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
+    useApplicationInfoStore: (selector: (state: Record<string, unknown>) => unknown) =>
+        selector({application: {edition: hoisted.edition}}),
+}));
+
+vi.mock('@/ee/shared/components/environment-promotion/EnvironmentPromotionDialog', () => ({
+    default: (props: Record<string, unknown>) => {
+        hoisted.promotionDialogProps.push(props);
+
+        return (
+            <div data-testid="environment-promotion-dialog">
+                <button onClick={props.onClose as () => void} type="button">
+                    close
+                </button>
+
+                <button onClick={() => (props.onPromoted as (result: unknown) => void)?.({})} type="button">
+                    promote
+                </button>
+            </div>
+        );
+    },
 }));
 
 vi.mock('@/shared/queries/automation/projectVersions.queries', () => ({
@@ -93,8 +137,16 @@ describe('ProjectDeploymentListItem', () => {
     beforeEach(() => {
         hoisted.captureProjectDeploymentEnabledMock.mockReset();
         hoisted.deleteProjectDeploymentMock.mockReset();
+        hoisted.edition = 'EE';
         hoisted.projectVersionsQueryMock.mockReset();
         hoisted.projectVersionsQueryMock.mockReturnValue({data: undefined});
+        hoisted.promotionDialogProps.length = 0;
+        hoisted.environmentsResult.data = {
+            environments: [
+                {id: '0', name: 'Development'},
+                {id: '1', name: 'Staging'},
+            ],
+        };
     });
 
     it('shows that a newer version is available when the project has published a later version', () => {
@@ -260,5 +312,59 @@ describe('ProjectDeploymentListItem', () => {
         await user.click(screen.getByRole('switch'));
 
         expect(hoisted.captureProjectDeploymentEnabledMock).not.toHaveBeenCalled();
+    });
+
+    it('hides the Promote to environment menu item when fewer than two environments exist', () => {
+        hoisted.environmentsResult.data = {environments: [{id: '0', name: 'Development'}]};
+
+        render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
+
+        expect(screen.queryByText('Promote to environment…')).not.toBeInTheDocument();
+    });
+
+    it('hides the Promote to environment menu item on CE even with multiple environments', () => {
+        hoisted.edition = 'CE';
+
+        render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
+
+        expect(screen.queryByText('Promote to environment…')).not.toBeInTheDocument();
+    });
+
+    it('mounts the promotion dialog on click and unmounts it on close', async () => {
+        const user = userEvent.setup();
+
+        render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
+
+        expect(screen.queryByTestId('environment-promotion-dialog')).not.toBeInTheDocument();
+
+        await user.click(screen.getByText('Promote to environment…'));
+
+        expect(await screen.findByTestId('environment-promotion-dialog')).toBeInTheDocument();
+        expect(hoisted.promotionDialogProps.at(-1)).toMatchObject({
+            resourceType: 'PROJECT_DEPLOYMENT',
+            sourceEnvironmentId: 0,
+            sourceId: '42',
+            sourceName: 'My Project Deployment',
+            targetListPath: '/automation/deployments',
+        });
+
+        await user.click(screen.getByText('close'));
+
+        expect(screen.queryByTestId('environment-promotion-dialog')).not.toBeInTheDocument();
+    });
+
+    it('invalidates the projectDeployments query when onPromoted fires', async () => {
+        const invalidateQueriesSpy = vi.spyOn(QueryClient.prototype, 'invalidateQueries');
+        const user = userEvent.setup();
+
+        render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
+
+        await user.click(screen.getByText('Promote to environment…'));
+
+        await user.click(await screen.findByText('promote'));
+
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['projectDeployments']});
+
+        invalidateQueriesSpy.mockRestore();
     });
 });

@@ -5,13 +5,49 @@ import DataTableListItemDropdownMenu from '../DataTableListItemDropdownMenu';
 
 const hoisted = vi.hoisted(() => {
     return {
+        edition: 'EE',
+        environmentsResult: {
+            data: {
+                environments: [
+                    {id: '0', name: 'Development'},
+                    {id: '1', name: 'Staging'},
+                ],
+            },
+        } as {data: {environments: {id: string; name: string}[]} | undefined},
         handleDeleteClick: vi.fn(),
         handleDuplicateClick: vi.fn(),
         handleExportCsvClick: vi.fn(),
         handleRenameClick: vi.fn(),
         mockUseDataTableListItemDropdownMenu: vi.fn(),
+        promotionDialogProps: [] as Record<string, unknown>[],
     };
 });
+
+vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@/shared/middleware/graphql')>();
+
+    return {
+        ...actual,
+        useEnvironmentsQuery: () => hoisted.environmentsResult,
+    };
+});
+
+vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
+    useApplicationInfoStore: (selector: (state: Record<string, unknown>) => unknown) =>
+        selector({application: {edition: hoisted.edition}}),
+}));
+
+vi.mock('@/shared/stores/useEnvironmentStore', () => ({
+    useEnvironmentStore: (selector: (state: Record<string, unknown>) => unknown) => selector({currentEnvironmentId: 0}),
+}));
+
+vi.mock('@/ee/shared/components/environment-promotion/EnvironmentPromotionDialog', () => ({
+    default: (props: Record<string, unknown>) => {
+        hoisted.promotionDialogProps.push(props);
+
+        return <div data-testid="environment-promotion-dialog" />;
+    },
+}));
 
 vi.mock('../hooks/useDataTableListItemDropdownMenu', () => ({
     default: hoisted.mockUseDataTableListItemDropdownMenu,
@@ -19,6 +55,16 @@ vi.mock('../hooks/useDataTableListItemDropdownMenu', () => ({
 
 beforeEach(() => {
     windowResizeObserver();
+    hoisted.edition = 'EE';
+    hoisted.promotionDialogProps = [];
+    hoisted.environmentsResult = {
+        data: {
+            environments: [
+                {id: '0', name: 'Development'},
+                {id: '1', name: 'Staging'},
+            ],
+        },
+    };
     hoisted.mockUseDataTableListItemDropdownMenu.mockReturnValue({
         handleDeleteClick: hoisted.handleDeleteClick,
         handleDuplicateClick: hoisted.handleDuplicateClick,
@@ -107,5 +153,42 @@ describe('DataTableListItemDropdownMenu', () => {
         await userEvent.click(deleteItem);
 
         expect(hoisted.handleDeleteClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('should show Promote to environment when there are two or more environments', async () => {
+        render(<DataTableListItemDropdownMenu baseName="orders" dataTableId="123" />);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Table menu'}));
+
+        expect(screen.getByRole('menuitem', {name: 'Promote to environment…'})).toBeInTheDocument();
+    });
+
+    it('should hide Promote to environment when there is only one environment', async () => {
+        hoisted.environmentsResult = {data: {environments: [{id: '0', name: 'Development'}]}};
+
+        render(<DataTableListItemDropdownMenu baseName="orders" dataTableId="123" />);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Table menu'}));
+
+        expect(screen.queryByRole('menuitem', {name: 'Promote to environment…'})).not.toBeInTheDocument();
+    });
+
+    it('should open the promotion dialog for the data table', async () => {
+        render(<DataTableListItemDropdownMenu baseName="orders" dataTableId="123" />);
+
+        expect(screen.queryByTestId('environment-promotion-dialog')).not.toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Table menu'}));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Promote to environment…'}));
+
+        expect(await screen.findByTestId('environment-promotion-dialog')).toBeInTheDocument();
+
+        expect(hoisted.promotionDialogProps[0]).toMatchObject({
+            resourceType: 'DATA_TABLE',
+            sourceEnvironmentId: 0,
+            sourceId: '123',
+            sourceName: 'orders',
+            targetListPath: '/automation/datatables',
+        });
     });
 });

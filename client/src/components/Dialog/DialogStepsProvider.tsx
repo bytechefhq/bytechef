@@ -33,6 +33,7 @@ interface DialogStepsProviderProps {
     defaultStepId?: string;
     onComplete?: () => void | Promise<void>;
     onCurrentStepChange?: (stepId: string) => void;
+    resetKey?: number | string;
     steps: DialogStepI[];
     validateStep?: (step: DialogStepI) => boolean | Promise<boolean>;
 }
@@ -55,6 +56,7 @@ function DialogStepsProvider({
     defaultStepId,
     onComplete,
     onCurrentStepChange,
+    resetKey,
     steps,
     validateStep,
 }: DialogStepsProviderProps) {
@@ -66,6 +68,8 @@ function DialogStepsProvider({
     const [isPending, setIsPending] = useState(false);
 
     const isPendingRef = useRef(false);
+    const resetKeyRef = useRef(resetKey);
+    const generationRef = useRef(0);
 
     const [selectedStepId, setSelectedStepId] = useControllableState({
         caller: 'DialogStepsProvider',
@@ -122,6 +126,8 @@ function DialogStepsProvider({
             return;
         }
 
+        const generation = generationRef.current;
+
         isPendingRef.current = true;
 
         setIsPending(true);
@@ -135,7 +141,13 @@ function DialogStepsProvider({
 
             if (isLastStep) {
                 await onComplete?.();
-            } else {
+            }
+
+            if (generation !== generationRef.current) {
+                return;
+            }
+
+            if (!isLastStep) {
                 setSelectedStepId(steps[currentStepIndex + 1].id);
             }
 
@@ -181,6 +193,18 @@ function DialogStepsProvider({
             steps,
         ]
     );
+
+    useEffect(() => {
+        if (resetKeyRef.current === resetKey) {
+            return;
+        }
+
+        resetKeyRef.current = resetKey;
+        generationRef.current += 1;
+
+        setCompletedStepIds(new Set());
+        setSelectedStepId(steps[0].id);
+    }, [resetKey, setSelectedStepId, steps]);
 
     useEffect(() => {
         if (currentStepId === undefined && selectedStepId !== currentStep.id) {

@@ -305,6 +305,8 @@ const IntegrationInstanceConfigurationListItem = ({
                         </div>
 
                         <IntegrationInstanceConfigurationListItemDropdownMenu
+                            integrationInstanceConfigurationId={integrationInstanceConfiguration.id!}
+                            integrationInstanceConfigurationName={integrationInstanceConfiguration.name}
                             moveUsersDisabled={!integrationConfigurations}
                             moveUsersDisabledReason={moveUsersDisabledReason}
                             onDeleteClick={() => setShowDeleteDialog(true)}

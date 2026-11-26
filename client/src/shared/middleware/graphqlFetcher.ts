@@ -2,10 +2,15 @@ import {getCookie} from '@/shared/util/cookie-utils';
 
 import {endpointUrl, fetchParams} from './config';
 
+export type GraphQLErrorExtensionsType = Record<string, unknown>;
+
 export class GraphQLResponseError extends Error {
-    constructor(message: string) {
+    readonly extensions?: GraphQLErrorExtensionsType;
+
+    constructor(message: string, extensions?: GraphQLErrorExtensionsType) {
         super(message);
 
+        this.extensions = extensions;
         this.name = 'GraphQLResponseError';
     }
 }
@@ -27,10 +32,10 @@ export function fetcher<TData, TVariables>(
 
         if (!res.ok) {
             const errorJson = await res.json().catch(() => null);
-            const serverMessage = errorJson?.errors?.[0]?.message;
+            const serverError = errorJson?.errors?.[0];
 
-            if (serverMessage) {
-                throw new GraphQLResponseError(serverMessage);
+            if (serverError?.message) {
+                throw new GraphQLResponseError(serverError.message, serverError.extensions);
             }
 
             throw new Error(`GraphQL request failed with status ${res.status}`);
@@ -39,9 +44,9 @@ export function fetcher<TData, TVariables>(
         const json = await res.json();
 
         if (json.errors) {
-            const {message} = json.errors[0];
+            const {extensions, message} = json.errors[0];
 
-            throw new GraphQLResponseError(message);
+            throw new GraphQLResponseError(message, extensions);
         }
 
         return json.data;

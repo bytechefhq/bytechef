@@ -8,10 +8,17 @@ import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import TagList from '@/shared/components/TagList';
 import McpServerListItemDropdownMenu from '@/shared/components/mcp-server/McpServerListItemDropdownMenu';
 import McpServerToolCounts from '@/shared/components/mcp-server/McpServerToolCounts';
-import {McpServer, Tag} from '@/shared/middleware/graphql';
+import EEVersion from '@/shared/edition/EEVersion';
+import {McpServer, PromotionResourceType, Tag} from '@/shared/middleware/graphql';
+import {useQueryClient} from '@tanstack/react-query';
+import {Suspense, lazy} from 'react';
 
 import {McpProjectWorkflowItemType} from '../mcp-project-workflow-list/hooks/useMcpProjectList';
 import useMcpServerListItem from './hooks/useMcpServerListItem';
+
+const EnvironmentPromotionDialog = lazy(
+    () => import('@/ee/shared/components/environment-promotion/EnvironmentPromotionDialog')
+);
 
 interface McpServerListItemProps {
     mcpServer: McpServer;
@@ -29,11 +36,16 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
         mcpServerTagIds,
         setShowDeleteDialog,
         setShowEditDialog,
+        setShowPromotionDialog,
         showDeleteDialog,
         showEditDialog,
+        showPromoteToEnvironment,
+        showPromotionDialog,
         toolsCollapsibleTriggerRef,
         updateMcpServerTagsMutation,
     } = useMcpServerListItem(mcpServer);
+
+    const queryClient = useQueryClient();
 
     return (
         <>
@@ -119,6 +131,8 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
                             mcpServer={mcpServer}
                             onDeleteClick={() => setShowDeleteDialog(true)}
                             onEditClick={() => setShowEditDialog(true)}
+                            onPromoteClick={() => setShowPromotionDialog(true)}
+                            showPromoteToEnvironment={showPromoteToEnvironment}
                         />
                     </div>
                 </div>
@@ -138,6 +152,24 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
                     open={showEditDialog}
                     triggerNode={<></>}
                 />
+            )}
+
+            {showPromotionDialog && (
+                <EEVersion hidden={true}>
+                    <Suspense fallback={null}>
+                        <EnvironmentPromotionDialog
+                            onClose={() => setShowPromotionDialog(false)}
+                            onPromoted={() => {
+                                void queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
+                            }}
+                            resourceType={PromotionResourceType.McpServer}
+                            sourceEnvironmentId={+mcpServer.environmentId}
+                            sourceId={mcpServer.id}
+                            sourceName={mcpServer.name}
+                            targetListPath="/automation/mcp-servers"
+                        />
+                    </Suspense>
+                </EEVersion>
             )}
         </>
     );

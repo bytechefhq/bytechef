@@ -17,22 +17,29 @@ import {
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import TagList from '@/shared/components/TagList';
 import useMcpServerListItemClick from '@/shared/components/mcp-server/hooks/useMcpServerListItemClick';
+import EEVersion from '@/shared/edition/EEVersion';
 import {
     A2aServer,
+    PromotionResourceType,
     Tag,
     useDeleteA2aServerMutation,
+    useEnvironmentsQuery,
     useUpdateA2aServerMutation,
     useUpdateA2aServerTagsMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {EditIcon, EllipsisVerticalIcon, PlusIcon, Trash2Icon} from 'lucide-react';
-import {useState} from 'react';
+import {EditIcon, EllipsisVerticalIcon, PlusIcon, RocketIcon, Trash2Icon} from 'lucide-react';
+import {Suspense, lazy, useState} from 'react';
 
 import A2aServerConnect from './A2aServerConnect';
 import A2aServerDialog from './A2aServerDialog';
 import A2aServerWorkflowDialog from './A2aServerWorkflowDialog';
 import A2aProjectList from './a2a-project-list/A2aProjectList';
 import useA2aProjectList from './a2a-project-list/hooks/useA2aProjectList';
+
+const EnvironmentPromotionDialog = lazy(
+    () => import('@/ee/shared/components/environment-promotion/EnvironmentPromotionDialog')
+);
 
 interface A2aServerListItemProps {
     a2aServer: A2aServer;
@@ -44,6 +51,7 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
     const [addProjectDialogOpen, setAddProjectDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [showPromotionDialog, setShowPromotionDialog] = useState(false);
 
     const queryClient = useQueryClient();
 
@@ -52,6 +60,7 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
     const {a2aProjects} = useA2aProjectList(a2aServer.id);
 
     const deleteA2aServerMutation = useDeleteA2aServerMutation();
+    const environmentsQuery = useEnvironmentsQuery();
     const updateA2aServerMutation = useUpdateA2aServerMutation();
     const updateA2aServerTagsMutation = useUpdateA2aServerTagsMutation({
         onSuccess: () => {
@@ -61,6 +70,8 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
     });
 
     const a2aServerTagIds = a2aServer.tags?.map((tag) => tag?.id);
+
+    const showPromoteToEnvironment = (environmentsQuery.data?.environments?.length ?? 0) >= 2;
 
     const workflowCount = a2aProjects.reduce((total, a2aProject) => total + (a2aProject.workflowIds?.length || 0), 0);
 
@@ -180,6 +191,17 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
                                     <EditIcon /> Edit
                                 </DropdownMenuItem>
 
+                                {showPromoteToEnvironment && (
+                                    <EEVersion hidden={true}>
+                                        <DropdownMenuItem
+                                            className="dropdown-menu-item"
+                                            onClick={() => setShowPromotionDialog(true)}
+                                        >
+                                            <RocketIcon /> Promote to environment…
+                                        </DropdownMenuItem>
+                                    </EEVersion>
+                                )}
+
                                 <DropdownMenuSeparator />
 
                                 <DropdownMenuItem
@@ -244,6 +266,24 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
                 onConfirm={handleDelete}
                 open={deleteDialogOpen}
             />
+
+            {showPromotionDialog && (
+                <EEVersion hidden={true}>
+                    <Suspense fallback={null}>
+                        <EnvironmentPromotionDialog
+                            onClose={() => setShowPromotionDialog(false)}
+                            onPromoted={() => {
+                                void queryClient.invalidateQueries({queryKey: ['a2aServers']});
+                            }}
+                            resourceType={PromotionResourceType.A2AServer}
+                            sourceEnvironmentId={+a2aServer.environmentId}
+                            sourceId={a2aServer.id}
+                            sourceName={a2aServer.name}
+                            targetListPath="/automation/a2a-servers"
+                        />
+                    </Suspense>
+                </EEVersion>
+            )}
         </Collapsible>
     );
 };

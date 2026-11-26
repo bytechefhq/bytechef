@@ -1,0 +1,56 @@
+query environmentPromotionPreview(
+    $resourceType: PromotionResourceType!
+    $sourceEnvironmentId: ID!
+    $sourceId: ID!
+    $targetEnvironmentId: ID!
+) {
+    environmentPromotionPreview(
+        resourceType: $resourceType
+        sourceEnvironmentId: $sourceEnvironmentId
+        sourceId: $sourceId
+        targetEnvironmentId: $targetEnvironmentId
+    ) {
+        changes {
+            assetType
+            destructive
+            key
+            kind
+            name
+            parentName
+        }
+        connections {
+            componentName
+            connectionVersion
+            sourceConnectionId
+            sourceConnectionName
+            suggestedTargetConnectionId
+            targetCandidates {
+                connectionId
+                name
+            }
+            usedBy
+        }
+        destructiveChangesHash
+        existingTargetId
+        existingTargetName
+        projects {
+            projectId
+            projectName
+            sourceProjectVersion
+            targetProjectVersion
+        }
+        resourceType
+        schemaChanges {
+            columnName
+            destructive
+            fromType
+            kind
+            tableName
+            toType
+        }
+        sourceEnvironmentId
+        sourceId
+        targetEnvironmentId
+        warnings
+    }
+}

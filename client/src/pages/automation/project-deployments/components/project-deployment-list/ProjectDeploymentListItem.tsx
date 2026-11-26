@@ -7,8 +7,10 @@ import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import ProjectDeploymentListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-list/ProjectDeploymentListItemDropdownMenu';
 import {useProjectDeploymentsEnabledStore} from '@/pages/automation/project-deployments/stores/useProjectDeploymentsEnabledStore';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
+import EEVersion from '@/shared/edition/EEVersion';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {ProjectDeployment, ProjectStatus, Tag} from '@/shared/middleware/automation/configuration';
+import {PromotionResourceType, useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useUpdateProjectDeploymentTagsMutation} from '@/shared/mutations/automation/projectDeploymentTags.mutations';
 import {
     useDeleteProjectDeploymentMutation,
@@ -19,10 +21,14 @@ import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployme
 import {useGetProjectVersionsQuery} from '@/shared/queries/automation/projectVersions.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {useCallback, useRef, useState} from 'react';
+import {Suspense, lazy, useCallback, useRef, useState} from 'react';
 
 import TagList from '../../../../../shared/components/TagList';
 import ProjectDeploymentDialog from '../project-deployment-dialog/ProjectDeploymentDialog';
+
+const EnvironmentPromotionDialog = lazy(
+    () => import('@/ee/shared/components/environment-promotion/EnvironmentPromotionDialog')
+);
 
 interface ProjectDeploymentListItemProps {
     projectDeployment: ProjectDeployment;
@@ -38,6 +44,7 @@ const ProjectDeploymentListItem = ({
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showChangeProjectVersionDialog, setShowChangeProjectVersionDialog] = useState(false);
+    const [showPromotionDialog, setShowPromotionDialog] = useState(false);
 
     const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
@@ -53,6 +60,8 @@ const ProjectDeploymentListItem = ({
     );
 
     const queryClient = useQueryClient();
+
+    const environmentsQuery = useEnvironmentsQuery();
 
     const deleteProjectDeploymentMutation = useDeleteProjectDeploymentMutation({
         onSuccess: () => {
@@ -127,6 +136,8 @@ const ProjectDeploymentListItem = ({
     const lastPublishedProjectVersion = (projectVersions ?? [])
         .filter((projectVersion) => projectVersion.status === ProjectStatus.Published)
         .reduce((lastVersion, projectVersion) => Math.max(lastVersion, projectVersion.version ?? 0), 0);
+
+    const showPromoteToEnvironment = (environmentsQuery.data?.environments?.length ?? 0) >= 2;
 
     const newerVersionAvailable =
         projectDeployment.projectVersion != null && lastPublishedProjectVersion > projectDeployment.projectVersion;
@@ -239,6 +250,8 @@ const ProjectDeploymentListItem = ({
                             onChangeProjectVersionClick={() => setShowChangeProjectVersionDialog(true)}
                             onDeleteClick={() => setShowDeleteDialog(true)}
                             onEditClick={() => setShowEditDialog(true)}
+                            onPromoteClick={() => setShowPromotionDialog(true)}
+                            showPromoteToEnvironment={showPromoteToEnvironment}
                         />
                     </div>
                 </div>
@@ -273,6 +286,26 @@ const ProjectDeploymentListItem = ({
                     projectDeployment={projectDeployment}
                     redirectOnSubmit={false}
                 />
+            )}
+
+            {showPromotionDialog && projectDeployment.id != null && projectDeployment.environmentId != null && (
+                <EEVersion hidden={true}>
+                    <Suspense fallback={null}>
+                        <EnvironmentPromotionDialog
+                            onClose={() => setShowPromotionDialog(false)}
+                            onPromoted={() => {
+                                void queryClient.invalidateQueries({
+                                    queryKey: ProjectDeploymentKeys.projectDeployments,
+                                });
+                            }}
+                            resourceType={PromotionResourceType.ProjectDeployment}
+                            sourceEnvironmentId={projectDeployment.environmentId}
+                            sourceId={String(projectDeployment.id)}
+                            sourceName={projectDeployment.name}
+                            targetListPath="/automation/deployments"
+                        />
+                    </Suspense>
+                </EEVersion>
             )}
         </>
     );
