@@ -126,6 +126,10 @@ describe('AiHubHomePanel', () => {
 
         expect(screen.getByText('No AI providers enabled')).toBeInTheDocument();
         expect(screen.queryByTestId('ai-hub-composer')).toBeNull();
+        expect(screen.getByRole('link', {name: 'How to set up AI providers'})).toHaveAttribute(
+            'href',
+            'https://docs.bytechef.io/platform/settings/ai/ai-providers'
+        );
 
         await user.click(screen.getByRole('button', {name: 'Open AI Providers'}));
 

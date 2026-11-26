@@ -5,23 +5,18 @@ import AiHubChatComposer from '@/ee/pages/automation/ai-hub/composer/AiHubChatCo
 import useAiHubChatLaunchers from '@/ee/pages/automation/ai-hub/hooks/useAiHubChatLaunchers';
 import AiHubSuggestionChips from '@/ee/pages/automation/ai-hub/messages/AiHubSuggestionChips';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import NoAiProvidersEmptyState from '@/shared/components/ai/NoAiProvidersEmptyState';
 import ModelPicker from '@/shared/components/ai/model-picker/ModelPicker';
 import {writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
 import {findAvailableRememberedModel} from '@/shared/components/ai/model-picker/resolveRememberedModel';
-import {AI_PROVIDERS_LINK_LABEL} from '@/shared/constants';
 import {useAiDefaultModelQuery, useAiProviderCatalogQuery} from '@/shared/middleware/graphql';
-import {AI_PROVIDERS_SETTINGS_PATH} from '@/shared/navigation/settingsPaths';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {BrainCircuitIcon} from 'lucide-react';
-import {useNavigate} from 'react-router-dom';
 
 const AiHubHomePanel = () => {
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const draftLlmSelection = useAiHubChatsStore((state) => state.draftLlmSelection);
     const setDraftLlmSelection = useAiHubChatsStore((state) => state.setDraftLlmSelection);
-
-    const navigate = useNavigate();
 
     const {onSelectWorkflowChat, workflowChats} = useAiHubChatLaunchers();
 
@@ -48,21 +43,9 @@ const AiHubHomePanel = () => {
 
             <div className="flex flex-1 items-center justify-center px-4">
                 {!isDefaultModelPending && !hasEnabledProvider ? (
-                    <div className="flex flex-col items-center justify-center gap-4 text-center">
-                        <BrainCircuitIcon className="size-10 text-content-neutral-secondary" />
-
-                        <div className="flex flex-col gap-1">
-                            <p className="text-sm font-medium text-content-neutral-primary">No AI providers enabled</p>
-
-                            <p className="text-sm text-content-neutral-secondary">
-                                Enable an AI provider to chat with Basil.
-                            </p>
-                        </div>
-
-                        <Button onClick={() => navigate(AI_PROVIDERS_SETTINGS_PATH)}>{AI_PROVIDERS_LINK_LABEL}</Button>
-
+                    <NoAiProvidersEmptyState description="Basil answers questions about your projects and builds workflows with a model from an AI provider. Enable a provider, such as OpenAI or Anthropic, for this environment to start chatting.">
                         {workflowChats.length > 0 && (
-                            <fieldset className="mt-4 flex w-full max-w-md flex-col gap-2 border-0">
+                            <fieldset className="flex w-full max-w-md flex-col gap-2 border-0">
                                 <legend className="mb-2 text-sm text-content-neutral-secondary">
                                     Workflow chats run your workflows and need no AI provider:
                                 </legend>
@@ -84,7 +67,7 @@ const AiHubHomePanel = () => {
                                 ))}
                             </fieldset>
                         )}
-                    </div>
+                    </NoAiProvidersEmptyState>
                 ) : (
                     <div className="flex w-full max-w-2xl flex-col gap-6">
                         <div className="text-center">
