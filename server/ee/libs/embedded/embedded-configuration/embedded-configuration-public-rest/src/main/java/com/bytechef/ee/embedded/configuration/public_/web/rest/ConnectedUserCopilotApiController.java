@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -45,6 +46,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
@@ -94,11 +96,12 @@ public class ConnectedUserCopilotApiController {
 
         String additionalSystemPrompt = sanitizeAdditionalSystemPrompt(
             stateMap.get(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT));
+        Mode mode = parseMode(stateMap.get("mode"));
 
         stateMap.clear();
 
         stateMap.put("workflowId", context.workflowId());
-        stateMap.put("mode", Mode.BUILD.name());
+        stateMap.put("mode", mode.name());
         stateMap.put("autonomous", false);
         stateMap.put(CopilotConstants.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
         stateMap.put(
@@ -124,12 +127,12 @@ public class ConnectedUserCopilotApiController {
             stateMap.put(AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, allowedComponentNames);
         }
 
-        String agentId = Source.WORKFLOW_EDITOR.agentId(Mode.BUILD);
+        String agentId = Source.WORKFLOW_EDITOR.agentId(mode);
 
         LocalAgent localAgent = localAgentMap.get(agentId);
 
         if (localAgent == null) {
-            throw new IllegalStateException("Workflow editor BUILD agent not available: " + agentId);
+            throw new IllegalStateException("Workflow editor " + mode + " agent not available: " + agentId);
         }
 
         return agUiService.runAgent(localAgent, agUiParameters);
@@ -138,6 +141,18 @@ public class ConnectedUserCopilotApiController {
     @InitBinder
     public void initBinder(WebDataBinder dataBinder) {
         dataBinder.registerCustomEditor(EnvironmentModel.class, new CaseInsensitiveEnumPropertyEditorSupport());
+    }
+
+    private static Mode parseMode(@Nullable Object modeValue) {
+        if (modeValue == null) {
+            return Mode.BUILD;
+        }
+
+        try {
+            return Mode.valueOf(String.valueOf(modeValue));
+        } catch (IllegalArgumentException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown mode: " + modeValue, exception);
+        }
     }
 
     private static @Nullable String sanitizeAdditionalSystemPrompt(@Nullable Object additionalSystemPromptValue) {
