@@ -16,6 +16,25 @@ vi.mock('@/shared/hooks/useAnalytics', () => ({
 }));
 
 describe('IntegrationPublishDialog', () => {
+    it('names the integration in the title, not the component it is built on', () => {
+        render(
+            <QueryClientProvider client={new QueryClient()}>
+                <IntegrationPublishDialog
+                    integration={{
+                        componentName: 'cevisioGrpc',
+                        id: 2,
+                        multipleInstances: false,
+                        name: 'cevisio Ticket Rating (Visual)',
+                    }}
+                    onClose={vi.fn()}
+                />
+            </QueryClientProvider>
+        );
+
+        expect(screen.getByText('Publish Integration cevisio Ticket Rating (Visual)')).toBeInTheDocument();
+        expect(screen.queryByText(/cevisioGrpc/)).not.toBeInTheDocument();
+    });
+
     it('publishes with the description typed into the placeholder-guided field', async () => {
         render(
             <QueryClientProvider client={new QueryClient()}>
