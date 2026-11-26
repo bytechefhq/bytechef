@@ -1766,6 +1766,22 @@ public class AutomationProjectConfigurationFacadeImpl
             configuration.getLastModifiedDate(), lastExecutionDate);
     }
 
+    private static @Nullable String getAwaitedInputLabel(Workflow workflow, Map<String, Object> providedInputs) {
+        String missingInputName = InternalOnlyInputUtils.findMissingRequiredInternalOnlyInput(workflow, providedInputs);
+
+        if (missingInputName == null) {
+            return null;
+        }
+
+        return WorkflowInput.of(workflow)
+            .stream()
+            .filter(workflowInput -> missingInputName.equals(workflowInput.getName()))
+            .map(WorkflowInput::getLabel)
+            .filter(StringUtils::isNotBlank)
+            .findFirst()
+            .orElse(missingInputName);
+    }
+
     private AutomationProjectConfigurationDTO.Workflow toWorkflowDTO(
         AutomationProjectConfiguration configuration, ProjectWorkflow projectWorkflow,
         List<String> referenceWorkflowIds) {
@@ -1781,17 +1797,20 @@ public class AutomationProjectConfigurationFacadeImpl
         Optional<AutomationProjectConfigurationWorkflow> configurationWorkflowOptional =
             configuration.fetchWorkflow(projectWorkflow.getUuid());
 
+        boolean enabled = automationProjectConfigurationService.isWorkflowEnabled(
+            configuration, projectWorkflow.getUuid());
+
+        Map<String, Object> providedInputs = configurationWorkflowOptional
+            .map(configurationWorkflow -> InternalOnlyInputUtils.retainInternalOnlyInputs(
+                workflow, configurationWorkflow.getProvidedInputs()))
+            .orElse(Map.of());
+
         return new AutomationProjectConfigurationDTO.Workflow(
-            projectWorkflow.getUuidAsString(), workflowId, workflow.getLabel(),
-            automationProjectConfigurationService.isWorkflowEnabled(configuration, projectWorkflow.getUuid()),
-            lastExecutionDate,
+            projectWorkflow.getUuidAsString(), workflowId, workflow.getLabel(), enabled, lastExecutionDate,
             configurationWorkflowOptional
                 .map(AutomationProjectConfigurationWorkflow::getProvidedConnections)
                 .orElse(Map.of()),
-            configurationWorkflowOptional
-                .map(configurationWorkflow -> InternalOnlyInputUtils.retainInternalOnlyInputs(
-                    workflow, configurationWorkflow.getProvidedInputs()))
-                .orElse(Map.of()));
+            providedInputs, enabled ? getAwaitedInputLabel(workflow, providedInputs) : null);
     }
 
     private void validateReferencedWorkflowsExistInVersion(

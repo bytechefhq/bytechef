@@ -118,6 +118,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -585,6 +586,31 @@ class AutomationProjectConfigurationFacadeIntTest {
                 .containsExactly(
                     new AutomationProjectConfigurationUpdatedEvent(projectId, ENVIRONMENT_ID, configurationId),
                     new AutomationProjectConfigurationUpdatedEvent(projectId, ENVIRONMENT_ID, configurationId));
+    }
+
+    @Test
+    void testGetConfigurationsNamesTheInputAnEnabledWorkflowAwaits() {
+        long projectId = createProject("Awaited Input");
+
+        String workflowUuid = addWorkflow(
+            projectId, withLabel(CHANNEL_AND_REQUIRED_INTERNAL_ONLY_DEFINITION, "Sync Accounts"));
+
+        publish(projectId);
+
+        long configurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
+
+        assertThat(getAwaitedInputLabel(projectId)).isEqualTo("Account");
+
+        automationProjectConfigurationFacade.enableConfigurationWorkflow(configurationId, workflowUuid, false);
+
+        assertThat(getAwaitedInputLabel(projectId)).isNull();
+
+        automationProjectConfigurationFacade.updateConfigurationWorkflow(
+            configurationId, workflowUuid, Map.of(), Map.of("accountId", "acme"));
+        automationProjectConfigurationFacade.enableConfigurationWorkflow(configurationId, workflowUuid, true);
+
+        assertThat(getAwaitedInputLabel(projectId)).isNull();
     }
 
     @Test
@@ -2612,5 +2638,18 @@ class AutomationProjectConfigurationFacadeIntTest {
                 return RETURNS_DEFAULTS.answer(invocation);
             });
         }
+    }
+
+    private @Nullable String getAwaitedInputLabel(long projectId) {
+        List<AutomationProjectConfigurationDTO> configurations =
+            automationProjectConfigurationFacade.getConfigurations(projectId);
+
+        AutomationProjectConfigurationDTO configuration = configurations.getFirst();
+
+        List<AutomationProjectConfigurationDTO.Workflow> workflows = configuration.workflows();
+
+        AutomationProjectConfigurationDTO.Workflow workflow = workflows.getFirst();
+
+        return workflow.awaitedInputLabel();
     }
 }
