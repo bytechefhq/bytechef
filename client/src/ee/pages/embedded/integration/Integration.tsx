@@ -81,7 +81,7 @@ const Integration = () => {
                 </div>
             </div>
 
-            <div className="flex w-full flex-col">
+            <div className="flex w-full min-w-0 flex-col">
                 {!!integrationId && (
                     <IntegrationHeader
                         bottomResizablePanelRef={bottomResizablePanelRef}
