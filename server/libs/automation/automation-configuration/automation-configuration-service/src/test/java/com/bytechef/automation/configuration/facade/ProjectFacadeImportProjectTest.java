@@ -87,7 +87,8 @@ class ProjectFacadeImportProjectTest {
             mock(ProjectOwnershipService.class), projectService, mock(ProjectVersionWorkflowChangeFacade.class),
             mock(ProjectDeploymentFacade.class), projectWorkflowFacade, mock(SharedTemplateFileStorage.class),
             mock(SharedTemplateService.class), mock(TagService.class), mock(WorkflowService.class),
-            mock(WorkflowTestConfigurationService.class), mock(WorkflowNodeTestOutputService.class), List.of());
+            mock(WorkflowTestConfigurationService.class), mock(WorkflowNodeTestOutputService.class), List.of(),
+            List.of(), List.of());
     }
 
     @Test
