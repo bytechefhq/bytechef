@@ -14,6 +14,7 @@ import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotP
 import {
     MODE,
     Source,
+    isConnectedUserSource,
     isWorkflowEditorSource,
     useCopilotStore,
 } from '@/shared/components/copilot/stores/useCopilotStore';
@@ -89,17 +90,22 @@ export const CopilotPanelContent = ({className, headerClassName, onClose, source
     const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
     const location = useLocation();
 
-    const {data: defaultModelData, isPending: isDefaultModelPending} = useAiDefaultModelQuery({
-        environment: String(currentEnvironmentId),
-    });
+    const connectedUser = isConnectedUserSource(source || context?.source);
+
+    const {data: defaultModelData, isPending: isDefaultModelPending} = useAiDefaultModelQuery(
+        {environment: String(currentEnvironmentId)},
+        {enabled: !connectedUser}
+    );
 
     const hasEnabledProvider = defaultModelData?.aiDefaultModel != null;
+
+    const showNoProvidersEnabled = !connectedUser && !isDefaultModelPending && !hasEnabledProvider;
 
     const catalogEnvironment = context?.environmentId ?? currentEnvironmentId;
 
     const {data: providerCatalogData} = useAiProviderCatalogQuery(
         {environment: String(catalogEnvironment)},
-        {enabled: catalogEnvironment >= 0}
+        {enabled: !connectedUser && catalogEnvironment >= 0}
     );
 
     const displayedModel = useMemo(() => {
@@ -201,7 +207,7 @@ export const CopilotPanelContent = ({className, headerClassName, onClose, source
             </div>
 
             <div className="absolute inset-x-0 top-16 -bottom-3 -mx-1">
-                {!isDefaultModelPending && !hasEnabledProvider ? (
+                {showNoProvidersEnabled ? (
                     <NoAiProvidersEmptyState
                         className="h-full overflow-y-auto px-6"
                         description="The AI Copilot answers questions and builds workflows with a model from an AI provider. Enable a provider, such as OpenAI or Anthropic, for this environment to start chatting."
@@ -222,7 +228,7 @@ export const CopilotPanelContent = ({className, headerClassName, onClose, source
                             composerPlaceholder={composerPlaceholder}
                             dataComponents={aiChatDataComponents}
                             leadingComposerActions={
-                                currentWorkspaceId != null ? (
+                                !connectedUser && currentWorkspaceId != null ? (
                                     <ModelPicker
                                         defaultModel={defaultModelData?.aiDefaultModel?.model ?? null}
                                         defaultProvider={defaultModelData?.aiDefaultModel?.provider ?? null}

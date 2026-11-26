@@ -3,6 +3,7 @@ import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components
 import WorkflowBuilderHeader from '@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/WorkflowBuilderHeader';
 import {useWorkflowBuilder} from '@/ee/pages/embedded/workflow-builder/hooks/useWorkflowBuilder';
 import {getCreateConnectedUserConnection} from '@/ee/shared/mutations/embedded/connections.mutations';
+import {ConnectedUserProjectWorkflowKeys} from '@/ee/shared/queries/embedded/connectedUserProjectWorkflows.queries';
 import {
     ConnectionKeys,
     getConnectedUserConnectionsQuery,
@@ -16,9 +17,22 @@ import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
+import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
+import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {
+    Source,
+    WorkflowBuilderCopilotParametersI,
+    useCopilotStore,
+} from '@/shared/components/copilot/stores/useCopilotStore';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
 import {PlatformType} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
+import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {useQueryClient} from '@tanstack/react-query';
+import {useEffect} from 'react';
+import {useParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
 const WorkflowBuilder = () => {
@@ -35,6 +49,8 @@ const WorkflowBuilder = () => {
         }))
     );
     const workflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.workflowTestChatPanelOpen);
+    const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
+    const copilotEnabled = useApplicationInfoStore((state) => state.ai.copilot.enabled);
 
     const {
         bottomResizablePanelRef,
@@ -56,6 +72,34 @@ const WorkflowBuilder = () => {
     const {runDisabled} = useRun();
 
     const chatTrigger = useTestRunChatTrigger(workflow);
+
+    const queryClient = useQueryClient();
+
+    const {workflowUuid} = useParams();
+
+    useEffect(() => {
+        return useCopilotPostTurnRegistry.getState().register(Source.WORKFLOW_BUILDER_EMBEDDED, () => {
+            if (workflowUuid) {
+                void queryClient.invalidateQueries({
+                    queryKey: ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowUuid),
+                });
+            }
+
+            void queryClient.invalidateQueries({queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations});
+        });
+    }, [queryClient, workflowUuid]);
+
+    useEffect(() => {
+        const {context, setContext} = useCopilotStore.getState();
+
+        if (!workflowUuid || context.source !== Source.WORKFLOW_BUILDER_EMBEDDED) {
+            return;
+        }
+
+        if ((context.parameters as WorkflowBuilderCopilotParametersI).workflowUuid !== workflowUuid) {
+            setContext({...context, parameters: {workflowUuid}});
+        }
+    }, [workflowUuid]);
 
     if (!initialized) {
         return (
@@ -87,6 +131,7 @@ const WorkflowBuilder = () => {
                             value={{
                                 ConnectionKeys: ConnectionKeys,
                                 cancelWorkflowQueries,
+                                connectedUserWorkflowUuid: workflowUuid,
                                 deleteClusterElementParameterMutation,
                                 deleteWorkflowNodeParameterMutation,
                                 includeComponents,
@@ -110,7 +155,7 @@ const WorkflowBuilder = () => {
                                 <WorkflowEditorLayout
                                     includeComponents={includeComponents}
                                     runDisabled={runDisabled}
-                                    showCopilot={false}
+                                    showCopilot={copilotEnabled}
                                     showWorkflowInputs={false}
                                 />
                             )}
@@ -136,6 +181,12 @@ const WorkflowBuilder = () => {
                         )}
                     </ResizablePanel>
                 </ResizablePanelGroup>
+
+                {copilotEnabled && (
+                    <aside className="h-full shrink-0">
+                        <CopilotPanel open={copilotPanelOpen} />
+                    </aside>
+                )}
             </div>
         </div>
     );
