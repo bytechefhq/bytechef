@@ -1,0 +1,4 @@
+extend enum PromotionResourceType {
+    INTEGRATION_INSTANCE_CONFIGURATION
+    AUTOMATION_CONFIGURATION
+}

@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.service;
 import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfiguration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.jspecify.annotations.Nullable;
@@ -25,7 +26,13 @@ public interface AutomationProjectConfigurationService {
         long projectId, long environmentId, String name, @Nullable String permissionExpression, int projectVersion,
         boolean enabled, boolean automationHubVisible);
 
+    AutomationProjectConfiguration create(
+        long projectId, long environmentId, String name, @Nullable String permissionExpression, int projectVersion,
+        boolean enabled, boolean automationHubVisible, UUID uuid);
+
     void delete(long id);
+
+    Optional<AutomationProjectConfiguration> fetchConfiguration(UUID uuid, long environmentId);
 
     AutomationProjectConfiguration getConfiguration(long id);
 

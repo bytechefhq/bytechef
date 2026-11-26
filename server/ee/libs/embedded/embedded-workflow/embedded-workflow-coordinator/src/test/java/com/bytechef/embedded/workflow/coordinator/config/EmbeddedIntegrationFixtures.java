@@ -95,6 +95,7 @@ public class EmbeddedIntegrationFixtures {
         integrationInstanceConfiguration.setIntegrationId(integration.getId());
         integrationInstanceConfiguration.setIntegrationVersion(1);
         integrationInstanceConfiguration.setName(name);
+        integrationInstanceConfiguration.setUuid(UUID.randomUUID());
 
         return integrationInstanceConfigurationRepository.save(integrationInstanceConfiguration);
     }

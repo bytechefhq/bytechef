@@ -23,6 +23,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -51,6 +52,10 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
 
         projectDeployment.setEnabled(false);
 
+        if (projectDeployment.getUuid() == null) {
+            projectDeployment.setUuid(UUID.randomUUID());
+        }
+
         return projectDeploymentRepository.save(projectDeployment);
     }
 
@@ -62,6 +67,12 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
     @Override
     public Optional<ProjectDeployment> fetchProjectDeployment(long projectId, Environment environment) {
         return projectDeploymentRepository.findByProjectIdAndEnvironment(projectId, environment.ordinal());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<ProjectDeployment> fetchProjectDeployment(UUID uuid, Environment environment) {
+        return projectDeploymentRepository.findByUuidAndEnvironment(uuid, environment.ordinal());
     }
 
     @Override

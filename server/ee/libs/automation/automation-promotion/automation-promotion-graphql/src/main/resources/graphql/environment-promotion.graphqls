@@ -1,0 +1,149 @@
+"""
+The kinds of environment-scoped automation and embedded resources that can be promoted from one environment to
+another. Each promotion module adds its own values with extend enum.
+"""
+enum PromotionResourceType
+
+"""
+A connection in the target environment that a source connection can be rewired to.
+"""
+type PromotionConnectionCandidate {
+    connectionId: ID!
+    name: String!
+}
+
+"""
+A connection referenced by the source resource being promoted, together with a suggestion for which connection in
+the target environment it should be rewired to.
+"""
+type PromotionConnectionMapping {
+    sourceConnectionId: ID!
+    sourceConnectionName: String!
+    componentName: String!
+    connectionVersion: Int!
+    suggestedTargetConnectionId: ID
+    targetCandidates: [PromotionConnectionCandidate!]!
+    usedBy: [String!]!
+}
+
+"""
+The kinds of schema change promoting a resource applies to the target environment.
+"""
+enum PromotionSchemaChangeKind {
+    ADD_COLUMN
+    CHANGE_COLUMN_TYPE
+    CHANGE_LINK
+    CREATE_TABLE
+    DROP_COLUMN
+}
+
+"""
+One schema change promoting a resource applies to the target environment.
+"""
+type PromotionSchemaChange {
+    tableName: String!
+    columnName: String
+    kind: PromotionSchemaChangeKind!
+    fromType: String
+    toType: String
+    destructive: Boolean!
+}
+
+"""
+The kinds of change promoting a resource applies to a single asset in the target environment.
+"""
+enum PromotionChangeKind {
+    CREATE
+    DELETE
+    UPDATE
+}
+
+"""
+One asset promoting a resource creates, updates or deletes in the target environment. A destructive change removes
+or irreversibly alters target data.
+"""
+type PromotionChange {
+    kind: PromotionChangeKind!
+    assetType: String!
+    key: String!
+    parentName: String
+    name: String!
+    destructive: Boolean!
+}
+
+"""
+A project referenced by the source resource being promoted, together with the version already present in the
+target environment, if any.
+"""
+type PromotionProjectPreview {
+    projectId: ID!
+    projectName: String!
+    sourceProjectVersion: Int!
+    targetProjectVersion: Int
+}
+
+"""
+A dry-run preview of promoting one resource from its source environment to a target environment, returned before
+the caller commits to `promoteToEnvironment`.
+"""
+type EnvironmentPromotionPreview {
+    resourceType: PromotionResourceType!
+    sourceId: ID!
+    sourceEnvironmentId: ID!
+    targetEnvironmentId: ID!
+    existingTargetId: ID
+    existingTargetName: String
+    projects: [PromotionProjectPreview!]!
+    connections: [PromotionConnectionMapping!]!
+    schemaChanges: [PromotionSchemaChange!]!
+    changes: [PromotionChange!]!
+    destructiveChangesHash: String!
+    warnings: [String!]!
+}
+
+"""
+An explicit source-connection-to-target-connection mapping supplied by the caller for `promoteToEnvironment`.
+"""
+input PromotionConnectionMappingInput {
+    sourceConnectionId: ID!
+    targetConnectionId: ID!
+}
+
+"""
+Input for promoting a resource into another environment.
+"""
+input PromoteToEnvironmentInput {
+    resourceType: PromotionResourceType!
+    sourceId: ID!
+    sourceEnvironmentId: ID!
+    targetEnvironmentId: ID!
+    connectionMappings: [PromotionConnectionMappingInput!]!
+    expectedDestructiveChangesHash: String
+}
+
+"""
+The outcome of promoting one resource to a target environment.
+"""
+type EnvironmentPromotionResult {
+    targetId: ID!
+    created: Boolean!
+    targetUrl: String
+    unresolvedConnectionIds: [ID!]!
+}
+
+extend type Query {
+    """
+    Preview what promoting a resource into another environment will do (create vs. update, version moves,
+    suggested connection re-bindings, schema changes, warnings).
+    """
+    environmentPromotionPreview(
+        resourceType: PromotionResourceType!, sourceId: ID!, sourceEnvironmentId: ID!,
+        targetEnvironmentId: ID!): EnvironmentPromotionPreview!
+}
+
+extend type Mutation {
+    """
+    Promote a resource into another environment: creates the counterpart on first promotion, syncs it afterwards.
+    """
+    promoteToEnvironment(input: PromoteToEnvironmentInput!): EnvironmentPromotionResult!
+}

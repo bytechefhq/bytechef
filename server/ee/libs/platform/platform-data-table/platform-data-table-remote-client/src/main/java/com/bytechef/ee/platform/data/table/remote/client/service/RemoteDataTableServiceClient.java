@@ -13,6 +13,8 @@ import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.domain.DataTableLinkColumn;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.LinkSpec;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
@@ -29,6 +31,16 @@ public class RemoteDataTableServiceClient implements DataTableService {
 
     @Override
     public void addColumn(long dataTableId, ColumnSpec columnSpec, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void changeColumnType(long dataTableId, String columnName, ColumnType columnType, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void changeLinkColumn(long dataTableId, String columnName, LinkSpec linkSpec, long environmentId) {
         throw new UnsupportedOperationException();
     }
 

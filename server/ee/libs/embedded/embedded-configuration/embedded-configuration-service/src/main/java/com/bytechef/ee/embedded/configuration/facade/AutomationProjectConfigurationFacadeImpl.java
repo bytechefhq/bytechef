@@ -403,10 +403,8 @@ public class AutomationProjectConfigurationFacadeImpl
 
         Workflow sourceWorkflow = workflowService.getWorkflow(sourceProjectWorkflow.getWorkflowId());
 
-        Map<String, Object> carriedInputs = CarriedInputUtils.retainInputsOfUnchangedType(
+        return CarriedInputUtils.retainCarriedInputs(
             sourceWorkflow, targetWorkflow, sourceConfigurationWorkflow.getProvidedInputs());
-
-        return InternalOnlyInputUtils.retainInternalOnlyInputs(targetWorkflow, carriedInputs);
     }
 
     private String getCopyConfigurationName(AutomationProjectConfiguration sourceConfiguration, int projectVersion) {
@@ -1124,9 +1122,7 @@ public class AutomationProjectConfigurationFacadeImpl
         validateConfigurationNameIsUnique(
             configuration.getProjectId(), configuration.getEnvironmentId(), configurationName, id);
 
-        if (projectVersion < configuration.getProjectVersion()) {
-            validateReferencedWorkflowsExistInVersion(configuration, projectVersion);
-        }
+        validateVersionDowngrade(configuration, projectVersion);
 
         boolean turnsEnabled = enabled && !configuration.isEnabled();
 
@@ -1150,6 +1146,12 @@ public class AutomationProjectConfigurationFacadeImpl
         }
 
         publishUpdatedEvent(configuration);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void validateVersionChange(long id, int projectVersion) {
+        validateVersionDowngrade(automationProjectConfigurationService.getConfiguration(id), projectVersion);
     }
 
     @Override
@@ -1792,6 +1794,12 @@ public class AutomationProjectConfigurationFacadeImpl
                 .map(configurationWorkflow -> InternalOnlyInputUtils.retainInternalOnlyInputs(
                     workflow, configurationWorkflow.getProvidedInputs()))
                 .orElse(Map.of()));
+    }
+
+    private void validateVersionDowngrade(AutomationProjectConfiguration configuration, int projectVersion) {
+        if (projectVersion < configuration.getProjectVersion()) {
+            validateReferencedWorkflowsExistInVersion(configuration, projectVersion);
+        }
     }
 
     private void validateReferencedWorkflowsExistInVersion(

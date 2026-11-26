@@ -1,0 +1,4 @@
+extend enum PromotionResourceType {
+    A2A_SERVER
+    MCP_SERVER
+}

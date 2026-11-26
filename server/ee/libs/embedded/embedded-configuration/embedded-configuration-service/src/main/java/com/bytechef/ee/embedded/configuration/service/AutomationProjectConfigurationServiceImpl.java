@@ -65,8 +65,27 @@ public class AutomationProjectConfigurationServiceImpl
     }
 
     @Override
+    public AutomationProjectConfiguration create(
+        long projectId, long environmentId, String name, @Nullable String permissionExpression, int projectVersion,
+        boolean enabled, boolean automationHubVisible, UUID uuid) {
+
+        AutomationProjectConfiguration automationProjectConfiguration = new AutomationProjectConfiguration(
+            projectId, environmentId, name, permissionExpression, projectVersion, enabled, automationHubVisible);
+
+        automationProjectConfiguration.setUuid(uuid);
+
+        return automationProjectConfigurationRepository.save(automationProjectConfiguration);
+    }
+
+    @Override
     public void delete(long id) {
         automationProjectConfigurationRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<AutomationProjectConfiguration> fetchConfiguration(UUID uuid, long environmentId) {
+        return automationProjectConfigurationRepository.findByUuidAndEnvironmentId(uuid, environmentId);
     }
 
     @Override

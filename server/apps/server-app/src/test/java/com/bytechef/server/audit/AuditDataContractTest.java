@@ -83,10 +83,12 @@ class AuditDataContractTest {
     private static final String DEFINITION_EDIT = "workflow definition edit";
     private static final String DELEGATES = "delegates to an audited method";
     private static final String TAGS = "tag assignment";
+    private static final String PROMOTION_PREVIEW = "read-only promotion preview";
     private static final String RECORDED_BY_CALLER = "called only from audited methods";
     private static final String ROW_DATA = "data table rows are data and are not recorded";
     private static final String TOOL_SETTING = "parameter or skill edit of a tool of an audited MCP or A2A server";
     private static final String TRIGGER_INTERNAL = "trigger bookkeeping of an audited enable";
+    private static final String VALIDATION = "read-only validation";
     private static final String WORKFLOW_INPUTS = "workflow input or connection values";
     private static final Map<String, String> UNAUDITED_GUARDED_CLASSES = Map.of(
         "com.bytechef.ee.embedded.configuration.facade.WebhookTriggerTestFacadeImpl",
@@ -94,17 +96,26 @@ class AuditDataContractTest {
     private static final Map<String, String> UNAUDITED_GUARDED_METHODS = Map.ofEntries(
         Map.entry("A2aProjectWorkflowFacadeImpl.updateA2aProjectWorkflowSkill", TOOL_SETTING),
         Map.entry("A2aServerFacadeImpl.updateA2aServerTags", TAGS),
+        Map.entry("A2aServerPromotionContributor.preview", PROMOTION_PREVIEW),
+        Map.entry("A2aServerPromotionContributor.promote", RECORDED_BY_CALLER),
+        Map.entry("ApiCollectionPromotionContributor.preview", PROMOTION_PREVIEW),
+        Map.entry("ApiCollectionPromotionContributor.promote", RECORDED_BY_CALLER),
+        Map.entry("AutomationConfigurationPromotionContributor.preview", PROMOTION_PREVIEW),
+        Map.entry("AutomationConfigurationPromotionContributor.promote", RECORDED_BY_CALLER),
         Map.entry("AutomationProjectFacadeImpl.updateProjectWorkflow", DEFINITION_EDIT),
         Map.entry("AutomationProjectCodeWorkflowFacadeImpl.createEmptyCodeWorkflow", DELEGATES),
         Map.entry("AutomationProjectCodeWorkflowFacadeImpl.save", DEFINITION_EDIT),
         Map.entry("AutomationProjectCodeWorkflowFacadeImpl.updateCodeWorkflowSource", DEFINITION_EDIT),
         Map.entry("AutomationProjectConfigurationFacadeImpl.updateConfigurationWorkflow", WORKFLOW_INPUTS),
+        Map.entry("AutomationProjectConfigurationFacadeImpl.validateVersionChange", VALIDATION),
         Map.entry("ConnectedUserConnectionFacadeImpl.updateConnectedUserConnectionTags", TAGS),
         Map.entry("ConnectedUserConnectionFacadeImpl.updateIntegrationInstanceConnectionCredentials",
             RECORDED_BY_CALLER),
         Map.entry("com.bytechef.ee.embedded.configuration.facade.ConnectionFacadeImpl.updateConnectionTags", TAGS),
         Map.entry("CustomComponentFacadeImpl.updateCustomComponentSource", DEFINITION_EDIT),
         Map.entry("CustomComponentServiceImpl.publishCustomComponent", RECORDED_BY_CALLER),
+        Map.entry("DataTablePromotionContributor.preview", PROMOTION_PREVIEW),
+        Map.entry("DataTablePromotionContributor.promote", RECORDED_BY_CALLER),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpComponent", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpServer", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.deleteEmbeddedMcpComponent", DELEGATES),
@@ -122,6 +133,8 @@ class AuditDataContractTest {
         Map.entry("IntegrationInstanceConfigurationFacadeImpl.updateIntegrationInstanceConfigurationTags", TAGS),
         Map.entry("IntegrationInstanceConfigurationFacadeImpl.updateIntegrationInstanceConfigurationWorkflow",
             WORKFLOW_INPUTS),
+        Map.entry("IntegrationInstanceConfigurationPromotionContributor.preview", PROMOTION_PREVIEW),
+        Map.entry("IntegrationInstanceConfigurationPromotionContributor.promote", RECORDED_BY_CALLER),
         Map.entry("IntegrationInstanceFacadeImpl.enableIntegrationInstanceWorkflowTriggers", TRIGGER_INTERNAL),
         Map.entry("IntegrationInstanceFacadeImpl.provisionIntegrationInstance", DELEGATES),
         Map.entry("IntegrationInstanceFacadeImpl.updateIntegrationInstanceConfigurationWorkflowTriggers",
@@ -154,15 +167,21 @@ class AuditDataContractTest {
         Map.entry("McpServerFacadeImpl.updateMcpServer", DELEGATES),
         Map.entry("McpServerFacadeImpl.updateMcpServerTags", TAGS),
         Map.entry("McpServerFacadeImpl.updateMcpTool", DELEGATES),
+        Map.entry("McpServerPromotionContributor.preview", PROMOTION_PREVIEW),
+        Map.entry("McpServerPromotionContributor.promote", RECORDED_BY_CALLER),
         Map.entry("ProjectCodeWorkflowFacadeImpl.deployCodeWorkflowSource", RECORDED_BY_CALLER),
         Map.entry("ProjectCodeWorkflowFacadeImpl.renameCodeWorkflowSource", RECORDED_BY_CALLER),
         Map.entry("ProjectCodeWorkflowFacadeImpl.restoreCodeWorkflowSource", RECORDED_BY_CALLER),
         Map.entry("ProjectCodeWorkflowFacadeImpl.save", DEFINITION_EDIT),
         Map.entry("ProjectCodeWorkflowFacadeImpl.updateCodeWorkflowSource", DEFINITION_EDIT),
+        Map.entry("ProjectDeploymentPromotionContributor.preview", PROMOTION_PREVIEW),
+        Map.entry("ProjectDeploymentPromotionContributor.promote", RECORDED_BY_CALLER),
         Map.entry("ProjectTagFacadeImpl.updateProjectTags", TAGS),
         Map.entry("WorkspaceApiKeyFacadeImpl.create", DELEGATES),
         Map.entry("WorkspaceApiKeyFacadeImpl.delete", DELEGATES),
         Map.entry("WorkspaceDataTableFacadeImpl.addColumn", DELEGATES),
+        Map.entry("WorkspaceDataTableFacadeImpl.changeColumnType", DELEGATES),
+        Map.entry("WorkspaceDataTableFacadeImpl.changeLinkColumn", DELEGATES),
         Map.entry("WorkspaceDataTableFacadeImpl.clearRows", ROW_DATA),
         Map.entry("WorkspaceDataTableFacadeImpl.deleteRow", ROW_DATA),
         Map.entry("WorkspaceDataTableFacadeImpl.deleteRowByExternalId", ROW_DATA),

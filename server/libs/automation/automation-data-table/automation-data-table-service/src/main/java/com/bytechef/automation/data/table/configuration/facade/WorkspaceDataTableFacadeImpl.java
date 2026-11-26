@@ -109,6 +109,18 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
+    public void changeColumnType(long dataTableId, String columnName, ColumnType columnType, long environmentId) {
+        dataTableService.changeColumnType(dataTableId, columnName, columnType, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
+    public void changeLinkColumn(long dataTableId, String columnName, LinkSpec linkSpec, long environmentId) {
+        dataTableService.changeLinkColumn(dataTableId, columnName, linkSpec, environmentId);
+    }
+
+    @Override
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'DATA_TABLE_CREATE')")
     @Audited(event = DataTableAuditEvents.DATA_TABLE_CREATED, data = {
         @AuditData(key = "name", value = "#name"),

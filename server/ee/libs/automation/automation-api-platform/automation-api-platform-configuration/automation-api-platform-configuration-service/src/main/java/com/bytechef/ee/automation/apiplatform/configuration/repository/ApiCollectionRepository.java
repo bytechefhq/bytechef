@@ -10,7 +10,10 @@ package com.bytechef.ee.automation.apiplatform.configuration.repository;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.relational.core.sql.LockMode;
+import org.springframework.data.relational.repository.Lock;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -33,6 +36,9 @@ public interface ApiCollectionRepository
         WHERE project.workspace_id = :workspaceId
         """)
     List<Long> findAllApiCollectionProjectIds(@Param("workspaceId") long workspaceId);
+
+    @Lock(LockMode.PESSIMISTIC_WRITE)
+    List<ApiCollection> findAllByUuidOrderById(UUID uuid);
 
     Optional<ApiCollection> findByContextPath(String contextPath);
 }

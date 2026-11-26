@@ -73,6 +73,9 @@ public class AutomationProjectConfiguration {
     @Column("project_version")
     private int projectVersion;
 
+    @Column
+    private UUID uuid;
+
     @Version
     private int version;
 
@@ -93,6 +96,7 @@ public class AutomationProjectConfiguration {
         this.projectVersion = projectVersion;
         this.enabled = enabled;
         this.automationHubVisible = automationHubVisible;
+        this.uuid = UUID.randomUUID();
     }
 
     @Override
@@ -141,6 +145,10 @@ public class AutomationProjectConfiguration {
         return projectVersion;
     }
 
+    public UUID getUuid() {
+        return uuid;
+    }
+
     public int getVersion() {
         return version;
     }
@@ -177,6 +185,10 @@ public class AutomationProjectConfiguration {
         this.projectVersion = projectVersion;
     }
 
+    public void setUuid(UUID uuid) {
+        this.uuid = Objects.requireNonNull(uuid, "uuid");
+    }
+
     public void setWorkflows(Set<AutomationProjectConfigurationWorkflow> workflows) {
         this.workflows = workflows == null ? Collections.emptySet() : workflows;
     }
@@ -199,6 +211,7 @@ public class AutomationProjectConfiguration {
             "id=" + id +
             ", projectId=" + projectId +
             ", environmentId=" + environmentId +
+            ", uuid=" + uuid +
             ", name='" + name + '\'' +
             ", projectVersion=" + projectVersion +
             ", enabled=" + enabled +

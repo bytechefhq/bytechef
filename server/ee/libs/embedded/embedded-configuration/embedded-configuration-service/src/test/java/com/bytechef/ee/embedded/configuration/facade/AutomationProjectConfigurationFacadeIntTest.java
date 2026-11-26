@@ -802,6 +802,29 @@ class AutomationProjectConfigurationFacadeIntTest {
     }
 
     @Test
+    void testValidateVersionChangeRejectsOlderVersionLackingReferencedWorkflow() {
+        long projectId = createPublishedProject("Validate Blocked", 1);
+
+        String workflowUuid = addWorkflowAndPublish(projectId, "Validate Blocked Workflow");
+
+        long configurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 2, true, true);
+
+        givenReferences(configurationId,
+            newReference(workflowUuid, Environment.values()[(int) ENVIRONMENT_ID].name(), false));
+
+        assertThatThrownBy(() -> automationProjectConfigurationFacade.validateVersionChange(configurationId, 1))
+            .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
+                configurationException.getErrorKey()).isEqualTo(
+                    AutomationProjectConfigurationErrorType.VERSION_LACKS_REFERENCED_WORKFLOWS.getErrorKey()));
+
+        automationProjectConfigurationFacade.validateVersionChange(configurationId, 2);
+
+        assertThat(automationProjectConfigurationService.getConfiguration(configurationId)
+            .getProjectVersion()).isEqualTo(2);
+    }
+
+    @Test
     void testUpdateConfigurationRejectsOlderVersionLackingReferencedWorkflow() {
         long projectId = createPublishedProject("Rollback Blocked", 1);
 

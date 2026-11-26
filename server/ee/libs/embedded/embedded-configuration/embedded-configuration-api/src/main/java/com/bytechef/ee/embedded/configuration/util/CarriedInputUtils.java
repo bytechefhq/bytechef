@@ -11,6 +11,8 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.platform.configuration.domain.WorkflowInput;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +25,24 @@ import org.apache.commons.lang3.StringUtils;
 public final class CarriedInputUtils {
 
     private CarriedInputUtils() {
+    }
+
+    public static Set<String>
+        findDroppedInputs(Workflow sourceWorkflow, Workflow targetWorkflow, Map<String, ?> inputs) {
+        Map<String, Object> carriedInputs = retainCarriedInputs(sourceWorkflow, targetWorkflow, inputs);
+
+        Set<String> droppedInputNames = new TreeSet<>(inputs.keySet());
+
+        droppedInputNames.removeAll(carriedInputs.keySet());
+
+        return droppedInputNames;
+    }
+
+    public static Map<String, Object> retainCarriedInputs(
+        Workflow sourceWorkflow, Workflow targetWorkflow, Map<String, ?> inputs) {
+
+        return InternalOnlyInputUtils.retainInternalOnlyInputs(
+            targetWorkflow, retainInputsOfUnchangedType(sourceWorkflow, targetWorkflow, inputs));
     }
 
     public static Map<String, Object> retainInputsOfUnchangedType(
@@ -41,12 +61,16 @@ public final class CarriedInputUtils {
                 continue;
             }
 
-            if (StringUtils.equalsIgnoreCase(sourceWorkflowInput.getType(), targetWorkflowInput.getType())) {
+            if (hasSameType(sourceWorkflowInput, targetWorkflowInput)) {
                 carriedInputs.put(entry.getKey(), entry.getValue());
             }
         }
 
         return carriedInputs;
+    }
+
+    private static boolean hasSameType(WorkflowInput sourceWorkflowInput, WorkflowInput targetWorkflowInput) {
+        return StringUtils.equalsIgnoreCase(sourceWorkflowInput.getType(), targetWorkflowInput.getType());
     }
 
     private static Map<String, WorkflowInput> getWorkflowInputsByName(Workflow workflow) {

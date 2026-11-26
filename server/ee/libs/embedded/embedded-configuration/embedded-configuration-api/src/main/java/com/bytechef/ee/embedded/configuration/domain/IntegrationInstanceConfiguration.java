@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -87,6 +88,9 @@ public class IntegrationInstanceConfiguration {
 
     @Column("authorization_type")
     private Integer authorizationType;
+
+    @Column
+    private UUID uuid;
 
     @Version
     private int version;
@@ -177,6 +181,10 @@ public class IntegrationInstanceConfiguration {
         return authorizationType == null ? null : AuthorizationType.values()[authorizationType];
     }
 
+    public UUID getUuid() {
+        return uuid;
+    }
+
     public int getVersion() {
         return version;
     }
@@ -245,6 +253,10 @@ public class IntegrationInstanceConfiguration {
 
     public void setAuthorizationType(AuthorizationType authorizationType) {
         this.authorizationType = authorizationType == null ? null : authorizationType.ordinal();
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = Objects.requireNonNull(uuid, "uuid");
     }
 
     public void setVersion(int version) {

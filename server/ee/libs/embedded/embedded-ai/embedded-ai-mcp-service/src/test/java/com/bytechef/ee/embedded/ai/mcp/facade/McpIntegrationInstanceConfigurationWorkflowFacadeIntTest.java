@@ -216,10 +216,10 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
 
             integrationInstanceConfigurationId = insert(
                 """
-                    INSERT INTO integration_instance_configuration (integration_id, integration_version, name,
+                    INSERT INTO integration_instance_configuration (uuid, integration_id, integration_version, name,
                         enabled, environment, connection_parameters, authorization_type, created_date, created_by,
                         last_modified_date, last_modified_by, version)
-                    VALUES (?, ?, 'gmail', true, 0, ?, 0, now(), 'system', now(), 'system', 0)
+                    VALUES (gen_random_uuid(), ?, ?, 'gmail', true, 0, ?, 0, now(), 'system', now(), 'system', 0)
                     RETURNING id
                     """,
                 integrationId, INTEGRATION_VERSION, encryption.encrypt("{}"));

@@ -20,6 +20,8 @@ import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.domain.DataTableLinkColumn;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.LinkSpec;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
@@ -30,6 +32,10 @@ import org.jspecify.annotations.Nullable;
 public interface DataTableService {
 
     void addColumn(long dataTableId, ColumnSpec columnSpec, long environmentId);
+
+    void changeColumnType(long dataTableId, String columnName, ColumnType columnType, long environmentId);
+
+    void changeLinkColumn(long dataTableId, String columnName, LinkSpec linkSpec, long environmentId);
 
     long createTable(
         @Nullable Long workspaceId, String name, @Nullable String description, List<ColumnSpec> columnSpecs,

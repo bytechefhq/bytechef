@@ -18,11 +18,11 @@ package com.bytechef.automation.ai.a2a.service;
 
 import com.bytechef.automation.ai.a2a.domain.A2aServer;
 import com.bytechef.automation.ai.a2a.repository.A2aServerRepository;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.apache.commons.lang3.Validate;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,6 +65,12 @@ public class A2aServerServiceImpl implements A2aServerService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<A2aServer> fetchA2aServer(UUID uuid, Environment environment) {
+        return a2aServerRepository.findByUuidAndEnvironment(uuid, environment.ordinal());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public A2aServer getA2aServer(long a2aServerId) {
         return a2aServerRepository.findById(a2aServerId)
             .orElseThrow(() -> new IllegalArgumentException("A2A server with id " + a2aServerId + " not found"));
@@ -78,7 +84,6 @@ public class A2aServerServiceImpl implements A2aServerService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#a2aServerId, 'A2aServer', 'A2A_EDIT')")
     @Transactional(readOnly = true)
     public String getA2aServerSecretKey(long a2aServerId) {
         A2aServer a2aServer = getA2aServer(a2aServerId);

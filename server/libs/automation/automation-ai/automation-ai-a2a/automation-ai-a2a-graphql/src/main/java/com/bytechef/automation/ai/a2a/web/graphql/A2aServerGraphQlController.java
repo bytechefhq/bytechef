@@ -19,7 +19,6 @@ package com.bytechef.automation.ai.a2a.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.ai.a2a.domain.A2aServer;
 import com.bytechef.automation.ai.a2a.facade.A2aServerFacade;
-import com.bytechef.automation.ai.a2a.service.A2aServerService;
 import com.bytechef.graphql.error.GraphQlBadRequestException;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.tag.domain.Tag;
@@ -43,12 +42,10 @@ import org.springframework.stereotype.Controller;
 public class A2aServerGraphQlController {
 
     private final A2aServerFacade a2aServerFacade;
-    private final A2aServerService a2aServerService;
 
     @SuppressFBWarnings("EI")
-    public A2aServerGraphQlController(A2aServerFacade a2aServerFacade, A2aServerService a2aServerService) {
+    public A2aServerGraphQlController(A2aServerFacade a2aServerFacade) {
         this.a2aServerFacade = a2aServerFacade;
-        this.a2aServerService = a2aServerService;
     }
 
     @QueryMapping
@@ -121,7 +118,7 @@ public class A2aServerGraphQlController {
     @SchemaMapping(typeName = "A2aServer", field = "secretKey")
     public @Nullable String secretKey(A2aServer a2aServer) {
         try {
-            return a2aServerService.getA2aServerSecretKey(a2aServer.getId());
+            return a2aServerFacade.getA2aServerSecretKey(a2aServer.getId());
         } catch (AccessDeniedException accessDeniedException) {
             return null;
         }

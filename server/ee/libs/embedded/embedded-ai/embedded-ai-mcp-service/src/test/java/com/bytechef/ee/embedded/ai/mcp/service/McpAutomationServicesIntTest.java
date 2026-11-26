@@ -245,10 +245,10 @@ public class McpAutomationServicesIntTest {
     private long createAutomationProjectConfiguration(int environmentId) {
         return insert(
             """
-                INSERT INTO automation_project_configuration (project_id, environment_id, project_version, enabled,
+                INSERT INTO automation_project_configuration (uuid, project_id, environment_id, project_version, enabled,
                     automation_hub_visible, name, created_date, created_by, last_modified_date, last_modified_by,
                     version)
-                VALUES (?, ?, 1, true, true, ?, now(), 'system', now(), 'system', 0)
+                VALUES (gen_random_uuid(), ?, ?, 1, true, true, ?, now(), 'system', now(), 'system', 0)
                 RETURNING id
                 """,
             projectId, environmentId, "configuration-" + environmentId);

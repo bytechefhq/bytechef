@@ -17,13 +17,9 @@
 package com.bytechef.automation.ai.a2a.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -47,7 +43,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -92,23 +87,12 @@ class A2aServerServiceIntTest {
         }
 
         @Test
-        void testSecretKeyIsDeniedWithoutTheA2aEditScope() {
+        void testSecretKeyLeavesTheEditCheckToTheFacade() {
             authenticate("ROLE_USER");
-
-            assertThatExceptionOfType(AccessDeniedException.class)
-                .isThrownBy(() -> a2aServerService.getA2aServerSecretKey(1L));
-
-            verify(permissionService).hasResourceScope(1L, "A2aServer", "A2A_EDIT");
-            verify(a2aServerRepository, never()).findById(anyLong());
-        }
-
-        @Test
-        void testSecretKeyIsReturnedToAWorkspaceEditor() {
-            authenticate("ROLE_USER");
-
-            when(permissionService.hasResourceScope(1L, "A2aServer", "A2A_EDIT")).thenReturn(true);
 
             assertThat(a2aServerService.getA2aServerSecretKey(1L)).isEqualTo(a2aServer.getSecretKey());
+
+            verifyNoInteractions(permissionService);
         }
 
         @Test
@@ -280,6 +264,26 @@ class A2aServerServiceIntTest {
             assertThat(a2aServerService.fetchA2aServer(createdA2aServer.getSecretKey()))
                 .hasValueSatisfying(
                     a2aServer -> assertThat(a2aServer.getId()).isEqualTo(createdA2aServer.getId()));
+        }
+
+        @Test
+        void testFetchByUuidAndEnvironmentFindsOnlyTheServerOfThatEnvironment() {
+            A2aServer developmentA2aServer = a2aServerService.create(
+                new A2aServer("agent", null, Environment.DEVELOPMENT));
+
+            A2aServer stagingA2aServer = new A2aServer("agent", null, Environment.STAGING);
+
+            stagingA2aServer.setUuid(developmentA2aServer.getUuid());
+
+            stagingA2aServer = a2aServerService.create(stagingA2aServer);
+
+            long stagingA2aServerId = stagingA2aServer.getId();
+
+            assertThat(a2aServerService.fetchA2aServer(developmentA2aServer.getUuid(), Environment.STAGING))
+                .hasValueSatisfying(a2aServer -> assertThat(a2aServer.getId()).isEqualTo(stagingA2aServerId));
+            assertThat(a2aServerService.fetchA2aServer(developmentA2aServer.getUuid(), Environment.PRODUCTION))
+                .isEmpty();
+            assertThat(a2aServerService.fetchA2aServer(UUID.randomUUID(), Environment.DEVELOPMENT)).isEmpty();
         }
 
         @Test

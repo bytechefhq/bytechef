@@ -17,8 +17,10 @@
 package com.bytechef.automation.ai.a2a.service;
 
 import com.bytechef.automation.ai.a2a.domain.A2aServer;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author Ivica Cardic
@@ -30,6 +32,8 @@ public interface A2aServerService {
     void delete(long a2aServerId);
 
     Optional<A2aServer> fetchA2aServer(String secretKey);
+
+    Optional<A2aServer> fetchA2aServer(UUID uuid, Environment environment);
 
     A2aServer getA2aServer(long a2aServerId);
 

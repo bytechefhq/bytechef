@@ -209,10 +209,10 @@ public class ConnectedUserMcpServerFacadeIntTest {
                 """);
         integrationInstanceConfigurationId = insert(
             """
-                INSERT INTO integration_instance_configuration (integration_id, integration_version, name, enabled,
+                INSERT INTO integration_instance_configuration (uuid, integration_id, integration_version, name, enabled,
                     environment, connection_parameters, authorization_type, created_date, created_by,
                     last_modified_date, last_modified_by, version)
-                VALUES (?, 6, 'gmail', true, 0, ?, 0, now(), 'system', now(), 'system', 0)
+                VALUES (gen_random_uuid(), ?, 6, 'gmail', true, 0, ?, 0, now(), 'system', now(), 'system', 0)
                 RETURNING id
                 """,
             integrationId, encryption.encrypt("{}"));
@@ -577,10 +577,10 @@ public class ConnectedUserMcpServerFacadeIntTest {
                 """);
         long otherConfigurationId = insert(
             """
-                INSERT INTO integration_instance_configuration (integration_id, integration_version, name, enabled,
+                INSERT INTO integration_instance_configuration (uuid, integration_id, integration_version, name, enabled,
                     environment, connection_parameters, authorization_type, created_date, created_by,
                     last_modified_date, last_modified_by, version)
-                VALUES (?, 1, 'slack', true, 0, ?, 0, now(), 'system', now(), 'system', 0)
+                VALUES (gen_random_uuid(), ?, 1, 'slack', true, 0, ?, 0, now(), 'system', now(), 'system', 0)
                 RETURNING id
                 """,
             otherIntegrationId, encryption.encrypt("{}"));

@@ -18,6 +18,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,12 +56,24 @@ public class IntegrationInstanceConfigurationServiceImpl implements IntegrationI
 
         integrationInstanceConfiguration.setEnabled(false);
 
+        if (integrationInstanceConfiguration.getUuid() == null) {
+            integrationInstanceConfiguration.setUuid(UUID.randomUUID());
+        }
+
         return integrationInstanceConfigurationRepository.save(integrationInstanceConfiguration);
     }
 
     @Override
     public void delete(long id) {
         integrationInstanceConfigurationRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<IntegrationInstanceConfiguration> fetchIntegrationInstanceConfiguration(
+        UUID uuid, Environment environment) {
+
+        return integrationInstanceConfigurationRepository.findByUuidAndEnvironment(uuid, environment.ordinal());
     }
 
     @Override

@@ -1,0 +1,11 @@
+spring:
+  liquibase:
+    contexts: configuration, connection, execution
+
+bytechef:
+  edition: ee
+  webhook-url: /webhooks/{id}
+  workflow:
+    repository:
+      jdbc:
+        enabled: true
