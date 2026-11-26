@@ -1,3 +1,4 @@
+import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
@@ -149,6 +150,20 @@ const AutomationProjectConfigurationWorkflowListItem = ({
                     </Tooltip>
                 ) : (
                     <span className="text-xs whitespace-nowrap">No executions</span>
+                )}
+
+                {workflow.enabled && workflow.awaitedInputLabel && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <span>
+                                <Badge label="Awaits configuration" styleType="warning-outline" />
+                            </span>
+                        </TooltipTrigger>
+
+                        <TooltipContent side="left">
+                            {`Does not run until ${workflow.awaitedInputLabel} is set. Edit the workflow to set it.`}
+                        </TooltipContent>
+                    </Tooltip>
                 )}
 
                 <Switch

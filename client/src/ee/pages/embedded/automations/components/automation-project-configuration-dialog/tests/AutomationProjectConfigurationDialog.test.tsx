@@ -162,6 +162,7 @@ const existingConfigurationWithWorkflows = {
     ...existingConfiguration,
     workflows: [
         {
+            awaitedInputLabel: null,
             enabled: true,
             label: 'Sync Contacts',
             lastExecutionDate: null,
@@ -171,6 +172,7 @@ const existingConfigurationWithWorkflows = {
             workflowUuid: 'workflow-1',
         },
         {
+            awaitedInputLabel: null,
             enabled: false,
             label: 'Send Digest',
             lastExecutionDate: null,
