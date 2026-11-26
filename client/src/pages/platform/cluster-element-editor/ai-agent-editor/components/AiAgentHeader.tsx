@@ -1,5 +1,5 @@
 import Button from '@/components/Button/Button';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {AI_SKILLS_SETTINGS_PATH} from '@/shared/navigation/settingsPaths';
 import {ExternalLinkIcon, FlaskConicalIcon, LayoutGridIcon, SparklesIcon, XIcon, ZapIcon} from 'lucide-react';
 

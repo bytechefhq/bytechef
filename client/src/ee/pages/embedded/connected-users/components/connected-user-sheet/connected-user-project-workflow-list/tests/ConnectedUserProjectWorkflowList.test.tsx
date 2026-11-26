@@ -49,7 +49,7 @@ vi.mock('../ConnectedUserProjectConfigurationSwitch', () => ({
     ),
 }));
 
-vi.mock('@/components/ui/tooltip', () => ({
+vi.mock('@/components/Tooltip/Tooltip', () => ({
     Tooltip: ({children}: {children: React.ReactNode}) => <>{children}</>,
     TooltipContent: () => null,
     TooltipTrigger: ({children}: {children: React.ReactNode}) => <span>{children}</span>,

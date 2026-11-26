@@ -1,4 +1,4 @@
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {twMerge} from 'tailwind-merge';
 
 const CredentialsStatus = ({enabled}: {enabled?: boolean}) => {

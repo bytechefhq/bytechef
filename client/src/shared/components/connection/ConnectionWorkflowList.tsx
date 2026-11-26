@@ -6,7 +6,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import OpenInButton from '@/shared/components/OpenInButton';
 import {EllipsisVerticalIcon, Link2OffIcon, Loader2Icon, UserIcon} from 'lucide-react';
 import {useRef, useState} from 'react';

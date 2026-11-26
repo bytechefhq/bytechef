@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
 import {render} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';

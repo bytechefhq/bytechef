@@ -1,6 +1,7 @@
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -8,7 +9,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkspaceDialog from '@/ee/pages/settings/automation/workspaces/components/WorkspaceDialog';
 import {useDeleteWorkspaceMutation} from '@/ee/shared/mutations/automation/workspaces.mutations';
 import {Workspace} from '@/shared/middleware/automation/configuration';

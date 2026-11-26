@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {formatDateTime} from '@/pages/automation/workflow-executions/utils/workflowExecutionsTable';
 import {render as renderWithQueryClient} from '@/shared/util/test-utils';
 import {fireEvent, render as renderWithoutProviders, screen, within} from '@testing-library/react';

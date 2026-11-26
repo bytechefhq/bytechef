@@ -2,7 +2,7 @@ import {createRoot} from 'react-dom/client';
 
 import '../styles/index.css';
 
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import EmbeddedIntegrationMarketplaceApp from '@/ee/EmbeddedIntegrationMarketplaceApp';
 import IntegrationMarketplaceGate from '@/ee/pages/embedded/integration-marketplace/IntegrationMarketplaceGate';
 import I18n from '@/i18n';

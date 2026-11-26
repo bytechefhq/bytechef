@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {Connection, ConnectionOriginEnum} from '@/ee/shared/middleware/embedded/configuration';
 import {render, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';
 import {ReactNode} from 'react';

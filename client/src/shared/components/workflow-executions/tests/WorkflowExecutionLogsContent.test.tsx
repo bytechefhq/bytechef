@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {fireEvent, render as testingLibraryRender, screen, within} from '@testing-library/react';
 import {ReactElement} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';

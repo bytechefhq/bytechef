@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {AutomationJourneyStageType} from '@/pages/automation/journey/getAutomationJourney';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {AutomationGettingStartedQuery} from '@/shared/middleware/graphql';

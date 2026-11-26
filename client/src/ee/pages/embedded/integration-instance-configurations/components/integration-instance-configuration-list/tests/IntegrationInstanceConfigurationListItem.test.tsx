@@ -1,5 +1,5 @@
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {Collapsible} from '@/components/ui/collapsible';
-import {TooltipProvider} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationListItem from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationListItem';
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';

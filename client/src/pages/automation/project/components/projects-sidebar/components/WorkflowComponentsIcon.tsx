@@ -1,6 +1,6 @@
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Skeleton} from '@/components/ui/skeleton';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 
 export type WorkflowComponentIconDefinitionType = Pick<ComponentDefinitionBasic, 'icon' | 'name' | 'title'>;

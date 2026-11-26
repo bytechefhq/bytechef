@@ -1,8 +1,8 @@
 import Button from '@/components/Button/Button';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import LoadingIcon from '@/components/LoadingIcon';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {IntegrationComponentElementI} from '@/ee/pages/embedded/integrations/components/integration-list/integrationComponentElementUtils';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {AlertTriangleIcon, ClipboardIcon, WrenchIcon} from 'lucide-react';

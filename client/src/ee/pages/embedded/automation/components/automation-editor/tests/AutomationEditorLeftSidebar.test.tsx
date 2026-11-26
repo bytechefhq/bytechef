@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import AutomationEditorLeftSidebar from '@/ee/pages/embedded/automation/components/automation-editor/AutomationEditorLeftSidebar';
 import {useAutomationEditorSidebarStore} from '@/ee/pages/embedded/automation/components/automation-editor/stores/useAutomationEditorSidebarStore';
 import {fireEvent, render, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';

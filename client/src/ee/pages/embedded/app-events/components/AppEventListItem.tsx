@@ -7,7 +7,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import AppEventDialog from '@/ee/pages/embedded/app-events/components/AppEventDialog';
 import {AppEvent} from '@/ee/shared/middleware/embedded/configuration';
 import {useDeleteAppEventMutation} from '@/ee/shared/mutations/embedded/appEvents.mutations';

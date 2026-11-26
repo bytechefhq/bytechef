@@ -1,5 +1,5 @@
 import Button from '@/components/Button/Button';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import AiAgentTestRuntimeProvider from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/runtime-providers/AiAgentTestRuntimeProvider';
 import {MessageSquareXIcon, PlayIcon, SparklesIcon, WorkflowIcon, XIcon} from 'lucide-react';
 import {useEffect} from 'react';

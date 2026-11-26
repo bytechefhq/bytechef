@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {Project, ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {ReactNode} from 'react';

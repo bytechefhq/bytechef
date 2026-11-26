@@ -1,9 +1,9 @@
 import Badge from '@/components/Badge/Badge';
 import LoadingDots from '@/components/LoadingDots';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Sheet, SheetCloseButton, SheetContent, SheetDescription, SheetTitle} from '@/components/ui/sheet';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     useConnectedUserCatalogWorkflowCopiesQuery,
     useConnectedUserCodeWorkflowReferencesQuery,

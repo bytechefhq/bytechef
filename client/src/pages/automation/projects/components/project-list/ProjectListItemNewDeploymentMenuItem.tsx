@@ -1,5 +1,5 @@
 import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {RocketIcon} from 'lucide-react';
 
 interface ProjectListItemNewDeploymentMenuItemProps {

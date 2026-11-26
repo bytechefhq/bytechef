@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import ProjectItemSelect from '@/pages/automation/project/components/project-header/components/ProjectItemSelect';
 import {render, screen, userEvent, within} from '@/shared/util/test-utils';
 import {beforeEach, expect, it, vi} from 'vitest';

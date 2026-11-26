@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import AutomationEditorSettingsMenu from '@/ee/pages/embedded/automation/components/automation-editor/components/AutomationEditorSettingsMenu';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {beforeEach, expect, it, vi} from 'vitest';

@@ -2,7 +2,7 @@ import {createRoot} from 'react-dom/client';
 
 import '../styles/index.css';
 
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import EmbeddedAutomationHubApp from '@/ee/EmbeddedAutomationHubApp';
 import AutomationHubLayout from '@/ee/pages/embedded/automation-hub/AutomationHubLayout';
 import HubBuilderView from '@/ee/pages/embedded/automation-hub/HubBuilderView';

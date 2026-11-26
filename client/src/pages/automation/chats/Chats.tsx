@@ -1,5 +1,5 @@
 import Button from '@/components/Button/Button';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import ChatsEmptyState from '@/pages/automation/chats/components/ChatsEmptyState';
 import ChatsSidebar from '@/pages/automation/chats/components/ChatsSidebar';
 import {useChatsStore} from '@/pages/automation/chats/stores/useChatsStore';

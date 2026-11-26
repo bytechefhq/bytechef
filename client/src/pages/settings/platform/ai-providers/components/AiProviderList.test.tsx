@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {AiProvider} from '@/shared/middleware/platform/configuration';
 import {createTestQueryClientWrapper} from '@/shared/util/test-utils';
 import {fireEvent, render, screen} from '@testing-library/react';

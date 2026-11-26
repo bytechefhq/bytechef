@@ -1,6 +1,6 @@
 import {Select, SelectContent, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Label} from '@/components/ui/label';
-import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/ui/tooltip';
 import DeprecatedBadge from '@/shared/components/DeprecatedBadge';
 import {
     ActionDefinitionBasic,

@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import AutomationEditorBreadcrumb from '@/ee/pages/embedded/automation/components/automation-editor/components/AutomationEditorBreadcrumb';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {ComponentProps} from 'react';

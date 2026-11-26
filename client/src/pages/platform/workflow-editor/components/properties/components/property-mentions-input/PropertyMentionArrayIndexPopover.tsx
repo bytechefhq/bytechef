@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
 import {Input} from '@/components/Input/Input';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     MAX_SAMPLE_ARRAY_ROWS,
     type SampleArrayI,

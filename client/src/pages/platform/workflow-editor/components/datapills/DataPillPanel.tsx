@@ -1,6 +1,6 @@
 import {Input} from '@/components/Input/Input';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Skeleton} from '@/components/ui/skeleton';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import DataPillPanelBody, {
     OperationType,
 } from '@/pages/platform/workflow-editor/components/datapills/DataPillPanelBody';

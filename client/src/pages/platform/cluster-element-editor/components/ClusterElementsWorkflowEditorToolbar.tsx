@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {ButtonGroup} from '@/components/ui/button-group';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Panel, useReactFlow} from '@xyflow/react';
 import {BrushCleaningIcon, FocusIcon, LockIcon, LockOpenIcon, ZoomInIcon, ZoomOutIcon} from 'lucide-react';
 import {useCallback} from 'react';

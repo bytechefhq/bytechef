@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useUserGuidingStore} from '@/shared/stores/useUserGuidingStore';
 import {render, screen, userEvent} from '@/shared/util/test-utils';

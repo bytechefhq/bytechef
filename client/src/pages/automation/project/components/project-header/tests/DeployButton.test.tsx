@@ -1,5 +1,5 @@
 import {Dialog, DialogContent, DialogTitle, DialogTrigger} from '@/components/Dialog';
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import DeployButton from '@/pages/automation/project/components/project-header/components/DeployButton';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {render, screen, userEvent} from '@/shared/util/test-utils';

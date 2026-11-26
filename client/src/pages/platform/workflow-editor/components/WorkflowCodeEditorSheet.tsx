@@ -1,10 +1,10 @@
 import Button from '@/components/Button/Button';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import UnsavedChangesAlertDialog from '@/components/UnsavedChangesAlertDialog';
 import {ButtonGroup, ButtonGroupSeparator} from '@/components/ui/button-group';
 import {ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import RunDisabledReasons from '@/pages/platform/workflow-editor/components/RunDisabledReasons';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import {useEvaluatorFunctionDefinitions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/useEvaluatorFunctionDefinitions';

@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import AutomationConfigurationsSheet from '@/ee/pages/embedded/automation/components/automation-editor/components/AutomationConfigurationsSheet';
 import {AutomationProjectsQuery} from '@/shared/middleware/graphql';
 import {render, screen, userEvent} from '@/shared/util/test-utils';

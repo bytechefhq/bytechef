@@ -1,5 +1,5 @@
 import Badge from '@/components/Badge/Badge';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 
 interface ConnectedUserOriginBadgeProps {
     provisioned: boolean;

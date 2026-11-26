@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {PRODUCTION_ENVIRONMENT, STAGING_ENVIRONMENT} from '@/shared/constants';
 import {ProjectDeployment, ResponseError, Workflow} from '@/shared/middleware/automation/configuration';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';

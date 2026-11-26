@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {useConnectedUserSheetStore} from '@/ee/pages/embedded/connected-users/stores/useConnectedUserSheetStore';
 import {EmbeddedGettingStartedQuery} from '@/shared/middleware/graphql';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';

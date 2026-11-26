@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
 import RequiredMark from '@/components/RequiredMark';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Label} from '@/components/ui/label';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentConnection} from '@/shared/middleware/platform/configuration';
 
 import usePropertyCodeEditorDialogRightPanelConnectionsLabel from './hooks/usePropertyCodeEditorDialogRightPanelConnectionsLabel';

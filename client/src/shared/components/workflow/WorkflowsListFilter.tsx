@@ -6,7 +6,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import {Input} from '@/components/Input/Input';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {SORT_OPTIONS} from '@/shared/constants';
 import {CheckIcon, ListFilterIcon, SearchIcon} from 'lucide-react';
 import {forwardRef} from 'react';

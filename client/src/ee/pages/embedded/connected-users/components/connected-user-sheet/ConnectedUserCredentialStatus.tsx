@@ -1,4 +1,4 @@
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {CredentialStatus} from '@/ee/shared/middleware/embedded/connected-user';
 import {twMerge} from 'tailwind-merge';
 

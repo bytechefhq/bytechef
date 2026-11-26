@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import WorkflowsListFilter from '@/shared/components/workflow/WorkflowsListFilter';
 import {fireEvent, render, screen, userEvent, waitFor} from '@/shared/util/test-utils';
 import {expect, it, vi} from 'vitest';

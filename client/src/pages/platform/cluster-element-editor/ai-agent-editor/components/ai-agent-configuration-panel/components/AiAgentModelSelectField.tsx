@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
 import RequiredMark from '@/components/RequiredMark';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
 import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {BrainIcon, ComponentIcon, SettingsIcon} from 'lucide-react';

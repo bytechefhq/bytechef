@@ -2,8 +2,8 @@ import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     CONFIGURATIONS_LOAD_FAILED_REASON,
     NO_OTHER_CONFIGURATION_REASON,

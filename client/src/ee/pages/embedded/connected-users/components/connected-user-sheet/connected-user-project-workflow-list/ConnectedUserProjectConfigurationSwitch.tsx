@@ -1,6 +1,6 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {useEnableConnectedUserAutomationProjectConfigurationMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 

@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentsPanel from '@/pages/automation/project/components/ProjectDeploymentsPanel';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';

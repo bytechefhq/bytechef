@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import McpWorkflowToolForm from '@/pages/platform/mcp-servers/components/McpWorkflowToolForm';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {act, render, renderHook, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';

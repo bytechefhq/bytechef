@@ -1,5 +1,5 @@
 import Button from '@/components/Button/Button';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import RunDisabledReasons from '@/pages/platform/workflow-editor/components/RunDisabledReasons';
 import {MessageCircleMoreIcon, PlayIcon, SquareIcon} from 'lucide-react';
 

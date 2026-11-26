@@ -6,7 +6,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {EditIcon, EllipsisVerticalIcon, RefreshCcwIcon, Trash2Icon, UsersIcon} from 'lucide-react';
 
 interface IntegrationInstanceConfigurationListItemDropdownMenuProps {

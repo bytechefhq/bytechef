@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {ActionDefinition, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {render, screen} from '@testing-library/react';

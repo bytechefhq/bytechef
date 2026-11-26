@@ -1,5 +1,5 @@
 import Badge from '@/components/Badge/Badge';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import useMcpComponentListItem from '@/ee/pages/embedded/mcp-servers/components/mcp-component-list/hooks/useMcpComponentListItem';
 import McpComponentCollapsible from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentCollapsible';
 import McpComponentListItemDropdownMenu from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentListItemDropdownMenu';
