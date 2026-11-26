@@ -19,6 +19,7 @@ query automationProjectConfigurations($projectId: ID!, $environmentId: ID) {
             lastExecutionDate
             providedConnections
             providedInputs
+            awaitedInputLabel
         }
     }
 }
