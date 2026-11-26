@@ -124,8 +124,8 @@ const WorkflowBuilder = () => {
                 workflowVersion={connectedUserProjectWorkflow?.workflowVersion}
             />
 
-            <div className="flex flex-1">
-                <ResizablePanelGroup className="flex-1 bg-transparent" orientation="vertical">
+            <div className="flex min-w-0 flex-1">
+                <ResizablePanelGroup className="min-w-0 flex-1 bg-transparent" orientation="vertical">
                     <ResizablePanel className="relative flex" defaultSize={650}>
                         <WorkflowEditorProvider
                             value={{
