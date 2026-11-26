@@ -1424,7 +1424,7 @@ export type AutomationProjectConfigurationsQueryVariables = Exact<{
 }>;
 
 
-export type AutomationProjectConfigurationsQuery = { automationProjectConfigurations: Array<{ id: string, projectId: string, environmentId: string, name: string, permissionExpression: string | null, connectedUserCount: number, projectVersion: number, enabled: boolean, automationHubVisible: boolean, lastModifiedDate: string | null, lastExecutionDate: string | null, workflows: Array<{ workflowUuid: string, workflowId: string, label: string | null, enabled: boolean, lastExecutionDate: string | null, providedConnections: any, providedInputs: any }> }> };
+export type AutomationProjectConfigurationsQuery = { automationProjectConfigurations: Array<{ id: string, projectId: string, environmentId: string, name: string, permissionExpression: string | null, connectedUserCount: number, projectVersion: number, enabled: boolean, automationHubVisible: boolean, lastModifiedDate: string | null, lastExecutionDate: string | null, workflows: Array<{ workflowUuid: string, workflowId: string, label: string | null, enabled: boolean, lastExecutionDate: string | null, providedConnections: any, providedInputs: any, awaitedInputLabel: string | null }> }> };
 
 export type AutomationProjectTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -8103,6 +8103,7 @@ export const AutomationProjectConfigurationsDocument = new TypedDocumentString(`
       lastExecutionDate
       providedConnections
       providedInputs
+      awaitedInputLabel
     }
   }
 }
