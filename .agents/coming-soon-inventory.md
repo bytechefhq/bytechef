@@ -138,8 +138,6 @@ running instance, or check the gate.
 |---|---|---|
 | `users` | `ff-3900` | `/platform/settings/users` |
 | `identity-providers` | `ff-1040` | `/platform/settings/identity-providers` |
-| `admin-api-keys` | `ff-1024` | `/platform/settings/admin-api-keys` |
-| `custom-components` | `ff-1024` | `/platform/settings/components/custom-components` |
 | `api-connectors` | `ff-207` | `/platform/settings/components/api-connectors` |
 | `/account/appearance` | `ff-445` | `/platform/your-account/appearance` |
 | `git-configuration` | `ff-1039` | `/platform/automation/settings/git-configuration` |
@@ -190,6 +188,6 @@ delete its partial row — otherwise it is counted twice. That happened to the A
 pages the day they were marked.
 
 **Verify a flag before recording it; do not infer it from the folder.** `api-connectors` is gated by
-`ff-207`, not the `ff-1024` that `custom-components` uses, and `/account/appearance` is gated by
+`ff-207`, not a flag shared with `custom-components`, and `/account/appearance` is gated by
 `ff-445` — both were recorded wrongly at first by guessing from the docs path. `Settings.tsx` is the
 only authority.
