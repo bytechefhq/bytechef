@@ -1,6 +1,6 @@
 import {ComponentDefinition} from '@/shared/middleware/platform/configuration';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {render, screen} from '@testing-library/react';
+import {render, screen} from '@/shared/util/test-utils';
 import {describe, expect, it} from 'vitest';
 
 import DescriptionTab from '../DescriptionTab';
