@@ -118,8 +118,8 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
             onOpenChange={setIsExpanded}
             open={isExpanded}
         >
-            <div className="group w-full rounded-md px-3 py-3 hover:bg-surface-neutral-primary-hover">
-                <div className="flex items-center justify-between">
+            <div className="w-full">
+                <div className="group flex items-center justify-between rounded-md px-3 py-3 hover:bg-surface-neutral-primary-hover">
                     <div className="flex flex-1 items-center gap-x-2">
                         <CollapsibleTrigger asChild>
                             <Button
@@ -252,7 +252,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                 </div>
 
                 <CollapsibleContent>
-                    <div className="mt-4 ml-8">
+                    <div className="mt-1 mr-3 mb-3 ml-11">
                         {isLoadingDefinition && (
                             <div className="flex items-center gap-2 text-sm text-content-neutral-secondary">
                                 <LoadingIcon className="size-4" />

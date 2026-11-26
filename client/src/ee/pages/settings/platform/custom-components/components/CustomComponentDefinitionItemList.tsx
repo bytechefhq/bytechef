@@ -13,7 +13,7 @@ const CustomComponentDefinitionItemList = ({emptyMessage, items}: CustomComponen
     items.length > 0 ? (
         <ul className="divide-y divide-stroke-neutral-primary">
             {items.map((item) => (
-                <li className="py-2" key={item.name}>
+                <li className="-mx-3 rounded-md px-3 py-2 hover:bg-surface-neutral-primary-hover" key={item.name}>
                     <div className="text-sm font-medium">{item.title || item.name}</div>
 
                     <div className="text-xs text-content-neutral-secondary">{item.name}</div>
