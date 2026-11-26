@@ -46,7 +46,7 @@ const IntegrationPublishDialog = ({integration, onClose}: {integration: Integrat
                 <DialogMain>
                     <DialogHeader
                         description="Publish integration to activate its workflows."
-                        title={`Publish Integration ${integration.componentName}`}
+                        title={`Publish Integration ${integration.name ?? integration.componentName}`}
                     />
 
                     <DialogBody>
