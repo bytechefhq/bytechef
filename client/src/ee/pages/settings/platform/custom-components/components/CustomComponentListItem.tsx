@@ -118,7 +118,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
             onOpenChange={setIsExpanded}
             open={isExpanded}
         >
-            <div className="group w-full rounded-md px-3 py-4 hover:bg-surface-neutral-primary-hover">
+            <div className="group w-full rounded-md px-3 py-3 hover:bg-surface-neutral-primary-hover">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-1 items-center gap-x-2">
                         <CollapsibleTrigger asChild>
@@ -212,16 +212,14 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                             )}
                         </div>
 
-                        <div className="flex w-56 shrink-0 flex-col items-end gap-y-2">
-                            <div className="flex min-h-8 items-center">
-                                <Switch
-                                    checked={customComponent.enabled ?? false}
-                                    onCheckedChange={handleOnCheckedChange}
-                                />
-                            </div>
+                        <div className="flex w-56 shrink-0 flex-col items-end gap-y-4">
+                            <Switch
+                                checked={customComponent.enabled ?? false}
+                                onCheckedChange={handleOnCheckedChange}
+                            />
 
                             <Tooltip>
-                                <TooltipTrigger className="flex min-h-7 items-center text-sm text-content-neutral-secondary">
+                                <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
                                     {customComponent.lastModifiedDate ? (
                                         <span className="text-xs whitespace-nowrap">
                                             {`Modified at ${new Date(customComponent.lastModifiedDate).toLocaleDateString()} ${new Date(customComponent.lastModifiedDate).toLocaleTimeString()}`}
