@@ -30,7 +30,7 @@ export const FormLabelWithDescription = ({description, label, required}: FormLab
                 {required && <RequiredMark />}
             </span>
 
-            <TooltipProvider delayDuration={150}>
+            <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <button
