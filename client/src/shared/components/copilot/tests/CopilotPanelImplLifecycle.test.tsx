@@ -140,6 +140,10 @@ describe('CopilotPanelImpl', () => {
 
         expect(screen.getByText('No AI providers enabled')).toBeInTheDocument();
         expect(screen.queryByTestId('thread')).not.toBeInTheDocument();
+        expect(screen.getByRole('link', {name: 'How to set up AI providers'})).toHaveAttribute(
+            'href',
+            'https://docs.bytechef.io/platform/settings/ai/ai-providers'
+        );
 
         await user.click(screen.getByRole('button', {name: AI_PROVIDERS_LINK_LABEL}));
 
