@@ -29,7 +29,8 @@ public record AutomationProjectConfigurationDTO(
      */
     public record Workflow(
         String workflowUuid, String workflowId, String label, boolean enabled, @Nullable Instant lastExecutionDate,
-        Map<String, Long> providedConnections, Map<String, Object> providedInputs) {
+        Map<String, Long> providedConnections, Map<String, Object> providedInputs,
+        @Nullable String awaitedInputLabel) {
 
         public Workflow {
             providedConnections = providedConnections == null ? Map.of() : providedConnections;
