@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {NodeDataType} from '@/shared/types';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {fireEvent, render, screen} from '@testing-library/react';

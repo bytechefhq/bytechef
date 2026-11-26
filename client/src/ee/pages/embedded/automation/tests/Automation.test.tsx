@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';

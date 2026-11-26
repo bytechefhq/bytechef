@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Tabs, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {getClusterElementsLabel} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {ClickedDefinitionType, UpdateWorkflowMutationType} from '@/shared/types';

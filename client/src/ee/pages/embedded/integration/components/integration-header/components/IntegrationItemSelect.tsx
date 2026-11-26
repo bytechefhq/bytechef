@@ -6,8 +6,8 @@ import {
     DropdownMenuRadioItem,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Skeleton} from '@/components/ui/skeleton';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import {ChevronDownIcon} from 'lucide-react';
 

@@ -1,6 +1,6 @@
 import Badge from '@/components/Badge/Badge';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ComponentIcon} from 'lucide-react';

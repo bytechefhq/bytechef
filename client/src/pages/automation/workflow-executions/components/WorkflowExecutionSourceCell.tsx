@@ -1,4 +1,4 @@
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {WorkflowExecution, WorkflowExecutionSourceEnum} from '@/shared/middleware/automation/workflow/execution';
 import {Layers3Icon, LayoutTemplateIcon, type LucideIcon, NetworkIcon, ServerIcon} from 'lucide-react';
 

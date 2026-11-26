@@ -2,7 +2,7 @@ import {createRoot} from 'react-dom/client';
 
 import './styles/index.css';
 
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import I18n from '@/i18n';
 import {buildLoginPath} from '@/shared/auth/login-redirect-utils';
 import {ConditionalPostHogProvider} from '@/shared/providers/conditional-posthog-provider';

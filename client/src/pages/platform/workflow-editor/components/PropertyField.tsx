@@ -1,4 +1,4 @@
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {TYPE_ICONS} from '@/shared/typeIcons';
 import {PropertyAllType} from '@/shared/types';
 import {ClipboardCheck, ClipboardIcon, InfoIcon} from 'lucide-react';

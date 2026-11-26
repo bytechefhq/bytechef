@@ -1,6 +1,7 @@
 import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import Switch from '@/components/Switch/Switch';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
     DropdownMenu,
@@ -9,7 +10,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ApiConnectorEditDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorEditDialog';
 import ApiConnectorEndpointListItem from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorEndpointListItem';
 import {ApiConnector} from '@/shared/middleware/graphql';

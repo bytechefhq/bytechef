@@ -6,7 +6,7 @@ import {
     DropdownMenuRadioItem,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {ChevronDownIcon, type LucideIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 import InlineSVG from 'react-inlinesvg';

@@ -1,7 +1,7 @@
 import Badge from '@/components/Badge/Badge';
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import ConnectionListItemDropdownMenu from '@/shared/components/connection/ConnectionListItemDropdownMenu';
 import isCollapsibleRowClick, {

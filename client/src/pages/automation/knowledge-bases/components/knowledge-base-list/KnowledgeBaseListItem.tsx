@@ -6,7 +6,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import EditKnowledgeBaseDialog from '@/pages/automation/knowledge-base/components/EditKnowledgeBaseDialog';
 import KnowledgeBaseListItemDeleteDialog from '@/pages/automation/knowledge-bases/components/knowledge-base-list/KnowledgeBaseListItemDeleteDialog';
 import KnowledgeBaseListItemTagList from '@/pages/automation/knowledge-bases/components/knowledge-base-list/KnowledgeBaseListItemTagList';

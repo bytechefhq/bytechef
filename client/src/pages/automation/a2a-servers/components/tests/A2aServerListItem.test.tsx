@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {A2aServer} from '@/shared/middleware/graphql';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {render, screen, waitFor} from '@testing-library/react';

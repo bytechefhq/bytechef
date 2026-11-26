@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import BreadcrumbTitleSelect, {getPublishedVersion} from '@/shared/components/BreadcrumbTitleSelect';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {FolderIcon} from 'lucide-react';

@@ -1,9 +1,9 @@
 import Button from '@/components/Button/Button';
 import {Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader, DialogMain} from '@/components/Dialog';
 import {Input} from '@/components/Input/Input';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useCreateTestDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/hooks/useCreateTestDialog';
 import {InfoIcon} from 'lucide-react';
 

@@ -53,7 +53,7 @@ vi.mock('@/components/ui/collapsible', () => ({
     CollapsibleTrigger: ({children}: {children: React.ReactNode}) => <button type="button">{children}</button>,
 }));
 
-vi.mock('@/components/ui/tooltip', () => ({
+vi.mock('@/components/Tooltip/Tooltip', () => ({
     Tooltip: ({children}: {children: React.ReactNode}) => <>{children}</>,
     TooltipContent: ({children}: {children: React.ReactNode}) => <div>{children}</div>,
     TooltipTrigger: ({children}: {children: React.ReactNode}) => <div>{children}</div>,

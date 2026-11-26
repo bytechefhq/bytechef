@@ -1,7 +1,7 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import PageLoader from '@/components/PageLoader';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import useCodeWorkflowHeaderStore from '@/pages/platform/code-workflow/stores/useCodeWorkflowHeaderStore';
 import MonacoEditorWrapper from '@/shared/components/MonacoEditorWrapper';
 import {CompletionContextType, ScriptLanguageType} from '@/shared/components/monaco/completion/completionTypes';

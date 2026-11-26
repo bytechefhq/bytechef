@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {
     createTestQueryClientWrapper,

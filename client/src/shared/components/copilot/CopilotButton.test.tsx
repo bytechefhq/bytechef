@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';

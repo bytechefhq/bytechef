@@ -1,4 +1,4 @@
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {ForwardRefExoticComponent, SVGProps} from 'react';
 import {twMerge} from 'tailwind-merge';
 

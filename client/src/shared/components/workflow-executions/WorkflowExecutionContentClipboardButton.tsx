@@ -1,5 +1,5 @@
 import Button from '@/components/Button/Button';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {SPACE} from '@/shared/constants';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {CheckIcon, CopyIcon} from 'lucide-react';

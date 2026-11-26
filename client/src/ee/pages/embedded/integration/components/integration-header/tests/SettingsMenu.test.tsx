@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import SettingsMenu from '@/ee/pages/embedded/integration/components/integration-header/components/settings-menu/SettingsMenu';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {render, screen, userEvent, waitFor} from '@/shared/util/test-utils';

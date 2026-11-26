@@ -1,5 +1,5 @@
 import Button from '@/components/Button/Button';
-import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {XIcon} from 'lucide-react';
 
 interface DeletePropertyButtonProps {

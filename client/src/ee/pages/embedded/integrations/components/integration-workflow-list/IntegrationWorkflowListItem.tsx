@@ -1,4 +1,4 @@
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import IntegrationWorkflowPermissionExpressionField from '@/ee/pages/embedded/integrations/components/integration-workflow-list/IntegrationWorkflowPermissionExpressionField';
 import {Integration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import {useDeleteWorkflowMutation, useUpdateWorkflowMutation} from '@/ee/shared/mutations/embedded/workflows.mutations';

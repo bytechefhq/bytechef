@@ -1,8 +1,8 @@
 import Badge, {BadgeStyleType} from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import Switch from '@/components/Switch/Switch';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiProviderForm from '@/pages/settings/platform/ai-providers/components/AiProviderForm';
 import {AiProvider} from '@/shared/middleware/platform/configuration';
 import {useEnableAiProviderMutation} from '@/shared/mutations/platform/aiProvider.mutations';

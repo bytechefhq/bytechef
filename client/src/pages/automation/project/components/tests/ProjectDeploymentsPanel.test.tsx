@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import ProjectDeploymentsPanel from '@/pages/automation/project/components/ProjectDeploymentsPanel';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {Project, ProjectDeployment} from '@/shared/middleware/automation/configuration';

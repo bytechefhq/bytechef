@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {Skeleton} from '@/components/ui/skeleton';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {SparklesIcon, WorkflowIcon} from 'lucide-react';

@@ -1,7 +1,7 @@
 import Badge from '@/components/Badge/Badge';
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {getTemplateCategoryLabel} from '@/pages/automation/templates/constants/templateCategories';
 import {Link} from 'react-router-dom';
 

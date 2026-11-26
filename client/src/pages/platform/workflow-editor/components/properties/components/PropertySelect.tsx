@@ -1,7 +1,7 @@
 import RequiredMark from '@/components/RequiredMark';
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Label} from '@/components/ui/label';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {SelectOptionType} from '@/shared/types';
 import {CheckIcon, CircleQuestionMarkIcon} from 'lucide-react';
 import {Select as SelectPrimitive} from 'radix-ui';

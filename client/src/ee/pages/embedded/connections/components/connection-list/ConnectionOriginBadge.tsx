@@ -1,5 +1,5 @@
 import Badge from '@/components/Badge/Badge';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {CONNECTION_ORIGIN_BADGES} from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connectionOriginBadges';
 import {ConnectionOriginEnum} from '@/ee/shared/middleware/embedded/configuration';
 

@@ -2,7 +2,7 @@ import {createRoot} from 'react-dom/client';
 
 import '../styles/index.css';
 
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import EmbeddedWorkflowBuilderApp from '@/ee/EmbeddedWorkflowBuilderApp';
 import WorkflowBuilder from '@/ee/pages/embedded/workflow-builder/WorkflowBuilder';
 import I18n from '@/i18n';

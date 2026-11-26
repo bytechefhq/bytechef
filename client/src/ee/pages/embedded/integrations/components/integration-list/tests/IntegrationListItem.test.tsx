@@ -1,5 +1,5 @@
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {Collapsible} from '@/components/ui/collapsible';
-import {TooltipProvider} from '@/components/ui/tooltip';
 import IntegrationListItem from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationListItem';
 import {IntegrationListItemTabType} from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationListItemTabs';
 import {

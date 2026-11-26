@@ -1,10 +1,10 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {Skeleton} from '@/components/ui/skeleton';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AutomationEditorProjectSelect, {
     ALL_PROJECTS_VALUE,
 } from '@/ee/pages/embedded/automation/components/automation-editor/components/AutomationEditorProjectSelect';

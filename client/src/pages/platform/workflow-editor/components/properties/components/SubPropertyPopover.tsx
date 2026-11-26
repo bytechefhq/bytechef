@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Popover, PopoverClose, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import PropertySelect from '@/pages/platform/workflow-editor/components/properties/components/PropertySelect';
 import PropertyInput from '@/pages/platform/workflow-editor/components/properties/components/property-input/PropertyInput';
 import {encodePath} from '@/pages/platform/workflow-editor/utils/encodingUtils';

@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {render as testingLibraryRender, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {ReactElement} from 'react';

@@ -1,7 +1,7 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ApiConnectorEndpoint} from '@/shared/middleware/graphql';
 import {CalendarIcon, EllipsisVerticalIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';

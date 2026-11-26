@@ -1,6 +1,6 @@
 import Badge from '@/components/Badge/Badge';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Separator} from '@/components/ui/separator';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowsListItem from '@/pages/automation/project/components/projects-sidebar/components/WorkflowsListItem';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {Fragment, useMemo} from 'react';

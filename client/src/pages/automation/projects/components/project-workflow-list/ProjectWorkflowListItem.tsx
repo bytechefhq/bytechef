@@ -1,5 +1,5 @@
 import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {WorkflowShareDialog} from '@/pages/automation/project/components/WorkflowShareDialog';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import WorkflowDescriptionTooltip from '@/shared/components/workflow/WorkflowDescriptionTooltip';

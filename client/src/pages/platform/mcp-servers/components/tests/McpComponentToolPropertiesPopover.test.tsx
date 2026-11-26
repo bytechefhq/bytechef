@@ -33,8 +33,8 @@ vi.mock('@/pages/platform/workflow-editor/components/properties/Properties', () 
     return {default: PropertiesStub};
 });
 
-vi.mock('@/components/ui/tooltip', async () => {
-    const actual = await vi.importActual<Record<string, unknown>>('@/components/ui/tooltip');
+vi.mock('@/components/Tooltip/Tooltip', async () => {
+    const actual = await vi.importActual<Record<string, unknown>>('@/components/Tooltip/Tooltip');
 
     return actual;
 });

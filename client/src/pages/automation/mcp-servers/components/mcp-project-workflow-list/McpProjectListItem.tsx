@@ -1,6 +1,6 @@
 import Badge from '@/components/Badge/Badge';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import {FolderIcon} from 'lucide-react';

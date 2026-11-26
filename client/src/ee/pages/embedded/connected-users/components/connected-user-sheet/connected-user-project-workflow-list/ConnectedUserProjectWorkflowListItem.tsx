@@ -3,7 +3,7 @@ import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {
     AWAITING_CONFIGURATION_REASON,
     TURNED_OFF_BY_ADMINISTRATOR_REASON,

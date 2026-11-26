@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import AutomationProjectWorkflowListItem from '@/ee/pages/embedded/automations/components/automation-project-list/AutomationProjectWorkflowListItem';
 import {resetAll, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';

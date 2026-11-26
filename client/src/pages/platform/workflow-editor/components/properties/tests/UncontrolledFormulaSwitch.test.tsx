@@ -1,6 +1,6 @@
 vi.mock('@/pages/platform/workflow-editor/utils/saveProperty', () => ({default: vi.fn()}));
 
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {FormulaEnabledProvider} from '@/pages/platform/workflow-editor/components/properties/FormulaEnabledContext';
 import Property from '@/pages/platform/workflow-editor/components/properties/Property';
 import {workflowEditorProviderTestValue} from '@/pages/platform/workflow-editor/providers/tests/workflowEditorProviderTestValue';

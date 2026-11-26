@@ -1,10 +1,10 @@
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {Skeleton} from '@/components/ui/skeleton';
-import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/ui/tooltip';
 import CurrentOperationSelect from '@/pages/platform/workflow-editor/components/CurrentOperationSelect';
 import DescriptionTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DescriptionTab';
 import ConnectionTab from '@/pages/platform/workflow-editor/components/node-details-tabs/connection-tab/ConnectionTab';

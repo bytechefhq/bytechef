@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {render, screen} from '@/shared/util/test-utils';
 import userEvent from '@testing-library/user-event';
 import {describe, expect, it, vi} from 'vitest';

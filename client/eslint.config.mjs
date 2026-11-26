@@ -229,6 +229,7 @@ export default [
             'src/components/Button/Button.tsx',
             'src/components/Select/Select.tsx',
             'src/components/Switch/Switch.tsx',
+            'src/components/Tooltip/Tooltip.tsx',
         ],
         rules: {
             '@typescript-eslint/no-restricted-imports': 'off',

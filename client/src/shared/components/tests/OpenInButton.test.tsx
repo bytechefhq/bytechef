@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import OpenInButton from '@/shared/components/OpenInButton';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {describe, expect, it, vi} from 'vitest';

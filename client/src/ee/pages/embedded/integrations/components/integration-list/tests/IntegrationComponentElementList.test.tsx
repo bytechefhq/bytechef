@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import IntegrationComponentElementList from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationComponentElementList';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {describe, expect, it, vi} from 'vitest';

@@ -5,6 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {
     Breadcrumb,
     BreadcrumbEllipsis,
@@ -13,7 +14,6 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {EXECUTIONS_PANEL_HEADER_CLASS_NAME} from '@/shared/components/workflow-executions/workflowExecutionsPanelClassNames';
 import {ChevronLeftIcon, WorkflowIcon} from 'lucide-react';
 import {CSSProperties, useEffect, useRef, useState} from 'react';

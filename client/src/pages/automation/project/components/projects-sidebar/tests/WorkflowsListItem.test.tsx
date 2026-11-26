@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import WorkflowsListItem from '@/pages/automation/project/components/projects-sidebar/components/WorkflowsListItem';
 import {fireEvent, render, screen, userEvent} from '@/shared/util/test-utils';
 import {MemoryRouter} from 'react-router-dom';

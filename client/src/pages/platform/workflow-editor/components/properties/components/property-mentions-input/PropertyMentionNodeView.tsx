@@ -1,5 +1,5 @@
 import Button from '@/components/Button/Button';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {setArrayIndex, splitByArrayIndex} from '@/pages/platform/workflow-editor/utils/dataPillArrayIndex';
 import {

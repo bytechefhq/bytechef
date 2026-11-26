@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import ProjectWorkflowsList from '@/pages/automation/project/components/projects-sidebar/components/ProjectWorkflowsList';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {render, screen} from '@/shared/util/test-utils';

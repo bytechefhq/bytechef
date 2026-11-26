@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {pickToolFormChanges} from '@/pages/platform/mcp-servers/hooks/useMcpComponentToolForms';
 import buildToolParametersPayload from '@/pages/platform/mcp-servers/utils/buildToolParametersPayload';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';

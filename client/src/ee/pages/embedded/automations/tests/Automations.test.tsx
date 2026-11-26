@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {act, createTestQueryClientWrapper, screen, userEvent, waitFor, within} from '@/shared/util/test-utils';
 import {render} from '@testing-library/react';
 import {ReactElement, ReactNode} from 'react';

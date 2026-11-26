@@ -1,5 +1,5 @@
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {Collapsible} from '@/components/ui/collapsible';
-import {TooltipProvider} from '@/components/ui/tooltip';
 import ProjectListItem from '@/pages/automation/projects/components/project-list/ProjectListItem';
 import {ProjectListItemTabType} from '@/pages/automation/projects/components/project-list/ProjectListItemTabs';
 import {Project, ProjectStatus} from '@/shared/middleware/automation/configuration';

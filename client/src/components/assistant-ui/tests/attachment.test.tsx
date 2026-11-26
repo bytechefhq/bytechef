@@ -1,5 +1,5 @@
 import {Thread} from '@/components/assistant-ui/thread';
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {render, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {AssistantRuntimeProvider, ThreadMessageLike, useExternalStoreRuntime} from '@assistant-ui/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';

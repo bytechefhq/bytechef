@@ -14,7 +14,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@/components/Tooltip/Tooltip";
 import {
   Dialog,
   DialogContent,

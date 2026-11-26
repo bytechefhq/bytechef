@@ -1,7 +1,7 @@
 import {MultiSelect, MultiSelectOptionType} from '@/components/MultiSelect/MultiSelect';
 import RequiredMark from '@/components/RequiredMark';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Label} from '@/components/ui/label';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {GetClusterElementNodeOptionsRequest, OptionsDataSource} from '@/shared/middleware/platform/configuration';
 import {
     useGetClusterElementNodeOptionsQuery,

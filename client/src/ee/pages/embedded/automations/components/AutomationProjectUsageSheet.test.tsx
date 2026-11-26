@@ -19,7 +19,7 @@ vi.mock('@/shared/middleware/graphql', async () => {
     };
 });
 
-vi.mock('@/components/ui/tooltip', () => ({
+vi.mock('@/components/Tooltip/Tooltip', () => ({
     Tooltip: ({children}: {children: React.ReactNode}) => <div>{children}</div>,
     TooltipContent: ({children}: {children: React.ReactNode}) => <div data-testid="tooltip-content">{children}</div>,
     TooltipTrigger: ({children}: {children: React.ReactNode}) => <div data-testid="tooltip-trigger">{children}</div>,

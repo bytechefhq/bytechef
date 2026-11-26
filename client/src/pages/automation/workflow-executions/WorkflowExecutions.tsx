@@ -6,8 +6,8 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import TablePagination from '@/components/TablePagination';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Label} from '@/components/ui/label';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useWorkflowExecutions} from '@/pages/automation/workflow-executions/hooks/useWorkflowExecutions';
 import {
     getProjectDeploymentLabel,

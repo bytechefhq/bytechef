@@ -1,5 +1,5 @@
 import {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {PlatformType} from '@/shared/middleware/graphql';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {MemoryRouter} from 'react-router-dom';

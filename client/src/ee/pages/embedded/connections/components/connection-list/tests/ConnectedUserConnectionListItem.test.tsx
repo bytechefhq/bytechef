@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {Connection, ConnectionOriginEnum} from '@/ee/shared/middleware/embedded/configuration';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
 import {render, resetAll, screen, userEvent, windowResizeObserver, within} from '@/shared/util/test-utils';

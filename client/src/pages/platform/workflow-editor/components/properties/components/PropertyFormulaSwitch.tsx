@@ -1,5 +1,5 @@
 import Switch from '@/components/Switch/Switch';
-import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 
 interface PropertyFormulaSwitchProps {
     disabled?: boolean;

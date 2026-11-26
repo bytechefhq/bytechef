@@ -1,3 +1,4 @@
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -7,7 +8,6 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Skeleton} from '@/components/ui/skeleton';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {AutomationProjectsQuery} from '@/shared/middleware/graphql';
 import {ChevronDownIcon} from 'lucide-react';
 

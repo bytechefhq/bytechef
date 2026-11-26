@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {CustomComponent, CustomComponentLanguage, CustomComponentStatus} from '@/shared/middleware/graphql';
 import {fireEvent, render, resetAll, screen, userEvent} from '@/shared/util/test-utils';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';

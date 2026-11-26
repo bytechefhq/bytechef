@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {EmbeddedAiAutoMemoriesQuery, EmbeddedAiAutoMemoryConnectedUsersQuery} from '@/shared/middleware/graphql';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {render, screen, within} from '@testing-library/react';

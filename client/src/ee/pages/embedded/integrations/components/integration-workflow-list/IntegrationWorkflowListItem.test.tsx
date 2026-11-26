@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import IntegrationWorkflowListItem from '@/ee/pages/embedded/integrations/components/integration-workflow-list/IntegrationWorkflowListItem';
 import {Integration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import {act, render, screen, userEvent} from '@/shared/util/test-utils';

@@ -1,5 +1,5 @@
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {Collapsible} from '@/components/ui/collapsible';
-import {TooltipProvider} from '@/components/ui/tooltip';
 import AutomationProjectListItem from '@/ee/pages/embedded/automations/components/automation-project-list/AutomationProjectListItem';
 import {AutomationProjectsQuery} from '@/shared/middleware/graphql';
 import {

@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {GraphQLResponseError} from '@/shared/middleware/graphqlFetcher';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';

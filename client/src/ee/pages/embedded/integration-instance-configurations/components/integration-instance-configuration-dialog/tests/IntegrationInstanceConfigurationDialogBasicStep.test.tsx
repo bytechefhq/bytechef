@@ -1,5 +1,5 @@
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {Form} from '@/components/ui/form';
-import {TooltipProvider} from '@/components/ui/tooltip';
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {Authorization, AuthorizationType} from '@/shared/middleware/platform/configuration';
 import {mockScrollIntoView, render, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';

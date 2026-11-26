@@ -9,8 +9,8 @@ import {
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import Switch from '@/components/Switch/Switch';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     NO_CONNECTED_USERS_REASON,
     NO_OTHER_CONFIGURATION_REASON,

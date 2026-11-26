@@ -32,6 +32,12 @@ export const restrictedImports = {
             allowTypeImports: true,
         },
         {
+            name: '@/components/ui/tooltip',
+            message:
+                "Import Tooltip primitives from '@/components/Tooltip/Tooltip' instead. The wrapper opens tooltips after a short delay; the shadcn base opens them instantly.",
+            allowTypeImports: true,
+        },
+        {
             name: '@/components/ui/alert-dialog',
             message:
                 "Import AlertDialog from '@/components/AlertDialog' instead. It builds on the design-system Dialog and handles the pending state, so a confirmed action cannot be submitted twice or dismissed mid-flight.",

@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import ProjectTitle from '@/pages/automation/project/components/project-header/components/ProjectTitle';
 import {Project, ProjectStatus} from '@/shared/middleware/automation/configuration';
 import {render, screen, userEvent} from '@/shared/util/test-utils';

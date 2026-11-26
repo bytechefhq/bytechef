@@ -7,7 +7,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import {Input} from '@/components/Input/Input';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import AiSkillsPanel from '@/pages/automation/ai/skills/AiSkillsPanel';
 import AiSkillsCreateDropdown from '@/pages/automation/ai/skills/components/AiSkillsCreateDropdown';
 import useAiSkills from '@/pages/automation/ai/skills/hooks/useAiSkills';

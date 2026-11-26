@@ -1,7 +1,7 @@
 import RequiredMark from '@/components/RequiredMark';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import PropertyFormulaSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyFormulaSwitch';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {CircleQuestionMarkIcon} from 'lucide-react';

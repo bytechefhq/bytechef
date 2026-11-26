@@ -1,5 +1,5 @@
 import {DropdownMenu, DropdownMenuContent} from '@/components/DropdownMenu/DropdownMenu';
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import ProjectTabButtons from '@/pages/automation/project/components/project-header/components/settings-menu/components/ProjectTabButtons/ProjectTabButtons';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';

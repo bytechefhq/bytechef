@@ -4,8 +4,8 @@ import DatePicker from '@/components/DatePicker/DatePicker';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import TablePagination from '@/components/TablePagination';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Label} from '@/components/ui/label';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ExternalInvocationDetailsDialog from '@/pages/automation/external-invocations/components/ExternalInvocationDetailsDialog';
 import ExternalInvocationsTable from '@/pages/automation/external-invocations/components/ExternalInvocationsTable';
 import {

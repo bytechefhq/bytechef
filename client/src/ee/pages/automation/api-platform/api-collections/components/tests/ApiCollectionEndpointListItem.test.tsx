@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {ApiCollectionEndpoint} from '@/ee/shared/middleware/automation/api-platform';
 import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
 import {ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';

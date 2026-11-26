@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {i18n} from '@lingui/core';
 import {I18nProvider} from '@lingui/react';
 import {render, screen, within} from '@testing-library/react';

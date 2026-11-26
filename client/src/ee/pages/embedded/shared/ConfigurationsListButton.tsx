@@ -1,5 +1,5 @@
 import Button from '@/components/Button/Button';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {ListIcon} from 'lucide-react';
 
 interface ConfigurationsListButtonProps {

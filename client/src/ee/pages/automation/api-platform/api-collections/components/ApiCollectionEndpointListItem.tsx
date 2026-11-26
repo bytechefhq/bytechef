@@ -3,6 +3,7 @@ import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import Switch from '@/components/Switch/Switch';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,7 +11,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ApiCollectionEndpointDialog from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionEndpointDialog';
 import {getApiCollectionEndpointPath} from '@/ee/pages/automation/api-platform/api-collections/utils/getApiCollectionEndpointPath';
 import {ApiCollectionEndpoint} from '@/ee/shared/middleware/automation/api-platform';

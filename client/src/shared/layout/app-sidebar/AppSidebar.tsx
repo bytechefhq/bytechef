@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {
     Sidebar,
     SidebarContent,
@@ -12,7 +13,6 @@ import {
     SidebarRail,
     useSidebar,
 } from '@/components/ui/sidebar';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';

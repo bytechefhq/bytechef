@@ -1,6 +1,6 @@
 import Badge from '@/components/Badge/Badge';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     EXECUTIONS_TABLE_CELL_CLASS_NAME,
     EXECUTIONS_TABLE_HEADER_CLASS_NAME,

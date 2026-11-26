@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AutomationExecutionsSheet from '@/ee/pages/embedded/automations/components/automation-executions-sheet/AutomationExecutionsSheet';
 import AutomationProjectConfigurationDialog from '@/ee/pages/embedded/automations/components/automation-project-configuration-dialog/AutomationProjectConfigurationDialog';
 import AutomationProjectConfigurationList from '@/ee/pages/embedded/automations/components/automation-project-configuration-list/AutomationProjectConfigurationList';

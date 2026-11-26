@@ -1,8 +1,8 @@
 import Button from '@/components/Button/Button';
 import RequiredMark from '@/components/RequiredMark';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Label} from '@/components/ui/label';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {CanvasPropertyEditorProvider} from '@/pages/platform/workflow-editor/components/properties/CanvasPropertyEditorContext';
 import Property from '@/pages/platform/workflow-editor/components/properties/Property';
 import PropertyFormulaSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyFormulaSwitch';

@@ -1,5 +1,5 @@
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ChevronDownIcon, ChevronRightIcon, FolderIcon} from 'lucide-react';
 import {ReactNode, useState} from 'react';
 

@@ -6,7 +6,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import Switch from '@/components/Switch/Switch';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import useAutomationExecutionsSheetStore from '@/ee/pages/embedded/automations/stores/useAutomationExecutionsSheetStore';
 import OpenAutomationButton from '@/ee/pages/embedded/shared/OpenAutomationButton';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';

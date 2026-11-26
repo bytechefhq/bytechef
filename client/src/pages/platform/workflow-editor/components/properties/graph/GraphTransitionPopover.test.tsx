@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {GraphTransitionType} from '@/shared/types';
 import {act, fireEvent, render, screen} from '@testing-library/react';

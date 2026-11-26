@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import IntegrationConfigurationsSheet from '@/ee/pages/embedded/integration/components/IntegrationConfigurationsSheet';
 import {Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {render, screen, userEvent} from '@/shared/util/test-utils';

@@ -1,4 +1,4 @@
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import WorkflowComponentsIcon, {
     WorkflowComponentIconDefinitionType,
 } from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';

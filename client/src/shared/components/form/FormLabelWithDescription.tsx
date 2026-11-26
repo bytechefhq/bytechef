@@ -1,6 +1,6 @@
 import RequiredMark from '@/components/RequiredMark';
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {FormLabel} from '@/components/ui/form';
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from '@/components/ui/tooltip';
 import {InfoIcon} from 'lucide-react';
 
 import type {ReactNode} from 'react';

@@ -1,4 +1,4 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
+import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {AutomationProjectTagsQuery, AutomationProjectsQuery, CodeWorkflowLanguage} from '@/shared/middleware/graphql';
 import {createTestQueryClientWrapper, screen, userEvent} from '@/shared/util/test-utils';
 import {render} from '@testing-library/react';

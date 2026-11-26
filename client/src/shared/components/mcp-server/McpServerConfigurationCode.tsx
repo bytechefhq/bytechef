@@ -1,7 +1,7 @@
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Card} from '@/components/ui/card';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {AlertTriangleIcon, CheckIcon, CopyIcon, RefreshCwIcon} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
