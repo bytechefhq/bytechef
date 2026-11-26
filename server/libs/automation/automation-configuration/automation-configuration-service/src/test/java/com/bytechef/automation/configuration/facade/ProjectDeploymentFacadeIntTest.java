@@ -1323,7 +1323,7 @@ public class ProjectDeploymentFacadeIntTest {
                         new ProjectDeploymentWorkflowDTO(
                             projectDeploymentWorkflow.connections(), null, null, projectDeploymentWorkflow.inputs(),
                             projectDeploymentWorkflow.enabled(), projectDeploymentWorkflow.id(), null, null, null,
-                            null, projectDeploymentWorkflow.projectDeploymentId(), null,
+                            null, null, projectDeploymentWorkflow.projectDeploymentId(), null,
                             projectDeploymentWorkflow.version(), projectWorkflow.getWorkflowId(),
                             projectDeploymentWorkflow.workflowUuid()));
                 }

@@ -109,10 +109,11 @@ class RollbackProjectDeploymentToolCallbackTest {
             .projectDeploymentWorkflows(
                 List.of(
                     new ProjectDeploymentWorkflowDTO(
-                        connections, null, null, Map.of("key", "value"), true, 70L, null, null, null, null, 7L, null,
+                        connections, null, null, Map.of("key", "value"), true, 70L, null, null, null, null, null, 7L,
+                        null,
                         0, "workflow-v3", "uuid-1"),
                     new ProjectDeploymentWorkflowDTO(
-                        List.of(), null, null, Map.of(), false, 71L, null, null, null, null, 7L, null, 0,
+                        List.of(), null, null, Map.of(), false, 71L, null, null, null, null, null, 7L, null, 0,
                         "added-in-v3", "uuid-2")))
             .build();
 
