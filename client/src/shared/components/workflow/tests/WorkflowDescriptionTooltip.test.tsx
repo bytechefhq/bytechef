@@ -3,7 +3,7 @@ import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {describe, expect, it} from 'vitest';
 
-import WorkflowDescriptionTooltip, {WORKFLOW_DESCRIPTION_TOOLTIP_DELAY_DURATION} from '../WorkflowDescriptionTooltip';
+import WorkflowDescriptionTooltip from '../WorkflowDescriptionTooltip';
 
 const renderTooltip = (description?: string) =>
     render(
@@ -41,7 +41,7 @@ describe('WorkflowDescriptionTooltip', () => {
                 expect(document.querySelector('[data-slot="tooltip-content"]')).toHaveTextContent(
                     'Copies new orders to the warehouse sheet'
                 ),
-            {timeout: WORKFLOW_DESCRIPTION_TOOLTIP_DELAY_DURATION + 2000}
+            {timeout: 2500}
         );
     });
 
@@ -55,7 +55,7 @@ describe('WorkflowDescriptionTooltip', () => {
         expect(document.querySelector('[data-slot="tooltip-content"]')).toBeNull();
 
         await waitFor(() => expect(document.querySelector('[data-slot="tooltip-content"]')).not.toBeNull(), {
-            timeout: WORKFLOW_DESCRIPTION_TOOLTIP_DELAY_DURATION + 2000,
+            timeout: 2500,
         });
     });
 });

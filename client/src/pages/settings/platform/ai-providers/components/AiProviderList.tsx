@@ -133,7 +133,7 @@ const AiProviderList = ({aiProviders, environment}: {aiProviders: AiProvider[]; 
 
                                             {AI_PROVIDER_BADGES.filter((badge) => badge.isShown(aiProvider)).map(
                                                 (badge) => (
-                                                    <Tooltip delayDuration={500} key={badge.label}>
+                                                    <Tooltip key={badge.label}>
                                                         <TooltipTrigger asChild>
                                                             <Badge
                                                                 label={badge.label}
