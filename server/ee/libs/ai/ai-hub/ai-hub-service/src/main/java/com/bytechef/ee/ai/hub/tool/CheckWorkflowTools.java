@@ -40,8 +40,10 @@ public class CheckWorkflowTools {
         description = "Check a saved workflow the way the workflow editor does and return every error it would flag: " +
             "missing connections, data pills that reference nothing, unknown resources such as data tables, invalid " +
             "parameters. An empty issues list means the editor shows no errors. Issues with userAction true need " +
-            "the user, such as a connection to create. Call it before describing an existing workflow as working, " +
-            "complete or ready.")
+            "the user, such as a connection to create. Warnings are the editor's warnings: name each one to the user, "
+            +
+            "and for a reference into a task whose output is only known after it runs, such as a script task, say a " +
+            "test run will confirm it. Call it before describing an existing workflow as working, complete or ready.")
     public WorkflowCheck checkWorkflow(
         @ToolParam(description = "The id of the workflow to check") String workflowId, ToolContext toolContext) {
 
@@ -59,7 +61,8 @@ public class CheckWorkflowTools {
             throw new IllegalArgumentException("Workflow " + workflowId + " was not found. Check the workflow id.");
         }
 
-        return new WorkflowCheck(workflowId, persistedWorkflowChecker.check(workflowId));
+        return new WorkflowCheck(
+            workflowId, persistedWorkflowChecker.check(workflowId), persistedWorkflowChecker.checkWarnings(workflowId));
     }
 
     private @Nullable Project fetchWorkflowProject(String workflowId) {
@@ -70,10 +73,12 @@ public class CheckWorkflowTools {
         }
     }
 
-    public record WorkflowCheck(String workflowId, List<PersistedWorkflowChecker.Issue> issues) {
+    public record WorkflowCheck(
+        String workflowId, List<PersistedWorkflowChecker.Issue> issues, List<PersistedWorkflowChecker.Issue> warnings) {
 
         public WorkflowCheck {
             issues = List.copyOf(issues);
+            warnings = List.copyOf(warnings);
         }
     }
 }

@@ -40,9 +40,11 @@ Connections and component options:
   (knowledgeBaseId).
 
 Checking workflows:
-- checkWorkflow({workflowId}) - the errors the workflow editor shows for a saved
-  workflow. Call it before you describe a workflow as working, complete or ready; an
+- checkWorkflow({workflowId}) - the errors and warnings the workflow editor shows for a
+  saved workflow. Call it before you describe a workflow as working, complete or ready; an
   empty issues list is the only evidence that it is.
+  Name every warning it returns; a reference into a script task's output is expected, so
+  say a test run will confirm it.
 
 Executions:
 - listWorkflowExecutions({jobStatus?, workflowId?}) - recent runs in the workspace, newest

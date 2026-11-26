@@ -42,14 +42,17 @@ class CheckWorkflowToolsTest {
     @Test
     void testCheckWorkflowReturnsTheEditorIssues() {
         List<Issue> issues = List.of(new Issue("googleMail_1", "Connection is required", true));
+        List<Issue> warnings = List.of(new Issue("send_1", "Property 'python_1.goal' might not exist", false));
 
         when(projectService.getWorkflowProject(WORKFLOW_ID)).thenReturn(projectInWorkspace(7L));
         when(persistedWorkflowChecker.check(WORKFLOW_ID)).thenReturn(issues);
+        when(persistedWorkflowChecker.checkWarnings(WORKFLOW_ID)).thenReturn(warnings);
 
         WorkflowCheck workflowCheck = checkWorkflowTools.checkWorkflow(WORKFLOW_ID, workspaceContext(7L));
 
         assertThat(workflowCheck.workflowId()).isEqualTo(WORKFLOW_ID);
         assertThat(workflowCheck.issues()).isEqualTo(issues);
+        assertThat(workflowCheck.warnings()).isEqualTo(warnings);
     }
 
     @Test
