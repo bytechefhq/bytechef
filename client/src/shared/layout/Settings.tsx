@@ -51,20 +51,12 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
             return isFeatureFlagEnabled('ff-207');
         }
 
-        if (pageKey === 'custom-components') {
-            return isFeatureFlagEnabled('ff-1024');
-        }
-
         if (pageKey === 'git-configuration') {
             return isFeatureFlagEnabled('ff-1039');
         }
 
         if (pageKey === 'mcp-server') {
             return isFeatureFlagEnabled('ff-2197');
-        }
-
-        if (pageKey === 'admin-api-keys') {
-            return isFeatureFlagEnabled('ff-1024');
         }
 
         if (pageKey === 'identity-providers') {

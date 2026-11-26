@@ -130,11 +130,11 @@ describe('Settings', () => {
         renderSettings([
             {title: 'Organization'},
             {href: 'users', title: 'Users'},
-            {items: [{href: 'custom-components', title: 'Custom Components'}], title: 'AI'},
+            {items: [{href: 'git-configuration', title: 'Git Configuration'}], title: 'AI'},
         ]);
 
         expect(screen.queryByText('AI')).not.toBeInTheDocument();
-        expect(screen.queryByText('Custom Components')).not.toBeInTheDocument();
+        expect(screen.queryByText('Git Configuration')).not.toBeInTheDocument();
         expect(screen.getByText('Users')).toBeInTheDocument();
     });
 
@@ -158,9 +158,17 @@ describe('Settings', () => {
         expect(screen.getByText('API Connectors')).toBeInTheDocument();
     });
 
-    it('does not mark the workspace API Keys page current on the Organization Admin API Keys page', () => {
-        hoisted.enabledFeatureFlags = ['ff-1024'];
+    it('shows Custom Components and Admin API Keys with no feature flag on', () => {
+        renderSettings([
+            {href: '/settings/custom-components', title: 'Custom Components'},
+            {href: '/settings/admin-api-keys', title: 'Admin API Keys'},
+        ]);
 
+        expect(screen.getByText('Custom Components')).toBeInTheDocument();
+        expect(screen.getByText('Admin API Keys')).toBeInTheDocument();
+    });
+
+    it('does not mark the workspace API Keys page current on the Organization Admin API Keys page', () => {
         renderSettings(
             [
                 {href: '/automation/settings/workspace-api-keys', title: 'API Keys'},
