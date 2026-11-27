@@ -16,6 +16,16 @@ const splitAtOrganization = (navItems: SettingsNavItemI[]) => {
 };
 
 describe('getSettingsNavItems', () => {
+    it('marks the Organization MCP Server page as beta in both modes', () => {
+        [PlatformType.AUTOMATION, PlatformType.EMBEDDED].forEach((mode) => {
+            const mcpServerNavItem = getSettingsNavItems(mode).find(
+                (navItem) => navItem.href === '/settings/mcp-server'
+            );
+
+            expect(mcpServerNavItem).toMatchObject({badge: 'Beta', title: 'MCP Server'});
+        });
+    });
+
     it('lists Memories and Hub under an AI group of the Automation current workspace, not under the Organization AI group', () => {
         const {organization, section} = splitAtOrganization(getSettingsNavItems(PlatformType.AUTOMATION));
 

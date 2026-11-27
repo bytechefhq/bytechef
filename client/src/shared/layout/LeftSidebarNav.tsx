@@ -1,3 +1,4 @@
+import Badge from '@/components/Badge/Badge';
 import {buttonVariants} from '@/components/ui/button';
 import {Skeleton} from '@/components/ui/skeleton';
 import {cn} from '@/shared/util/cn-utils';
@@ -40,6 +41,7 @@ const LeftSidebarNav = ({body, className, loading = false, loadingRows = 4, titl
 );
 
 interface LeftSidebarNavItemProps {
+    badge?: string;
     className?: string;
     disabled?: boolean;
     item: {
@@ -53,6 +55,7 @@ interface LeftSidebarNavItemProps {
 }
 
 const LeftSidebarNavItem = ({
+    badge,
     className,
     disabled = false,
     icon,
@@ -88,6 +91,15 @@ const LeftSidebarNavItem = ({
         {icon}
 
         <span className={cn('truncate', current && 'font-semibold')}>{name}</span>
+
+        {badge && (
+            <Badge
+                className="ml-auto px-1.5 py-0 text-[10px] leading-4"
+                label={badge}
+                styleType="primary-outline"
+                weight="semibold"
+            />
+        )}
     </Link>
 );
 
