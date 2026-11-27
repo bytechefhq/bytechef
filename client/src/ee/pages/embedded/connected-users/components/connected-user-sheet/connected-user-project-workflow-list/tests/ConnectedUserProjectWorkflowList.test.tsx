@@ -242,7 +242,7 @@ describe('ConnectedUserProjectWorkflowList', () => {
         );
     });
 
-    it('marks project groups with a Reference badge and the Created by this user group with a Copy badge', () => {
+    it('marks project groups with a Managed badge and the Created by this user group with a Custom badge', () => {
         render(
             <ConnectedUserProjectWorkflowList
                 connectedUserProjectWorkflows={[
@@ -259,10 +259,10 @@ describe('ConnectedUserProjectWorkflowList', () => {
         );
 
         expect(
-            within(screen.getByRole('region', {name: 'Automation Playground'})).getByText('Reference')
+            within(screen.getByRole('region', {name: 'Automation Playground'})).getByText('Managed')
         ).toBeInTheDocument();
         expect(
-            within(screen.getByRole('region', {name: 'Created by this user'})).getByText('Copy')
+            within(screen.getByRole('region', {name: 'Created by this user'})).getByText('Custom')
         ).toBeInTheDocument();
     });
 

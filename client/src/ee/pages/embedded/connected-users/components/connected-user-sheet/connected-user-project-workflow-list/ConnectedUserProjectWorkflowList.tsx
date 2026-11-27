@@ -156,7 +156,7 @@ const ConnectedUserProjectWorkflowList = ({
                                     <TooltipTrigger asChild>
                                         <span className="shrink-0">
                                             <Badge
-                                                label={group.projectName ? 'Reference' : 'Copy'}
+                                                label={group.projectName ? 'Managed' : 'Custom'}
                                                 styleType="outline-outline"
                                                 weight="semibold"
                                             />
