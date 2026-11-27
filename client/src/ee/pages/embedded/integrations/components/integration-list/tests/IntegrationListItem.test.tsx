@@ -138,6 +138,15 @@ const renderItem = (overrides: Partial<Integration> = {}, activeTab?: Integratio
         </TooltipProvider>
     );
 
+const clickLastMenuTrigger = async () => {
+    const menuTrigger = screen
+        .getAllByRole('button')
+        .filter((button) => button.getAttribute('aria-haspopup') === 'menu')
+        .pop();
+
+    await userEvent.click(menuTrigger!);
+};
+
 const openMenu = async (triggerName?: string) => {
     renderItem({}, triggerName ? 'workflows' : undefined);
 
@@ -268,39 +277,29 @@ describe('IntegrationListItem', () => {
             );
         });
 
-        it('should offer configuring instead of publishing an unpublished integration without workflows', async () => {
+        it('should offer configuring and no publishing for an unpublished integration without workflows', async () => {
             renderItem({integrationWorkflowIds: [], lastPublishedDate: undefined});
 
-            const menuTrigger = screen
-                .getAllByRole('button')
-                .filter((button) => button.getAttribute('aria-haspopup') === 'menu')
-                .pop();
+            await clickLastMenuTrigger();
 
-            await userEvent.click(menuTrigger!);
-
-            const publishMenuItem = screen.getByRole('menuitem', {name: 'Publish'});
-
-            expect(publishMenuItem).toHaveAttribute('data-disabled');
+            expect(screen.queryByRole('menuitem', {name: 'Publish'})).not.toBeInTheDocument();
             expect(screen.getByRole('menuitem', {name: 'New Configuration'})).not.toHaveAttribute('data-disabled');
-
-            await userEvent.hover(publishMenuItem.parentElement!);
-
-            expect(await screen.findByRole('tooltip')).toHaveTextContent(
-                'Add a workflow before publishing the integration.'
-            );
         });
 
-        it('should disable Publish for a published integration whose draft has no workflows', async () => {
-            renderItem({integrationWorkflowIds: []});
+        it('should hide Publish for a published integration whose draft and published version are empty', async () => {
+            renderItem({integrationWorkflowIds: [], unpublishedChanges: false});
 
-            const menuTrigger = screen
-                .getAllByRole('button')
-                .filter((button) => button.getAttribute('aria-haspopup') === 'menu')
-                .pop();
+            await clickLastMenuTrigger();
 
-            await userEvent.click(menuTrigger!);
+            expect(screen.queryByRole('menuitem', {name: 'Publish'})).not.toBeInTheDocument();
+        });
 
-            expect(screen.getByRole('menuitem', {name: 'Publish'})).toHaveAttribute('data-disabled');
+        it('should enable Publish once every workflow is removed from a published integration', async () => {
+            renderItem({integrationWorkflowIds: [], unpublishedChanges: true});
+
+            await clickLastMenuTrigger();
+
+            expect(screen.getByRole('menuitem', {name: 'Publish'})).not.toHaveAttribute('data-disabled');
         });
 
         it('should switch to the Configurations tab once New Configuration creates a configuration', async () => {
@@ -351,6 +350,14 @@ describe('IntegrationListItem', () => {
             await userEvent.click(screen.getByText('V1'));
 
             expect(hoisted.onTabChange).toHaveBeenCalledWith('workflows');
+        });
+
+        it('should open the actions tab when a collapsed connection-only row is clicked', async () => {
+            renderItem({integrationWorkflowIds: [], lastPublishedDate: undefined});
+
+            await userEvent.click(screen.getByText('No publishing needed'));
+
+            expect(hoisted.onTabChange).toHaveBeenCalledWith('actions');
         });
 
         it('should collapse an open row when it is clicked', async () => {
@@ -494,6 +501,26 @@ describe('IntegrationListItem', () => {
 
             expect(screen.getByText('DRAFT').parentElement).toHaveTextContent('V3DRAFT');
             expect(screen.queryByText('PUBLISHED')).not.toBeInTheDocument();
+        });
+
+        it('should replace the version with a usage badge for a connection-only integration', () => {
+            renderItem({integrationWorkflowIds: [], lastIntegrationVersion: 2, unpublishedChanges: false});
+
+            expect(screen.getByText('Actions, tools & MCP')).toBeInTheDocument();
+            expect(screen.queryByText('PUBLISHED')).not.toBeInTheDocument();
+            expect(screen.queryByText(/^Published at/)).not.toBeInTheDocument();
+        });
+
+        it('should keep the version while the removal of all workflows is unpublished', () => {
+            renderItem({
+                integrationWorkflowIds: [],
+                lastIntegrationVersion: 2,
+                lastStatus: IntegrationStatus.Draft,
+                unpublishedChanges: true,
+            });
+
+            expect(screen.getByText('DRAFT').parentElement).toHaveTextContent('V2DRAFT');
+            expect(screen.queryByText('Actions, tools & MCP')).not.toBeInTheDocument();
         });
     });
 });

@@ -20,6 +20,7 @@ import {Form} from '@/components/ui/form';
 import IntegrationInstanceConfigurationDialogOauth2Step from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogOauth2Step';
 import {useWorkflowsEnabledStore} from '@/ee/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
 import ConfigurationDialogTabs, {ConfigurationDialogTabType} from '@/ee/pages/embedded/shared/ConfigurationDialogTabs';
+import {isIntegrationConnectionOnly} from '@/ee/pages/embedded/shared/integrationPublication';
 import {
     ComponentConnection,
     IntegrationInstanceConfiguration,
@@ -373,6 +374,9 @@ const IntegrationInstanceConfigurationDialog = ({
             curIntegrationId={curIntegrationId}
             curIntegrationVersion={curIntegrationVersion}
             getValues={getValues}
+            hideIntegrationVersion={
+                !!integration && !updateIntegrationVersion && isIntegrationConnectionOnly(integration)
+            }
             integrationInstanceConfiguration={integrationInstanceConfiguration}
             setCurIntegrationId={setCurIntegrationId}
             setCurIntegrationVersion={setCurIntegrationVersion}

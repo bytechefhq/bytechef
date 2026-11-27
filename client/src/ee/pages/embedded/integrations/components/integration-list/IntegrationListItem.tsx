@@ -21,7 +21,11 @@ import IntegrationListItemTabs, {
     IntegrationListItemTabType,
 } from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationListItemTabs';
 import useIntegrationComponentElements from '@/ee/pages/embedded/integrations/components/integration-list/useIntegrationComponentElements';
-import {isIntegrationConfigurable} from '@/ee/pages/embedded/shared/integrationPublication';
+import {
+    canPublishIntegration,
+    isIntegrationConfigurable,
+    isIntegrationConnectionOnly,
+} from '@/ee/pages/embedded/shared/integrationPublication';
 import {Integration, IntegrationInstanceConfiguration, Tag} from '@/ee/shared/middleware/embedded/configuration';
 import {
     useDeleteIntegrationMutation,
@@ -106,6 +110,8 @@ const IntegrationListItem = ({
     const workflowCount = integration.integrationWorkflowIds?.length ?? 0;
     const hasWorkflows = workflowCount > 0;
     const isConfigurable = isIntegrationConfigurable(integration);
+    const connectionOnly = isIntegrationConnectionOnly(integration);
+    const defaultTab: IntegrationListItemTabType = connectionOnly ? 'actions' : 'workflows';
 
     const createIntegrationWorkflowMutation = useCreateIntegrationWorkflowMutation({
         onSuccess: (integrationWorkflowId) => {
@@ -202,9 +208,9 @@ const IntegrationListItem = ({
                 return;
             }
 
-            onTabChange(activeTab ? undefined : 'workflows');
+            onTabChange(activeTab ? undefined : defaultTab);
         },
-        [activeTab, onTabChange]
+        [activeTab, defaultTab, onTabChange]
     );
 
     return (
@@ -317,50 +323,67 @@ const IntegrationListItem = ({
                             )}
                         </div>
 
-                        {integration.lastIntegrationVersion && (
+                        {connectionOnly ? (
                             <div className="flex items-center gap-x-3 sm:w-60 sm:shrink-0 sm:flex-col sm:items-end sm:gap-x-0 sm:gap-y-4">
                                 <div className="flex items-center">
-                                    {integration.lastPublishedDate &&
-                                    integration.lastIntegrationVersion &&
-                                    !integration.unpublishedChanges ? (
-                                        <Badge
-                                            className="flex space-x-1 border-transparent"
-                                            styleType="success-outline"
-                                            weight="semibold"
-                                        >
-                                            <span>V{integration.lastIntegrationVersion - 1}</span>
-
-                                            <span>PUBLISHED</span>
-                                        </Badge>
-                                    ) : (
-                                        <Badge
-                                            className="flex space-x-1"
-                                            styleType="secondary-filled"
-                                            weight="semibold"
-                                        >
-                                            <span>V{integration.lastIntegrationVersion}</span>
-
-                                            <span>{integration.lastStatus}</span>
-                                        </Badge>
-                                    )}
+                                    <Badge
+                                        className="border-transparent"
+                                        label="Actions, tools & MCP"
+                                        styleType="secondary-filled"
+                                        weight="semibold"
+                                    />
                                 </div>
 
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <div className="flex items-center text-sm text-content-neutral-secondary sm:mt-0">
-                                            {integration.lastPublishedDate ? (
-                                                <span className="text-xs">
-                                                    {`Published at ${integration.lastPublishedDate?.toLocaleDateString()} ${integration.lastPublishedDate?.toLocaleTimeString()}`}
-                                                </span>
-                                            ) : (
-                                                <span className="text-xs">Not yet published</span>
-                                            )}
-                                        </div>
-                                    </TooltipTrigger>
-
-                                    <TooltipContent side="left">Last Published Date</TooltipContent>
-                                </Tooltip>
+                                <div className="flex items-center text-sm text-content-neutral-secondary sm:mt-0">
+                                    <span className="text-xs">No publishing needed</span>
+                                </div>
                             </div>
+                        ) : (
+                            integration.lastIntegrationVersion && (
+                                <div className="flex items-center gap-x-3 sm:w-60 sm:shrink-0 sm:flex-col sm:items-end sm:gap-x-0 sm:gap-y-4">
+                                    <div className="flex items-center">
+                                        {integration.lastPublishedDate &&
+                                        integration.lastIntegrationVersion &&
+                                        !integration.unpublishedChanges ? (
+                                            <Badge
+                                                className="flex space-x-1 border-transparent"
+                                                styleType="success-outline"
+                                                weight="semibold"
+                                            >
+                                                <span>V{integration.lastIntegrationVersion - 1}</span>
+
+                                                <span>PUBLISHED</span>
+                                            </Badge>
+                                        ) : (
+                                            <Badge
+                                                className="flex space-x-1"
+                                                styleType="secondary-filled"
+                                                weight="semibold"
+                                            >
+                                                <span>V{integration.lastIntegrationVersion}</span>
+
+                                                <span>{integration.lastStatus}</span>
+                                            </Badge>
+                                        )}
+                                    </div>
+
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <div className="flex items-center text-sm text-content-neutral-secondary sm:mt-0">
+                                                {integration.lastPublishedDate ? (
+                                                    <span className="text-xs">
+                                                        {`Published at ${integration.lastPublishedDate?.toLocaleDateString()} ${integration.lastPublishedDate?.toLocaleTimeString()}`}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-xs">Not yet published</span>
+                                                )}
+                                            </div>
+                                        </TooltipTrigger>
+
+                                        <TooltipContent side="left">Last Published Date</TooltipContent>
+                                    </Tooltip>
+                                </div>
+                            )
                         )}
 
                         <DropdownMenu>
@@ -376,10 +399,12 @@ const IntegrationListItem = ({
                                         onClick={() => setShowEditDialog(true)}
                                     />
 
-                                    <IntegrationListItemPublishMenuItem
-                                        canPublish={hasWorkflows}
-                                        onClick={() => setShowPublishIntegrationDialog(true)}
-                                    />
+                                    {!connectionOnly && (
+                                        <IntegrationListItemPublishMenuItem
+                                            canPublish={canPublishIntegration(integration)}
+                                            onClick={() => setShowPublishIntegrationDialog(true)}
+                                        />
+                                    )}
                                 </DropdownMenuGroup>
 
                                 <DropdownMenuSeparator />
@@ -523,7 +548,7 @@ const IntegrationListItem = ({
                             onRetry={() => void refetchComponentElements()}
                         />
                     }
-                    activeTab={activeTab ?? 'workflows'}
+                    activeTab={activeTab ?? defaultTab}
                     configurationsContent={configurationsContent}
                     onTabChange={(tab) => onTabChange(tab)}
                     toolCount={componentTools?.length}

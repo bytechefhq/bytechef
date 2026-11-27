@@ -53,6 +53,7 @@ interface BasicStepHarnessPropsI {
     authorizationRequired?: boolean;
     authorizations?: Authorization[];
     curIntegrationId?: number;
+    hideIntegrationVersion?: boolean;
     integrationInstanceConfiguration?: IntegrationInstanceConfiguration;
     onSubmit?: (formData: IntegrationInstanceConfiguration) => void;
 }
@@ -61,6 +62,7 @@ const BasicStepHarness = ({
     authorizationRequired,
     authorizations,
     curIntegrationId,
+    hideIntegrationVersion,
     integrationInstanceConfiguration,
     onSubmit,
 }: BasicStepHarnessPropsI) => {
@@ -82,6 +84,7 @@ const BasicStepHarness = ({
                     control={form.control}
                     curIntegrationId={curIntegrationId}
                     getValues={form.getValues}
+                    hideIntegrationVersion={hideIntegrationVersion}
                     integrationInstanceConfiguration={integrationInstanceConfiguration}
                     setCurIntegrationId={vi.fn()}
                     setCurIntegrationVersion={vi.fn()}
@@ -304,5 +307,12 @@ describe('IntegrationInstanceConfigurationDialogBasicStep', () => {
         expect(screen.getByText('Version', {selector: 'label'})).toHaveTextContent(/^Version\*$/);
         expect(screen.getByText('Authorization', {selector: 'label'})).toHaveTextContent(/^Authorization\*$/);
         expect(screen.getByText('Description', {selector: 'label'})).toHaveTextContent(/^Description$/);
+    });
+
+    it('should hide the Version field for a connection-only integration', () => {
+        render(<BasicStepHarness authorizations={authorizations} curIntegrationId={2} hideIntegrationVersion />);
+
+        expect(screen.queryByText('Version', {selector: 'label'})).not.toBeInTheDocument();
+        expect(screen.getByText('Name', {selector: 'label'})).toBeInTheDocument();
     });
 });

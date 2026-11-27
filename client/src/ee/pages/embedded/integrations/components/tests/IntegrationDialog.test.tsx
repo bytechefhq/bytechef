@@ -1,16 +1,21 @@
 import {Integration} from '@/ee/shared/middleware/embedded/configuration';
-import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {act, render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import IntegrationDialog from '../IntegrationDialog';
 
 const hoisted = vi.hoisted(() => ({
     createMutate: vi.fn(),
+    createOptions: {current: undefined as {onSuccess?: (integrationId: number) => void} | undefined},
     updateMutate: vi.fn(),
 }));
 
 vi.mock('@/ee/shared/mutations/embedded/integrations.mutations', () => ({
-    useCreateIntegrationMutation: () => ({mutate: hoisted.createMutate, reset: vi.fn()}),
+    useCreateIntegrationMutation: (options: {onSuccess?: (integrationId: number) => void}) => {
+        hoisted.createOptions.current = options;
+
+        return {mutate: hoisted.createMutate, reset: vi.fn()};
+    },
     useUpdateIntegrationMutation: () => ({mutate: hoisted.updateMutate, reset: vi.fn()}),
 }));
 
@@ -62,9 +67,27 @@ describe('IntegrationDialog', () => {
             render(<IntegrationDialog integration={newIntegration} onClose={onClose} />);
 
             expect(screen.getByText('Create Integration')).toBeInTheDocument();
-            expect(
-                screen.getByText('Use this to create your integration which will contain workflows')
-            ).toBeInTheDocument();
+            expect(screen.getByText('Use this to create an integration your users connect to')).toBeInTheDocument();
+        });
+
+        it('should offer both usages with workflows selected by default', () => {
+            render(<IntegrationDialog integration={newIntegration} onClose={onClose} />);
+
+            expect(screen.getByRole('radio', {name: 'With workflows'})).toBeChecked();
+            expect(screen.getByRole('radio', {name: 'Actions, tools & MCP'})).not.toBeChecked();
+        });
+
+        it('should report the chosen usage when the integration is created', async () => {
+            const onSuccess = vi.fn();
+            const user = userEvent.setup();
+
+            render(<IntegrationDialog integration={newIntegration} onClose={onClose} onSuccess={onSuccess} />);
+
+            await user.click(screen.getByRole('radio', {name: 'Actions, tools & MCP'}));
+
+            act(() => hoisted.createOptions.current?.onSuccess?.(5));
+
+            expect(onSuccess).toHaveBeenCalledWith(5, 'connectionOnly');
         });
 
         it('should render the component picker', () => {
@@ -79,6 +102,12 @@ describe('IntegrationDialog', () => {
             render(<IntegrationDialog integration={existingIntegration} onClose={onClose} />);
 
             expect(screen.getByText('Edit Integration')).toBeInTheDocument();
+        });
+
+        it('should not offer a usage choice', () => {
+            render(<IntegrationDialog integration={existingIntegration} onClose={onClose} />);
+
+            expect(screen.queryByRole('radio', {name: 'Actions, tools & MCP'})).not.toBeInTheDocument();
         });
     });
 
