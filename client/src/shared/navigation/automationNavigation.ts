@@ -26,6 +26,7 @@ export type NavigationGroupType = {
 };
 
 export type NavigationType = {
+    badge?: string;
     group?: NavigationGroupType;
     name: string;
     href: string;
@@ -43,6 +44,7 @@ export const automationNavigation: NavigationType[] = [
         name: 'Getting Started',
     },
     {
+        badge: 'Beta',
         href: '/automation/ai-hub',
         icon: MessagesSquareIcon,
         name: 'AI Hub',

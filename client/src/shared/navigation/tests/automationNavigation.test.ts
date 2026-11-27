@@ -26,6 +26,13 @@ describe('filterAutomationNavigation', () => {
         expect(navigation[1].href).toBe('/automation/projects');
     });
 
+    it('marks the AI Hub entry as beta', () => {
+        const navigation = filterAutomationNavigation(baseFilter);
+
+        expect(navigation.find((navItem) => navItem.href === '/automation/ai-hub')?.badge).toBe('Beta');
+        expect(navigation.find((navItem) => navItem.href === '/automation/projects')?.badge).toBeUndefined();
+    });
+
     it('drops the AI Hub entry when the AI Hub is disabled', () => {
         const navigation = filterAutomationNavigation({...baseFilter, aiHubEnabled: false});
 
