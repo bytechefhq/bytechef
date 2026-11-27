@@ -39,7 +39,7 @@ Click **New Configuration** in the top-right corner. The **New Configuration** w
 |---|---|---|
 | **Integration** | Yes | The integration to deploy. |
 | **Name** | Yes | The configuration name. |
-| **Version** | Yes | The published integration version to deploy. |
+| **Version** | Yes | The published integration version to deploy. Not shown for an [integration without workflows](/platform/embedded/build/integrations#integrations-without-workflows): ByteChef deploys its latest published version, and publishes version 1 for you on its first configuration. |
 | **Authorization** | When the integration requires it | Shown when the integration's connection offers more than one authorization type. Cannot be changed after the configuration is created. |
 | **Environment** | n/a | Read-only. The environment currently selected. |
 | **Description** | No | Free text. |

@@ -7,6 +7,8 @@ description: Create and manage integrations that connect your product to third-p
 
 An integration connects your product to one third-party service, such as Slack or HubSpot. You build the integration's workflows on the **Integrations** page, publish a version, and then activate that version for your connected users through an [Integration Configuration](/platform/embedded/configure/instance-configurations). Tenant admins use this page to author everything your end users later turn on from inside your product.
 
+An integration does not need workflows. If your product only calls the component's actions through the Actions API, calls its tools through the Tools API, or exposes its tools through an [MCP server](/platform/embedded/configure/mcp-servers), create the integration and a configuration, and skip versions and publishing. See [Integrations without workflows](#integrations-without-workflows).
+
 > **Integrations are authored in Development.** The **Integrations** entry appears in the Embedded sidebar only while the **Development** environment is selected. In Staging and Production, the sidebar shows **Integration Configurations** instead.
 
 ## Key Features
@@ -15,7 +17,7 @@ An integration connects your product to one third-party service, such as Slack o
 |---|---|
 | Categories | Organize integrations by category. The left sidebar lists all categories. |
 | Tags | Assign tags to integrations for flexible grouping and filtering. |
-| Versioning | Each integration tracks versions with a status of `DRAFT` or `PUBLISHED`. |
+| Versioning | Each integration with workflows tracks versions with a status of `DRAFT` or `PUBLISHED`. An integration without workflows needs no versions. |
 | Workflow and configuration counts | The integration card shows how many workflows belong to the integration and how many Development instance configurations use it. |
 | Publish date | The card shows when the integration was last published, or **Not yet published** for drafts. |
 | Permission expression | An optional SpEL expression that restricts which connected users can see the integration (and, per workflow, which workflows). |
@@ -27,8 +29,8 @@ Each integration in the list displays:
 - **Icon and name** - the component icon and integration name, linking to the workflow editor.
 - **Summary** - for example **2 workflows - 1 configuration**. Click it, or the empty space on the card, to expand the integration (see [Expanded integration](#expanded-integration)). The configuration count covers all of the integration's Development instance configurations, enabled or not.
 - **Tags** - assigned tags shown as badges. Click **+** to add a tag or the **x** on a badge to remove it.
-- **Version badge** - the current version number and status, for example `V1 PUBLISHED` or `V2 DRAFT`.
-- **Last published date** - the timestamp of the most recent publish, or **Not yet published**.
+- **Version badge** - the current version number and status, for example `V1 PUBLISHED` or `V2 DRAFT`. An [integration without workflows](#integrations-without-workflows) shows **Actions, tools & MCP** instead.
+- **Last published date** - the timestamp of the most recent publish, or **Not yet published**. An integration without workflows shows **No publishing needed** instead.
 
 ---
 
@@ -38,8 +40,11 @@ Each integration in the list displays:
 
 1. Click **New Integration** in the top-right corner of the Integrations page. On an empty page, click **Create Integration**.
 2. In **Component**, select the third-party service to integrate with. **Name** is filled in from the component title.
-3. Optionally set **Category**, **Description**, **Permission Expression** and **Tags**.
-4. Click **Save**. ByteChef creates the integration with a default workflow and opens the workflow editor.
+3. Under **How will you use it?**, choose **With workflows** (the default) to build workflows your users enable and configure, or **Actions, tools & MCP** to use the connection from your code or through an MCP server.
+4. Optionally set **Category**, **Description**, **Permission Expression** and **Tags**.
+5. Click **Save**. The new integration opens expanded in the list: on **Workflows** for **With workflows**, on **Actions** for **Actions, tools & MCP**.
+
+The choice is not stored. It only decides which tab opens first, and you can add workflows to either kind later.
 
 The component cannot be changed after the integration is created.
 
@@ -50,21 +55,21 @@ The three-dot menu on each integration card contains:
 | Action | Description |
 |---|---|
 | **Edit** | Update the name, category, description, permission expression or tags. |
-| **Publish** | Publish the current draft as a new version. Disabled until the integration has at least one workflow. |
+| **Publish** | Publish the current draft as a new version. Enabled when the draft has at least one workflow, or when a published integration has unpublished changes, for example after you delete all of its workflows. Hidden for an [integration without workflows](#integrations-without-workflows). |
 | **New Workflow** | Create a workflow in this integration. |
 | **Import Workflow** | Import a workflow from a JSON or YAML file. |
 | **View Workflows** | Open the workflow editor. Shown when the integration has at least one workflow. |
-| **New Configuration** | Create a Development [instance configuration](/platform/embedded/configure/instance-configurations). Disabled, with the tooltip "Publish the integration before configuring it.", until the integration has a published version. |
+| **New Configuration** | Create a Development [instance configuration](/platform/embedded/configure/instance-configurations). Disabled, with the tooltip "Publish the integration before configuring it.", while an integration that has never been published has workflows. |
 | **Delete** | Permanently delete the integration and all its workflows. |
 
 ### Expanded integration
 
-An expanded integration has four tabs. It always opens on **Workflows**.
+An expanded integration has four tabs. It opens on **Workflows**, or on **Actions** for an [integration without workflows](#integrations-without-workflows).
 
 | Tab | Content |
 |---|---|
 | **Workflows** | The integration's workflows. **New Workflow** sits on the right; its dropdown arrow offers **Import Workflow**. Each workflow row has its own menu with **Edit** (label, description and the workflow's permission expression), **Export** and **Delete**. |
-| **Configurations** | The integration's [instance configurations](/platform/embedded/configure/instance-configurations) in the Development environment, each expanded to show its workflows, with **New Configuration** on the right. Clicking a configuration workflow opens its executions. Before the first publish, the tab shows **Publish the integration to configure it** with a **Publish** button. After a publish, with no configuration yet, it shows **No configurations in Development** with a **Configure** button. |
+| **Configurations** | The integration's [instance configurations](/platform/embedded/configure/instance-configurations) in the Development environment, each expanded to show its workflows, with **New Configuration** on the right. Clicking a configuration workflow opens its executions. If the integration has workflows and has never been published, the tab shows **Publish the integration to configure it** with a **Publish** button. Otherwise, with no configuration yet, it shows **No configurations in Development** with a **Configure** button. |
 | **Actions** | The actions of the integration's component, with their description and a copyable **Action ID**. The tab label shows the count. |
 | **Tools** | The tools of the integration's component, with their description and a copyable **Tool ID**. The tab label shows the count. |
 
@@ -88,6 +93,24 @@ Publishing creates a new, read-only version of the integration that you can acti
 1. Open the integration's three-dot menu and click **Publish**.
 2. Optionally enter a **Description** of the changes.
 3. Click **Publish**.
+
+### Integrations without workflows
+
+An integration whose draft has no workflows, and which has never been published or has nothing left to publish, is used only for its connection. Your backend calls its component's actions through the Actions API and its tools through the Tools API, and an [MCP server](/platform/embedded/configure/mcp-servers) can expose its tools to an agent. None of these paths use workflows or versions. Code integrations are never treated this way.
+
+For such an integration:
+
+- The card shows **Actions, tools & MCP** and **No publishing needed** in place of the version badge and publish date, and the three-dot menu has no **Publish**.
+- Expanding it opens the **Actions** tab.
+- **New Configuration** skips the **Version** field and the **Workflows** step. The first configuration publishes version 1 for you.
+
+Adding a workflow turns the integration into a regular one at once: the version badge and **Publish** come back, and you publish and upgrade configurations as usual.
+
+#### Removing every workflow
+
+If you delete every workflow from a published integration, it keeps its version badge and **Publish** stays enabled, because the removal is an unpublished change. Connected users keep running the workflows of the version their configuration deploys. After you publish the empty version, the integration becomes an integration without workflows.
+
+Configurations on an older version keep running its workflows until you move them. Use **Change Integration Version** on each configuration (see [Instance Configurations](/platform/embedded/configure/instance-configurations)): it disables the workflows that the empty version no longer has and removes them from connected users. **Move Users…** and **Upgrade integration** on the [Connected Users](/platform/embedded/monitor/connected-users#upgrading-several-users-at-once) page skip connected users who have an enabled workflow that the target version does not have.
 
 ### Restricting who sees an integration
 
