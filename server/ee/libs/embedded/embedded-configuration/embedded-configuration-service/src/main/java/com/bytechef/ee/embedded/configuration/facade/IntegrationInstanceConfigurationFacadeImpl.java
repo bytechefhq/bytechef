@@ -296,10 +296,17 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             integration = integrationService.getIntegration(integrationId);
         }
 
-        if (integration.getLastIntegrationVersion() == integrationInstanceConfiguration.getIntegrationVersion()) {
+        Integer integrationVersion = integrationInstanceConfiguration.getIntegrationVersion();
+
+        if (Objects.equals(integration.getLastIntegrationVersion(), integrationVersion)) {
             throw new ConfigurationException(
-                "Integration version v=%s cannot be in DRAFT".formatted(
-                    integrationInstanceConfiguration.getIntegrationVersion()),
+                "Integration version v=%s cannot be in DRAFT".formatted(integrationVersion),
+                IntegrationInstanceConfigurationErrorType.INVALID_INTEGRATION_VERSION);
+        }
+
+        if (!isPublishedIntegrationVersion(integration, integrationVersion)) {
+            throw new ConfigurationException(
+                "Integration version v=%s is not published".formatted(integrationVersion),
                 IntegrationInstanceConfigurationErrorType.INVALID_INTEGRATION_VERSION);
         }
 
@@ -1148,6 +1155,20 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 Objects.equals(componentConnection.componentName(), connection.getComponentName()));
     }
 
+    private static boolean
+        isPublishedIntegrationVersion(Integration integration, @Nullable Integer integrationVersion) {
+        if (integrationVersion == null) {
+            return false;
+        }
+
+        Optional<IntegrationVersion> integrationVersionOptional = integration.fetchIntegrationVersion(
+            integrationVersion);
+
+        return integrationVersionOptional
+            .map(curIntegrationVersion -> curIntegrationVersion.getStatus() == IntegrationVersion.Status.PUBLISHED)
+            .orElse(false);
+    }
+
     private void validateChangeVersion(IntegrationInstanceConfiguration sourceConfiguration, int integrationVersion) {
         if (Objects.equals(sourceConfiguration.getIntegrationVersion(), integrationVersion)) {
             throw new IllegalArgumentException(
@@ -1157,14 +1178,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
         Integration integration = integrationService.getIntegration(sourceConfiguration.getIntegrationId());
 
-        Optional<IntegrationVersion> integrationVersionOptional = integration.fetchIntegrationVersion(
-            integrationVersion);
-
-        boolean published = integrationVersionOptional
-            .map(curIntegrationVersion -> curIntegrationVersion.getStatus() == IntegrationVersion.Status.PUBLISHED)
-            .orElse(false);
-
-        if (!published) {
+        if (!isPublishedIntegrationVersion(integration, integrationVersion)) {
             throw new IllegalArgumentException(
                 "Integration id=%s has no published version %s".formatted(integration.getId(), integrationVersion));
         }
