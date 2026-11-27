@@ -64,7 +64,7 @@ const configuration: ConfigurationType = {
 };
 
 const workflow: WorkflowType = {
-    awaitedInputLabel: null,
+    awaitedInputLabels: [],
     enabled: true,
     label: 'Summarize Email',
     lastExecutionDate: null,

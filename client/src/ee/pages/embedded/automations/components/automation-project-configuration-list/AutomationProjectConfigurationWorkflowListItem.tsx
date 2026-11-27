@@ -37,6 +37,13 @@ interface AutomationProjectConfigurationWorkflowListItemProps {
     workflowTemplate?: AutomationProjectType['workflowTemplates'][number];
 }
 
+const awaitedInputLabelsFormat = new Intl.ListFormat('en', {style: 'long', type: 'conjunction'});
+
+const getAwaitedInputsMessage = (awaitedInputLabels: string[]) =>
+    awaitedInputLabels.length === 1
+        ? `Does not run until ${awaitedInputLabels[0]} is set. Edit the workflow to set it.`
+        : `Does not run until ${awaitedInputLabelsFormat.format(awaitedInputLabels)} are set. Edit the workflow to set them.`;
+
 const AutomationProjectConfigurationWorkflowListItem = ({
     configuration,
     project,
@@ -152,7 +159,7 @@ const AutomationProjectConfigurationWorkflowListItem = ({
                     <span className="text-xs whitespace-nowrap">No executions</span>
                 )}
 
-                {workflow.enabled && workflow.awaitedInputLabel && (
+                {workflow.enabled && workflow.awaitedInputLabels.length > 0 && (
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <span>
@@ -161,7 +168,7 @@ const AutomationProjectConfigurationWorkflowListItem = ({
                         </TooltipTrigger>
 
                         <TooltipContent side="left">
-                            {`Does not run until ${workflow.awaitedInputLabel} is set. Edit the workflow to set it.`}
+                            {getAwaitedInputsMessage(workflow.awaitedInputLabels)}
                         </TooltipContent>
                     </Tooltip>
                 )}
