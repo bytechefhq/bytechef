@@ -103,9 +103,9 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
             5L, 7L, 0L, "Beta", "metadata['beta'] == 'true'", 2, true, false, 3,
             List.of(
                 new AutomationProjectConfigurationDTO.Workflow("uuid-one", "workflow-id-one", "One", true,
-                    null, Map.of("openai", 42L), Map.of("channel", "general"), "Account"),
+                    null, Map.of("openai", 42L), Map.of("channel", "general"), List.of("Account", "API Key")),
                 new AutomationProjectConfigurationDTO.Workflow("uuid-two", "workflow-id-two", "Two", false,
-                    null, Map.of(), Map.of(), null)),
+                    null, Map.of(), Map.of(), List.of())),
             Instant.parse("2026-10-28T10:00:00Z"), null);
 
         when(automationProjectConfigurationFacade.getConfigurations(7L))
@@ -132,7 +132,7 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
                             enabled
                             providedConnections
                             providedInputs
-                            awaitedInputLabel
+                            awaitedInputLabels
                         }
                     }
                 }
@@ -159,11 +159,12 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
             .path("automationProjectConfigurations[*].workflows[*].enabled")
             .entityList(Boolean.class)
             .containsExactly(true, false)
-            .path("automationProjectConfigurations[0].workflows[0].awaitedInputLabel")
-            .entity(String.class)
-            .isEqualTo("Account")
-            .path("automationProjectConfigurations[0].workflows[1].awaitedInputLabel")
-            .valueIsNull()
+            .path("automationProjectConfigurations[0].workflows[0].awaitedInputLabels")
+            .entityList(String.class)
+            .containsExactly("Account", "API Key")
+            .path("automationProjectConfigurations[0].workflows[1].awaitedInputLabels")
+            .entityList(String.class)
+            .hasSize(0)
             .path("automationProjectConfigurations[0].workflows[1].label")
             .entity(String.class)
             .isEqualTo("Two")

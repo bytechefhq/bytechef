@@ -1766,20 +1766,11 @@ public class AutomationProjectConfigurationFacadeImpl
             configuration.getLastModifiedDate(), lastExecutionDate);
     }
 
-    private static @Nullable String getAwaitedInputLabel(Workflow workflow, Map<String, Object> providedInputs) {
-        String missingInputName = InternalOnlyInputUtils.findMissingRequiredInternalOnlyInput(workflow, providedInputs);
-
-        if (missingInputName == null) {
-            return null;
-        }
-
-        return WorkflowInput.of(workflow)
+    private static List<String> getAwaitedInputLabels(Workflow workflow, Map<String, Object> providedInputs) {
+        return InternalOnlyInputUtils.getMissingRequiredInternalOnlyInputs(workflow, providedInputs)
             .stream()
-            .filter(workflowInput -> missingInputName.equals(workflowInput.getName()))
-            .map(WorkflowInput::getLabel)
-            .filter(StringUtils::isNotBlank)
-            .findFirst()
-            .orElse(missingInputName);
+            .map(workflowInput -> StringUtils.defaultIfBlank(workflowInput.getLabel(), workflowInput.getName()))
+            .toList();
     }
 
     private AutomationProjectConfigurationDTO.Workflow toWorkflowDTO(
@@ -1810,7 +1801,7 @@ public class AutomationProjectConfigurationFacadeImpl
             configurationWorkflowOptional
                 .map(AutomationProjectConfigurationWorkflow::getProvidedConnections)
                 .orElse(Map.of()),
-            providedInputs, enabled ? getAwaitedInputLabel(workflow, providedInputs) : null);
+            providedInputs, enabled ? getAwaitedInputLabels(workflow, providedInputs) : List.of());
     }
 
     private void validateReferencedWorkflowsExistInVersion(

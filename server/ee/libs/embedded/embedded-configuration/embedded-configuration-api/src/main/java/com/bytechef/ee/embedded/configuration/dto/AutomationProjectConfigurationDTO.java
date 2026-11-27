@@ -30,11 +30,12 @@ public record AutomationProjectConfigurationDTO(
     public record Workflow(
         String workflowUuid, String workflowId, String label, boolean enabled, @Nullable Instant lastExecutionDate,
         Map<String, Long> providedConnections, Map<String, Object> providedInputs,
-        @Nullable String awaitedInputLabel) {
+        List<String> awaitedInputLabels) {
 
         public Workflow {
             providedConnections = providedConnections == null ? Map.of() : providedConnections;
             providedInputs = providedInputs == null ? Map.of() : providedInputs;
+            awaitedInputLabels = awaitedInputLabels == null ? List.of() : List.copyOf(awaitedInputLabels);
         }
     }
 }

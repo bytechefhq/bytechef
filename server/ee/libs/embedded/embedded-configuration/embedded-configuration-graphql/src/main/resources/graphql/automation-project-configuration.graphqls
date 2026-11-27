@@ -21,7 +21,7 @@ type AutomationProjectConfigurationWorkflow {
     lastExecutionDate: String
     providedConnections: Map
     providedInputs: Map
-    awaitedInputLabel: String
+    awaitedInputLabels: [String!]!
 }
 
 type AutomationProjectConfigurationWorkflowProvidableValues {
