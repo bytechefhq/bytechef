@@ -684,7 +684,7 @@ export type AutomationProjectConfigurationVersionImpactWorkflow = {
 
 export type AutomationProjectConfigurationWorkflow = {
   __typename?: 'AutomationProjectConfigurationWorkflow';
-  awaitedInputLabel?: Maybe<Scalars['String']['output']>;
+  awaitedInputLabels: Array<Scalars['String']['output']>;
   enabled: Scalars['Boolean']['output'];
   label?: Maybe<Scalars['String']['output']>;
   lastExecutionDate?: Maybe<Scalars['String']['output']>;
