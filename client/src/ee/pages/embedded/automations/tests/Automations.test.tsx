@@ -31,7 +31,12 @@ const hoisted = vi.hoisted(() => {
             lastModifiedDate: string | null;
             projectId: string;
             projectVersion: number;
-            workflows: Array<{enabled: boolean; label: string | null; workflowUuid: string}>;
+            workflows: Array<{
+                awaitedInputLabels: string[];
+                enabled: boolean;
+                label: string | null;
+                workflowUuid: string;
+            }>;
         }>,
         createCodeWorkflowMutate: vi.fn(),
         createProjectMutate: vi.fn(),
@@ -588,7 +593,7 @@ describe('Automations', () => {
                 lastModifiedDate: null,
                 projectId: 'project-13',
                 projectVersion: 1,
-                workflows: [{enabled: true, label: 'Mailer', workflowUuid: 'wf-uuid-13'}],
+                workflows: [{awaitedInputLabels: [], enabled: true, label: 'Mailer', workflowUuid: 'wf-uuid-13'}],
             },
         ];
 
