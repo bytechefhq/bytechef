@@ -555,6 +555,47 @@ class IntegrationInstanceConfigurationFacadeIntTest {
     }
 
     @Test
+    void testCreateIntegrationInstanceConfigurationRefusesAMissingVersionOnAPublishedIntegration() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration();
+
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO = IntegrationInstanceConfigurationDTO
+            .builder()
+            .authorizationType(AuthorizationType.API_KEY)
+            .connectionParameters(Map.of("key", "admin-value"))
+            .environment(Environment.STAGING)
+            .integrationId(integration.getId())
+            .integrationInstanceConfigurationWorkflows(List.of())
+            .name("instance-configuration-" + UUID.randomUUID())
+            .tags(List.of())
+            .build();
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.createIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationDTO))
+                    .isInstanceOf(ConfigurationException.class)
+                    .satisfies(throwable -> assertThat(((ConfigurationException) throwable).getErrorKey())
+                        .isEqualTo(
+                            IntegrationInstanceConfigurationErrorType.INVALID_INTEGRATION_VERSION.getErrorKey()));
+    }
+
+    @Test
+    void testCreateIntegrationInstanceConfigurationRefusesAnUnknownVersion() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration();
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.createIntegrationInstanceConfiguration(
+                newIntegrationInstanceConfigurationDTO(integration.getId(), 99)))
+                    .isInstanceOf(ConfigurationException.class)
+                    .satisfies(throwable -> assertThat(((ConfigurationException) throwable).getErrorKey())
+                        .isEqualTo(
+                            IntegrationInstanceConfigurationErrorType.INVALID_INTEGRATION_VERSION.getErrorKey()));
+    }
+
+    @Test
     void testCreateIntegrationInstanceConfigurationAllowsAnotherVersionWhateverTheExistingLockVersion() {
         authenticate(admin());
 
