@@ -70,7 +70,7 @@ const configuration: AutomationProjectConfigurationType = {
     projectVersion: 2,
     workflows: [
         {
-            awaitedInputLabel: null,
+            awaitedInputLabels: [],
             enabled: true,
             label: 'Mailer',
             lastExecutionDate: null,

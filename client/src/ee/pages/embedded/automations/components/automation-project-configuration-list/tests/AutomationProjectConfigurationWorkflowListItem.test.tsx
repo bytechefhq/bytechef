@@ -52,7 +52,7 @@ type WorkflowType = AutomationProjectConfigurationType['workflows'][number];
 type WorkflowTemplateType = AutomationProjectType['workflowTemplates'][number];
 
 const workflow: WorkflowType = {
-    awaitedInputLabel: null,
+    awaitedInputLabels: [],
     enabled: true,
     label: 'Mailer',
     lastExecutionDate: null,
@@ -288,7 +288,7 @@ describe('AutomationProjectConfigurationWorkflowListItem', () => {
     });
 
     it('marks an enabled workflow that awaits a required internal-only input', async () => {
-        renderItem({workflow: {awaitedInputLabel: 'Contact Page URL'}});
+        renderItem({workflow: {awaitedInputLabels: ['Contact Page URL']}});
 
         await userEvent.hover(screen.getByText('Awaits configuration'));
 
@@ -300,6 +300,18 @@ describe('AutomationProjectConfigurationWorkflowListItem', () => {
         expect(screen.getByRole('switch', {name: 'Enable Mailer'})).toBeChecked();
     });
 
+    it('names every required internal-only input an enabled workflow awaits', async () => {
+        renderItem({workflow: {awaitedInputLabels: ['Contact Page URL', 'Region', 'API Key']}});
+
+        await userEvent.hover(screen.getByText('Awaits configuration'));
+
+        expect(
+            await screen.findByRole('tooltip', {
+                name: 'Does not run until Contact Page URL, Region, and API Key are set. Edit the workflow to set them.',
+            })
+        ).toBeInTheDocument();
+    });
+
     it('does not mark a workflow that awaits nothing or is switched off', () => {
         const {unmount} = renderItem();
 
@@ -307,7 +319,7 @@ describe('AutomationProjectConfigurationWorkflowListItem', () => {
 
         unmount();
 
-        renderItem({workflow: {awaitedInputLabel: 'Contact Page URL', enabled: false}});
+        renderItem({workflow: {awaitedInputLabels: ['Contact Page URL'], enabled: false}});
 
         expect(screen.queryByText('Awaits configuration')).not.toBeInTheDocument();
     });
