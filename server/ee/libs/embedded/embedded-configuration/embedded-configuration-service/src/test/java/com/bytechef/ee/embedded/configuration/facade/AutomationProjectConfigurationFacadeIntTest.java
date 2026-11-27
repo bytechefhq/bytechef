@@ -118,7 +118,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -216,6 +215,14 @@ class AutomationProjectConfigurationFacadeIntTest {
     private static final String CHANNEL_AND_REQUIRED_INTERNAL_ONLY_DEFINITION = """
         {"label":"%s","inputs":[{"name":"channel","label":"Channel","type":"string","required":true},
          {"name":"accountId","label":"Account","type":"string","required":true,"internalOnly":true}],
+         "triggers":[],"tasks":[]}
+        """;
+
+    private static final String TWO_REQUIRED_INTERNAL_ONLY_DEFINITION = """
+        {"label":"%s","inputs":[
+         {"name":"accountId","label":"Account","type":"string","required":true,"internalOnly":true},
+         {"name":"region","label":"Region","type":"string","required":false,"internalOnly":true},
+         {"name":"apiKey","type":"string","required":true,"internalOnly":true}],
          "triggers":[],"tasks":[]}
         """;
 
@@ -600,17 +607,37 @@ class AutomationProjectConfigurationFacadeIntTest {
         long configurationId = automationProjectConfigurationFacade.createConfiguration(
             projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
 
-        assertThat(getAwaitedInputLabel(projectId)).isEqualTo("Account");
+        assertThat(getAwaitedInputLabels(projectId)).containsExactly("Account");
 
         automationProjectConfigurationFacade.enableConfigurationWorkflow(configurationId, workflowUuid, false);
 
-        assertThat(getAwaitedInputLabel(projectId)).isNull();
+        assertThat(getAwaitedInputLabels(projectId)).isEmpty();
 
         automationProjectConfigurationFacade.updateConfigurationWorkflow(
             configurationId, workflowUuid, Map.of(), Map.of("accountId", "acme"));
         automationProjectConfigurationFacade.enableConfigurationWorkflow(configurationId, workflowUuid, true);
 
-        assertThat(getAwaitedInputLabel(projectId)).isNull();
+        assertThat(getAwaitedInputLabels(projectId)).isEmpty();
+    }
+
+    @Test
+    void testGetConfigurationsNamesEveryInputAnEnabledWorkflowAwaits() {
+        long projectId = createProject("Awaited Inputs");
+
+        String workflowUuid = addWorkflow(
+            projectId, withLabel(TWO_REQUIRED_INTERNAL_ONLY_DEFINITION, "Sync Accounts"));
+
+        publish(projectId);
+
+        long configurationId = automationProjectConfigurationFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
+
+        assertThat(getAwaitedInputLabels(projectId)).containsExactly("Account", "apiKey");
+
+        automationProjectConfigurationFacade.updateConfigurationWorkflow(
+            configurationId, workflowUuid, Map.of(), Map.of("accountId", "acme", "apiKey", "secret"));
+
+        assertThat(getAwaitedInputLabels(projectId)).isEmpty();
     }
 
     @Test
@@ -2640,7 +2667,7 @@ class AutomationProjectConfigurationFacadeIntTest {
         }
     }
 
-    private @Nullable String getAwaitedInputLabel(long projectId) {
+    private List<String> getAwaitedInputLabels(long projectId) {
         List<AutomationProjectConfigurationDTO> configurations =
             automationProjectConfigurationFacade.getConfigurations(projectId);
 
@@ -2650,6 +2677,6 @@ class AutomationProjectConfigurationFacadeIntTest {
 
         AutomationProjectConfigurationDTO.Workflow workflow = workflows.getFirst();
 
-        return workflow.awaitedInputLabel();
+        return workflow.awaitedInputLabels();
     }
 }

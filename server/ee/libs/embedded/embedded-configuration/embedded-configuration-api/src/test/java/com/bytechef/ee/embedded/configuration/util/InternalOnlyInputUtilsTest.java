@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.configuration.domain.WorkflowInput;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -71,6 +72,30 @@ class InternalOnlyInputUtilsTest {
     @Test
     void testFindMissingRequiredInternalOnlyInputIgnoresOptionalAndPlain() {
         assertNull(InternalOnlyInputUtils.findMissingRequiredInternalOnlyInput(workflow(), Map.of("accountId", "a")));
+    }
+
+    @Test
+    void testGetMissingRequiredInternalOnlyInputsReturnsEveryMissingOne() {
+        Workflow workflow = new Workflow("""
+            {
+              "label": "Workflow",
+              "inputs": [
+                {"name": "accountId", "type": "string", "required": true, "internalOnly": true},
+                {"name": "region", "type": "string", "required": false, "internalOnly": true},
+                {"name": "apiKey", "type": "string", "required": true, "internalOnly": true},
+                {"name": "channel", "type": "string", "required": true}
+              ],
+              "tasks": []
+            }
+            """, Workflow.Format.JSON);
+
+        List<String> missingInputNames = InternalOnlyInputUtils.getMissingRequiredInternalOnlyInputs(
+            workflow, Map.of("apiKey", " "))
+            .stream()
+            .map(WorkflowInput::getName)
+            .toList();
+
+        assertEquals(List.of("accountId", "apiKey"), missingInputNames);
     }
 
     @Test

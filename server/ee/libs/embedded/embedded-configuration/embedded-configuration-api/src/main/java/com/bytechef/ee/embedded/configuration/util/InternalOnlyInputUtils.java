@@ -72,6 +72,23 @@ public final class InternalOnlyInputUtils {
     public static @Nullable String findMissingRequiredInternalOnlyInput(
         Workflow workflow, Map<String, ?> configurationInputs) {
 
+        List<WorkflowInput> missingWorkflowInputs = getMissingRequiredInternalOnlyInputs(
+            workflow, configurationInputs);
+
+        if (missingWorkflowInputs.isEmpty()) {
+            return null;
+        }
+
+        WorkflowInput missingWorkflowInput = missingWorkflowInputs.getFirst();
+
+        return missingWorkflowInput.getName();
+    }
+
+    public static List<WorkflowInput> getMissingRequiredInternalOnlyInputs(
+        Workflow workflow, Map<String, ?> configurationInputs) {
+
+        List<WorkflowInput> missingWorkflowInputs = new ArrayList<>();
+
         for (WorkflowInput workflowInput : WorkflowInput.of(workflow)) {
             if (!workflowInput.isInternalOnly() || !workflowInput.isRequired()) {
                 continue;
@@ -80,11 +97,11 @@ public final class InternalOnlyInputUtils {
             Object value = configurationInputs.get(workflowInput.getName());
 
             if (value == null || (value instanceof String string && string.isBlank())) {
-                return workflowInput.getName();
+                missingWorkflowInputs.add(workflowInput);
             }
         }
 
-        return null;
+        return missingWorkflowInputs;
     }
 
     public static String removeInternalOnlyInputs(Workflow workflow) {
