@@ -4,7 +4,7 @@ import {EmbeddedGettingStartedQuery} from '@/shared/middleware/graphql';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {gettingStartedStore} from '@/shared/stores/useGettingStartedStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {act, cleanup, render, screen, waitFor, within} from '@testing-library/react';
+import {act, cleanup, render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {ReactNode} from 'react';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
@@ -378,8 +378,20 @@ describe('EmbeddedGettingStarted', () => {
         expect(gettingStartedStore.getState().completions.embedded).toBeUndefined();
     });
 
-    it('dismiss asks for confirmation then stores the dismissal in the browser', async () => {
-        renderPage();
+    it('dismiss asks for confirmation, stores the dismissal in the browser and opens Integrations', async () => {
+        render(
+            <QueryClientProvider client={queryClient}>
+                <TooltipProvider>
+                    <MemoryRouter initialEntries={['/embedded/getting-started']}>
+                        <Routes>
+                            <Route element={<EmbeddedGettingStarted />} path="/embedded/getting-started" />
+
+                            <Route element={<div>Integrations page</div>} path="/embedded/integrations" />
+                        </Routes>
+                    </MemoryRouter>
+                </TooltipProvider>
+            </QueryClientProvider>
+        );
 
         await userEvent.click(screen.getByRole('button', {name: 'Dismiss'}));
 
@@ -389,9 +401,7 @@ describe('EmbeddedGettingStarted', () => {
 
         expect(gettingStartedStore.getState().completions.embedded).toBe('DISMISSED');
 
-        await waitFor(() => {
-            expect(screen.queryByRole('button', {name: 'Dismiss'})).not.toBeInTheDocument();
-        });
+        expect(await screen.findByText('Integrations page')).toBeInTheDocument();
     });
 
     it('keeps the connected user panel open when the test user step collapses after connecting', () => {
