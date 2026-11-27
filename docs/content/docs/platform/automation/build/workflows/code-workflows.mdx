@@ -26,6 +26,30 @@ The same contract also builds two embedded artifacts: [catalog code projects](/p
 which your connected users run by reference, and [code integrations](/platform/embedded/build/code-integrations). This
 page describes the contract; those pages describe what is specific to each.
 
+## Two ways to author
+
+You can write a code workflow inside ByteChef, or write it outside and upload the file. Both paths produce the same
+project, and you can switch between them at any time.
+
+| | Edit in ByteChef | Author externally and upload |
+|---|---|---|
+| Where you write it | The source editor that opens in place of the canvas | Your own IDE and repository |
+| Languages | JavaScript and Python | Java, JavaScript and Python |
+| How it gets into ByteChef | **New Code Project** creates it; saves go to the draft | **Import Code Project** in the UI, or the [deploy endpoint](#deploying-through-the-api) from CI |
+| Publishing | **Publish** from the project header | Every upload saves and publishes in one step |
+| Good for | Trying ideas, quick edits, autocomplete against the components | Git history, pull request review, CI, Java |
+
+Things to know when you mix the two:
+
+- **An upload replaces unpublished editor changes.** It overwrites the draft before publishing, so publish or copy out
+  any editor work first. After an upload, the editor continues from the uploaded source.
+- **Workflows keep their identity by name.** Test configurations and connections carry over between editor saves
+  and uploads as long as a workflow's name stays the same.
+- **Java is upload only.** The editor does not open a Java project; rebuild the JAR and upload it again.
+
+See [Creating and editing in ByteChef](#creating-and-editing-in-bytechef) and
+[Deploying through the API](#deploying-through-the-api) for the details of each path.
+
 ## Languages
 
 The language is taken from the uploaded file's extension.
