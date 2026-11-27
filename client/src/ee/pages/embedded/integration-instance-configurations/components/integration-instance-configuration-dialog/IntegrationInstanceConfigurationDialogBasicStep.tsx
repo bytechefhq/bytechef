@@ -26,6 +26,7 @@ interface IntegrationInstanceConfigurationDialogBasicStepProps {
     curIntegrationId?: number;
     curIntegrationVersion?: number;
     getValues: UseFormGetValues<IntegrationInstanceConfiguration>;
+    hideIntegrationVersion?: boolean;
     integrationInstanceConfiguration: IntegrationInstanceConfiguration | undefined;
     setCurIntegrationId: Dispatch<SetStateAction<number | undefined>>;
     setCurIntegrationVersion: Dispatch<SetStateAction<number | undefined>>;
@@ -40,6 +41,7 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
     curIntegrationId,
     curIntegrationVersion,
     getValues,
+    hideIntegrationVersion = false,
     integrationInstanceConfiguration,
     setCurIntegrationId,
     setCurIntegrationVersion,
@@ -119,11 +121,13 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                     control={control}
                     name="integrationVersion"
                     render={({field}) => (
-                        <FormItem>
-                            <FormLabel className="gap-0">
-                                Version
-                                <RequiredMark />
-                            </FormLabel>
+                        <FormItem className={hideIntegrationVersion ? 'hidden' : undefined}>
+                            {!hideIntegrationVersion && (
+                                <FormLabel className="gap-0">
+                                    Version
+                                    <RequiredMark />
+                                </FormLabel>
+                            )}
 
                             <FormControl>
                                 <IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect
@@ -132,6 +136,7 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                                             ? integrationInstanceConfiguration?.integrationVersion
                                             : undefined
                                     }
+                                    hidden={hideIntegrationVersion}
                                     integrationId={curIntegrationId}
                                     integrationVersion={curIntegrationVersion}
                                     onChange={(value) => {

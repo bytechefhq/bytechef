@@ -36,6 +36,21 @@ describe('IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSele
         expect(onChange).toHaveBeenCalledWith(3);
     });
 
+    it('renders nothing when hidden but still selects the latest published version', () => {
+        const onChange = vi.fn();
+
+        const {container} = render(
+            <IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect
+                hidden
+                integrationId={1}
+                onChange={onChange}
+            />
+        );
+
+        expect(container).toBeEmptyDOMElement();
+        expect(onChange).toHaveBeenCalledWith(3);
+    });
+
     it('selects the latest other published version when the current one is excluded', () => {
         const onChange = vi.fn();
 

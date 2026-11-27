@@ -64,12 +64,17 @@ const CurrentSearch = () => {
     return <div>{`search: ${location.search}`}</div>;
 };
 
-const renderList = (initialEntry = '/embedded/integrations', newlyCreatedIntegrationId?: number) =>
+const renderList = (
+    initialEntry = '/embedded/integrations',
+    newlyCreatedIntegrationId?: number,
+    newlyCreatedIntegrationTab?: IntegrationListItemTabType
+) =>
     render(
         <MemoryRouter initialEntries={[initialEntry]}>
             <IntegrationList
                 integrations={integrations}
                 newlyCreatedIntegrationId={newlyCreatedIntegrationId}
+                newlyCreatedIntegrationTab={newlyCreatedIntegrationTab}
                 tags={[]}
             />
 
@@ -100,6 +105,13 @@ describe('IntegrationList', () => {
 
         expect(screen.getByText('Asana tab workflows')).toBeInTheDocument();
         expect(screen.getByText('Asana workflow list')).toBeInTheDocument();
+        expect(screen.getByText('Accelo tab none')).toBeInTheDocument();
+    });
+
+    it('opens a newly created connection-only integration on the actions tab', () => {
+        renderList('/embedded/integrations', 2, 'actions');
+
+        expect(screen.getByText('Asana tab actions')).toBeInTheDocument();
         expect(screen.getByText('Accelo tab none')).toBeInTheDocument();
     });
 

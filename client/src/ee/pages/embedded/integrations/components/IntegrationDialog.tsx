@@ -11,6 +11,8 @@ import {
     DialogTrigger,
 } from '@/components/Dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {Label} from '@/components/ui/label';
+import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
 import {Textarea} from '@/components/ui/textarea';
 import {Integration, Tag} from '@/ee/shared/middleware/embedded/configuration';
 import {
@@ -34,10 +36,12 @@ import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
+export type IntegrationUsageType = 'connectionOnly' | 'workflows';
+
 interface IntegrationDialogProps {
     integration: Integration | undefined;
     onClose?: (integration?: Integration) => void;
-    onSuccess?: (integrationId: number | void) => void;
+    onSuccess?: (integrationId: number | void, usage: IntegrationUsageType) => void;
     triggerNode?: ReactNode;
 }
 
@@ -45,6 +49,7 @@ type IntegrationFormValuesType = Integration & {permissionExpression?: string | 
 
 const IntegrationDialog = ({integration, onClose, onSuccess, triggerNode}: IntegrationDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
+    const [usage, setUsage] = useState<IntegrationUsageType>('workflows');
 
     const {captureIntegrationCreated} = useAnalytics();
 
@@ -102,7 +107,7 @@ const IntegrationDialog = ({integration, onClose, onSuccess, triggerNode}: Integ
         void queryClient.invalidateQueries({queryKey: ['integrationCodeWorkflowSource']});
 
         if (onSuccess) {
-            onSuccess(integrationId);
+            onSuccess(integrationId, usage);
         }
 
         closeDialog();
@@ -122,6 +127,8 @@ const IntegrationDialog = ({integration, onClose, onSuccess, triggerNode}: Integ
 
     function closeDialog() {
         reset();
+
+        setUsage('workflows');
 
         setIsOpen(false);
 
@@ -179,9 +186,11 @@ const IntegrationDialog = ({integration, onClose, onSuccess, triggerNode}: Integ
                 <DialogMain>
                     <Form {...form}>
                         <DialogHeader
-                            description={`Use this to ${
-                                integration?.id ? 'edit' : 'create'
-                            } your integration which will contain workflows`}
+                            description={
+                                integration?.id
+                                    ? 'Use this to edit your integration'
+                                    : 'Use this to create an integration your users connect to'
+                            }
                             title={`${integration?.id ? 'Edit' : 'Create'} Integration`}
                         />
 
@@ -191,6 +200,58 @@ const IntegrationDialog = ({integration, onClose, onSuccess, triggerNode}: Integ
                                 `An error has occurred: ${categoriesError.message}`}
 
                             {tagsError && !tagsLoading && `An error has occurred: ${tagsError.message}`}
+
+                            {!integration?.id && (
+                                <fieldset className="border-0">
+                                    <legend className="mb-2 text-sm font-medium">How will you use it?</legend>
+
+                                    <RadioGroup
+                                        aria-label="Integration usage"
+                                        className="flex flex-col gap-3"
+                                        onValueChange={(value) => setUsage(value as IntegrationUsageType)}
+                                        value={usage}
+                                    >
+                                        <div className="flex items-start gap-2">
+                                            <RadioGroupItem
+                                                aria-label="With workflows"
+                                                id="integration-usage-workflows"
+                                                value="workflows"
+                                            />
+
+                                            <Label
+                                                className="flex flex-col items-start gap-1"
+                                                htmlFor="integration-usage-workflows"
+                                            >
+                                                <span>With workflows</span>
+
+                                                <span className="text-xs font-normal text-content-neutral-secondary">
+                                                    Build workflows your users enable and configure.
+                                                </span>
+                                            </Label>
+                                        </div>
+
+                                        <div className="flex items-start gap-2">
+                                            <RadioGroupItem
+                                                aria-label="Actions, tools & MCP"
+                                                id="integration-usage-connection-only"
+                                                value="connectionOnly"
+                                            />
+
+                                            <Label
+                                                className="flex flex-col items-start gap-1"
+                                                htmlFor="integration-usage-connection-only"
+                                            >
+                                                <span>Actions, tools & MCP</span>
+
+                                                <span className="text-xs font-normal text-content-neutral-secondary">
+                                                    Use the connection from your code through the Actions and Tools
+                                                    APIs, or expose its tools through an MCP server.
+                                                </span>
+                                            </Label>
+                                        </div>
+                                    </RadioGroup>
+                                </fieldset>
+                            )}
 
                             <FormField
                                 control={control}

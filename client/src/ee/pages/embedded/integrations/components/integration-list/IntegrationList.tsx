@@ -28,12 +28,14 @@ const IntegrationList = ({
     componentDefinitions,
     integrations,
     newlyCreatedIntegrationId,
+    newlyCreatedIntegrationTab = 'workflows',
     tags,
     taskDispatcherDefinitions,
 }: {
     componentDefinitions?: ComponentDefinitionBasic[];
     integrations: Integration[];
     newlyCreatedIntegrationId?: number;
+    newlyCreatedIntegrationTab?: IntegrationListItemTabType;
     tags: Tag[];
     taskDispatcherDefinitions?: TaskDispatcherDefinition[];
 }) => {
@@ -94,9 +96,9 @@ const IntegrationList = ({
 
     useEffect(() => {
         if (newlyCreatedIntegrationId) {
-            handleTabChange(newlyCreatedIntegrationId, 'workflows');
+            handleTabChange(newlyCreatedIntegrationId, newlyCreatedIntegrationTab);
         }
-    }, [handleTabChange, newlyCreatedIntegrationId]);
+    }, [handleTabChange, newlyCreatedIntegrationId, newlyCreatedIntegrationTab]);
 
     return (
         <div className="w-full self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">

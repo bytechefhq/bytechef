@@ -5,7 +5,7 @@ import PageLoader from '@/components/PageLoader';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {EMBEDDED_INTEGRATIONS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
-import IntegrationDialog from '@/ee/pages/embedded/integrations/components/IntegrationDialog';
+import IntegrationDialog, {IntegrationUsageType} from '@/ee/pages/embedded/integrations/components/IntegrationDialog';
 import IntegrationsFilterTitle from '@/ee/pages/embedded/integrations/components/IntegrationsFilterTitle';
 import NewIntegrationCodeWorkflowDialog from '@/ee/pages/embedded/integrations/components/NewIntegrationCodeWorkflowDialog';
 import UnifiedApiLeftSidebarNav from '@/ee/pages/embedded/integrations/components/UnifiedApiLeftSidebarNav';
@@ -39,7 +39,9 @@ const INTEGRATION_STEPS = [
 ];
 
 const Integrations = () => {
-    const [newlyCreatedIntegrationId, setNewlyCreatedIntegrationId] = useState<number | undefined>();
+    const [newlyCreatedIntegration, setNewlyCreatedIntegration] = useState<
+        {id: number; usage: IntegrationUsageType} | undefined
+    >();
     const [showImportCodeWorkflowDialog, setShowImportCodeWorkflowDialog] = useState(false);
     const [showIntegrationDialog, setShowIntegrationDialog] = useState(false);
     const [showNewCodeWorkflowDialog, setShowNewCodeWorkflowDialog] = useState(false);
@@ -165,7 +167,10 @@ const Integrations = () => {
                     <IntegrationList
                         componentDefinitions={componentDefinitions}
                         integrations={integrations}
-                        newlyCreatedIntegrationId={newlyCreatedIntegrationId}
+                        newlyCreatedIntegrationId={newlyCreatedIntegration?.id}
+                        newlyCreatedIntegrationTab={
+                            newlyCreatedIntegration?.usage === 'connectionOnly' ? 'actions' : 'workflows'
+                        }
                         tags={tags}
                         taskDispatcherDefinitions={taskDispatcherDefinitions}
                     />
@@ -233,7 +238,9 @@ const Integrations = () => {
                             );
                         }
                     }}
-                    onSuccess={(integrationId) => integrationId && setNewlyCreatedIntegrationId(integrationId)}
+                    onSuccess={(integrationId, usage) =>
+                        integrationId && setNewlyCreatedIntegration({id: integrationId, usage})
+                    }
                 />
             )}
 

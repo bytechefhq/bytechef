@@ -7,11 +7,13 @@ import {useEffect, useMemo} from 'react';
 
 const IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect = ({
     excludedIntegrationVersion,
+    hidden = false,
     integrationId,
     integrationVersion,
     onChange,
 }: {
     excludedIntegrationVersion?: number;
+    hidden?: boolean;
     integrationId: number;
     integrationVersion?: number;
     onChange: (value: number) => void;
@@ -49,6 +51,10 @@ const IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect =
             onChange(latestSelectableVersion);
         }
     }, [integrationVersion, latestSelectableVersion, onChange]);
+
+    if (hidden) {
+        return null;
+    }
 
     return (
         <Select
