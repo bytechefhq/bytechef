@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/command';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Separator} from '@/components/ui/separator';
-import {CheckIcon, ChevronDown, CircleXIcon, XIcon} from 'lucide-react';
+import {CheckIcon, ChevronDown, CircleXIcon, Loader2Icon, XIcon} from 'lucide-react';
 import {ButtonHTMLAttributes, ComponentType, ReactNode, forwardRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -207,18 +207,32 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                             </div>
                         )}
 
-                        {(!selectedValues || selectedValues.length === 0) && (
+                        {(optionsLoading || !selectedValues || selectedValues.length === 0) && (
                             <div className="mx-auto flex w-full items-center justify-between">
-                                <span
-                                    aria-label={placeholder}
-                                    className={twMerge(
-                                        'flex items-center text-sm text-primary',
-                                        leadingIcon && 'ml-9',
-                                        placeholderClassName
-                                    )}
-                                >
-                                    {placeholder}
-                                </span>
+                                {optionsLoading ? (
+                                    <span
+                                        aria-label="Loading options..."
+                                        className={twMerge(
+                                            'flex items-center gap-2 text-sm text-content-neutral-secondary',
+                                            leadingIcon && 'ml-9'
+                                        )}
+                                        role="status"
+                                    >
+                                        <Loader2Icon className="size-4 animate-spin" />
+                                        Loading options...
+                                    </span>
+                                ) : (
+                                    <span
+                                        aria-label={placeholder}
+                                        className={twMerge(
+                                            'flex items-center text-sm text-primary',
+                                            leadingIcon && 'ml-9',
+                                            placeholderClassName
+                                        )}
+                                    >
+                                        {placeholder}
+                                    </span>
+                                )}
 
                                 <ChevronDown
                                     className={twMerge(

@@ -20,6 +20,7 @@ interface RenderMultiSelectProps {
     disabled?: boolean;
     leadingIcon?: ReactNode;
     maxCount?: number;
+    optionsLoading?: boolean;
     placeholder?: string;
     searchable?: boolean;
     showFooter?: boolean;
@@ -31,6 +32,7 @@ const renderMultiSelect = ({
     disabled = false,
     leadingIcon,
     maxCount = 3,
+    optionsLoading = false,
     placeholder = 'Select...',
     searchable = false,
     showFooter = false,
@@ -44,6 +46,7 @@ const renderMultiSelect = ({
             maxCount={maxCount}
             onValueChange={mockOnValueChange}
             options={mockOptions}
+            optionsLoading={optionsLoading}
             placeholder={placeholder}
             searchable={searchable}
             showFooter={showFooter}
@@ -54,6 +57,27 @@ const renderMultiSelect = ({
 describe('MultiSelect component', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+    });
+
+    it('should show a loading status instead of the placeholder while options load', () => {
+        renderMultiSelect({optionsLoading: true, placeholder: 'Pick tools'});
+
+        expect(screen.getByRole('status')).toHaveTextContent('Loading options...');
+        expect(screen.queryByText('Pick tools')).not.toBeInTheDocument();
+        expect(screen.getByRole('button')).toBeDisabled();
+    });
+
+    it('should show the loading status instead of the selected values while options load', () => {
+        renderMultiSelect({optionsLoading: true, value: ['option-one']});
+
+        expect(screen.getByRole('status')).toHaveTextContent('Loading options...');
+        expect(screen.queryByLabelText('Option One-selected')).not.toBeInTheDocument();
+    });
+
+    it('should not show the loading status when options are loaded', () => {
+        renderMultiSelect({});
+
+        expect(screen.queryByRole('status')).not.toBeInTheDocument();
     });
 
     it('should show placeholder when no values are selected', () => {

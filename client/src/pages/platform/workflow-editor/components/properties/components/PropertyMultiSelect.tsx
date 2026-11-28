@@ -2,6 +2,8 @@ import {MultiSelect, MultiSelectOptionType} from '@/components/MultiSelect/Multi
 import RequiredMark from '@/components/RequiredMark';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Label} from '@/components/ui/label';
+import {useClusterElementContext} from '@/pages/platform/workflow-editor/components/properties/ClusterElementContext';
+import {useClusterElementOptionsQuery} from '@/shared/middleware/graphql';
 import {GetClusterElementNodeOptionsRequest, OptionsDataSource} from '@/shared/middleware/platform/configuration';
 import {
     useGetClusterElementNodeOptionsQuery,
@@ -61,6 +63,8 @@ const PropertyMultiSelect = ({
             operationChangeInProgress: state.operationChangeInProgress,
         }))
     );
+
+    const clusterElementContext = useClusterElementContext();
 
     const {rootClusterElementNodeData} = useWorkflowEditorStore(
         useShallow((state) => ({
@@ -155,7 +159,92 @@ const PropertyMultiSelect = ({
             Boolean(queryEnabled && currentNode?.clusterElementType)
         );
 
+    const clusterElementInputParameters = useMemo(
+        () =>
+            clusterElementContext?.inputParameters
+                ? Object.fromEntries(
+                      Object.entries(clusterElementContext.inputParameters).filter(
+                          ([, parameterValue]) =>
+                              !(
+                                  typeof parameterValue === 'string' &&
+                                  (parameterValue.startsWith('=') || parameterValue.includes('${'))
+                              )
+                      )
+                  )
+                : undefined,
+        [clusterElementContext?.inputParameters]
+    );
+
+    const clusterElementLookupDependsOnValues = useMemo(
+        () =>
+            clusterElementInputParameters && lookupDependsOnPaths?.length
+                ? lookupDependsOnPaths.map((dependencyPath) => clusterElementInputParameters[dependencyPath])
+                : undefined,
+        [clusterElementInputParameters, lookupDependsOnPaths]
+    );
+
+    const clusterElementContextQueryEnabled = useMemo(() => {
+        if (
+            !clusterElementContext ||
+            (clusterElementContext.connectionRequired === true && clusterElementContext.connectionId == null) ||
+            !optionsDataSource ||
+            currentNode
+        ) {
+            return false;
+        }
+
+        if (lookupDependsOnPaths?.length) {
+            return !!clusterElementLookupDependsOnValues?.every(
+                (dependencyValue) => dependencyValue !== undefined && dependencyValue !== null && dependencyValue !== ''
+            );
+        }
+
+        return true;
+    }, [
+        clusterElementContext,
+        clusterElementLookupDependsOnValues,
+        currentNode,
+        lookupDependsOnPaths,
+        optionsDataSource,
+    ]);
+
+    const clusterElementPropertyName = name || path || '';
+
+    const {data: contextClusterElementOptionsData, isLoading: isContextClusterElementOptionsLoading} =
+        useClusterElementOptionsQuery(
+            {
+                clusterElementName: clusterElementContext?.clusterElementName || '',
+                componentName: clusterElementContext?.componentName || '',
+                componentVersion: clusterElementContext?.componentVersion || 0,
+                connectionId: clusterElementContext?.connectionId,
+                inputParameters: clusterElementInputParameters,
+                lookupDependsOnPaths: lookupDependsOnPaths || [],
+                propertyName: clusterElementPropertyName,
+            },
+            {
+                enabled: clusterElementContextQueryEnabled,
+                queryKey: [
+                    'clusterElementOptions',
+                    {
+                        clusterElementName: clusterElementContext?.clusterElementName,
+                        componentName: clusterElementContext?.componentName,
+                        componentVersion: clusterElementContext?.componentVersion,
+                        connectionId: clusterElementContext?.connectionId,
+                        lookupDependsOnValues: clusterElementLookupDependsOnValues,
+                        propertyName: clusterElementPropertyName,
+                    },
+                ],
+            }
+        );
+
     const mappedOptionsData: MultiSelectOptionType[] | undefined = useMemo(() => {
+        if (contextClusterElementOptionsData?.clusterElementOptions) {
+            return contextClusterElementOptionsData.clusterElementOptions.map((option) => ({
+                label: option.label || String(option.value ?? ''),
+                value: String(option.value ?? option.label),
+            }));
+        }
+
         if (clusterElementOptionsData) {
             return clusterElementOptionsData.map((option) => ({
                 ...option,
@@ -173,7 +262,7 @@ const PropertyMultiSelect = ({
         }
 
         return undefined;
-    }, [optionsData, clusterElementOptionsData]);
+    }, [optionsData, clusterElementOptionsData, contextClusterElementOptionsData]);
 
     const missingConnection = useMemo(
         () =>
@@ -200,6 +289,10 @@ const PropertyMultiSelect = ({
     );
 
     const memoizedPlaceholder = useMemo(() => {
+        if (mappedOptionsData?.length) {
+            return placeholder || undefined;
+        }
+
         const conditions = [
             {
                 condition: !!missingConnection && !connectionRequirementMet && !options?.length,
@@ -235,6 +328,7 @@ const PropertyMultiSelect = ({
         dependencyMissing,
         lookupDependsOnPaths,
         lookupDependsOnValues?.length,
+        mappedOptionsData?.length,
         missingConnection,
         noOptionsAvailable,
         options?.length,
@@ -291,7 +385,10 @@ const PropertyMultiSelect = ({
                     }
                 }}
                 options={mappedOptionsData ?? options ?? []}
-                optionsLoading={(isOptionsDataLoading || isClusterElementOptionsDataLoading) && !!queryEnabled}
+                optionsLoading={
+                    ((isOptionsDataLoading || isClusterElementOptionsDataLoading) && !!queryEnabled) ||
+                    (isContextClusterElementOptionsLoading && clusterElementContextQueryEnabled)
+                }
                 placeholder={memoizedPlaceholder}
                 placeholderClassName={placeholderClassName}
                 value={value}
