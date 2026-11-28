@@ -39,6 +39,9 @@ export enum Source {
     COMPONENT_RULE = 'COMPONENT_RULE',
 }
 
+export const isWorkflowEditorSource = (source: Source) =>
+    source === Source.WORKFLOW_EDITOR || source === Source.WORKFLOW_EDITOR_EMBEDDED;
+
 export interface CodeEditorCopilotParametersI {
     language: string;
 }
@@ -143,6 +146,9 @@ interface CopilotStateI {
 
     globalPanelConversationToken: string | null;
     setGlobalPanelConversationToken: (token: string | null) => void;
+
+    workflowEditorWorkflowKey: string | undefined;
+    bindWorkflowEditorWorkflow: (workflowKey: string) => void;
 }
 
 export const useCopilotStore = create<CopilotStateI>()(
@@ -152,7 +158,12 @@ export const useCopilotStore = create<CopilotStateI>()(
             // New conversation = reset the picker too. The picker is "per conversation" by design, so a
             // user who picked GPT-4o in one conversation lands on the workspace default in the next one
             // rather than carrying the selection across unrelated threads.
-            set({conversationId: generateRandomId(), selectedLlmModel: null, selectedLlmProvider: null});
+            set((state) => ({
+                context: {...state.context, mode: MODE.ASK},
+                conversationId: generateRandomId(),
+                selectedLlmModel: null,
+                selectedLlmProvider: null,
+            }));
         },
 
         context: {
@@ -188,7 +199,7 @@ export const useCopilotStore = create<CopilotStateI>()(
             set((state) => {
                 return {
                     ...state,
-                    messages: [...state.messages, message],
+                    messages: [...state.messages, message.id ? message : {...message, id: generateRandomId()}],
                 };
             }),
         appendToLastAssistantMessage: (text: string) =>
@@ -212,7 +223,7 @@ export const useCopilotStore = create<CopilotStateI>()(
                 }
 
                 // No assistant message for the current turn yet; create one.
-                messages.push({role: 'assistant', content: text} as ThreadMessageLike);
+                messages.push({role: 'assistant', content: text, id: generateRandomId()} as ThreadMessageLike);
 
                 return {...state, messages};
             }),
@@ -302,5 +313,27 @@ export const useCopilotStore = create<CopilotStateI>()(
 
         globalPanelConversationToken: null,
         setGlobalPanelConversationToken: (token) => set({globalPanelConversationToken: token}),
+
+        workflowEditorWorkflowKey: undefined,
+        bindWorkflowEditorWorkflow: (workflowKey) =>
+            set((state) => {
+                if (state.workflowEditorWorkflowKey === workflowKey) {
+                    return state;
+                }
+
+                if (state.workflowEditorWorkflowKey === undefined) {
+                    return {...state, workflowEditorWorkflowKey: workflowKey};
+                }
+
+                return {
+                    ...state,
+                    context: {...state.context, mode: MODE.ASK},
+                    conversationId: generateRandomId(),
+                    messages: [],
+                    selectedLlmModel: null,
+                    selectedLlmProvider: null,
+                    workflowEditorWorkflowKey: workflowKey,
+                };
+            }),
     }))
 );

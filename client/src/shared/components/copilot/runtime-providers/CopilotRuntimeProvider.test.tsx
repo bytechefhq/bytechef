@@ -9,7 +9,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {CopilotRuntimeProvider} from './CopilotRuntimeProvider';
 
 interface FakeSubscriberI {
-    onRunErrorEvent?: (params: {event: {message?: string}}) => void;
+    onRunErrorEvent?: (params: {event: {code?: string; message?: string}}) => void;
     onTextMessageContentEvent?: (params: {event: {delta: string}; textMessageBuffer: string}) => void;
 }
 
@@ -227,7 +227,7 @@ describe('CopilotRuntimeProvider', () => {
     });
 
     describe('run errors', () => {
-        it('renders the humanised RUN_ERROR message and skips post-turn callbacks', async () => {
+        it('renders the humanised RUN_ERROR message and still runs post-turn callbacks', async () => {
             const postTurnCallback = vi.fn();
 
             useCopilotPostTurnRegistry.getState().register(Source.WORKFLOW_EDITOR, postTurnCallback);
@@ -247,9 +247,42 @@ describe('CopilotRuntimeProvider', () => {
 
             expect(useCopilotStore.getState().messages.at(-1)).toEqual({
                 content: [{data: {message: 'Model gpt-x is not available'}, type: 'data-run-error'}],
+                id: expect.any(String),
                 role: 'assistant',
             });
-            expect(postTurnCallback).not.toHaveBeenCalled();
+            expect(postTurnCallback).toHaveBeenCalledTimes(1);
+        });
+
+        it('renders the next step for a RUN_ERROR that carries a known code', async () => {
+            renderProvider();
+
+            const agent = hoisted.agents[0];
+            const sendPromise = startSend();
+
+            act(() =>
+                agent.subscriber?.onRunErrorEvent?.({
+                    event: {
+                        code: 'MODEL_SELECTION_INCOMPLETE',
+                        message: 'The model selection is incomplete (provider=openai, model=null). Pick a model again.',
+                    },
+                })
+            );
+
+            await finishRun(agent, sendPromise);
+
+            expect(useCopilotStore.getState().messages.at(-1)).toEqual({
+                content: [
+                    {
+                        data: {
+                            code: 'MODEL_SELECTION_INCOMPLETE',
+                            message: 'Your model selection is incomplete. Pick a model again.',
+                        },
+                        type: 'data-run-error',
+                    },
+                ],
+                id: expect.any(String),
+                role: 'assistant',
+            });
         });
 
         it('renders the fallback text when the RUN_ERROR message is empty', async () => {
@@ -266,6 +299,7 @@ describe('CopilotRuntimeProvider', () => {
                 content: [
                     {data: {message: 'The agent run failed before completing this turn.'}, type: 'data-run-error'},
                 ],
+                id: expect.any(String),
                 role: 'assistant',
             });
         });
@@ -283,6 +317,27 @@ describe('CopilotRuntimeProvider', () => {
 
             expect(hoisted.agents).toHaveLength(0);
             expect(hoisted.toastError).toHaveBeenCalledWith('Copilot is not ready yet');
+        });
+
+        it('runs post-turn callbacks when the run rejects', async () => {
+            vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+            const postTurnCallback = vi.fn();
+
+            useCopilotPostTurnRegistry.getState().register(Source.WORKFLOW_EDITOR, postTurnCallback);
+
+            renderProvider();
+
+            const agent = hoisted.agents[0];
+            const sendPromise = startSend();
+
+            await act(async () => {
+                agent.rejectRun?.(new Error('network down'));
+
+                await sendPromise;
+            });
+
+            expect(postTurnCallback).toHaveBeenCalledTimes(1);
         });
 
         it('shows "Failed to send message" when the run rejects', async () => {

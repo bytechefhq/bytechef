@@ -34,6 +34,8 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,6 +46,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -82,6 +86,13 @@ class CopilotChatFacadeImpl implements CopilotChatFacade {
 
     @Override
     public SseEmitter chat(String agentId, AgUiParameters agUiParameters) {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        if (copilotEmbeddedAccessChecker != null &&
+            copilotEmbeddedAccessChecker.isConnectedUser(securityContext.getAuthentication())) {
+            throw new AccessDeniedException("Connected users cannot use the Copilot");
+        }
+
         State state = agUiParameters.getState();
         Map<String, Object> stateMap = state.getState();
 
@@ -109,9 +120,21 @@ class CopilotChatFacadeImpl implements CopilotChatFacade {
         authorizeWorkspaceAccess(stateMap, build);
 
         stateMap.remove(CopilotConstants.STATE_AUTHENTICATED_USER_ID);
+        stateMap.remove(CopilotConstants.STATE_CONVERSATION_SCOPE);
+        stateMap.remove(CopilotConstants.STATE_SCOPED_PROJECT_ID);
 
-        injectAuthenticatedUserId(stateMap);
-        stateMap.put(CopilotConstants.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
+        String login = SecurityUtils.fetchCurrentUserLogin()
+            .orElseThrow(() -> new AccessDeniedException("The Copilot run has no authenticated user"));
+        String tenantId = TenantContext.getCurrentTenantId();
+
+        Long userId = injectAuthenticatedUserId(stateMap, login);
+
+        stateMap.put(CopilotConstants.STATE_TENANT_ID, tenantId);
+        stateMap.put(
+            CopilotConstants.STATE_CONVERSATION_SCOPE,
+            userId == null
+                ? String.join(":", "app", tenantId, "login", URLEncoder.encode(login, StandardCharsets.UTF_8))
+                : String.join(":", "app", tenantId, "user", String.valueOf(userId)));
 
         return agUiService.runAgent(localAgent, agUiParameters);
     }
@@ -124,25 +147,24 @@ class CopilotChatFacadeImpl implements CopilotChatFacade {
         }
     }
 
-    private void injectAuthenticatedUserId(Map<String, Object> stateMap) {
+    private @Nullable Long injectAuthenticatedUserId(Map<String, Object> stateMap, String login) {
         if (userService == null) {
-            return;
+            return null;
         }
 
-        Optional<String> currentUserLogin = SecurityUtils.fetchCurrentUserLogin();
-
-        Optional<Long> userId = currentUserLogin.flatMap(userService::fetchUserByLogin)
+        Optional<Long> userId = userService.fetchUserByLogin(login)
             .map(User::getId);
 
         if (userId.isEmpty()) {
             log.warn(
-                "No user resolved for login '{}'; the Copilot run state carries no authenticated user id",
-                currentUserLogin.orElse(null));
+                "No user resolved for login '{}'; the Copilot run state carries no authenticated user id", login);
 
-            return;
+            return null;
         }
 
         stateMap.put(CopilotConstants.STATE_AUTHENTICATED_USER_ID, userId.get());
+
+        return userId.get();
     }
 
     private void authorizeIntegrationWorkflowAccess(Map<String, Object> stateMap) {

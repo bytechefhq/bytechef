@@ -55,6 +55,7 @@ dependencies {
     testImplementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-tool"))
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-tool"))
     testImplementation(project(":server:libs:automation:automation-connection:automation-connection-tool"))
+    testImplementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-tool"))
     testImplementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-tool"))
     testImplementation(project(":server:libs:platform:platform-component:platform-component-tool"))
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-tool"))

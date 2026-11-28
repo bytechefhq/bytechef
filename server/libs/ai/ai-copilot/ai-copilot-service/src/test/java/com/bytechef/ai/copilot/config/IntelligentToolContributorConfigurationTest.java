@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.copilot.connection.CopilotConnectionLister;
+import com.bytechef.ai.copilot.tool.ask.SubAgentAskRelay;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolContributor;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
@@ -320,11 +321,13 @@ final class IntelligentToolContributorConfigurationTest {
         TaskTools taskTools = mock(TaskTools.class);
         ScriptTools scriptTools = mock(ScriptTools.class);
 
+        ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider = emptySubAgentAskRelayProvider();
+
         ChatClient beanClient = copilotConfiguration.workflowEditorBuildSubAgentChatClient(
-            chatModel, projectWorkflowTools, taskTools, scriptTools);
+            chatModel, projectWorkflowTools, taskTools, scriptTools, subAgentAskRelayProvider);
 
         IntelligentToolChatClientFactory factory = copilotConfiguration.workflowEditorBuildSubAgentChatClientFactory(
-            beanClient, projectWorkflowTools, taskTools, scriptTools);
+            beanClient, projectWorkflowTools, taskTools, scriptTools, subAgentAskRelayProvider);
 
         return new DelegateFixture(beanClient, factory);
     }
@@ -480,14 +483,18 @@ final class IntelligentToolContributorConfigurationTest {
         TriggerDefinitionFacade triggerDefinitionFacade = mock(TriggerDefinitionFacade.class);
         PropertyOptionsResolver propertyOptionsResolver = mock(PropertyOptionsResolver.class);
         ObjectProvider<CopilotConnectionLister> connectionListerProvider = emptyProvider();
+        ScopedConnectionGuard scopedConnectionGuard = new ScopedConnectionGuard(connectionListerProvider);
 
         return new CopilotConfiguration(
             promptResource, promptResource, promptResource, promptResource, promptResource, promptResource,
             promptResource, promptResource, promptResource, promptResource, promptResource, workflowValidatorTools,
-            workflowInstructionTools, connectionDefinitionService, workspaceConnectionFacade,
-            componentDefinitionService, actionDefinitionService, actionDefinitionFacade, triggerDefinitionService,
-            triggerDefinitionFacade, propertyOptionsResolver, connectionListerProvider,
-            new ScopedConnectionGuard(connectionListerProvider));
+            workflowInstructionTools,
+            new InteractivePickerToolCallbacksImpl(
+                connectionDefinitionService, workspaceConnectionFacade, componentDefinitionService,
+                actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
+                propertyOptionsResolver, connectionListerProvider, scopedConnectionGuard),
+            actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
+            propertyOptionsResolver, scopedConnectionGuard);
     }
 
     private static List<IntelligentToolDefinition> contributedDefinitions(
@@ -531,6 +538,11 @@ final class IntelligentToolContributorConfigurationTest {
     }
 
     private record DelegateCase(String definitionName, IntelligentToolVariant variant, String fixtureKey) {
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<SubAgentAskRelay> emptySubAgentAskRelayProvider() {
+        return mock(ObjectProvider.class);
     }
 
     private static IntelligentToolContributor platformIntelligentToolContributor(

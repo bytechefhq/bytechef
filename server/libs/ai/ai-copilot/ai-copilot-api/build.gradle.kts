@@ -6,11 +6,13 @@ dependencies {
     implementation("org.springframework.data:spring-data-jdbc")
     implementation("tools.jackson.core:jackson-databind")
     implementation("org.springframework.ai:spring-ai-client-chat")
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":spring-ai:spring-ag-ui:packages:core"))
     implementation("org.springframework:spring-webmvc")
     implementation(project(":spring-ai:spring-ag-ui:packages:server"))
     implementation(project(":spring-ai:spring-ag-ui:servers:spring"))
+    implementation("org.springframework.security:spring-security-core")
 
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter")

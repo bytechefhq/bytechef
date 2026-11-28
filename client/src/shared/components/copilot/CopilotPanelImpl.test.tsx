@@ -5,12 +5,13 @@ import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {ReactNode} from 'react';
-import {MemoryRouter} from 'react-router-dom';
+import {MemoryRouter, useNavigate} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
     useAiDefaultModelQuery: () => ({data: {aiDefaultModel: null}, isPending: false}),
+    useAiProviderCatalogQuery: () => ({data: undefined}),
 }));
 
 const wrapper = ({children}: {children: ReactNode}) => (
@@ -93,6 +94,84 @@ describe('CopilotPanelContent closeGlobalPanel', () => {
         expect(state.composerPlaceholder).toBeUndefined();
         expect(state.conversationStack).toHaveLength(1);
         expect(useCopilotPanelStore.getState().copilotPanelOpen).toBe(false);
+    });
+
+    it('keeps a workflow editor conversation in Build when closing without a pushed token', async () => {
+        const user = userEvent.setup();
+
+        useCopilotStore.setState({
+            context: {mode: MODE.BUILD, parameters: {}, source: Source.WORKFLOW_EDITOR},
+            globalPanelConversationToken: null,
+        });
+
+        render(<CopilotPanelContent />, {wrapper});
+
+        await user.click(screen.getByLabelText('Close Copilot panel'));
+
+        const state = useCopilotStore.getState();
+
+        expect(state.context).toEqual({mode: MODE.BUILD, parameters: {}, source: Source.WORKFLOW_EDITOR});
+        expect(state.messages).toEqual([{content: 'covering turn', role: 'user'}]);
+        expect(useCopilotPanelStore.getState().copilotPanelOpen).toBe(false);
+    });
+
+    it('returns a Skills Build conversation to Ask when closing without a pushed token', async () => {
+        const user = userEvent.setup();
+
+        useCopilotStore.setState({
+            context: {mode: MODE.BUILD, parameters: {}, source: Source.SKILLS},
+            globalPanelConversationToken: null,
+        });
+
+        render(<CopilotPanelContent />, {wrapper});
+
+        await user.click(screen.getByLabelText('Close Copilot panel'));
+
+        expect(useCopilotStore.getState().context).toEqual({
+            mode: MODE.ASK,
+            parameters: {},
+            source: Source.WORKFLOW_EDITOR,
+        });
+    });
+
+    it('returns to Ask when the user switches to another workflow', async () => {
+        const user = userEvent.setup();
+
+        useCopilotStore.setState({
+            context: {mode: MODE.BUILD, parameters: {}, source: Source.WORKFLOW_EDITOR},
+            globalPanelConversationToken: null,
+        });
+
+        const SwitchWorkflowButton = () => {
+            const navigate = useNavigate();
+
+            return <button onClick={() => navigate('/projects/1/project-workflows/3')}>Switch workflow</button>;
+        };
+
+        render(
+            <MemoryRouter initialEntries={['/projects/1/project-workflows/2']}>
+                <TooltipProvider>
+                    <SwitchWorkflowButton />
+
+                    <CopilotPanelContent />
+                </TooltipProvider>
+            </MemoryRouter>
+        );
+
+        await user.click(screen.getByText('Switch workflow'));
+
+        const state = useCopilotStore.getState();
+
+        expect(state.context.mode).toBe(MODE.ASK);
+        expect(state.messages).toEqual([]);
+    });
+});
+
+describe('CopilotPanelContent without an AI provider', () => {
+    it('offers the same Open AI Providers action as a coded run error', () => {
+        render(<CopilotPanelContent />, {wrapper});
+
+        expect(screen.getByRole('button', {name: 'Open AI Providers'})).toBeInTheDocument();
     });
 });
 

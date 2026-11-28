@@ -7,13 +7,14 @@ import AskUserQuestionMessage, {
 import CreateConnectionMessage, {
     CreateConnectionDataI,
 } from '@/shared/components/ai-chat/messages/CreateConnectionMessage';
-import RunErrorMessage, {RunErrorDataI} from '@/shared/components/ai-chat/messages/RunErrorMessage';
+import RunErrorMessage from '@/shared/components/ai-chat/messages/RunErrorMessage';
 import SelectConnectionMessage, {
     SelectConnectionDataI,
 } from '@/shared/components/ai-chat/messages/SelectConnectionMessage';
 import SelectPropertyOptionMessage, {
     SelectPropertyOptionDataI,
 } from '@/shared/components/ai-chat/messages/SelectPropertyOptionMessage';
+import {RunErrorDataI} from '@/shared/components/ai-chat/messages/toRunErrorData';
 import {DataMessagePartProps} from '@assistant-ui/react';
 
 export const aiChatDataComponents = {

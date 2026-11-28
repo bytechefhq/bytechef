@@ -246,7 +246,7 @@ function App() {
             canEditWorkspace &&
             currentEnvironmentId === DEVELOPMENT_ENVIRONMENT &&
             currentWorkspaceId !== undefined,
-        workspaceId: currentWorkspaceId,
+        workspaceId: currentWorkspaceId!,
     });
 
     const showAutomationGettingStarted = shouldShowAutomationGettingStarted({
