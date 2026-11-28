@@ -16,6 +16,7 @@ import {DataMessagePartProps, ThreadMessageLike} from '@assistant-ui/react';
 import {QueryClient} from '@tanstack/react-query';
 import {render, screen} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
+import {toast} from 'sonner';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {
@@ -23,9 +24,12 @@ import {
     bootstrapAiHubTurnRunState,
     buildAiHubSubscriber,
     buildStateToSend,
+    getForbiddenTurnRunErrorCode,
+    getLastUserMessageText,
     getOptimisticTurnMarker,
     hasLivePropertyOptionPicker,
     invalidateWorkflowQueries,
+    isForbiddenTurnError,
     isTurnInFlightError,
     projectMessagesWithToolCalls,
     removeOptimisticTurnMessages,
@@ -34,7 +38,13 @@ import {
 } from '../AiHubRuntimeProvider';
 
 import type {AgentSubscriber} from '@ag-ui/client';
-import type {RunFinishedEvent, ToolCallEndEvent, ToolCallResultEvent, ToolCallStartEvent} from '@ag-ui/core';
+import type {
+    RunFinishedEvent,
+    RunStartedEvent,
+    ToolCallEndEvent,
+    ToolCallResultEvent,
+    ToolCallStartEvent,
+} from '@ag-ui/core';
 
 vi.mock('@/ee/pages/automation/ai-hub/chats/api/chats.api', () => ({
     createAiHubChat: vi.fn(),
@@ -108,6 +118,17 @@ const makeRunFinishedParams = (): {
     pendingToolCallIds: [],
 });
 
+const makeRunStartedParams = (): {event: RunStartedEvent} & SubscriberParamsBaseType => ({
+    ...baseSubscriberParams,
+    event: {
+        rawEvent: undefined,
+        runId: 'run-1',
+        threadId: 'thread-1',
+        timestamp: undefined,
+        type: EventType.RUN_STARTED,
+    },
+});
+
 type RunErrorParamsType = Parameters<NonNullable<AgentSubscriber['onRunErrorEvent']>>[0];
 
 const makeRunErrorParams = (message: string) => ({event: {message}}) as RunErrorParamsType;
@@ -150,6 +171,65 @@ describe('isTurnInFlightError', () => {
         expect(isTurnInFlightError({message: 'HTTP 409: {not json'})).toBe(false);
         expect(isTurnInFlightError(null)).toBe(false);
         expect(isTurnInFlightError(undefined)).toBe(false);
+    });
+});
+
+describe('getForbiddenTurnRunErrorCode', () => {
+    it('maps the workspace role refusal from the parsed payload', () => {
+        expect(
+            getForbiddenTurnRunErrorCode({
+                payload: {error: 'Workspace is not accessible to the current user'},
+                status: 403,
+            })
+        ).toBe('WORKSPACE_ACCESS_DENIED');
+    });
+
+    it('maps the chat refusal from the message when there is no payload', () => {
+        expect(
+            getForbiddenTurnRunErrorCode({
+                message: 'HTTP 403: {"error":"AiHubChat is not accessible to the current user"}',
+            })
+        ).toBe('CHAT_ACCESS_DENIED');
+    });
+
+    it('falls back to the neutral code for any other refusal', () => {
+        expect(getForbiddenTurnRunErrorCode({payload: {error: 'Access denied'}, status: 403})).toBe('ACCESS_DENIED');
+        expect(getForbiddenTurnRunErrorCode({message: 'HTTP 403: ', status: 403})).toBe('ACCESS_DENIED');
+    });
+});
+
+describe('isForbiddenTurnError', () => {
+    it('recognises the HttpAgent rejection of a 403 by its status', () => {
+        expect(isForbiddenTurnError({message: 'HTTP 403: {}', status: 403})).toBe(true);
+    });
+
+    it('recognises a 403 from its message when the status is missing', () => {
+        expect(
+            isForbiddenTurnError({message: 'HTTP 403: {"error":"Workspace is not accessible to the current user"}'})
+        ).toBe(true);
+    });
+
+    it('does not match other failures', () => {
+        expect(isForbiddenTurnError({message: 'HTTP 409: {"error":"TURN_IN_FLIGHT"}', status: 409})).toBe(false);
+        expect(isForbiddenTurnError({message: 'HTTP 4031 is not a status'})).toBe(false);
+        expect(isForbiddenTurnError(null)).toBe(false);
+    });
+});
+
+describe('getLastUserMessageText', () => {
+    it('returns the text of the latest user message, skipping later assistant rows', () => {
+        expect(
+            getLastUserMessageText([
+                {content: 'First', role: 'user'},
+                {content: 'Reply', role: 'assistant'},
+                {content: [{text: 'Delete the Demo project', type: 'text'}], role: 'user'},
+                {content: 'Approve it?', role: 'assistant'},
+            ])
+        ).toBe('Delete the Demo project');
+    });
+
+    it('returns an empty string for a transcript without a user message', () => {
+        expect(getLastUserMessageText([{content: 'Hello', role: 'assistant'}])).toBe('');
     });
 });
 
@@ -712,6 +792,27 @@ describe('buildAiHubSubscriber', () => {
         });
     });
 
+    describe('onRunStartedEvent', () => {
+        it('tells the turn the server accepted it', () => {
+            const onRunStarted = vi.fn();
+
+            createSubscriber({onRunStarted}).onRunStartedEvent!(makeRunStartedParams());
+
+            expect(onRunStarted).toHaveBeenCalledOnce();
+        });
+
+        it('stays quiet for a turn whose chat is no longer shown', () => {
+            const onRunStarted = vi.fn();
+            const subscriber = createSubscriber({onRunStarted});
+
+            aiHubStore.setState({chatId: 'thread-2'});
+
+            subscriber.onRunStartedEvent!(makeRunStartedParams());
+
+            expect(onRunStarted).not.toHaveBeenCalled();
+        });
+    });
+
     describe('onRunErrorEvent for 409 TURN_IN_FLIGHT', () => {
         const turnInFlightMessage = 'HTTP 409: {"error":"TURN_IN_FLIGHT"}';
 
@@ -1133,8 +1234,10 @@ describe('runPostTurnTelemetry', () => {
         });
     });
 
-    it('marks the title generation failure on the chats store when it fails', async () => {
+    it('marks the title generation failure on the chats store, without a toast, when it fails', async () => {
         vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+        const toastErrorSpy = vi.spyOn(toast, 'error');
 
         mockGenerateChatTitle.mockRejectedValue(new Error('model down'));
 
@@ -1143,6 +1246,8 @@ describe('runPostTurnTelemetry', () => {
         await vi.waitFor(() => {
             expect(aiHubChatsStore.getState().titleGenerationFailures[100]).toBe('model down');
         });
+
+        expect(toastErrorSpy).not.toHaveBeenCalled();
     });
 });
 

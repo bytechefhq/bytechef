@@ -14,6 +14,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -22,7 +23,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.agui.server.LocalAgent;
+import com.bytechef.ee.ai.hub.agent.AiHubChatStreamer;
+import com.bytechef.ee.ai.hub.agent.AiHubContinuationStarterImpl;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
+import com.bytechef.ee.ai.hub.approval.AiHubContinuationStarter;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApproval;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatMessage;
@@ -62,8 +67,13 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @version ee
@@ -72,6 +82,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  */
 @ExtendWith(MockitoExtension.class)
 class AiHubChatServiceTest {
+
+    private static final int DELETED_ORDINAL = AiHubChatStatus.DELETED.ordinal();
 
     private static final long WORKSPACE_ID = 1L;
     private static final long OTHER_WORKSPACE_ID = 2L;
@@ -113,7 +125,7 @@ class AiHubChatServiceTest {
 
         chatService = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider,
-            inFlightRunRegistry);
+            inFlightRunRegistry, mock(PlatformTransactionManager.class));
     }
 
     @AfterEach
@@ -307,7 +319,8 @@ class AiHubChatServiceTest {
         chat.setMessageCount(3);
 
         when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
-        when(chatRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        when(chatRepository.updateTitleUnlessDeleted(anyLong(), any(), anyInt(), any())).thenReturn(1);
 
         AiHubChatPatch patch = new AiHubChatPatch("New title", null, null, null);
 
@@ -316,6 +329,186 @@ class AiHubChatServiceTest {
         assertThat(result.getTitle()).isEqualTo("New title");
         assertThat(result.getMessageCount()).isEqualTo(3);
         assertThat(result.getStatus()).isEqualTo(AiHubChatStatus.ACTIVE);
+
+        verify(chatRepository).updateTitleUnlessDeleted(eq(1L), eq("New title"), eq(DELETED_ORDINAL),
+            any(LocalDateTime.class));
+        verify(chatRepository, never()).updateLastPreviewUnlessDeleted(anyLong(), any(), anyInt(), any());
+        verify(chatRepository, never()).updateMessageCountUnlessDeleted(anyLong(), anyInt(), anyInt(), any());
+        verify(chatRepository, never()).updateStatusUnlessDeleted(anyLong(), anyInt(), anyInt(), any());
+        verify(chatRepository, never()).save(any());
+    }
+
+    @Test
+    void testPatchUpdatesPreviewAndMessageCountWithoutTouchingTheTitle() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        when(chatRepository.updateLastPreviewUnlessDeleted(anyLong(), any(), anyInt(), any())).thenReturn(1);
+        when(chatRepository.updateMessageCountUnlessDeleted(anyLong(), anyInt(), anyInt(), any())).thenReturn(1);
+
+        chatService.patch(1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, "Latest preview", 4, null));
+
+        verify(chatRepository).updateLastPreviewUnlessDeleted(
+            eq(1L), eq("Latest preview"), eq(DELETED_ORDINAL), any(LocalDateTime.class));
+        verify(chatRepository).updateMessageCountUnlessDeleted(eq(1L), eq(4), eq(DELETED_ORDINAL),
+            any(LocalDateTime.class));
+        verify(chatRepository, never()).updateTitleUnlessDeleted(anyLong(), any(), anyInt(), any());
+        verify(chatRepository, never()).updateStatusUnlessDeleted(anyLong(), anyInt(), anyInt(), any());
+        verify(chatRepository, never()).save(any());
+    }
+
+    @Test
+    void testPatchRejectsANegativeMessageCountBeforeWriting() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        assertThatThrownBy(
+            () -> chatService.patch(1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, -1, null)))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verify(chatRepository, never()).updateMessageCountUnlessDeleted(anyLong(), anyInt(), anyInt(), any());
+    }
+
+    @Test
+    void testPatchWithNoFieldsCannotBeBuilt() {
+        assertThatThrownBy(() -> new AiHubChatPatch(null, null, null, null))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("at least one");
+    }
+
+    @Test
+    void testPatchTitleOfAChatDeletedConcurrentlyThrowsConflict() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        assertThatThrownBy(
+            () -> chatService.patch(1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch("New title", null, null, null)))
+                .isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    void testPatchPreviewOfAChatDeletedConcurrentlyThrowsConflict() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+        when(chatRepository.updateLastPreviewUnlessDeleted(
+            eq(1L), eq("Latest preview"), eq(DELETED_ORDINAL), any(LocalDateTime.class)))
+                .thenReturn(0);
+
+        assertThatThrownBy(
+            () -> chatService.patch(
+                1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, "Latest preview", null, null)))
+                    .isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    void testPatchMessageCountOfAChatDeletedConcurrentlyThrowsConflict() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+        when(chatRepository.updateMessageCountUnlessDeleted(
+            eq(1L), eq(7), eq(DELETED_ORDINAL), any(LocalDateTime.class)))
+                .thenReturn(0);
+
+        assertThatThrownBy(
+            () -> chatService.patch(1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, 7, null)))
+                .isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    void testPatchOfAChatInDeletedStatusIsNotFoundBeforeWriting() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.DELETED);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        assertThatThrownBy(
+            () -> chatService.patch(
+                1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.ARCHIVED)))
+                    .isInstanceOf(NotFoundException.class);
+
+        verify(chatRepository, never()).updateStatusUnlessDeleted(anyLong(), anyInt(), anyInt(), any());
+    }
+
+    @Test
+    void testAChatInDeletedStatusCannotBeReadOrWritten() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.DELETED);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+        when(chatRepository.findByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
+
+        assertThatThrownBy(() -> chatService.getViewable(1L, WORKSPACE_ID, USER_ID))
+            .isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> chatService.loadMessages(1L, WORKSPACE_ID, USER_ID))
+            .isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> chatService.appendAssistantMessage(1L, WORKSPACE_ID, USER_ID, "Hello"))
+            .isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> chatService.truncateMessages(1L, WORKSPACE_ID, USER_ID, "event-1", true))
+            .isInstanceOf(NotFoundException.class);
+        assertThat(chatService.findByThreadIdViewable(THREAD_ID, USER_ID)).isEmpty();
+
+        verify(chatRepository, never()).updateUpdatedAtUnlessDeleted(anyLong(), anyInt(), any());
+    }
+
+    @Test
+    void testAChatInDeletedStatusCanStillBeHardDeleted() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.DELETED);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        chatService.delete(1L, WORKSPACE_ID, USER_ID);
+
+        verify(chatRepository).delete(chat);
+    }
+
+    @Test
+    void testListWithoutAStatusExcludesDeletedChatsAndListingDeletedReturnsNothing() {
+        List<AiHubChat> chats = List.of(buildChat(1L, USER_ID, "t-1", AiHubChatStatus.ACTIVE));
+
+        when(chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndStatusNotOrderByUpdatedAtDesc(
+            eq(WORKSPACE_ID), eq(USER_ID), eq(0), eq(DELETED_ORDINAL), anyInt()))
+                .thenReturn(chats);
+
+        assertThat(chatService.list(WORKSPACE_ID, USER_ID, 0, null)).isEqualTo(chats);
+        assertThat(chatService.list(WORKSPACE_ID, USER_ID, 0, AiHubChatStatus.DELETED)).isEmpty();
+    }
+
+    @Test
+    void testPatchStatusOfAChatDeletedConcurrentlyThrowsConflict() {
+        AiHubChat chat =
+            buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+        when(chatRepository.updateStatusUnlessDeleted(
+            eq(1L), eq(AiHubChatStatus.ARCHIVED.ordinal()), eq(AiHubChatStatus.DELETED.ordinal()),
+            any(LocalDateTime.class)))
+                .thenReturn(0);
+
+        assertThatThrownBy(
+            () -> chatService.patch(
+                1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.ARCHIVED)))
+                    .isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    void testPatchStatusToDeletedIsRejectedBeforeAnyLookup() {
+        assertThatThrownBy(
+            () -> chatService.patch(
+                1L, WORKSPACE_ID, USER_ID, new AiHubChatPatch(null, null, null, AiHubChatStatus.DELETED)))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+        verify(chatRepository, never()).findById(anyLong());
+        verify(chatRepository, never()).updateStatusUnlessDeleted(anyLong(), anyInt(), anyInt(), any());
     }
 
     @Test
@@ -369,6 +562,37 @@ class AiHubChatServiceTest {
         chatService.delete(1L, WORKSPACE_ID, USER_ID);
 
         verify(approvalService).deleteByChat(1L);
+    }
+
+    @Test
+    void testDeleteStopsTheChatsInFlightRunBeforeRemovingItsApprovals() {
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
+        AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
+            mock(PlatformTransactionManager.class));
+
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        InFlightAiHubRunRegistry.InFlightRun run = registry.tryStart(THREAD_ID, "run-1")
+            .orElseThrow();
+
+        Mono<Void> stopRequested = registry.stopRequested(THREAD_ID);
+
+        doAnswer(invocation -> {
+            assertThat(run.isTerminated()).isTrue();
+
+            return null;
+        }).when(approvalService)
+            .deleteByChat(1L);
+
+        serviceWithRegistry.delete(1L, WORKSPACE_ID, USER_ID);
+
+        StepVerifier.create(stopRequested)
+            .verifyComplete();
+        verify(approvalService).deleteByChat(1L);
+        verify(chatRepository).delete(chat);
     }
 
     @Test
@@ -438,12 +662,13 @@ class AiHubChatServiceTest {
         List<SessionEvent> events = givenActiveEvents();
 
         when(sessionRepository.applyCompaction(eq(THREAD_ID), any(), anyLong())).thenReturn(true);
-        when(chatRepository.save(any(AiHubChat.class)))
-            .thenAnswer(invocation -> invocation.getArgument(0));
 
         OptionalInt deleted = chatService.truncateMessages(1L, WORKSPACE_ID, USER_ID, "event-200", false);
 
         assertThat(deleted).hasValue(2);
+
+        verify(chatRepository).updateUpdatedAtUnlessDeleted(eq(1L), eq(DELETED_ORDINAL), any(LocalDateTime.class));
+        verify(chatRepository, never()).save(any());
         assertThat(archivedEventIds()).containsExactlyInAnyOrder(events.get(1)
             .getId(),
             events.get(2)
@@ -455,8 +680,6 @@ class AiHubChatServiceTest {
         List<SessionEvent> events = givenActiveEvents();
 
         when(sessionRepository.applyCompaction(eq(THREAD_ID), any(), anyLong())).thenReturn(true);
-        when(chatRepository.save(any(AiHubChat.class)))
-            .thenAnswer(invocation -> invocation.getArgument(0));
 
         OptionalInt deleted = chatService.truncateMessages(1L, WORKSPACE_ID, USER_ID, "event-100", true);
 
@@ -510,7 +733,8 @@ class AiHubChatServiceTest {
     void testTruncateMessagesAfterAStopIsRefusedUntilTheStoppedRunEnds() {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
-            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry);
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
+            mock(PlatformTransactionManager.class));
 
         givenActiveEvents();
 
@@ -657,6 +881,192 @@ class AiHubChatServiceTest {
     }
 
     @Test
+    void testDeletingAChatRemovesApprovalsTheGateLeftAfterTheCancel() {
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        TransactionSynchronizationManager.initSynchronization();
+
+        try {
+            chatService.delete(1L, WORKSPACE_ID, USER_ID);
+
+            verify(approvalService, times(1)).deleteByChat(1L);
+
+            TransactionSynchronizationManager.getSynchronizations()
+                .forEach(TransactionSynchronization::afterCommit);
+
+            verify(approvalService, times(2)).deleteByChat(1L);
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+    }
+
+    @Test
+    void testDeletingAChatNeverStartsItsQueuedApprovalContinuation() {
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
+        AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
+            mock(PlatformTransactionManager.class));
+
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+        lenient().when(chatRepository.findByThreadId(THREAD_ID))
+            .thenReturn(Optional.of(chat));
+
+        LocalAgent askAgent = mock(LocalAgent.class);
+
+        when(askAgent.getAgentId()).thenReturn("ai_hub_ask");
+
+        AiHubContinuationStarter continuationStarter = new AiHubContinuationStarterImpl(
+            new AiHubChatStreamer(registry, new JsonMapper()), registry, List.of(askAgent), serviceWithRegistry);
+
+        InFlightAiHubRunRegistry.InFlightRun runningTurn = registry.tryStart(THREAD_ID, "run-running")
+            .orElseThrow();
+
+        AiHubToolApproval approval = new AiHubToolApproval();
+
+        approval.setMode("ASK");
+        approval.setRequestedByUserId(USER_ID);
+
+        assertThat(continuationStarter.startContinuation(approval, chat, WORKSPACE_ID, "[tool-approval #5]"))
+            .isEmpty();
+
+        serviceWithRegistry.delete(1L, WORKSPACE_ID, USER_ID);
+
+        runningTurn.complete();
+
+        verify(askAgent, never()).runAgent(any(), any());
+        assertThat(registry.isInFlight(THREAD_ID)).isFalse();
+    }
+
+    @Test
+    void testARolledBackDeleteLeavesTheChatsThreadUsable() {
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
+        AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
+            mock(PlatformTransactionManager.class));
+
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        TransactionSynchronizationManager.initSynchronization();
+
+        try {
+            serviceWithRegistry.delete(1L, WORKSPACE_ID, USER_ID);
+
+            assertThat(registry.tryStart(THREAD_ID, "run-during-delete")).isEmpty();
+
+            TransactionSynchronizationManager.getSynchronizations()
+                .forEach(synchronization -> synchronization.afterCompletion(
+                    TransactionSynchronization.STATUS_ROLLED_BACK));
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+
+        assertThat(registry.tryStart(THREAD_ID, "run-after-rollback")).isPresent();
+        verify(sessionService, never()).delete(any());
+    }
+
+    @Test
+    void testADeleteThatFailsAfterRetiringStillLiftsTheRetirementOnRollback() {
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
+        AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
+            mock(PlatformTransactionManager.class));
+
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+        doThrow(new IllegalStateException("database down")).when(approvalService)
+            .deleteByChat(1L);
+
+        TransactionSynchronizationManager.initSynchronization();
+
+        try {
+            assertThatThrownBy(() -> serviceWithRegistry.delete(1L, WORKSPACE_ID, USER_ID))
+                .isInstanceOf(IllegalStateException.class);
+
+            assertThat(registry.isRetired(THREAD_ID)).isTrue();
+
+            TransactionSynchronizationManager.getSynchronizations()
+                .forEach(synchronization -> synchronization.afterCompletion(
+                    TransactionSynchronization.STATUS_ROLLED_BACK));
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+
+        assertThat(registry.isRetired(THREAD_ID)).isFalse();
+        assertThat(registry.tryStart(THREAD_ID, "run-after-rollback")).isPresent();
+    }
+
+    @Test
+    void testACommittedDeleteKeepsTheChatsThreadRetired() {
+        InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
+        AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
+            mock(PlatformTransactionManager.class));
+
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        TransactionSynchronizationManager.initSynchronization();
+
+        try {
+            serviceWithRegistry.delete(1L, WORKSPACE_ID, USER_ID);
+
+            for (TransactionSynchronization synchronization : TransactionSynchronizationManager
+                .getSynchronizations()) {
+
+                synchronization.afterCommit();
+                synchronization.afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
+            }
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+
+        assertThat(registry.tryStart(THREAD_ID, "run-after-commit")).isEmpty();
+    }
+
+    @Test
+    void testAfterCommitCleanupsRunInRequiresNewTransactions() {
+        PlatformTransactionManager transactionManager = mock(PlatformTransactionManager.class);
+        AiHubChatServiceImpl serviceWithTransactionManager = new AiHubChatServiceImpl(
+            chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider,
+            inFlightRunRegistry, transactionManager);
+
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        TransactionSynchronizationManager.initSynchronization();
+
+        try {
+            serviceWithTransactionManager.delete(1L, WORKSPACE_ID, USER_ID);
+
+            verify(transactionManager, never()).getTransaction(any());
+
+            TransactionSynchronizationManager.getSynchronizations()
+                .forEach(TransactionSynchronization::afterCommit);
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+
+        ArgumentCaptor<TransactionDefinition> definitionCaptor = ArgumentCaptor.forClass(TransactionDefinition.class);
+
+        verify(transactionManager, times(2)).getTransaction(definitionCaptor.capture());
+
+        assertThat(definitionCaptor.getAllValues())
+            .extracting(TransactionDefinition::getPropagationBehavior)
+            .containsOnly(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        verify(sessionService).delete(THREAD_ID);
+        verify(approvalService, times(2)).deleteByChat(1L);
+    }
+
+    @Test
     void testDeleteSucceedsWhenTheSessionPurgeFails() {
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
@@ -675,11 +1085,12 @@ class AiHubChatServiceTest {
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
         when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
-        when(chatRepository.save(any(AiHubChat.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         chatService.appendAssistantMessage(1L, WORKSPACE_ID, USER_ID, "hello");
 
         verify(sessionRepository).appendEvent(any(SessionEvent.class));
+        verify(chatRepository).updateUpdatedAtUnlessDeleted(eq(1L), eq(DELETED_ORDINAL), any(LocalDateTime.class));
+        verify(chatRepository, never()).save(any());
     }
 
     @Test

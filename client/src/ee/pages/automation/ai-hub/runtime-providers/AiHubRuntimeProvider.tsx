@@ -2,6 +2,7 @@ import {createAiHubChat, generateAiHubChatTitle, patchChat} from '@/ee/pages/aut
 import {AiHubChatsKeys} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
 import {useTruncateAiHubChatMessagesMutation} from '@/ee/pages/automation/ai-hub/chats/hooks/useTruncateChatMessages';
 import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
+import {toToolApprovalConflictResolution} from '@/ee/pages/automation/ai-hub/chats/pendingToolApproval';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {aiHubComposerStore} from '@/ee/pages/automation/ai-hub/composer/stores/useAiHubComposerStore';
 import {attachToInFlightRun} from '@/ee/pages/automation/ai-hub/runtime-providers/inFlightRunClient';
@@ -17,7 +18,13 @@ import {MODE, useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubS
 import {aiHubTabsStore, getTabGenericId} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ApprovalResolutionContext} from '@/shared/components/ai-chat/approvalResolutionContext';
-import {toRunErrorData} from '@/shared/components/ai-chat/messages/toRunErrorData';
+import {
+    RUN_ERROR_CODE_ACCESS_DENIED,
+    RUN_ERROR_CODE_CHAT_ACCESS_DENIED,
+    RUN_ERROR_CODE_CHAT_NOT_FOUND,
+    RUN_ERROR_CODE_WORKSPACE_ACCESS_DENIED,
+    toRunErrorData,
+} from '@/shared/components/ai-chat/messages/toRunErrorData';
 import {parseJson, toToolResultDataPart} from '@/shared/components/ai-chat/messages/toToolResultDataPart';
 import {aiChatRetryableErrorStore} from '@/shared/components/ai-chat/stores/useAiChatRetryableErrorStore';
 import {
@@ -32,6 +39,7 @@ import {
     useAiProviderCatalogQuery,
     useResolveAiHubToolApprovalMutation,
 } from '@/shared/middleware/graphql';
+import {GraphQLHttpError, GraphQLResponseError} from '@/shared/middleware/graphqlFetcher';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {environmentStore, useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -95,32 +103,70 @@ const validateOpenWorkflowTabResult = (raw: unknown): OpenWorkflowTabResultType 
  * first {@code {}.
  */
 export function isTurnInFlightError(source: {message?: string; payload?: unknown} | null | undefined): boolean {
+    return readTurnErrorReason(source) === 'TURN_IN_FLIGHT';
+}
+
+export function isChatNotFoundTurnError(source: {message?: unknown; payload?: unknown} | null | undefined): boolean {
+    return readTurnErrorReason(source) === RUN_ERROR_CODE_CHAT_NOT_FOUND;
+}
+
+function readTurnErrorReason(source: {message?: unknown; payload?: unknown} | null | undefined): string | undefined {
     if (!source) {
-        return false;
+        return undefined;
     }
 
-    const isTurnInFlightBody = (body: unknown) =>
-        body != null && typeof body === 'object' && (body as {error?: unknown}).error === 'TURN_IN_FLIGHT';
+    const readReason = (body: unknown) => {
+        const reason = body != null && typeof body === 'object' ? (body as {error?: unknown}).error : undefined;
 
-    if (isTurnInFlightBody(source.payload)) {
-        return true;
-    }
+        return typeof reason === 'string' ? reason : undefined;
+    };
 
-    if (typeof source.message !== 'string') {
-        return false;
+    const payloadReason = readReason(source.payload);
+
+    if (payloadReason !== undefined || typeof source.message !== 'string') {
+        return payloadReason;
     }
 
     const jsonStart = source.message.indexOf('{');
 
     if (jsonStart < 0) {
-        return false;
+        return undefined;
     }
 
     try {
-        return isTurnInFlightBody(JSON.parse(source.message.slice(jsonStart)));
+        return readReason(JSON.parse(source.message.slice(jsonStart)));
     } catch {
+        return undefined;
+    }
+}
+
+export function isForbiddenTurnError(source: {message?: unknown; status?: unknown} | null | undefined): boolean {
+    if (!source) {
         return false;
     }
+
+    return source.status === 403 || (typeof source.message === 'string' && /^HTTP 403\b/.test(source.message));
+}
+
+const FORBIDDEN_TURN_RUN_ERROR_CODES: Record<string, string> = {
+    'AiHubChat is not accessible to the current user': RUN_ERROR_CODE_CHAT_ACCESS_DENIED,
+    'Workspace is not accessible to the current user': RUN_ERROR_CODE_WORKSPACE_ACCESS_DENIED,
+};
+
+export function getForbiddenTurnRunErrorCode(
+    source: {message?: unknown; payload?: unknown; status?: unknown} | null | undefined
+): string {
+    const reason = readTurnErrorReason(source);
+
+    return (reason !== undefined && FORBIDDEN_TURN_RUN_ERROR_CODES[reason]) || RUN_ERROR_CODE_ACCESS_DENIED;
+}
+
+function isChatThreadConflictError(error: unknown): boolean {
+    return error instanceof GraphQLResponseError && error.errorCode === 'CONFLICT';
+}
+
+export function isToolApprovalConflictError(error: unknown): error is GraphQLResponseError {
+    return error instanceof GraphQLResponseError && error.errorCode === 'CONFLICT';
 }
 
 export function getOptimisticTurnMarker(message: ThreadMessageLike): string | undefined {
@@ -157,6 +203,12 @@ export function getMessageText(message: ThreadMessageLike): string {
         .join('\n');
 }
 
+export function getLastUserMessageText(messages: ThreadMessageLike[]): string {
+    const lastUserMessage = messages.findLast((message) => message.role === 'user');
+
+    return lastUserMessage ? getMessageText(lastUserMessage) : '';
+}
+
 export function findReloadedUserMessageIndex(messages: ThreadMessageLike[], parentId: string | null): number {
     const parentIndex = parentId == null ? -1 : messages.findIndex((message) => message.id === parentId);
 
@@ -180,6 +232,11 @@ interface BuildSubscriberDepsI {
      */
     chatId?: string;
     getLastUserMessage: () => string;
+    /**
+     * Fires on RUN_STARTED of a turn still showing in the thread: the server has accepted the turn, and with it
+     * superseded any approval that was waiting for a decision.
+     */
+    onRunStarted?: () => void;
     /** Fires instead of the red error bubble when the server rejects the turn with 409 TURN_IN_FLIGHT. */
     onTurnInFlight?: (threadId: string) => void;
     /** Fires with the raw tool result after a successful {@code buildWorkflow} or {@code importWorkflow}. */
@@ -301,6 +358,7 @@ export const buildAiHubSubscriber = ({
     assistantMessageIndex = 0,
     chatId: subscriberChatId,
     getLastUserMessage,
+    onRunStarted,
     onTurnInFlight,
     onWorkflowMutated,
     runLifecycle,
@@ -445,6 +503,13 @@ export const buildAiHubSubscriber = ({
             if (subscriberChatId != null && aiHubChatsStore.getState().chatActivity[subscriberChatId] !== 'paused') {
                 aiHubChatsStore.getState().clearActivityState(subscriberChatId);
             }
+        },
+        onRunStartedEvent: () => {
+            if (isStaleChat()) {
+                return;
+            }
+
+            onRunStarted?.();
         },
         onTextMessageContentEvent: ({event, textMessageBuffer}) => {
             if (isStaleChat()) {
@@ -633,14 +698,19 @@ export const runPostTurnTelemetry = ({
                 console.error('Failed to generate chat title:', error);
 
                 aiHubChatsStore.getState().markTitleGenerationFailed(chatId, errorMessage);
-
-                toast.error(`Failed to generate chat title: ${errorMessage}`);
             });
     }
 };
 
+/**
+ * Runs when the focused chat changes: drops the tool-call cards and the retry banner of the chat being left. It does
+ * not abort the in-flight run, so the turn completes server-side and is loaded on return; the subscriber's chat
+ * guards keep its late events out of the new chat.
+ */
 export const cleanupForChatChange = (previousChatId: string | undefined): void => {
     aiChatToolCallStore.getState().resetForChat(previousChatId);
+
+    aiChatRetryableErrorStore.getState().clearError();
 };
 
 export const projectMessagesWithToolCalls = (
@@ -770,7 +840,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                 appendToLastAssistantMessage,
                 assistantMessageIndex: useAiHubStore.getState().messages.length - 1,
                 chatId: threadId,
-                getLastUserMessage: () => '(resumed turn)',
+                getLastUserMessage: () => getLastUserMessageText(useAiHubStore.getState().messages),
                 onWorkflowMutated: handleWorkflowMutated,
                 runLifecycle: {onSettle: () => aiHubRunStateStore.getState().setChatRunning(threadId, false)},
             });
@@ -797,16 +867,32 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                 throw new Error('No active chat');
             }
 
-            const result = await resolveToolApprovalMutation.mutateAsync({
-                approvalId: String(approvalId),
-                approved,
-                comment,
-                workspaceId: String(currentWorkspaceId),
-            });
+            let result;
+
+            try {
+                result = await resolveToolApprovalMutation.mutateAsync({
+                    approvalId: String(approvalId),
+                    approved,
+                    comment,
+                    workspaceId: String(currentWorkspaceId),
+                });
+            } catch (error) {
+                if (!isToolApprovalConflictError(error)) {
+                    throw error;
+                }
+
+                const conflictResolution = toToolApprovalConflictResolution(error.message);
+
+                aiHubChatsStore.getState().clearActivityState(currentChatId);
+
+                useAiHubStore.getState().markToolApprovalResolved(approvalId, conflictResolution);
+
+                return conflictResolution;
+            }
 
             aiHubChatsStore.getState().clearActivityState(currentChatId);
 
-            const {approval, continuationStarted} = result.resolveAiHubToolApproval;
+            const {approval, continuationStarted, runId} = result.resolveAiHubToolApproval;
 
             useAiHubStore.getState().markToolApprovalResolved(approvalId, {
                 executionError: approval.executionError,
@@ -814,6 +900,10 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             });
 
             if (continuationStarted) {
+                if (runId) {
+                    aiHubRunStateStore.getState().setChatRunId(currentChatId, runId);
+                }
+
                 addMessage({content: '', role: 'assistant'});
 
                 aiHubChatsStore.getState().setActivityState(currentChatId, 'running');
@@ -910,7 +1000,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
         onFailure: (errorMessage: string) => void;
         optimisticTurnMarker: string;
         runId: string;
-    }): Promise<{turnInFlight: boolean}> => {
+    }): Promise<{turnForbidden: boolean; turnInFlight: boolean}> => {
         const turnController = startTurnController();
         const {handleTurnInFlight, wasHandled} = createTurnInFlightHandler(
             optimisticTurnMarker,
@@ -933,22 +1023,72 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             assistantMessageIndex: useAiHubStore.getState().messages.length - 1,
             chatId,
             getLastUserMessage: () => input,
+            onRunStarted: () => useAiHubStore.getState().markPendingToolApprovalsSuperseded(),
             onTurnInFlight: handleTurnInFlight,
             onWorkflowMutated: handleWorkflowMutated,
             runLifecycle: {onSettle: () => aiHubRunStateStore.getState().setChatRunning(chatId, false)},
             turnAbortSignal: turnController.signal,
         });
 
+        let turnForbidden = false;
+
         try {
             await agent!.runAgent({abortController: turnController, runId}, subscriber);
         } catch (error) {
             if (isTurnInFlightError(error as {message?: string; payload?: unknown})) {
                 handleTurnInFlight();
+            } else if (isForbiddenTurnError(error as {message?: unknown; status?: unknown})) {
+                turnForbidden = true;
+
+                console.warn('AI Hub turn refused with 403:', error);
+
+                if (chatId != null) {
+                    aiHubChatsStore.getState().clearActivityState(chatId);
+                }
+
+                if (useAiHubStore.getState().chatId === chatId) {
+                    addMessage({
+                        content: [
+                            {
+                                data: toRunErrorData({
+                                    code: getForbiddenTurnRunErrorCode(
+                                        error as {message?: unknown; payload?: unknown; status?: unknown}
+                                    ),
+                                }),
+                                type: 'data-run-error',
+                            },
+                        ],
+                        role: 'assistant',
+                    });
+                }
+            } else if (isChatNotFoundTurnError(error as {message?: unknown; payload?: unknown})) {
+                turnForbidden = true;
+
+                console.warn('AI Hub turn refused because the chat no longer exists:', error);
+
+                if (chatId != null) {
+                    aiHubChatsStore.getState().clearActivityState(chatId);
+                }
+
+                if (useAiHubStore.getState().chatId === chatId) {
+                    addMessage({
+                        content: [
+                            {
+                                data: toRunErrorData({code: RUN_ERROR_CODE_CHAT_NOT_FOUND}),
+                                type: 'data-run-error',
+                            },
+                        ],
+                        role: 'assistant',
+                    });
+
+                    if (composerTextOnRollback !== undefined) {
+                        runtime.thread.composer.setText(composerTextOnRollback);
+                    }
+                }
             } else if (!isAbortError(error, turnController.signal)) {
                 const errorMessage = error instanceof Error ? error.message : String(error);
 
                 console.error('AI Hub agent run failed:', error);
-                toast.error(`AI Hub failed: ${errorMessage}`);
 
                 aiChatToolCallStore.getState().failAllRunning({error: errorMessage});
 
@@ -966,7 +1106,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             }
         }
 
-        return {turnInFlight: wasHandled()};
+        return {turnForbidden, turnInFlight: wasHandled()};
     };
 
     const onNew = async (message: AppendMessage) => {
@@ -988,8 +1128,6 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             const errorMessage = 'AI Hub is not ready: missing chat id.';
 
             toast.error(errorMessage);
-
-            aiChatRetryableErrorStore.getState().setError({errorMessage, lastUserMessage: input, toolName: 'aiHub'});
 
             return;
         }
@@ -1036,11 +1174,16 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                 useAiHubStore.getState().resetMessages();
 
                 console.error('Failed to auto-create chat on first message:', error);
-                toast.error(`Failed to start chat: ${errorMessage}`);
 
-                aiChatRetryableErrorStore
-                    .getState()
-                    .setError({errorMessage, lastUserMessage: input, toolName: 'aiHub'});
+                if (isChatThreadConflictError(error)) {
+                    useAiHubStore.getState().generateChatId();
+                }
+
+                if (!(error instanceof GraphQLResponseError) && !(error instanceof GraphQLHttpError)) {
+                    toast.error(`Failed to start chat: ${errorMessage}`);
+                }
+
+                runtime.thread.composer.setText(input);
             },
         });
 
@@ -1052,7 +1195,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
         aiHubComposerStore.getState().clear();
 
-        const {turnInFlight} = await runTurn({
+        const {turnForbidden, turnInFlight} = await runTurn({
             composerTextOnRollback: input,
             input,
             onFailure: (errorMessage) =>
@@ -1065,7 +1208,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
         const persistedChatId = aiHubChatsStore.getState().currentChatId;
 
-        if (!turnInFlight && persistedChatId != null) {
+        if (!turnInFlight && !turnForbidden && persistedChatId != null) {
             runPostTurnTelemetry({
                 chatId: persistedChatId,
                 input,
@@ -1088,13 +1231,15 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
         const runId = getRandomId();
 
+        aiChatRetryableErrorStore.getState().clearError();
+
         agent.setMessages([{content: userMessage.content, id: userMessage.id, role: 'user'}]);
 
         markChatRunning(runId);
 
         await runTurn({
             input: userMessage.content,
-            onFailure: () => undefined,
+            onFailure: (errorMessage) => toast.error(`AI Hub failed: ${errorMessage}`),
             optimisticTurnMarker: getRandomId(),
             runId,
         });
@@ -1255,6 +1400,9 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
     const onCancel = async () => {
         turnControllerRef.current?.abort();
         turnControllerRef.current = null;
+
+        continuationDisposerRef.current?.();
+        continuationDisposerRef.current = null;
 
         aiChatToolCallStore.getState().failAllRunning({reason: 'Cancelled by user'}, 'aborted');
 

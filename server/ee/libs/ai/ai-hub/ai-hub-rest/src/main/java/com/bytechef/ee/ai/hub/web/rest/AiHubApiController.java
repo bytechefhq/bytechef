@@ -14,16 +14,19 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.ai.hub.agent.AiHubChatStreamer;
 import com.bytechef.ee.ai.hub.agent.AiHubRunState;
+import com.bytechef.ee.ai.hub.agent.AiHubTurnErrorCode;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry.InFlightRun;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatStatus;
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
 import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.ee.ai.hub.util.Mode;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentication;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.TenantContext;
@@ -44,6 +47,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -101,6 +106,8 @@ public class AiHubApiController {
     @Validated
     @PostMapping(value = "/ai/chat/ai_hub")
     public SseEmitter chat(@NonNull @RequestBody() AgUiParameters agUiParameters) {
+        rejectConnectedUser();
+
         long userId = userService.getCurrentUser()
             .getId();
 
@@ -134,6 +141,8 @@ public class AiHubApiController {
 
     @GetMapping(value = "/ai/chat/ai_hub/{threadId}/attach")
     public SseEmitter attach(@PathVariable("threadId") String threadId) {
+        rejectConnectedUser();
+
         long userId = userService.getCurrentUser()
             .getId();
 
@@ -156,7 +165,7 @@ public class AiHubApiController {
     public ResponseEntity<Map<String, Object>> handleTurnInFlight(TurnInFlightException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(Map.of("error", "TURN_IN_FLIGHT"));
+            .body(Map.of("error", AiHubTurnErrorCode.TURN_IN_FLIGHT.name()));
     }
 
     @ExceptionHandler(ResponseStatusException.class)
@@ -189,6 +198,14 @@ public class AiHubApiController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .contentType(MediaType.APPLICATION_JSON)
             .body(Map.of("error", "An unexpected error occurred while dispatching the agent"));
+    }
+
+    private static void rejectConnectedUser() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        if (securityContext.getAuthentication() instanceof ConnectedUserAuthentication) {
+            throw new AccessDeniedException("Connected users cannot use the AI Hub");
+        }
     }
 
     private long enforceWorkspaceRole(AgUiParameters agUiParameters, Mode mode) {
@@ -260,12 +277,18 @@ public class AiHubApiController {
     }
 
     private AiHubChat resolveChat(String threadId, long userId, long workspaceId, long environmentId) {
+        if (inFlightRunRegistry.isRetired(threadId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, AiHubTurnErrorCode.CHAT_NOT_FOUND.name());
+        }
+
         Optional<AiHubChat> chatOptional = chatService.findByThreadId(threadId);
 
         if (chatOptional.isPresent()) {
             AiHubChat chat = chatOptional.get();
 
-            if (!accessPolicy.canParticipate(chat, userId) || !Objects.equals(chat.getWorkspaceId(), workspaceId)) {
+            if (chat.getStatus() == AiHubChatStatus.DELETED || !accessPolicy.canParticipate(chat, userId)
+                || !Objects.equals(chat.getWorkspaceId(), workspaceId)) {
+
                 throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN, "AiHubChat is not accessible to the current user");
             }

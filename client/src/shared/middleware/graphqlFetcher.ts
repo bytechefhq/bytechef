@@ -2,13 +2,38 @@ import {getCookie} from '@/shared/util/cookie-utils';
 
 import {endpointUrl, fetchParams} from './config';
 
+interface GraphQLResponseErrorBodyI {
+    extensions?: {errorCode?: unknown};
+    message?: string;
+}
+
 export class GraphQLResponseError extends Error {
-    constructor(message: string) {
+    readonly errorCode: string | undefined;
+
+    constructor(message: string, errorCode?: string) {
         super(message);
 
+        this.errorCode = errorCode;
         this.name = 'GraphQLResponseError';
     }
 }
+
+export class GraphQLHttpError extends Error {
+    readonly status: number;
+
+    constructor(status: number) {
+        super(`GraphQL request failed with status ${status}`);
+
+        this.name = 'GraphQLHttpError';
+        this.status = status;
+    }
+}
+
+const toGraphQLResponseError = (error: GraphQLResponseErrorBodyI) => {
+    const errorCode = error.extensions?.errorCode;
+
+    return new GraphQLResponseError(error.message ?? '', typeof errorCode === 'string' ? errorCode : undefined);
+};
 
 export function fetcher<TData, TVariables>(
     query: string | {toString(): string},
@@ -27,21 +52,20 @@ export function fetcher<TData, TVariables>(
 
         if (!res.ok) {
             const errorJson = await res.json().catch(() => null);
-            const serverMessage = errorJson?.errors?.[0]?.message;
 
-            if (serverMessage) {
-                throw new GraphQLResponseError(serverMessage);
+            const serverError: GraphQLResponseErrorBodyI | undefined = errorJson?.errors?.[0];
+
+            if (serverError?.message) {
+                throw toGraphQLResponseError(serverError);
             }
 
-            throw new Error(`GraphQL request failed with status ${res.status}`);
+            throw new GraphQLHttpError(res.status);
         }
 
         const json = await res.json();
 
         if (json.errors) {
-            const {message} = json.errors[0];
-
-            throw new GraphQLResponseError(message);
+            throw toGraphQLResponseError(json.errors[0]);
         }
 
         return json.data;

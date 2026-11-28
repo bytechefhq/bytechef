@@ -48,9 +48,12 @@ import org.springframework.ai.session.compaction.CompactionPlan;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @version ee
@@ -64,6 +67,10 @@ public class AiHubChatServiceImpl implements AiHubChatService {
 
     private static final Logger log = LoggerFactory.getLogger(AiHubChatServiceImpl.class);
 
+    private static final String CHAT_DELETED_MESSAGE = "AiHubChat was deleted and can no longer change";
+
+    private static final int DELETED_STATUS_ORDINAL = AiHubChatStatus.DELETED.ordinal();
+
     private static final int LIST_LIMIT = 100;
 
     private static final int MESSAGE_LIMIT = 500;
@@ -76,13 +83,15 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     private final Clock clock;
     private final ObjectProvider<AiHubSessionMemory> aiHubSessionMemoryProvider;
     private final InFlightAiHubRunRegistry inFlightRunRegistry;
+    private final TransactionTemplate requiresNewTransactionTemplate;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public AiHubChatServiceImpl(
         AiHubChatRepository chatRepository, AiHubChatAccessPolicy accessPolicy,
         AiHubToolApprovalService approvalService, ObjectProvider<AiHubSessionMemory> aiHubSessionMemoryProvider,
-        InFlightAiHubRunRegistry inFlightRunRegistry) {
+        InFlightAiHubRunRegistry inFlightRunRegistry, PlatformTransactionManager transactionManager) {
 
+        this.requiresNewTransactionTemplate = requiresNewTransactionTemplate(transactionManager);
         this.chatRepository = chatRepository;
         this.accessPolicy = accessPolicy;
         this.approvalService = approvalService;
@@ -143,9 +152,13 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     @Override
     @Transactional(readOnly = true)
     public List<AiHubChat> list(long workspaceId, long userId, int environment, @Nullable AiHubChatStatus status) {
+        if (status == AiHubChatStatus.DELETED) {
+            return List.of();
+        }
+
         if (status == null) {
-            return chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentOrderByUpdatedAtDesc(
-                workspaceId, userId, environment, LIST_LIMIT);
+            return chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndStatusNotOrderByUpdatedAtDesc(
+                workspaceId, userId, environment, DELETED_STATUS_ORDINAL, LIST_LIMIT);
         }
 
         return chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndStatusOrderByUpdatedAtDesc(
@@ -305,30 +318,55 @@ public class AiHubChatServiceImpl implements AiHubChatService {
 
     @Override
     public AiHubChat patch(long chatId, long requesterWorkspaceId, long requesterUserId, AiHubChatPatch chatPatch) {
-        AiHubChat chat = loadManageable(chatId, requesterWorkspaceId, requesterUserId);
+        AiHubChatStatus status = chatPatch.status();
 
-        if (chatPatch.title() != null) {
-            chat.setTitle(chatPatch.title());
-            chat.setAutoTitled(false);
+        if (status == AiHubChatStatus.DELETED) {
+            throw new IllegalArgumentException("A chat is deleted with deleteAiHubChat, not by setting its status");
         }
 
-        if (chatPatch.lastPreview() != null) {
-            chat.setLastPreview(chatPatch.lastPreview());
+        AiHubChat chat = loadManageable(chatId, requesterWorkspaceId, requesterUserId);
+
+        LocalDateTime updatedAt = LocalDateTime.now(clock);
+
+        String title = chatPatch.title();
+
+        if (title != null) {
+            chat.setTitle(title);
+            chat.setAutoTitled(false);
+
+            requireUpdated(
+                chatRepository.updateTitleUnlessDeleted(chatId, chat.getTitle(), DELETED_STATUS_ORDINAL, updatedAt));
+        }
+
+        String lastPreview = chatPatch.lastPreview();
+
+        if (lastPreview != null) {
+            chat.setLastPreview(lastPreview);
+
+            requireUpdated(
+                chatRepository.updateLastPreviewUnlessDeleted(
+                    chatId, chat.getLastPreview(), DELETED_STATUS_ORDINAL, updatedAt));
         }
 
         Integer messageCount = chatPatch.messageCount();
 
         if (messageCount != null) {
             chat.setMessageCount(messageCount);
+
+            requireUpdated(
+                chatRepository.updateMessageCountUnlessDeleted(
+                    chatId, chat.getMessageCount(), DELETED_STATUS_ORDINAL, updatedAt));
         }
 
-        if (chatPatch.status() != null) {
-            chat.setStatus(chatPatch.status());
+        if (status != null) {
+            chat.setStatus(status);
+
+            requireUpdated(
+                chatRepository.updateStatusUnlessDeleted(chatId, status.ordinal(), DELETED_STATUS_ORDINAL, updatedAt));
         }
 
-        chat.setUpdatedAt(LocalDateTime.now(clock));
-
-        return chatRepository.save(chat);
+        return chatRepository.findById(chatId)
+            .orElseThrow(() -> new NotFoundException("AiHubChat not found"));
     }
 
     @Override
@@ -400,8 +438,7 @@ public class AiHubChatServiceImpl implements AiHubChatService {
             chat, activeEvents.subList(0, cutoffEventIndex), activeEvents.get(messageEventIndex)
                 .getTimestamp());
 
-        chat.setUpdatedAt(LocalDateTime.now(clock));
-        chatRepository.save(chat);
+        chatRepository.updateUpdatedAtUnlessDeleted(chatId, DELETED_STATUS_ORDINAL, LocalDateTime.now(clock));
 
         return OptionalInt.of(activeEvents.size() - cutoffEventIndex);
     }
@@ -529,8 +566,7 @@ public class AiHubChatServiceImpl implements AiHubChatService {
                     .message(new AssistantMessage(content))
                     .build());
 
-        chat.setUpdatedAt(LocalDateTime.now(clock));
-        chatRepository.save(chat);
+        chatRepository.updateUpdatedAtUnlessDeleted(chatId, DELETED_STATUS_ORDINAL, LocalDateTime.now(clock));
     }
 
     @Override
@@ -550,29 +586,69 @@ public class AiHubChatServiceImpl implements AiHubChatService {
 
     @Override
     public void delete(long chatId, long requesterWorkspaceId, long requesterUserId) {
-        AiHubChat chat = loadManageable(chatId, requesterWorkspaceId, requesterUserId);
+        AiHubChat chat = load(chatId, requesterWorkspaceId, requesterUserId, accessPolicy::canManage, true);
+
+        String threadId = chat.getThreadId();
+
+        boolean cleanupScheduled = scheduleCompletionCleanup(chatId, threadId);
+
+        inFlightRunRegistry.retireThread(threadId);
 
         approvalService.deleteByChat(chatId);
 
         chatRepository.delete(chat);
 
-        scheduleChatMemoryDeleteAfterCommit(chat.getThreadId());
+        if (!cleanupScheduled) {
+            deleteSessionMessages(threadId);
+        }
     }
 
-    private void scheduleChatMemoryDeleteAfterCommit(String threadId) {
+    private boolean scheduleCompletionCleanup(long chatId, String threadId) {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-            deleteSessionMessages(threadId);
-
-            return;
+            return false;
         }
 
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 
             @Override
             public void afterCommit() {
-                deleteSessionMessages(threadId);
+                runInNewTransaction(() -> deleteSessionMessages(threadId), "purge the session of thread " + threadId);
+                runInNewTransaction(() -> deleteLeftoverApprovals(chatId), "delete the approvals of chat " + chatId);
+            }
+
+            @Override
+            public void afterCompletion(int status) {
+                if (status == STATUS_ROLLED_BACK) {
+                    inFlightRunRegistry.reinstateThread(threadId);
+                }
             }
         });
+
+        return true;
+    }
+
+    private static TransactionTemplate requiresNewTransactionTemplate(PlatformTransactionManager transactionManager) {
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+
+        return transactionTemplate;
+    }
+
+    private void runInNewTransaction(Runnable cleanup, String description) {
+        try {
+            requiresNewTransactionTemplate.executeWithoutResult(transactionStatus -> cleanup.run());
+        } catch (RuntimeException exception) {
+            log.warn("Failed to {} after the chat delete committed", description, exception);
+        }
+    }
+
+    private void deleteLeftoverApprovals(long chatId) {
+        try {
+            approvalService.deleteByChat(chatId);
+        } catch (RuntimeException exception) {
+            log.warn("Failed to delete the approvals left for deleted chat id={}", chatId, exception);
+        }
     }
 
     private void deleteSessionMessages(String threadId) {
@@ -600,9 +676,20 @@ public class AiHubChatServiceImpl implements AiHubChatService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<AiHubChat> findNotDeletedByThreadId(String threadId) {
+        if (inFlightRunRegistry.isRetired(threadId)) {
+            return Optional.empty();
+        }
+
+        return chatRepository.findByThreadId(threadId)
+            .filter(chat -> !isDeleted(chat));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<AiHubChat> findByThreadIdViewable(String threadId, long requesterUserId) {
         return chatRepository.findByThreadId(threadId)
-            .filter(chat -> accessPolicy.canView(chat, requesterUserId));
+            .filter(chat -> !isDeleted(chat) && accessPolicy.canView(chat, requesterUserId));
     }
 
     @Override
@@ -615,7 +702,7 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         Map<String, AiHubChat> chatByThreadId = new LinkedHashMap<>();
 
         for (AiHubChat chat : chatRepository.findAllByThreadIdIn(threadIds)) {
-            if (accessPolicy.canView(chat, requesterUserId)) {
+            if (!isDeleted(chat) && accessPolicy.canView(chat, requesterUserId)) {
                 chatByThreadId.put(chat.getThreadId(), chat);
             }
         }
@@ -641,6 +728,10 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         return loadManageable(chatId, requesterWorkspaceId, requesterUserId);
     }
 
+    private static boolean isDeleted(AiHubChat chat) {
+        return chat.getStatus() == AiHubChatStatus.DELETED;
+    }
+
     private static boolean workspaceOwnsChat(long workspaceId, AiHubChat chat) {
         return Objects.equals(chat.getWorkspaceId(), workspaceId);
     }
@@ -653,6 +744,12 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         return load(chatId, requesterWorkspaceId, requesterUserId, accessPolicy::canParticipate);
     }
 
+    private static void requireUpdated(int updatedRowCount) {
+        if (updatedRowCount == 0) {
+            throw new ConflictException(CHAT_DELETED_MESSAGE);
+        }
+    }
+
     private AiHubChat loadManageable(long chatId, long requesterWorkspaceId, long requesterUserId) {
         return load(chatId, requesterWorkspaceId, requesterUserId, accessPolicy::canManage);
     }
@@ -660,7 +757,15 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     private AiHubChat load(
         long chatId, long requesterWorkspaceId, long requesterUserId, BiPredicate<AiHubChat, Long> allowed) {
 
+        return load(chatId, requesterWorkspaceId, requesterUserId, allowed, false);
+    }
+
+    private AiHubChat load(
+        long chatId, long requesterWorkspaceId, long requesterUserId, BiPredicate<AiHubChat, Long> allowed,
+        boolean includeDeleted) {
+
         AiHubChat chat = chatRepository.findById(chatId)
+            .filter(foundChat -> includeDeleted || !isDeleted(foundChat))
             .orElseThrow(() -> new NotFoundException("AiHubChat not found"));
 
         if (!workspaceOwnsChat(requesterWorkspaceId, chat) || !allowed.test(chat, requesterUserId)) {
