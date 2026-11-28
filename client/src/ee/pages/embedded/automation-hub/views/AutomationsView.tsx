@@ -16,11 +16,15 @@ import {useAutomationHubStore} from '@/ee/pages/embedded/automation-hub/stores/u
 import CatalogToolbar, {
     CATALOG_LAYOUT_STORAGE_KEY,
 } from '@/ee/pages/embedded/automation-hub/views/components/CatalogToolbar';
+import CreateAutomationWithAiDialog from '@/ee/pages/embedded/automation-hub/views/components/CreateAutomationWithAiDialog';
 import TemplateGridSection, {
     CatalogFilterType,
     CatalogLayoutType,
 } from '@/ee/pages/embedded/automation-hub/views/components/TemplateGridSection';
 import {getEmbedCredentials} from '@/ee/pages/embedded/shared/embedCredentials';
+import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
+import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {ActivationDialog} from '@bytechef/embedded';
 import {AutomationProjectWorkflowTemplate, ConnectedUserProjectWorkflow} from '@bytechef/embedded-api';
 import {useQueryClient} from '@tanstack/react-query';
@@ -46,6 +50,7 @@ const AutomationsView = ({onActivate}: AutomationsViewProps) => {
         () => readStoredLayout() as CatalogLayoutType | undefined
     );
 
+    const [createWithAiDialogOpen, setCreateWithAiDialogOpen] = useState(false);
     const [filter, setFilter] = useState<CatalogFilterType>('all');
     const [search, setSearch] = useState('');
 
@@ -67,13 +72,15 @@ const AutomationsView = ({onActivate}: AutomationsViewProps) => {
         }))
     );
 
+    const copilotEnabled = useApplicationInfoStore((state) => state.ai.copilot.enabled);
+
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
     const {data: projects, error: projectsError, isLoading: projectsLoading} = useGetTemplateProjectsQuery();
     const {data: automations, error: automationsError, isLoading: automationsLoading} = useGetAutomationsQuery();
 
-    const {mutate: createBlankAutomation} = useCreateBlankAutomationMutation();
+    const {isPending: createBlankAutomationPending, mutate: createBlankAutomation} = useCreateBlankAutomationMutation();
     const {mutateAsync: deleteAutomation} = useDeleteAutomationMutation();
     const {mutateAsync: deprovisionReference} = useDeprovisionReferenceMutation();
     const {mutateAsync: setEnabled} = useSetAutomationEnabledMutation();
@@ -136,6 +143,32 @@ const AutomationsView = ({onActivate}: AutomationsViewProps) => {
         });
     };
 
+    const handleCreateWithAi = (prompt: string) => {
+        createBlankAutomation(undefined, {
+            onSuccess: (workflowUuid) => {
+                const {
+                    bindWorkflowEditorWorkflow,
+                    generateConversationId,
+                    resetMessages,
+                    setContext,
+                    setPendingPrompt,
+                } = useCopilotStore.getState();
+
+                bindWorkflowEditorWorkflow(`connectedUser:${workflowUuid}`);
+                resetMessages();
+                generateConversationId();
+                setContext({mode: MODE.BUILD, parameters: {workflowUuid}, source: Source.WORKFLOW_BUILDER_EMBEDDED});
+                setPendingPrompt(prompt);
+
+                useCopilotPanelStore.getState().setCopilotPanelOpen(true);
+
+                setCreateWithAiDialogOpen(false);
+
+                void navigate(`/embedded/hub/builder/${workflowUuid}`);
+            },
+        });
+    };
+
     const handleUseTemplate = (template: AutomationProjectWorkflowTemplate) => {
         if (onActivate) {
             onActivate(template);
@@ -162,6 +195,7 @@ const AutomationsView = ({onActivate}: AutomationsViewProps) => {
                 layoutSwitcherAllowed={layoutSwitcherAllowed}
                 newWorkflowEnabled={newWorkflowEnabled}
                 onCreateBlankAutomation={handleCreateBlankAutomation}
+                onCreateWithAi={copilotEnabled ? () => setCreateWithAiDialogOpen(true) : undefined}
                 onFilterChange={setFilter}
                 onLayoutChange={handleLayoutChange}
                 onSearchChange={setSearch}
@@ -197,6 +231,14 @@ const AutomationsView = ({onActivate}: AutomationsViewProps) => {
                     projects={projects || []}
                     search={search}
                     unmatchedAutomations={unmatchedAutomations}
+                />
+            )}
+
+            {createWithAiDialogOpen && (
+                <CreateAutomationWithAiDialog
+                    isPending={createBlankAutomationPending}
+                    onClose={() => setCreateWithAiDialogOpen(false)}
+                    onCreate={handleCreateWithAi}
                 />
             )}
 

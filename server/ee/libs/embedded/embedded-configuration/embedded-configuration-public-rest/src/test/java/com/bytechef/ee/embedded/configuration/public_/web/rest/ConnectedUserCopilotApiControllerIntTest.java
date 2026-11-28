@@ -152,6 +152,58 @@ public class ConnectedUserCopilotApiControllerIntTest {
 
     @Test
     @WithMockUser(username = "ext-user-1")
+    public void testCopilotChatRunsTheAskAgentWhenAskModeIsRequested() throws Exception {
+        when(connectedUserProjectFacade.prepareCopilotChat(
+            eq("ext-user-1"), eq(WORKFLOW_UUID), eq(Environment.PRODUCTION)))
+                .thenReturn(new CopilotChatContextDTO("wf-99", 1114L, Set.of("slack")));
+
+        when(agUiService.runAgent(any(LocalAgent.class), any(AgUiParameters.class)))
+            .thenReturn(new SseEmitter());
+
+        mockMvc
+            .perform(
+                post("/v1/automation/workflows/{workflowUuid}/copilot/chat", WORKFLOW_UUID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"threadId\":\"thread-1\",\"state\":{\"mode\":\"ASK\"}}")
+                    .accept(MediaType.TEXT_EVENT_STREAM))
+            .andExpect(status().isOk());
+
+        ArgumentCaptor<AgUiParameters> parametersCaptor = ArgumentCaptor.forClass(AgUiParameters.class);
+        ArgumentCaptor<LocalAgent> agentCaptor = ArgumentCaptor.forClass(LocalAgent.class);
+
+        verify(agUiService).runAgent(agentCaptor.capture(), parametersCaptor.capture());
+
+        assertThat(agentCaptor.getValue()
+            .getAgentId()).isEqualTo("workflow_editor_ask");
+
+        Map<String, Object> stateMap = parametersCaptor.getValue()
+            .getState()
+            .getState();
+
+        assertThat(stateMap).containsEntry("mode", "ASK");
+        assertThat(stateMap).containsEntry(CopilotConstants.STATE_SCOPED_PROJECT_ID, 1114L);
+    }
+
+    @Test
+    @WithMockUser(username = "ext-user-1")
+    public void testCopilotChatRejectsAnUnknownMode() throws Exception {
+        when(connectedUserProjectFacade.prepareCopilotChat(
+            eq("ext-user-1"), eq(WORKFLOW_UUID), eq(Environment.PRODUCTION)))
+                .thenReturn(new CopilotChatContextDTO("wf-99", 1114L, Set.of("slack")));
+
+        mockMvc
+            .perform(
+                post("/v1/automation/workflows/{workflowUuid}/copilot/chat", WORKFLOW_UUID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"threadId\":\"thread-1\",\"state\":{\"mode\":\"ADMIN\"}}")
+                    .accept(MediaType.TEXT_EVENT_STREAM))
+            .andExpect(status().isBadRequest());
+
+        verify(agUiService, never()).runAgent(any(), any());
+    }
+
+    @Test
+    @WithMockUser(username = "ext-user-1")
     public void testCopilotChatDropsClientSuppliedAuthenticatedUserId() throws Exception {
         Map<String, Object> stateMap = runWithClientState(
             "{\"" + CopilotConstants.STATE_AUTHENTICATED_USER_ID + "\":999}", Set.of("slack"));
@@ -410,6 +462,15 @@ public class ConnectedUserCopilotApiControllerIntTest {
         @Bean
         public AgUiService agUiService() {
             return mock(AgUiService.class);
+        }
+
+        @Bean
+        public LocalAgent workflowEditorAskAgent() {
+            LocalAgent agent = mock(LocalAgent.class);
+
+            when(agent.getAgentId()).thenReturn("workflow_editor_ask");
+
+            return agent;
         }
 
         @Bean

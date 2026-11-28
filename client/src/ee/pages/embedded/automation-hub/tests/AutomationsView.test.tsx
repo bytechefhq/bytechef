@@ -1,4 +1,7 @@
 import {useAutomationHubStore} from '@/ee/pages/embedded/automation-hub/stores/useAutomationHubStore';
+import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
+import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {AutomationProject, ConnectedUserProjectWorkflow, ResponseError} from '@bytechef/embedded-api';
 import {render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -829,6 +832,77 @@ describe('AutomationsView', () => {
             renderView();
 
             expect(screen.getByRole('button', {name: 'New Automation'})).toBeInTheDocument();
+        });
+    });
+
+    describe('create with AI', () => {
+        const setCopilotEnabled = (enabled: boolean) =>
+            applicationInfoStore.setState((state) => ({ai: {...state.ai, copilot: {enabled}}}));
+
+        beforeEach(() => {
+            setCopilotEnabled(true);
+
+            useCopilotPanelStore.setState({copilotPanelOpen: false});
+            useCopilotStore.setState({
+                context: {mode: MODE.ASK, parameters: {}, source: Source.WORKFLOW_EDITOR},
+                conversationId: 'conversation-1',
+                messages: [{content: 'an older chat', role: 'user'}],
+                pendingPrompt: undefined,
+            });
+        });
+
+        it('creates a blank automation and opens it with the prompt handed to the Copilot to build', async () => {
+            const user = userEvent.setup();
+
+            renderView();
+
+            await user.click(screen.getByRole('button', {name: 'Create with AI'}));
+            await user.type(screen.getByLabelText('What should it do?'), '  Post new leads to Slack  ');
+            await user.click(screen.getByRole('button', {name: 'Create'}));
+
+            expect(createBlankMutateMock).toHaveBeenCalled();
+            expect(navigateMock).toHaveBeenCalledWith('/embedded/hub/builder/new-workflow-uuid');
+
+            const copilotState = useCopilotStore.getState();
+
+            expect(copilotState.context).toEqual({
+                mode: MODE.BUILD,
+                parameters: {workflowUuid: 'new-workflow-uuid'},
+                source: Source.WORKFLOW_BUILDER_EMBEDDED,
+            });
+            expect(copilotState.pendingPrompt).toBe('Post new leads to Slack');
+            expect(copilotState.workflowEditorWorkflowKey).toBe('connectedUser:new-workflow-uuid');
+            expect(copilotState.messages).toHaveLength(0);
+            expect(copilotState.conversationId).not.toBe('conversation-1');
+            expect(useCopilotPanelStore.getState().copilotPanelOpen).toBe(true);
+        });
+
+        it('will not create an automation from an empty prompt', async () => {
+            const user = userEvent.setup();
+
+            renderView();
+
+            await user.click(screen.getByRole('button', {name: 'Create with AI'}));
+            await user.type(screen.getByLabelText('What should it do?'), '   ');
+
+            expect(screen.getByRole('button', {name: 'Create'})).toBeDisabled();
+            expect(createBlankMutateMock).not.toHaveBeenCalled();
+        });
+
+        it('offers no Create with AI when the Copilot is disabled', () => {
+            setCopilotEnabled(false);
+
+            renderView();
+
+            expect(screen.queryByRole('button', {name: 'Create with AI'})).not.toBeInTheDocument();
+        });
+
+        it('offers no Create with AI when the newWorkflow tab is disabled', () => {
+            useAutomationHubStore.setState({tabs: {automations: true, connections: true, newWorkflow: false}});
+
+            renderView();
+
+            expect(screen.queryByRole('button', {name: 'Create with AI'})).not.toBeInTheDocument();
         });
     });
 

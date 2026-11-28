@@ -168,8 +168,14 @@ const WorkflowEditorLayout = ({
 
     const issues = useWorkflowIssues();
 
-    const {automationProjectId, codeWorkflow, codeWorkflowLanguage, invalidateWorkflowQueries, updateWorkflowMutation} =
-        useWorkflowEditor();
+    const {
+        automationProjectId,
+        codeWorkflow,
+        codeWorkflowLanguage,
+        connectedUserWorkflowUuid,
+        invalidateWorkflowQueries,
+        updateWorkflowMutation,
+    } = useWorkflowEditor();
     const {handleClusterElementsCanvasOpenChange, isMainRootClusterElement} = useWorkflowEditorLayout();
 
     const queryClient = useQueryClient();
@@ -189,11 +195,13 @@ const WorkflowEditorLayout = ({
     );
 
     useCopilotWorkflowEditorBinding(
-        integrationWorkflowId
-            ? `integration:${integrationId}:${integrationWorkflowId}`
-            : projectWorkflowId
-              ? `project:${projectId}:${projectWorkflowId}`
-              : undefined
+        connectedUserWorkflowUuid
+            ? `connectedUser:${connectedUserWorkflowUuid}`
+            : integrationWorkflowId
+              ? `integration:${integrationId}:${integrationWorkflowId}`
+              : projectWorkflowId
+                ? `project:${projectId}:${projectWorkflowId}`
+                : undefined
     );
 
     const handleClosePlayground = useCallback(() => {

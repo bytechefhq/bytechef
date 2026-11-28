@@ -98,7 +98,7 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         return noInputs && noConnections;
     }, [workflow]);
 
-    const {useGetComponentDefinitionsQuery} = useWorkflowEditor();
+    const {connectedUserWorkflowUuid, useGetComponentDefinitionsQuery} = useWorkflowEditor();
     const {integrationId} = useParams();
 
     const embeddedAutomationEditorMatch = useMatch(EMBEDDED_AUTOMATION_EDITOR_PATH);
@@ -177,6 +177,10 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
     };
 
     const getCopilotSource = () => {
+        if (connectedUserWorkflowUuid) {
+            return Source.WORKFLOW_BUILDER_EMBEDDED;
+        }
+
         if (integrationId) {
             return Source.WORKFLOW_EDITOR_EMBEDDED;
         }
@@ -190,7 +194,11 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         setContext({
             ...currentContext,
             mode: isWorkflowEditorSource(currentContext.source) ? currentContext.mode : MODE.ASK,
-            parameters: integrationId ? {integrationId} : {},
+            parameters: connectedUserWorkflowUuid
+                ? {workflowUuid: connectedUserWorkflowUuid}
+                : integrationId
+                  ? {integrationId}
+                  : {},
             source: getCopilotSource(),
         });
 
