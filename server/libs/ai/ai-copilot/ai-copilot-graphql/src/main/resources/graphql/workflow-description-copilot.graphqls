@@ -1,0 +1,13 @@
+extend type Mutation {
+    generateWorkflowDescription(input: GenerateWorkflowDescriptionInput!): GenerateWorkflowDescriptionPayload!
+}
+
+input GenerateWorkflowDescriptionInput {
+    workflowId: ID!
+    workflowNodeName: String
+    environmentId: Int!
+}
+
+type GenerateWorkflowDescriptionPayload {
+    value: String!
+}

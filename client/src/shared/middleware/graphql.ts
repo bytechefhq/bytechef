@@ -3062,6 +3062,13 @@ export type GeneratePropertyValueMutationVariables = Exact<{
 
 export type GeneratePropertyValueMutation = { generatePropertyValue: { value: string, valid: boolean, message: string | null } };
 
+export type GenerateWorkflowDescriptionMutationVariables = Exact<{
+  input: Types.GenerateWorkflowDescriptionInput;
+}>;
+
+
+export type GenerateWorkflowDescriptionMutation = { generateWorkflowDescription: { value: string } };
+
 export type CreateCustomComponentMutationVariables = Exact<{
   name: string;
   language: Types.CustomComponentLanguage;
@@ -14513,6 +14520,27 @@ export const useGeneratePropertyValueMutation = <
       {
     mutationKey: ['generatePropertyValue'],
     mutationFn: (variables?: GeneratePropertyValueMutationVariables) => fetcher<GeneratePropertyValueMutation, GeneratePropertyValueMutationVariables>(GeneratePropertyValueDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const GenerateWorkflowDescriptionDocument = new TypedDocumentString(`
+    mutation generateWorkflowDescription($input: GenerateWorkflowDescriptionInput!) {
+  generateWorkflowDescription(input: $input) {
+    value
+  }
+}
+    `);
+
+export const useGenerateWorkflowDescriptionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<GenerateWorkflowDescriptionMutation, TError, GenerateWorkflowDescriptionMutationVariables, TContext>) => {
+    
+    return useMutation<GenerateWorkflowDescriptionMutation, TError, GenerateWorkflowDescriptionMutationVariables, TContext>(
+      {
+    mutationKey: ['generateWorkflowDescription'],
+    mutationFn: (variables?: GenerateWorkflowDescriptionMutationVariables) => fetcher<GenerateWorkflowDescriptionMutation, GenerateWorkflowDescriptionMutationVariables>(GenerateWorkflowDescriptionDocument, variables)(),
     ...options
   }
     )};

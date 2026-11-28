@@ -1867,6 +1867,17 @@ export type GenerateSpecificationResponse = {
   specification?: Maybe<Scalars['String']['output']>;
 };
 
+export type GenerateWorkflowDescriptionInput = {
+  environmentId: Scalars['Int']['input'];
+  workflowId: Scalars['ID']['input'];
+  workflowNodeName?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type GenerateWorkflowDescriptionPayload = {
+  __typename?: 'GenerateWorkflowDescriptionPayload';
+  value: Scalars['String']['output'];
+};
+
 export type GenerationJobStatus = {
   __typename?: 'GenerationJobStatus';
   errorMessage?: Maybe<Scalars['String']['output']>;
@@ -2543,6 +2554,7 @@ export type Mutation = {
   generateFromDocumentation: ApiConnector;
   generatePropertyValue: GeneratePropertyValuePayload;
   generateSpecification: GenerateSpecificationResponse;
+  generateWorkflowDescription: GenerateWorkflowDescriptionPayload;
   importDataTableCsv: Scalars['Boolean']['output'];
   importOpenApiSpecification: ApiConnector;
   importProjectTemplate: Scalars['ID']['output'];
@@ -3360,6 +3372,11 @@ export type MutationGeneratePropertyValueArgs = {
 
 export type MutationGenerateSpecificationArgs = {
   input: GenerateSpecificationInput;
+};
+
+
+export type MutationGenerateWorkflowDescriptionArgs = {
+  input: GenerateWorkflowDescriptionInput;
 };
 
 
