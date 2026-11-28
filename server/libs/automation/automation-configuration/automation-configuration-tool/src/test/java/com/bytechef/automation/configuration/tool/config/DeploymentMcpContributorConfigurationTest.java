@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.tool.DeploymentToolCallbacksFactory;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
@@ -44,7 +45,7 @@ class DeploymentMcpContributorConfigurationTest {
     @Test
     void contributesTheSevenFlatDeploymentToolsWhenFactoryPresent() {
         DeploymentToolCallbacksFactory deploymentToolCallbacksFactory = new DeploymentToolCallbacksFactory(
-            mock(ProjectDeploymentFacade.class));
+            mock(ProjectDeploymentFacade.class), mock(ProjectWorkflowService.class));
 
         McpServerToolCallbackContributor contributor = configuration.deploymentFlatCrudMcpContributor(
             presentFactory(deploymentToolCallbacksFactory), workspaceFacade);
@@ -68,7 +69,7 @@ class DeploymentMcpContributorConfigurationTest {
     @Test
     void onlyListProjectDeploymentsAcceptsWorkspaceId() {
         DeploymentToolCallbacksFactory deploymentToolCallbacksFactory = new DeploymentToolCallbacksFactory(
-            mock(ProjectDeploymentFacade.class));
+            mock(ProjectDeploymentFacade.class), mock(ProjectWorkflowService.class));
 
         McpServerToolCallbackContributor contributor = configuration.deploymentFlatCrudMcpContributor(
             presentFactory(deploymentToolCallbacksFactory), workspaceFacade);

@@ -35,6 +35,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.automation.ai.tool.GrantingPermissionService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.tool.ScopedProjectGuard;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
@@ -60,10 +61,12 @@ class WorkflowExecutionToolsTest {
 
     private static final long OWN_PROJECT_ID = 7L;
 
+    private final ProjectOwnershipService projectOwnershipService = mock(ProjectOwnershipService.class);
+
     private final ProjectWorkflowExecutionFacade facade = mock(ProjectWorkflowExecutionFacade.class);
     private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
     private final WorkflowExecutionTools workflowExecutionTools = new WorkflowExecutionTools(
-        facade, new ScopedProjectGuard(new GrantingPermissionService(), projectWorkflowService,
+        facade, new ScopedProjectGuard(new GrantingPermissionService(), projectOwnershipService, projectWorkflowService,
             mock(ScopedConnectionGuard.class)));
 
     @Test

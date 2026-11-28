@@ -53,7 +53,7 @@ dependencies {
     implementation("org.springframework:spring-webmvc")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.security:spring-security-core")
-    implementation(project(":server:libs:platform:platform-component:platform-component-tool"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
     implementation(project(":spring-ai:spring-ag-ui:packages:core"))
     implementation(project(":spring-ai:spring-ag-ui:packages:server"))
     implementation(project(":spring-ai:spring-ag-ui:servers:spring"))

@@ -134,11 +134,11 @@ public class CreateProjectDeploymentToolCallback implements ToolCallback {
 
             long projectDeploymentId = projectDeploymentFacade.createProjectDeployment(dto);
 
-            return JsonUtils.write(
+            return writeResult(
                 new CreateProjectDeploymentOutput(
                     projectDeploymentId, projectId, input.projectVersion(), environment.name(), false));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (IllegalArgumentException | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
@@ -157,5 +157,13 @@ public class CreateProjectDeploymentToolCallback implements ToolCallback {
 
     public record CreateProjectDeploymentOutput(
         long projectDeploymentId, long projectId, int projectVersion, String environment, boolean enabled) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(CreateProjectDeploymentToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }

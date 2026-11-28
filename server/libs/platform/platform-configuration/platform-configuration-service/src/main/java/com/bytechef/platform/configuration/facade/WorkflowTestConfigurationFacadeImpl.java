@@ -25,10 +25,14 @@ import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.security.WorkflowConnectionAccessResolver;
+import com.bytechef.platform.configuration.security.WorkflowConnectionAccessResolver.ConnectionAccess;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,8 +41,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,16 +55,19 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
 
     private final ConnectionService connectionService;
     private final ComponentConnectionFacade componentConnectionFacade;
+    private final ObjectProvider<WorkflowConnectionAccessResolver> workflowConnectionAccessResolvers;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
     public WorkflowTestConfigurationFacadeImpl(
         ConnectionService connectionService, ComponentConnectionFacade componentConnectionFacade,
+        ObjectProvider<WorkflowConnectionAccessResolver> workflowConnectionAccessResolvers,
         WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.connectionService = connectionService;
         this.componentConnectionFacade = componentConnectionFacade;
+        this.workflowConnectionAccessResolvers = workflowConnectionAccessResolvers;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
@@ -98,7 +108,7 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
 
         Workflow workflow = workflowService.getWorkflow(workflowTestConfiguration.getWorkflowId());
 
-        validateConnections(workflowTestConfiguration.getConnections(), workflow);
+        validateConnections(workflowTestConfiguration, workflow);
         validateInputs(workflowTestConfiguration.getInputs(), workflow);
 
         return workflowTestConfigurationService.saveWorkflowTestConfiguration(workflowTestConfiguration);
@@ -109,6 +119,8 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
         String workflowId, String workflowNodeName, String clusterElementType,
         String clusterElementWorkflowNodeName, String workflowConnectionKey, long connectionId,
         long environmentId) {
+
+        checkConnectionAccess(workflowId, connectionId, environmentId);
 
         Connection connection = connectionService.getConnection(connectionId);
 
@@ -140,7 +152,7 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
         String rootWorkflowConnectionKey = clusterElementComponentConnection == null
             ? workflowConnectionKey : clusterElementComponentConnection.key();
 
-        validateConnection(rootWorkflowNodeName, rootWorkflowConnectionKey, connectionId, workflow);
+        validateConnection(rootWorkflowNodeName, rootWorkflowConnectionKey, connectionId, environmentId, workflow);
 
         boolean workflowNodeTrigger = WorkflowTrigger.fetch(workflow, rootWorkflowNodeName)
             .isPresent();
@@ -221,18 +233,75 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
             && Objects.equals(workflowConnection.key(), connection.getWorkflowConnectionKey());
     }
 
-    private void validateConnections(
-        List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections, Workflow workflow) {
+    private void validateConnections(WorkflowTestConfiguration workflowTestConfiguration, Workflow workflow) {
+        List<WorkflowTestConfigurationConnection> storedWorkflowTestConfigurationConnections =
+            getStoredWorkflowTestConfigurationConnections(workflowTestConfiguration);
+
+        List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections =
+            workflowTestConfiguration.getConnections();
 
         for (WorkflowTestConfigurationConnection workflowTestConfigurationConnection : workflowTestConfigurationConnections) {
-            validateConnection(
+            boolean stored = storedWorkflowTestConfigurationConnections.contains(workflowTestConfigurationConnection);
+
+            if (!stored) {
+                checkConnectionAccess(
+                    Validate.notNull(workflow.getId(), "id"), workflowTestConfigurationConnection.getConnectionId(),
+                    Validate.notNull(workflowTestConfiguration.getEnvironmentId(), "environmentId"));
+            }
+
+            validateConnectionComponent(
                 workflowTestConfigurationConnection.getWorkflowNodeName(),
                 workflowTestConfigurationConnection.getWorkflowConnectionKey(),
                 workflowTestConfigurationConnection.getConnectionId(), workflow);
         }
     }
 
+    private List<WorkflowTestConfigurationConnection> getStoredWorkflowTestConfigurationConnections(
+        WorkflowTestConfiguration workflowTestConfiguration) {
+
+        Long environmentId = workflowTestConfiguration.getEnvironmentId();
+
+        if (environmentId == null) {
+            return List.of();
+        }
+
+        Optional<WorkflowTestConfiguration> storedWorkflowTestConfigurationOptional =
+            workflowTestConfigurationService.fetchWorkflowTestConfiguration(
+                workflowTestConfiguration.getWorkflowId(), environmentId);
+
+        return storedWorkflowTestConfigurationOptional
+            .map(WorkflowTestConfiguration::getConnections)
+            .orElse(List.of());
+    }
+
+    private void checkConnectionAccess(String workflowId, long connectionId, long environmentId) {
+        if (SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN)) {
+            return;
+        }
+
+        ConnectionAccess connectionAccess = workflowConnectionAccessResolvers.orderedStream()
+            .map(resolver -> resolver.resolveConnectionAccess(workflowId, connectionId, environmentId))
+            .filter(curConnectionAccess -> curConnectionAccess != ConnectionAccess.ABSTAIN)
+            .findFirst()
+            .orElse(ConnectionAccess.DENIED);
+
+        if (connectionAccess != ConnectionAccess.GRANTED) {
+            throw new AccessDeniedException(
+                "Connection %d cannot be used in workflow %s in environment %d".formatted(
+                    connectionId, workflowId, environmentId));
+        }
+    }
+
     private void validateConnection(
+        String workflowNodeName, String workflowConnectionKey, long connectionId, long environmentId,
+        Workflow workflow) {
+
+        checkConnectionAccess(Validate.notNull(workflow.getId(), "id"), connectionId, environmentId);
+
+        validateConnectionComponent(workflowNodeName, workflowConnectionKey, connectionId, workflow);
+    }
+
+    private void validateConnectionComponent(
         String workflowNodeName, String workflowConnectionKey, long connectionId, Workflow workflow) {
 
         Connection connection = connectionService.getConnection(connectionId);

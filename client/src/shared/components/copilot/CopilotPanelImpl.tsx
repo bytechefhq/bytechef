@@ -4,6 +4,7 @@ import {Thread} from '@/components/assistant-ui/thread';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ModeSwitch from '@/shared/components/ModeSwitch/ModeSwitch';
 import {aiChatDataComponents} from '@/shared/components/ai-chat/messages/aiChatDataComponents';
+import NoAiProvidersEmptyState from '@/shared/components/ai/NoAiProvidersEmptyState';
 import ModelPicker from '@/shared/components/ai/model-picker/ModelPicker';
 import {writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
 import {findAvailableRememberedModel} from '@/shared/components/ai/model-picker/resolveRememberedModel';
@@ -16,14 +17,12 @@ import {
     isWorkflowEditorSource,
     useCopilotStore,
 } from '@/shared/components/copilot/stores/useCopilotStore';
-import {AI_PROVIDERS_LINK_LABEL} from '@/shared/constants';
 import {useAiDefaultModelQuery, useAiProviderCatalogQuery} from '@/shared/middleware/graphql';
-import {AI_PROVIDERS_SETTINGS_PATH} from '@/shared/navigation/settingsPaths';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {type SuggestionConfig} from '@assistant-ui/react';
-import {BotMessageSquareIcon, BrainCircuitIcon, MessageSquareXIcon, XIcon} from 'lucide-react';
+import {BotMessageSquareIcon, MessageSquareXIcon, XIcon} from 'lucide-react';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -89,7 +88,6 @@ export const CopilotPanelContent = ({className, headerClassName, onClose, source
     const compactHeader = useCopilotPanelStore((state) => state.compactHeader);
     const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
     const location = useLocation();
-    const navigate = useNavigate();
 
     const {data: defaultModelData, isPending: isDefaultModelPending} = useAiDefaultModelQuery({
         environment: String(currentEnvironmentId),
@@ -204,19 +202,10 @@ export const CopilotPanelContent = ({className, headerClassName, onClose, source
 
             <div className="absolute inset-x-0 top-16 -bottom-3 -mx-1">
                 {!isDefaultModelPending && !hasEnabledProvider ? (
-                    <div className="flex h-full flex-col items-center justify-center gap-4 px-8 text-center">
-                        <BrainCircuitIcon className="size-10 text-content-neutral-secondary" />
-
-                        <div className="flex flex-col gap-1">
-                            <p className="text-sm font-medium text-content-neutral-primary">No AI providers enabled</p>
-
-                            <p className="text-sm text-content-neutral-secondary">
-                                Enable an AI provider to start using the AI Copilot.
-                            </p>
-                        </div>
-
-                        <Button onClick={() => navigate(AI_PROVIDERS_SETTINGS_PATH)}>{AI_PROVIDERS_LINK_LABEL}</Button>
-                    </div>
+                    <NoAiProvidersEmptyState
+                        className="h-full overflow-y-auto px-6"
+                        description="The AI Copilot answers questions and builds workflows with a model from an AI provider. Enable a provider, such as OpenAI or Anthropic, for this environment to start chatting."
+                    />
                 ) : (
                     <CopilotRuntimeProvider source={source} suggestions={COPILOT_SUGGESTIONS}>
                         <Thread

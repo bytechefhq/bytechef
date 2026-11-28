@@ -121,6 +121,13 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<Long> fetchMcpServerEnvironmentId(long mcpServerId) {
+        return mcpServerRepository.findById(mcpServerId)
+            .map(McpServer::getEnvironmentId);
+    }
+
+    @Override
     @Audited(event = McpServerAuditEvents.MCP_SERVER_CREATED, mapper = McpServerAuditMapper.class, data = {
         @AuditData(key = "mcpServerId", value = "#result?.id"),
         @AuditData(key = "name", value = "#result?.name"),

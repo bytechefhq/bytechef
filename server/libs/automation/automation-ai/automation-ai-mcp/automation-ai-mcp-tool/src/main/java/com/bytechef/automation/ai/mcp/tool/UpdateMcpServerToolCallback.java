@@ -37,7 +37,7 @@ public class UpdateMcpServerToolCallback implements ToolCallback {
 
     private static final String DESCRIPTION = """
         Update an existing MCP server's name and/or enabled state. Supply mcpServerId (numeric, from
-        listMcpServers). At least one of name or enabled must be supplied — fields you omit are left
+        listMcpServers). At least one of name or enabled must be supplied; fields you omit are left
         unchanged. Use enabled=true to bring a server online or enabled=false to take it offline. Returns
         {mcpServerId, name, enabled} reflecting the post-update values.""";
 
@@ -99,18 +99,23 @@ public class UpdateMcpServerToolCallback implements ToolCallback {
             try {
                 mcpServerId = Long.parseLong(mcpServerIdString);
             } catch (NumberFormatException exception) {
-                return toolError("Invalid mcpServerId — must be a numeric id");
+                return toolError("Invalid mcpServerId: must be a numeric id");
             }
 
-            McpServer updated = workspaceMcpServerFacade.updateWorkspaceMcpServer(
-                mcpServerId, nameSupplied ? name : null, input.enabled());
+            McpServer updated;
 
-            return JsonUtils.write(
+            try {
+                updated = workspaceMcpServerFacade.updateWorkspaceMcpServer(
+                    mcpServerId, nameSupplied ? name : null, input.enabled());
+            } catch (NoSuchElementException exception) {
+                return toolError("MCP server " + mcpServerId + " not found. Check the id with listMcpServers.");
+            }
+
+            return writeResult(
                 new UpdateMcpServerOutput(updated.getId(), updated.getName(), updated.isEnabled()));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
-        } catch (IllegalArgumentException | NoSuchElementException
-            | com.bytechef.exception.ConfigurationException exception) {
+            return ToolErrors.invalidInput(exception);
+        } catch (IllegalArgumentException | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(UpdateMcpServerToolCallback.class, TOOL_NAME, exception);
@@ -125,5 +130,13 @@ public class UpdateMcpServerToolCallback implements ToolCallback {
     }
 
     public record UpdateMcpServerOutput(long mcpServerId, String name, boolean enabled) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(UpdateMcpServerToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }

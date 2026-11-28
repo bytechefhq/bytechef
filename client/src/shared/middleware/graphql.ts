@@ -2579,6 +2579,7 @@ export type ClusterElementDynamicPropertiesQueryVariables = Exact<{
   connectionId?: any;
   inputParameters?: any;
   lookupDependsOnPaths?: Array<string> | string | null | undefined;
+  mcpComponentId: string | number;
 }>;
 
 
@@ -2631,6 +2632,7 @@ export type ClusterElementOptionsQueryVariables = Exact<{
   connectionId?: any;
   inputParameters?: any;
   lookupDependsOnPaths?: Array<string> | string | null | undefined;
+  mcpComponentId: string | number;
 }>;
 
 
@@ -12563,7 +12565,7 @@ export const useClusterElementMissingRequiredPropertiesQuery = <
     )};
 
 export const ClusterElementDynamicPropertiesDocument = new TypedDocumentString(`
-    query clusterElementDynamicProperties($componentName: String!, $componentVersion: Int!, $clusterElementName: String!, $propertyName: String!, $connectionId: Long, $inputParameters: Map, $lookupDependsOnPaths: [String!]) {
+    query clusterElementDynamicProperties($componentName: String!, $componentVersion: Int!, $clusterElementName: String!, $propertyName: String!, $connectionId: Long, $inputParameters: Map, $lookupDependsOnPaths: [String!], $mcpComponentId: ID!) {
   clusterElementDynamicProperties(
     componentName: $componentName
     componentVersion: $componentVersion
@@ -12572,6 +12574,7 @@ export const ClusterElementDynamicPropertiesDocument = new TypedDocumentString(`
     connectionId: $connectionId
     inputParameters: $inputParameters
     lookupDependsOnPaths: $lookupDependsOnPaths
+    mcpComponentId: $mcpComponentId
   ) {
     advancedOption
     description
@@ -12865,7 +12868,7 @@ export const useClusterElementDynamicPropertiesQuery = <
     )};
 
 export const ClusterElementOptionsDocument = new TypedDocumentString(`
-    query clusterElementOptions($componentName: String!, $componentVersion: Int!, $clusterElementName: String!, $propertyName: String!, $connectionId: Long, $inputParameters: Map, $lookupDependsOnPaths: [String!]) {
+    query clusterElementOptions($componentName: String!, $componentVersion: Int!, $clusterElementName: String!, $propertyName: String!, $connectionId: Long, $inputParameters: Map, $lookupDependsOnPaths: [String!], $mcpComponentId: ID!) {
   clusterElementOptions(
     componentName: $componentName
     componentVersion: $componentVersion
@@ -12874,6 +12877,7 @@ export const ClusterElementOptionsDocument = new TypedDocumentString(`
     connectionId: $connectionId
     inputParameters: $inputParameters
     lookupDependsOnPaths: $lookupDependsOnPaths
+    mcpComponentId: $mcpComponentId
   ) {
     description
     label

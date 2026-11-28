@@ -51,6 +51,8 @@ public interface McpComponentService {
      */
     void delete(long mcpComponentId);
 
+    Optional<McpComponent> fetchMcpComponent(long mcpComponentId);
+
     Optional<Long> fetchMcpComponentMcpServerId(long mcpComponentId);
 
     /**

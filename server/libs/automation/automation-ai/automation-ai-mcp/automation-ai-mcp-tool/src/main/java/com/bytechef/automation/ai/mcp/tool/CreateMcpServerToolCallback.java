@@ -125,7 +125,7 @@ public class CreateMcpServerToolCallback implements ToolCallback {
             McpServer mcpServer = workspaceMcpServerFacade.createWorkspaceMcpServer(
                 input.name(), PlatformType.AUTOMATION, environment, enabled, null, workspaceId);
 
-            return JsonUtils.write(
+            return writeResult(
                 new CreateMcpServerOutput(
                     mcpServer.getId(), mcpServer.getName(),
                     mcpServer.getType()
@@ -134,7 +134,7 @@ public class CreateMcpServerToolCallback implements ToolCallback {
                         .name(),
                     mcpServer.isEnabled()));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (IllegalArgumentException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
@@ -151,5 +151,13 @@ public class CreateMcpServerToolCallback implements ToolCallback {
 
     public record CreateMcpServerOutput(
         long mcpServerId, String name, String type, String environment, boolean enabled) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(CreateMcpServerToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }

@@ -217,6 +217,12 @@ describe('Settings', () => {
         expect(screen.getByText('Appearance')).toBeInTheDocument();
     });
 
+    it('shows the Management MCP Server page without a feature flag', () => {
+        renderSettings([{href: '/settings/mcp-server', title: 'MCP Server'}]);
+
+        expect(screen.getByRole('link', {name: 'MCP Server'})).toHaveAttribute('href', '/settings/mcp-server');
+    });
+
     it('marks only the most specific link as current when another link is its prefix', () => {
         renderSettings(
             [

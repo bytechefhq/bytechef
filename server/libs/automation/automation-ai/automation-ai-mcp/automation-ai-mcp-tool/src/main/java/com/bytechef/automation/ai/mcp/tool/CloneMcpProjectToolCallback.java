@@ -102,11 +102,11 @@ public class CloneMcpProjectToolCallback implements ToolCallback {
 
             McpProject clone = mcpProjectFacade.cloneMcpProject(mcpProjectId, targetMcpServerId);
 
-            return JsonUtils.write(
+            return writeResult(
                 new CloneMcpProjectOutput(
                     clone.getId(), clone.getProjectDeploymentId(), clone.getMcpServerId()));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (IllegalArgumentException | IllegalStateException | NoSuchElementException
             | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());
@@ -123,5 +123,13 @@ public class CloneMcpProjectToolCallback implements ToolCallback {
     }
 
     public record CloneMcpProjectOutput(long mcpProjectId, long projectDeploymentId, long mcpServerId) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(CloneMcpProjectToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }

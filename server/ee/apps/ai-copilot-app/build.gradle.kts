@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-tool"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-tool"))
+    implementation(project(":server:libs:automation:automation-connection:automation-connection-tool"))
     implementation(project(":server:libs:automation:automation-data-table:automation-data-table-tool"))
     implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-tool"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-tool"))
@@ -26,9 +27,12 @@ dependencies {
     implementation(project(":server:libs:config:jdbc-config"))
 
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-rest"))
-    implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-service"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-service"))
     implementation(project(":server:ee:libs:config:observability-config"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-tool"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-tool"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-tool"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-tool"))
 
     runtimeOnly("com.zaxxer:HikariCP")
     runtimeOnly("org.postgresql:postgresql")

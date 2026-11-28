@@ -17,14 +17,21 @@
 package com.bytechef.automation.configuration.tool;
 
 import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
+import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ErrorType;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.tool.ScopedConnectionGuard;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +58,7 @@ public class ScopedProjectGuard {
     private static final Logger log = LoggerFactory.getLogger(ScopedProjectGuard.class);
 
     private final @Nullable PermissionService permissionService;
+    private final @Nullable ProjectOwnershipService projectOwnershipService;
     private final @Nullable ProjectWorkflowService projectWorkflowService;
     private final ScopedConnectionGuard scopedConnectionGuard;
 
@@ -58,20 +66,22 @@ public class ScopedProjectGuard {
     @SuppressFBWarnings("EI")
     public ScopedProjectGuard(
         ObjectProvider<PermissionService> permissionServiceProvider,
+        ObjectProvider<ProjectOwnershipService> projectOwnershipServiceProvider,
         ObjectProvider<ProjectWorkflowService> projectWorkflowServiceProvider,
         ScopedConnectionGuard scopedConnectionGuard) {
 
         this(
-            permissionServiceProvider.getIfAvailable(), projectWorkflowServiceProvider.getIfAvailable(),
-            scopedConnectionGuard);
+            permissionServiceProvider.getIfAvailable(), projectOwnershipServiceProvider.getIfAvailable(),
+            projectWorkflowServiceProvider.getIfAvailable(), scopedConnectionGuard);
     }
 
     @SuppressFBWarnings("EI")
     public ScopedProjectGuard(
-        @Nullable PermissionService permissionService, @Nullable ProjectWorkflowService projectWorkflowService,
-        ScopedConnectionGuard scopedConnectionGuard) {
+        @Nullable PermissionService permissionService, @Nullable ProjectOwnershipService projectOwnershipService,
+        @Nullable ProjectWorkflowService projectWorkflowService, ScopedConnectionGuard scopedConnectionGuard) {
 
         this.permissionService = permissionService;
+        this.projectOwnershipService = projectOwnershipService;
         this.projectWorkflowService = projectWorkflowService;
         this.scopedConnectionGuard = scopedConnectionGuard;
     }
@@ -86,6 +96,12 @@ public class ScopedProjectGuard {
                 (permissionService == null || !permissionService.hasWorkflowScope(workflowId, scope))) {
 
                 log.warn("Rejected workflow {}: the caller lacks the {} scope", workflowId, scope);
+
+                throw new ExecutionException(getWorkflowNotAccessibleMessage(workflowId), errorType);
+            }
+
+            if (isHiddenProject(getWorkflowProjectId(workflowId, errorType), toolContext, errorType)) {
+                log.warn("Rejected workflow {}: its project is not reachable from automation tools", workflowId);
 
                 throw new ExecutionException(getWorkflowNotAccessibleMessage(workflowId), errorType);
             }
@@ -130,6 +146,8 @@ public class ScopedProjectGuard {
                 throw new ExecutionException(getProjectNotAccessibleMessage(projectId), errorType);
             }
 
+            checkProjectNotHidden(projectId, toolContext, errorType);
+
             return;
         }
 
@@ -148,6 +166,14 @@ public class ScopedProjectGuard {
         }
     }
 
+    public void checkProjectNotHidden(long projectId, @Nullable ToolContext toolContext, ErrorType errorType) {
+        if (isHiddenProject(projectId, toolContext, errorType)) {
+            log.warn("Rejected project {}: it is not reachable from automation tools", projectId);
+
+            throw new ExecutionException(getProjectNotAccessibleMessage(projectId), errorType);
+        }
+    }
+
     public void checkConnection(long connectionId, @Nullable ToolContext toolContext, ErrorType errorType) {
         String denialMessage = scopedConnectionGuard.fetchDenialMessage(null, connectionId, toolContext);
 
@@ -158,6 +184,69 @@ public class ScopedProjectGuard {
 
     public @Nullable Long fetchScopedProjectId(@Nullable ToolContext toolContext) {
         return ScopedProjectToolContext.fetchScopedProjectId(toolContext);
+    }
+
+    private long getWorkflowProjectId(String workflowId, ErrorType errorType) {
+        if (projectWorkflowService == null) {
+            log.error("Rejected workflow {}: no project workflow lookup is available", workflowId);
+
+            throw new ExecutionException(getWorkflowNotAccessibleMessage(workflowId), errorType);
+        }
+
+        ProjectWorkflow projectWorkflow;
+
+        try {
+            projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            throw new ExecutionException(getWorkflowNotAccessibleMessage(workflowId), errorType);
+        }
+
+        return projectWorkflow.getProjectId();
+    }
+
+    static Set<ProjectOwner> getHiddenProjectOwners(@Nullable ToolContext toolContext) {
+        Set<ProjectOwner> hiddenProjectOwners = EnumSet.allOf(ProjectOwner.class);
+
+        ProjectOwner declaredProjectOwner = fetchDeclaredProjectOwner(toolContext);
+
+        if (declaredProjectOwner != null && declaredProjectOwner != ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT) {
+            hiddenProjectOwners.remove(declaredProjectOwner);
+        }
+
+        return hiddenProjectOwners;
+    }
+
+    private static @Nullable ProjectOwner fetchDeclaredProjectOwner(@Nullable ToolContext toolContext) {
+        if (toolContext == null) {
+            return null;
+        }
+
+        Map<String, Object> context = toolContext.getContext();
+
+        if (context == null ||
+            !(context.get(AutomationToolInvocationContext.TOOL_CONTEXT_PROJECT_OWNER_KEY) instanceof String name)) {
+
+            return null;
+        }
+
+        try {
+            return ProjectOwner.valueOf(name);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return null;
+        }
+    }
+
+    private boolean isHiddenProject(long projectId, @Nullable ToolContext toolContext, ErrorType errorType) {
+        if (projectOwnershipService == null) {
+            log.error("Rejected project {}: no project ownership lookup is available", projectId);
+
+            throw new ExecutionException(getProjectNotAccessibleMessage(projectId), errorType);
+        }
+
+        Set<Long> hiddenProjectIds = projectOwnershipService.getOwnedProjectIds(
+            List.of(projectId), getHiddenProjectOwners(toolContext));
+
+        return !hiddenProjectIds.isEmpty();
     }
 
     private static String getProjectNotAccessibleMessage(long projectId) {

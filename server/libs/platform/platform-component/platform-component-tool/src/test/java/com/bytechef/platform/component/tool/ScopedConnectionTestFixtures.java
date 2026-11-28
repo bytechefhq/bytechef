@@ -16,7 +16,10 @@
 
 package com.bytechef.platform.component.tool;
 
+import static org.mockito.Mockito.mock;
+
 import com.bytechef.ai.copilot.connection.CopilotConnectionLister;
+import com.bytechef.ai.copilot.connection.WorkspaceConnectionLister;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import java.util.HashMap;
@@ -37,13 +40,35 @@ final class ScopedConnectionTestFixtures {
     }
 
     static ScopedConnectionGuard newGuard(List<CopilotConnectionLister> connectionListers) {
+        return newGuard(connectionListers, mock(WorkspaceConnectionLister.class));
+    }
+
+    static ScopedConnectionGuard newGuard(
+        List<CopilotConnectionLister> connectionListers, WorkspaceConnectionLister workspaceConnectionLister) {
+
         StaticListableBeanFactory beanFactory = new StaticListableBeanFactory();
 
         for (int index = 0; index < connectionListers.size(); index++) {
             beanFactory.addBean("connectionLister" + index, connectionListers.get(index));
         }
 
-        return new ScopedConnectionGuard(beanFactory.getBeanProvider(CopilotConnectionLister.class));
+        StaticListableBeanFactory workspaceBeanFactory = new StaticListableBeanFactory();
+
+        workspaceBeanFactory.addBean("workspaceConnectionLister", workspaceConnectionLister);
+
+        return new ScopedConnectionGuard(
+            beanFactory.getBeanProvider(CopilotConnectionLister.class),
+            workspaceBeanFactory.getBeanProvider(WorkspaceConnectionLister.class));
+    }
+
+    static ToolContext workspaceToolContext(long workspaceId) {
+        return new ToolContext(
+            AgentToolInvocationContext.builder()
+                .workspaceId(workspaceId)
+                .userId(7L)
+                .environmentId(0L)
+                .build()
+                .toToolContext());
     }
 
     static ScopedConnectionGuard newGuardEntitledTo(List<Long> connectionIds) {

@@ -27,7 +27,7 @@ import com.agui.server.LocalAgent;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ai.copilot.util.Mode;
 import com.bytechef.ai.copilot.util.Source;
-import com.bytechef.platform.component.tool.TaskTools;
+import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
@@ -104,7 +104,7 @@ public class CopilotWorkflowGeneratorImpl implements CopilotWorkflowGenerator {
         }
 
         if (allowedComponentNames != null && !allowedComponentNames.isEmpty()) {
-            stateMap.put(TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, allowedComponentNames);
+            stateMap.put(AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, allowedComponentNames);
         }
 
         State state = new State(stateMap);

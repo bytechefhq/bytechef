@@ -1,0 +1,431 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.automation.workflow.execution.tool.config;
+
+import com.agui.core.exception.AGUIException;
+import com.agui.core.state.State;
+import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
+import com.bytechef.ai.copilot.tool.InteractivePickerToolCallbacks;
+import com.bytechef.ai.copilot.tool.ToolStateVisibilityMetrics;
+import com.bytechef.ai.copilot.tool.ask.SubAgentAskRelay;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.tool.AutomationConfigurationAgentType;
+import com.bytechef.automation.configuration.tool.ProjectWorkflowTools;
+import com.bytechef.automation.configuration.tool.ReadProjectTools;
+import com.bytechef.automation.configuration.tool.ReadProjectWorkflowTools;
+import com.bytechef.automation.configuration.tool.ScriptTools;
+import com.bytechef.automation.configuration.tool.agent.WorkflowEditorSpringAIAgent;
+import com.bytechef.automation.data.table.tool.DataTableTools;
+import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionTools;
+import com.bytechef.platform.ai.tool.RehydrateContextToolCallback;
+import com.bytechef.platform.ai.tool.SecurityContextRehydrator;
+import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
+import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.component.tool.ComponentTools;
+import com.bytechef.platform.component.tool.LookupComponentPropertyOptionsToolCallback;
+import com.bytechef.platform.component.tool.PropertyOptionsResolver;
+import com.bytechef.platform.component.tool.ScopedConnectionGuard;
+import com.bytechef.platform.component.tool.TaskTools;
+import com.bytechef.platform.configuration.context.EnvironmentContext;
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
+import com.bytechef.platform.workflow.tool.WorkflowInstructionTools;
+import com.bytechef.platform.workflow.tool.WorkflowValidatorTools;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import org.jspecify.annotations.Nullable;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.support.ToolCallbacks;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
+
+/**
+ * @author Marko Kriskovic
+ */
+@Configuration
+@ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
+public class WorkflowEditorAgentConfiguration {
+
+    static final Set<String> CLUSTER_ELEMENT_LOOKUP_TOOL_NAMES = Set.of(
+        "getAction", "getClusterElement", "searchClusterElements");
+
+    private static final String BUILD_WORKFLOW_SUBAGENT_ASK_SECTION = """
+
+        ## Asking the user
+
+        When a choice is genuinely the user's and you hold 2 to 4 real options for it (values lookupPropertyOptions
+        returned in this delegation, or fixed options from the property definition),
+        ask ONE question with askUserQuestion and stop. Every option must be one of those values.
+        """;
+
+    private static final String BUILD_WORKFLOW_SUBAGENT_NO_ASK_SECTION = """
+
+        ## Asking the user
+
+        You do not have these tools: askUserQuestion.
+        Never ask the user a question. Leave a choice that is genuinely the user's empty and name it in your report.
+        """;
+
+    private static final String BUILD_WORKFLOW_SUBAGENT_ADDENDUM = """
+
+        ## Brand-new workflows (overrides step 7's "you always author into an EXISTING workflow" note)
+
+        You are a one-shot subagent. Your caller gives you EITHER a `workflowId` (the workflow already exists) OR a
+        `projectId` (the workflow does not exist yet). Build the COMPLETE definition first, exactly as step 7
+        requires, then persist it with ONE call:
+
+        - Given a `workflowId` — `getWorkflow(workflowId)` for its current `version`, then
+          `updateWorkflow(workflowId, workflow, version)`.
+        - Given only a `projectId` — `createProjectWorkflow(projectId, workflow)` carrying the COMPLETE definition.
+          Never create an empty or default "Manual" placeholder workflow and fill it in afterwards; the single
+          create call must carry the whole workflow.
+
+        If you are given both, the `workflowId` wins — update it. Never create a second workflow for a project you
+        were already pointed at.
+
+        You still cannot create a PROJECT (`createProject` is not among your tools). Given neither a `workflowId`
+        nor a `projectId`, say so plainly and tell the caller to create or choose the project first, then re-invoke
+        you with its `projectId`.
+
+        After persisting, call `getWorkflow(workflowId)` to confirm, then continue with step 8 as written. The
+        `workflowId | projectId | projectWorkflowId` line is REQUIRED on both branches — `createProjectWorkflow`
+        returns all three ids.
+        """;
+
+    private final Resource promptWorkflowEditorAskResource;
+    private final Resource promptWorkflowEditorBuildResource;
+    private final WorkflowValidatorTools workflowValidatorTools;
+    private final WorkflowInstructionTools workflowInstructionTools;
+    private final State state = new State();
+
+    private final String workflowEditorAskSystemPrompt;
+    private final String workflowEditorBuildSystemPrompt;
+    private final String workflowEditorBuildSubAgentSystemPrompt;
+
+    private final InteractivePickerToolCallbacks interactivePickerToolCallbacks;
+    private final ActionDefinitionService actionDefinitionService;
+    private final ActionDefinitionFacade actionDefinitionFacade;
+    private final TriggerDefinitionService triggerDefinitionService;
+    private final TriggerDefinitionFacade triggerDefinitionFacade;
+    private final PropertyOptionsResolver propertyOptionsResolver;
+    private final ScopedConnectionGuard scopedConnectionGuard;
+    private final @Nullable DataTableTools dataTableTools;
+
+    @SuppressFBWarnings({
+        "EI", "CT_CONSTRUCTOR_THROW"
+    })
+    public WorkflowEditorAgentConfiguration(
+        @Value("classpath:prompt_workflow_editor_ask.txt") Resource promptWorkflowEditorAskResource,
+        @Value("classpath:prompt_workflow_editor_build.txt") Resource promptWorkflowEditorBuildResource,
+        @Value("classpath:prompt_workflow_editor_build_sub_agent.txt") Resource promptWorkflowEditorBuildSubAgentResource,
+        WorkflowValidatorTools workflowValidatorTools,
+        WorkflowInstructionTools workflowInstructionTools,
+        InteractivePickerToolCallbacks interactivePickerToolCallbacks,
+        ActionDefinitionService actionDefinitionService,
+        ActionDefinitionFacade actionDefinitionFacade,
+        TriggerDefinitionService triggerDefinitionService,
+        TriggerDefinitionFacade triggerDefinitionFacade,
+        PropertyOptionsResolver propertyOptionsResolver,
+        ScopedConnectionGuard scopedConnectionGuard,
+        ObjectProvider<DataTableTools> dataTableToolsProvider) {
+
+        this.dataTableTools = dataTableToolsProvider.getIfAvailable();
+        this.interactivePickerToolCallbacks = interactivePickerToolCallbacks;
+        this.scopedConnectionGuard = scopedConnectionGuard;
+        this.actionDefinitionService = actionDefinitionService;
+        this.actionDefinitionFacade = actionDefinitionFacade;
+        this.triggerDefinitionService = triggerDefinitionService;
+        this.triggerDefinitionFacade = triggerDefinitionFacade;
+        this.propertyOptionsResolver = propertyOptionsResolver;
+        this.workflowValidatorTools = workflowValidatorTools;
+        this.workflowInstructionTools = workflowInstructionTools;
+        this.promptWorkflowEditorAskResource = promptWorkflowEditorAskResource;
+        this.promptWorkflowEditorBuildResource = promptWorkflowEditorBuildResource;
+        this.workflowEditorAskSystemPrompt = getSystemPrompt(promptWorkflowEditorAskResource);
+        this.workflowEditorBuildSystemPrompt = getSystemPrompt(promptWorkflowEditorBuildResource);
+        this.workflowEditorBuildSubAgentSystemPrompt = getSystemPrompt(promptWorkflowEditorBuildSubAgentResource);
+    }
+
+    private static List<ToolCallback> getCurrentWebSearchToolCallbacks(
+        WebSearchToolCallbackProvider webSearchToolCallbackProvider) {
+
+        Environment environment = EnvironmentContext.fetchCurrentEnvironment();
+
+        if (environment == null) {
+            return List.of();
+        }
+
+        return webSearchToolCallbackProvider.getToolCallbacks(environment.ordinal());
+    }
+
+    private List<ToolCallback> wrapTools(SecurityContextRehydrator securityContextRehydrator, List<Object> tools) {
+        List<ToolCallback> toolCallbacks = new ArrayList<>();
+
+        for (Object tool : tools) {
+            if (tool instanceof ToolCallback toolCallback) {
+                toolCallbacks.add(RehydrateContextToolCallback.wrap(toolCallback, securityContextRehydrator));
+            } else {
+                for (ToolCallback toolCallback : ToolCallbacks.from(tool)) {
+                    toolCallbacks.add(RehydrateContextToolCallback.wrap(toolCallback, securityContextRehydrator));
+                }
+            }
+        }
+
+        return toolCallbacks;
+    }
+
+    @Bean
+    WorkflowEditorSpringAIAgent workflowEditorAskSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
+        ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
+        WorkflowExecutionTools workflowExecutionTools, WebSearchToolCallbackProvider webSearchToolCallbackProvider,
+        WorkflowService workflowService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
+        Advisor questionAnswerAdvisor, PermissionService permissionService,
+        SecurityContextRehydrator securityContextRehydrator,
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
+        throws AGUIException {
+
+        List<Object> tools = new ArrayList<>(
+            List.of(
+                readProjectTools, readProjectWorkflowTools, componentTools, taskTools, workflowExecutionTools,
+                workflowValidatorTools, workflowInstructionTools));
+
+        tools.addAll(interactivePickerToolCallbacks.write());
+
+        WorkflowEditorSpringAIAgent springAIAgent = WorkflowEditorSpringAIAgent.builder()
+            .agentId(AutomationConfigurationAgentType.WORKFLOW_EDITOR_ASK.key())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(getSystemPrompt(promptWorkflowEditorAskResource))
+            .state(state)
+            .toolCallbacks(wrapTools(securityContextRehydrator, tools))
+            .advisor(questionAnswerAdvisor)
+            .workflowService(workflowService)
+            .workflowNodeOutputFacade(workflowNodeOutputFacade)
+            .permissionService(permissionService)
+            .securityContextRehydrator(securityContextRehydrator)
+            .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
+            .build();
+
+        springAIAgent.setWebSearchToolCallbackProvider(webSearchToolCallbackProvider);
+
+        return springAIAgent;
+    }
+
+    @Bean
+    WorkflowEditorSpringAIAgent workflowEditorBuildSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, ProjectWorkflowTools projectWorkflowTools,
+        ComponentTools componentTools, TaskTools taskTools, ScriptTools scriptTools,
+        WorkflowExecutionTools workflowExecutionTools, WorkflowService workflowService,
+        WorkflowNodeOutputFacade workflowNodeOutputFacade, PermissionService permissionService,
+        SecurityContextRehydrator securityContextRehydrator,
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
+        throws AGUIException {
+
+        List<Object> tools = new ArrayList<>(
+            List.of(
+                projectWorkflowTools, componentTools, taskTools, scriptTools, workflowExecutionTools,
+                workflowValidatorTools, workflowInstructionTools));
+
+        if (dataTableTools != null) {
+            tools.add(dataTableTools);
+        }
+
+        tools.addAll(interactivePickerToolCallbacks.write());
+
+        return WorkflowEditorSpringAIAgent.builder()
+            .agentId(AutomationConfigurationAgentType.WORKFLOW_EDITOR_BUILD.key())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(getSystemPrompt(promptWorkflowEditorBuildResource))
+            .state(state)
+            .toolCallbacks(wrapTools(securityContextRehydrator, tools))
+            .workflowService(workflowService)
+            .workflowNodeOutputFacade(workflowNodeOutputFacade)
+            .permissionService(permissionService)
+            .securityContextRehydrator(securityContextRehydrator)
+            .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
+            .build();
+    }
+
+    @Bean
+    public ChatClient workflowEditorAskSubAgentChatClient(
+        ChatModel chatModel, ReadProjectTools readProjectTools,
+        ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
+        Advisor questionAnswerAdvisor) {
+
+        return buildWorkflowEditorAskSubAgentChatClient(
+            chatModel, readProjectTools, readProjectWorkflowTools, componentTools, taskTools, List.of(),
+            questionAnswerAdvisor);
+    }
+
+    @Bean
+    public IntelligentToolChatClientFactory workflowEditorAskSubAgentChatClientFactory(
+        @Qualifier("workflowEditorAskSubAgentChatClient") ChatClient workflowEditorAskSubAgentChatClient,
+        ChatModel chatModel,
+        ReadProjectTools readProjectTools, ReadProjectWorkflowTools readProjectWorkflowTools,
+        ComponentTools componentTools, TaskTools taskTools, WebSearchToolCallbackProvider webSearchToolCallbackProvider,
+        Advisor questionAnswerAdvisor) {
+
+        return candidateChatModel -> {
+            List<ToolCallback> webSearchToolCallbacks = getCurrentWebSearchToolCallbacks(
+                webSearchToolCallbackProvider);
+
+            if (candidateChatModel == null && webSearchToolCallbacks.isEmpty()) {
+                return workflowEditorAskSubAgentChatClient;
+            }
+
+            return buildWorkflowEditorAskSubAgentChatClient(
+                candidateChatModel == null ? chatModel : candidateChatModel, readProjectTools, readProjectWorkflowTools,
+                componentTools, taskTools, webSearchToolCallbacks, questionAnswerAdvisor);
+        };
+    }
+
+    private ChatClient buildWorkflowEditorAskSubAgentChatClient(
+        ChatModel chatModel, ReadProjectTools readProjectTools,
+        ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
+        List<ToolCallback> webSearchToolCallbacks,
+        Advisor questionAnswerAdvisor) {
+
+        ChatClient.Builder builder = ChatClient.builder(chatModel)
+            .defaultSystem(workflowEditorAskSystemPrompt)
+            .defaultAdvisors(questionAnswerAdvisor);
+
+        List<Object> tools = new ArrayList<>(
+            List.of(
+                readProjectTools, readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools,
+                workflowInstructionTools));
+
+        builder.defaultTools(tools.toArray());
+
+        builder.defaultToolCallbacks(webSearchToolCallbacks);
+
+        return builder.build();
+    }
+
+    @Bean
+    public ChatClient workflowEditorBuildSubAgentChatClient(
+        ChatModel chatModel, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
+        ComponentTools componentTools, ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider) {
+
+        return buildWorkflowEditorBuildSubAgentChatClient(
+            chatModel, projectWorkflowTools, taskTools, scriptTools, componentTools,
+            hasAskTool(subAgentAskRelayProvider), List.of());
+    }
+
+    @Bean
+    public IntelligentToolChatClientFactory workflowEditorBuildSubAgentChatClientFactory(
+        @Qualifier("workflowEditorBuildSubAgentChatClient") ChatClient workflowEditorBuildSubAgentChatClient,
+        ChatModel chatModel, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
+        ComponentTools componentTools, ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider,
+        WebSearchToolCallbackProvider webSearchToolCallbackProvider) {
+
+        boolean askToolAvailable = hasAskTool(subAgentAskRelayProvider);
+
+        return candidateChatModel -> {
+            List<ToolCallback> webSearchToolCallbacks = getCurrentWebSearchToolCallbacks(
+                webSearchToolCallbackProvider);
+
+            if (candidateChatModel == null && webSearchToolCallbacks.isEmpty()) {
+                return workflowEditorBuildSubAgentChatClient;
+            }
+
+            return buildWorkflowEditorBuildSubAgentChatClient(
+                candidateChatModel == null ? chatModel : candidateChatModel, projectWorkflowTools, taskTools,
+                scriptTools, componentTools, askToolAvailable, webSearchToolCallbacks);
+        };
+    }
+
+    private ChatClient buildWorkflowEditorBuildSubAgentChatClient(
+        ChatModel chatModel, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
+        ComponentTools componentTools, boolean askToolAvailable, List<ToolCallback> webSearchToolCallbacks) {
+
+        List<ToolCallback> toolCallbacks = new ArrayList<>(clusterElementLookupToolCallbacks(componentTools));
+
+        toolCallbacks.add(
+            new LookupComponentPropertyOptionsToolCallback(
+                actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
+                propertyOptionsResolver, ToolStateVisibilityMetrics.NOOP, scopedConnectionGuard));
+        toolCallbacks.addAll(webSearchToolCallbacks);
+
+        return ChatClient.builder(chatModel)
+            .defaultSystem(buildWorkflowSubAgentSystemPrompt(askToolAvailable))
+            .defaultTools(
+                withDataTableTools(
+                    projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools, workflowInstructionTools))
+            .defaultToolCallbacks(toolCallbacks)
+            .build();
+    }
+
+    static List<ToolCallback> clusterElementLookupToolCallbacks(ComponentTools componentTools) {
+        return Arrays.stream(ToolCallbacks.from(componentTools))
+            .filter(toolCallback -> CLUSTER_ELEMENT_LOOKUP_TOOL_NAMES.contains(toolCallback.getToolDefinition()
+                .name()))
+            .toList();
+    }
+
+    private static boolean hasAskTool(ObjectProvider<SubAgentAskRelay> subAgentAskRelayProvider) {
+        return subAgentAskRelayProvider.getIfAvailable() != null;
+    }
+
+    String buildWorkflowSubAgentSystemPrompt(boolean askToolAvailable) {
+        return workflowEditorBuildSystemPrompt + "\n\n" + workflowEditorBuildSubAgentSystemPrompt +
+            BUILD_WORKFLOW_SUBAGENT_ADDENDUM + (askToolAvailable
+                ? BUILD_WORKFLOW_SUBAGENT_ASK_SECTION : BUILD_WORKFLOW_SUBAGENT_NO_ASK_SECTION);
+    }
+
+    private Object[] withDataTableTools(Object... tools) {
+        List<Object> allTools = new ArrayList<>(List.of(tools));
+
+        if (dataTableTools != null) {
+            allTools.add(dataTableTools);
+        }
+
+        return allTools.toArray();
+    }
+
+    private String getSystemPrompt(Resource systemPromptResource) {
+        try {
+            InputStream inputStream = systemPromptResource.getInputStream();
+
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException exception) {
+            throw new IllegalStateException(
+                "Failed to read system prompt resource: " + systemPromptResource.getDescription(), exception);
+        }
+    }
+}

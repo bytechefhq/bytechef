@@ -7,6 +7,7 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-client-chat")
     implementation("org.springframework.ai:spring-ai-model")
     implementation("org.springframework.security:spring-security-core")
+    implementation(project(":server:libs:ai:ai-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
@@ -21,6 +22,7 @@ dependencies {
     testImplementation(project(":server:libs:ai:ai-copilot:ai-copilot-service"))
     testImplementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-tool"))
     testImplementation(project(":server:libs:platform:platform-component:platform-component-tool"))
     testImplementation(project(":server:libs:test:test-support"))
 }

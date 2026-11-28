@@ -9,6 +9,7 @@ dependencies {
     implementation("org.springframework:spring-web")
     implementation("tools.jackson.core:jackson-databind")
     implementation(project(":server:libs:ai:ai-api"))
+    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-agent-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool-api"))
     implementation(project(":server:libs:config:app-config"))

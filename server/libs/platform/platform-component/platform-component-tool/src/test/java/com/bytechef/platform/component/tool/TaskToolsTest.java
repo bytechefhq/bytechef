@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.exception.ExecutionException;
+import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.ai.tool.util.ToolUtils;
 import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.component.tool.ComponentTools.ActionMinimalInfo;
@@ -180,7 +181,7 @@ class TaskToolsTest {
             new TaskDispatcherMinimalInfo("condition", "Branch on a condition", 1)));
 
         ToolContext toolContext = new ToolContext(Map.of(
-            TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("slack")));
+            AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("slack")));
 
         List<TaskMinimalInfo> result = taskTools.listTasks(null, null, toolContext);
 
@@ -214,7 +215,7 @@ class TaskToolsTest {
             new TaskDispatcherMinimalInfo("loop", "Loop over rows", 1)));
 
         ToolContext toolContext = new ToolContext(Map.of(
-            TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("googleSheets")));
+            AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("googleSheets")));
 
         List<TaskMinimalInfo> result = taskTools.searchTasks("row", null, null, toolContext);
 
@@ -234,7 +235,7 @@ class TaskToolsTest {
         when(taskDispatcherTools.listTaskDispatchers()).thenReturn(List.of());
 
         ToolContext toolContext = new ToolContext(Map.of(
-            TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("slack")));
+            AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("slack")));
 
         // The two disallowed googleSheets actions come first; a limit-first implementation would
         // truncate to them and then filter to an empty list. Filtering before the limit keeps both slack actions.
@@ -254,7 +255,7 @@ class TaskToolsTest {
         when(taskDispatcherTools.listTaskDispatchers()).thenReturn(List.of());
 
         ToolContext toolContext = new ToolContext(Map.of(
-            TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of()));
+            AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of()));
 
         List<TaskMinimalInfo> result = taskTools.listTasks(null, null, toolContext);
 
@@ -272,7 +273,7 @@ class TaskToolsTest {
         when(taskDispatcherTools.listTaskDispatchers()).thenReturn(List.of());
 
         ToolContext toolContext = new ToolContext(Map.of(
-            TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, List.of("slack")));
+            AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, List.of("slack")));
 
         List<TaskMinimalInfo> result = taskTools.listTasks(null, null, toolContext);
 
@@ -284,7 +285,7 @@ class TaskToolsTest {
     @Test
     void testGetTaskRejectsAComponentOutsideTheAllowList() {
         ToolContext toolContext = new ToolContext(Map.of(
-            TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("slack")));
+            AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("slack")));
 
         ExecutionException executionException = assertThrows(
             ExecutionException.class,
@@ -300,7 +301,7 @@ class TaskToolsTest {
         when(taskDispatcherTools.getTaskDispatcherDefinition("condition", null)).thenReturn("{}");
 
         ToolContext toolContext = new ToolContext(Map.of(
-            TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("slack")));
+            AllowedComponentNamesUtils.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("slack")));
 
         String result = taskTools.getTaskDefinition("taskDispatcher", "condition", null, null, toolContext);
 

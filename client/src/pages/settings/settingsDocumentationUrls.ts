@@ -1,5 +1,7 @@
 export const ADMIN_API_KEYS_DOCUMENTATION_URL = 'https://docs.bytechef.io/platform/settings/admin-api-keys';
 
+export const AI_PROVIDERS_DOCUMENTATION_URL = 'https://docs.bytechef.io/platform/settings/ai/ai-providers';
+
 export const API_CONNECTORS_DOCUMENTATION_URL = 'https://docs.bytechef.io/platform/settings/components/api-connectors';
 
 export const CUSTOM_COMPONENTS_DOCUMENTATION_URL =

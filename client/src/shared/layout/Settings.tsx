@@ -55,10 +55,6 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
             return isFeatureFlagEnabled('ff-1039');
         }
 
-        if (pageKey === 'mcp-server') {
-            return isFeatureFlagEnabled('ff-2197');
-        }
-
         if (pageKey === 'identity-providers') {
             return isFeatureFlagEnabled('ff-1040');
         }

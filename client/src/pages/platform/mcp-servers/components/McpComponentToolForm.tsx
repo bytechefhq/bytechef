@@ -12,6 +12,7 @@ interface McpComponentToolFormProps {
     connectionId?: string | null;
     connectionRequired?: boolean;
     form: UseFormReturn<Record<string, unknown>>;
+    mcpComponentId?: string;
     properties: PropertyAllType[];
     toolName: string;
 }
@@ -22,6 +23,7 @@ const McpComponentToolForm = ({
     connectionId,
     connectionRequired,
     form,
+    mcpComponentId,
     properties,
     toolName,
 }: McpComponentToolFormProps) => {
@@ -56,6 +58,7 @@ const McpComponentToolForm = ({
                 connectionId: connectionId ? Number(connectionId) : undefined,
                 connectionRequired,
                 inputParameters: formValues,
+                mcpComponentId,
             }}
         >
             <McpToolFormFields

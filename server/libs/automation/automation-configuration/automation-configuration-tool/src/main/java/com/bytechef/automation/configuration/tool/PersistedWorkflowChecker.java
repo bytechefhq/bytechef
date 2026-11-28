@@ -16,23 +16,63 @@
 
 package com.bytechef.automation.configuration.tool;
 
+import com.bytechef.platform.configuration.context.EnvironmentContext;
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.NodeValidationIssue;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowIssueKind;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowIssueSeverity;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowValidationResult;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
+import org.springframework.stereotype.Component;
 
 /**
- * Validates a workflow the build specialist saved, with the same checks the workflow editor's issue panel runs.
- *
  * @author Ivica Cardic
  */
-@FunctionalInterface
-public interface PersistedWorkflowChecker {
+@Component
+public class PersistedWorkflowChecker {
 
-    List<Issue> check(String workflowId);
+    private final WorkflowValidatorFacade workflowValidatorFacade;
 
-    /**
-     * One validation error of the saved workflow. {@code userAction} marks an error only the user can resolve, such as
-     * a connection the workflow still needs.
-     */
-    record Issue(@Nullable String nodeName, String message, boolean userAction) {
+    @SuppressFBWarnings("EI")
+    public PersistedWorkflowChecker(WorkflowValidatorFacade workflowValidatorFacade) {
+        this.workflowValidatorFacade = workflowValidatorFacade;
+    }
+
+    public List<Issue> check(String workflowId) {
+        Environment environment = EnvironmentContext.fetchCurrentEnvironment();
+
+        long environmentId = environment == null ? Environment.DEVELOPMENT.ordinal() : environment.ordinal();
+
+        WorkflowValidationResult workflowValidationResult = workflowValidatorFacade.validateWorkflowById(
+            workflowId, environmentId);
+
+        List<Issue> issues = new ArrayList<>();
+
+        for (NodeValidationIssue nodeValidationIssue : workflowValidationResult.nodeIssues()) {
+            if (nodeValidationIssue.severity() == WorkflowIssueSeverity.ERROR) {
+                issues.add(
+                    new Issue(
+                        nodeValidationIssue.nodeName(), nodeValidationIssue.message(),
+                        nodeValidationIssue.kind() == WorkflowIssueKind.MISSING_CONNECTION));
+            }
+        }
+
+        for (String error : workflowValidationResult.errors()) {
+            boolean coveredByNodeIssue = issues.stream()
+                .anyMatch(issue -> error.contains(issue.message()));
+
+            if (!coveredByNodeIssue) {
+                issues.add(new Issue(null, error, false));
+            }
+        }
+
+        return issues;
+    }
+
+    public record Issue(@Nullable String nodeName, String message, boolean userAction) {
     }
 }

@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.tool;
 
 import static com.bytechef.automation.configuration.exception.ProjectWorkflowErrorType.GET_WORKFLOW;
 
+import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
 import com.bytechef.automation.ai.tool.WorkspaceNotAccessibleException;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
@@ -34,6 +35,7 @@ import com.bytechef.automation.configuration.tool.util.WorkflowPersistCaptureUti
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
+import com.bytechef.platform.ai.tool.util.ToolUtils;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -131,7 +133,7 @@ public class ProjectWorkflowTools {
         } catch (Exception e) {
             log.error("getWorkflow({}): Failed to get workflow {}", workflowId, workflowId, e);
 
-            throw new ExecutionException("Failed to get workflow: " + e.getMessage(), e, GET_WORKFLOW);
+            throw ToolUtils.toToolExecutionException("get workflow", e, GET_WORKFLOW);
         }
     }
 
@@ -159,8 +161,8 @@ public class ProjectWorkflowTools {
         } catch (Exception e) {
             log.error("listWorkflows({}, {}): Failed to list project workflows", projectId, query, e);
 
-            throw new ExecutionException(
-                "Failed to list project workflows: " + e.getMessage(), e, ProjectWorkflowErrorType.LIST_WORKFLOWS);
+            throw ToolUtils.toToolExecutionException("list project workflows", e,
+                ProjectWorkflowErrorType.LIST_WORKFLOWS);
         }
     }
 
@@ -222,8 +224,7 @@ public class ProjectWorkflowTools {
         } catch (Exception e) {
             log.error("searchWorkflows({}, {}): Failed to search workflows with query '{}'", query, projectId, query,
                 e);
-            throw new ExecutionException(
-                "Failed to search workflows: " + e.getMessage(), e, ProjectWorkflowErrorType.SEARCH_WORKFLOWS);
+            throw ToolUtils.toToolExecutionException("search workflows", e, ProjectWorkflowErrorType.SEARCH_WORKFLOWS);
         }
     }
 
@@ -270,8 +271,7 @@ public class ProjectWorkflowTools {
             log.error(
                 "createProjectWorkflow({}): Failed to create workflow for project {}", projectId, projectId, e);
 
-            throw new ExecutionException(
-                "Failed to create project workflow: " + e.getMessage(), e,
+            throw ToolUtils.toToolExecutionException("create project workflow", e,
                 ProjectWorkflowErrorType.CREATE_WORKFLOW);
         }
     }
@@ -352,8 +352,7 @@ public class ProjectWorkflowTools {
         } catch (Exception e) {
             log.error("deleteWorkflow({}): Failed to delete workflow {}", workflowId, workflowId, e);
 
-            throw new ExecutionException(
-                "Failed to delete workflow: " + e.getMessage(), e, ProjectWorkflowErrorType.DELETE_WORKFLOW);
+            throw ToolUtils.toToolExecutionException("delete workflow", e, ProjectWorkflowErrorType.DELETE_WORKFLOW);
         }
     }
 
@@ -406,8 +405,7 @@ public class ProjectWorkflowTools {
         } catch (Exception e) {
             log.error("updateWorkflow({}): Failed to update workflow {}", workflowId, workflowId, e);
 
-            throw new ExecutionException(
-                "Failed to update workflow: " + e.getMessage(), e, ProjectWorkflowErrorType.UPDATE_WORKFLOW);
+            throw ToolUtils.toToolExecutionException("update workflow", e, ProjectWorkflowErrorType.UPDATE_WORKFLOW);
         }
     }
 
@@ -477,7 +475,7 @@ public class ProjectWorkflowTools {
                 ("Could not bind connection %d to node '%s' (key '%s'): %s. This node was NOT connected; tell the "
                     + "user and do not report it as done. Verify the node name, that the connection exists in the "
                     + "current environment, and that the connection key matches the node.")
-                        .formatted(connectionId, workflowNodeName, connectionKey, e.getMessage()),
+                        .formatted(connectionId, workflowNodeName, connectionKey, ToolErrors.toUserFacingDetail(e)),
                 e, ProjectWorkflowErrorType.SAVE_TEST_CONNECTION);
         }
     }

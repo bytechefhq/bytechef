@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.connection.WorkspaceConnectionLister;
 import com.bytechef.ai.copilot.tool.ToolStateVisibilityMetrics;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.platform.component.domain.Option;
@@ -92,6 +93,37 @@ class LookupComponentPropertyOptionsToolCallbackTest {
         verifyNoInteractions(
             actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
             resolver);
+    }
+
+    @Test
+    void testRejectsAConnectionOutsideTheWorkspaceOfAnInAppRunBeforeAnyLookup() {
+        LookupComponentPropertyOptionsToolCallback workspaceToolCallback =
+            new LookupComponentPropertyOptionsToolCallback(
+                actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
+                resolver, metrics,
+                ScopedConnectionTestFixtures.newGuard(List.of(), mock(WorkspaceConnectionLister.class)));
+
+        String result = workspaceToolCallback.call(
+            "{\"kind\": \"ACTION\", \"componentName\": \"slack\", \"operationName\": \"send\", "
+                + "\"propertyName\": \"channel\", \"connectionId\": 900}",
+            ScopedConnectionTestFixtures.workspaceToolContext(3L));
+
+        assertThat(result).contains(ScopedConnectionGuard.NOT_ENTITLED_MESSAGE);
+
+        verifyNoInteractions(actionDefinitionFacade, triggerDefinitionFacade, resolver);
+    }
+
+    @Test
+    void testMalformedInputNamesTheFieldWithoutEchoingTheParserText() {
+        String result = toolCallback.call(
+            "{\"kind\": \"ACTION\", \"componentName\": \"slack\", \"operationName\": \"send\", "
+                + "\"propertyName\": \"channel\", \"connectionId\": \"secret-token\"}",
+            toolContext());
+
+        assertThat(result).contains("Invalid input: unexpected value for 'connectionId'");
+        assertThat(result).doesNotContain("secret-token");
+
+        verifyNoInteractions(resolver);
     }
 
     @Test
