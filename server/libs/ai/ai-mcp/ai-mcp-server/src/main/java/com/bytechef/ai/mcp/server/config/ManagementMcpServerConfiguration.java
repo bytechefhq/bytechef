@@ -17,13 +17,13 @@
 package com.bytechef.ai.mcp.server.config;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
-import com.bytechef.automation.ai.tool.ClusterElementTools;
-import com.bytechef.automation.ai.tool.ProjectTools;
-import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
-import com.bytechef.automation.ai.tool.ScriptTools;
-import com.bytechef.platform.ai.tool.ComponentTools;
-import com.bytechef.platform.ai.tool.TaskDispatcherTools;
-import com.bytechef.platform.ai.tool.TaskTools;
+import com.bytechef.automation.configuration.tool.ClusterElementTools;
+import com.bytechef.automation.configuration.tool.ProjectTools;
+import com.bytechef.automation.configuration.tool.ProjectWorkflowTools;
+import com.bytechef.automation.configuration.tool.ScriptTools;
+import com.bytechef.platform.component.tool.ComponentTools;
+import com.bytechef.platform.component.tool.TaskTools;
+import com.bytechef.platform.workflow.tool.TaskDispatcherTools;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import io.modelcontextprotocol.server.McpServer;

@@ -1,0 +1,16 @@
+dependencies {
+    implementation("com.openai:openai-java-client-okhttp")
+    implementation("org.apache.commons:commons-lang3")
+    implementation("org.springframework.ai:spring-ai-autoconfigure-vector-store-pgvector")
+    implementation("org.springframework.ai:spring-ai-commons")
+    implementation("org.springframework.ai:spring-ai-ollama")
+    implementation("org.springframework.ai:spring-ai-openai")
+    implementation("org.springframework.ai:spring-ai-pgvector-store")
+    implementation("org.springframework.ai:spring-ai-vector-store-advisor")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.boot:spring-boot-jackson")
+    implementation("org.springframework.data:spring-data-jdbc")
+    implementation("org.springframework.security:spring-security-core")
+    implementation("org.springframework:spring-webmvc")
+    implementation("tools.jackson.core:jackson-databind")
+}

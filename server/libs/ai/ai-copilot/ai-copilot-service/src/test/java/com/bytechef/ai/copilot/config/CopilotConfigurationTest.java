@@ -23,19 +23,20 @@ import com.agui.core.exception.AGUIException;
 import com.bytechef.ai.copilot.agent.McpServerSpringAIAgent;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.connection.CopilotConnectionLister;
-import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
-import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
-import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
-import com.bytechef.platform.ai.tool.WorkflowInstructionTools;
-import com.bytechef.platform.ai.tool.WorkflowValidatorTools;
+import com.bytechef.platform.ai.tool.SecurityContextRehydrator;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.component.tool.PropertyOptionsResolver;
+import com.bytechef.platform.component.tool.ScopedConnectionGuard;
+import com.bytechef.platform.workflow.tool.WorkflowInstructionTools;
+import com.bytechef.platform.workflow.tool.WorkflowValidatorTools;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -53,8 +54,9 @@ class CopilotConfigurationTest {
 
     private final CopilotConfiguration copilotConfiguration = new CopilotConfiguration(
         PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE,
-        PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, mock(WorkflowValidatorTools.class),
-        mock(WorkflowInstructionTools.class), mock(ConnectionDefinitionService.class),
+        PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE,
+        mock(WorkflowValidatorTools.class), mock(WorkflowInstructionTools.class),
+        mock(ConnectionDefinitionService.class),
         mock(WorkspaceConnectionFacade.class), mock(ComponentDefinitionService.class),
         mock(ActionDefinitionService.class), mock(ActionDefinitionFacade.class), mock(TriggerDefinitionService.class),
         mock(TriggerDefinitionFacade.class), mock(PropertyOptionsResolver.class),
@@ -66,7 +68,8 @@ class CopilotConfigurationTest {
             mock(ChatMemory.class), mock(ChatModel.class),
             CopilotConfigurationTest.<IntelligentToolChatClientFactory>emptyProvider(),
             PROMPT_RESOURCE, mock(SecurityContextRehydrator.class),
-            CopilotConfigurationTest.<OverrideChatClientResolver>emptyProvider());
+            CopilotConfigurationTest.<OverrideChatClientResolver>emptyProvider(),
+            CopilotConfigurationTest.<SubAgentChatModelResolver>emptyProvider());
 
         assertThat(mcpServerSpringAIAgent.getAgentId()).isEqualTo("mcp_server_build");
     }

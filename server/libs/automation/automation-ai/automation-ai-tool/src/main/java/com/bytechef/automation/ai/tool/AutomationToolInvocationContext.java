@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.ai.tool;
 
+import com.bytechef.ai.copilot.tool.context.ScopedToolContextKeys;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
@@ -25,9 +26,9 @@ import org.springframework.ai.chat.model.ToolContext;
  */
 public record AutomationToolInvocationContext(@Nullable Long workspaceId, @Nullable Long environmentId) {
 
-    public static final String TOOL_CONTEXT_WORKSPACE_ID_KEY = "bytechef.automationTool.workspaceId";
-    public static final String TOOL_CONTEXT_ENVIRONMENT_ID_KEY = "bytechef.automationTool.environmentId";
-    public static final String TOOL_CONTEXT_PROJECT_OWNER_KEY = "bytechef.automationTool.projectOwner";
+    public static final String TOOL_CONTEXT_WORKSPACE_ID_KEY = ScopedToolContextKeys.TOOL_CONTEXT_WORKSPACE_ID_KEY;
+    public static final String TOOL_CONTEXT_ENVIRONMENT_ID_KEY = ScopedToolContextKeys.TOOL_CONTEXT_ENVIRONMENT_ID_KEY;
+    public static final String TOOL_CONTEXT_PROJECT_OWNER_KEY = ScopedToolContextKeys.TOOL_CONTEXT_PROJECT_OWNER_KEY;
 
     public static @Nullable AutomationToolInvocationContext fromToolContext(@Nullable ToolContext toolContext) {
         if (toolContext == null) {

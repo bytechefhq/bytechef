@@ -49,10 +49,6 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
         selector({currentEnvironmentId: 1}),
 }));
 
-vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
-    useFeatureFlagsStore: () => () => true,
-}));
-
 const ORIGINAL_DEFINITION = '{"tasks": []}';
 
 const UPDATED_DEFINITION = '{"tasks": [{"name": "delay_1", "type": "delay/v1/delay"}]}';

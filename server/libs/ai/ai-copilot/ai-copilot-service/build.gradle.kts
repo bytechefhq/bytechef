@@ -105,6 +105,7 @@ spotless {
 
 dependencies {
     implementation(libs.com.github.mizosoft.methanol)
+    implementation(libs.org.springaicommunity.spring.ai.agent.utils)
     implementation("com.openai:openai-java-client-okhttp")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.ai:spring-ai-commons")
@@ -118,6 +119,14 @@ dependencies {
     implementation("org.springframework.data:spring-data-jdbc")
     implementation("org.springframework.security:spring-security-core")
     implementation("tools.jackson.core:jackson-databind")
+    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-agent-api"))
+    implementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-tool"))
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-tool"))
+    implementation(project(":server:libs:automation:automation-connection:automation-connection-tool"))
+    implementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-tool"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-tool"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-tool"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-tool"))
     implementation(project(":spring-ai:spring-ag-ui:packages:core"))
     implementation(project(":spring-ai:spring-ag-ui:utils:json"))
     implementation(project(":spring-ai:spring-ag-ui:packages:server"))
@@ -137,9 +146,16 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
 
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
-    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool"))
+    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool-api"))
 
     implementation(project(":server:libs:core:tenant:tenant-api"))
+
+    implementation(project(":server:libs:ai:ai-api"))
+    implementation("org.springframework:spring-webmvc")
+    implementation(project(":spring-ai:spring-ag-ui:servers:spring"))
+    implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
+    implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
     testImplementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
     testImplementation(project(":server:libs:test:test-support"))

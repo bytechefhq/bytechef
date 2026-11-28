@@ -14,8 +14,8 @@ import org.springframework.ai.chat.model.ChatModel;
 /**
  * Resolves an override {@link ChatClient} from the platform AI provider catalog: given a catalog provider key (e.g.
  * {@code "ai.provider.openAi"}) + model name, reads the environment-scoped platform API key and builds a Spring-AI
- * {@link ChatClient}. Returns {@code null} (caller falls back) when the key is unknown, the provider is disabled, no
- * API key is stored, or the model can't be built.
+ * {@link ChatClient}. Returns {@code null} when the key is unknown, the provider is disabled, no API key is stored, or
+ * the model can't be built; the caller decides.
  *
  * @version ee
  *
@@ -47,8 +47,8 @@ public interface CatalogChatClientResolver {
 
     /**
      * Resolves a {@link ChatClient} for a specific preferred provider, using that provider's configured default chat
-     * model. Returns {@code null} (caller falls back to {@link #resolveDefault(int)}) when the provider key is blank,
-     * or the provider is disabled, unconfigured, or has no default model in the environment.
+     * model. Returns {@code null} when the provider key is blank, or the provider is disabled, unconfigured, or has no
+     * default model in the environment; the caller decides.
      *
      * @param providerKey the catalog provider key to prefer (e.g. {@code "anthropic"})
      * @param environment the environment ordinal
@@ -69,4 +69,7 @@ public interface CatalogChatClientResolver {
      */
     @Nullable
     ChatModel resolveDefaultChatModel(@Nullable String preferredProviderKey, int environment);
+
+    @Nullable
+    ChatModel resolveChatModel(String providerKey, String model, int environment);
 }
