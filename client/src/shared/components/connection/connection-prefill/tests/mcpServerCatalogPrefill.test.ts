@@ -36,6 +36,20 @@ const createEntry = (overrides: Partial<McpServerCatalogEntryType> = {}): McpSer
     ...overrides,
 });
 
+const LINEAR_ENTRY = createEntry({
+    authentication: createAuthentication({
+        authorizationUrl: 'https://linear.app/oauth/authorize',
+        dynamicClientRegistration: false,
+        scopes: ['read'],
+        tokenUrl: 'https://api.linear.app/oauth/token',
+        type: 'oauth2',
+    }),
+    component: 'linear',
+    slug: 'linear',
+    title: 'Linear',
+    url: 'https://mcp.linear.app/mcp',
+});
+
 describe('getMcpServerCatalogPrefill', () => {
     it('maps an oauth2 entry with dynamic client registration to the automatic OAuth2 authorization', () => {
         const prefill = getMcpServerCatalogPrefill(
@@ -110,6 +124,41 @@ describe('getMcpServerCatalogPrefill', () => {
         });
     });
 
+    it('signs in with the predefined app of the entry component when the server has no dynamic client registration', () => {
+        const prefill = getMcpServerCatalogPrefill(LINEAR_ENTRY, ['github', 'linear']);
+
+        expect(prefill).toEqual({
+            authorizationType: 'OAUTH2_AUTHORIZATION_CODE_PKCE',
+            credentialsRequired: false,
+            parameters: {
+                authorizationUrl: 'https://linear.app/oauth/authorize',
+                scopes: 'read',
+                tokenUrl: 'https://api.linear.app/oauth/token',
+                transportType: 'httpStreamable',
+                url: 'https://mcp.linear.app/mcp',
+            },
+        });
+    });
+
+    it('asks for credentials when the entry component has no predefined app', () => {
+        expect(getMcpServerCatalogPrefill(LINEAR_ENTRY, ['github'])).toEqual(
+            expect.objectContaining({authorizationType: 'OAUTH2_AUTHORIZATION_CODE', credentialsRequired: true})
+        );
+    });
+
+    it('asks for credentials when an entry with a predefined app lacks its endpoints', () => {
+        const entry = createEntry({
+            authentication: createAuthentication({
+                authorizationUrl: 'https://linear.app/oauth/authorize',
+                dynamicClientRegistration: false,
+                type: 'oauth2',
+            }),
+            component: 'linear',
+        });
+
+        expect(getMcpServerCatalogPrefill(entry, ['linear']).credentialsRequired).toBe(true);
+    });
+
     it('maps a header entry that only needs the Authorization header to the bearer token authorization', () => {
         const prefill = getMcpServerCatalogPrefill(
             createEntry({
@@ -180,6 +229,10 @@ describe('getMcpServerCatalogPrefillOption', () => {
         ).toEqual([
             'Enter the Client Id of an OAuth app registered with this server, and its Client Secret if it has one.',
         ]);
+    });
+
+    it('does not ask for credentials of an entry whose component has a predefined app', () => {
+        expect(getMcpServerCatalogPrefillOption(LINEAR_ENTRY, ['linear']).notes).toEqual([]);
     });
 
     it('explains URL placeholders, manual OAuth2 credentials and unsupported headers', () => {

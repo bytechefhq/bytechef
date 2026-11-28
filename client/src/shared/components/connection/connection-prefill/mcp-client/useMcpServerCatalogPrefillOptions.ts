@@ -6,11 +6,17 @@ import {getMcpServerCatalogPrefillOption} from './mcpServerCatalogPrefill';
 
 const STALE_TIME = 5 * 60 * 1000;
 
-export default function useMcpServerCatalogPrefillOptions(enabled: boolean): ConnectionPrefillOptionI[] {
+export default function useMcpServerCatalogPrefillOptions(
+    enabled: boolean,
+    predefinedApps: string[] | undefined
+): ConnectionPrefillOptionI[] {
     const {data} = useMcpServerCatalogQuery(undefined, {enabled, retry: false, staleTime: STALE_TIME});
 
     return useMemo(
-        () => (enabled && data?.mcpServerCatalog ? data.mcpServerCatalog.map(getMcpServerCatalogPrefillOption) : []),
-        [data, enabled]
+        () =>
+            enabled && data?.mcpServerCatalog
+                ? data.mcpServerCatalog.map((entry) => getMcpServerCatalogPrefillOption(entry, predefinedApps))
+                : [],
+        [data, enabled, predefinedApps]
     );
 }

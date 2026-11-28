@@ -212,16 +212,17 @@ const ConnectionDialog = ({
 
     const {data: tags, error: tagsError, isLoading: tagsLoading} = useGetConnectionTagsQuery();
 
-    const connectionPrefillOptions = useConnectionPrefillOptions(
-        selectedComponentDefinition?.name,
-        isOpen && !connection?.id && currentType !== PlatformType.EMBEDDED
-    );
-
     const {
         data: oAuth2Properties,
         error: oAuth2PropertiesError,
         isLoading: oAuth2PropertiesLoading,
     } = useGetOAuth2PropertiesQuery();
+
+    const connectionPrefillOptions = useConnectionPrefillOptions(
+        selectedComponentDefinition?.name,
+        isOpen && !connection?.id && currentType !== PlatformType.EMBEDDED,
+        oAuth2Properties?.predefinedApps
+    );
 
     const queryClient = useQueryClient();
 
@@ -365,7 +366,17 @@ const ConnectionDialog = ({
         (property) => property.name === 'clientId' && !property.required
     );
 
+    const selectedConnectionPrefill = connectionPrefillOptions.find(
+        (connectionPrefillOption) => connectionPrefillOption.value === connectionPrefillValue
+    )?.prefill;
+
+    const usesPredefinedAppEndpoints =
+        selectedConnectionPrefill?.credentialsRequired === false &&
+        authorizationUrlValue === selectedConnectionPrefill.parameters.authorizationUrl &&
+        tokenUrlValue === selectedConnectionPrefill.parameters.tokenUrl;
+
     const manualOAuth2ClientIdMissing =
+        !usesPredefinedAppEndpoints &&
         isOAuth2AuthorizationType &&
         isEnteringCredentials &&
         showAuthorizationProperties &&

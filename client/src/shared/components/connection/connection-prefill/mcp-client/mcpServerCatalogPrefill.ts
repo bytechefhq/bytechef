@@ -10,7 +10,18 @@ const TRANSPORT_TYPES = ['httpStreamable', 'sse'];
 
 const isAuthorizationHeader = (headerName: string) => headerName.toLowerCase() === 'authorization';
 
-export function getMcpServerCatalogPrefill(entry: McpServerCatalogEntryType): ConnectionPrefillI {
+const hasPredefinedApp = ({authentication, component}: McpServerCatalogEntryType, predefinedApps: string[]) =>
+    authentication.type === 'oauth2' &&
+    !authentication.dynamicClientRegistration &&
+    !!authentication.authorizationUrl &&
+    !!authentication.tokenUrl &&
+    !!component &&
+    predefinedApps.includes(component);
+
+export function getMcpServerCatalogPrefill(
+    entry: McpServerCatalogEntryType,
+    predefinedApps: string[] = []
+): ConnectionPrefillI {
     const {authentication} = entry;
 
     const parameters: Record<string, string> = {url: entry.url};
@@ -36,6 +47,10 @@ export function getMcpServerCatalogPrefill(entry: McpServerCatalogEntryType): Co
             parameters.scopes = authentication.scopes.join(',');
         }
 
+        if (hasPredefinedApp(entry, predefinedApps)) {
+            return {authorizationType: 'OAUTH2_AUTHORIZATION_CODE_PKCE', credentialsRequired: false, parameters};
+        }
+
         return {
             authorizationType: authentication.pkce ? 'OAUTH2_AUTHORIZATION_CODE_PKCE' : 'OAUTH2_AUTHORIZATION_CODE',
             credentialsRequired: true,
@@ -54,7 +69,7 @@ export function getMcpServerCatalogPrefill(entry: McpServerCatalogEntryType): Co
     return {authorizationType: undefined, parameters};
 }
 
-function getMcpServerCatalogNotes(entry: McpServerCatalogEntryType): string[] {
+function getMcpServerCatalogNotes(entry: McpServerCatalogEntryType, predefinedApps: string[]): string[] {
     const {authentication} = entry;
 
     const notes: string[] = [];
@@ -65,7 +80,11 @@ function getMcpServerCatalogNotes(entry: McpServerCatalogEntryType): string[] {
         );
     }
 
-    if (authentication.type === 'oauth2' && !authentication.dynamicClientRegistration) {
+    if (
+        authentication.type === 'oauth2' &&
+        !authentication.dynamicClientRegistration &&
+        !hasPredefinedApp(entry, predefinedApps)
+    ) {
         notes.push(
             authentication.pkce
                 ? 'Enter the Client Id of an OAuth app registered with this server, and its Client Secret if it has one.'
@@ -86,12 +105,15 @@ function getMcpServerCatalogNotes(entry: McpServerCatalogEntryType): string[] {
     return notes;
 }
 
-export function getMcpServerCatalogPrefillOption(entry: McpServerCatalogEntryType): ConnectionPrefillOptionI {
+export function getMcpServerCatalogPrefillOption(
+    entry: McpServerCatalogEntryType,
+    predefinedApps: string[] = []
+): ConnectionPrefillOptionI {
     return {
         description: entry.description ?? undefined,
         label: entry.title,
-        notes: getMcpServerCatalogNotes(entry),
-        prefill: getMcpServerCatalogPrefill(entry),
+        notes: getMcpServerCatalogNotes(entry, predefinedApps),
+        prefill: getMcpServerCatalogPrefill(entry, predefinedApps),
         value: entry.slug,
         websiteUrl: entry.websiteUrl ?? undefined,
     };

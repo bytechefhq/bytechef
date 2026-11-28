@@ -4,7 +4,8 @@ import {ConnectionPrefillOptionI} from './types';
 
 export default function useConnectionPrefillOptions(
     componentName: string | undefined,
-    enabled: boolean
+    enabled: boolean,
+    predefinedApps?: string[]
 ): ConnectionPrefillOptionI[] {
-    return useMcpServerCatalogPrefillOptions(enabled && componentName === MCP_CLIENT_COMPONENT_NAME);
+    return useMcpServerCatalogPrefillOptions(enabled && componentName === MCP_CLIENT_COMPONENT_NAME, predefinedApps);
 }

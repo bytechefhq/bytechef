@@ -934,6 +934,19 @@ describe('ConnectionDialog', () => {
                 url: 'https://api.elevenlabs.io/mcp',
             },
             {
+                authentication: {
+                    authorizationUrl: 'https://linear.app/oauth/authorize',
+                    dynamicClientRegistration: false,
+                    tokenUrl: 'https://api.linear.app/oauth/token',
+                    type: 'oauth2',
+                },
+                component: 'linear',
+                slug: 'linear',
+                title: 'Linear',
+                transportType: 'httpStreamable',
+                url: 'https://mcp.linear.app/mcp',
+            },
+            {
                 authentication: {type: 'none'},
                 slug: 'deepwiki',
                 title: 'DeepWiki',
@@ -1134,6 +1147,27 @@ describe('ConnectionDialog', () => {
                 expect(
                     screen.getByText("Notion supports automatic sign-in, so you don't need your own OAuth app.")
                 ).toBeInTheDocument();
+            });
+
+            it('signs in with the predefined app of a known server without asking for a Client Id', async () => {
+                const user = userEvent.setup({pointerEventsCheck: 0});
+
+                vi.mocked(useGetOAuth2PropertiesQuery).mockReturnValue({
+                    data: {predefinedApps: ['linear'], redirectUri: 'http://127.0.0.1:5177/callback'},
+                    error: null,
+                    isLoading: false,
+                } as never);
+
+                renderMcpClientDialog();
+
+                await pickKnownServer(user, 'Linear');
+
+                expect(
+                    screen.getByText("Linear supports automatic sign-in, so you don't need your own OAuth app.")
+                ).toBeInTheDocument();
+                expect(screen.queryByTestId('connection-property-clientId')).not.toBeInTheDocument();
+                expect(screen.queryByText('Client Id is required')).not.toBeInTheDocument();
+                expect(screen.getByRole('button', {name: 'Next'})).toBeEnabled();
             });
 
             it('opens the own OAuth app fields on request', async () => {
