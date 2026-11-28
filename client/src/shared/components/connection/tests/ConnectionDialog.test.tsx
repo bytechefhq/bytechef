@@ -742,6 +742,44 @@ describe('ConnectionDialog', () => {
 
         const getLastOAuth2ButtonProps = () => vi.mocked(OAuth2Button).mock.lastCall![0];
 
+        it('selects the scopes of the latest OAuth step after going back', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            vi.mocked(useGetOAuth2AuthorizationParametersQuery).mockReturnValue({
+                data: {
+                    authorizationContext: 'sealed-context',
+                    authorizationUrl: 'https://auth.example.com/authorize',
+                    clientId: 'reg-1',
+                    scopes: {read: true},
+                },
+                error: null,
+                isLoading: false,
+            } as never);
+
+            renderCreateDialog();
+
+            await user.click(await screen.findByRole('button', {name: 'Next'}));
+
+            await waitFor(() => expect(getLastOAuth2ButtonProps().scopes).toEqual({read: true}));
+
+            await user.click(screen.getByRole('button', {name: 'Previous'}));
+
+            vi.mocked(useGetOAuth2AuthorizationParametersQuery).mockReturnValue({
+                data: {
+                    authorizationContext: 'sealed-context',
+                    authorizationUrl: 'https://auth.example.com/authorize',
+                    clientId: 'reg-1',
+                    scopes: {default: true},
+                },
+                error: null,
+                isLoading: false,
+            } as never);
+
+            await user.click(await screen.findByRole('button', {name: 'Next'}));
+
+            await waitFor(() => expect(getLastOAuth2ButtonProps().scopes).toEqual({default: true}));
+        });
+
         it('moves to the OAuth step and hands the sealed authorization context to the OAuth2 button', async () => {
             const user = userEvent.setup({pointerEventsCheck: 0});
 

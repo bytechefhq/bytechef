@@ -1220,6 +1220,7 @@ const ConnectionDialog = ({
                                             connectionMutation.reset();
 
                                             setOAuth2Error(undefined);
+                                            setValue('selectedScopes', undefined);
 
                                             setWizardStep('configuration_step');
                                         }}
