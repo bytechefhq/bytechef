@@ -686,6 +686,7 @@ include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-r
 include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-rest:embedded-configuration-rest-api")
 include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-rest:embedded-configuration-rest-impl")
 include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-service")
+include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-tool")
 include("server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api")
 include("server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-graphql")
 include("server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-remote-client")
