@@ -31,7 +31,7 @@ Each row in the list shows:
 Click **New Configuration** in the top-right corner. The **New Configuration** wizard shows a step indicator and **Next** / **Previous** buttons. The steps depend on the integration you pick.
 
 1. **Basic**: set the fields in the table below.
-2. **OAuth2 Connection** (only when the integration's component authenticates with OAuth2): enter the **OAuth2 Credentials**. You can switch between your own app credentials and predefined app credentials.
+2. **OAuth2 Connection** (only when the integration's component authenticates with OAuth2): enter the **OAuth2 Credentials**. You can switch between your own app credentials and predefined app credentials. For an **MCP Client** integration with **OAuth2 (PKCE)**, enter the server's **Authorization URL**, **Token URL** and **Client Id**: automatic sign-in, which discovers the endpoints and registers a client, is not available for embedded integrations.
 3. **Workflows**: for each workflow in the integration, enable or disable it and set its connections and input values.
 4. Click **Save** on the last step.
 

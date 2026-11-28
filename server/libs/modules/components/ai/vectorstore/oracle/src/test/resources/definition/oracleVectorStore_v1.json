@@ -1670,6 +1670,7 @@
         "required": false,
         "type": "BOOLEAN"
       } ],
+      "protectedResourceUrl": null,
       "refresh": null,
       "refreshOn": [ 401 ],
       "refreshToken": null,

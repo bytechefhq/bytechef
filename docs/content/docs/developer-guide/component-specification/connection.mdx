@@ -32,6 +32,8 @@ Each authorization is configured via `ModifiableAuthorization` and can drive how
 - `refresh(RefreshFunction refresh)` / `refreshToken(RefreshTokenFunction refreshTokenFunction)` - Implement custom refresh logic or provide only the refresh token value.
 - `scopes(ScopesFunction scopes)` - Defines the list of OAuth2 scopes to request.
 - `oAuth2AuthorizationExtraQueryParameters(...)` - Add extra query parameters to the OAuth2 authorization URL.
+- `pkce(PkceFunction pkce)` - For `OAUTH2_AUTHORIZATION_CODE_PKCE`, customize the PKCE values (verifier, challenge and challenge method) that ByteChef generates.
+- `protectedResourceUrl(ProtectedResourceUrlFunction protectedResourceUrl)` - Return the URL of the protected resource, computed from the connection parameters, to enable automatic OAuth2 sign-in. When the user leaves the authorization URL and token URL empty, ByteChef reads the resource's protected resource metadata ([RFC 9728](https://datatracker.ietf.org/doc/html/rfc9728)) and its authorization server's metadata ([RFC 8414](https://datatracker.ietf.org/doc/html/rfc8414)). It then registers itself as a client ([RFC 7591](https://datatracker.ietf.org/doc/html/rfc7591)). The MCP Client component returns the MCP server URL. Automatic sign-in is not available for embedded integrations.
 
 ### Examples
 

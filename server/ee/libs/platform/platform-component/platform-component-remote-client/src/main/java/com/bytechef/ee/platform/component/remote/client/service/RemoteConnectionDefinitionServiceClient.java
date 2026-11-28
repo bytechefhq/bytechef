@@ -141,6 +141,14 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     }
 
     @Override
+    public Optional<String> getProtectedResourceUrl(
+        String componentName, int connectionVersion, AuthorizationType authorizationType,
+        Map<String, ?> connectionParameters) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public ConnectionDefinition getConnectionDefinition(String componentName, Integer componentVersion) {
         return defaultRestClient.get(
             uriBuilder -> toUri(

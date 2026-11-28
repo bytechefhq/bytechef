@@ -28,6 +28,7 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.ai.tool.constant.ToolConstants;
+import com.bytechef.platform.ai.tool.util.ToolPropertyUtils;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.a2a.A2A;
@@ -88,12 +89,15 @@ public class A2aAgentTool {
             .description("Delegate a task to a remote A2A (Agent2Agent) agent.")
             .type(TOOLS)
             .properties(
+                ToolPropertyUtils.toolName(DEFAULT_TOOL_NAME),
+                ToolPropertyUtils.toolDescription("tool"),
                 string(AGENT_URL)
                     .label("Agent URL")
                     .description(
                         "The URL of the remote A2A agent - for a ByteChef A2A Server, the endpoint URL from the " +
                             "server's Connect tab. The agent card is read from " +
                             "<Agent URL>/.well-known/agent-card.json. Private and loopback addresses are not allowed.")
+                    .expressionEnabled(false)
                     .required(true))
             .object(() -> this::apply);
     }

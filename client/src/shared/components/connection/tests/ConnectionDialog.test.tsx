@@ -1,24 +1,32 @@
 import {TooltipProvider} from '@/components/Tooltip/Tooltip';
+import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
+import OAuth2Button from '@/shared/components/connection/OAuth2Button';
+import {useMcpServerCatalogQuery} from '@/shared/middleware/graphql';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
 import {
     useGetOAuth2AuthorizationParametersQuery,
     useGetOAuth2PropertiesQuery,
 } from '@/shared/queries/platform/oauth2.queries';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {render, screen, waitFor} from '@testing-library/react';
+import {act, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {ComponentProps, ReactNode} from 'react';
 import {Control, Controller} from 'react-hook-form';
 import {MemoryRouter} from 'react-router-dom';
-import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
 vi.mock('@/shared/queries/platform/connectionDefinitions.queries', () => ({
     useGetConnectionDefinitionQuery: vi.fn(() => ({data: undefined, error: null, isLoading: false})),
     useGetConnectionDefinitionsQuery: vi.fn(() => ({data: undefined})),
 }));
 
+const hoisted = vi.hoisted(() => ({
+    removeQueries: vi.fn(),
+}));
+
 vi.mock('@/shared/queries/platform/oauth2.queries', () => ({
+    OAuth2Keys: {oAuth2AuthorizationParametersPrefix: ['automation_connections', 'oAuth2AuthorizationParameters']},
     useGetOAuth2AuthorizationParametersQuery: vi.fn(() => ({data: undefined, error: null, isLoading: false})),
     useGetOAuth2PropertiesQuery: vi.fn(() => ({data: undefined, error: null, isLoading: false})),
 }));
@@ -26,6 +34,10 @@ vi.mock('@/shared/queries/platform/oauth2.queries', () => ({
 vi.mock('@/pages/platform/workflow-editor/components/properties/Properties', () => ({
     default: ({control, properties}: {control: Control; properties?: Array<{name: string; required?: boolean}>}) => (
         <div data-testid="connection-properties">
+            {properties?.map((property) => (
+                <span data-testid={`connection-property-${property.name}`} key={`marker-${property.name}`} />
+            ))}
+
             {properties
                 ?.filter((property) => property.required)
                 .map((property) => (
@@ -50,7 +62,7 @@ vi.mock('@/shared/components/connection/ConnectionParameters', () => ({
 }));
 
 vi.mock('@/shared/components/connection/OAuth2Button', () => ({
-    default: () => null,
+    default: vi.fn(() => null),
 }));
 
 vi.mock('@/shared/components/connection/Scopes', () => ({
@@ -63,6 +75,7 @@ vi.mock('@/shared/middleware/graphql', async () => {
     return {
         ...actual,
         useConnectionCredentialStoresQuery: vi.fn(() => ({data: undefined})),
+        useMcpServerCatalogQuery: vi.fn(() => ({data: undefined})),
     };
 });
 
@@ -73,6 +86,7 @@ vi.mock('@tanstack/react-query', async () => {
         ...actual,
         useQueryClient: vi.fn(() => ({
             invalidateQueries: vi.fn().mockResolvedValue(undefined),
+            removeQueries: hoisted.removeQueries,
         })),
     };
 });
@@ -105,6 +119,14 @@ const renderDialog = (props: Partial<ComponentProps<typeof ConnectionDialog>> = 
 
 describe('ConnectionDialog', () => {
     beforeEach(() => {
+        hoisted.removeQueries.mockClear();
+
+        vi.mocked(useGetOAuth2AuthorizationParametersQuery).mockReturnValue({
+            data: undefined,
+            error: null,
+            isLoading: false,
+        } as never);
+
         vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
             data: undefined,
             error: null,
@@ -175,6 +197,18 @@ describe('ConnectionDialog', () => {
             expect(
                 screen.queryByText('Create your connection to connect to the chosen service')
             ).not.toBeInTheDocument();
+        });
+    });
+
+    it('drops the cached authorization parameters when the dialog closes', async () => {
+        const user = userEvent.setup({pointerEventsCheck: 0});
+
+        renderDialog();
+
+        await user.click(screen.getByRole('button', {name: 'Cancel'}));
+
+        expect(hoisted.removeQueries).toHaveBeenCalledWith({
+            queryKey: ['automation_connections', 'oAuth2AuthorizationParameters'],
         });
     });
 
@@ -624,5 +658,961 @@ describe('ConnectionDialog', () => {
 
         expect(screen.getByText('Component', {selector: 'label'})).toHaveTextContent(/^Component\*$/);
         expect(screen.getByText('Name', {selector: 'label'})).toHaveTextContent(/^Name\*$/);
+    });
+
+    describe('updating the credentials of an automatic OAuth2 connection', () => {
+        const oAuth2Connection = {
+            authorizationType: 'OAUTH2_AUTHORIZATION_CODE_PKCE',
+            componentName: 'mcpClient',
+            credentialStatus: 'INVALID',
+            id: 7,
+            name: 'MCP',
+            tags: [],
+            version: 1,
+        };
+
+        beforeEach(() => {
+            vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+                data: {
+                    authorizations: [{title: 'OAuth2 (automatic)', type: 'OAUTH2_AUTHORIZATION_CODE_PKCE'}],
+                    properties: [{name: 'url', type: 'STRING'}],
+                },
+                error: null,
+                isLoading: false,
+            } as never);
+        });
+
+        it('sends the connection id with the authorization-parameters request', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderDialog({
+                connection: oAuth2Connection as never,
+                useUpdateConnectionCredentialsMutation: (() => ({
+                    isPending: false,
+                    mutateAsync: vi.fn(),
+                    reset: vi.fn(),
+                })) as never,
+                useUpdateConnectionMutation: (() => ({isPending: false, mutate: vi.fn(), reset: vi.fn()})) as never,
+            });
+
+            await user.click(await screen.findByRole('button', {name: 'Next'}));
+
+            await waitFor(() =>
+                expect(useGetOAuth2AuthorizationParametersQuery).toHaveBeenLastCalledWith(
+                    expect.objectContaining({
+                        authorizationType: 'OAUTH2_AUTHORIZATION_CODE_PKCE',
+                        connectionId: 7,
+                    }),
+                    true
+                )
+            );
+        });
+    });
+
+    describe('creating an automatic OAuth2 connection', () => {
+        afterEach(() => {
+            usePlatformTypeStore.setState({currentType: PlatformType.AUTOMATION});
+        });
+
+        beforeEach(() => {
+            vi.mocked(OAuth2Button).mockClear();
+
+            vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+                data: {authorizations: [{title: 'OAuth2 (automatic)', type: 'OAUTH2_AUTHORIZATION_CODE_PKCE'}]},
+                error: null,
+                isLoading: false,
+            } as never);
+
+            vi.mocked(useGetOAuth2AuthorizationParametersQuery).mockReturnValue({
+                data: {
+                    authorizationContext: 'sealed-context',
+                    authorizationUrl: 'https://auth.example.com/authorize',
+                    clientId: 'reg-1',
+                },
+                error: null,
+                isLoading: false,
+            } as never);
+        });
+
+        const renderCreateDialog = (mutateAsync = vi.fn()) =>
+            renderDialog({
+                componentDefinition: {name: 'mcpClient', title: 'MCP Client'} as never,
+                useCreateConnectionMutation: (() => ({isPending: false, mutateAsync, reset: vi.fn()})) as never,
+            });
+
+        const getLastOAuth2ButtonProps = () => vi.mocked(OAuth2Button).mock.lastCall![0];
+
+        it('keeps the configuration footer while the OAuth step is loading', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            vi.mocked(useGetOAuth2AuthorizationParametersQuery).mockReturnValue({
+                data: undefined,
+                error: null,
+                isLoading: true,
+            } as never);
+
+            renderCreateDialog();
+
+            await user.click(await screen.findByRole('button', {name: 'Next'}));
+
+            expect(screen.queryByRole('button', {name: 'Previous'})).not.toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Cancel'})).toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Next'})).toBeDisabled();
+        });
+
+        it('selects the scopes of the latest OAuth step after going back', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            vi.mocked(useGetOAuth2AuthorizationParametersQuery).mockReturnValue({
+                data: {
+                    authorizationContext: 'sealed-context',
+                    authorizationUrl: 'https://auth.example.com/authorize',
+                    clientId: 'reg-1',
+                    scopes: {read: true},
+                },
+                error: null,
+                isLoading: false,
+            } as never);
+
+            renderCreateDialog();
+
+            await user.click(await screen.findByRole('button', {name: 'Next'}));
+
+            await waitFor(() => expect(getLastOAuth2ButtonProps().scopes).toEqual({read: true}));
+
+            await user.click(screen.getByRole('button', {name: 'Previous'}));
+
+            vi.mocked(useGetOAuth2AuthorizationParametersQuery).mockReturnValue({
+                data: {
+                    authorizationContext: 'sealed-context',
+                    authorizationUrl: 'https://auth.example.com/authorize',
+                    clientId: 'reg-1',
+                    scopes: {default: true},
+                },
+                error: null,
+                isLoading: false,
+            } as never);
+
+            await user.click(await screen.findByRole('button', {name: 'Next'}));
+
+            await waitFor(() => expect(getLastOAuth2ButtonProps().scopes).toEqual({default: true}));
+        });
+
+        it('moves to the OAuth step and hands the sealed authorization context to the OAuth2 button', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderCreateDialog();
+
+            expect(OAuth2Button).not.toHaveBeenCalled();
+
+            await user.click(await screen.findByRole('button', {name: 'Next'}));
+
+            await waitFor(() => expect(OAuth2Button).toHaveBeenCalled());
+
+            expect(screen.queryByRole('button', {name: 'Next'})).not.toBeInTheDocument();
+            expect(useGetOAuth2AuthorizationParametersQuery).toHaveBeenLastCalledWith(
+                expect.objectContaining({
+                    authorizationType: 'OAUTH2_AUTHORIZATION_CODE_PKCE',
+                    componentName: 'mcpClient',
+                }),
+                true
+            );
+            expect(getLastOAuth2ButtonProps()).toEqual(
+                expect.objectContaining({
+                    authorizationContext: 'sealed-context',
+                    authorizationUrl: 'https://auth.example.com/authorize',
+                    clientId: 'reg-1',
+                })
+            );
+        });
+
+        it('disables the authorization-parameters query before dropping it when the dialog closes', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderCreateDialog();
+
+            await user.click(await screen.findByRole('button', {name: 'Next'}));
+
+            await waitFor(() => expect(OAuth2Button).toHaveBeenCalled());
+
+            hoisted.removeQueries.mockClear();
+
+            await user.keyboard('{Escape}');
+
+            expect(hoisted.removeQueries).toHaveBeenCalledWith({
+                queryKey: ['automation_connections', 'oAuth2AuthorizationParameters'],
+            });
+            expect(vi.mocked(useGetOAuth2AuthorizationParametersQuery).mock.lastCall![1]).toBe(false);
+        });
+
+        it('tells the server the authorization parameters are for an automation connection', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderCreateDialog();
+
+            await user.click(await screen.findByRole('button', {name: 'Next'}));
+
+            await waitFor(() =>
+                expect(useGetOAuth2AuthorizationParametersQuery).toHaveBeenLastCalledWith(
+                    expect.objectContaining({type: 'AUTOMATION'}),
+                    true
+                )
+            );
+            expect(screen.queryByText('Authorization URL and Token URL are required')).not.toBeInTheDocument();
+        });
+
+        it('tells the server the authorization parameters are for an embedded connection', async () => {
+            usePlatformTypeStore.setState({currentType: PlatformType.EMBEDDED});
+
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderDialog({componentDefinition: {name: 'slack', title: 'Slack'} as never});
+
+            await user.click(await screen.findByRole('button', {name: 'Next'}));
+
+            await waitFor(() =>
+                expect(useGetOAuth2AuthorizationParametersQuery).toHaveBeenLastCalledWith(
+                    expect.objectContaining({componentName: 'slack', type: 'EMBEDDED'}),
+                    true
+                )
+            );
+        });
+
+        it('requires the authorization and token URLs for an embedded MCP Client connection', async () => {
+            usePlatformTypeStore.setState({currentType: PlatformType.EMBEDDED});
+
+            renderCreateDialog();
+
+            expect(await screen.findByText('Authorization URL and Token URL are required')).toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Next'})).toBeDisabled();
+        });
+
+        it('drops the cached authorization parameters when the code exchange fails', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderCreateDialog(vi.fn().mockRejectedValue(new Error('Sign-in took too long; try again')));
+
+            await user.click(await screen.findByRole('button', {name: 'Next'}));
+
+            await waitFor(() => expect(OAuth2Button).toHaveBeenCalled());
+
+            hoisted.removeQueries.mockClear();
+
+            await act(async () => {
+                await expect(getLastOAuth2ButtonProps().onCodeSuccess!({code: 'the-code'} as never)).rejects.toThrow(
+                    'Sign-in took too long; try again'
+                );
+            });
+
+            expect(hoisted.removeQueries).toHaveBeenCalledWith({
+                queryKey: ['automation_connections', 'oAuth2AuthorizationParameters'],
+            });
+        });
+    });
+
+    describe('choosing a known MCP server', () => {
+        const MCP_SERVER_CATALOG = [
+            {
+                authentication: {dynamicClientRegistration: true, type: 'oauth2'},
+                description: 'Official Notion MCP server',
+                slug: 'notion',
+                title: 'Notion',
+                transportType: 'httpStreamable',
+                url: 'https://mcp.notion.com/mcp',
+            },
+            {
+                authentication: {
+                    authorizationUrl: 'https://elevenlabs.io/app/oauth/authorize',
+                    dynamicClientRegistration: false,
+                    pkce: true,
+                    tokenUrl: 'https://api.us.elevenlabs.io/v1/oauth/token',
+                    type: 'oauth2',
+                },
+                slug: 'elevenlabs',
+                title: 'ElevenLabs',
+                transportType: 'httpStreamable',
+                url: 'https://api.elevenlabs.io/mcp',
+            },
+            {
+                authentication: {
+                    authorizationUrl: 'https://linear.app/oauth/authorize',
+                    dynamicClientRegistration: false,
+                    tokenUrl: 'https://api.linear.app/oauth/token',
+                    type: 'oauth2',
+                },
+                component: 'linear',
+                slug: 'linear',
+                title: 'Linear',
+                transportType: 'httpStreamable',
+                url: 'https://mcp.linear.app/mcp',
+            },
+            {
+                authentication: {type: 'none'},
+                slug: 'deepwiki',
+                title: 'DeepWiki',
+                transportType: 'sse',
+                url: 'https://mcp.deepwiki.com/sse',
+            },
+        ];
+
+        beforeEach(() => {
+            vi.mocked(useMcpServerCatalogQuery).mockClear();
+
+            vi.mocked(useMcpServerCatalogQuery).mockReturnValue({
+                data: {mcpServerCatalog: MCP_SERVER_CATALOG},
+            } as never);
+
+            vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+                data: {
+                    authorizationRequired: false,
+                    authorizations: [
+                        {title: 'Bearer Token', type: 'BEARER_TOKEN'},
+                        {title: 'OAuth2 (manual)', type: 'OAUTH2_AUTHORIZATION_CODE'},
+                        {title: 'OAuth2 (PKCE)', type: 'OAUTH2_AUTHORIZATION_CODE_PKCE'},
+                    ],
+                    properties: [
+                        {name: 'url', type: 'STRING'},
+                        {name: 'transportType', type: 'STRING'},
+                    ],
+                },
+                error: null,
+                isLoading: false,
+            } as never);
+        });
+
+        afterEach(() => {
+            usePlatformTypeStore.setState({currentType: PlatformType.AUTOMATION});
+        });
+
+        const renderMcpClientDialog = (mutateAsync = vi.fn()) =>
+            renderDialog({
+                componentDefinition: {name: 'mcpClient', title: 'MCP Client'} as never,
+                useCreateConnectionMutation: (() => ({isPending: false, mutateAsync, reset: vi.fn()})) as never,
+            });
+
+        it('selects the automatic OAuth2 authorization for a server with dynamic client registration', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderMcpClientDialog();
+
+            await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+            await user.click(await screen.findByRole('option', {name: 'Notion'}));
+
+            expect(await screen.findByText('OAuth2 (PKCE)')).toBeInTheDocument();
+            expect(screen.getByText('Official Notion MCP server')).toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Next'})).toBeInTheDocument();
+        });
+
+        it('shows the known server picker above the connection name', () => {
+            renderMcpClientDialog();
+
+            const knownServerPicker = screen.getByRole('combobox', {name: 'Choose a known server'});
+            const nameInput = screen.getByPlaceholderText('My Connection');
+
+            expect(
+                knownServerPicker.compareDocumentPosition(nameInput) & Node.DOCUMENT_POSITION_FOLLOWING
+            ).toBeTruthy();
+        });
+
+        it('names the connection after the component and the chosen server', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderMcpClientDialog();
+
+            await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+            await user.click(await screen.findByRole('option', {name: 'Notion'}));
+
+            expect(screen.getByPlaceholderText('My Connection')).toHaveValue('MCP Client Notion');
+        });
+
+        it('renames the connection when another server is picked', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderMcpClientDialog();
+
+            await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+            await user.click(await screen.findByRole('option', {name: 'ElevenLabs'}));
+
+            await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+            await user.click(await screen.findByRole('option', {name: 'Notion'}));
+
+            expect(screen.getByPlaceholderText('My Connection')).toHaveValue('MCP Client Notion');
+        });
+
+        it('keeps the chosen server after going back from the OAuth step', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderMcpClientDialog();
+
+            await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+            await user.click(await screen.findByRole('option', {name: 'Notion'}));
+
+            await user.click(screen.getByRole('button', {name: 'Next'}));
+            await user.click(await screen.findByRole('button', {name: 'Previous'}));
+
+            expect(await screen.findByRole('combobox', {name: 'Choose a known server'})).toHaveTextContent('Notion');
+            expect(screen.getByText('Official Notion MCP server')).toBeInTheDocument();
+        });
+
+        it('keeps a connection name the user typed when a server is picked', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderMcpClientDialog();
+
+            const nameInput = screen.getByPlaceholderText('My Connection');
+
+            await user.clear(nameInput);
+            await user.type(nameInput, 'Team Notion');
+
+            await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+            await user.click(await screen.findByRole('option', {name: 'Notion'}));
+
+            expect(nameInput).toHaveValue('Team Notion');
+        });
+
+        describe('the OAuth2 fields of an MCP Client connection', () => {
+            const PKCE_PROPERTY_NAMES = [
+                'clientId',
+                'clientSecret',
+                'authorizationUrl',
+                'tokenUrl',
+                'headerPrefix',
+                'scopes',
+            ];
+
+            beforeEach(() => {
+                vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+                    data: {
+                        authorizationRequired: false,
+                        authorizations: [
+                            {title: 'Bearer Token', type: 'BEARER_TOKEN'},
+                            {
+                                properties: PKCE_PROPERTY_NAMES.map((propertyName) => ({
+                                    name: propertyName,
+                                    type: 'STRING',
+                                })),
+                                title: 'OAuth2 (PKCE)',
+                                type: 'OAUTH2_AUTHORIZATION_CODE_PKCE',
+                            },
+                        ],
+                        properties: [
+                            {name: 'url', type: 'STRING'},
+                            {name: 'transportType', type: 'STRING'},
+                        ],
+                    },
+                    error: null,
+                    isLoading: false,
+                } as never);
+
+                vi.mocked(useGetOAuth2PropertiesQuery).mockReturnValue({
+                    data: {redirectUri: 'http://127.0.0.1:5177/callback'},
+                    error: null,
+                    isLoading: false,
+                } as never);
+            });
+
+            afterEach(() => {
+                vi.mocked(useGetOAuth2PropertiesQuery).mockReturnValue({
+                    data: undefined,
+                    error: null,
+                    isLoading: false,
+                } as never);
+            });
+
+            const pickKnownServer = async (user: ReturnType<typeof userEvent.setup>, serverTitle: string) => {
+                await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+                await user.click(await screen.findByRole('option', {name: serverTitle}));
+            };
+
+            const selectPkceAuthorization = async (user: ReturnType<typeof userEvent.setup>) => {
+                const authorizationCombobox = screen
+                    .getAllByRole('combobox')
+                    .find((combobox) => combobox.textContent === 'None')!;
+
+                await user.click(authorizationCombobox);
+                await user.click(await screen.findByRole('option', {name: 'OAuth2 (PKCE)'}));
+            };
+
+            it('hides the OAuth2 fields for a known server that signs in automatically', async () => {
+                const user = userEvent.setup({pointerEventsCheck: 0});
+
+                renderMcpClientDialog();
+
+                await pickKnownServer(user, 'Notion');
+
+                expect(screen.queryByTestId('connection-property-scopes')).not.toBeInTheDocument();
+                expect(screen.queryByTestId('connection-property-clientId')).not.toBeInTheDocument();
+                expect(screen.queryByTestId('connection-property-tokenUrl')).not.toBeInTheDocument();
+                expect(screen.queryByText('Redirect URI')).not.toBeInTheDocument();
+                expect(
+                    screen.getByText("Notion supports automatic sign-in, so you don't need your own OAuth app.")
+                ).toBeInTheDocument();
+            });
+
+            it('signs in with the predefined app of a known server without asking for a Client Id', async () => {
+                const user = userEvent.setup({pointerEventsCheck: 0});
+
+                vi.mocked(useGetOAuth2PropertiesQuery).mockReturnValue({
+                    data: {predefinedApps: ['linear'], redirectUri: 'http://127.0.0.1:5177/callback'},
+                    error: null,
+                    isLoading: false,
+                } as never);
+
+                renderMcpClientDialog();
+
+                await pickKnownServer(user, 'Linear');
+
+                expect(
+                    screen.getByText("Linear supports automatic sign-in, so you don't need your own OAuth app.")
+                ).toBeInTheDocument();
+                expect(screen.queryByTestId('connection-property-clientId')).not.toBeInTheDocument();
+                expect(screen.queryByText('Client Id is required')).not.toBeInTheDocument();
+                expect(screen.getByRole('button', {name: 'Next'})).toBeEnabled();
+            });
+
+            it('opens the own OAuth app fields on request', async () => {
+                const user = userEvent.setup({pointerEventsCheck: 0});
+
+                renderMcpClientDialog();
+
+                await pickKnownServer(user, 'Notion');
+
+                await user.click(screen.getByRole('button', {name: 'Use your own OAuth app'}));
+
+                expect(screen.getByTestId('connection-property-clientId')).toBeInTheDocument();
+                expect(screen.getByTestId('connection-property-clientSecret')).toBeInTheDocument();
+                expect(screen.getByTestId('connection-property-authorizationUrl')).toBeInTheDocument();
+                expect(screen.getByTestId('connection-property-tokenUrl')).toBeInTheDocument();
+                expect(screen.getByTestId('connection-property-headerPrefix')).toBeInTheDocument();
+                expect(screen.getByText('Redirect URI')).toBeInTheDocument();
+            });
+
+            it('collapses the own OAuth app fields for a server URL typed by hand', async () => {
+                const user = userEvent.setup({pointerEventsCheck: 0});
+
+                renderMcpClientDialog();
+
+                await selectPkceAuthorization(user);
+
+                expect(screen.queryByTestId('connection-property-scopes')).not.toBeInTheDocument();
+                expect(screen.queryByTestId('connection-property-clientId')).not.toBeInTheDocument();
+                expect(screen.getByRole('button', {name: 'Use your own OAuth app'})).toBeInTheDocument();
+                expect(screen.getByText('Leave these empty to sign in automatically.')).toBeInTheDocument();
+            });
+
+            it('keeps the own OAuth app fields open for a known server that needs a Client Id', async () => {
+                const user = userEvent.setup({pointerEventsCheck: 0});
+
+                renderMcpClientDialog();
+
+                await pickKnownServer(user, 'ElevenLabs');
+
+                expect(screen.getByTestId('connection-property-clientId')).toBeInTheDocument();
+                expect(screen.getByTestId('connection-property-tokenUrl')).toBeInTheDocument();
+                expect(screen.getByText('Redirect URI')).toBeInTheDocument();
+            });
+
+            it('collapses the own OAuth app fields again when a server that signs in automatically is picked', async () => {
+                const user = userEvent.setup({pointerEventsCheck: 0});
+
+                renderMcpClientDialog();
+
+                await pickKnownServer(user, 'ElevenLabs');
+                await pickKnownServer(user, 'Notion');
+
+                expect(screen.queryByTestId('connection-property-clientId')).not.toBeInTheDocument();
+                expect(screen.queryByTestId('connection-property-scopes')).not.toBeInTheDocument();
+            });
+
+            describe('on the OAuth step', () => {
+                beforeEach(() => {
+                    vi.mocked(useGetOAuth2AuthorizationParametersQuery).mockReturnValue({
+                        data: {
+                            authorizationContext: 'sealed-context',
+                            authorizationUrl: 'https://mcp.notion.com/authorize',
+                            clientId: 'reg-1',
+                            scopes: {default: true},
+                        },
+                        error: null,
+                        isLoading: false,
+                    } as never);
+                });
+
+                afterEach(() => {
+                    vi.mocked(useGetOAuth2AuthorizationParametersQuery).mockReturnValue({
+                        data: undefined,
+                        error: null,
+                        isLoading: false,
+                    } as never);
+                });
+
+                const getLastOAuth2ButtonProps = () => vi.mocked(OAuth2Button).mock.lastCall![0];
+
+                it('requests the additional scopes together with the advertised ones', async () => {
+                    const user = userEvent.setup({pointerEventsCheck: 0});
+
+                    renderMcpClientDialog();
+
+                    await pickKnownServer(user, 'Notion');
+
+                    await user.click(screen.getByRole('button', {name: 'Next'}));
+
+                    await user.type(
+                        await screen.findByRole('textbox', {name: 'Additional scopes'}),
+                        'comments:read, pages:write'
+                    );
+
+                    await waitFor(() =>
+                        expect(getLastOAuth2ButtonProps().scopes).toEqual({
+                            'comments:read': true,
+                            default: true,
+                            'pages:write': true,
+                        })
+                    );
+                });
+
+                it('saves the requested scopes on the connection', async () => {
+                    const mutateAsync = vi.fn().mockResolvedValue(1);
+                    const user = userEvent.setup({pointerEventsCheck: 0});
+
+                    renderMcpClientDialog(mutateAsync);
+
+                    await pickKnownServer(user, 'Notion');
+
+                    await user.click(screen.getByRole('button', {name: 'Next'}));
+
+                    await user.type(await screen.findByRole('textbox', {name: 'Additional scopes'}), 'comments:read');
+
+                    await waitFor(() =>
+                        expect(getLastOAuth2ButtonProps().scopes).toEqual({'comments:read': true, default: true})
+                    );
+
+                    const {onCodeSuccess} = getLastOAuth2ButtonProps();
+
+                    await act(async () => {
+                        await onCodeSuccess!({code: 'authorization-code'} as never);
+                    });
+
+                    const savedConnection = mutateAsync.mock.lastCall![0];
+
+                    expect(savedConnection.parameters.scopes).toBe('default,comments:read');
+                    expect(savedConnection.parameters.code).toBe('authorization-code');
+                });
+            });
+
+            it('shows every OAuth2 field in an embedded integration, where automatic sign-in is unavailable', async () => {
+                const user = userEvent.setup({pointerEventsCheck: 0});
+
+                usePlatformTypeStore.setState({currentType: PlatformType.EMBEDDED});
+
+                renderMcpClientDialog();
+
+                await selectPkceAuthorization(user);
+
+                for (const propertyName of PKCE_PROPERTY_NAMES) {
+                    expect(screen.getByTestId(`connection-property-${propertyName}`)).toBeInTheDocument();
+                }
+
+                expect(screen.queryByRole('button', {name: 'Use your own OAuth app'})).not.toBeInTheDocument();
+            });
+        });
+
+        it('selects the PKCE authorization for a manual OAuth2 server that requires PKCE', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderMcpClientDialog();
+
+            await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+            await user.click(await screen.findByRole('option', {name: 'ElevenLabs'}));
+
+            expect(await screen.findByText('OAuth2 (PKCE)')).toBeInTheDocument();
+            expect(
+                screen.getByText(
+                    'Enter the Client Id of an OAuth app registered with this server, and its Client Secret if it has one.'
+                )
+            ).toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Next'})).toBeInTheDocument();
+        });
+
+        it('saves the prefilled server URL and transport type', async () => {
+            const mutateAsync = vi.fn().mockResolvedValue(1);
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderMcpClientDialog(mutateAsync);
+
+            await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+            await user.click(await screen.findByRole('option', {name: 'DeepWiki'}));
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() =>
+                expect(mutateAsync).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        authorizationType: undefined,
+                        componentName: 'mcpClient',
+                        parameters: {transportType: 'sse', url: 'https://mcp.deepwiki.com/sse'},
+                    })
+                )
+            );
+        });
+
+        it('drops the previous server OAuth2 endpoints when another server is picked', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderMcpClientDialog();
+
+            await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+            await user.click(await screen.findByRole('option', {name: 'ElevenLabs'}));
+
+            await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+            await user.click(await screen.findByRole('option', {name: 'Notion'}));
+
+            await user.click(screen.getByRole('button', {name: 'Next'}));
+
+            await waitFor(() =>
+                expect(useGetOAuth2AuthorizationParametersQuery).toHaveBeenLastCalledWith(
+                    expect.objectContaining({authorizationType: 'OAUTH2_AUTHORIZATION_CODE_PKCE'}),
+                    true
+                )
+            );
+
+            const requestParameters = vi.mocked(useGetOAuth2AuthorizationParametersQuery).mock.lastCall![0]
+                .parameters as Record<string, unknown>;
+
+            expect(requestParameters.url).toBe('https://mcp.notion.com/mcp');
+            expect(requestParameters.transportType).toBe('httpStreamable');
+            expect(requestParameters.authorizationUrl).toBeUndefined();
+            expect(requestParameters.tokenUrl).toBeUndefined();
+        });
+
+        it('restores the default transport type when the next server has no valid transport type', async () => {
+            const mutateAsync = vi.fn().mockResolvedValue(1);
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            vi.mocked(useMcpServerCatalogQuery).mockReturnValue({
+                data: {
+                    mcpServerCatalog: [
+                        ...MCP_SERVER_CATALOG,
+                        {
+                            authentication: {type: 'none'},
+                            slug: 'stdio-server',
+                            title: 'Stdio Server',
+                            transportType: 'stdio',
+                            url: 'https://mcp.example.com/stdio',
+                        },
+                    ],
+                },
+            } as never);
+
+            vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+                data: {
+                    authorizationRequired: false,
+                    authorizations: [{title: 'Bearer Token', type: 'BEARER_TOKEN'}],
+                    properties: [
+                        {name: 'url', type: 'STRING'},
+                        {defaultValue: 'httpStreamable', name: 'transportType', type: 'STRING'},
+                    ],
+                },
+                error: null,
+                isLoading: false,
+            } as never);
+
+            renderMcpClientDialog(mutateAsync);
+
+            await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+            await user.click(await screen.findByRole('option', {name: 'DeepWiki'}));
+
+            await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+            await user.click(await screen.findByRole('option', {name: 'Stdio Server'}));
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() => expect(mutateAsync).toHaveBeenCalled());
+
+            expect(mutateAsync.mock.lastCall![0].parameters).toEqual({
+                transportType: 'httpStreamable',
+                url: 'https://mcp.example.com/stdio',
+            });
+        });
+
+        it('resets the authorization when the next server does not offer one', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+                data: {
+                    authorizationRequired: true,
+                    authorizations: [
+                        {title: 'Bearer Token', type: 'BEARER_TOKEN'},
+                        {title: 'OAuth2 (PKCE)', type: 'OAUTH2_AUTHORIZATION_CODE_PKCE'},
+                    ],
+                    properties: [
+                        {name: 'url', type: 'STRING'},
+                        {name: 'transportType', type: 'STRING'},
+                    ],
+                },
+                error: null,
+                isLoading: false,
+            } as never);
+
+            renderMcpClientDialog();
+
+            await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+            await user.click(await screen.findByRole('option', {name: 'ElevenLabs'}));
+
+            expect(await screen.findByText('OAuth2 (PKCE)')).toBeInTheDocument();
+
+            await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+            await user.click(await screen.findByRole('option', {name: 'DeepWiki'}));
+
+            await waitFor(() => expect(screen.queryByText('OAuth2 (PKCE)')).not.toBeInTheDocument());
+            expect(screen.getByText('Bearer Token')).toBeInTheDocument();
+        });
+
+        it('requires a client id when the authorization and token URLs are set', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+                data: {
+                    authorizationRequired: false,
+                    authorizations: [
+                        {
+                            properties: [
+                                {name: 'clientId', required: false, type: 'STRING'},
+                                {name: 'authorizationUrl', required: false, type: 'STRING'},
+                                {name: 'tokenUrl', required: false, type: 'STRING'},
+                            ],
+                            title: 'OAuth2 (PKCE)',
+                            type: 'OAUTH2_AUTHORIZATION_CODE_PKCE',
+                        },
+                    ],
+                    properties: [
+                        {name: 'url', type: 'STRING'},
+                        {name: 'transportType', type: 'STRING'},
+                    ],
+                },
+                error: null,
+                isLoading: false,
+            } as never);
+
+            renderMcpClientDialog();
+
+            await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+            await user.click(await screen.findByRole('option', {name: 'ElevenLabs'}));
+
+            expect(await screen.findByText('Client Id is required')).toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Next'})).toBeDisabled();
+        });
+
+        it('resets the header prefix to the default of the chosen authorization', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+                data: {
+                    authorizationRequired: false,
+                    authorizations: [
+                        {
+                            properties: [{defaultValue: 'Bearer', name: 'headerPrefix', type: 'STRING'}],
+                            title: 'OAuth2 (PKCE)',
+                            type: 'OAUTH2_AUTHORIZATION_CODE_PKCE',
+                        },
+                    ],
+                    properties: [
+                        {name: 'url', type: 'STRING'},
+                        {name: 'transportType', type: 'STRING'},
+                    ],
+                },
+                error: null,
+                isLoading: false,
+            } as never);
+
+            renderMcpClientDialog();
+
+            await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+            await user.click(await screen.findByRole('option', {name: 'Notion'}));
+
+            await user.click(screen.getByRole('button', {name: 'Next'}));
+
+            await waitFor(() =>
+                expect(useGetOAuth2AuthorizationParametersQuery).toHaveBeenLastCalledWith(
+                    expect.objectContaining({authorizationType: 'OAUTH2_AUTHORIZATION_CODE_PKCE'}),
+                    true
+                )
+            );
+
+            const requestParameters = vi.mocked(useGetOAuth2AuthorizationParametersQuery).mock.lastCall![0]
+                .parameters as Record<string, unknown>;
+
+            expect(requestParameters.headerPrefix).toBe('Bearer');
+        });
+
+        it('hides the picker when the catalog is empty', () => {
+            vi.mocked(useMcpServerCatalogQuery).mockReturnValue({data: {mcpServerCatalog: []}} as never);
+
+            renderMcpClientDialog();
+
+            expect(screen.queryByRole('combobox', {name: 'Choose a known server'})).not.toBeInTheDocument();
+            expect(screen.getByTestId('connection-properties')).toBeInTheDocument();
+        });
+
+        it('hides the picker when the catalog cannot be loaded', () => {
+            vi.mocked(useMcpServerCatalogQuery).mockReturnValue({
+                data: undefined,
+                error: new Error('Bad Gateway'),
+            } as never);
+
+            renderMcpClientDialog();
+
+            expect(screen.queryByRole('combobox', {name: 'Choose a known server'})).not.toBeInTheDocument();
+        });
+
+        it('keeps manual entry when no server is picked', async () => {
+            const mutateAsync = vi.fn().mockResolvedValue(1);
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderMcpClientDialog(mutateAsync);
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() =>
+                expect(mutateAsync).toHaveBeenCalledWith(
+                    expect.objectContaining({componentName: 'mcpClient', parameters: {}})
+                )
+            );
+        });
+
+        it('shows the picker for an automation connection', () => {
+            usePlatformTypeStore.setState({currentType: PlatformType.AUTOMATION});
+
+            renderMcpClientDialog();
+
+            expect(screen.getByRole('combobox', {name: 'Choose a known server'})).toBeInTheDocument();
+            expect(useMcpServerCatalogQuery).toHaveBeenLastCalledWith(
+                undefined,
+                expect.objectContaining({enabled: true})
+            );
+        });
+
+        it('hides the picker and skips the catalog for an embedded connection', () => {
+            usePlatformTypeStore.setState({currentType: PlatformType.EMBEDDED});
+
+            renderMcpClientDialog();
+
+            expect(screen.queryByRole('combobox', {name: 'Choose a known server'})).not.toBeInTheDocument();
+            expect(screen.getByTestId('connection-properties')).toBeInTheDocument();
+            expect(useMcpServerCatalogQuery).toHaveBeenLastCalledWith(
+                undefined,
+                expect.objectContaining({enabled: false})
+            );
+        });
+
+        it('does not query the catalog for other components', () => {
+            renderDialog({componentDefinition: {name: 'slack', title: 'Slack'} as never});
+
+            expect(useMcpServerCatalogQuery).toHaveBeenLastCalledWith(
+                undefined,
+                expect.objectContaining({enabled: false})
+            );
+            expect(screen.queryByRole('combobox', {name: 'Choose a known server'})).not.toBeInTheDocument();
+        });
     });
 });

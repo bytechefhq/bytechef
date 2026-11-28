@@ -30,6 +30,25 @@ The **Environment** field in the dialog shows the environment the connection is 
   External credential stores are not available in the latest released version of ByteChef. When they are, an administrator can configure an external secret backend, and the create dialog shows a **Credential storage** selector. With a non-default store, you can turn on **Register existing credential** and reference a secret in that store by its path or UUID instead of entering the credentials in ByteChef. The selector appears only when more than one credential store is available, and it cannot be changed after the connection is created.
 </Callout>
 
+### Choose a known MCP server
+
+The create dialog of an **MCP Client** connection shows a **Choose a known server** list above the server URL. Picking a server from ByteChef's MCP server catalog fills in its URL, transport type and authorization:
+
+- Servers that support dynamic client registration get **OAuth2 (PKCE)** with the URL fields left empty. ByteChef discovers the authorization server and registers itself.
+- OAuth servers that require PKCE get **OAuth2 (PKCE)** with their authorization URL, token URL and scopes. Add the client ID, and the client secret if the app has one, of an OAuth app registered with the server.
+- Other OAuth servers get **OAuth2 (manual)** with their authorization URL, token URL and scopes.
+- If your ByteChef instance has a predefined OAuth app for the service behind a server, for example the Linear component's app for the Linear MCP server, the server gets **OAuth2 (PKCE)** and signs in with that app, so you don't enter a client ID. ByteChef then always uses the authorization and token URLs from the catalog.
+
+Every field stays editable, and you can skip the list and enter the server yourself. The list is hidden when the catalog cannot be fetched.
+
+### Sign in to an MCP server automatically
+
+When you enter an MCP server yourself, choose **OAuth2 (PKCE)** and leave **Authorization URL** and **Token URL** empty. ByteChef reads the server's OAuth metadata to find its authorization server and registers itself as a client, so you don't need an OAuth app first. After **Next**, the dialog lists the scopes the server advertises. Clear any you don't need, and enter more under **Additional scopes**. The connection saves the scopes it requested.
+
+If the server doesn't support client registration, sign-in stops with a message saying so. Fill in **Authorization URL**, **Token URL** and the **Client Id** of an OAuth app registered with the server, plus its **Client Secret** if the app has one. ByteChef then uses those endpoints as entered. **Client Id** is required whenever both URLs are filled in.
+
+Automatic sign-in only calls `https` URLs on public addresses. For a self-hosted MCP server or authorization server on your internal network, an administrator adds its host to [`BYTECHEF_OAUTH2_DISCOVERY_ALLOWED_HOSTS`](/platform/use-bytechef/self-hosted/configuration/environment-variables). The same limit applies to the token and refresh requests of every MCP Client OAuth2 (PKCE) connection.
+
 ## Manage connections
 
 The **Connections** page lists every connection with its component icon, name, tags, creation date, and two status badges:

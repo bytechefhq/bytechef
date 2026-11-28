@@ -20,6 +20,10 @@ import { mapValues } from '../runtime';
  */
 export interface OAuth2AuthorizationParameters {
     /**
+     * Opaque, server-sealed state the client must post back with the authorization code.
+     */
+    authorizationContext?: string;
+    /**
      * The authorization url.
      */
     authorizationUrl?: string;
@@ -54,6 +58,7 @@ export function OAuth2AuthorizationParametersFromJSONTyped(json: any, ignoreDisc
     }
     return {
         
+        'authorizationContext': json['authorizationContext'] == null ? undefined : json['authorizationContext'],
         'authorizationUrl': json['authorizationUrl'] == null ? undefined : json['authorizationUrl'],
         'clientId': json['clientId'] == null ? undefined : json['clientId'],
         'extraQueryParameters': json['extraQueryParameters'] == null ? undefined : json['extraQueryParameters'],
@@ -72,6 +77,7 @@ export function OAuth2AuthorizationParametersToJSONTyped(value?: OAuth2Authoriza
 
     return {
         
+        'authorizationContext': value['authorizationContext'],
         'authorizationUrl': value['authorizationUrl'],
         'clientId': value['clientId'],
         'extraQueryParameters': value['extraQueryParameters'],

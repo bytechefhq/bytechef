@@ -90,6 +90,45 @@ describe('McpToolFormFields', () => {
         await waitFor(() => expect(button).toBeEnabled());
     });
 
+    it('hides let ai fill required when no required field can be filled by ai', () => {
+        const expressionDisabledProperties = [
+            {
+                controlType: 'SELECT',
+                defaultValue: 'ALL',
+                expressionEnabled: false,
+                name: 'toolFilterType',
+                required: true,
+                type: 'STRING',
+            },
+            {controlType: 'TEXT', name: 'note', type: 'STRING'},
+        ] as Array<PropertyAllType>;
+
+        const NoAiFillableFields = () => {
+            const form = useForm<Record<string, unknown>>({defaultValues: {}});
+
+            return <McpToolFormFields form={form} properties={expressionDisabledProperties} values={form.watch()} />;
+        };
+
+        render(<NoAiFillableFields />);
+
+        expect(screen.getByTestId('properties')).toHaveTextContent('toolFilterType,note');
+        expect(screen.queryByRole('button', {name: 'Let AI fill required'})).not.toBeInTheDocument();
+    });
+
+    it('keeps let ai fill required visible but disabled once every ai fillable field has a value', async () => {
+        const Filled = () => {
+            const form = useForm<Record<string, unknown>>({defaultValues: {replyTo: 'a@b.c', subject: 'Hello'}});
+
+            return <McpToolFormFields form={form} properties={properties} values={form.watch()} />;
+        };
+
+        render(<Filled />);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Show Advanced Properties'}));
+
+        expect(screen.getByRole('button', {name: 'Let AI fill required'})).toBeDisabled();
+    });
+
     it('keeps a value typed while the options are loading', async () => {
         let resolveOptions: (options: Array<{value?: unknown}>) => void = () => {};
 

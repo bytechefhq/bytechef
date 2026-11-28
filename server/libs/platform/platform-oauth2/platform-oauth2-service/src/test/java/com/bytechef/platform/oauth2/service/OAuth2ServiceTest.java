@@ -26,6 +26,8 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Oauth2;
 import com.bytechef.config.ApplicationProperties.Oauth2.OAuth2App;
+import com.bytechef.platform.githubproxy.client.model.McpServerCatalogAuthentication;
+import com.bytechef.platform.githubproxy.client.model.McpServerCatalogEntry;
 import com.bytechef.platform.githubproxy.client.model.OAuthApp;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.LinkedHashMap;
@@ -41,7 +43,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(ObjectMapperSetupExtension.class)
 class OAuth2ServiceTest {
 
+    private static final String LINEAR_URL = "https://mcp.linear.app/mcp";
+    private static final String LINEAR_AUTHORIZATION_URL = "https://linear.app/oauth/authorize";
+    private static final String LINEAR_TOKEN_URL = "https://api.linear.app/oauth/token";
+
     private final ApplicationProperties applicationProperties = new ApplicationProperties();
+    private final RemoteMcpServerCatalogClient remoteMcpServerCatalogClient = mock(RemoteMcpServerCatalogClient.class);
     private final RemoteOAuth2AppsClient remoteOAuth2AppsClient = mock(RemoteOAuth2AppsClient.class);
     private Map<String, OAuth2App> predefinedOAuth2Apps;
 
@@ -59,7 +66,7 @@ class OAuth2ServiceTest {
         when(remoteOAuth2AppsClient.getOAuth2Apps())
             .thenReturn(Map.of("googleDrive", new OAuthApp("remoteId", "remoteSecret")));
 
-        OAuth2ServiceImpl oAuth2Service = new OAuth2ServiceImpl(applicationProperties, remoteOAuth2AppsClient);
+        OAuth2ServiceImpl oAuth2Service = newOAuth2Service();
 
         Map<String, ?> parameters = oAuth2Service.checkPredefinedParameters("googleDrive", Map.of());
 
@@ -74,7 +81,7 @@ class OAuth2ServiceTest {
         when(remoteOAuth2AppsClient.getOAuth2Apps())
             .thenReturn(Map.of("googleDrive", new OAuthApp("remoteId", "remoteSecret")));
 
-        OAuth2ServiceImpl oAuth2Service = new OAuth2ServiceImpl(applicationProperties, remoteOAuth2AppsClient);
+        OAuth2ServiceImpl oAuth2Service = newOAuth2Service();
 
         Map<String, ?> parameters = oAuth2Service.checkPredefinedParameters("googleDrive", Map.of());
 
@@ -89,7 +96,7 @@ class OAuth2ServiceTest {
         when(remoteOAuth2AppsClient.getOAuth2Apps())
             .thenReturn(Map.of("googleDrive", new OAuthApp("remoteId", "remoteSecret")));
 
-        OAuth2ServiceImpl oAuth2Service = new OAuth2ServiceImpl(applicationProperties, remoteOAuth2AppsClient);
+        OAuth2ServiceImpl oAuth2Service = newOAuth2Service();
 
         Map<String, ?> parameters = oAuth2Service.checkPredefinedParameters(
             "googleDrive", Map.of(Authorization.CLIENT_ID, "mine", Authorization.CLIENT_SECRET, "mySecret"));
@@ -104,7 +111,7 @@ class OAuth2ServiceTest {
     void testUnknownComponentLeavesParametersUnchanged() {
         when(remoteOAuth2AppsClient.getOAuth2Apps()).thenReturn(Map.of());
 
-        OAuth2ServiceImpl oAuth2Service = new OAuth2ServiceImpl(applicationProperties, remoteOAuth2AppsClient);
+        OAuth2ServiceImpl oAuth2Service = newOAuth2Service();
 
         Map<String, ?> parameters = oAuth2Service.checkPredefinedParameters("slack", Map.of("a", "b"));
 
@@ -121,11 +128,147 @@ class OAuth2ServiceTest {
                 "googleDrive", new OAuthApp("remoteId", "remoteSecret"), "zendesk", new OAuthApp("id", "secret"),
                 "asana", new OAuthApp("id", "secret")));
 
-        OAuth2ServiceImpl oAuth2Service = new OAuth2ServiceImpl(applicationProperties, remoteOAuth2AppsClient);
+        OAuth2ServiceImpl oAuth2Service = newOAuth2Service();
 
         List<String> names = oAuth2Service.getPredefinedApps();
 
         assertThat(names).containsExactly("slack", "googleDrive", "asana", "zendesk");
+    }
+
+    @Test
+    void testCatalogComponentAppFillsMcpClientCredentialsAndCatalogEndpoints() {
+        when(remoteMcpServerCatalogClient.getMcpServerCatalog())
+            .thenReturn(List.of(linearEntry(false, LINEAR_AUTHORIZATION_URL, LINEAR_TOKEN_URL, "linear")));
+        when(remoteOAuth2AppsClient.getOAuth2Apps())
+            .thenReturn(Map.of("linear", new OAuthApp("linearId", "linearSecret")));
+
+        OAuth2ServiceImpl oAuth2Service = newOAuth2Service();
+
+        Map<String, ?> parameters = oAuth2Service.checkPredefinedParameters(
+            "mcpClient",
+            Map.of(
+                "url", LINEAR_URL, Authorization.AUTHORIZATION_URL, "https://attacker.example.com/authorize",
+                Authorization.TOKEN_URL, "https://attacker.example.com/token"));
+
+        assertThat(parameters.get(Authorization.CLIENT_ID)).isEqualTo("linearId");
+        assertThat(parameters.get(Authorization.CLIENT_SECRET)).isEqualTo("linearSecret");
+        assertThat(parameters.get(Authorization.AUTHORIZATION_URL)).isEqualTo(LINEAR_AUTHORIZATION_URL);
+        assertThat(parameters.get(Authorization.TOKEN_URL)).isEqualTo(LINEAR_TOKEN_URL);
+        assertThat(parameters.get("url")).isEqualTo(LINEAR_URL);
+    }
+
+    @Test
+    void testLocalPredefinedAppOfCatalogComponentIsUsed() {
+        predefinedOAuth2Apps.put("linear", app("localId", "localSecret"));
+
+        when(remoteMcpServerCatalogClient.getMcpServerCatalog())
+            .thenReturn(List.of(linearEntry(false, LINEAR_AUTHORIZATION_URL, LINEAR_TOKEN_URL, "linear")));
+        when(remoteOAuth2AppsClient.getOAuth2Apps()).thenReturn(Map.of());
+
+        OAuth2ServiceImpl oAuth2Service = newOAuth2Service();
+
+        Map<String, ?> parameters = oAuth2Service.checkPredefinedParameters("mcpClient", Map.of("url", LINEAR_URL));
+
+        assertThat(parameters.get(Authorization.CLIENT_ID)).isEqualTo("localId");
+        assertThat(parameters.get(Authorization.CLIENT_SECRET)).isEqualTo("localSecret");
+        assertThat(parameters.get(Authorization.TOKEN_URL)).isEqualTo(LINEAR_TOKEN_URL);
+    }
+
+    @Test
+    void testCatalogEntryWithDynamicClientRegistrationIsIgnored() {
+        when(remoteMcpServerCatalogClient.getMcpServerCatalog())
+            .thenReturn(List.of(linearEntry(true, LINEAR_AUTHORIZATION_URL, LINEAR_TOKEN_URL, "linear")));
+        when(remoteOAuth2AppsClient.getOAuth2Apps())
+            .thenReturn(Map.of("linear", new OAuthApp("linearId", "linearSecret")));
+
+        OAuth2ServiceImpl oAuth2Service = newOAuth2Service();
+
+        Map<String, ?> parameters = oAuth2Service.checkPredefinedParameters("mcpClient", Map.of("url", LINEAR_URL));
+
+        assertThat(parameters).containsOnlyKeys("url");
+    }
+
+    @Test
+    void testCatalogEntryWithoutEndpointsIsIgnored() {
+        when(remoteMcpServerCatalogClient.getMcpServerCatalog())
+            .thenReturn(List.of(linearEntry(false, LINEAR_AUTHORIZATION_URL, " ", "linear")));
+        when(remoteOAuth2AppsClient.getOAuth2Apps())
+            .thenReturn(Map.of("linear", new OAuthApp("linearId", "linearSecret")));
+
+        OAuth2ServiceImpl oAuth2Service = newOAuth2Service();
+
+        Map<String, ?> parameters = oAuth2Service.checkPredefinedParameters("mcpClient", Map.of("url", LINEAR_URL));
+
+        assertThat(parameters).containsOnlyKeys("url");
+    }
+
+    @Test
+    void testCatalogComponentWithoutAppIsIgnored() {
+        when(remoteMcpServerCatalogClient.getMcpServerCatalog())
+            .thenReturn(List.of(linearEntry(false, LINEAR_AUTHORIZATION_URL, LINEAR_TOKEN_URL, "linear")));
+        when(remoteOAuth2AppsClient.getOAuth2Apps()).thenReturn(Map.of());
+
+        OAuth2ServiceImpl oAuth2Service = newOAuth2Service();
+
+        Map<String, ?> parameters = oAuth2Service.checkPredefinedParameters("mcpClient", Map.of("url", LINEAR_URL));
+
+        assertThat(parameters).containsOnlyKeys("url");
+    }
+
+    @Test
+    void testMcpClientUrlWithoutCatalogEntryIsIgnored() {
+        when(remoteMcpServerCatalogClient.getMcpServerCatalog())
+            .thenReturn(List.of(linearEntry(false, LINEAR_AUTHORIZATION_URL, LINEAR_TOKEN_URL, "linear")));
+        when(remoteOAuth2AppsClient.getOAuth2Apps())
+            .thenReturn(Map.of("linear", new OAuthApp("linearId", "linearSecret")));
+
+        OAuth2ServiceImpl oAuth2Service = newOAuth2Service();
+
+        Map<String, ?> parameters = oAuth2Service.checkPredefinedParameters(
+            "mcpClient", Map.of("url", "https://mcp.example.com/mcp"));
+
+        assertThat(parameters).containsOnlyKeys("url");
+    }
+
+    @Test
+    void testProvidedMcpClientIdKeepsTheUserEndpoints() {
+        OAuth2ServiceImpl oAuth2Service = newOAuth2Service();
+
+        Map<String, ?> parameters = oAuth2Service.checkPredefinedParameters(
+            "mcpClient",
+            Map.of(
+                "url", LINEAR_URL, Authorization.CLIENT_ID, "mine", Authorization.TOKEN_URL,
+                "https://auth.example.com/token"));
+
+        assertThat(parameters.get(Authorization.CLIENT_ID)).isEqualTo("mine");
+        assertThat(parameters.get(Authorization.TOKEN_URL)).isEqualTo("https://auth.example.com/token");
+
+        verify(remoteMcpServerCatalogClient, never()).getMcpServerCatalog();
+    }
+
+    @Test
+    void testOtherComponentsDoNotReadTheCatalog() {
+        when(remoteOAuth2AppsClient.getOAuth2Apps()).thenReturn(Map.of());
+
+        OAuth2ServiceImpl oAuth2Service = newOAuth2Service();
+
+        oAuth2Service.checkPredefinedParameters("slack", Map.of("url", LINEAR_URL));
+
+        verify(remoteMcpServerCatalogClient, never()).getMcpServerCatalog();
+    }
+
+    private OAuth2ServiceImpl newOAuth2Service() {
+        return new OAuth2ServiceImpl(applicationProperties, remoteMcpServerCatalogClient, remoteOAuth2AppsClient);
+    }
+
+    private static McpServerCatalogEntry linearEntry(
+        boolean dynamicClientRegistration, String authorizationUrl, String tokenUrl, String component) {
+
+        return new McpServerCatalogEntry(
+            "linear", "Linear", null, LINEAR_URL, null, "httpStreamable",
+            new McpServerCatalogAuthentication(
+                "oauth2", dynamicClientRegistration, null, authorizationUrl, tokenUrl, false, null, null),
+            null, component);
     }
 
     private static OAuth2App app(String clientId, String clientSecret) {

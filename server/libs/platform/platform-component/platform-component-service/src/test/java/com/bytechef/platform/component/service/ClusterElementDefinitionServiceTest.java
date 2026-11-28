@@ -40,7 +40,9 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolCallbackProviderFunction;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
+import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.ValueProperty;
@@ -391,6 +393,30 @@ class ClusterElementDefinitionServiceTest {
     }
 
     @Test
+    void testAToolCallbackProviderElementIsNotGivenTheToolProperties() {
+        ClusterElementDefinition result = getToolClusterElementDefinition(
+            List.of(string("url")), mock(ToolCallbackProviderFunction.class));
+
+        assertEquals(List.of("url"), getPropertyNames(result));
+    }
+
+    @Test
+    void testAMultipleConnectionsToolCallbackProviderElementIsNotGivenTheToolProperties() {
+        ClusterElementDefinition result = getToolClusterElementDefinition(
+            List.of(string("url")), mock(MultipleConnectionsToolCallbackProviderFunction.class));
+
+        assertEquals(List.of("url"), getPropertyNames(result));
+    }
+
+    @Test
+    void testAToolCallbackProviderElementKeepsOnlyTheToolPropertiesItDeclares() {
+        ClusterElementDefinition result = getToolClusterElementDefinition(
+            List.of(string("toolName"), string("url")), mock(ToolCallbackProviderFunction.class));
+
+        assertEquals(List.of("toolName", "url"), getPropertyNames(result));
+    }
+
+    @Test
     void testANonToolClusterElementDefinitionIsNotGivenTheToolProperties() {
         ClusterElementType chatMemoryType = new ClusterElementType("CHAT_MEMORY", "chatMemory", "Chat Memory");
 
@@ -403,8 +429,21 @@ class ClusterElementDefinitionServiceTest {
     private ClusterElementDefinition getToolClusterElementDefinition(
         List<? extends com.bytechef.component.definition.Property> properties) {
 
+        return getToolClusterElementDefinition(properties, null);
+    }
+
+    private ClusterElementDefinition getToolClusterElementDefinition(
+        List<? extends com.bytechef.component.definition.Property> properties, Object element) {
+
         return getClusterElementDefinition(
-            new ClusterElementType("TOOLS", "tools", "Tools"), "TOOLS", properties);
+            new ClusterElementType("TOOLS", "tools", "Tools"), "TOOLS", properties, element);
+    }
+
+    private ClusterElementDefinition getClusterElementDefinition(
+        ClusterElementType clusterElementType, String clusterElementTypeName,
+        List<? extends com.bytechef.component.definition.Property> properties) {
+
+        return getClusterElementDefinition(clusterElementType, clusterElementTypeName, properties, null);
     }
 
     @SuppressWarnings({
@@ -412,11 +451,14 @@ class ClusterElementDefinitionServiceTest {
     })
     private ClusterElementDefinition getClusterElementDefinition(
         ClusterElementType clusterElementType, String clusterElementTypeName,
-        List<? extends com.bytechef.component.definition.Property> properties) {
+        List<? extends com.bytechef.component.definition.Property> properties, Object element) {
 
         com.bytechef.component.definition.ClusterElementDefinition<?> elementDefinition =
             mock(com.bytechef.component.definition.ClusterElementDefinition.class);
 
+        lenient().doReturn(element)
+            .when(elementDefinition)
+            .getElement();
         when(elementDefinition.getName()).thenReturn("post");
         when(elementDefinition.getType()).thenReturn(clusterElementType);
         when(elementDefinition.getDescription()).thenReturn(Optional.empty());

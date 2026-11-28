@@ -1703,6 +1703,7 @@
         "required": true,
         "type": "INTEGER"
       } ],
+      "protectedResourceUrl": null,
       "refresh": null,
       "refreshOn": [ 401 ],
       "refreshToken": null,

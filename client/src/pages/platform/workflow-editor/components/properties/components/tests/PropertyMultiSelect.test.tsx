@@ -8,12 +8,23 @@ import userEvent from '@testing-library/user-event';
 import {ComponentProps} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
+import {ClusterElementContextI, ClusterElementProvider} from '../../ClusterElementContext';
 import PropertyMultiSelect from '../PropertyMultiSelect';
 
 const hoisted = vi.hoisted(() => ({
     clusterElementOptionsQuery: vi.fn(),
+    contextClusterElementOptionsQuery: vi.fn(),
     workflowNodeOptionsQuery: vi.fn(),
 }));
+
+vi.mock('@/shared/middleware/graphql', async () => {
+    const actual = await vi.importActual<typeof import('@/shared/middleware/graphql')>('@/shared/middleware/graphql');
+
+    return {
+        ...actual,
+        useClusterElementOptionsQuery: (...args: unknown[]) => hoisted.contextClusterElementOptionsQuery(...args),
+    };
+});
 
 vi.mock('@/shared/queries/platform/workflowNodeOptions.queries', () => ({
     useGetClusterElementNodeOptionsQuery: (...args: unknown[]) => hoisted.clusterElementOptionsQuery(...args),
@@ -81,6 +92,119 @@ beforeEach(() => {
 
     hoisted.workflowNodeOptionsQuery.mockReset();
     hoisted.workflowNodeOptionsQuery.mockReturnValue({data: undefined, isLoading: false});
+
+    hoisted.contextClusterElementOptionsQuery.mockReset();
+    hoisted.contextClusterElementOptionsQuery.mockReturnValue({data: undefined, isLoading: false});
+});
+
+describe('PropertyMultiSelect inside a cluster element form outside the workflow editor', () => {
+    const CLUSTER_ELEMENT_CONTEXT: ClusterElementContextI = {
+        clusterElementName: 'mcpTools',
+        componentName: 'mcpClient',
+        componentVersion: 1,
+        connectionId: 5,
+        connectionRequired: true,
+        inputParameters: {toolFilterType: 'INCLUDE'},
+    };
+
+    const TOOLS_PROPERTY = {label: 'Tools to Include', name: 'toolsToInclude'} as PropertyAllType;
+
+    const renderInClusterElementForm = (clusterElementContext: ClusterElementContextI = CLUSTER_ELEMENT_CONTEXT) =>
+        render(
+            <TooltipProvider>
+                <ClusterElementProvider value={clusterElementContext}>
+                    <PropertyMultiSelect
+                        deletePropertyButton={null}
+                        lookupDependsOnPaths={['toolFilterType']}
+                        optionsDataSource={{optionsLookupDependsOn: ['toolFilterType']}}
+                        path="toolsToInclude"
+                        property={TOOLS_PROPERTY}
+                        showInputTypeSwitchButton={false}
+                        value={[]}
+                        workflowId=""
+                    />
+                </ClusterElementProvider>
+            </TooltipProvider>
+        );
+
+    beforeEach(() => {
+        useWorkflowNodeDetailsPanelStore.setState({currentNode: undefined});
+    });
+
+    it('loads the options by component, cluster element and connection', async () => {
+        hoisted.contextClusterElementOptionsQuery.mockReturnValue({
+            data: {clusterElementOptions: [{label: 'notion-search', value: 'notion-search'}]},
+            isLoading: false,
+        });
+
+        renderInClusterElementForm();
+
+        const [variables, queryOptions] = lastQueryCall(hoisted.contextClusterElementOptionsQuery);
+
+        expect(variables).toEqual({
+            clusterElementName: 'mcpTools',
+            componentName: 'mcpClient',
+            componentVersion: 1,
+            connectionId: 5,
+            inputParameters: {toolFilterType: 'INCLUDE'},
+            lookupDependsOnPaths: ['toolFilterType'],
+            propertyName: 'toolsToInclude',
+        });
+        expect(queryOptions.enabled).toBe(true);
+
+        await userEvent.click(getTrigger());
+
+        expect(await screen.findByText('notion-search')).toBeInTheDocument();
+    });
+
+    it('says the options are loading while the slow server answers', () => {
+        hoisted.contextClusterElementOptionsQuery.mockReturnValue({data: undefined, isLoading: true});
+
+        renderInClusterElementForm();
+
+        expect(screen.getByRole('status')).toHaveTextContent('Loading options...');
+        expect(getTrigger()).toBeDisabled();
+    });
+
+    it('does not say the options are loading while the query waits for a connection', () => {
+        hoisted.contextClusterElementOptionsQuery.mockReturnValue({data: undefined, isLoading: true});
+
+        renderInClusterElementForm({...CLUSTER_ELEMENT_CONTEXT, connectionId: undefined});
+
+        expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    });
+
+    it('shows the default placeholder once the options are loaded', () => {
+        hoisted.contextClusterElementOptionsQuery.mockReturnValue({
+            data: {clusterElementOptions: [{label: 'notion-search', value: 'notion-search'}]},
+            isLoading: false,
+        });
+
+        renderInClusterElementForm();
+
+        expect(getTrigger()).toHaveTextContent('Select...');
+        expect(getTrigger()).toBeEnabled();
+    });
+
+    it('waits for a required connection', () => {
+        renderInClusterElementForm({...CLUSTER_ELEMENT_CONTEXT, connectionId: undefined});
+
+        expect(lastQueryCall(hoisted.contextClusterElementOptionsQuery)[1].enabled).toBe(false);
+    });
+
+    it('waits for the properties its options depend on', () => {
+        renderInClusterElementForm({...CLUSTER_ELEMENT_CONTEXT, inputParameters: {}});
+
+        expect(lastQueryCall(hoisted.contextClusterElementOptionsQuery)[1].enabled).toBe(false);
+    });
+
+    it('leaves the options to the workflow node queries inside the workflow editor', () => {
+        setCurrentNode({});
+
+        renderInClusterElementForm();
+
+        expect(lastQueryCall(hoisted.contextClusterElementOptionsQuery)[1].enabled).toBe(false);
+    });
 });
 
 describe('PropertyMultiSelect', () => {

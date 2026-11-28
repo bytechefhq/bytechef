@@ -16,8 +16,10 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
+import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
@@ -28,6 +30,7 @@ import {
     AuthorizationType,
     ComponentDefinition,
     ComponentDefinitionBasic,
+    GetOAuth2AuthorizationParametersRequestTypeEnum,
     Tag,
 } from '@/shared/middleware/platform/configuration';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
@@ -36,14 +39,15 @@ import {
     useGetConnectionDefinitionsQuery,
 } from '@/shared/queries/platform/connectionDefinitions.queries';
 import {
+    OAuth2Keys,
     useGetOAuth2AuthorizationParametersQuery,
     useGetOAuth2PropertiesQuery,
 } from '@/shared/queries/platform/oauth2.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
-import {ClipboardIcon, ExternalLinkIcon, InfoIcon, KeyRoundIcon, RocketIcon} from 'lucide-react';
-import {ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
+import {ChevronDownIcon, ClipboardIcon, ExternalLinkIcon, InfoIcon, KeyRoundIcon, RocketIcon} from 'lucide-react';
+import {ReactNode, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {Link} from 'react-router-dom';
 import {toast} from 'sonner';
@@ -52,8 +56,13 @@ import {twMerge} from 'tailwind-merge';
 import ComponentSelectionInput from './ComponentSelectionInput';
 import OAuth2Button from './OAuth2Button';
 import Scopes from './Scopes';
+import ConnectionPrefillPicker from './connection-prefill/ConnectionPrefillPicker';
+import {MCP_CLIENT_COMPONENT_NAME} from './connection-prefill/mcp-client/mcpServerCatalogPrefill';
+import {ConnectionPrefillOptionI} from './connection-prefill/types';
+import useConnectionPrefillOptions from './connection-prefill/useConnectionPrefillOptions';
 
 export interface ConnectionDialogFormProps {
+    additionalScopes?: string;
     authorizationType?: string;
     componentName: string;
     environmentId: number;
@@ -66,6 +75,26 @@ export interface ConnectionDialogFormProps {
 }
 
 const NO_AUTHORIZATION_OPTION_VALUE = 'NONE';
+
+function mergeAdditionalScopes(scopes: {[key: string]: boolean} | undefined, additionalScopes: string | undefined) {
+    const additionalScopeNames = (additionalScopes || '').split(/[\s,]+/).filter((scopeName) => scopeName);
+
+    return {
+        ...scopes,
+        ...Object.fromEntries(additionalScopeNames.map((scopeName) => [scopeName, true])),
+    };
+}
+
+const PREFILL_RESET_PARAMETER_NAMES = [
+    'authorizationUrl',
+    'clientId',
+    'clientSecret',
+    'headerPrefix',
+    'scopes',
+    'token',
+    'tokenUrl',
+    'transportType',
+];
 
 interface ConnectionDialogProps {
     componentDefinition?: ComponentDefinition;
@@ -119,6 +148,9 @@ const ConnectionDialog = ({
     const [connectionVersion, setConnectionVersion] = useState(connection?.connectionVersion || 1);
     const [isOpen, setIsOpen] = useState(!triggerNode);
     const [isUpdatingCredentials, setIsUpdatingCredentials] = useState(false);
+    const [automaticSignInServerLabel, setAutomaticSignInServerLabel] = useState<string>();
+    const [connectionPrefillValue, setConnectionPrefillValue] = useState<string>();
+    const [ownOAuthAppOpen, setOwnOAuthAppOpen] = useState(false);
     const [oAuth2Error, setOAuth2Error] = useState<string>();
     const [wizardStep, setWizardStep] = useState<'configuration_step' | 'oauth_step'>('configuration_step');
     const [selectedComponentDefinition, setSelectedComponentDefinition] = useState<
@@ -126,7 +158,10 @@ const ConnectionDialog = ({
     >(componentDefinition);
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
+    const prefilledConnectionNameRef = useRef<string>(undefined);
+
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentType = usePlatformTypeStore((state) => state.currentType);
 
     const form = useForm<ConnectionDialogFormProps>({
         defaultValues: {
@@ -170,7 +205,10 @@ const ConnectionDialog = ({
         data: oAuth2AuthorizationParameters,
         error: oAuth2AuthorizationParametersError,
         isLoading: oAuth2AuthorizationParametersLoading,
-    } = useGetOAuth2AuthorizationParametersQuery(getNewOAuth2AuthorizationParameters(), wizardStep === 'oauth_step');
+    } = useGetOAuth2AuthorizationParametersQuery(
+        getNewOAuth2AuthorizationParameters(),
+        isOpen && wizardStep === 'oauth_step'
+    );
 
     const {data: tags, error: tagsError, isLoading: tagsLoading} = useGetConnectionTagsQuery();
 
@@ -179,6 +217,12 @@ const ConnectionDialog = ({
         error: oAuth2PropertiesError,
         isLoading: oAuth2PropertiesLoading,
     } = useGetOAuth2PropertiesQuery();
+
+    const connectionPrefillOptions = useConnectionPrefillOptions(
+        selectedComponentDefinition?.name,
+        isOpen && !connection?.id && currentType !== PlatformType.EMBEDDED,
+        oAuth2Properties?.predefinedApps
+    );
 
     const queryClient = useQueryClient();
 
@@ -283,18 +327,138 @@ const ConnectionDialog = ({
 
     const showOAuth2Step = (isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) && isEnteringCredentials;
 
+    const showOAuthStepContent = wizardStep === 'oauth_step' && !oAuth2AuthorizationParametersLoading;
+
+    const requiresManualOAuth2Endpoints =
+        currentType === PlatformType.EMBEDDED &&
+        selectedComponentName === MCP_CLIENT_COMPONENT_NAME &&
+        getAuthorizationType() === 'OAUTH2_AUTHORIZATION_CODE_PKCE' &&
+        isEnteringCredentials;
+
+    const offersAutomaticSignIn =
+        currentType !== PlatformType.EMBEDDED &&
+        selectedComponentName === MCP_CLIENT_COMPONENT_NAME &&
+        getAuthorizationType() === 'OAUTH2_AUTHORIZATION_CODE_PKCE' &&
+        isEnteringCredentials;
+
+    const authorizationProperties = authorizations?.[0]?.properties;
+
+    const ownOAuthAppProperties = authorizationProperties?.filter((property) => property.name !== 'scopes') || [];
+
+    const selectedScopesValue = watch('selectedScopes');
+    const additionalScopesValue = watch('additionalScopes');
+
+    const requestedScopes = useMemo(() => {
+        const selectedScopes = selectedScopesValue ?? oAuth2AuthorizationParameters?.scopes;
+
+        return offersAutomaticSignIn ? mergeAdditionalScopes(selectedScopes, additionalScopesValue) : selectedScopes;
+    }, [additionalScopesValue, oAuth2AuthorizationParameters?.scopes, offersAutomaticSignIn, selectedScopesValue]);
+
+    const authorizationUrlValue = watch('parameters.authorizationUrl') as unknown as string | undefined;
+    const tokenUrlValue = watch('parameters.tokenUrl') as unknown as string | undefined;
+
+    const clientIdValue = watch('parameters.clientId') as unknown as string | undefined;
+
+    const manualOAuth2EndpointsMissing =
+        requiresManualOAuth2Endpoints && (!authorizationUrlValue?.trim() || !tokenUrlValue?.trim());
+
+    const optionalClientIdProperty = authorizations?.[0]?.properties?.find(
+        (property) => property.name === 'clientId' && !property.required
+    );
+
+    const selectedConnectionPrefill = connectionPrefillOptions.find(
+        (connectionPrefillOption) => connectionPrefillOption.value === connectionPrefillValue
+    )?.prefill;
+
+    const usesPredefinedAppEndpoints =
+        selectedConnectionPrefill?.credentialsRequired === false &&
+        authorizationUrlValue === selectedConnectionPrefill.parameters.authorizationUrl &&
+        tokenUrlValue === selectedConnectionPrefill.parameters.tokenUrl;
+
+    const manualOAuth2ClientIdMissing =
+        !usesPredefinedAppEndpoints &&
+        isOAuth2AuthorizationType &&
+        isEnteringCredentials &&
+        showAuthorizationProperties &&
+        !!optionalClientIdProperty &&
+        !!authorizationUrlValue?.trim() &&
+        !!tokenUrlValue?.trim() &&
+        !clientIdValue?.trim();
+
     const showRedirectUriInput =
         (isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) &&
         isEnteringCredentials &&
         !usePredefinedOAuthApp &&
         oAuth2Properties?.redirectUri;
 
+    const redirectUriField =
+        showRedirectUriInput && oAuth2Properties?.redirectUri ? (
+            <div className="space-y-2">
+                <Label>Redirect URI</Label>
+
+                <RedirectUriInput redirectUri={oAuth2Properties.redirectUri} />
+            </div>
+        ) : null;
+
     const tagNames = connection?.tags?.map((tag) => tag.name);
 
     const remainingTags = tags?.filter((tag) => !tagNames?.includes(tag.name));
 
+    function applyConnectionPrefill({label, prefill, value}: ConnectionPrefillOptionI) {
+        setConnectionPrefillValue(value);
+
+        const componentTitle = selectedComponentDefinition?.title || componentDefinition?.title;
+        const currentConnectionName = getValues('name');
+
+        if (
+            !currentConnectionName ||
+            currentConnectionName === componentTitle ||
+            currentConnectionName === prefilledConnectionNameRef.current
+        ) {
+            const prefilledConnectionName = componentTitle ? `${componentTitle} ${label}` : label;
+
+            prefilledConnectionNameRef.current = prefilledConnectionName;
+
+            setValue('name', prefilledConnectionName, {shouldValidate: true});
+        }
+
+        const authorizationTypeValues = authorizationOptions.map((authorizationOption) => authorizationOption.value);
+
+        const prefillAuthorizationType = authorizationTypeValues.includes(prefill.authorizationType)
+            ? prefill.authorizationType
+            : authorizationOptions[0]?.value;
+
+        setAuthorizationType(prefillAuthorizationType);
+        setAutomaticSignInServerLabel(prefill.credentialsRequired === false ? label : undefined);
+        setOwnOAuthAppOpen(prefill.credentialsRequired === true);
+        setUsePredefinedOAuthApp(false);
+        setValue('authorizationType', prefillAuthorizationType as string);
+
+        const prefillAuthorization = connectionDefinition?.authorizations?.find(
+            (authorization) => authorization.type === prefillAuthorizationType
+        );
+
+        const defaultValueProperties = [
+            ...(connectionDefinition?.properties || []),
+            ...(prefillAuthorization?.properties || []),
+        ];
+
+        for (const parameterName of PREFILL_RESET_PARAMETER_NAMES) {
+            const defaultValueProperty = defaultValueProperties.find((property) => property.name === parameterName) as
+                {defaultValue?: unknown} | undefined;
+
+            setValue(`parameters.${parameterName}`, defaultValueProperty?.defaultValue as never);
+        }
+
+        for (const [parameterName, parameterValue] of Object.entries(prefill.parameters)) {
+            setValue(`parameters.${parameterName}`, parameterValue as never, {shouldValidate: true});
+        }
+    }
+
     function closeDialog() {
         setIsOpen(false);
+
+        removeOAuth2AuthorizationParameters();
 
         setTimeout(() => {
             formReset();
@@ -302,6 +466,8 @@ const ConnectionDialog = ({
             setIsUpdatingCredentials(false);
             setOAuth2Error(undefined);
             setWizardStep('configuration_step');
+            setConnectionPrefillValue(undefined);
+            setAutomaticSignInServerLabel(undefined);
 
             if (!componentDefinition) {
                 setAuthorizationType(undefined);
@@ -317,9 +483,27 @@ const ConnectionDialog = ({
         }, 300);
     }
 
+    function getRequestedScopesParameters() {
+        if (!offersAutomaticSignIn) {
+            return {};
+        }
+
+        const requestedScopeNames = Object.keys(requestedScopes || {}).filter(
+            (scopeName) => requestedScopes?.[scopeName]
+        );
+
+        return {scopes: requestedScopeNames.length ? requestedScopeNames.join(',') : undefined};
+    }
+
     async function handleCodeSuccess(payload: CodePayloadI) {
         if (payload.code) {
-            await saveConnection(payload);
+            try {
+                await saveConnection({...payload, ...getRequestedScopesParameters()});
+            } catch (error) {
+                removeOAuth2AuthorizationParameters();
+
+                throw error;
+            }
         }
     }
 
@@ -337,8 +521,12 @@ const ConnectionDialog = ({
 
     async function handleTokenSuccess(payload: TokenPayloadI) {
         if (payload.access_token) {
-            await saveConnection(payload);
+            await saveConnection({...payload, ...getRequestedScopesParameters()});
         }
+    }
+
+    function removeOAuth2AuthorizationParameters() {
+        queryClient.removeQueries({queryKey: OAuth2Keys.oAuth2AuthorizationParametersPrefix});
     }
 
     function getAuthorizationType() {
@@ -380,11 +568,16 @@ const ConnectionDialog = ({
 
         return {
             authorizationType: authorizationType as AuthorizationType,
-            componentName,
+            componentName: componentName || (connection?.componentName as string),
+            connectionId: isUpdatingCredentials ? connection?.id : undefined,
             connectionVersion,
             parameters: {
                 ...parameters,
             },
+            type:
+                currentType === PlatformType.EMBEDDED
+                    ? GetOAuth2AuthorizationParametersRequestTypeEnum.Embedded
+                    : GetOAuth2AuthorizationParametersRequestTypeEnum.Automation,
         };
     }
 
@@ -569,7 +762,7 @@ const ConnectionDialog = ({
                         <DialogBody className="flex min-w-0 flex-col">
                             {errors?.length > 0 && <Errors errors={errors} />}
 
-                            {(wizardStep === 'configuration_step' || oAuth2AuthorizationParametersLoading) && (
+                            {!showOAuthStepContent && (
                                 <>
                                     {isUpdatingCredentials && connection?.credentialStatus === 'INVALID' && (
                                         <Alert variant="destructive">
@@ -620,6 +813,14 @@ const ConnectionDialog = ({
                                                 );
                                             }}
                                             rules={{required: true}}
+                                        />
+                                    )}
+
+                                    {!connection?.id && (
+                                        <ConnectionPrefillPicker
+                                            onSelect={applyConnectionPrefill}
+                                            options={connectionPrefillOptions}
+                                            value={connectionPrefillValue}
                                         />
                                     )}
 
@@ -765,27 +966,97 @@ const ConnectionDialog = ({
                                         />
                                     )}
 
-                                    {showRedirectUriInput && oAuth2Properties?.redirectUri && (
-                                        <div className="space-y-2">
-                                            <Label>Redirect URI</Label>
-
-                                            <RedirectUriInput redirectUri={oAuth2Properties.redirectUri} />
-                                        </div>
-                                    )}
+                                    {!offersAutomaticSignIn && redirectUriField}
 
                                     {isEnteringCredentials &&
                                         showAuthorizationProperties &&
-                                        !!authorizations?.length &&
-                                        authorizations[0]?.properties && (
+                                        !!authorizationProperties &&
+                                        !offersAutomaticSignIn && (
                                             <WorkflowMockProvider>
                                                 <Properties
                                                     control={control}
                                                     formState={formState}
                                                     hideFromAi={true}
-                                                    properties={authorizations[0]?.properties}
+                                                    properties={authorizationProperties}
                                                 />
                                             </WorkflowMockProvider>
                                         )}
+
+                                    {showAuthorizationProperties &&
+                                        !!authorizationProperties &&
+                                        offersAutomaticSignIn && (
+                                            <>
+                                                <Collapsible onOpenChange={setOwnOAuthAppOpen} open={ownOAuthAppOpen}>
+                                                    <fieldset className="space-y-4 border-0">
+                                                        <div className="space-y-1">
+                                                            <CollapsibleTrigger asChild>
+                                                                <Button
+                                                                    className="gap-1 text-sm"
+                                                                    size="inline"
+                                                                    type="button"
+                                                                    variant="link"
+                                                                >
+                                                                    Use your own OAuth app
+                                                                    <ChevronDownIcon
+                                                                        className={twMerge(
+                                                                            'transition-transform',
+                                                                            ownOAuthAppOpen && 'rotate-180'
+                                                                        )}
+                                                                    />
+                                                                </Button>
+                                                            </CollapsibleTrigger>
+
+                                                            <p className="text-sm text-content-neutral-secondary">
+                                                                {automaticSignInServerLabel
+                                                                    ? `${automaticSignInServerLabel} supports automatic sign-in, so you don't need your own OAuth app.`
+                                                                    : 'Leave these empty to sign in automatically.'}
+                                                            </p>
+                                                        </div>
+
+                                                        <CollapsibleContent className="space-y-4">
+                                                            {redirectUriField}
+
+                                                            <WorkflowMockProvider>
+                                                                <Properties
+                                                                    control={control}
+                                                                    formState={formState}
+                                                                    hideFromAi={true}
+                                                                    properties={ownOAuthAppProperties}
+                                                                />
+                                                            </WorkflowMockProvider>
+                                                        </CollapsibleContent>
+                                                    </fieldset>
+                                                </Collapsible>
+                                            </>
+                                        )}
+
+                                    {requiresManualOAuth2Endpoints && (
+                                        <Alert>
+                                            <InfoIcon className="size-4" />
+
+                                            <AlertTitle>Authorization URL and Token URL are required</AlertTitle>
+
+                                            <AlertDescription>
+                                                Automatic OAuth2 discovery isn&apos;t available for embedded
+                                                integrations yet. Enter the Authorization URL and Token URL of the MCP
+                                                server&apos;s OAuth app.
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
+
+                                    {manualOAuth2ClientIdMissing && (
+                                        <Alert>
+                                            <InfoIcon className="size-4" />
+
+                                            <AlertTitle>Client Id is required</AlertTitle>
+
+                                            <AlertDescription>
+                                                Enter the Client Id of the OAuth app registered with the server. It is
+                                                required when the Authorization URL and Token URL are set; leave both
+                                                empty to sign in automatically.
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
 
                                     {showOAuth2AppPredefined && (
                                         <div>
@@ -844,7 +1115,7 @@ const ConnectionDialog = ({
                                 </>
                             )}
 
-                            {!oAuth2AuthorizationParametersLoading && wizardStep === 'oauth_step' && (
+                            {showOAuthStepContent && (
                                 <>
                                     <Alert className="border-surface-brand-secondary bg-surface-brand-secondary text-content-brand-primary">
                                         <RocketIcon className="size-4" />
@@ -880,6 +1151,34 @@ const ConnectionDialog = ({
                                                     />
                                                 );
                                             }}
+                                        />
+                                    )}
+
+                                    {offersAutomaticSignIn && (
+                                        <FormField
+                                            control={control}
+                                            name="additionalScopes"
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        {scopes && Object.keys(scopes).length > 0
+                                                            ? 'Additional scopes'
+                                                            : 'Scopes'}
+                                                    </FormLabel>
+
+                                                    <FormControl>
+                                                        <Input
+                                                            placeholder="scope1, scope2"
+                                                            {...field}
+                                                            value={field.value || ''}
+                                                        />
+                                                    </FormControl>
+
+                                                    <FormDescription>
+                                                        Comma-separated scopes to request from the server.
+                                                    </FormDescription>
+                                                </FormItem>
+                                            )}
                                         />
                                     )}
                                 </>
@@ -927,13 +1226,14 @@ const ConnectionDialog = ({
                                     </SelectContent>
                                 </Select>
 
-                                {wizardStep === 'oauth_step' && (
+                                {showOAuthStepContent && (
                                     <Button
                                         label="Previous"
                                         onClick={() => {
                                             connectionMutation.reset();
 
                                             setOAuth2Error(undefined);
+                                            setValue('selectedScopes', undefined);
 
                                             setWizardStep('configuration_step');
                                         }}
@@ -942,15 +1242,20 @@ const ConnectionDialog = ({
                                     />
                                 )}
 
-                                {wizardStep === 'configuration_step' && (
+                                {!showOAuthStepContent && (
                                     <Button label="Cancel" onClick={closeDialog} type="button" variant="outline" />
                                 )}
 
                                 {showOAuth2Step && (
                                     <>
-                                        {wizardStep === 'configuration_step' && (
+                                        {!showOAuthStepContent && (
                                             <Button
-                                                disabled={!formState.isValid}
+                                                disabled={
+                                                    wizardStep === 'oauth_step' ||
+                                                    !formState.isValid ||
+                                                    manualOAuth2EndpointsMissing ||
+                                                    manualOAuth2ClientIdMissing
+                                                }
                                                 label="Next"
                                                 onClick={handleSubmit(() => {
                                                     setWizardStep('oauth_step');
@@ -959,10 +1264,13 @@ const ConnectionDialog = ({
                                             />
                                         )}
 
-                                        {wizardStep === 'oauth_step' &&
+                                        {showOAuthStepContent &&
                                             oAuth2AuthorizationParameters?.authorizationUrl &&
                                             oAuth2AuthorizationParameters?.clientId && (
                                                 <OAuth2Button
+                                                    authorizationContext={
+                                                        oAuth2AuthorizationParameters.authorizationContext
+                                                    }
                                                     authorizationUrl={oAuth2AuthorizationParameters.authorizationUrl}
                                                     clientId={oAuth2AuthorizationParameters.clientId}
                                                     componentName={selectedComponentName}
@@ -977,9 +1285,7 @@ const ConnectionDialog = ({
                                                     onTokenSuccess={handleTokenSuccess}
                                                     redirectUri={oAuth2Properties?.redirectUri ?? ''}
                                                     responseType={isOAuth2AuthorizationType ? 'code' : 'token'}
-                                                    scopes={
-                                                        watch('selectedScopes') ?? oAuth2AuthorizationParameters?.scopes
-                                                    }
+                                                    scopes={requestedScopes}
                                                 />
                                             )}
                                     </>

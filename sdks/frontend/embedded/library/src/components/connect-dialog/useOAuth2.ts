@@ -9,6 +9,7 @@ const objectToQuery = (object: Record<string, string>) => {
 };
 
 interface Oauth2Props {
+    authorizationContext?: string;
     authorizationUrl: string;
     clientId: string;
     redirectUri: string;
@@ -31,10 +32,10 @@ const enhanceAuthorizationUrl = (
     scope: string,
     state: string,
     responseType: Oauth2Props['responseType'],
-    extraQueryParametersRef: React.MutableRefObject<Oauth2Props['extraQueryParameters']>
+    extraQueryParameters: Oauth2Props['extraQueryParameters']
 ) => {
     const authorizationQueryParameters = Object.fromEntries(
-        Object.entries(extraQueryParametersRef.current ?? {}).filter(([key]) => key !== 'code_verifier')
+        Object.entries(extraQueryParameters ?? {}).filter(([key]) => key !== 'code_verifier')
     );
 
     const query = objectToQuery({
@@ -105,6 +106,7 @@ const cleanup = (
 };
 
 const useOAuth2 = ({
+    authorizationContext,
     authorizationUrl,
     clientId,
     extraQueryParameters,
@@ -115,11 +117,13 @@ const useOAuth2 = ({
     responseType,
     scope = '',
 }: Oauth2Props) => {
+    const authorizationContextRef = useRef(authorizationContext);
     const extraQueryParametersRef = useRef(extraQueryParameters);
     const popupRef = useRef<Window | null>(null);
     const currentStateRef = useRef(undefined);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const intervalRef = useRef<any | null>(null);
+    const messageListenerRef = useRef<((message: MessageEvent) => void) | null>(null);
 
     const [{error, loading}, setUI] = useState<{
         loading: boolean;
@@ -127,11 +131,20 @@ const useOAuth2 = ({
     }>({error: null, loading: false});
 
     const getAuth = useCallback(() => {
+        if (messageListenerRef.current) {
+            cleanup(intervalRef, popupRef, messageListenerRef.current);
+
+            messageListenerRef.current = null;
+        }
+
         // 1. Init
         setUI({
             error: null,
             loading: true,
         });
+
+        const authorizationContextSnapshot = authorizationContextRef.current;
+        const extraQueryParametersSnapshot = extraQueryParametersRef.current;
 
         // 2. Generate and save state
         const state = generateState();
@@ -147,7 +160,7 @@ const useOAuth2 = ({
                 scope,
                 state,
                 responseType,
-                extraQueryParametersRef
+                extraQueryParametersSnapshot
             )
         );
 
@@ -199,7 +212,8 @@ const useOAuth2 = ({
                     if (responseType === 'code' && onCodeSuccess) {
                         onCodeSuccess({
                             ...payload,
-                            code_verifier: extraQueryParametersRef.current?.code_verifier,
+                            authorizationContext: authorizationContextSnapshot,
+                            code_verifier: extraQueryParametersSnapshot?.code_verifier,
                         });
                     } else {
                         if (onTokenSuccess) {
@@ -226,6 +240,8 @@ const useOAuth2 = ({
         }
 
         window.addEventListener('message', handleMessageListener);
+
+        messageListenerRef.current = handleMessageListener;
 
         // 4. Begin interval to check if popup was closed forcefully by the user
         intervalRef.current = setInterval(() => {
@@ -256,6 +272,10 @@ const useOAuth2 = ({
             }
         };
     }, [authorizationUrl, clientId, redirectUri, scope, responseType, onCodeSuccess, onTokenSuccess, onError, setUI]);
+
+    useEffect(() => {
+        authorizationContextRef.current = authorizationContext;
+    }, [authorizationContext]);
 
     useEffect(() => {
         extraQueryParametersRef.current = extraQueryParameters;
