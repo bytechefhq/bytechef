@@ -21,6 +21,8 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Oauth2;
 import com.bytechef.config.ApplicationProperties.Oauth2.OAuth2App;
+import com.bytechef.platform.githubproxy.client.model.McpServerCatalogAuthentication;
+import com.bytechef.platform.githubproxy.client.model.McpServerCatalogEntry;
 import com.bytechef.platform.githubproxy.client.model.OAuthApp;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -36,12 +38,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class OAuth2ServiceImpl implements OAuth2Service {
 
+    private static final String MCP_CLIENT_COMPONENT_NAME = "mcpClient";
+    private static final String MCP_CLIENT_URL = "url";
+    private static final String OAUTH2_AUTHENTICATION_TYPE = "oauth2";
+
     private final Oauth2 oauth2;
+    private final RemoteMcpServerCatalogClient remoteMcpServerCatalogClient;
     private final RemoteOAuth2AppsClient remoteOAuth2AppsClient;
 
-    public OAuth2ServiceImpl(ApplicationProperties applicationProperties,
+    public OAuth2ServiceImpl(
+        ApplicationProperties applicationProperties, RemoteMcpServerCatalogClient remoteMcpServerCatalogClient,
         RemoteOAuth2AppsClient remoteOAuth2AppsClient) {
+
         this.oauth2 = applicationProperties.getOauth2();
+        this.remoteMcpServerCatalogClient = remoteMcpServerCatalogClient;
         this.remoteOAuth2AppsClient = remoteOAuth2AppsClient;
     }
 
@@ -49,28 +59,17 @@ public class OAuth2ServiceImpl implements OAuth2Service {
     public Map<String, ?> checkPredefinedParameters(String componentName, Map<String, ?> parameters) {
         Map<String, Object> newParameters = new HashMap<>(parameters);
 
-        if (StringUtils.isBlank(MapUtils.getString(parameters, Authorization.CLIENT_ID))) {
-            Map<String, OAuth2App> predefinedOAuth2Apps = oauth2.getPredefinedApps();
+        if (StringUtils.isNotBlank(MapUtils.getString(parameters, Authorization.CLIENT_ID))) {
+            return newParameters;
+        }
 
-            OAuth2App oAuth2App = predefinedOAuth2Apps.get(componentName);
+        PredefinedApp predefinedApp = findPredefinedApp(componentName);
 
-            if (oAuth2App != null) {
-                newParameters.putAll(
-                    Map.of(
-                        Authorization.CLIENT_ID, oAuth2App.getClientId(),
-                        Authorization.CLIENT_SECRET, oAuth2App.getClientSecret()));
-            } else {
-                Map<String, OAuthApp> remoteOAuth2Apps = remoteOAuth2AppsClient.getOAuth2Apps();
-
-                OAuthApp oAuthApp = remoteOAuth2Apps.get(componentName);
-
-                if (oAuthApp != null) {
-                    newParameters.putAll(
-                        Map.of(
-                            Authorization.CLIENT_ID, oAuthApp.clientId(),
-                            Authorization.CLIENT_SECRET, oAuthApp.clientSecret()));
-                }
-            }
+        if (predefinedApp != null) {
+            newParameters.put(Authorization.CLIENT_ID, predefinedApp.clientId());
+            newParameters.put(Authorization.CLIENT_SECRET, predefinedApp.clientSecret());
+        } else if (MCP_CLIENT_COMPONENT_NAME.equals(componentName)) {
+            applyMcpServerCatalogApp(newParameters);
         }
 
         return newParameters;
@@ -96,5 +95,64 @@ public class OAuth2ServiceImpl implements OAuth2Service {
                 .toList());
 
         return List.copyOf(names);
+    }
+
+    private void applyMcpServerCatalogApp(Map<String, Object> parameters) {
+        String url = MapUtils.getString(parameters, MCP_CLIENT_URL);
+
+        if (StringUtils.isBlank(url)) {
+            return;
+        }
+
+        String trimmedUrl = url.trim();
+
+        for (McpServerCatalogEntry mcpServerCatalogEntry : remoteMcpServerCatalogClient.getMcpServerCatalog()) {
+            McpServerCatalogAuthentication authentication = mcpServerCatalogEntry.authentication();
+
+            if (trimmedUrl.equals(mcpServerCatalogEntry.url()) && hasPredefinedAppEndpoints(authentication) &&
+                StringUtils.isNotBlank(mcpServerCatalogEntry.component())) {
+
+                PredefinedApp predefinedApp = findPredefinedApp(mcpServerCatalogEntry.component());
+
+                if (predefinedApp != null) {
+                    parameters.put(Authorization.CLIENT_ID, predefinedApp.clientId());
+                    parameters.put(Authorization.CLIENT_SECRET, predefinedApp.clientSecret());
+                    parameters.put(Authorization.AUTHORIZATION_URL, authentication.authorizationUrl());
+                    parameters.put(Authorization.TOKEN_URL, authentication.tokenUrl());
+                }
+
+                return;
+            }
+        }
+    }
+
+    private PredefinedApp findPredefinedApp(String componentName) {
+        Map<String, OAuth2App> predefinedOAuth2Apps = oauth2.getPredefinedApps();
+
+        OAuth2App oAuth2App = predefinedOAuth2Apps.get(componentName);
+
+        if (oAuth2App != null) {
+            return new PredefinedApp(oAuth2App.getClientId(), oAuth2App.getClientSecret());
+        }
+
+        Map<String, OAuthApp> remoteOAuth2Apps = remoteOAuth2AppsClient.getOAuth2Apps();
+
+        OAuthApp oAuthApp = remoteOAuth2Apps.get(componentName);
+
+        if (oAuthApp != null) {
+            return new PredefinedApp(oAuthApp.clientId(), oAuthApp.clientSecret());
+        }
+
+        return null;
+    }
+
+    private static boolean hasPredefinedAppEndpoints(McpServerCatalogAuthentication authentication) {
+        return authentication != null && OAUTH2_AUTHENTICATION_TYPE.equals(authentication.type()) &&
+            !Boolean.TRUE.equals(authentication.dynamicClientRegistration()) &&
+            StringUtils.isNotBlank(authentication.authorizationUrl()) &&
+            StringUtils.isNotBlank(authentication.tokenUrl());
+    }
+
+    private record PredefinedApp(String clientId, String clientSecret) {
     }
 }
