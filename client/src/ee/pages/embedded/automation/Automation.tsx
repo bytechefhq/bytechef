@@ -16,7 +16,9 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import WorkflowTestRunLeaveDialog from '@/shared/components/WorkflowTestRunLeaveDialog';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useWorkflowTestRunGuard} from '@/shared/hooks/useWorkflowTestRunGuard';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
 import {PlatformType, useAutomationProjectsQuery} from '@/shared/middleware/graphql';
@@ -35,6 +37,7 @@ import {
     useGetWorkspaceConnectionsQuery,
 } from '@/shared/queries/automation/connections.queries';
 import {WorkflowKeys, useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
+import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef} from 'react';
@@ -171,6 +174,17 @@ const Automation = () => {
             .getState()
             .register(() => ({projectOwner: 'EMBEDDED_AUTOMATION_PROJECT'}));
     }, []);
+
+    useEffect(() => {
+        return useCopilotPostTurnRegistry.getState().register(Source.WORKFLOW_EDITOR_EMBEDDED_AUTOMATION, () => {
+            if (workflowId) {
+                void queryClient.invalidateQueries({queryKey: WorkflowKeys.workflow(workflowId)});
+            }
+
+            void queryClient.invalidateQueries({queryKey: ['automationProjects']});
+            void queryClient.invalidateQueries({queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations});
+        });
+    }, [queryClient, workflowId]);
 
     return (
         <div className="flex w-full">

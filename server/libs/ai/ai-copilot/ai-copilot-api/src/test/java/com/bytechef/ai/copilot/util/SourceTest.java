@@ -41,6 +41,19 @@ class SourceTest {
     }
 
     @Test
+    void testEmbeddedAutomationSourceRunsTheWorkflowEditorAgents() {
+        assertThat(Source.fromId("workflow_editor_embedded_automation"))
+            .contains(Source.WORKFLOW_EDITOR_EMBEDDED_AUTOMATION);
+        assertThat(Source.WORKFLOW_EDITOR_EMBEDDED_AUTOMATION.agentId(Mode.ASK)).isEqualTo("workflow_editor_ask");
+        assertThat(Source.WORKFLOW_EDITOR_EMBEDDED_AUTOMATION.agentId(Mode.BUILD)).isEqualTo("workflow_editor_build");
+        assertThat(Source.WORKFLOW_EDITOR_EMBEDDED_AUTOMATION.workflowOwner())
+            .isEqualTo(WorkflowOwner.AUTOMATION_PROJECT);
+
+        assertThatThrownBy(() -> Source.WORKFLOW_EDITOR_EMBEDDED_AUTOMATION.resolveMode(null))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     void testBuildOnlySourcesAlwaysResolveToBuild() {
         assertThat(Source.CONVERTER.resolveMode(Mode.ASK)).isEqualTo(Mode.BUILD);
         assertThat(Source.MCP_SERVER.resolveMode(null)).isEqualTo(Mode.BUILD);
@@ -65,7 +78,7 @@ class SourceTest {
 
         assertThat(Source.values())
             .filteredOn(source -> !source.name()
-                .endsWith("_EMBEDDED"))
+                .contains("_EMBEDDED"))
             .allMatch(source -> source.workflowOwner() == WorkflowOwner.PROJECT);
     }
 }

@@ -8,6 +8,9 @@
 package com.bytechef.ee.embedded.configuration.copilot;
 
 import com.bytechef.ai.copilot.security.CopilotEmbeddedAccessChecker;
+import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
 import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentication;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -24,11 +27,27 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class EmbeddedCopilotAccessChecker implements CopilotEmbeddedAccessChecker {
 
+    private final AutomationProjectFacade automationProjectFacade;
     private final IntegrationWorkflowFacade integrationWorkflowFacade;
+    private final ProjectService projectService;
 
     @SuppressFBWarnings("EI")
-    public EmbeddedCopilotAccessChecker(IntegrationWorkflowFacade integrationWorkflowFacade) {
+    public EmbeddedCopilotAccessChecker(
+        AutomationProjectFacade automationProjectFacade, IntegrationWorkflowFacade integrationWorkflowFacade,
+        ProjectService projectService) {
+
+        this.automationProjectFacade = automationProjectFacade;
         this.integrationWorkflowFacade = integrationWorkflowFacade;
+        this.projectService = projectService;
+    }
+
+    @Override
+    public AutomationProjectScope checkAutomationProjectWorkflowAccess(String workflowId) {
+        long projectId = automationProjectFacade.getProjectWorkflowProjectId(workflowId);
+
+        Project project = projectService.getProject(projectId);
+
+        return new AutomationProjectScope(projectId, project.getWorkspaceId());
     }
 
     @Override

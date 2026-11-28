@@ -27,6 +27,7 @@ export enum Source {
     CODE_WORKFLOW_EMBEDDED = 'CODE_WORKFLOW_EMBEDDED',
     CUSTOM_COMPONENT = 'CUSTOM_COMPONENT',
     WORKFLOW_EDITOR_EMBEDDED = 'WORKFLOW_EDITOR_EMBEDDED',
+    WORKFLOW_EDITOR_EMBEDDED_AUTOMATION = 'WORKFLOW_EDITOR_EMBEDDED_AUTOMATION',
     WORKFLOW_EXECUTION_EMBEDDED = 'WORKFLOW_EXECUTION_EMBEDDED',
     KNOWLEDGE_BASE = 'KNOWLEDGE_BASE',
     DATA_TABLE = 'DATA_TABLE',
@@ -40,7 +41,9 @@ export enum Source {
 }
 
 export const isWorkflowEditorSource = (source: Source) =>
-    source === Source.WORKFLOW_EDITOR || source === Source.WORKFLOW_EDITOR_EMBEDDED;
+    source === Source.WORKFLOW_EDITOR ||
+    source === Source.WORKFLOW_EDITOR_EMBEDDED ||
+    source === Source.WORKFLOW_EDITOR_EMBEDDED_AUTOMATION;
 
 export interface CodeEditorCopilotParametersI {
     language: string;

@@ -22,6 +22,7 @@ import com.agui.server.spring.AgUiParameters;
 import com.agui.server.spring.AgUiService;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ai.copilot.security.CopilotEmbeddedAccessChecker;
+import com.bytechef.ai.copilot.security.CopilotEmbeddedAccessChecker.AutomationProjectScope;
 import com.bytechef.ai.copilot.util.Mode;
 import com.bytechef.ai.copilot.util.Source;
 import com.bytechef.ai.copilot.util.Source.WorkflowOwner;
@@ -111,7 +112,13 @@ class CopilotChatFacadeImpl implements CopilotChatFacade {
 
         boolean build = mode == Mode.BUILD;
 
-        if (source.workflowOwner() == WorkflowOwner.INTEGRATION) {
+        AutomationProjectScope automationProjectScope = null;
+
+        if (source.workflowOwner() == WorkflowOwner.AUTOMATION_PROJECT) {
+            automationProjectScope = authorizeAutomationProjectWorkflowAccess(stateMap);
+
+            stateMap.put(CopilotConstants.STATE_WORKSPACE_ID, automationProjectScope.workspaceId());
+        } else if (source.workflowOwner() == WorkflowOwner.INTEGRATION) {
             authorizeIntegrationWorkflowAccess(stateMap);
         } else {
             authorizeWorkflowAccess(stateMap, build);
@@ -122,6 +129,10 @@ class CopilotChatFacadeImpl implements CopilotChatFacade {
         stateMap.remove(CopilotConstants.STATE_AUTHENTICATED_USER_ID);
         stateMap.remove(CopilotConstants.STATE_CONVERSATION_SCOPE);
         stateMap.remove(CopilotConstants.STATE_SCOPED_PROJECT_ID);
+
+        if (automationProjectScope != null) {
+            stateMap.put(CopilotConstants.STATE_SCOPED_PROJECT_ID, automationProjectScope.projectId());
+        }
 
         String login = SecurityUtils.fetchCurrentUserLogin()
             .orElseThrow(() -> new AccessDeniedException("The Copilot run has no authenticated user"));
@@ -165,6 +176,22 @@ class CopilotChatFacadeImpl implements CopilotChatFacade {
         stateMap.put(CopilotConstants.STATE_AUTHENTICATED_USER_ID, userId.get());
 
         return userId.get();
+    }
+
+    private AutomationProjectScope authorizeAutomationProjectWorkflowAccess(Map<String, Object> stateMap) {
+        if (!(stateMap.get("workflowId") instanceof String workflowId) || workflowId.isBlank()) {
+            throw new AccessDeniedException("The embedded automation Copilot run has no workflow");
+        }
+
+        if (copilotEmbeddedAccessChecker == null) {
+            throw new AccessDeniedException("Workflow authorization is not available");
+        }
+
+        try {
+            return copilotEmbeddedAccessChecker.checkAutomationProjectWorkflowAccess(workflowId);
+        } catch (IllegalArgumentException exception) {
+            throw new AccessDeniedException("Access denied to workflow " + workflowId, exception);
+        }
     }
 
     private void authorizeIntegrationWorkflowAccess(Map<String, Object> stateMap) {

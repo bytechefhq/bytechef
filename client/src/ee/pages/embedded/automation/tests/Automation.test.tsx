@@ -1,8 +1,11 @@
 import {TooltipProvider} from '@/components/Tooltip/Tooltip';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {fireEvent, render, screen, userEvent} from '@/shared/util/test-utils';
+import {QueryClient} from '@tanstack/react-query';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -300,5 +303,18 @@ describe('Automation', () => {
 
         expect(useWorkflowEditorStore.getState().workflowTestExecution).toBeUndefined();
         expect(useWorkflowEditorStore.getState().workflowTestNodeStates).toEqual({});
+    });
+
+    it('refreshes the workflow and the automation projects after an embedded automation Copilot turn', () => {
+        const invalidateQueriesSpy = vi.spyOn(QueryClient.prototype, 'invalidateQueries');
+
+        renderAutomation();
+
+        useCopilotPostTurnRegistry.getState().runFor(Source.WORKFLOW_EDITOR_EMBEDDED_AUTOMATION);
+
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['automations', 'draft-workflow-1']});
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['automationProjects']});
+
+        invalidateQueriesSpy.mockRestore();
     });
 });
