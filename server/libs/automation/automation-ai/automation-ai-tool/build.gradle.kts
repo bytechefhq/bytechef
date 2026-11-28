@@ -17,6 +17,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-core")
     implementation("org.springframework:spring-context")
     implementation("tools.jackson.core:jackson-databind")
+    implementation(project(":server:libs:automation:automation-ai:automation-ai-agent:automation-ai-agent-api"))
     implementation(project(":server:libs:ai:ai-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool-api"))

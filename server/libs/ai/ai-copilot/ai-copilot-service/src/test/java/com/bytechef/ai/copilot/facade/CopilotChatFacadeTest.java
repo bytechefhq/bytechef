@@ -33,6 +33,7 @@ import com.agui.server.spring.AgUiParameters;
 import com.agui.server.spring.AgUiService;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ai.copilot.security.CopilotEmbeddedAccessChecker;
+import com.bytechef.ai.copilot.security.CopilotEmbeddedAccessChecker.AutomationProjectScope;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -846,6 +847,113 @@ class CopilotChatFacadeTest {
         verify(copilotEmbeddedAccessChecker).checkIntegrationWorkflowAccess("wf1");
         verify(permissionService).hasWorkspaceRole(5L, "EDITOR");
         verify(projectWorkflowService, never()).getWorkflowProjectWorkflow(any());
+        verify(agUiService, never()).runAgent(any(), any());
+    }
+
+    @Test
+    void testChatEmbeddedAutomationWorkflowEditorScopesTheRunToTheWorkflowProject() {
+        LocalAgent agent = localAgent("workflow_editor_build");
+        CopilotEmbeddedAccessChecker copilotEmbeddedAccessChecker = mock(CopilotEmbeddedAccessChecker.class);
+
+        CopilotChatFacadeImpl facade = new CopilotChatFacadeImpl(
+            agUiService, List.of(agent), Optional.of(permissionService), Optional.of(projectWorkflowService),
+            Optional.empty(), Optional.of(copilotEmbeddedAccessChecker));
+
+        AgUiParameters parameters = parameters(
+            Map.<String, Object>of(
+                "workflowId", "wf1", CopilotConstants.STATE_WORKSPACE_ID, "5",
+                CopilotConstants.STATE_SCOPED_PROJECT_ID, 99L, "mode", "BUILD"));
+
+        when(copilotEmbeddedAccessChecker.checkAutomationProjectWorkflowAccess("wf1"))
+            .thenReturn(new AutomationProjectScope(7L, 1L));
+        when(permissionService.hasWorkspaceRole(1L, "EDITOR")).thenReturn(true);
+        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+
+        facade.chat("workflow_editor_embedded_automation", parameters);
+
+        State state = parameters.getState();
+
+        assertThat(state.getState())
+            .containsEntry(CopilotConstants.STATE_SCOPED_PROJECT_ID, 7L)
+            .containsEntry(CopilotConstants.STATE_WORKSPACE_ID, 1L);
+        verify(permissionService).hasWorkspaceRole(1L, "EDITOR");
+        verify(permissionService, never()).hasWorkspaceRole(5L, "EDITOR");
+        verify(projectWorkflowService, never()).getWorkflowProjectWorkflow(any());
+        verify(agUiService).runAgent(eq(agent), any());
+    }
+
+    @Test
+    void testChatEmbeddedAutomationWorkflowEditorDeniedWithoutAWorkflow() {
+        LocalAgent agent = localAgent("workflow_editor_ask");
+        CopilotEmbeddedAccessChecker copilotEmbeddedAccessChecker = mock(CopilotEmbeddedAccessChecker.class);
+
+        CopilotChatFacadeImpl facade = new CopilotChatFacadeImpl(
+            agUiService, List.of(agent), Optional.of(permissionService), Optional.of(projectWorkflowService),
+            Optional.empty(), Optional.of(copilotEmbeddedAccessChecker));
+
+        AgUiParameters parameters = parameters(Map.<String, Object>of("mode", "ASK"));
+
+        assertThatThrownBy(() -> facade.chat("workflow_editor_embedded_automation", parameters))
+            .isInstanceOf(AccessDeniedException.class)
+            .hasMessage("The embedded automation Copilot run has no workflow");
+
+        verify(agUiService, never()).runAgent(any(), any());
+    }
+
+    @Test
+    void testChatEmbeddedAutomationWorkflowEditorDeniedForAWorkflowOutsideAnAutomationProject() {
+        LocalAgent agent = localAgent("workflow_editor_ask");
+        CopilotEmbeddedAccessChecker copilotEmbeddedAccessChecker = mock(CopilotEmbeddedAccessChecker.class);
+
+        CopilotChatFacadeImpl facade = new CopilotChatFacadeImpl(
+            agUiService, List.of(agent), Optional.empty(), Optional.empty(), Optional.empty(),
+            Optional.of(copilotEmbeddedAccessChecker));
+
+        when(copilotEmbeddedAccessChecker.checkAutomationProjectWorkflowAccess("wf1"))
+            .thenThrow(new IllegalArgumentException("Project with id 7 is not an automation project"));
+
+        AgUiParameters parameters = parameters(Map.<String, Object>of("workflowId", "wf1", "mode", "ASK"));
+
+        assertThatThrownBy(() -> facade.chat("workflow_editor_embedded_automation", parameters))
+            .isInstanceOf(AccessDeniedException.class)
+            .hasMessage("Access denied to workflow wf1");
+
+        verify(agUiService, never()).runAgent(any(), any());
+    }
+
+    @Test
+    void testChatEmbeddedAutomationWorkflowEditorDeniedWhenTheEmbeddedAccessCheckerDenies() {
+        LocalAgent agent = localAgent("workflow_editor_ask");
+        CopilotEmbeddedAccessChecker copilotEmbeddedAccessChecker = mock(CopilotEmbeddedAccessChecker.class);
+
+        CopilotChatFacadeImpl facade = new CopilotChatFacadeImpl(
+            agUiService, List.of(agent), Optional.empty(), Optional.empty(), Optional.empty(),
+            Optional.of(copilotEmbeddedAccessChecker));
+
+        when(copilotEmbeddedAccessChecker.checkAutomationProjectWorkflowAccess("wf1"))
+            .thenThrow(new AccessDeniedException("denied"));
+
+        AgUiParameters parameters = parameters(Map.<String, Object>of("workflowId", "wf1", "mode", "ASK"));
+
+        assertThatThrownBy(() -> facade.chat("workflow_editor_embedded_automation", parameters))
+            .isInstanceOf(AccessDeniedException.class)
+            .hasMessage("denied");
+
+        verify(agUiService, never()).runAgent(any(), any());
+    }
+
+    @Test
+    void testChatEmbeddedAutomationWorkflowEditorFailsClosedWithoutTheEmbeddedAccessChecker() {
+        CopilotChatFacadeImpl facadeWithoutServices = new CopilotChatFacadeImpl(
+            agUiService, List.of(localAgent("workflow_editor_ask")), Optional.empty(), Optional.empty(),
+            Optional.empty(), Optional.empty());
+
+        AgUiParameters parameters = parameters(Map.<String, Object>of("workflowId", "wf1", "mode", "ASK"));
+
+        assertThatThrownBy(() -> facadeWithoutServices.chat("workflow_editor_embedded_automation", parameters))
+            .isInstanceOf(AccessDeniedException.class)
+            .hasMessage("Workflow authorization is not available");
+
         verify(agUiService, never()).runAgent(any(), any());
     }
 

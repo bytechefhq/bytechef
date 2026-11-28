@@ -21,8 +21,10 @@ import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/
 import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useEffect, useMemo} from 'react';
-import {useParams} from 'react-router-dom';
+import {useMatch, useParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
+
+const EMBEDDED_AUTOMATION_EDITOR_PATH = '/embedded/automations/:workflowUuid/editor';
 
 export const useWorkflowLayout = (includeComponents?: string[]) => {
     const {copilotPanelOpen, setCopilotPanelOpen} = useCopilotPanelStore(
@@ -96,8 +98,10 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         return noInputs && noConnections;
     }, [workflow]);
 
-    const {useGetComponentDefinitionsQuery} = useWorkflowEditor();
+    const {connectedUserWorkflowUuid, useGetComponentDefinitionsQuery} = useWorkflowEditor();
     const {integrationId} = useParams();
+
+    const embeddedAutomationEditorMatch = useMatch(EMBEDDED_AUTOMATION_EDITOR_PATH);
 
     const componentDefinitionsQueryParameters: object = {
         actionDefinitions: true,
@@ -172,14 +176,30 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         openIssuesSidebar();
     };
 
+    const getCopilotSource = () => {
+        if (connectedUserWorkflowUuid) {
+            return Source.WORKFLOW_BUILDER_EMBEDDED;
+        }
+
+        if (integrationId) {
+            return Source.WORKFLOW_EDITOR_EMBEDDED;
+        }
+
+        return embeddedAutomationEditorMatch ? Source.WORKFLOW_EDITOR_EMBEDDED_AUTOMATION : Source.WORKFLOW_EDITOR;
+    };
+
     const handleCopilotClick = () => {
         const {context: currentContext} = useCopilotStore.getState();
 
         setContext({
             ...currentContext,
             mode: isWorkflowEditorSource(currentContext.source) ? currentContext.mode : MODE.ASK,
-            parameters: integrationId ? {integrationId} : {},
-            source: integrationId ? Source.WORKFLOW_EDITOR_EMBEDDED : Source.WORKFLOW_EDITOR,
+            parameters: connectedUserWorkflowUuid
+                ? {workflowUuid: connectedUserWorkflowUuid}
+                : integrationId
+                  ? {integrationId}
+                  : {},
+            source: getCopilotSource(),
         });
 
         if (!copilotPanelOpen) {

@@ -35,6 +35,9 @@ public final class AiHubToolApprovalDefaults {
 
     private static final List<String> GATED_PREFIXES = List.of("delete", "drop", "rollback", "promote");
 
+    private static final List<String> READ_ONLY_COMPONENT_TOOL_PREFIXES = List.of(
+        "fetch", "find", "get", "list", "lookup", "query", "read", "search");
+
     private AiHubToolApprovalDefaults() {
     }
 
@@ -52,5 +55,21 @@ public final class AiHubToolApprovalDefaults {
         }
 
         return false;
+    }
+
+    public static boolean isComponentToolGatedByDefault(String clusterElementName) {
+        for (String prefix : READ_ONLY_COMPONENT_TOOL_PREFIXES) {
+            if (clusterElementName.equals(prefix)) {
+                return false;
+            }
+
+            if (clusterElementName.startsWith(prefix) && clusterElementName.length() > prefix.length()
+                && Character.isUpperCase(clusterElementName.charAt(prefix.length()))) {
+
+                return false;
+            }
+        }
+
+        return true;
     }
 }

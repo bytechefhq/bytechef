@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectWorkflowType;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import java.util.List;
@@ -68,6 +69,7 @@ class WorkflowSearchAssetProviderTest {
         when(projectWorkflow.getId()).thenReturn(id);
         when(projectWorkflow.getProjectId()).thenReturn(projectId);
         when(projectWorkflow.getWorkflowId()).thenReturn(workflowId);
+        when(projectWorkflow.getType()).thenReturn(ProjectWorkflowType.WORKFLOW);
 
         return projectWorkflow;
     }

@@ -43,6 +43,8 @@ public interface AutomationProjectFacade {
 
     List<AutomationProjectVersionWorkflowDTO> getProjectVersionWorkflows(long projectId, int projectVersion);
 
+    long getProjectWorkflowProjectId(String workflowId);
+
     List<AutomationProjectCategoryDTO> getCategories();
 
     List<AutomationProjectTagDTO> getTags();

@@ -51,21 +51,28 @@ import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.SearchDocsTools;
 import com.bytechef.ee.ai.hub.tool.UserRequestForwardingToolCallback;
+import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
+import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.platform.ai.tool.SecurityContextRehydrator;
 import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.component.tool.ComponentTools;
+import com.bytechef.platform.component.tool.TaskTools;
 import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
+import com.bytechef.platform.workflow.tool.TaskDispatcherTools;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
+import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
@@ -113,6 +120,17 @@ public class AiHubConfiguration {
     static final Set<String> COMPONENT_DEFINITION_TOOL_NAMES = Set.of("getAction", "getClusterElement", "getTrigger");
     static final Set<String> INTELLIGENT_TOOL_NAMES = Set.of("buildWorkflow", "importWorkflow");
 
+    static final Set<String> ASK_PINNED_TOOL_NAMES = Set.of(
+        "askUserQuestion", "checkWorkflow", "getWorkflow", "listProjects", "listWorkflows", "openWorkflowChatTab",
+        "openWorkflowTab", "searchProjects", "searchWorkflows");
+
+    static final Set<String> BUILD_PINNED_TOOL_NAMES = Set.of(
+        "askUserQuestion", "buildWorkflow", "checkWorkflow", "createConnection", "createProject",
+        "createProjectWorkflow", "getWorkflow", "importWorkflow", "listConnectionsForComponent", "listProjects",
+        "listWorkflows", "openWorkflowChatTab", "openWorkflowTab", "saveWorkflowTestConnection", "searchProjects",
+        "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection", "selectPropertyOption",
+        "selectTriggerPropertyOption");
+
     private static final String BUILD_WORKFLOW_TOOL_NAME = "buildWorkflow";
     private static final String UPDATE_WORKFLOW_TOOL_NAME = "updateWorkflow";
 
@@ -129,28 +147,18 @@ public class AiHubConfiguration {
         this.promptAiHubBuildResource = promptAiHubBuildResource;
     }
 
-    /**
-     * The LLM delegate the {@code ai_hub_ask} {@link AiHubRoutingAgent} wraps. It shares the router's agent id, so it
-     * is not a default candidate: unqualified {@code List<LocalAgent>} injection sees only the router, while
-     * {@code @Qualifier("aiHubAskSpringAIAgent")} injection still resolves it.
-     */
     @Bean(defaultCandidate = false)
-    AiHubSpringAIAgent aiHubAskSpringAIAgent(
-        AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
-        ReadProjectWorkflowTools readProjectWorkflowTools, WorkflowExecutionTools workflowExecutionTools,
-        ObjectProvider<ComponentTools> componentToolsProvider,
+    AiHubModeToolCallbacks aiHubAskToolCallbacks(
+        ReadProjectTools readProjectTools, ReadProjectWorkflowTools readProjectWorkflowTools,
+        WorkflowExecutionTools workflowExecutionTools, ObjectProvider<ComponentTools> componentToolsProvider,
         ObjectProvider<PersistedWorkflowChecker> persistedWorkflowCheckerProvider,
         ObjectProvider<ProjectService> projectServiceProvider,
         ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, ProjectWorkflowFacade projectWorkflowFacade,
         AiHubChatService chatService, AiHubChatAccessPolicy chatAccessPolicy,
-        SecurityContextRehydrator securityContextRehydrator, AiHubApprovalGate approvalGate,
-        ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
-        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
-        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
+        @Qualifier("copilotEmbeddingProviderStatusProvider") //
         ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
-        @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider)
-        throws AGUIException {
+        @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider) {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
             List.of(ToolCallbacks.from(readProjectTools, readProjectWorkflowTools, workflowExecutionTools)));
@@ -165,17 +173,13 @@ public class AiHubConfiguration {
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, null));
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
 
-        return buildAgent(
-            AiHubAgentType.AI_HUB_ASK, Mode.ASK, promptAiHubAskResource, toolCallbacks, aiHubSessionMemory, chatModel,
-            securityContextRehydrator, approvalGate, inFlightRunRegistryProvider, overrideChatClientResolverProvider,
-            webSearchToolCallbackProviderProvider);
+        return new AiHubModeToolCallbacks(toolCallbacks, ASK_PINNED_TOOL_NAMES);
     }
 
     @Bean(defaultCandidate = false)
-    AiHubSpringAIAgent aiHubBuildSpringAIAgent(
-        AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel, ProjectTools projectTools,
-        ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools, WorkflowExecutionTools workflowExecutionTools,
-        ObjectProvider<ComponentTools> componentToolsProvider,
+    AiHubModeToolCallbacks aiHubBuildToolCallbacks(
+        ProjectTools projectTools, ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools,
+        WorkflowExecutionTools workflowExecutionTools, ObjectProvider<ComponentTools> componentToolsProvider,
         ObjectProvider<PersistedWorkflowChecker> persistedWorkflowCheckerProvider,
         ObjectProvider<ProjectService> projectServiceProvider,
         ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
@@ -183,14 +187,10 @@ public class AiHubConfiguration {
         WorkspaceFacade workspaceFacade, ProjectWorkflowFacade projectWorkflowFacade,
         ProjectDeploymentFacade projectDeploymentFacade, AiHubChatService chatService,
         AiHubChatAccessPolicy chatAccessPolicy, AiHubChatArtifactRecorder aiHubChatArtifactRecorder,
-        SecurityContextRehydrator securityContextRehydrator, AiHubApprovalGate approvalGate,
         AiHubToolApprovalPolicy toolApprovalPolicy,
-        ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
-        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
-        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
+        @Qualifier("copilotEmbeddingProviderStatusProvider") //
         ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
-        @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider)
-        throws AGUIException {
+        @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider) {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
             buildProjectToolCallbacks(projectTools, projectWorkflowLifecycleTools, workflowExecutionTools));
@@ -215,10 +215,50 @@ public class AiHubConfiguration {
 
         requireBuildWorkflow(toolCallbacks);
 
+        return new AiHubModeToolCallbacks(toolCallbacks, BUILD_PINNED_TOOL_NAMES);
+    }
+
+    /**
+     * The LLM delegate the {@code ai_hub_ask} {@link AiHubRoutingAgent} wraps. It shares the router's agent id, so it
+     * is not a default candidate: unqualified {@code List<LocalAgent>} injection sees only the router, while
+     * {@code @Qualifier("aiHubAskSpringAIAgent")} injection still resolves it.
+     */
+    @Bean(defaultCandidate = false)
+    AiHubSpringAIAgent aiHubAskSpringAIAgent(
+        AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel,
+        @Qualifier("aiHubAskToolCallbacks") AiHubModeToolCallbacks aiHubAskToolCallbacks,
+        SecurityContextRehydrator securityContextRehydrator, AiHubApprovalGate approvalGate,
+        ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
+        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
+        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
+        @Qualifier("aiHubAskToolSearchToolCallAdvisor") //
+        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider)
+        throws AGUIException {
+
         return buildAgent(
-            AiHubAgentType.AI_HUB_BUILD, Mode.BUILD, promptAiHubBuildResource, toolCallbacks, aiHubSessionMemory,
-            chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
-            overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider);
+            AiHubAgentType.AI_HUB_ASK, Mode.ASK, promptAiHubAskResource, aiHubAskToolCallbacks.pinned(),
+            aiHubSessionMemory, chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
+            overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider,
+            toolSearchToolCallAdvisorProvider);
+    }
+
+    @Bean(defaultCandidate = false)
+    AiHubSpringAIAgent aiHubBuildSpringAIAgent(
+        AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel,
+        @Qualifier("aiHubBuildToolCallbacks") AiHubModeToolCallbacks aiHubBuildToolCallbacks,
+        SecurityContextRehydrator securityContextRehydrator, AiHubApprovalGate approvalGate,
+        ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
+        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
+        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
+        @Qualifier("aiHubBuildToolSearchToolCallAdvisor") //
+        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider)
+        throws AGUIException {
+
+        return buildAgent(
+            AiHubAgentType.AI_HUB_BUILD, Mode.BUILD, promptAiHubBuildResource, aiHubBuildToolCallbacks.pinned(),
+            aiHubSessionMemory, chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
+            overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider,
+            toolSearchToolCallAdvisorProvider);
     }
 
     /**
@@ -273,6 +313,32 @@ public class AiHubConfiguration {
     }
 
     @Bean
+    AiHubGlobalToolCatalog aiHubAskGlobalToolCatalog(
+        @Qualifier("aiHubAskToolCallbacks") AiHubModeToolCallbacks aiHubAskToolCallbacks,
+        ObjectProvider<ComponentTools> componentToolsProvider, ObjectProvider<TaskTools> taskToolsProvider,
+        ObjectProvider<TaskDispatcherTools> taskDispatcherToolsProvider) {
+
+        return new AiHubGlobalToolCatalog(
+            ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID,
+            catalogToolCallbacks(
+                aiHubAskToolCallbacks, componentToolsProvider, taskToolsProvider,
+                taskDispatcherToolsProvider));
+    }
+
+    @Bean
+    AiHubGlobalToolCatalog aiHubBuildGlobalToolCatalog(
+        @Qualifier("aiHubBuildToolCallbacks") AiHubModeToolCallbacks aiHubBuildToolCallbacks,
+        ObjectProvider<ComponentTools> componentToolsProvider, ObjectProvider<TaskTools> taskToolsProvider,
+        ObjectProvider<TaskDispatcherTools> taskDispatcherToolsProvider) {
+
+        return new AiHubGlobalToolCatalog(
+            ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID,
+            catalogToolCallbacks(
+                aiHubBuildToolCallbacks, componentToolsProvider, taskToolsProvider,
+                taskDispatcherToolsProvider));
+    }
+
+    @Bean
     AiHubPinnedToolCallbacks aiHubPinnedToolCallbacks(
         @Qualifier("aiHubAskSpringAIAgent") AiHubSpringAIAgent aiHubAskSpringAIAgent,
         @Qualifier("aiHubBuildSpringAIAgent") AiHubSpringAIAgent aiHubBuildSpringAIAgent) {
@@ -305,6 +371,50 @@ public class AiHubConfiguration {
             .filter(toolCallback -> COMPONENT_DEFINITION_TOOL_NAMES.contains(toolCallback.getToolDefinition()
                 .name()))
             .toList();
+    }
+
+    static List<ToolCallback> catalogToolCallbacks(
+        AiHubModeToolCallbacks modeToolCallbacks, ObjectProvider<ComponentTools> componentToolsProvider,
+        ObjectProvider<TaskTools> taskToolsProvider, ObjectProvider<TaskDispatcherTools> taskDispatcherToolsProvider) {
+
+        Map<String, ToolCallback> toolCallbacks = new LinkedHashMap<>();
+
+        addAbsent(toolCallbacks, modeToolCallbacks.unpinned());
+
+        ComponentTools componentTools = componentToolsProvider.getIfAvailable();
+
+        if (componentTools != null) {
+            addAbsent(toolCallbacks, List.of(ToolCallbacks.from(componentTools)));
+        }
+
+        TaskTools taskTools = taskToolsProvider.getIfAvailable();
+
+        if (taskTools != null) {
+            addAbsent(toolCallbacks, List.of(ToolCallbacks.from(taskTools)));
+        }
+
+        TaskDispatcherTools taskDispatcherTools = taskDispatcherToolsProvider.getIfAvailable();
+
+        if (taskDispatcherTools != null) {
+            addAbsent(toolCallbacks, List.of(ToolCallbacks.from(taskDispatcherTools)));
+        }
+
+        Set<String> pinnedToolNames = modeToolCallbacks.pinnedToolNames();
+
+        return toolCallbacks.values()
+            .stream()
+            .filter(toolCallback -> !pinnedToolNames.contains(
+                toolCallback.getToolDefinition()
+                    .name()))
+            .toList();
+    }
+
+    private static void addAbsent(Map<String, ToolCallback> toolCallbacksByName, List<ToolCallback> toolCallbacks) {
+        for (ToolCallback toolCallback : toolCallbacks) {
+            ToolDefinition toolDefinition = toolCallback.getToolDefinition();
+
+            toolCallbacksByName.putIfAbsent(toolDefinition.name(), toolCallback);
+        }
     }
 
     static List<ToolCallback> checkWorkflowToolCallbacks(
@@ -371,7 +481,8 @@ public class AiHubConfiguration {
         SecurityContextRehydrator securityContextRehydrator, AiHubApprovalGate approvalGate,
         ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
-        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider)
+        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
+        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider)
         throws AGUIException {
 
         AiHubSpringAIAgent.Builder builder = AiHubSpringAIAgent.builder()
@@ -389,6 +500,7 @@ public class AiHubConfiguration {
         builder.advisor(aiHubSessionMemory.createResentUserMessageAdvisor());
         builder.advisor(aiHubSessionMemory.createSessionMemoryAdvisor());
         builder.advisor(aiHubSessionMemory.createTurnEndingToolResultAdvisor(approvalGate::recordToolCallId));
+        toolSearchToolCallAdvisorProvider.ifAvailable(builder::advisor);
 
         overrideChatClientResolverProvider.ifAvailable(builder::overrideChatClientResolver);
         webSearchToolCallbackProviderProvider.ifAvailable(builder::webSearchToolCallbackProvider);

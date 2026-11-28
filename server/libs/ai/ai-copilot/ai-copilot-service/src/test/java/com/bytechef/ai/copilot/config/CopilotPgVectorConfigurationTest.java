@@ -19,10 +19,13 @@ package com.bytechef.ai.copilot.config;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Ai.Copilot.Embedding.Provider;
+import com.bytechef.platform.ai.provider.facade.AiProviderFacade;
+import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -34,6 +37,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreProperties;
 
 /**
  * @author Ivica Cardic
@@ -105,6 +109,59 @@ class CopilotPgVectorConfigurationTest {
         embeddingModel.embed("ByteChef");
 
         assertThat(authorizations).containsExactly("Bearer secret-token");
+    }
+
+    @Test
+    void testOllamaQueryEmbeddingModelUsesTheServerModelWithoutAUserKey() {
+        ApplicationProperties applicationProperties = mockOllamaApplicationProperties();
+        AiProviderFacade aiProviderFacade = mock(AiProviderFacade.class);
+
+        EmbeddingModel embeddingModel = new CopilotPgVectorConfiguration().copilotQueryEmbeddingModel(
+            applicationProperties, aiProviderFacade, new PgVectorStoreProperties());
+
+        embeddingModel.embed("ByteChef");
+
+        assertThat(requestPaths).containsExactly("/api/embed");
+        verifyNoInteractions(aiProviderFacade);
+    }
+
+    @Test
+    void testOpenAiQueryEmbeddingModelTakesTheKeyFromTheAiProviders() {
+        ApplicationProperties applicationProperties = mock(ApplicationProperties.class, RETURNS_DEEP_STUBS);
+
+        when(applicationProperties.getAi()
+            .getCopilot()
+            .getEmbedding()
+            .getProvider()).thenReturn(Provider.OPENAI);
+
+        EmbeddingModel embeddingModel = new CopilotPgVectorConfiguration().copilotQueryEmbeddingModel(
+            applicationProperties, mock(AiProviderFacade.class), new PgVectorStoreProperties());
+
+        assertThat(embeddingModel).isInstanceOf(CopilotQueryEmbeddingModel.class);
+    }
+
+    @Test
+    void testDocsSearchIsActiveWithOllamaOrAUserOpenAiKey() {
+        AiProviderFacade aiProviderFacade = mock(AiProviderFacade.class);
+
+        when(aiProviderFacade.getApiKey("ai.provider.openAi", 0)).thenReturn("user-key");
+
+        EmbeddingProviderStatusProvider ollamaStatusProvider = new CopilotPgVectorConfiguration()
+            .copilotEmbeddingProviderStatusProvider(mockOllamaApplicationProperties(), aiProviderFacade);
+
+        ApplicationProperties openAiApplicationProperties = mock(ApplicationProperties.class, RETURNS_DEEP_STUBS);
+
+        when(openAiApplicationProperties.getAi()
+            .getCopilot()
+            .getEmbedding()
+            .getProvider()).thenReturn(Provider.OPENAI);
+
+        EmbeddingProviderStatusProvider openAiStatusProvider = new CopilotPgVectorConfiguration()
+            .copilotEmbeddingProviderStatusProvider(openAiApplicationProperties, aiProviderFacade);
+
+        assertThat(ollamaStatusProvider.isEmbeddingActive(1)).isTrue();
+        assertThat(openAiStatusProvider.isEmbeddingActive(0)).isTrue();
+        assertThat(openAiStatusProvider.isEmbeddingActive(1)).isFalse();
     }
 
     private ApplicationProperties mockOllamaApplicationProperties() {

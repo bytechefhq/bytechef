@@ -96,6 +96,7 @@ export interface WorkflowEditorStateI extends WorkflowReadOnlyStateI {
     cancelWorkflowQueries: () => void;
     codeWorkflow?: boolean;
     codeWorkflowLanguage?: string;
+    connectedUserWorkflowUuid?: string;
     deleteClusterElementParameterMutation: UseMutationResult<
         DeleteClusterElementParameter200Response,
         Error,

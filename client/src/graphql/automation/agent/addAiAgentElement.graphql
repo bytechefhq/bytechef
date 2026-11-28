@@ -1,0 +1,10 @@
+mutation addAiAgentElement($input: AddAiAgentElementInput!) {
+    addAiAgentElement(input: $input) {
+        id
+        kind
+        referenceId
+        position
+        parameters
+        connectionId
+    }
+}

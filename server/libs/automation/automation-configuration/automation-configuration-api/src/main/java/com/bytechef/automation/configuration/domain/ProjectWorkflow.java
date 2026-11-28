@@ -68,6 +68,9 @@ public final class ProjectWorkflow {
     @Version
     private int version;
 
+    @Column("type")
+    private int type = ProjectWorkflowType.WORKFLOW.ordinal();
+
     public ProjectWorkflow() {
     }
 
@@ -86,6 +89,20 @@ public final class ProjectWorkflow {
         this.projectVersion = projectVersion;
         this.workflowId = workflowId;
         this.uuid = uuid;
+    }
+
+    public ProjectWorkflow(long projectId, int projectVersion, String workflowId, ProjectWorkflowType type) {
+        this(projectId, projectVersion, workflowId);
+
+        this.type = type.ordinal();
+    }
+
+    public ProjectWorkflow(
+        long projectId, int projectVersion, String workflowId, UUID uuid, ProjectWorkflowType type) {
+
+        this(projectId, projectVersion, workflowId, uuid);
+
+        this.type = type.ordinal();
     }
 
     @Override
@@ -152,6 +169,10 @@ public final class ProjectWorkflow {
         return version;
     }
 
+    public ProjectWorkflowType getType() {
+        return toEnum(ProjectWorkflowType.values(), type, "type");
+    }
+
     public void setProjectVersion(int projectVersion) {
         this.projectVersion = projectVersion;
     }
@@ -172,12 +193,26 @@ public final class ProjectWorkflow {
         this.version = version;
     }
 
+    public void setType(ProjectWorkflowType type) {
+        this.type = type.ordinal();
+    }
+
+    private static <T extends Enum<T>> T toEnum(T[] values, int ordinal, String propertyName) {
+        if (ordinal < 0 || ordinal >= values.length) {
+            throw new IllegalStateException(
+                "Invalid %s value: %d, expected 0..%d".formatted(propertyName, ordinal, values.length - 1));
+        }
+
+        return values[ordinal];
+    }
+
     @Override
     public String toString() {
         return "ProjectWorkflow{" +
             "id=" + id +
             ", projectId=" + projectId +
             ", projectVersion=" + projectVersion +
+            ", type=" + type +
             ", workflowId='" + workflowId + '\'' +
             ", uuid='" + uuid + '\'' +
             ", createdBy='" + createdBy + '\'' +

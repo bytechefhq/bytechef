@@ -27,6 +27,8 @@ export enum Source {
     CODE_WORKFLOW_EMBEDDED = 'CODE_WORKFLOW_EMBEDDED',
     CUSTOM_COMPONENT = 'CUSTOM_COMPONENT',
     WORKFLOW_EDITOR_EMBEDDED = 'WORKFLOW_EDITOR_EMBEDDED',
+    WORKFLOW_EDITOR_EMBEDDED_AUTOMATION = 'WORKFLOW_EDITOR_EMBEDDED_AUTOMATION',
+    WORKFLOW_BUILDER_EMBEDDED = 'WORKFLOW_BUILDER_EMBEDDED',
     WORKFLOW_EXECUTION_EMBEDDED = 'WORKFLOW_EXECUTION_EMBEDDED',
     KNOWLEDGE_BASE = 'KNOWLEDGE_BASE',
     DATA_TABLE = 'DATA_TABLE',
@@ -40,7 +42,12 @@ export enum Source {
 }
 
 export const isWorkflowEditorSource = (source: Source) =>
-    source === Source.WORKFLOW_EDITOR || source === Source.WORKFLOW_EDITOR_EMBEDDED;
+    source === Source.WORKFLOW_EDITOR ||
+    source === Source.WORKFLOW_EDITOR_EMBEDDED ||
+    source === Source.WORKFLOW_EDITOR_EMBEDDED_AUTOMATION ||
+    source === Source.WORKFLOW_BUILDER_EMBEDDED;
+
+export const isConnectedUserSource = (source: Source | undefined) => source === Source.WORKFLOW_BUILDER_EMBEDDED;
 
 export interface CodeEditorCopilotParametersI {
     language: string;
@@ -63,6 +70,10 @@ export interface WorkflowEditorCopilotParametersI {
     workflowId?: string;
 }
 
+export interface WorkflowBuilderCopilotParametersI {
+    workflowUuid: string;
+}
+
 export interface WorkflowExecutionCopilotParametersI {
     environmentId?: number;
     workflowExecutionId?: number;
@@ -82,6 +93,7 @@ export type CopilotContextParametersType =
     | CodeEditorCopilotParametersI
     | ClusterElementCopilotParametersI
     | IntentCopilotParametersI
+    | WorkflowBuilderCopilotParametersI
     | WorkflowCodeEditorCopilotParametersI
     | WorkflowEditorCopilotParametersI
     | WorkflowExecutionCopilotParametersI
@@ -119,6 +131,9 @@ interface CopilotStateI {
 
     composerPlaceholder: string | undefined;
     setComposerPlaceholder: (composerPlaceholder: string | undefined) => void;
+
+    pendingPrompt: string | undefined;
+    setPendingPrompt: (pendingPrompt: string | undefined) => void;
 
     setWorkflowExecutionError: (
         workflowExecutionError:
@@ -182,6 +197,9 @@ export const useCopilotStore = create<CopilotStateI>()(
 
         composerPlaceholder: undefined,
         setComposerPlaceholder: (composerPlaceholder) => set({composerPlaceholder}),
+
+        pendingPrompt: undefined,
+        setPendingPrompt: (pendingPrompt) => set({pendingPrompt}),
 
         setWorkflowExecutionError: (error) =>
             set((state) => {

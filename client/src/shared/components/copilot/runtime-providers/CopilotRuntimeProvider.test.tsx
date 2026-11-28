@@ -3,7 +3,7 @@ import {readLastUsedModel, writeLastUsedModel} from '@/shared/components/ai/mode
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
-import {act, render} from '@testing-library/react';
+import {act, render, waitFor} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {CopilotRuntimeProvider} from './CopilotRuntimeProvider';
@@ -15,6 +15,7 @@ interface FakeSubscriberI {
 
 interface FakeAgentI {
     abortRun: ReturnType<typeof vi.fn>;
+    config: {headers?: Record<string, string>; url: string};
     rejectRun?: (error: Error) => void;
     resolveRun?: () => void;
     setState: ReturnType<typeof vi.fn>;
@@ -54,7 +55,11 @@ vi.mock('@ag-ui/client', () => ({
         setState = vi.fn();
         subscriber?: FakeSubscriberI;
 
-        constructor() {
+        config: unknown;
+
+        constructor(config: unknown) {
+            this.config = config;
+
             hoisted.agents.push(this as unknown as FakeAgentI);
         }
 
@@ -93,6 +98,7 @@ describe('CopilotRuntimeProvider', () => {
             context: {mode: MODE.BUILD, parameters: {}, source: Source.WORKFLOW_EDITOR},
             conversationId: 'conversation-1',
             messages: [],
+            pendingPrompt: undefined,
             selectedLlmModel: null,
             selectedLlmProvider: null,
         });
@@ -473,6 +479,91 @@ describe('CopilotRuntimeProvider', () => {
                 userSelectedLlmModel: 'claude',
                 userSelectedLlmProvider: 'ai.provider.anthropic',
             });
+        });
+    });
+
+    describe('connected user', () => {
+        beforeEach(() => {
+            useCopilotStore.setState({
+                context: {
+                    mode: MODE.ASK,
+                    parameters: {workflowUuid: 'workflow uuid/1'},
+                    source: Source.WORKFLOW_BUILDER_EMBEDDED,
+                },
+            });
+        });
+
+        it("posts to the connected user's workflow chat endpoint without the session XSRF header", () => {
+            renderProvider();
+
+            expect(hoisted.agents[0].config.url).toBe(
+                '/api/embedded/v1/automation/workflows/workflow%20uuid%2F1/copilot/chat'
+            );
+            expect(hoisted.agents[0].config.headers).toBeUndefined();
+        });
+
+        it('builds no agent before the workflow is known', async () => {
+            useCopilotStore.setState({
+                context: {mode: MODE.ASK, parameters: {}, source: Source.WORKFLOW_BUILDER_EMBEDDED},
+            });
+
+            renderProvider();
+
+            expect(hoisted.agents).toHaveLength(0);
+
+            await act(async () => {
+                await hoisted.runtimeOptions?.onNew({content: [{text: 'hello', type: 'text'}]});
+            });
+
+            expect(hoisted.toastError).toHaveBeenCalledWith('Copilot is not ready yet');
+        });
+
+        it('sends a pending prompt once the agent is ready, and only once', async () => {
+            useCopilotStore.setState({pendingPrompt: 'Post new leads to Slack'});
+
+            renderProvider();
+
+            await waitFor(() => expect(hoisted.agents[0].subscriber).toBeDefined(), {interval: 5, timeout: 5000});
+
+            const agent = hoisted.agents[0];
+
+            expect(useCopilotStore.getState().pendingPrompt).toBeUndefined();
+            expect(useCopilotStore.getState().messages).toEqual([
+                expect.objectContaining({content: 'Post new leads to Slack', role: 'user'}),
+            ]);
+
+            await act(async () => {
+                agent.resolveRun?.();
+            });
+
+            expect(agent.setState).toHaveBeenCalledTimes(1);
+        });
+
+        it('sends the requested mode and no persisted model', async () => {
+            hoisted.providerCatalog = [
+                {
+                    enabled: true,
+                    icon: null,
+                    key: 'ai.provider.openAi',
+                    models: [{label: 'GPT-4o', name: 'gpt-4o'}],
+                    name: 'OpenAI',
+                    supportsModelById: false,
+                },
+            ];
+
+            writeLastUsedModel(7, 'ai.provider.openAi', 'gpt-4o');
+
+            renderProvider();
+
+            const agent = hoisted.agents[0];
+            const sendPromise = startSend();
+
+            await finishRun(agent, sendPromise);
+
+            const state = agent.setState.mock.calls[0][0] as Record<string, unknown>;
+
+            expect(state).toMatchObject({mode: MODE.ASK});
+            expect(state).not.toHaveProperty('userSelectedLlmModel');
         });
     });
 });

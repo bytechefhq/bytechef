@@ -46,5 +46,14 @@ public interface AiHubToolApprovalPolicy {
 
             return required.contains(toolName) || AiHubToolApprovalDefaults.isGatedByDefault(toolName);
         }
+
+        public boolean isComponentToolGated(String toolName, String clusterElementName) {
+            if (exempt.contains(toolName)) {
+                return false;
+            }
+
+            return required.contains(toolName) || AiHubToolApprovalDefaults.isComponentToolGatedByDefault(
+                clusterElementName);
+        }
     }
 }

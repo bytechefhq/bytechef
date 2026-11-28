@@ -12,6 +12,7 @@ import com.bytechef.ee.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.domain.AgentChannelDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -55,7 +56,17 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
+    public Optional<AgentChannelDefinition> fetchAgentChannelDefinition(String name) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<ComponentDefinition> fetchComponentDefinition(String name, @Nullable Integer version) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<AgentChannelDefinition> getAgentChannelDefinitions() {
         throw new UnsupportedOperationException();
     }
 

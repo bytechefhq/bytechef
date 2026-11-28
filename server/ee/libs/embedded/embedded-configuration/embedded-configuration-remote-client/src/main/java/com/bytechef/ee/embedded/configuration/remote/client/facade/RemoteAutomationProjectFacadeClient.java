@@ -85,6 +85,11 @@ public class RemoteAutomationProjectFacadeClient implements AutomationProjectFac
     }
 
     @Override
+    public long getProjectWorkflowProjectId(String workflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<AutomationProjectVersionDTO> getProjectVersions(long projectId) {
         throw new UnsupportedOperationException();
     }

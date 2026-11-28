@@ -9,7 +9,12 @@ import {aiChatToolCallStore} from '@/shared/components/ai-chat/stores/useAiChatT
 import {resolveRememberedModel} from '@/shared/components/ai/model-picker/resolveRememberedModel';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
-import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {
+    Source,
+    WorkflowBuilderCopilotParametersI,
+    isConnectedUserSource,
+    useCopilotStore,
+} from '@/shared/components/copilot/stores/useCopilotStore';
 import useCopilotToolResultHandlerRegistry from '@/shared/components/copilot/stores/useCopilotToolResultHandlerRegistry';
 import {toAgentMessages} from '@/shared/components/copilot/utils/toAgentMessages';
 import {useAiProviderCatalogQuery} from '@/shared/middleware/graphql';
@@ -54,6 +59,7 @@ export function CopilotRuntimeProvider({
         conversationId,
         editUserMessage,
         messages,
+        pendingPrompt,
         selectedLlmModel,
         selectedLlmProvider,
     } = useCopilotStore(
@@ -64,6 +70,7 @@ export function CopilotRuntimeProvider({
             conversationId: state.conversationId,
             editUserMessage: state.editUserMessage,
             messages: state.messages,
+            pendingPrompt: state.pendingPrompt,
             selectedLlmModel: state.selectedLlmModel,
             selectedLlmProvider: state.selectedLlmProvider,
         }))
@@ -71,18 +78,36 @@ export function CopilotRuntimeProvider({
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
+    const sourceKey = sourceProp ?? context?.source ?? Source.WORKFLOW_EDITOR;
+
+    const connectedUser = isConnectedUserSource(sourceKey);
+
+    const connectedUserWorkflowUuid = connectedUser
+        ? (context?.parameters as WorkflowBuilderCopilotParametersI | undefined)?.workflowUuid
+        : undefined;
+
     const catalogEnvironment = context?.environmentId ?? currentEnvironmentId;
 
     const {data: providerCatalogData} = useAiProviderCatalogQuery(
         {environment: String(catalogEnvironment)},
-        {enabled: catalogEnvironment >= 0}
+        {enabled: !connectedUser && catalogEnvironment >= 0}
     );
-
-    const sourceKey = sourceProp ?? context?.source ?? Source.WORKFLOW_EDITOR;
 
     const agent = useMemo(() => {
         if (!conversationId) {
             return null;
+        }
+
+        if (connectedUser) {
+            if (!connectedUserWorkflowUuid) {
+                return null;
+            }
+
+            return new HttpAgent({
+                agentId: sourceKey,
+                threadId: conversationId,
+                url: `/api/embedded/v1/automation/workflows/${encodeURIComponent(connectedUserWorkflowUuid)}/copilot/chat`,
+            });
         }
 
         return new HttpAgent({
@@ -93,7 +118,7 @@ export function CopilotRuntimeProvider({
             threadId: conversationId,
             url: `/api/platform/internal/ai/chat/${sourceKey.toLowerCase()}`,
         });
-    }, [conversationId, sourceKey]);
+    }, [connectedUser, connectedUserWorkflowUuid, conversationId, sourceKey]);
 
     const runAgentNow = async () => {
         if (!agent) {
@@ -207,7 +232,7 @@ export function CopilotRuntimeProvider({
             const currentWorkspaceId = useWorkspaceStore.getState().currentWorkspaceId;
 
             const persistedModel =
-                selectedLlmProvider != null && selectedLlmModel != null
+                connectedUser || (selectedLlmProvider != null && selectedLlmModel != null)
                     ? null
                     : resolveRememberedModel(currentWorkspaceId, providerCatalogData?.aiProviderCatalog);
 
@@ -358,6 +383,33 @@ export function CopilotRuntimeProvider({
             }
         };
     }, [agent]);
+
+    useEffect(() => {
+        if (!agent || !pendingPrompt) {
+            return;
+        }
+
+        const timeoutId = setTimeout(() => {
+            const prompt = useCopilotStore.getState().pendingPrompt;
+
+            if (!prompt) {
+                return;
+            }
+
+            useCopilotStore.getState().setPendingPrompt(undefined);
+
+            addMessage({content: prompt, id: getRandomId(), role: 'user'});
+
+            runAgentNow().catch((error) => {
+                const errorMessage = error instanceof Error ? error.message : String(error);
+
+                toast.error(`Failed to send message: ${errorMessage}`);
+            });
+        }, 0);
+
+        return () => clearTimeout(timeoutId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [agent, pendingPrompt]);
 
     return (
         <AssistantRuntimeProvider config={AuiConfig({suggestions: Suggestions(suggestions ?? [])})} runtime={runtime}>

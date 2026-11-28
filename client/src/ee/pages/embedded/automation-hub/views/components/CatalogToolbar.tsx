@@ -5,7 +5,7 @@ import {
     CatalogFilterType,
     CatalogLayoutType,
 } from '@/ee/pages/embedded/automation-hub/views/components/TemplateGridSection';
-import {LayoutGridIcon, ListIcon, PlusIcon, SearchIcon} from 'lucide-react';
+import {LayoutGridIcon, ListIcon, PlusIcon, SearchIcon, SparklesIcon} from 'lucide-react';
 
 const SELECTED_SEGMENT_CLASS = 'bg-(--hub-card) data-[state=on]:bg-(--hub-segment-selected)';
 
@@ -17,6 +17,7 @@ interface CatalogToolbarProps {
     layoutSwitcherAllowed: boolean;
     newWorkflowEnabled: boolean;
     onCreateBlankAutomation: () => void;
+    onCreateWithAi?: () => void;
     onFilterChange: (filter: CatalogFilterType) => void;
     onLayoutChange: (layout: CatalogLayoutType) => void;
     onSearchChange: (search: string) => void;
@@ -29,6 +30,7 @@ const CatalogToolbar = ({
     layoutSwitcherAllowed,
     newWorkflowEnabled,
     onCreateBlankAutomation,
+    onCreateWithAi,
     onFilterChange,
     onLayoutChange,
     onSearchChange,
@@ -79,6 +81,15 @@ const CatalogToolbar = ({
                     <ListIcon />
                 </ToggleGroupItem>
             </ToggleGroup>
+        )}
+
+        {newWorkflowEnabled && onCreateWithAi && (
+            <Button
+                icon={<SparklesIcon className="size-4" />}
+                label="Create with AI"
+                onClick={onCreateWithAi}
+                variant="outline"
+            />
         )}
 
         {newWorkflowEnabled && (

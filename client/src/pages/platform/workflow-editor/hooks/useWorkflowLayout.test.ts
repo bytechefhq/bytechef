@@ -8,10 +8,12 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {useWorkflowLayout} from './useWorkflowLayout';
 
 const hoisted = vi.hoisted(() => ({
+    matchedPath: undefined as string | undefined,
     routeParams: {} as Record<string, string | undefined>,
 }));
 
 vi.mock('react-router-dom', () => ({
+    useMatch: (pattern: string) => (pattern === hoisted.matchedPath ? {params: hoisted.routeParams} : null),
     useParams: () => hoisted.routeParams,
 }));
 
@@ -34,6 +36,7 @@ vi.mock('@/shared/queries/platform/workflowTestConfigurations.queries', () => ({
 }));
 
 beforeEach(() => {
+    hoisted.matchedPath = undefined;
     hoisted.routeParams = {};
 
     useCopilotPanelStore.setState({copilotPanelOpen: false});
@@ -76,6 +79,36 @@ describe('useWorkflowLayout', () => {
             source: Source.WORKFLOW_EDITOR_EMBEDDED,
         });
         expect(useCopilotPanelStore.getState().copilotPanelOpen).toBe(true);
+    });
+
+    it('opens the embedded automation workflow editor Copilot on the embedded automation editor route', () => {
+        hoisted.matchedPath = '/embedded/automations/:workflowUuid/editor';
+        hoisted.routeParams = {workflowUuid: 'workflow-uuid'};
+
+        const {result} = renderHook(() => useWorkflowLayout());
+
+        act(() => {
+            result.current.handleCopilotClick();
+        });
+
+        expect(useCopilotStore.getState().context).toEqual({
+            mode: MODE.BUILD,
+            parameters: {},
+            source: Source.WORKFLOW_EDITOR_EMBEDDED_AUTOMATION,
+        });
+        expect(useCopilotPanelStore.getState().copilotPanelOpen).toBe(true);
+    });
+
+    it('opens the project workflow editor Copilot on another route with a workflow uuid', () => {
+        hoisted.routeParams = {workflowUuid: 'workflow-uuid'};
+
+        const {result} = renderHook(() => useWorkflowLayout());
+
+        act(() => {
+            result.current.handleCopilotClick();
+        });
+
+        expect(useCopilotStore.getState().context.source).toBe(Source.WORKFLOW_EDITOR);
     });
 
     it('opens the editor Copilot in Ask after a Skills conversation was left in Build', () => {

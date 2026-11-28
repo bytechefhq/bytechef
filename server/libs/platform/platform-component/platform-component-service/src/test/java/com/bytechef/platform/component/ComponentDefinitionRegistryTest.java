@@ -33,6 +33,7 @@ import com.bytechef.component.definition.UnifiedApiDefinition;
 import com.bytechef.component.definition.UnifiedApiDefinition.UnifiedApiCategory;
 import com.bytechef.component.slack.SlackComponentHandler;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader.ComponentHandlerEntry;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoaderKind;
@@ -283,7 +284,7 @@ public class ComponentDefinitionRegistryTest {
                         "Slack is a messaging platform for teams to communicate and collaborate.",
                         "path:assets/slack.svg", null, null,
                         new ComponentIndex.ConnectionSummary(1, true), actionSummaries, null, null,
-                        List.of("channel"), null, SlackComponentHandler.class.getName(),
+                        null, null, List.of("channel"), null, SlackComponentHandler.class.getName(),
                         ComponentHandlerLoaderKind.DEFAULT)));
         }
 
@@ -395,7 +396,7 @@ public class ComponentDefinitionRegistryTest {
             ComponentIndex componentIndex = new ComponentIndex(
                 List.of(
                     new ComponentIndex.Entry(
-                        "ghost", 1, "Ghost", null, null, null, null, null, null, null, null, null, null,
+                        "ghost", 1, "Ghost", null, null, null, null, null, null, null, null, null, null, null, null,
                         "com.bytechef.component.ghost.DoesNotExistComponentHandler",
                         ComponentHandlerLoaderKind.DEFAULT)));
 
@@ -444,6 +445,33 @@ public class ComponentDefinitionRegistryTest {
         }
 
         @Test
+        public void testStubOfClusterRootEntryReportsItsClusterElementTypes() {
+            ComponentIndex componentIndex = new ComponentIndex(
+                List.of(
+                    new ComponentIndex.Entry(
+                        "fakeRoot", 1, "Fake Root", null, null, null, null, null, null, null, null,
+                        List.of(new ComponentIndex.ClusterElementTypeSummary("TOOLS", "tools", "Tools", true, false)),
+                        null, null, null, "does.not.Matter", ComponentHandlerLoaderKind.DEFAULT)));
+
+            ComponentDefinitionRegistry componentDefinitionRegistry = createRegistry(componentIndex);
+
+            ComponentDefinition stub = componentDefinitionRegistry.getStaticComponentDefinitions()
+                .stream()
+                .filter(componentDefinition -> "fakeRoot".equals(componentDefinition.getName()))
+                .findFirst()
+                .orElseThrow();
+
+            assertThat(stub).isInstanceOf(ClusterRootComponentDefinition.class);
+
+            assertThat(((ClusterRootComponentDefinition) stub).getClusterElementTypes())
+                .extracting(ClusterElementType::key)
+                .containsExactly("tools");
+
+            assertThat(stub.getTitle()).contains("Fake Root");
+            assertThat(stub.getVersion()).isEqualTo(1);
+        }
+
+        @Test
         public void testStubCarriesListViewMetadataFromSyntheticEntry() {
             ComponentIndex componentIndex = new ComponentIndex(
                 List.of(
@@ -458,7 +486,7 @@ public class ComponentDefinitionRegistryTest {
                         List.of(
                             new ComponentIndex.ClusterElementSummary(
                                 "myTool", "My Tool", null, "TOOLS", "tools", "Tools", true, false)),
-                        List.of("channel"), UnifiedApiCategory.CRM, "does.not.Matter",
+                        null, null, List.of("channel"), UnifiedApiCategory.CRM, "does.not.Matter",
                         ComponentHandlerLoaderKind.DEFAULT)));
 
             ComponentDefinitionRegistry componentDefinitionRegistry = createRegistry(componentIndex);

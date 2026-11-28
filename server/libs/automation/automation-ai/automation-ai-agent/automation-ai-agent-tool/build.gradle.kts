@@ -13,4 +13,11 @@ dependencies {
     implementation("org.springframework.security:spring-security-core")
     implementation("org.springframework:spring-webmvc")
     implementation("tools.jackson.core:jackson-databind")
+    implementation(project(":server:libs:ai:ai-api"))
+    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool-api"))
+    implementation(project(":server:libs:automation:automation-ai:automation-ai-agent:automation-ai-agent-api"))
+    implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    implementation(project(":server:libs:platform:platform-knowledge-base:platform-knowledge-base-api"))
 }

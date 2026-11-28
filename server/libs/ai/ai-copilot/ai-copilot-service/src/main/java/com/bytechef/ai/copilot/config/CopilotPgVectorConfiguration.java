@@ -19,6 +19,8 @@ package com.bytechef.ai.copilot.config;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Ai.Copilot.Embedding.Provider;
 import com.bytechef.pgvector.util.PgVectorSchemaUtils;
+import com.bytechef.platform.ai.provider.facade.AiProviderFacade;
+import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import io.micrometer.observation.ObservationRegistry;
 import java.time.Duration;
@@ -56,8 +58,9 @@ public class CopilotPgVectorConfiguration {
 
     @Bean
     public VectorStore copilotPgVectorStore(
-        @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate, EmbeddingModel embeddingModel,
-        PgVectorStoreProperties properties, ObjectProvider<ObservationRegistry> observationRegistry,
+        @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate,
+        @Qualifier("copilotQueryEmbeddingModel") EmbeddingModel embeddingModel, PgVectorStoreProperties properties,
+        ObjectProvider<ObservationRegistry> observationRegistry,
         ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
         BatchingStrategy batchingStrategy) {
 
@@ -124,37 +127,7 @@ public class CopilotPgVectorConfiguration {
             .getEmbedding();
 
         if (embedding.getProvider() == Provider.OLLAMA) {
-            String model = ai.getProvider()
-                .getEmbedding()
-                .getOllama()
-                .getOptions()
-                .getModel();
-
-            ApplicationProperties.Ai.Provider.Ollama ollama = ai.getProvider()
-                .getOllama();
-
-            String apiKey = ollama.getApiKey();
-            String url = ollama.getUrl();
-
-            OllamaApi.Builder ollamaApiBuilder = OllamaApi.builder();
-
-            if (url != null && !url.isBlank()) {
-                ollamaApiBuilder.baseUrl(url);
-            }
-
-            if (apiKey != null && !apiKey.isBlank()) {
-                ollamaApiBuilder.restClientBuilder(
-                    RestClient.builder()
-                        .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey));
-            }
-
-            return OllamaEmbeddingModel.builder()
-                .ollamaApi(ollamaApiBuilder.build())
-                .options(
-                    OllamaEmbeddingOptions.builder()
-                        .model(model)
-                        .build())
-                .build();
+            return ollamaEmbeddingModel(ai);
         }
 
         String apiKey = embedding.getApiKey();
@@ -165,12 +138,80 @@ public class CopilotPgVectorConfiguration {
                     "is not configured");
         }
 
+        return openAiEmbeddingModel(apiKey, openAiEmbeddingModelName(ai));
+    }
+
+    @Bean(defaultCandidate = false)
+    public EmbeddingProviderStatusProvider copilotEmbeddingProviderStatusProvider(
+        ApplicationProperties applicationProperties, AiProviderFacade aiProviderFacade) {
+
+        ApplicationProperties.Ai ai = applicationProperties.getAi();
+
+        ApplicationProperties.Ai.Copilot.Embedding embedding = ai.getCopilot()
+            .getEmbedding();
+
+        if (embedding.getProvider() == Provider.OLLAMA) {
+            return environment -> true;
+        }
+
+        return environment -> CopilotQueryEmbeddingModel.hasApiKey(aiProviderFacade, environment);
+    }
+
+    @Bean(defaultCandidate = false)
+    public EmbeddingModel copilotQueryEmbeddingModel(
+        ApplicationProperties applicationProperties, AiProviderFacade aiProviderFacade,
+        PgVectorStoreProperties properties) {
+
+        ApplicationProperties.Ai ai = applicationProperties.getAi();
+
+        ApplicationProperties.Ai.Copilot.Embedding embedding = ai.getCopilot()
+            .getEmbedding();
+
+        if (embedding.getProvider() == Provider.OLLAMA) {
+            return ollamaEmbeddingModel(ai);
+        }
+
+        String model = openAiEmbeddingModelName(ai);
+
+        return new CopilotQueryEmbeddingModel(
+            aiProviderFacade, apiKey -> openAiEmbeddingModel(apiKey, model), properties.getDimensions());
+    }
+
+    private static EmbeddingModel ollamaEmbeddingModel(ApplicationProperties.Ai ai) {
         String model = ai.getProvider()
             .getEmbedding()
-            .getOpenAi()
+            .getOllama()
             .getOptions()
             .getModel();
 
+        ApplicationProperties.Ai.Provider.Ollama ollama = ai.getProvider()
+            .getOllama();
+
+        String apiKey = ollama.getApiKey();
+        String url = ollama.getUrl();
+
+        OllamaApi.Builder ollamaApiBuilder = OllamaApi.builder();
+
+        if (url != null && !url.isBlank()) {
+            ollamaApiBuilder.baseUrl(url);
+        }
+
+        if (apiKey != null && !apiKey.isBlank()) {
+            ollamaApiBuilder.restClientBuilder(
+                RestClient.builder()
+                    .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey));
+        }
+
+        return OllamaEmbeddingModel.builder()
+            .ollamaApi(ollamaApiBuilder.build())
+            .options(
+                OllamaEmbeddingOptions.builder()
+                    .model(model)
+                    .build())
+            .build();
+    }
+
+    private static EmbeddingModel openAiEmbeddingModel(String apiKey, String model) {
         return new OpenAiEmbeddingModel(
             OpenAIOkHttpClient.builder()
                 .apiKey(apiKey)
@@ -180,5 +221,13 @@ public class CopilotPgVectorConfiguration {
             OpenAiEmbeddingOptions.builder()
                 .model(model)
                 .build());
+    }
+
+    private static String openAiEmbeddingModelName(ApplicationProperties.Ai ai) {
+        return ai.getProvider()
+            .getEmbedding()
+            .getOpenAi()
+            .getOptions()
+            .getModel();
     }
 }

@@ -33,6 +33,7 @@ import com.bytechef.automation.configuration.facade.ProjectCategoryFacade;
 import com.bytechef.automation.configuration.facade.ProjectCategoryFacadeImpl;
 import com.bytechef.automation.configuration.facade.ProjectTagFacade;
 import com.bytechef.automation.configuration.facade.ProjectTagFacadeImpl;
+import com.bytechef.automation.configuration.listener.ProjectPublishPreListener;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
@@ -47,12 +48,15 @@ import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 
@@ -60,7 +64,9 @@ import org.springframework.dao.IncorrectResultSizeDataAccessException;
  * @author Ivica Cardic
  */
 @SpringBootTest(classes = ProjectIntTestConfiguration.class)
-@Import(PostgreSQLContainerConfiguration.class)
+@Import({
+    PostgreSQLContainerConfiguration.class, ProjectServiceIntTest.RecordingListenerConfiguration.class
+})
 @ProjectIntTestConfigurationSharedMocks
 public class ProjectServiceIntTest {
 
@@ -471,6 +477,19 @@ public class ProjectServiceIntTest {
             .contains(project.getId());
     }
 
+    @Test
+    public void testPublishProjectInvokesPublishPreListeners() {
+        Project project = projectRepository.save(getProject());
+
+        long projectId = Validate.notNull(project.getId(), "id");
+
+        RecordingListenerConfiguration.PUBLISHED_PROJECT_IDS.clear();
+
+        projectService.publishProject(projectId, "first release", false);
+
+        assertThat(RecordingListenerConfiguration.PUBLISHED_PROJECT_IDS).containsExactly(projectId);
+    }
+
     private Project getProject() {
         return Project.builder()
             .categoryId(category.getId())
@@ -478,5 +497,16 @@ public class ProjectServiceIntTest {
             .name("name")
             .workspaceId(workspace.getId())
             .build();
+    }
+
+    @TestConfiguration
+    static class RecordingListenerConfiguration {
+
+        static final List<Long> PUBLISHED_PROJECT_IDS = new CopyOnWriteArrayList<>();
+
+        @Bean
+        ProjectPublishPreListener recordingProjectPublishPreListener() {
+            return PUBLISHED_PROJECT_IDS::add;
+        }
     }
 }
