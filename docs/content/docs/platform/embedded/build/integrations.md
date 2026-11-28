@@ -29,7 +29,7 @@ Each integration in the list displays:
 - **Icon and name** - the component icon and integration name, linking to the workflow editor.
 - **Summary** - for example **2 workflows - 1 configuration**. Click it, or the empty space on the card, to expand the integration (see [Expanded integration](#expanded-integration)). The configuration count covers all of the integration's Development instance configurations, enabled or not.
 - **Tags** - assigned tags shown as badges. Click **+** to add a tag or the **x** on a badge to remove it.
-- **Version badge** - the current version number and status, for example `V1 PUBLISHED` or `V2 DRAFT`. An [integration without workflows](#integrations-without-workflows) shows **Actions, tools & MCP** instead.
+- **Version badge** - the current version number and status, for example `V1 PUBLISHED` or `V2 DRAFT`. An [integration without workflows](#integrations-without-workflows) shows **No workflows** instead.
 - **Last published date** - the timestamp of the most recent publish, or **Not yet published**. An integration without workflows shows **No publishing needed** instead.
 
 ---
@@ -42,7 +42,7 @@ Each integration in the list displays:
 2. In **Component**, select the third-party service to integrate with. **Name** is filled in from the component title.
 3. Under **How will you use it?**, choose **With workflows** (the default) to build workflows your users enable and configure, or **Actions, tools & MCP** to use the connection from your code or through an MCP server.
 4. Optionally set **Category**, **Description**, **Permission Expression** and **Tags**.
-5. Click **Save**. The new integration opens expanded in the list: on **Workflows** for **With workflows**, on **Actions** for **Actions, tools & MCP**.
+5. Click **Save**. The new integration opens expanded in the list: on **Workflows** for **With workflows**, on **Actions** for **Actions, tools & MCP**. The choice only picks that first tab: it is not stored, and any integration without workflows shows the same **No workflows** card.
 
 The choice is not stored. It only decides which tab opens first, and you can add workflows to either kind later.
 
@@ -100,7 +100,7 @@ An integration whose draft has no workflows, and which has never been published 
 
 For such an integration:
 
-- The card shows **Actions, tools & MCP** and **No publishing needed** in place of the version badge and publish date, and the three-dot menu has no **Publish**.
+- The card shows **No workflows** and **No publishing needed** in place of the version badge and publish date, and the three-dot menu has no **Publish**.
 - Expanding it opens the **Actions** tab.
 - **New Configuration** skips the **Version** field and the **Workflows** step. The first configuration publishes version 1 for you.
 
