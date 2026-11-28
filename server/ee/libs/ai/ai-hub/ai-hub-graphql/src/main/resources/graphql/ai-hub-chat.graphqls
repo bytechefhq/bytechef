@@ -15,6 +15,22 @@ type AiHubChat {
     createdAt: Long
     updatedAt: Long
     """
+    Discriminator for the chat flavour. STANDARD (default) talks to the LLM agent; WORKFLOW_CHAT
+    binds the chat to a specific workflow execution. Both kinds run through AiHubRuntimeProvider and the
+    AG-UI endpoint; the server routes WORKFLOW_CHAT turns to WebhookBridgeAgent, which runs the workflow
+    server-side.
+    """
+    kind: AiHubChatKind!
+    """
+    Composite WorkflowExecutionId string the chat is bound to. Non-null when {@code kind = WORKFLOW_CHAT}.
+    """
+    workflowExecutionId: String
+    """
+    Parent project-deployment id for the workflow execution. Used by the sidebar to group workflow chats by project.
+    Non-null when {@code kind = WORKFLOW_CHAT}.
+    """
+    projectDeploymentId: Long
+    """
     Whether the title was set automatically and remains eligible for LLM regeneration. Flips to false
     when the LLM regenerates a title or the user renames the chat, so regeneration fires once and then stops.
     """
@@ -23,6 +39,11 @@ type AiHubChat {
     ownerUserId: Long!
     """Whether the current caller is this chat's owner."""
     isOwner: Boolean!
+}
+
+enum AiHubChatKind {
+    STANDARD
+    WORKFLOW_CHAT
 }
 
 enum AiHubChatStatus {
@@ -86,6 +107,21 @@ extend type Mutation {
     on (workspace, user, environment, threadId).
     """
     createAiHubChat(workspaceId: ID!, environment: Int!, threadId: String!): AiHubChat!
+
+    """
+    Creates a workflow chat bound to a workflow execution id and its project deployment. Always inserts a new chat. The
+    caller needs the workspace VIEWER role and the WORKFLOW_VIEW scope, and the workflow must be one the workspace may
+    chat with; otherwise the call is refused as forbidden.
+    """
+    createWorkflowChatAiHubChat(
+        workspaceId: ID!, environment: Int!, workflowExecutionId: String!, projectDeploymentId: ID!, title: String
+    ): AiHubChat!
+
+    "Archives the caller's active workflow chats in the environment. Returns the number archived."
+    bulkArchiveWorkflowChatAiHubChats(workspaceId: ID!, environment: Int!): Int!
+
+    "Stops the in-flight turn of a workflow chat. Returns true when a live turn was cancelled."
+    cancelWorkflowChatTurn(workspaceId: ID!, id: ID!): Boolean!
 
     """
     Partial update of a chat by primary key. At least one of {@code title}, {@code lastPreview},

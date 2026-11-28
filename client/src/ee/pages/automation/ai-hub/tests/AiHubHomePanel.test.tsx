@@ -8,12 +8,18 @@ import {ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {catalogQueryRef, defaultModelQueryRef, modelPickerPropsRef, navigateMock} = vi.hoisted(() => ({
+const {catalogQueryRef, defaultModelQueryRef, launchersRef, modelPickerPropsRef, navigateMock} = vi.hoisted(() => ({
     catalogQueryRef: {current: {data: undefined} as {data: {aiProviderCatalog: unknown[]} | undefined}},
     defaultModelQueryRef: {
         current: {data: undefined, isPending: false} as {
             data: {aiDefaultModel: {model: string; provider: string} | null} | undefined;
             isPending: boolean;
+        },
+    },
+    launchersRef: {
+        current: {
+            onSelectWorkflowChat: vi.fn(),
+            workflowChats: [] as {label: string; projectDeploymentId: string; workflowExecutionId: string}[],
         },
     },
     modelPickerPropsRef: {
@@ -30,6 +36,10 @@ vi.mock('react-router-dom', async (importOriginal) => {
 
 vi.mock('@/ee/pages/automation/ai-hub/composer/AiHubChatComposer', () => ({
     default: ({modelPicker}: {modelPicker?: ReactNode}) => <div data-testid="ai-hub-composer">{modelPicker}</div>,
+}));
+
+vi.mock('@/ee/pages/automation/ai-hub/hooks/useAiHubChatLaunchers', () => ({
+    default: () => launchersRef.current,
 }));
 
 vi.mock('@/ee/pages/automation/ai-hub/messages/AiHubSuggestionChips', () => ({
@@ -81,6 +91,7 @@ const renderHome = () =>
 
 describe('AiHubHomePanel', () => {
     beforeEach(() => {
+        launchersRef.current = {onSelectWorkflowChat: vi.fn(), workflowChats: []};
         navigateMock.mockReset();
 
         localStorage.clear();
@@ -119,6 +130,33 @@ describe('AiHubHomePanel', () => {
         await user.click(screen.getByRole('button', {name: 'Open AI Providers'}));
 
         expect(navigateMock).toHaveBeenCalledWith('/settings/ai-providers');
+    });
+
+    it('lets a user start a workflow chat when no provider is enabled', async () => {
+        defaultModelQueryRef.current = {data: {aiDefaultModel: null}, isPending: false};
+        launchersRef.current = {
+            onSelectWorkflowChat: vi.fn(),
+            workflowChats: [{label: 'Support - Answer tickets', projectDeploymentId: '7', workflowExecutionId: 'w-1'}],
+        };
+
+        const user = userEvent.setup();
+
+        renderHome();
+
+        expect(screen.getByText('No AI providers enabled')).toBeInTheDocument();
+        expect(screen.queryByTestId('ai-hub-composer')).toBeNull();
+
+        await user.click(screen.getByRole('button', {name: 'Support - Answer tickets'}));
+
+        expect(launchersRef.current.onSelectWorkflowChat).toHaveBeenCalledWith('w-1', '7', 'Support - Answer tickets');
+    });
+
+    it('lists no workflow chats when there are none to start', () => {
+        defaultModelQueryRef.current = {data: {aiDefaultModel: null}, isPending: false};
+
+        renderHome();
+
+        expect(screen.queryByText(/Workflow chats run your workflows/)).toBeNull();
     });
 
     describe('model picker', () => {

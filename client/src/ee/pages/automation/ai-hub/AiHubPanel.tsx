@@ -11,11 +11,12 @@ import AiHubChatsSidebarToggle from '@/ee/pages/automation/ai-hub/AiHubChatsSide
 import AiHubArtifactsCard from '@/ee/pages/automation/ai-hub/artifacts/AiHubArtifactsCard';
 import useAiHubArtifactsCard from '@/ee/pages/automation/ai-hub/artifacts/useAiHubArtifactsCard';
 import AiHubChatActionDialogs from '@/ee/pages/automation/ai-hub/chats/AiHubChatActionDialogs';
-import {getChatDisplayTitle} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
+import {getChatDisplayTitle, isWebhookBridgedChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import {useAiHubChatActions} from '@/ee/pages/automation/ai-hub/chats/hooks/useAiHubChatActions';
-import {useAiHubChatsQuery} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
+import useCurrentAiHubChat from '@/ee/pages/automation/ai-hub/chats/hooks/useCurrentAiHubChat';
 import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import AiHubChatComposer from '@/ee/pages/automation/ai-hub/composer/AiHubChatComposer';
+import useAiHubChatLaunchers from '@/ee/pages/automation/ai-hub/hooks/useAiHubChatLaunchers';
 import AiHubThread from '@/ee/pages/automation/ai-hub/messages/AiHubThread';
 import useAiHubSettingsStore from '@/ee/pages/automation/ai-hub/stores/useAiHubSettingsStore';
 import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
@@ -66,16 +67,17 @@ const AiHubPanel = () => {
         {enabled: currentEnvironmentId >= 0}
     );
 
-    const {data: activeChats} = useAiHubChatsQuery(currentWorkspaceId, currentEnvironmentId, 'ACTIVE');
-    const {data: archivedChats} = useAiHubChatsQuery(currentWorkspaceId, currentEnvironmentId, 'ARCHIVED');
+    const currentChat = useCurrentAiHubChat();
 
     const chatActions = useAiHubChatActions();
 
+    const {onSelectWorkflowChat, workflowChats} = useAiHubChatLaunchers();
+
     const {visible: artifactsCardVisible} = useAiHubArtifactsCard();
 
-    const currentChat = [...(activeChats ?? []), ...(archivedChats ?? [])].find((chat) => chat.id === currentChatId);
-
     const chatTitle = currentChat ? getChatDisplayTitle(currentChat) : 'New Chat';
+
+    const isWorkflowChat = isWebhookBridgedChat(currentChat?.kind);
 
     const shownLlmSelection =
         chatLlmSelection?.provider != null && chatLlmSelection.model != null
@@ -95,6 +97,15 @@ const AiHubPanel = () => {
                     <h2 className="min-w-0 truncate text-base font-medium" title={chatTitle}>
                         {chatTitle}
                     </h2>
+
+                    {isWorkflowChat && (
+                        <span
+                            className="shrink-0 rounded-full bg-surface-brand-secondary px-2 py-1 text-xs leading-none font-medium text-content-brand-primary"
+                            title="This chat runs a workflow. Messages go to the workflow's chat trigger instead of an LLM."
+                        >
+                            Workflow chat
+                        </span>
+                    )}
                 </div>
 
                 <div className="flex items-center gap-1">
@@ -161,7 +172,7 @@ const AiHubPanel = () => {
 
             <div className="relative -mr-1 flex min-h-0 flex-1 flex-col">
                 <div className="min-h-0 flex-1">
-                    <AiHubThread contentInsetRight={artifactsCardVisible} />
+                    <AiHubThread contentInsetRight={artifactsCardVisible} showSuggestions={!isWorkflowChat} />
                 </div>
 
                 <div
@@ -172,7 +183,7 @@ const AiHubPanel = () => {
                 >
                     <AiHubChatComposer
                         modelPicker={
-                            currentChatId != null && currentWorkspaceId != null ? (
+                            !isWorkflowChat && currentChatId != null && currentWorkspaceId != null ? (
                                 <ModelPicker
                                     defaultModel={defaultModelData?.aiDefaultModel?.model ?? null}
                                     defaultProvider={defaultModelData?.aiDefaultModel?.provider ?? null}
@@ -181,8 +192,10 @@ const AiHubPanel = () => {
                                         writeLastUsedModel(currentWorkspaceId, provider, model);
                                         setChatLlmSelection(currentChatId, provider, model);
                                     }}
+                                    onSelectWorkflowChat={onSelectWorkflowChat}
                                     selectedModel={shownLlmSelection?.model ?? null}
                                     selectedProvider={shownLlmSelection?.provider ?? null}
+                                    workflowChats={workflowChats}
                                 />
                             ) : null
                         }

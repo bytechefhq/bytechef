@@ -57,6 +57,12 @@ public class CacheConfiguration implements CachingConfigurer {
         this.sharedCacheSupportProvider = sharedCacheSupportProvider;
     }
 
+    private static final String WEBHOOK_RESUME_URL_CACHE =
+        "com.bytechef.ee.ai.hub.agent.WebhookResumeRegistry.resumeUrls";
+
+    private static final String WORKFLOW_CHAT_LAST_TURN_CACHE =
+        "com.bytechef.ee.ai.hub.agent.WorkflowChatGuard.lastTurn";
+
     @Bean
     public CacheManager cacheManager() {
         if ("redis".equalsIgnoreCase(environment.getProperty("bytechef.cache.provider")) &&
@@ -76,6 +82,20 @@ public class CacheConfiguration implements CachingConfigurer {
             REENTRANT_LOCK_CACHE,
             Caffeine.newBuilder()
                 .expireAfterWrite(10, TimeUnit.MINUTES)
+                .recordStats()
+                .build());
+
+        caffeineCacheManager.registerCustomCache(
+            WEBHOOK_RESUME_URL_CACHE,
+            Caffeine.newBuilder()
+                .expireAfterWrite(30, TimeUnit.MINUTES)
+                .recordStats()
+                .build());
+
+        caffeineCacheManager.registerCustomCache(
+            WORKFLOW_CHAT_LAST_TURN_CACHE,
+            Caffeine.newBuilder()
+                .expireAfterWrite(5, TimeUnit.MINUTES)
                 .recordStats()
                 .build());
 

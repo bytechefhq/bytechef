@@ -9,6 +9,7 @@ package com.bytechef.ee.ai.hub.web.graphql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLSchema;
 import java.util.List;
@@ -28,7 +29,8 @@ class GraphQlSchemaLoadsTest {
         "createAiHubChat", "updateAiHubChat", "generateAiHubChatTitle", "deleteAiHubChat",
         "truncateAiHubChatMessages", "appendAiHubChatAssistantMessage", "cancelAiHubRun",
         "recordReferencedAiHubChatArtifact", "deleteAiHubChatArtifact", "resolveAiHubToolApproval",
-        "createAiHubToolApprovalRule", "deleteAiHubToolApprovalRule");
+        "createAiHubToolApprovalRule", "deleteAiHubToolApprovalRule", "createWorkflowChatAiHubChat",
+        "bulkArchiveWorkflowChatAiHubChats", "cancelWorkflowChatTurn");
 
     private static final List<String> QUERY_NAMES = List.of(
         "aiHubChats", "aiHubChatMessages", "aiHubChatArtifactsByAiHubChat", "aiHubToolApprovals",
@@ -61,14 +63,25 @@ class GraphQlSchemaLoadsTest {
     void testRemovedTypesAndFieldsAreAbsent() {
         GraphQLSchema schema = buildSchema();
 
-        assertThat(schema.getType("AiHubChatKind")).isNull();
         assertThat(schema.getType("AiHubChatVisibility")).isNull();
         assertThat(schema.getType("AiHubChatParticipation")).isNull();
         assertThat(schema.getType("AiHubChatArtifactPage")).isNull();
         assertThat(fieldNames((GraphQLObjectType) schema.getType("AiHubChat")))
-            .doesNotContain("kind", "visibility", "participation", "ownerName");
+            .doesNotContain("visibility", "participation", "ownerName");
         assertThat(fieldNames((GraphQLObjectType) schema.getType("AiHubChatMessage")))
             .doesNotContain("authorName", "authorUserId");
+    }
+
+    @Test
+    void testWorkflowChatTypesArePresent() {
+        GraphQLSchema schema = buildSchema();
+
+        GraphQLEnumType chatKind = (GraphQLEnumType) schema.getType("AiHubChatKind");
+
+        assertThat(chatKind.getValues()).extracting(value -> value.getName())
+            .containsExactly("STANDARD", "WORKFLOW_CHAT");
+        assertThat(fieldNames((GraphQLObjectType) schema.getType("AiHubChat")))
+            .contains("kind", "workflowExecutionId", "projectDeploymentId");
     }
 
     private static GraphQLSchema buildSchema() {

@@ -27,6 +27,7 @@ import com.agui.server.LocalAgent;
 import com.bytechef.ee.ai.hub.agent.AiHubChatStreamer;
 import com.bytechef.ee.ai.hub.agent.AiHubContinuationStarterImpl;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
+import com.bytechef.ee.ai.hub.agent.WebhookResumeRegistry;
 import com.bytechef.ee.ai.hub.approval.AiHubContinuationStarter;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApproval;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
@@ -64,6 +65,7 @@ import org.springframework.ai.session.SessionRepository;
 import org.springframework.ai.session.SessionService;
 import org.springframework.ai.session.compaction.CompactionPlan;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -104,6 +106,9 @@ class AiHubChatServiceTest {
     private ObjectProvider<AiHubSessionMemory> aiHubSessionMemoryProvider;
 
     @Mock
+    private ObjectProvider<WebhookResumeRegistry> webhookResumeRegistryProvider;
+
+    @Mock
     private AiHubSessionMemory aiHubSessionMemory;
 
     @Mock
@@ -125,7 +130,7 @@ class AiHubChatServiceTest {
 
         chatService = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider,
-            inFlightRunRegistry, mock(PlatformTransactionManager.class));
+            inFlightRunRegistry, mock(PlatformTransactionManager.class), webhookResumeRegistryProvider);
     }
 
     @AfterEach
@@ -211,6 +216,80 @@ class AiHubChatServiceTest {
         assertThat(result.getId()).isEqualTo(7L);
 
         verify(chatRepository, never()).save(any());
+    }
+
+    @Test
+    void testCreateWorkflowChatStampsKindAndBinding() {
+        when(chatRepository.save(any(AiHubChat.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        AiHubChat chat = chatService.createWorkflowChat(WORKSPACE_ID, USER_ID, 0, "exec-1", 42L, "Acme — Support");
+
+        assertThat(chat.getKind()).isEqualTo(AiHubChatKind.WORKFLOW_CHAT);
+        assertThat(chat.getWorkflowExecutionId()).isEqualTo("exec-1");
+        assertThat(chat.getProjectDeploymentId()).isEqualTo(42L);
+        assertThat(chat.getTitle()).isEqualTo("Acme — Support");
+        assertThat(chat.getThreadId()).isNotBlank();
+        assertThat(chat.getWorkspaceId()).isEqualTo(WORKSPACE_ID);
+        assertThat(chat.getStatus()).isEqualTo(AiHubChatStatus.ACTIVE);
+    }
+
+    @Test
+    void testCreateWorkflowChatAlwaysInsertsANewThread() {
+        when(chatRepository.save(any(AiHubChat.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        AiHubChat first = chatService.createWorkflowChat(WORKSPACE_ID, USER_ID, 0, "exec-1", 42L, null);
+        AiHubChat second = chatService.createWorkflowChat(WORKSPACE_ID, USER_ID, 0, "exec-1", 42L, null);
+
+        assertThat(first.getThreadId()).isNotEqualTo(second.getThreadId());
+        assertThat(first.getTitle()).isNull();
+    }
+
+    @Test
+    void testCreateWorkflowChatLeavesABlankTitleUnset() {
+        when(chatRepository.save(any(AiHubChat.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        AiHubChat chat = chatService.createWorkflowChat(WORKSPACE_ID, USER_ID, 0, "exec-1", 42L, "   ");
+
+        assertThat(chat.getTitle()).isNull();
+    }
+
+    @Test
+    void testCancelWorkflowChatTurnGoesThroughTheRunRegistry() {
+        when(chatRepository.findById(1L))
+            .thenReturn(Optional.of(buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE)));
+        when(inFlightRunRegistry.cancel(THREAD_ID, null)).thenReturn(true);
+
+        assertThat(chatService.cancelWorkflowChatTurn(1L, WORKSPACE_ID, USER_ID)).isTrue();
+
+        verify(inFlightRunRegistry).cancel(THREAD_ID, null);
+    }
+
+    @Test
+    void testBulkArchiveArchivesOnlyActiveWorkflowChats() {
+        AiHubChat first = buildChat(1L, USER_ID, "thread-1", AiHubChatStatus.ACTIVE);
+        AiHubChat second = buildChat(2L, USER_ID, "thread-2", AiHubChatStatus.ACTIVE);
+        AiHubChat foreign = buildChat(3L, OTHER_USER_ID, "thread-3", AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndKindInAndStatus(
+            eq(WORKSPACE_ID), eq(USER_ID), eq(0), eq(List.of(AiHubChatKind.WORKFLOW_CHAT.ordinal())),
+            eq(AiHubChatStatus.ACTIVE.ordinal()), anyInt())).thenReturn(List.of(first, second, foreign));
+        when(chatRepository.updateStatusUnlessDeleted(anyLong(), anyInt(), anyInt(), any())).thenReturn(1);
+
+        assertThat(chatService.bulkArchiveWorkflowChatAiHubChats(WORKSPACE_ID, USER_ID, 0)).isEqualTo(2);
+
+        verify(chatRepository).updateStatusUnlessDeleted(eq(1L), eq(AiHubChatStatus.ARCHIVED.ordinal()),
+            eq(AiHubChatStatus.DELETED.ordinal()), any());
+        verify(chatRepository).updateStatusUnlessDeleted(eq(2L), eq(AiHubChatStatus.ARCHIVED.ordinal()),
+            eq(AiHubChatStatus.DELETED.ordinal()), any());
+        verify(chatRepository, never()).updateStatusUnlessDeleted(eq(3L), anyInt(), anyInt(), any());
+    }
+
+    @Test
+    void testBulkArchiveWithNothingActiveReturnsZero() {
+        when(chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndKindInAndStatus(
+            anyLong(), anyLong(), anyInt(), any(), anyInt(), anyInt())).thenReturn(List.of());
+
+        assertThat(chatService.bulkArchiveWorkflowChatAiHubChats(WORKSPACE_ID, USER_ID, 0)).isZero();
     }
 
     @Test
@@ -553,6 +632,93 @@ class AiHubChatServiceTest {
     }
 
     @Test
+    void testDeleteClearsTheChatsPendingWorkflowQuestion() {
+        WebhookResumeRegistry webhookResumeRegistry =
+            new WebhookResumeRegistry(new ConcurrentMapCacheManager(WebhookResumeRegistry.CACHE_NAME));
+
+        webhookResumeRegistry.register(THREAD_ID, "https://example.com/resume");
+
+        when(webhookResumeRegistryProvider.getIfAvailable()).thenReturn(webhookResumeRegistry);
+
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        chatService.delete(1L, WORKSPACE_ID, USER_ID);
+
+        assertThat(webhookResumeRegistry.consume(THREAD_ID)).isNull();
+        verify(chatRepository).delete(chat);
+    }
+
+    @Test
+    void testARolledBackDeleteKeepsTheChatsPendingWorkflowQuestion() {
+        WebhookResumeRegistry webhookResumeRegistry =
+            new WebhookResumeRegistry(new ConcurrentMapCacheManager(WebhookResumeRegistry.CACHE_NAME));
+
+        webhookResumeRegistry.register(THREAD_ID, "https://example.com/resume");
+
+        lenient().when(webhookResumeRegistryProvider.getIfAvailable())
+            .thenReturn(webhookResumeRegistry);
+        when(chatRepository.findById(1L))
+            .thenReturn(Optional.of(buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE)));
+
+        TransactionSynchronizationManager.initSynchronization();
+
+        try {
+            chatService.delete(1L, WORKSPACE_ID, USER_ID);
+
+            TransactionSynchronizationManager.getSynchronizations()
+                .forEach(synchronization -> synchronization.afterCompletion(
+                    TransactionSynchronization.STATUS_ROLLED_BACK));
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+
+        assertThat(webhookResumeRegistry.consume(THREAD_ID)).isEqualTo("https://example.com/resume");
+    }
+
+    @Test
+    void testACommittedDeleteClearsTheChatsPendingWorkflowQuestion() {
+        WebhookResumeRegistry webhookResumeRegistry =
+            new WebhookResumeRegistry(new ConcurrentMapCacheManager(WebhookResumeRegistry.CACHE_NAME));
+
+        webhookResumeRegistry.register(THREAD_ID, "https://example.com/resume");
+
+        when(webhookResumeRegistryProvider.getIfAvailable()).thenReturn(webhookResumeRegistry);
+        when(chatRepository.findById(1L))
+            .thenReturn(Optional.of(buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE)));
+
+        TransactionSynchronizationManager.initSynchronization();
+
+        try {
+            chatService.delete(1L, WORKSPACE_ID, USER_ID);
+
+            for (TransactionSynchronization synchronization : TransactionSynchronizationManager
+                .getSynchronizations()) {
+
+                synchronization.afterCommit();
+                synchronization.afterCompletion(TransactionSynchronization.STATUS_COMMITTED);
+            }
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+
+        assertThat(webhookResumeRegistry.consume(THREAD_ID)).isNull();
+    }
+
+    @Test
+    void testDeleteWithoutAResumeRegistryStillDeletes() {
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        chatService.delete(1L, WORKSPACE_ID, USER_ID);
+
+        verify(webhookResumeRegistryProvider).getIfAvailable();
+        verify(chatRepository).delete(chat);
+    }
+
+    @Test
     void testDeleteRemovesTheChatsToolApprovals() {
         AiHubChat chat =
             buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
@@ -569,7 +735,7 @@ class AiHubChatServiceTest {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
-            mock(PlatformTransactionManager.class));
+            mock(PlatformTransactionManager.class), webhookResumeRegistryProvider);
 
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
@@ -703,6 +869,53 @@ class AiHubChatServiceTest {
     }
 
     @Test
+    void testTruncateMessagesClearsThePendingWorkflowQuestionOfTheDroppedExchange() {
+        WebhookResumeRegistry webhookResumeRegistry = givenPendingWorkflowQuestion();
+
+        givenActiveEvents();
+
+        when(sessionRepository.applyCompaction(eq(THREAD_ID), any(), anyLong())).thenReturn(true);
+
+        chatService.truncateMessages(1L, WORKSPACE_ID, USER_ID, "event-100", true);
+
+        assertThat(webhookResumeRegistry.consume(THREAD_ID)).isNull();
+    }
+
+    @Test
+    void testTruncateMessagesThatDropsNothingKeepsThePendingWorkflowQuestion() {
+        WebhookResumeRegistry webhookResumeRegistry = givenPendingWorkflowQuestion();
+
+        givenActiveEvents();
+
+        chatService.truncateMessages(1L, WORKSPACE_ID, USER_ID, "event-300", true);
+
+        assertThat(webhookResumeRegistry.consume(THREAD_ID)).isEqualTo("https://example.com/resume");
+    }
+
+    @Test
+    void testARolledBackTruncationKeepsThePendingWorkflowQuestion() {
+        WebhookResumeRegistry webhookResumeRegistry = givenPendingWorkflowQuestion();
+
+        givenActiveEvents();
+
+        when(sessionRepository.applyCompaction(eq(THREAD_ID), any(), anyLong())).thenReturn(true);
+
+        TransactionSynchronizationManager.initSynchronization();
+
+        try {
+            chatService.truncateMessages(1L, WORKSPACE_ID, USER_ID, "event-100", true);
+
+            TransactionSynchronizationManager.getSynchronizations()
+                .forEach(synchronization -> synchronization.afterCompletion(
+                    TransactionSynchronization.STATUS_ROLLED_BACK));
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+
+        assertThat(webhookResumeRegistry.consume(THREAD_ID)).isEqualTo("https://example.com/resume");
+    }
+
+    @Test
     void testTruncateMessagesIsEmptyForAMessageTheChatDoesNotHold() {
         givenActiveEvents();
 
@@ -734,7 +947,7 @@ class AiHubChatServiceTest {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
-            mock(PlatformTransactionManager.class));
+            mock(PlatformTransactionManager.class), webhookResumeRegistryProvider);
 
         givenActiveEvents();
 
@@ -759,6 +972,18 @@ class AiHubChatServiceTest {
 
         assertThatThrownBy(() -> chatService.truncateMessages(1L, WORKSPACE_ID, OTHER_USER_ID, "event-100", false))
             .isInstanceOf(NotFoundException.class);
+    }
+
+    private WebhookResumeRegistry givenPendingWorkflowQuestion() {
+        WebhookResumeRegistry webhookResumeRegistry =
+            new WebhookResumeRegistry(new ConcurrentMapCacheManager(WebhookResumeRegistry.CACHE_NAME));
+
+        webhookResumeRegistry.register(THREAD_ID, "https://example.com/resume");
+
+        lenient().when(webhookResumeRegistryProvider.getIfAvailable())
+            .thenReturn(webhookResumeRegistry);
+
+        return webhookResumeRegistry;
     }
 
     private List<SessionEvent> givenActiveEvents() {
@@ -907,7 +1132,7 @@ class AiHubChatServiceTest {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
-            mock(PlatformTransactionManager.class));
+            mock(PlatformTransactionManager.class), webhookResumeRegistryProvider);
 
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
@@ -946,7 +1171,7 @@ class AiHubChatServiceTest {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
-            mock(PlatformTransactionManager.class));
+            mock(PlatformTransactionManager.class), webhookResumeRegistryProvider);
 
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
@@ -975,7 +1200,7 @@ class AiHubChatServiceTest {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
-            mock(PlatformTransactionManager.class));
+            mock(PlatformTransactionManager.class), webhookResumeRegistryProvider);
 
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
@@ -1007,7 +1232,7 @@ class AiHubChatServiceTest {
         InFlightAiHubRunRegistry registry = new InFlightAiHubRunRegistry();
         AiHubChatServiceImpl serviceWithRegistry = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider, registry,
-            mock(PlatformTransactionManager.class));
+            mock(PlatformTransactionManager.class), webhookResumeRegistryProvider);
 
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 
@@ -1036,7 +1261,7 @@ class AiHubChatServiceTest {
         PlatformTransactionManager transactionManager = mock(PlatformTransactionManager.class);
         AiHubChatServiceImpl serviceWithTransactionManager = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider,
-            inFlightRunRegistry, transactionManager);
+            inFlightRunRegistry, transactionManager, webhookResumeRegistryProvider);
 
         AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
 

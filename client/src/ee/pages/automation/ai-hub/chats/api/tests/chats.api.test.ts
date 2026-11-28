@@ -8,6 +8,7 @@ import {
     getChatDisplayTitle,
     getChatMessages,
     getToolApprovals,
+    isWebhookBridgedChat,
     patchChat,
     toChat,
 } from '../chats.api';
@@ -185,16 +186,44 @@ describe('toChat', () => {
             environmentId: 0,
             id: 101,
             isOwner: true,
+            kind: 'STANDARD',
             lastPreview: null,
             messageCount: 5,
             ownerUserId: 3,
+            projectDeploymentId: null,
             status: 'ACTIVE',
             threadId: 'thread-1',
             title: 'Hello',
             updatedAt: new Date(1716000060000).toISOString(),
             userId: 3,
+            workflowExecutionId: null,
             workspaceId: 7,
         });
+    });
+
+    it('maps the kind and workflow binding', () => {
+        expect(
+            toChat({
+                ...graphQlChat,
+                kind: AiHubChatKind.WorkflowChat,
+                projectDeploymentId: '42',
+                workflowExecutionId: 'exec-1',
+            })
+        ).toMatchObject({kind: 'WORKFLOW_CHAT', projectDeploymentId: '42', workflowExecutionId: 'exec-1'});
+    });
+
+    it('maps a standard chat to a null workflow binding', () => {
+        expect(toChat(graphQlChat)).toMatchObject({
+            kind: 'STANDARD',
+            projectDeploymentId: null,
+            workflowExecutionId: null,
+        });
+    });
+
+    it('treats only WORKFLOW_CHAT as webhook bridged', () => {
+        expect(isWebhookBridgedChat('WORKFLOW_CHAT')).toBe(true);
+        expect(isWebhookBridgedChat('STANDARD')).toBe(false);
+        expect(isWebhookBridgedChat(undefined)).toBe(false);
     });
 });
 

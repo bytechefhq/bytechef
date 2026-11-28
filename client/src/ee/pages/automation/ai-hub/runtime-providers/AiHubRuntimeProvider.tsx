@@ -1,4 +1,10 @@
-import {createAiHubChat, generateAiHubChatTitle, patchChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
+import {
+    AiHubChatI,
+    createAiHubChat,
+    generateAiHubChatTitle,
+    isWebhookBridgedChat,
+    patchChat,
+} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import {AiHubChatsKeys} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
 import {useTruncateAiHubChatMessagesMutation} from '@/ee/pages/automation/ai-hub/chats/hooks/useTruncateChatMessages';
 import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
@@ -18,6 +24,7 @@ import {MODE, useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubS
 import {aiHubTabsStore, getTabGenericId} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ApprovalResolutionContext} from '@/shared/components/ai-chat/approvalResolutionContext';
+import {AskUserQuestionDataI} from '@/shared/components/ai-chat/messages/AskUserQuestionMessage';
 import {
     RUN_ERROR_CODE_ACCESS_DENIED,
     RUN_ERROR_CODE_CHAT_ACCESS_DENIED,
@@ -62,6 +69,11 @@ export const WORKSPACE_NOT_READY_MESSAGE = 'The workspace is still loading. Send
 export const EDIT_NOT_SENT_MESSAGE =
     'The chat changed while your edit was being saved, so the edited message was not sent. Open the chat to send it again.';
 
+const ASK_WORKFLOW_QUESTION_EVENT_NAME = 'ask-workflow-question';
+
+type OpenChatTabResultType =
+    {chatId: number; opened: true; threadId: string; title: string | null} | {error: string; opened: false};
+
 type OpenWorkflowTabResultType =
     | {name: string; opened: true; projectId: string; projectWorkflowId: number; workflowId: string}
     | {error: string; opened: false};
@@ -94,6 +106,97 @@ const validateOpenWorkflowTabResult = (raw: unknown): OpenWorkflowTabResultType 
     }
 
     return {error: typeof record.error === 'string' ? record.error : 'tool reported opened:false', opened: false};
+};
+
+const validateOpenChatTabResult = (raw: unknown): OpenChatTabResultType | null => {
+    if (typeof raw !== 'object' || raw === null) {
+        return null;
+    }
+
+    const record = raw as Record<string, unknown>;
+
+    if (record.opened === true && typeof record.threadId === 'string' && typeof record.chatId === 'number') {
+        return {
+            chatId: record.chatId,
+            opened: true,
+            threadId: record.threadId,
+            title: typeof record.title === 'string' ? record.title : null,
+        };
+    }
+
+    return {error: typeof record.error === 'string' ? record.error : 'tool reported opened:false', opened: false};
+};
+
+const toWorkflowQuestionOption = (
+    value: unknown
+): AskUserQuestionDataI['questions'][number]['options'][number] | null => {
+    if (typeof value !== 'object' || value === null) {
+        return null;
+    }
+
+    const option = value as {description?: unknown; label?: unknown};
+
+    if (typeof option.label !== 'string') {
+        return null;
+    }
+
+    if (option.description === undefined) {
+        return {label: option.label};
+    }
+
+    if (typeof option.description !== 'string') {
+        return null;
+    }
+
+    return {description: option.description, label: option.label};
+};
+
+const toWorkflowQuestion = (value: unknown): AskUserQuestionDataI['questions'][number] | null => {
+    if (typeof value !== 'object' || value === null) {
+        return null;
+    }
+
+    const question = value as {header?: unknown; multiSelect?: unknown; options?: unknown; question?: unknown};
+
+    if (typeof question.question !== 'string' || question.question.trim().length === 0) {
+        return null;
+    }
+
+    const options = Array.isArray(question.options)
+        ? question.options.map(toWorkflowQuestionOption).filter((option) => option !== null)
+        : [];
+
+    return {
+        header: typeof question.header === 'string' ? question.header : undefined,
+        multiSelect: question.multiSelect === true,
+        options,
+        question: question.question,
+    };
+};
+
+const toWorkflowQuestionData = (value: unknown): AskUserQuestionDataI | null => {
+    if (typeof value !== 'object' || value === null) {
+        return null;
+    }
+
+    const record = value as {questions?: unknown; resumeUrl?: unknown};
+
+    if (!Array.isArray(record.questions)) {
+        return null;
+    }
+
+    const questions = record.questions.map(toWorkflowQuestion).filter((question) => question !== null);
+
+    if (questions.length === 0) {
+        return null;
+    }
+
+    return {
+        answerFormat: 'plain',
+        awaitingAnswer: typeof record.resumeUrl === 'string' && record.resumeUrl.length > 0,
+        kind: 'ask-user-question',
+        questions,
+    };
 };
 
 /**
@@ -232,6 +335,8 @@ interface BuildSubscriberDepsI {
      */
     chatId?: string;
     getLastUserMessage: () => string;
+    /** Fires after an {@code openWorkflowChatTab} result switched the hub to another chat. */
+    onChatOpened?: () => void;
     /**
      * Fires on RUN_STARTED of a turn still showing in the thread: the server has accepted the turn, and with it
      * superseded any approval that was waiting for a decision.
@@ -358,6 +463,7 @@ export const buildAiHubSubscriber = ({
     assistantMessageIndex = 0,
     chatId: subscriberChatId,
     getLastUserMessage,
+    onChatOpened,
     onRunStarted,
     onTurnInFlight,
     onWorkflowMutated,
@@ -431,6 +537,30 @@ export const buildAiHubSubscriber = ({
         });
     };
 
+    const openChat = (toolCallName: string, toolResultContent: string) => {
+        const parsed = validateOpenChatTabResult(parseJson<unknown>(toolResultContent, `${toolCallName} result`));
+
+        if (parsed === null) {
+            console.warn(`[AiHub] ${toolCallName}: unparseable result`, toolResultContent);
+
+            recordToolFailure(toolCallName, 'unparseable result');
+
+            return;
+        }
+
+        if (!parsed.opened) {
+            recordToolFailure(toolCallName, parsed.error);
+
+            return;
+        }
+
+        useAiHubStore.setState({chatId: parsed.threadId, messages: []});
+
+        aiHubChatsStore.getState().setCurrentChatId(parsed.chatId);
+
+        onChatOpened?.();
+    };
+
     const addInteractiveDataPart = (toolCallId: string, toolCallName: string | undefined, content: string) => {
         const dataPart = toToolResultDataPart(toolCallName ?? '', content);
 
@@ -468,6 +598,25 @@ export const buildAiHubSubscriber = ({
     };
 
     return {
+        onCustomEvent: ({event}) => {
+            if (event.name !== ASK_WORKFLOW_QUESTION_EVENT_NAME || isStaleChat()) {
+                return;
+            }
+
+            const questionData = toWorkflowQuestionData(event.value);
+
+            if (questionData === null) {
+                console.warn('[AiHub] ask-workflow-question without questions', event.value);
+
+                return;
+            }
+
+            addMessage({content: [{data: questionData, type: 'data-ask-user-question'}], role: 'assistant'});
+
+            if (questionData.awaitingAnswer && subscriberChatId != null) {
+                aiHubChatsStore.getState().setActivityState(subscriberChatId, 'paused');
+            }
+        },
         onRunErrorEvent: ({event}) => {
             const userAborted = turnAbortSignal?.aborted === true;
             const turnInFlight = subscriberChatId != null && isTurnInFlightError(event as {message?: string});
@@ -586,6 +735,8 @@ export const buildAiHubSubscriber = ({
 
             if (toolCallName === 'openWorkflowTab') {
                 openWorkflowTab(toolCallName, toolResultContent);
+            } else if (toolCallName === 'openWorkflowChatTab') {
+                openChat(toolCallName, toolResultContent);
             } else {
                 addInteractiveDataPart(event.toolCallId, toolCallName, toolResultContent);
             }
@@ -667,14 +818,24 @@ interface PostTurnTelemetryArgsI {
     chatId: number;
     input: string;
     invalidateChats: () => void;
+    isWorkflowChat?: boolean;
     messageCount: number;
     workspaceId: number;
 }
+
+export const isCachedWorkflowChat = (queryClient: QueryClient, chatId: number): boolean => {
+    const cachedChatLists = queryClient.getQueriesData<AiHubChatI[]>({queryKey: [...AiHubChatsKeys.all, 'list']});
+
+    return cachedChatLists.some(
+        ([, chats]) => chats?.some((chat) => chat.id === chatId && isWebhookBridgedChat(chat.kind)) === true
+    );
+};
 
 export const runPostTurnTelemetry = ({
     chatId,
     input,
     invalidateChats,
+    isWorkflowChat = false,
     messageCount,
     workspaceId,
 }: PostTurnTelemetryArgsI): void => {
@@ -685,7 +846,7 @@ export const runPostTurnTelemetry = ({
         );
     });
 
-    if (messageCount >= 2) {
+    if (!isWorkflowChat && messageCount >= 2) {
         generateAiHubChatTitle({chatId, workspaceId})
             .then(() => {
                 aiHubChatsStore.getState().clearTitleGenerationFailure(chatId);
@@ -1023,6 +1184,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             assistantMessageIndex: useAiHubStore.getState().messages.length - 1,
             chatId,
             getLastUserMessage: () => input,
+            onChatOpened: () => queryClient.invalidateQueries({queryKey: AiHubChatsKeys.all}),
             onRunStarted: () => useAiHubStore.getState().markPendingToolApprovalsSuperseded(),
             onTurnInFlight: handleTurnInFlight,
             onWorkflowMutated: handleWorkflowMutated,
@@ -1195,6 +1357,8 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
         aiHubComposerStore.getState().clear();
 
+        const turnChatId = aiHubChatsStore.getState().currentChatId;
+
         const {turnForbidden, turnInFlight} = await runTurn({
             composerTextOnRollback: input,
             input,
@@ -1206,13 +1370,14 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             runId,
         });
 
-        const persistedChatId = aiHubChatsStore.getState().currentChatId;
+        const stillOnTurnChat = useAiHubStore.getState().chatId === chatId;
 
-        if (!turnInFlight && !turnForbidden && persistedChatId != null) {
+        if (!turnInFlight && !turnForbidden && turnChatId != null && stillOnTurnChat) {
             runPostTurnTelemetry({
-                chatId: persistedChatId,
+                chatId: turnChatId,
                 input,
                 invalidateChats: () => queryClient.invalidateQueries({queryKey: AiHubChatsKeys.all}),
+                isWorkflowChat: isCachedWorkflowChat(queryClient, turnChatId),
                 messageCount: useAiHubStore.getState().messages.length,
                 workspaceId: currentWorkspaceId,
             });

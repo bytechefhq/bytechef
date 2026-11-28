@@ -11,6 +11,7 @@ import {AiHubChatI} from '../api/chats.api';
 
 const {
     generateAiHubChatTitleMock,
+    liveWorkflowLabelRef,
     mockChatsDataRef,
     mockChatsLoadingRef,
     patchChatMock,
@@ -18,6 +19,7 @@ const {
     useAiHubChatsQueryMock,
 } = vi.hoisted(() => ({
     generateAiHubChatTitleMock: vi.fn(),
+    liveWorkflowLabelRef: {current: null as string | null},
     mockChatsDataRef: {current: [] as AiHubChatI[]},
     mockChatsLoadingRef: {current: false},
     patchChatMock: vi.fn(),
@@ -34,6 +36,9 @@ vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useChats', () => ({
     },
     useDeleteAiHubChatMutation: () => ({mutate: vi.fn()}),
     usePatchAiHubChatMutation: () => ({mutate: patchChatMock}),
+}));
+vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useLiveWorkflowLabel', () => ({
+    useLiveWorkflowLabel: () => liveWorkflowLabelRef.current,
 }));
 vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useSwitchChat', () => ({
     useSwitchChat: () => switchChatMock,
@@ -62,14 +67,17 @@ function buildChat(overrides: Partial<AiHubChatI> = {}): AiHubChatI {
         environmentId: 2,
         id: 1,
         isOwner: true,
+        kind: 'STANDARD',
         lastPreview: null,
         messageCount: 0,
         ownerUserId: 1,
+        projectDeploymentId: null,
         status: 'ACTIVE',
         threadId: 'thread-1',
         title: 'Chat',
         updatedAt: new Date().toISOString(),
         userId: 1,
+        workflowExecutionId: null,
         workspaceId: 1,
         ...overrides,
     };
@@ -92,6 +100,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+    liveWorkflowLabelRef.current = null;
     mockChatsDataRef.current = [];
     mockChatsLoadingRef.current = false;
     vi.clearAllMocks();
@@ -120,6 +129,29 @@ describe('getChatsPage', () => {
 });
 
 describe('AiHubChatsSidebar', () => {
+    it('renders a workflow icon for a workflow chat and the live workflow label in its tooltip', async () => {
+        liveWorkflowLabelRef.current = 'Acme — Support v2';
+        mockChatsDataRef.current = [
+            buildChat({id: 5, kind: 'WORKFLOW_CHAT', title: 'Acme — Support', workflowExecutionId: 'exec-1'}),
+        ];
+
+        renderSidebar();
+
+        const workflowIcon = screen.getByRole('img', {name: 'Workflow chat'});
+
+        await userEvent.hover(workflowIcon);
+
+        expect(await screen.findByRole('tooltip')).toHaveTextContent('Current workflow label: Acme — Support v2');
+    });
+
+    it('renders no workflow icon for a standard chat', () => {
+        mockChatsDataRef.current = [buildChat({id: 5, title: 'Plain'})];
+
+        renderSidebar();
+
+        expect(screen.queryByRole('img', {name: 'Workflow chat'})).toBeNull();
+    });
+
     it('renders New Chat and nothing from the dropped menus', () => {
         renderSidebar();
 

@@ -12,7 +12,9 @@ import com.agui.core.state.State;
 import com.bytechef.ai.copilot.tool.InteractivePickerToolCallbacks;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.tool.DeploymentToolCallbacksFactory;
@@ -22,18 +24,30 @@ import com.bytechef.automation.configuration.tool.ReadProjectTools;
 import com.bytechef.automation.configuration.tool.ReadProjectWorkflowTools;
 import com.bytechef.component.ai.agent.chat.memory.builtin.util.BuiltInSessionRepositoryFactory;
 import com.bytechef.component.ai.agent.chat.memory.builtin.util.BuiltInSessionRepositoryFactory.BuiltInSessionStore;
+import com.bytechef.ee.ai.hub.agent.AiHubRoutingAgent;
 import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
 import com.bytechef.ee.ai.hub.agent.RunStopAdvisor;
+import com.bytechef.ee.ai.hub.agent.WebhookBridgeAgent;
+import com.bytechef.ee.ai.hub.agent.WebhookResumeRegistry;
+import com.bytechef.ee.ai.hub.agent.WorkflowChatGuard;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
 import com.bytechef.ee.ai.hub.approval.AiHubGatedToolFilterAdvisor;
 import com.bytechef.ee.ai.hub.approval.AiHubPinnedToolCallbacks;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
+import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
 import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
+import com.bytechef.ee.ai.hub.tool.CreateWorkflowChatToolCallback;
+import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
+import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.platform.ai.tool.SecurityContextRehydrator;
+import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
+import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,6 +68,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @version ee
@@ -81,15 +96,22 @@ public class AiHubConfiguration {
         this.promptAiHubBuildResource = promptAiHubBuildResource;
     }
 
-    @Bean
+    /**
+     * The LLM delegate the {@code ai_hub_ask} {@link AiHubRoutingAgent} wraps. It shares the router's agent id, so it
+     * is not a default candidate: unqualified {@code List<LocalAgent>} injection sees only the router, while
+     * {@code @Qualifier("aiHubAskSpringAIAgent")} injection still resolves it.
+     */
+    @Bean(defaultCandidate = false)
     AiHubSpringAIAgent aiHubAskSpringAIAgent(
         AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
         ReadProjectWorkflowTools readProjectWorkflowTools,
         ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, ProjectWorkflowFacade projectWorkflowFacade,
+        AiHubChatService chatService, AiHubChatAccessPolicy chatAccessPolicy,
         SecurityContextRehydrator securityContextRehydrator, AiHubApprovalGate approvalGate,
         ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
-        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider)
+        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
+        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider)
         throws AGUIException {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
@@ -98,22 +120,27 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(deploymentFlatCrudToolCallbacks(deploymentToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(interactivePickerToolCallbacks.read());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, null));
+        toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
 
         return buildAgent(
             AiHubAgentType.AI_HUB_ASK, Mode.ASK, promptAiHubAskResource, toolCallbacks, aiHubSessionMemory, chatModel,
-            securityContextRehydrator, approvalGate, inFlightRunRegistryProvider, overrideChatClientResolverProvider);
+            securityContextRehydrator, approvalGate, inFlightRunRegistryProvider, overrideChatClientResolverProvider,
+            webSearchToolCallbackProviderProvider);
     }
 
-    @Bean
+    @Bean(defaultCandidate = false)
     AiHubSpringAIAgent aiHubBuildSpringAIAgent(
         AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel, ProjectTools projectTools,
         ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools,
         ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, IntelligentToolCatalog intelligentToolCatalog,
         WorkspaceFacade workspaceFacade, ProjectWorkflowFacade projectWorkflowFacade,
-        AiHubChatArtifactRecorder aiHubChatArtifactRecorder, SecurityContextRehydrator securityContextRehydrator,
+        ProjectDeploymentFacade projectDeploymentFacade, AiHubChatService chatService,
+        AiHubChatAccessPolicy chatAccessPolicy, AiHubChatArtifactRecorder aiHubChatArtifactRecorder,
+        SecurityContextRehydrator securityContextRehydrator,
         AiHubApprovalGate approvalGate, ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
-        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider)
+        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
+        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider)
         throws AGUIException {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
@@ -122,6 +149,9 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(deploymentFlatCrudToolCallbacks(deploymentToolCallbacksFactoryProvider, true));
         toolCallbacks.addAll(interactivePickerToolCallbacks.write());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, aiHubChatArtifactRecorder));
+        toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
+        toolCallbacks.add(new ListChatWorkflowsToolCallback(projectDeploymentFacade));
+        toolCallbacks.add(new CreateWorkflowChatToolCallback(chatService, projectDeploymentFacade));
         toolCallbacks.addAll(
             intelligentToolCatalog.getByNames(
                 INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD,
@@ -133,7 +163,49 @@ public class AiHubConfiguration {
         return buildAgent(
             AiHubAgentType.AI_HUB_BUILD, Mode.BUILD, promptAiHubBuildResource, toolCallbacks, aiHubSessionMemory,
             chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
-            overrideChatClientResolverProvider);
+            overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider);
+    }
+
+    /**
+     * The agent that serves workflow chat turns through the chat's webhook trigger. It is a
+     * {@link com.agui.server.LocalAgent} but not a default candidate: the unqualified {@code List<LocalAgent>} the chat
+     * controllers dispatch from holds only agents a URL may address, and only the routers reach this one, by name.
+     */
+    @Bean(defaultCandidate = false)
+    WebhookBridgeAgent webhookBridgeAgent(
+        WebhookWorkflowExecutor webhookWorkflowExecutor, AiHubChatService chatService,
+        WebhookResumeRegistry webhookResumeRegistry, JsonMapper jsonMapper, WorkflowChatMetrics workflowChatMetrics,
+        AiHubSessionMemory aiHubSessionMemory, WorkflowChatGuard workflowChatGuard,
+        ObjectProvider<JobFacade> jobFacadeProvider, InFlightAiHubRunRegistry inFlightRunRegistry)
+        throws AGUIException {
+
+        return new WebhookBridgeAgent(
+            webhookWorkflowExecutor, chatService, webhookResumeRegistry, jsonMapper, workflowChatMetrics,
+            aiHubSessionMemory, workflowChatGuard, jobFacadeProvider.getIfAvailable(), inFlightRunRegistry);
+    }
+
+    @Bean
+    AiHubRoutingAgent aiHubAskRoutingAgent(
+        @Qualifier("aiHubAskSpringAIAgent") AiHubSpringAIAgent aiHubAskSpringAIAgent,
+        @Qualifier("webhookBridgeAgent") ObjectProvider<WebhookBridgeAgent> webhookBridgeAgentProvider,
+        AiHubChatService chatService)
+        throws AGUIException {
+
+        return new AiHubRoutingAgent(
+            AiHubAgentType.AI_HUB_ASK.key(), aiHubAskSpringAIAgent, webhookBridgeAgentProvider.getIfAvailable(),
+            chatService);
+    }
+
+    @Bean
+    AiHubRoutingAgent aiHubBuildRoutingAgent(
+        @Qualifier("aiHubBuildSpringAIAgent") AiHubSpringAIAgent aiHubBuildSpringAIAgent,
+        @Qualifier("webhookBridgeAgent") ObjectProvider<WebhookBridgeAgent> webhookBridgeAgentProvider,
+        AiHubChatService chatService)
+        throws AGUIException {
+
+        return new AiHubRoutingAgent(
+            AiHubAgentType.AI_HUB_BUILD.key(), aiHubBuildSpringAIAgent, webhookBridgeAgentProvider.getIfAvailable(),
+            chatService);
     }
 
     @Bean
@@ -189,7 +261,8 @@ public class AiHubConfiguration {
         AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel,
         SecurityContextRehydrator securityContextRehydrator, AiHubApprovalGate approvalGate,
         ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
-        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider)
+        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
+        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider)
         throws AGUIException {
 
         AiHubSpringAIAgent.Builder builder = AiHubSpringAIAgent.builder()
@@ -209,6 +282,7 @@ public class AiHubConfiguration {
         builder.advisor(aiHubSessionMemory.createTurnEndingToolResultAdvisor(approvalGate::recordToolCallId));
 
         overrideChatClientResolverProvider.ifAvailable(builder::overrideChatClientResolver);
+        webSearchToolCallbackProviderProvider.ifAvailable(builder::webSearchToolCallbackProvider);
 
         return builder.build();
     }

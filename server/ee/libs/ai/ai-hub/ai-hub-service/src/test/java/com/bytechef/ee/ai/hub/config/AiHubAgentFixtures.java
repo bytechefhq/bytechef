@@ -39,10 +39,12 @@ import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalPolicy;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
 import com.bytechef.platform.ai.tool.SecurityContextRehydrator;
+import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -76,6 +78,7 @@ public final class AiHubAgentFixtures {
     public final AiHubChatArtifactRecorder artifactRecorder = mock(AiHubChatArtifactRecorder.class);
     public final AiHubToolApprovalService approvalService = mock(AiHubToolApprovalService.class);
     public final AiHubChatService chatService = mock(AiHubChatService.class);
+    public final AiHubChatAccessPolicy chatAccessPolicy = mock(AiHubChatAccessPolicy.class);
     public final ChatModel chatModel = mock(ChatModel.class);
     public final AiHubToolApprovalPolicy policy = mock(AiHubToolApprovalPolicy.class);
     public final ProjectDeploymentFacade projectDeploymentFacade = mock(ProjectDeploymentFacade.class);
@@ -96,6 +99,8 @@ public final class AiHubAgentFixtures {
     public final ReadProjectTools readProjectTools = new ReadProjectTools(projectTools);
     public final ReadProjectWorkflowTools readProjectWorkflowTools = new ReadProjectWorkflowTools(projectWorkflowTools);
     public final SecurityContextRehydrator securityContextRehydrator = mock(SecurityContextRehydrator.class);
+    public final WebSearchToolCallbackProvider webSearchToolCallbackProvider =
+        mock(WebSearchToolCallbackProvider.class);
     public final AiHubSessionMemory sessionMemory = new AiHubSessionMemory(
         InMemorySessionRepository.builder()
             .build(),
@@ -169,8 +174,8 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubAskSpringAIAgent(
             sessionMemory, defaultChatModel, readProjectTools, readProjectWorkflowTools,
             deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, projectWorkflowFacade,
-            securityContextRehydrator, approvalGate, inFlightRunRegistryProvider(),
-            overrideChatClientResolverProvider);
+            chatService, chatAccessPolicy, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider(),
+            overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider());
     }
 
     private AiHubSpringAIAgent buildAgent(
@@ -181,8 +186,10 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubBuildSpringAIAgent(
             sessionMemory, defaultChatModel, projectTools, projectWorkflowLifecycleTools,
             deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, intelligentToolCatalog,
-            workspaceFacade, projectWorkflowFacade, artifactRecorder, securityContextRehydrator, approvalGate,
-            inFlightRunRegistryProvider(), overrideChatClientResolverProvider);
+            workspaceFacade, projectWorkflowFacade, projectDeploymentFacade, chatService, chatAccessPolicy,
+            artifactRecorder,
+            securityContextRehydrator, approvalGate, inFlightRunRegistryProvider(), overrideChatClientResolverProvider,
+            webSearchToolCallbackProviderProvider());
     }
 
     @SuppressWarnings("unchecked")
@@ -192,6 +199,21 @@ public final class AiHubAgentFixtures {
         doAnswer(invocation -> {
             invocation.<Consumer<InFlightAiHubRunRegistry>>getArgument(0)
                 .accept(inFlightRunRegistry);
+
+            return null;
+        }).when(provider)
+            .ifAvailable(any());
+
+        return provider;
+    }
+
+    @SuppressWarnings("unchecked")
+    private ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider() {
+        ObjectProvider<WebSearchToolCallbackProvider> provider = mock(ObjectProvider.class);
+
+        doAnswer(invocation -> {
+            invocation.<Consumer<WebSearchToolCallbackProvider>>getArgument(0)
+                .accept(webSearchToolCallbackProvider);
 
             return null;
         }).when(provider)
