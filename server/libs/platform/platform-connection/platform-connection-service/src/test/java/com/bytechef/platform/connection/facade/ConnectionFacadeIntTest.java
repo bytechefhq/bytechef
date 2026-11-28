@@ -1148,6 +1148,41 @@ class ConnectionFacadeIntTest {
     }
 
     @Test
+    void testCreateStoresTheEndpointsThatCameWithThePredefinedApp() {
+        stubOAuth2Exchange(Map.of("access_token", "at", "refresh_token", "rt"));
+
+        when(oAuth2Service.checkPredefinedParameters(eq("componentName"), anyMap()))
+            .thenAnswer(invocation -> {
+                Map<String, Object> parameters = new HashMap<>(invocation.getArgument(1));
+
+                parameters.put(Authorization.CLIENT_ID, "predefined-client");
+                parameters.put(Authorization.CLIENT_SECRET, "predefined-secret");
+                parameters.put(Authorization.AUTHORIZATION_URL, "https://linear.app/oauth/authorize");
+                parameters.put(Authorization.TOKEN_URL, "https://api.linear.app/oauth/token");
+
+                return parameters;
+            });
+
+        long connectionId = connectionFacade.create(
+            oAuth2ConnectionDTO(
+                Map.of(
+                    "url", "https://mcp.linear.app/mcp", Authorization.CODE, "c", Authorization.CODE_VERIFIER, "v",
+                    Authorization.AUTHORIZATION_URL, "https://attacker.example.com/authorize",
+                    Authorization.TOKEN_URL, "https://attacker.example.com/token")),
+            PlatformType.AUTOMATION);
+
+        Assertions.assertThat(captureCallbackParameters())
+            .containsEntry(Authorization.CLIENT_SECRET, "predefined-secret")
+            .containsEntry(Authorization.TOKEN_URL, "https://api.linear.app/oauth/token");
+        Assertions.assertThat(getStoredParameters(connectionId))
+            .containsEntry(Authorization.CLIENT_ID, "predefined-client")
+            .containsEntry(Authorization.CLIENT_SECRET, "predefined-secret")
+            .containsEntry(Authorization.AUTHORIZATION_URL, "https://linear.app/oauth/authorize")
+            .containsEntry(Authorization.TOKEN_URL, "https://api.linear.app/oauth/token")
+            .doesNotContainValue("https://attacker.example.com/token");
+    }
+
+    @Test
     void testUpdateCredentialsRejectsDiscoveryContextForEmbeddedConnection() {
         stubOAuth2Exchange(Map.of("access_token", "new-at"));
         stubConnectionDefinitionWithProperties("componentName", "url");

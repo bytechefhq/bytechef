@@ -296,7 +296,18 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         if ((clientId == null || clientId.equals("")) && (clientSecret == null || clientSecret.equals("")) &&
             predefinedClientId != null && predefinedClientSecret != null) {
 
-            connection.putAllParameters(Map.of(CLIENT_ID, predefinedClientId, CLIENT_SECRET, predefinedClientSecret));
+            Map<String, Object> predefinedAppParameters = new HashMap<>(
+                Map.of(CLIENT_ID, predefinedClientId, CLIENT_SECRET, predefinedClientSecret));
+
+            for (String endpointParameterName : List.of(Authorization.AUTHORIZATION_URL, Authorization.TOKEN_URL)) {
+                Object endpoint = callbackParameters.get(endpointParameterName);
+
+                if (endpoint != null) {
+                    predefinedAppParameters.put(endpointParameterName, endpoint);
+                }
+            }
+
+            connection.putAllParameters(predefinedAppParameters);
         }
 
         if (log.isWarnEnabled() && !connection.containsParameter(Authorization.REFRESH_TOKEN)) {
