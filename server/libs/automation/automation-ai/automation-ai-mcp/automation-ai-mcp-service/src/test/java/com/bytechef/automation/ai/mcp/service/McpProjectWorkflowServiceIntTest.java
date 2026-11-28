@@ -47,6 +47,7 @@ import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -132,6 +133,7 @@ class McpProjectWorkflowServiceIntTest {
         projectDeployment.setEnvironment(Environment.DEVELOPMENT);
         projectDeployment.setProjectId(project.getId());
         projectDeployment.setProjectVersion(1);
+        projectDeployment.setUuid(UUID.randomUUID());
 
         projectDeployment = projectDeploymentRepository.save(projectDeployment);
 

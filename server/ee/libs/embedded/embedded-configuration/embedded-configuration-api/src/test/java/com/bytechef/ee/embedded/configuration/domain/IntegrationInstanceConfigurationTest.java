@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import org.junit.jupiter.api.Test;
@@ -36,5 +37,20 @@ class IntegrationInstanceConfigurationTest {
 
         assertThat(integrationInstanceConfiguration.getAuthorizationType())
             .isEqualTo(AuthorizationType.OAUTH2_AUTHORIZATION_CODE);
+    }
+
+    @Test
+    void testNoArgConstructorAssignsNoUuid() {
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
+
+        assertThat(integrationInstanceConfiguration.getUuid()).isNull();
+    }
+
+    @Test
+    void testSetUuidRejectsNull() {
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
+
+        assertThatThrownBy(() -> integrationInstanceConfiguration.setUuid(null))
+            .isInstanceOf(NullPointerException.class);
     }
 }

@@ -18,6 +18,7 @@ package com.bytechef.platform.data.table.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.InstanceOfAssertFactories.list;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -34,10 +35,14 @@ import com.bytechef.platform.data.table.configuration.exception.DataTableExcepti
 import com.bytechef.platform.data.table.configuration.repository.DataTableRepository;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.LinkDeleteRule;
+import com.bytechef.platform.data.table.domain.LinkSpec;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
+import com.bytechef.platform.data.table.util.DataTablePhysicalNameUtils;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,6 +55,8 @@ import java.util.concurrent.locks.LockSupport;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -367,6 +374,232 @@ class DataTableServiceIntTest {
     }
 
     @Test
+    void testChangeColumnTypeIntegerToString() {
+        long tableId = dataTableService.createTable(
+            WORKSPACE_ID, "typed", null, List.of(new ColumnSpec("amount", ColumnType.INTEGER)), DEV_ENVIRONMENT_ID);
+
+        dataTableRowService.insertRow(tableId, Map.of("amount", 42), DEV_ENVIRONMENT_ID);
+
+        dataTableService.changeColumnType(tableId, "amount", ColumnType.STRING, DEV_ENVIRONMENT_ID);
+
+        assertEquals(ColumnType.STRING, findColumnType(tableId, "amount"));
+        assertThat(dataTableRowService.listRows(tableId, 10, 0, DEV_ENVIRONMENT_ID))
+            .extracting(dataTableRow -> dataTableRow.values()
+                .get("amount"))
+            .containsExactly("42");
+    }
+
+    @Test
+    void testChangeColumnTypeStringToIntegerConvertsNumericText() {
+        long tableId = dataTableService.createTable(
+            WORKSPACE_ID, "typed", null, List.of(new ColumnSpec("amount", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+
+        dataTableRowService.insertRow(tableId, Map.of("amount", "7"), DEV_ENVIRONMENT_ID);
+
+        dataTableService.changeColumnType(tableId, "amount", ColumnType.INTEGER, DEV_ENVIRONMENT_ID);
+
+        assertEquals(ColumnType.INTEGER, findColumnType(tableId, "amount"));
+        assertThat(dataTableRowService.listRows(tableId, 10, 0, DEV_ENVIRONMENT_ID))
+            .extracting(dataTableRow -> ((Number) dataTableRow.values()
+                .get("amount")).intValue())
+            .containsExactly(7);
+    }
+
+    @Test
+    void testChangeColumnTypeStringToIntegerWithNonNumericFails() {
+        long tableId = dataTableService.createTable(
+            WORKSPACE_ID, "typed", null, List.of(new ColumnSpec("amount", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+
+        dataTableRowService.insertRow(tableId, Map.of("amount", "abc"), DEV_ENVIRONMENT_ID);
+
+        assertThatThrownBy(
+            () -> dataTableService.changeColumnType(tableId, "amount", ColumnType.INTEGER, DEV_ENVIRONMENT_ID))
+                .isInstanceOf(RuntimeException.class);
+
+        assertEquals(ColumnType.STRING, findColumnType(tableId, "amount"));
+        assertThat(dataTableRowService.listRows(tableId, 10, 0, DEV_ENVIRONMENT_ID))
+            .extracting(dataTableRow -> dataTableRow.values()
+                .get("amount"))
+            .containsExactly("abc");
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "INTEGER, STRING", "NUMBER, STRING", "BOOLEAN, STRING", "DATE, STRING", "DATE_TIME, STRING",
+        "STRING, INTEGER", "NUMBER, INTEGER", "BOOLEAN, INTEGER", "STRING, NUMBER", "INTEGER, NUMBER",
+        "BOOLEAN, NUMBER", "STRING, BOOLEAN", "INTEGER, BOOLEAN", "NUMBER, BOOLEAN", "STRING, DATE",
+        "DATE_TIME, DATE", "STRING, DATE_TIME", "DATE, DATE_TIME"
+    })
+    void testChangeColumnTypeKeepsNullValuesNull(ColumnType fromColumnType, ColumnType toColumnType) {
+        long tableId = dataTableService.createTable(
+            WORKSPACE_ID, "typed", null,
+            List.of(new ColumnSpec("label", ColumnType.STRING), new ColumnSpec("amount", fromColumnType)),
+            DEV_ENVIRONMENT_ID);
+
+        dataTableRowService.insertRow(tableId, Map.of("label", "empty"), DEV_ENVIRONMENT_ID);
+
+        dataTableService.changeColumnType(tableId, "amount", toColumnType, DEV_ENVIRONMENT_ID);
+
+        assertEquals(toColumnType, findColumnType(tableId, "amount"));
+
+        List<DataTableRow> dataTableRows = dataTableRowService.listRows(tableId, 10, 0, DEV_ENVIRONMENT_ID);
+
+        assertThat(dataTableRows).hasSize(1);
+
+        DataTableRow dataTableRow = dataTableRows.getFirst();
+
+        assertNull(dataTableRow.values()
+            .get("amount"));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "INTEGER", "NUMBER"
+    })
+    void testChangeColumnTypeBooleanToNumericMapsTrueToOneAndFalseToZero(ColumnType toColumnType) {
+        long tableId = dataTableService.createTable(
+            WORKSPACE_ID, "typed", null,
+            List.of(new ColumnSpec("label", ColumnType.STRING), new ColumnSpec("flag", ColumnType.BOOLEAN)),
+            DEV_ENVIRONMENT_ID);
+
+        dataTableRowService.insertRow(tableId, Map.of("label", "yes", "flag", true), DEV_ENVIRONMENT_ID);
+        dataTableRowService.insertRow(tableId, Map.of("label", "no", "flag", false), DEV_ENVIRONMENT_ID);
+        dataTableRowService.insertRow(tableId, Map.of("label", "unknown"), DEV_ENVIRONMENT_ID);
+
+        dataTableService.changeColumnType(tableId, "flag", toColumnType, DEV_ENVIRONMENT_ID);
+
+        Map<Object, @Nullable Object> flagsByLabel = new HashMap<>();
+
+        for (DataTableRow dataTableRow : dataTableRowService.listRows(tableId, 10, 0, DEV_ENVIRONMENT_ID)) {
+            Map<String, Object> values = dataTableRow.values();
+
+            Object flag = values.get("flag");
+
+            flagsByLabel.put(values.get("label"), flag == null ? null : ((Number) flag).intValue());
+        }
+
+        assertThat(flagsByLabel).containsEntry("yes", 1)
+            .containsEntry("no", 0)
+            .containsEntry("unknown", null);
+    }
+
+    @Test
+    void testChangeColumnTypeRejectsLinkColumn() {
+        long targetId = createTable("targets", null, DEV_ENVIRONMENT_ID);
+        long sourceId = createTable("sources", null, DEV_ENVIRONMENT_ID);
+
+        dataTableService.addColumn(
+            sourceId,
+            new ColumnSpec("target", ColumnType.LINK, new LinkSpec(targetId, LinkDeleteRule.BLOCK, null)),
+            DEV_ENVIRONMENT_ID);
+
+        assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> dataTableService.changeColumnType(sourceId, "target", ColumnType.STRING, DEV_ENVIRONMENT_ID));
+        assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> dataTableService.changeColumnType(sourceId, "title", ColumnType.LINK, DEV_ENVIRONMENT_ID));
+        assertEquals(ColumnType.LINK, findColumnType(sourceId, "target"));
+        assertEquals(ColumnType.STRING, findColumnType(sourceId, "title"));
+    }
+
+    @Test
+    void testChangeLinkColumnWithSameTargetTableKeepsValuesAndAppliesNewDeleteRule() {
+        long targetId = createTable("link_targets", null, DEV_ENVIRONMENT_ID);
+        long sourceId = createTable("link_sources", null, DEV_ENVIRONMENT_ID);
+
+        dataTableService.addColumn(
+            sourceId,
+            new ColumnSpec("target", ColumnType.LINK, new LinkSpec(targetId, LinkDeleteRule.BLOCK, null)),
+            DEV_ENVIRONMENT_ID);
+
+        DataTableRow targetRow = dataTableRowService.insertRow(targetId, Map.of("title", "a"), DEV_ENVIRONMENT_ID);
+
+        dataTableRowService.insertRow(
+            sourceId, Map.of("title", "linked", "target", targetRow.id()), DEV_ENVIRONMENT_ID);
+
+        dataTableService.changeLinkColumn(
+            sourceId, "target", new LinkSpec(targetId, LinkDeleteRule.CLEAR, "title"), DEV_ENVIRONMENT_ID);
+
+        assertThat(dataTableService.fetchDataTableInfo(sourceId, DEV_ENVIRONMENT_ID))
+            .get()
+            .extracting(DataTableInfo::columns)
+            .asInstanceOf(list(ColumnSpec.class))
+            .contains(
+                new ColumnSpec("target", ColumnType.LINK, new LinkSpec(targetId, LinkDeleteRule.CLEAR, "title")));
+        assertEquals(targetRow.id(), selectLinkValue(sourceId, "target"));
+
+        dataTableRowService.deleteRow(targetId, targetRow.id(), DEV_ENVIRONMENT_ID);
+
+        assertNull(selectLinkValue(sourceId, "target"));
+    }
+
+    @Test
+    void testChangeLinkColumnWithNewTargetTableClearsValues() {
+        long firstTargetId = createTable("first_targets", null, DEV_ENVIRONMENT_ID);
+        long secondTargetId = createTable("second_targets", null, DEV_ENVIRONMENT_ID);
+        long sourceId = createTable("link_sources", null, DEV_ENVIRONMENT_ID);
+
+        dataTableService.addColumn(
+            sourceId,
+            new ColumnSpec("target", ColumnType.LINK, new LinkSpec(firstTargetId, LinkDeleteRule.BLOCK, null)),
+            DEV_ENVIRONMENT_ID);
+
+        DataTableRow targetRow = dataTableRowService.insertRow(
+            firstTargetId, Map.of("title", "a"), DEV_ENVIRONMENT_ID);
+
+        dataTableRowService.insertRow(
+            sourceId, Map.of("title", "linked", "target", targetRow.id()), DEV_ENVIRONMENT_ID);
+
+        dataTableService.changeLinkColumn(
+            sourceId, "target", new LinkSpec(secondTargetId, LinkDeleteRule.BLOCK, null), DEV_ENVIRONMENT_ID);
+
+        assertNull(selectLinkValue(sourceId, "target"));
+        assertThat(dataTableService.getLinksTo(secondTargetId, DEV_ENVIRONMENT_ID)).hasSize(1);
+        assertThat(dataTableService.getLinksTo(firstTargetId, DEV_ENVIRONMENT_ID)).isEmpty();
+        assertTrue(dataTableService.dropTable(firstTargetId, DEV_ENVIRONMENT_ID));
+    }
+
+    @Test
+    void testChangeColumnTypeRejectsUnsupportedConversion() {
+        long tableId = dataTableService.createTable(
+            WORKSPACE_ID, "typed", null, List.of(new ColumnSpec("born", ColumnType.DATE)), DEV_ENVIRONMENT_ID);
+
+        IllegalArgumentException illegalArgumentException = assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> dataTableService.changeColumnType(tableId, "born", ColumnType.INTEGER, DEV_ENVIRONMENT_ID));
+
+        assertThat(illegalArgumentException.getMessage()).contains("DATE")
+            .contains("INTEGER");
+    }
+
+    @Test
+    void testChangeColumnTypeOnMissingColumnReportsTypedError() {
+        long tableId = createTable("typed", null, DEV_ENVIRONMENT_ID);
+
+        assertEquals(
+            DataTableErrorType.COLUMN_NOT_FOUND,
+            assertThrowsExactly(
+                DataTableException.class,
+                () -> dataTableService.changeColumnType(tableId, "missing", ColumnType.INTEGER, DEV_ENVIRONMENT_ID))
+                    .getErrorType());
+    }
+
+    @Test
+    void testChangeColumnTypeAffectsOnlyTheGivenEnvironment() {
+        long tableId = dataTableService.createTable(
+            WORKSPACE_ID, "typed", null, List.of(new ColumnSpec("amount", ColumnType.INTEGER)), DEV_ENVIRONMENT_ID);
+
+        dataTableService.createTable(
+            WORKSPACE_ID, "typed", null, List.of(new ColumnSpec("amount", ColumnType.INTEGER)), STAGE_ENVIRONMENT_ID);
+
+        dataTableService.changeColumnType(tableId, "amount", ColumnType.STRING, STAGE_ENVIRONMENT_ID);
+
+        assertEquals(ColumnType.STRING, findColumnType(tableId, "amount", STAGE_ENVIRONMENT_ID));
+        assertEquals(ColumnType.INTEGER, findColumnType(tableId, "amount", DEV_ENVIRONMENT_ID));
+    }
+
+    @Test
     void testUpdateDescription() {
         long registeredId = createTable("registered", "before", DEV_ENVIRONMENT_ID);
 
@@ -439,6 +672,30 @@ class DataTableServiceIntTest {
         }
 
         throw new IllegalStateException("The concurrent create never blocked on the registry insert");
+    }
+
+    private ColumnType findColumnType(long dataTableId, String columnName) {
+        return findColumnType(dataTableId, columnName, DEV_ENVIRONMENT_ID);
+    }
+
+    private ColumnType findColumnType(long dataTableId, String columnName, long environmentId) {
+        DataTableInfo dataTableInfo = dataTableService.fetchDataTableInfo(dataTableId, environmentId)
+            .orElseThrow();
+
+        for (ColumnSpec columnSpec : dataTableInfo.columns()) {
+            if (columnName.equals(columnSpec.name())) {
+                return columnSpec.type();
+            }
+        }
+
+        throw new AssertionError("Column not found: " + columnName);
+    }
+
+    private @Nullable Long selectLinkValue(long dataTableId, String columnName) {
+        return jdbcTemplate.queryForObject(
+            "SELECT " + columnName + " FROM " + DataTablePhysicalNameUtils.getPhysicalName(
+                DEV_ENVIRONMENT_ID, dataTableId),
+            Long.class);
     }
 
     private long createTable(String name, @Nullable String description, long environmentId) {

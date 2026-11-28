@@ -1,0 +1,3 @@
+extend enum PromotionResourceType {
+    API_COLLECTION
+}

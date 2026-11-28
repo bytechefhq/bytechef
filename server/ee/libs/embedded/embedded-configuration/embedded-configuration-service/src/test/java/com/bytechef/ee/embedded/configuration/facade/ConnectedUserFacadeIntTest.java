@@ -322,9 +322,9 @@ class ConnectedUserFacadeIntTest {
         Long integrationInstanceConfigurationId = jdbcTemplate.queryForObject(
             """
                 INSERT INTO integration_instance_configuration (
-                    integration_id, integration_version, name, enabled, environment, authorization_type,
+                    uuid, integration_id, integration_version, name, enabled, environment, authorization_type,
                     connection_parameters, created_by, created_date, last_modified_by, last_modified_date, version)
-                VALUES (?, 1, 'Jira', true, ?, 0, '{}', 'system', now(), 'system', now(), 0)
+                VALUES (gen_random_uuid(), ?, 1, 'Jira', true, ?, 0, '{}', 'system', now(), 'system', now(), 0)
                 RETURNING id
                 """,
             Long.class, integration.getId(), Environment.PRODUCTION.ordinal());

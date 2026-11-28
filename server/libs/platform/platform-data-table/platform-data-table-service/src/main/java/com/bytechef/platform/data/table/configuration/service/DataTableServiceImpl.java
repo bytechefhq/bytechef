@@ -31,6 +31,7 @@ import com.bytechef.platform.data.table.configuration.repository.DataTableLinkCo
 import com.bytechef.platform.data.table.configuration.repository.DataTableRepository;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.ColumnTypeConversion;
 import com.bytechef.platform.data.table.domain.DataTableNames;
 import com.bytechef.platform.data.table.domain.LinkDeleteRule;
 import com.bytechef.platform.data.table.domain.LinkSpec;
@@ -119,6 +120,113 @@ public class DataTableServiceImpl implements DataTableService {
         if (dataTableLinkColumn != null) {
             addLinkConstraints(physicalName, dataTableLinkColumn);
         }
+    }
+
+    @Override
+    @Audited(event = DataTableAuditEvents.DATA_TABLE_COLUMN_TYPE_CHANGED, platform = PlatformType.AUTOMATION, data = {
+        @AuditData(key = "dataTableId", value = "#dataTableId"),
+        @AuditData(key = "columnName", value = "#columnName"),
+        @AuditData(key = "columnType", value = "#columnType"),
+        @AuditData(key = "environmentId", value = "#environmentId")
+    })
+    @Transactional
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    public void changeColumnType(long dataTableId, String columnName, ColumnType columnType, long environmentId) {
+        Assert.notNull(columnType, "columnType must not be null");
+
+        validateColumnName(columnName);
+
+        DataTable dataTable = getDataTable(dataTableId);
+
+        String physicalName = getExistingPhysicalName(dataTable, environmentId);
+
+        ColumnType currentColumnType = null;
+
+        for (ColumnSpec columnSpec : listColumns(dataTableId, environmentId)) {
+            String columnSpecName = columnSpec.name();
+
+            if (columnSpecName.equalsIgnoreCase(columnName)) {
+                currentColumnType = columnSpec.type();
+            }
+        }
+
+        if (currentColumnType == null) {
+            throw new DataTableException(
+                "Column '" + columnName + "' not found on table '" + dataTable.getName() + "'",
+                DataTableErrorType.COLUMN_NOT_FOUND);
+        }
+
+        if (currentColumnType == ColumnType.LINK || columnType == ColumnType.LINK) {
+            throw new IllegalArgumentException(
+                "Changing the type of column '" + columnName + "' from " + currentColumnType + " to " + columnType +
+                    " is not supported for LINK columns");
+        }
+
+        if (currentColumnType == columnType) {
+            return;
+        }
+
+        String quotedColumnName = escapeIdentifier(columnName);
+
+        String sql = "ALTER TABLE " + escapeIdentifier(physicalName) + " ALTER COLUMN " + quotedColumnName +
+            " TYPE " + sqlType(columnType) + " USING " +
+            getCastExpression(currentColumnType, columnType, quotedColumnName);
+
+        jdbcTemplate.execute(sql);
+    }
+
+    @Override
+    @Audited(event = DataTableAuditEvents.DATA_TABLE_COLUMN_LINK_CHANGED, platform = PlatformType.AUTOMATION, data = {
+        @AuditData(key = "dataTableId", value = "#dataTableId"),
+        @AuditData(key = "columnName", value = "#columnName"),
+        @AuditData(key = "targetDataTableId", value = "#linkSpec.targetDataTableId"),
+        @AuditData(key = "onDelete", value = "#linkSpec.onDelete"),
+        @AuditData(key = "environmentId", value = "#environmentId")
+    })
+    @Transactional
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    public void changeLinkColumn(long dataTableId, String columnName, LinkSpec linkSpec, long environmentId) {
+        Assert.notNull(linkSpec, "linkSpec must not be null");
+
+        validateColumnName(columnName);
+
+        DataTable dataTable = getDataTable(dataTableId);
+
+        String physicalName = getExistingPhysicalName(dataTable, environmentId);
+
+        Optional<DataTableLinkColumn> linkColumnOptional =
+            dataTableLinkColumnRepository.findByDataTableIdAndEnvironmentIdAndColumnName(
+                dataTableId, environmentId, columnName.toLowerCase(Locale.ROOT));
+
+        DataTableLinkColumn dataTableLinkColumn = linkColumnOptional.orElseThrow(() -> new DataTableException(
+            "Link column '" + columnName + "' not found on table '" + dataTable.getName() + "'",
+            DataTableErrorType.COLUMN_NOT_FOUND));
+
+        validateLink(dataTable, linkSpec, environmentId);
+
+        boolean targetTableChanged = dataTableLinkColumn.getTargetDataTableId() != linkSpec.targetDataTableId();
+
+        jdbcTemplate.execute(
+            "ALTER TABLE " + escapeIdentifier(physicalName) + " DROP CONSTRAINT IF EXISTS " +
+                escapeIdentifier(getForeignKeyName(dataTableLinkColumn)));
+        jdbcTemplate.execute("DROP INDEX IF EXISTS " + escapeIdentifier(getIndexName(dataTableLinkColumn)));
+
+        if (targetTableChanged) {
+            jdbcTemplate.execute(
+                "UPDATE " + escapeIdentifier(physicalName) + " SET " +
+                    escapeIdentifier(dataTableLinkColumn.getColumnName()) + " = NULL");
+        }
+
+        String displayColumnName = linkSpec.displayColumnName();
+
+        dataTableLinkColumn.setDisplayColumnName(
+            displayColumnName == null ? null : displayColumnName.toLowerCase(Locale.ROOT));
+        dataTableLinkColumn.setOnDelete(linkSpec.onDelete());
+        dataTableLinkColumn.setTargetDataTableId(linkSpec.targetDataTableId());
+
+        DataTableLinkColumn savedDataTableLinkColumn = dataTableLinkColumnRepository.save(dataTableLinkColumn);
+
+        addLinkConstraints(physicalName, savedDataTableLinkColumn);
     }
 
     @Override
@@ -440,6 +548,39 @@ public class DataTableServiceImpl implements DataTableService {
     private static DataTableException createAlreadyExistsException(String name) {
         return new DataTableException(
             "Data table '" + name + "' already exists in this workspace", DataTableErrorType.DATA_TABLE_ALREADY_EXISTS);
+    }
+
+    private static String getCastExpression(ColumnType fromColumnType, ColumnType toColumnType, String column) {
+        if (ColumnTypeConversion.of(fromColumnType, toColumnType) == ColumnTypeConversion.UNSUPPORTED) {
+            throw new IllegalArgumentException(
+                "Changing a column type from " + fromColumnType + " to " + toColumnType + " is not supported");
+        }
+
+        if (toColumnType == ColumnType.STRING) {
+            return column + "::text";
+        }
+
+        if (fromColumnType == ColumnType.BOOLEAN) {
+            return "CASE WHEN " + column + " IS NULL THEN NULL WHEN " + column + " THEN 1 ELSE 0 END";
+        }
+
+        if (toColumnType == ColumnType.BOOLEAN && fromColumnType != ColumnType.STRING) {
+            return "(" + column + " <> 0)";
+        }
+
+        return column + "::" + getCastTypeName(toColumnType);
+    }
+
+    private static String getCastTypeName(ColumnType columnType) {
+        return switch (columnType) {
+            case STRING -> "text";
+            case INTEGER -> "integer";
+            case NUMBER -> "numeric";
+            case BOOLEAN -> "boolean";
+            case DATE -> "date";
+            case DATE_TIME -> "timestamp";
+            case LINK -> throw new IllegalArgumentException("A column cannot be cast to " + columnType);
+        };
     }
 
     private String getExistingPhysicalName(DataTable dataTable, long environmentId) {

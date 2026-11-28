@@ -7,7 +7,15 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {DownloadIcon, EditIcon, EllipsisVerticalIcon, PlusIcon, RefreshCcwIcon, Trash2Icon} from 'lucide-react';
+import {
+    DownloadIcon,
+    EditIcon,
+    EllipsisVerticalIcon,
+    PlusIcon,
+    RefreshCcwIcon,
+    RocketIcon,
+    Trash2Icon,
+} from 'lucide-react';
 
 interface ApiCollectionListItemDropdownMenuProps {
     apiCollectionId: number;
@@ -15,6 +23,8 @@ interface ApiCollectionListItemDropdownMenuProps {
     onDeleteClick: () => void;
     onEditClick: () => void;
     onNewEndpoint: () => void;
+    onPromoteClick: () => void;
+    showPromoteToEnvironment: boolean;
 }
 
 const ApiCollectionListItemDropDownMenu = ({
@@ -23,6 +33,8 @@ const ApiCollectionListItemDropDownMenu = ({
     onDeleteClick,
     onEditClick,
     onNewEndpoint,
+    onPromoteClick,
+    showPromoteToEnvironment,
 }: ApiCollectionListItemDropdownMenuProps) => {
     return (
         <DropdownMenu>
@@ -38,6 +50,12 @@ const ApiCollectionListItemDropDownMenu = ({
                 <DropdownMenuItem className="dropdown-menu-item" onClick={onChangeProjectVersionClick}>
                     <RefreshCcwIcon /> Change Project Version
                 </DropdownMenuItem>
+
+                {showPromoteToEnvironment && (
+                    <DropdownMenuItem className="dropdown-menu-item" onClick={onPromoteClick}>
+                        <RocketIcon /> Promote to environment…
+                    </DropdownMenuItem>
+                )}
 
                 <DropdownMenuItem className="dropdown-menu-item" onClick={onNewEndpoint}>
                     <PlusIcon /> New Endpoint

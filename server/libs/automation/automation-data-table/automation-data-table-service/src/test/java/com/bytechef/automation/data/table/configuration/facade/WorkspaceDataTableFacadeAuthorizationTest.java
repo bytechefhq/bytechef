@@ -62,6 +62,16 @@ class WorkspaceDataTableFacadeAuthorizationTest {
     }
 
     @Test
+    void testChangeColumnTypeRequiresTableEditor() {
+        assertExpression("changeColumnType", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
+    }
+
+    @Test
+    void testChangeLinkColumnRequiresTableEditor() {
+        assertExpression("changeLinkColumn", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
+    }
+
+    @Test
     void testRemoveColumnRequiresTableEditor() {
         assertExpression("removeColumn", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
     }

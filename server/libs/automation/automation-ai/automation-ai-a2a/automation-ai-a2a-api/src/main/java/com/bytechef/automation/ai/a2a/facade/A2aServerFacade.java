@@ -44,6 +44,14 @@ public interface A2aServerFacade {
     void deleteA2aServer(long id);
 
     /**
+     * Returns the secret key of an A2A server to an editor of that server.
+     *
+     * @param a2aServerId the ID of the A2A server
+     * @return the secret key embedded in the A2A server URL
+     */
+    String getA2aServerSecretKey(long a2aServerId);
+
+    /**
      * Returns the tags assigned to any A2A server of a workspace.
      *
      * @param workspaceId the ID of the workspace

@@ -22,8 +22,10 @@ package com.bytechef.platform.data.table.audit;
 public final class DataTableAuditEvents {
 
     public static final String DATA_TABLE_COLUMN_ADDED = "DATA_TABLE_COLUMN_ADDED";
+    public static final String DATA_TABLE_COLUMN_LINK_CHANGED = "DATA_TABLE_COLUMN_LINK_CHANGED";
     public static final String DATA_TABLE_COLUMN_REMOVED = "DATA_TABLE_COLUMN_REMOVED";
     public static final String DATA_TABLE_COLUMN_RENAMED = "DATA_TABLE_COLUMN_RENAMED";
+    public static final String DATA_TABLE_COLUMN_TYPE_CHANGED = "DATA_TABLE_COLUMN_TYPE_CHANGED";
     public static final String DATA_TABLE_CREATED = "DATA_TABLE_CREATED";
     public static final String DATA_TABLE_DELETED = "DATA_TABLE_DELETED";
     public static final String DATA_TABLE_DUPLICATED = "DATA_TABLE_DUPLICATED";

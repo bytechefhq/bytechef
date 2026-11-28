@@ -21,6 +21,7 @@ import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -34,6 +35,8 @@ public interface ProjectDeploymentService {
     Optional<ProjectDeployment> fetchProjectDeployment(long id);
 
     Optional<ProjectDeployment> fetchProjectDeployment(long projectId, Environment environment);
+
+    Optional<ProjectDeployment> fetchProjectDeployment(UUID uuid, Environment environment);
 
     List<ProjectDeployment> getAllProjectDeployments(long projectId);
 

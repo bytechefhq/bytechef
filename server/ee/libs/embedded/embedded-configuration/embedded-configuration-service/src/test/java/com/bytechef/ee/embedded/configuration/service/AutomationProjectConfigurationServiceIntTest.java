@@ -85,6 +85,37 @@ class AutomationProjectConfigurationServiceIntTest {
     }
 
     @Test
+    void testCreateAssignsUuidAndFetchByUuidAndEnvironmentId() {
+        long projectId = insertProject(insertWorkspace());
+
+        AutomationProjectConfiguration configuration =
+            automationProjectConfigurationService.create(projectId, ENVIRONMENT_ID, "Default", null, 1, false, true);
+
+        assertThat(configuration.getUuid()).isNotNull();
+        assertThat(
+            automationProjectConfigurationService.fetchConfiguration(configuration.getUuid(), ENVIRONMENT_ID))
+                .hasValueSatisfying(fetched -> assertThat(fetched.getId()).isEqualTo(configuration.getId()));
+        assertThat(automationProjectConfigurationService.fetchConfiguration(configuration.getUuid(), 1L)).isEmpty();
+    }
+
+    @Test
+    void testCreateWithUuidAllowsItInAnotherEnvironmentOnly() {
+        long projectId = insertProject(insertWorkspace());
+
+        AutomationProjectConfiguration source =
+            automationProjectConfigurationService.create(projectId, ENVIRONMENT_ID, "Default", null, 1, false, true);
+
+        AutomationProjectConfiguration counterpart = automationProjectConfigurationService.create(
+            projectId, 1L, "Default", null, 1, false, true, source.getUuid());
+
+        assertThat(counterpart.getUuid()).isEqualTo(source.getUuid());
+        assertThatThrownBy(
+            () -> automationProjectConfigurationService.create(
+                projectId, ENVIRONMENT_ID, "Other", null, 1, false, true, source.getUuid()))
+                    .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
     void testCreateTwiceForTheSameEnvironmentThrows() {
         long projectId = insertProject(insertWorkspace());
 

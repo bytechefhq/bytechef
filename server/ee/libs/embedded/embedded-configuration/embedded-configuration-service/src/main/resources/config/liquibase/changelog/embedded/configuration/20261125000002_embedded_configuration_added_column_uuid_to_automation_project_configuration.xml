@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261125000002-1" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="automation_project_configuration" columnName="uuid"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="automation_project_configuration">
+            <column name="uuid" type="${uuid_type}"/>
+        </addColumn>
+        <rollback/>
+    </changeSet>
+
+    <changeSet id="20261125000002-2" author="Ivica Cardic" dbms="postgresql">
+        <sql>
+            UPDATE automation_project_configuration
+            SET uuid = gen_random_uuid()
+            WHERE uuid IS NULL;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20261125000002-3" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <uniqueConstraintExists tableName="automation_project_configuration" constraintName="uk_automation_project_configuration_uuid_environment_id"/>
+            </not>
+        </preConditions>
+        <addNotNullConstraint tableName="automation_project_configuration" columnName="uuid"/>
+        <addUniqueConstraint constraintName="uk_automation_project_configuration_uuid_environment_id" tableName="automation_project_configuration" columnNames="uuid,environment_id"/>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>

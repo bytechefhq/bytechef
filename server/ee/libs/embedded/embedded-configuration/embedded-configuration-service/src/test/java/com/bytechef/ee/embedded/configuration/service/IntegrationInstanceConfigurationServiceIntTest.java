@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
@@ -26,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
 /**
@@ -70,6 +72,88 @@ class IntegrationInstanceConfigurationServiceIntTest {
             .update();
         jdbcClient.sql("DELETE FROM tag")
             .update();
+    }
+
+    @Test
+    void testCreateAssignsUuidAndFetchByUuidAndEnvironment() {
+        long integrationId = createIntegration();
+
+        IntegrationInstanceConfiguration configuration = createIntegrationInstanceConfiguration(
+            integrationId, "lineage");
+
+        assertThat(configuration.getUuid()).isNotNull();
+        assertThat(
+            integrationInstanceConfigurationService.fetchIntegrationInstanceConfiguration(
+                configuration.getUuid(), Environment.PRODUCTION))
+                    .hasValueSatisfying(
+                        fetched -> assertThat(fetched.getId()).isEqualTo(configuration.getId()));
+        assertThat(
+            integrationInstanceConfigurationService.fetchIntegrationInstanceConfiguration(
+                configuration.getUuid(), Environment.DEVELOPMENT)).isEmpty();
+    }
+
+    @Test
+    void testListingReturnsTheStoredUuid() {
+        long integrationId = createIntegration();
+
+        IntegrationInstanceConfiguration configuration = createIntegrationInstanceConfiguration(
+            integrationId, "listed");
+
+        List<IntegrationInstanceConfiguration> configurations =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(null, null, null);
+
+        assertThat(configurations).extracting(IntegrationInstanceConfiguration::getUuid)
+            .containsExactly(configuration.getUuid());
+    }
+
+    @Test
+    void testUpdateKeepsTheUuid() {
+        long integrationId = createIntegration();
+
+        IntegrationInstanceConfiguration configuration = createIntegrationInstanceConfiguration(
+            integrationId, "before");
+
+        IntegrationInstanceConfiguration detached = new IntegrationInstanceConfiguration();
+
+        detached.setId(configuration.getId());
+        detached.setIntegrationId(integrationId);
+        detached.setIntegrationVersion(1);
+        detached.setName("after");
+        detached.setTagIds(List.of());
+        detached.setVersion(configuration.getVersion());
+
+        IntegrationInstanceConfiguration updated = integrationInstanceConfigurationService.update(detached);
+
+        assertThat(updated.getName()).isEqualTo("after");
+        assertThat(updated.getUuid()).isEqualTo(configuration.getUuid());
+        assertThat(
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                Objects.requireNonNull(configuration.getId()))
+                .getUuid()).isEqualTo(configuration.getUuid());
+    }
+
+    @Test
+    void testCreateKeepsPresetUuidAndAllowsItInAnotherEnvironmentOnly() {
+        long integrationId = createIntegration();
+
+        IntegrationInstanceConfiguration source = createIntegrationInstanceConfiguration(integrationId, "source");
+
+        IntegrationInstanceConfiguration counterpart = newIntegrationInstanceConfiguration(
+            integrationId, "counterpart", Environment.DEVELOPMENT);
+
+        counterpart.setUuid(source.getUuid());
+
+        counterpart = integrationInstanceConfigurationService.create(counterpart);
+
+        assertThat(counterpart.getUuid()).isEqualTo(source.getUuid());
+
+        IntegrationInstanceConfiguration duplicate = newIntegrationInstanceConfiguration(
+            integrationId, "duplicate", Environment.PRODUCTION);
+
+        duplicate.setUuid(source.getUuid());
+
+        assertThatThrownBy(() -> integrationInstanceConfigurationService.create(duplicate))
+            .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
@@ -277,6 +361,17 @@ class IntegrationInstanceConfigurationServiceIntTest {
     private IntegrationInstanceConfiguration createIntegrationInstanceConfiguration(
         long integrationId, String name, Environment environment, List<Long> tagIds) {
 
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = newIntegrationInstanceConfiguration(
+            integrationId, name, environment);
+
+        integrationInstanceConfiguration.setTagIds(tagIds);
+
+        return integrationInstanceConfigurationService.create(integrationInstanceConfiguration);
+    }
+
+    private IntegrationInstanceConfiguration newIntegrationInstanceConfiguration(
+        long integrationId, String name, Environment environment) {
+
         IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
 
         integrationInstanceConfiguration.setConnectionParameters(Map.of());
@@ -284,9 +379,8 @@ class IntegrationInstanceConfigurationServiceIntTest {
         integrationInstanceConfiguration.setIntegrationId(integrationId);
         integrationInstanceConfiguration.setIntegrationVersion(1);
         integrationInstanceConfiguration.setName(name);
-        integrationInstanceConfiguration.setTagIds(tagIds);
 
-        return integrationInstanceConfigurationService.create(integrationInstanceConfiguration);
+        return integrationInstanceConfiguration;
     }
 
     private long createTag(String name) {
@@ -301,9 +395,9 @@ class IntegrationInstanceConfigurationServiceIntTest {
                 .sql(
                     """
                         INSERT INTO mcp_server
-                            (name, type, environment, enabled, secret_key, created_date, created_by,
+                            (name, type, environment, enabled, secret_key, uuid, created_date, created_by,
                              last_modified_date, last_modified_by, version)
-                        VALUES ('mcp-server', 1, 2, true, 'secret', now(), 'test', now(), 'test', 0)
+                        VALUES ('mcp-server', 1, 2, true, 'secret', gen_random_uuid(), now(), 'test', now(), 'test', 0)
                         RETURNING id
                         """)
                 .query(Long.class)

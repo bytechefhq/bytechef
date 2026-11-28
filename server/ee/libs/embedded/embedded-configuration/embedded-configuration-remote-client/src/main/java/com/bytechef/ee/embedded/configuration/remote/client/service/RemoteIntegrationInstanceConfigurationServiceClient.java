@@ -15,6 +15,8 @@ import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 /**
@@ -44,6 +46,13 @@ public class RemoteIntegrationInstanceConfigurationServiceClient implements Inte
 
     @Override
     public void delete(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<IntegrationInstanceConfiguration> fetchIntegrationInstanceConfiguration(
+        UUID uuid, Environment environment) {
+
         throw new UnsupportedOperationException();
     }
 

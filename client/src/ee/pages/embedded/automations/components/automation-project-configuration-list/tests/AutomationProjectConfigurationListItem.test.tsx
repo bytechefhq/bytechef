@@ -14,9 +14,32 @@ const mocks = vi.hoisted(() => ({
     deleteMutate: vi.fn(),
     deleteMutationOptions: undefined as {onSuccess?: () => void} | undefined,
     deletePending: false,
+    edition: 'EE',
     enableConfigurationMutate: vi.fn(),
     enableWorkflowMutate: vi.fn(),
+    environmentsResult: {
+        data: {
+            environments: [
+                {id: '0', name: 'Development'},
+                {id: '1', name: 'Staging'},
+            ],
+        },
+    } as {data: {environments: {id: string; name: string}[]} | undefined},
     invalidateQueries: vi.fn(),
+    promotionDialogProps: [] as Record<string, unknown>[],
+}));
+
+vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
+    useApplicationInfoStore: (selector: (state: Record<string, unknown>) => unknown) =>
+        selector({application: {edition: mocks.edition}}),
+}));
+
+vi.mock('@/ee/shared/components/environment-promotion/EnvironmentPromotionDialog', () => ({
+    default: (props: Record<string, unknown>) => {
+        mocks.promotionDialogProps.push(props);
+
+        return <div data-testid="environment-promotion-dialog" />;
+    },
 }));
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
@@ -42,6 +65,7 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
         isPending: false,
         mutate: mocks.enableWorkflowMutate,
     }),
+    useEnvironmentsQuery: () => mocks.environmentsResult,
 }));
 
 vi.mock('@/shared/components/workflow/WorkflowTriggerAndComponentsRow', () => ({
@@ -144,6 +168,16 @@ describe('AutomationProjectConfigurationListItem', () => {
         mocks.deleteImpactError = false;
         mocks.deleteMutationOptions = undefined;
         mocks.deletePending = false;
+        mocks.edition = 'EE';
+        mocks.promotionDialogProps = [];
+        mocks.environmentsResult = {
+            data: {
+                environments: [
+                    {id: '0', name: 'Development'},
+                    {id: '1', name: 'Staging'},
+                ],
+            },
+        };
 
         useAutomationExecutionsSheetStore.setState({
             automationExecutionsSheetOpen: false,
@@ -294,7 +328,7 @@ describe('AutomationProjectConfigurationListItem', () => {
         expect(screen.queryByText('3 users')).not.toBeInTheDocument();
     });
 
-    it('orders the menu as Edit, Change Project Version, Move Users, separator, Delete', async () => {
+    it('orders the menu as Edit, Change Project Version, Move Users, Promote, separator, Delete', async () => {
         const user = userEvent.setup();
 
         renderItem();
@@ -309,10 +343,12 @@ describe('AutomationProjectConfigurationListItem', () => {
             'Edit Configuration',
             'Change Project Version',
             'Move Users',
+            'menuitem',
             'separator',
             'Delete Configuration',
         ]);
         expect(within(menu).getByText('Move Users…')).toBeInTheDocument();
+        expect(within(menu).getByText('Promote to environment…')).toBeInTheDocument();
     });
 
     it('disables Move Users with a tooltip when there is no other configuration in the environment', async () => {
@@ -489,5 +525,48 @@ describe('AutomationProjectConfigurationListItem', () => {
             workflowUuid: 'wf-1',
         });
         expect(mocks.invalidateQueries).toHaveBeenCalledWith({queryKey: ['automationProjectConfigurations']});
+    });
+
+    it('shows Promote to environment when there are two or more environments', async () => {
+        const user = userEvent.setup();
+
+        renderItem();
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+
+        expect(screen.getByRole('menuitem', {name: 'Promote to environment…'})).toBeInTheDocument();
+    });
+
+    it('hides Promote to environment when there is only one environment', async () => {
+        const user = userEvent.setup();
+
+        mocks.environmentsResult = {data: {environments: [{id: '0', name: 'Development'}]}};
+
+        renderItem();
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+
+        expect(screen.queryByRole('menuitem', {name: 'Promote to environment…'})).not.toBeInTheDocument();
+    });
+
+    it('opens the promotion dialog for the configuration', async () => {
+        const user = userEvent.setup();
+
+        renderItem();
+
+        expect(screen.queryByTestId('environment-promotion-dialog')).not.toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
+        await user.click(screen.getByRole('menuitem', {name: 'Promote to environment…'}));
+
+        expect(await screen.findByTestId('environment-promotion-dialog')).toBeInTheDocument();
+
+        expect(mocks.promotionDialogProps[0]).toMatchObject({
+            resourceType: 'AUTOMATION_CONFIGURATION',
+            sourceEnvironmentId: 2,
+            sourceId: 'configuration-1',
+            sourceName: 'STAGING',
+            targetListPath: '/embedded/automation-configurations',
+        });
     });
 });

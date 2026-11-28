@@ -707,6 +707,7 @@ public class IntegrationFacadeIntTest {
         integrationInstanceConfiguration.setIntegrationId(integrationId);
         integrationInstanceConfiguration.setIntegrationVersion(1);
         integrationInstanceConfiguration.setName("instance-configuration-" + UUID.randomUUID());
+        integrationInstanceConfiguration.setUuid(UUID.randomUUID());
 
         integrationInstanceConfigurationRepository.save(integrationInstanceConfiguration);
     }

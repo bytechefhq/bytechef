@@ -11,6 +11,8 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigur
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @version ee
@@ -22,6 +24,9 @@ public interface IntegrationInstanceConfigurationService {
     IntegrationInstanceConfiguration create(IntegrationInstanceConfiguration integrationInstanceConfiguration);
 
     void delete(long id);
+
+    Optional<IntegrationInstanceConfiguration> fetchIntegrationInstanceConfiguration(
+        UUID uuid, Environment environment);
 
     boolean isIntegrationInstanceConfigurationEnabled(long integrationInstanceConfigurationId);
 

@@ -16,6 +16,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import tools.jackson.databind.ObjectMapper;
 
@@ -109,6 +110,7 @@ public class CustomIntegrationInstanceConfigurationRepositoryImpl
                     }
 
                     integrationInstanceConfiguration.setPermissionExpression(rs.getString("permission_expression"));
+                    integrationInstanceConfiguration.setUuid(rs.getObject("uuid", UUID.class));
                     integrationInstanceConfiguration.setVersion(rs.getInt("version"));
 
                     return integrationInstanceConfiguration;

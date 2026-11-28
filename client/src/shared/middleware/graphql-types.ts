@@ -1512,6 +1512,35 @@ export enum EnvironmentEnum {
   Staging = 'STAGING'
 }
 
+/**
+ * A dry-run preview of promoting one resource from its source environment to a target environment, returned before
+ * the caller commits to `promoteToEnvironment`.
+ */
+export type EnvironmentPromotionPreview = {
+  __typename?: 'EnvironmentPromotionPreview';
+  changes: Array<PromotionChange>;
+  connections: Array<PromotionConnectionMapping>;
+  destructiveChangesHash: Scalars['String']['output'];
+  existingTargetId?: Maybe<Scalars['ID']['output']>;
+  existingTargetName?: Maybe<Scalars['String']['output']>;
+  projects: Array<PromotionProjectPreview>;
+  resourceType: PromotionResourceType;
+  schemaChanges: Array<PromotionSchemaChange>;
+  sourceEnvironmentId: Scalars['ID']['output'];
+  sourceId: Scalars['ID']['output'];
+  targetEnvironmentId: Scalars['ID']['output'];
+  warnings: Array<Scalars['String']['output']>;
+};
+
+/** The outcome of promoting one resource to a target environment. */
+export type EnvironmentPromotionResult = {
+  __typename?: 'EnvironmentPromotionResult';
+  created: Scalars['Boolean']['output'];
+  targetId: Scalars['ID']['output'];
+  targetUrl?: Maybe<Scalars['String']['output']>;
+  unresolvedConnectionIds: Array<Scalars['ID']['output']>;
+};
+
 export enum EvaluatorFunctionCategory {
   Collection = 'COLLECTION',
   DateTime = 'DATE_TIME',
@@ -2285,6 +2314,8 @@ export type Mutation = {
   insertDataTableRow: DataTableRow;
   inviteUser: Scalars['Boolean']['output'];
   moveAutomationProjectConfigurationConnectedUsers: ConfigurationMoveResult;
+  /** Promote a resource into another environment: creates the counterpart on first promotion, syncs it afterwards. */
+  promoteToEnvironment: EnvironmentPromotionResult;
   provisionConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
   provisionConnectedUserProjectWorkflows?: Maybe<Scalars['Boolean']['output']>;
   publishAutomationProject: Scalars['Boolean']['output'];
@@ -3028,6 +3059,11 @@ export type MutationMoveAutomationProjectConfigurationConnectedUsersArgs = {
 };
 
 
+export type MutationPromoteToEnvironmentArgs = {
+  input: PromoteToEnvironmentInput;
+};
+
+
 export type MutationProvisionConnectedUserMcpServerArgs = {
   connectedUserId: Scalars['ID']['input'];
   mcpServerId: Scalars['ID']['input'];
@@ -3763,6 +3799,111 @@ export type ProjectWorkflow = {
   workflowId: Scalars['String']['output'];
 };
 
+/** Input for promoting a resource into another environment. */
+export type PromoteToEnvironmentInput = {
+  connectionMappings: Array<PromotionConnectionMappingInput>;
+  expectedDestructiveChangesHash?: InputMaybe<Scalars['String']['input']>;
+  resourceType: PromotionResourceType;
+  sourceEnvironmentId: Scalars['ID']['input'];
+  sourceId: Scalars['ID']['input'];
+  targetEnvironmentId: Scalars['ID']['input'];
+};
+
+/**
+ * One asset promoting a resource creates, updates or deletes in the target environment. A destructive change removes
+ * or irreversibly alters target data.
+ */
+export type PromotionChange = {
+  __typename?: 'PromotionChange';
+  assetType: Scalars['String']['output'];
+  destructive: Scalars['Boolean']['output'];
+  key: Scalars['String']['output'];
+  kind: PromotionChangeKind;
+  name: Scalars['String']['output'];
+  parentName?: Maybe<Scalars['String']['output']>;
+};
+
+/** The kinds of change promoting a resource applies to a single asset in the target environment. */
+export enum PromotionChangeKind {
+  Create = 'CREATE',
+  Delete = 'DELETE',
+  Update = 'UPDATE'
+}
+
+/** A connection in the target environment that a source connection can be rewired to. */
+export type PromotionConnectionCandidate = {
+  __typename?: 'PromotionConnectionCandidate';
+  connectionId: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
+/**
+ * A connection referenced by the source resource being promoted, together with a suggestion for which connection in
+ * the target environment it should be rewired to.
+ */
+export type PromotionConnectionMapping = {
+  __typename?: 'PromotionConnectionMapping';
+  componentName: Scalars['String']['output'];
+  connectionVersion: Scalars['Int']['output'];
+  sourceConnectionId: Scalars['ID']['output'];
+  sourceConnectionName: Scalars['String']['output'];
+  suggestedTargetConnectionId?: Maybe<Scalars['ID']['output']>;
+  targetCandidates: Array<PromotionConnectionCandidate>;
+  usedBy: Array<Scalars['String']['output']>;
+};
+
+/** An explicit source-connection-to-target-connection mapping supplied by the caller for `promoteToEnvironment`. */
+export type PromotionConnectionMappingInput = {
+  sourceConnectionId: Scalars['ID']['input'];
+  targetConnectionId: Scalars['ID']['input'];
+};
+
+/**
+ * A project referenced by the source resource being promoted, together with the version already present in the
+ * target environment, if any.
+ */
+export type PromotionProjectPreview = {
+  __typename?: 'PromotionProjectPreview';
+  projectId: Scalars['ID']['output'];
+  projectName: Scalars['String']['output'];
+  sourceProjectVersion: Scalars['Int']['output'];
+  targetProjectVersion?: Maybe<Scalars['Int']['output']>;
+};
+
+/**
+ * The kinds of environment-scoped automation and embedded resources that can be promoted from one environment to
+ * another. Each promotion module adds its own values with extend enum.
+ */
+export enum PromotionResourceType {
+  A2AServer = 'A2A_SERVER',
+  ApiCollection = 'API_COLLECTION',
+  AutomationConfiguration = 'AUTOMATION_CONFIGURATION',
+  DataTable = 'DATA_TABLE',
+  IntegrationInstanceConfiguration = 'INTEGRATION_INSTANCE_CONFIGURATION',
+  McpServer = 'MCP_SERVER',
+  ProjectDeployment = 'PROJECT_DEPLOYMENT'
+}
+
+/** One schema change promoting a resource applies to the target environment. */
+export type PromotionSchemaChange = {
+  __typename?: 'PromotionSchemaChange';
+  columnName?: Maybe<Scalars['String']['output']>;
+  destructive: Scalars['Boolean']['output'];
+  fromType?: Maybe<Scalars['String']['output']>;
+  kind: PromotionSchemaChangeKind;
+  tableName: Scalars['String']['output'];
+  toType?: Maybe<Scalars['String']['output']>;
+};
+
+/** The kinds of schema change promoting a resource applies to the target environment. */
+export enum PromotionSchemaChangeKind {
+  AddColumn = 'ADD_COLUMN',
+  ChangeColumnType = 'CHANGE_COLUMN_TYPE',
+  ChangeLink = 'CHANGE_LINK',
+  CreateTable = 'CREATE_TABLE',
+  DropColumn = 'DROP_COLUMN'
+}
+
 export type PropertiesDataSource = {
   __typename?: 'PropertiesDataSource';
   propertiesLookupDependsOn?: Maybe<Array<Scalars['String']['output']>>;
@@ -4000,6 +4141,11 @@ export type Query = {
   embeddedMcpServers?: Maybe<Array<Maybe<McpServer>>>;
   embeddedMcpToolsByComponentId?: Maybe<Array<Maybe<McpTool>>>;
   endpointDiscoveryStatus?: Maybe<EndpointDiscoveryResult>;
+  /**
+   * Preview what promoting a resource into another environment will do (create vs. update, version moves,
+   * suggested connection re-bindings, schema changes, warnings).
+   */
+  environmentPromotionPreview: EnvironmentPromotionPreview;
   environments?: Maybe<Array<Maybe<Environment>>>;
   evaluatorFunctionDefinition: EvaluatorFunctionDefinition;
   evaluatorFunctionDefinitions: Array<EvaluatorFunctionDefinition>;
@@ -4682,6 +4828,14 @@ export type QueryEmbeddedMcpToolsByComponentIdArgs = {
 
 export type QueryEndpointDiscoveryStatusArgs = {
   jobId: Scalars['String']['input'];
+};
+
+
+export type QueryEnvironmentPromotionPreviewArgs = {
+  resourceType: PromotionResourceType;
+  sourceEnvironmentId: Scalars['ID']['input'];
+  sourceId: Scalars['ID']['input'];
+  targetEnvironmentId: Scalars['ID']['input'];
 };
 
 

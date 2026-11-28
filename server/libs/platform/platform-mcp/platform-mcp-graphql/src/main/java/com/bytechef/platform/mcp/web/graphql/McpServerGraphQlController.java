@@ -65,7 +65,7 @@ public class McpServerGraphQlController {
 
     @SchemaMapping(typeName = "McpServer", field = "secretKey")
     public String secretKey(McpServer mcpServer) {
-        return mcpServerService.getMcpServerSecretKey(mcpServer.getId());
+        return mcpServerFacade.getMcpServerSecretKey(mcpServer.getId());
     }
 
     @QueryMapping
@@ -129,7 +129,7 @@ public class McpServerGraphQlController {
         String secretKey;
 
         try {
-            secretKey = mcpServerService.getMcpServerSecretKey(mcpServer.getId());
+            secretKey = mcpServerFacade.getMcpServerSecretKey(mcpServer.getId());
         } catch (AccessDeniedException accessDeniedException) {
             secretKey = MASKED_SECRET_KEY;
         }

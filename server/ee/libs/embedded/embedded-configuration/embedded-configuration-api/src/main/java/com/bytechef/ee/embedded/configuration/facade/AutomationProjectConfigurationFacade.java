@@ -85,6 +85,8 @@ public interface AutomationProjectConfigurationFacade {
         long id, String name, @Nullable String permissionExpression, int projectVersion, boolean enabled,
         boolean automationHubVisible);
 
+    void validateVersionChange(long id, int projectVersion);
+
     void updateConfigurationWorkflow(
         long id, String workflowUuid, Map<String, Long> providedConnections, Map<String, Object> providedInputs);
 

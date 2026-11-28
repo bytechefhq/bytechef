@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -69,6 +70,9 @@ public final class McpServer {
     @Column("secret_key")
     private String secretKey;
 
+    @Column
+    private UUID uuid;
+
     @MappedCollection(idColumn = "mcp_server_id")
     private Set<McpServerTag> mcpServerTags = new HashSet<>();
 
@@ -103,6 +107,7 @@ public final class McpServer {
         this.name = name;
         this.secretKey = String.valueOf(TenantKey.of());
         this.type = type.ordinal();
+        this.uuid = UUID.randomUUID();
     }
 
     public McpServer(String name, PlatformType type, Environment environment, boolean enabled) {
@@ -111,6 +116,7 @@ public final class McpServer {
         this.name = name;
         this.secretKey = String.valueOf(TenantKey.of());
         this.type = type.ordinal();
+        this.uuid = UUID.randomUUID();
     }
 
     @Override
@@ -189,6 +195,10 @@ public final class McpServer {
         return version;
     }
 
+    public UUID getUuid() {
+        return uuid;
+    }
+
     public List<Long> getTagIds() {
         return mcpServerTags
             .stream()
@@ -240,6 +250,10 @@ public final class McpServer {
 
     public void setVersion(int version) {
         this.version = version;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public void setTagIds(List<Long> tagIds) {

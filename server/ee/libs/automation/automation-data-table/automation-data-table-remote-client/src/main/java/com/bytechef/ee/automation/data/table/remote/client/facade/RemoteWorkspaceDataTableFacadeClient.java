@@ -13,7 +13,9 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService.Webhook;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.domain.DataTableStorageUsage;
+import com.bytechef.platform.data.table.domain.LinkSpec;
 import com.bytechef.platform.data.table.execution.domain.CreateStrategy;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
@@ -40,6 +42,16 @@ public class RemoteWorkspaceDataTableFacadeClient implements WorkspaceDataTableF
 
     @Override
     public void addColumn(long dataTableId, ColumnSpec columnSpec, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void changeColumnType(long dataTableId, String columnName, ColumnType columnType, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void changeLinkColumn(long dataTableId, String columnName, LinkSpec linkSpec, long environmentId) {
         throw new UnsupportedOperationException();
     }
 

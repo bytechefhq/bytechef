@@ -123,6 +123,7 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useDuplicateAutomationProjectWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
     useEnableAutomationProjectConfigurationMutation: () => ({isPending: false, mutate: vi.fn()}),
     useEnableAutomationProjectConfigurationWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useEnvironmentsQuery: () => ({data: {environments: []}}),
     usePublishAutomationProjectMutation: (options?: {onSuccess?: () => void}) => {
         hoisted.publishProjectMutationOptions = options;
 

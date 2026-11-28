@@ -98,10 +98,10 @@ public class McpRowsIntTestFixture {
     public long insertAutomationProjectConfiguration(long projectId) {
         return insert(
             """
-                INSERT INTO automation_project_configuration (project_id, environment_id, project_version, enabled,
+                INSERT INTO automation_project_configuration (uuid, project_id, environment_id, project_version, enabled,
                     automation_hub_visible, name, created_date, created_by, last_modified_date, last_modified_by,
                     version)
-                VALUES (?, 0, 1, true, true, 'configuration-' || gen_random_uuid(), now(), 'system', now(),
+                VALUES (gen_random_uuid(), ?, 0, 1, true, true, 'configuration-' || gen_random_uuid(), now(), 'system', now(),
                     'system', 0)
                 RETURNING id
                 """,
@@ -277,10 +277,10 @@ public class McpRowsIntTestFixture {
     public long insertIntegrationInstanceConfiguration(long integrationId, int integrationVersion) {
         return insert(
             """
-                INSERT INTO integration_instance_configuration (integration_id, integration_version, name, enabled,
+                INSERT INTO integration_instance_configuration (uuid, integration_id, integration_version, name, enabled,
                     environment, connection_parameters, authorization_type, created_date, created_by,
                     last_modified_date, last_modified_by, version)
-                VALUES (?, ?, 'configuration', true, 0, ?, 0, now(), 'system', now(), 'system', 1)
+                VALUES (gen_random_uuid(), ?, ?, 'configuration', true, 0, ?, 0, now(), 'system', now(), 'system', 1)
                 RETURNING id
                 """,
             integrationId, integrationVersion, encryption.encrypt("{}"));

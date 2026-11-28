@@ -173,6 +173,12 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
+    public String getMcpServerSecretKey(long mcpServerId) {
+        return mcpServerService.getMcpServerSecretKey(mcpServerId);
+    }
+
+    @Override
     public Map<McpServer, List<Tag>> getMcpServerTags(List<McpServer> mcpServers) {
         var tagIds = mcpServers.stream()
             .flatMap(mcpServer -> CollectionUtils.stream(mcpServer.getTagIds()))

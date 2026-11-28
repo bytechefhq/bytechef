@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigura
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.jspecify.annotations.Nullable;
@@ -36,7 +37,20 @@ public class RemoteAutomationProjectConfigurationServiceClient
     }
 
     @Override
+    public AutomationProjectConfiguration create(
+        long projectId, long environmentId, String name, @Nullable String permissionExpression, int projectVersion,
+        boolean enabled, boolean automationHubVisible, UUID uuid) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void delete(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<AutomationProjectConfiguration> fetchConfiguration(UUID uuid, long environmentId) {
         throw new UnsupportedOperationException();
     }
 

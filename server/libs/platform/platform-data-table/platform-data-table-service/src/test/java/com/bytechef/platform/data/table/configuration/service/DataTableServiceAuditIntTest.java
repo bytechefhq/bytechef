@@ -38,6 +38,8 @@ import com.bytechef.platform.data.table.config.DataTableIntTestUtils;
 import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.LinkDeleteRule;
+import com.bytechef.platform.data.table.domain.LinkSpec;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -153,6 +155,52 @@ class DataTableServiceAuditIntTest {
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "SUCCESS")
             .containsEntry("dataTableId", String.valueOf(auditedId))
+            .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID))
+            .doesNotContainKeys("dataError", "errorClass");
+    }
+
+    @Test
+    void testChangeColumnTypeRecordsTheNewType() {
+        long auditedId = createAuditedTable();
+
+        dataTableService.changeColumnType(auditedId, "title", ColumnType.INTEGER, ENVIRONMENT_ID);
+
+        PersistentAuditEvent persistentAuditEvent =
+            findSingleEvent(DataTableAuditEvents.DATA_TABLE_COLUMN_TYPE_CHANGED);
+
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("dataTableId", String.valueOf(auditedId))
+            .containsEntry("columnName", "title")
+            .containsEntry("columnType", "INTEGER")
+            .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID))
+            .doesNotContainKeys("dataError", "errorClass");
+    }
+
+    @Test
+    void testChangeLinkColumnRecordsTheNewLink() {
+        long targetId = dataTableService.createTable(
+            null, "audited_target", null, List.of(new ColumnSpec("name", ColumnType.STRING)), ENVIRONMENT_ID);
+        long auditedId = createAuditedTable();
+
+        dataTableService.addColumn(
+            auditedId, new ColumnSpec("target", ColumnType.LINK, new LinkSpec(targetId, LinkDeleteRule.BLOCK, null)),
+            ENVIRONMENT_ID);
+
+        dataTableService.changeLinkColumn(
+            auditedId, "target", new LinkSpec(targetId, LinkDeleteRule.CLEAR, null), ENVIRONMENT_ID);
+
+        PersistentAuditEvent persistentAuditEvent =
+            findSingleEvent(DataTableAuditEvents.DATA_TABLE_COLUMN_LINK_CHANGED);
+
+        assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("dataTableId", String.valueOf(auditedId))
+            .containsEntry("columnName", "target")
+            .containsEntry("targetDataTableId", String.valueOf(targetId))
+            .containsEntry("onDelete", "CLEAR")
             .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID))
             .doesNotContainKeys("dataError", "errorClass");
     }

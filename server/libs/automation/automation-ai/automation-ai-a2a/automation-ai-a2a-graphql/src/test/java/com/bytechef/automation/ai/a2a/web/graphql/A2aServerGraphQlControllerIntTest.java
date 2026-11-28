@@ -19,7 +19,9 @@ package com.bytechef.automation.ai.a2a.web.graphql;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -149,11 +151,11 @@ class A2aServerGraphQlControllerIntTest {
 
     @Test
     @WithMockUser
-    void testA2aServersResolvesTheSecretKeyThroughTheGatedServiceMethod() {
+    void testA2aServersResolvesTheSecretKeyThroughTheGatedFacadeMethod() {
         A2aServer a2aServer = createA2aServer(5L, "agent", Environment.PRODUCTION);
 
         when(a2aServerFacade.getWorkspaceA2aServers(1L)).thenReturn(List.of(a2aServer));
-        when(a2aServerService.getA2aServerSecretKey(5L)).thenReturn("gated-secret");
+        when(a2aServerFacade.getA2aServerSecretKey(5L)).thenReturn("gated-secret");
 
         graphQlTester
             .document("""
@@ -184,7 +186,8 @@ class A2aServerGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("gated-secret");
 
-        verify(a2aServerService).getA2aServerSecretKey(5L);
+        verify(a2aServerFacade).getA2aServerSecretKey(5L);
+        verify(a2aServerService, never()).getA2aServerSecretKey(anyLong());
     }
 
     @Test
@@ -216,7 +219,7 @@ class A2aServerGraphQlControllerIntTest {
         A2aServer a2aServer = createA2aServer(5L, "agent", Environment.PRODUCTION);
 
         when(a2aServerFacade.getWorkspaceA2aServers(1L)).thenReturn(List.of(a2aServer));
-        when(a2aServerService.getA2aServerSecretKey(5L)).thenThrow(new AccessDeniedException("denied"));
+        when(a2aServerFacade.getA2aServerSecretKey(5L)).thenThrow(new AccessDeniedException("denied"));
 
         graphQlTester
             .document("""

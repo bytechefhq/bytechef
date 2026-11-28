@@ -9,7 +9,9 @@ package com.bytechef.ee.embedded.configuration.repository;
 
 import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfiguration;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -28,4 +30,6 @@ public interface AutomationProjectConfigurationRepository
 
     List<AutomationProjectConfiguration> findAllByProjectIdAndEnvironmentIdOrderByIdAsc(
         long projectId, long environmentId);
+
+    Optional<AutomationProjectConfiguration> findByUuidAndEnvironmentId(UUID uuid, long environmentId);
 }
