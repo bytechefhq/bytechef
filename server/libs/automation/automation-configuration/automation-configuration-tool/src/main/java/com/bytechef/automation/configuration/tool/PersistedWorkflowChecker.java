@@ -20,7 +20,6 @@ import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.NodeValidationIssue;
-import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowIssueKind;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowIssueSeverity;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowValidationResult;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -43,34 +42,50 @@ public class PersistedWorkflowChecker {
     }
 
     public List<Issue> check(String workflowId) {
-        Environment environment = EnvironmentContext.fetchCurrentEnvironment();
+        WorkflowValidationResult workflowValidationResult = validate(workflowId);
 
-        long environmentId = environment == null ? Environment.DEVELOPMENT.ordinal() : environment.ordinal();
+        return collectIssues(workflowValidationResult, WorkflowIssueSeverity.ERROR, workflowValidationResult.errors());
+    }
 
-        WorkflowValidationResult workflowValidationResult = workflowValidatorFacade.validateWorkflowById(
-            workflowId, environmentId);
+    public List<Issue> checkWarnings(String workflowId) {
+        WorkflowValidationResult workflowValidationResult = validate(workflowId);
+
+        return collectIssues(
+            workflowValidationResult, WorkflowIssueSeverity.WARNING, workflowValidationResult.warnings());
+    }
+
+    private static List<Issue> collectIssues(
+        WorkflowValidationResult workflowValidationResult, WorkflowIssueSeverity severity, List<String> messages) {
 
         List<Issue> issues = new ArrayList<>();
 
         for (NodeValidationIssue nodeValidationIssue : workflowValidationResult.nodeIssues()) {
-            if (nodeValidationIssue.severity() == WorkflowIssueSeverity.ERROR) {
+            if (nodeValidationIssue.severity() == severity) {
                 issues.add(
                     new Issue(
                         nodeValidationIssue.nodeName(), nodeValidationIssue.message(),
-                        nodeValidationIssue.kind() == WorkflowIssueKind.MISSING_CONNECTION));
+                        nodeValidationIssue.userAction()));
             }
         }
 
-        for (String error : workflowValidationResult.errors()) {
+        for (String message : messages) {
             boolean coveredByNodeIssue = issues.stream()
-                .anyMatch(issue -> error.contains(issue.message()));
+                .anyMatch(issue -> message.contains(issue.message()));
 
             if (!coveredByNodeIssue) {
-                issues.add(new Issue(null, error, false));
+                issues.add(new Issue(null, message, false));
             }
         }
 
         return issues;
+    }
+
+    private WorkflowValidationResult validate(String workflowId) {
+        Environment environment = EnvironmentContext.fetchCurrentEnvironment();
+
+        long environmentId = environment == null ? Environment.DEVELOPMENT.ordinal() : environment.ordinal();
+
+        return workflowValidatorFacade.validateWorkflowById(workflowId, environmentId);
     }
 
     public record Issue(@Nullable String nodeName, String message, boolean userAction) {

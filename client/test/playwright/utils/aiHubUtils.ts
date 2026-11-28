@@ -1,4 +1,4 @@
-import {type Page, type Request, type Route, expect} from '@playwright/test';
+import {type Locator, type Page, type Request, type Route, expect} from '@playwright/test';
 
 import {AI_HUB_ATTACH_URL, type AgUiTurnType, toSseBody} from './agUiStreamStub';
 import {
@@ -808,4 +808,252 @@ export async function listProjectWorkflowIds(page: Page, projectId: number): Pro
     await expectOk(response, `listing the workflows of project ${projectId}`);
 
     return ((await response.json()) as Array<{id: string}>).map((workflow) => workflow.id);
+}
+
+export interface WorkflowNodeI {
+    name: string;
+    parameters: Record<string, unknown>;
+    type: string;
+}
+
+const isWorkflowNode = (value: unknown): value is WorkflowNodeI =>
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as {type?: unknown}).type === 'string' &&
+    /^[A-Za-z0-9]+\/v\d+/.test((value as {type: string}).type);
+
+function collectWorkflowNodes(value: unknown, workflowNodes: WorkflowNodeI[]): void {
+    if (Array.isArray(value)) {
+        value.forEach((item) => collectWorkflowNodes(item, workflowNodes));
+
+        return;
+    }
+
+    if (typeof value !== 'object' || value === null) {
+        return;
+    }
+
+    if (isWorkflowNode(value)) {
+        workflowNodes.push({
+            name: String((value as {name?: unknown}).name ?? ''),
+            parameters: ((value as {parameters?: unknown}).parameters ?? {}) as Record<string, unknown>,
+            type: value.type,
+        });
+    }
+
+    Object.values(value).forEach((child) => collectWorkflowNodes(child, workflowNodes));
+}
+
+export async function readWorkflowNodes(page: Page, workflowId: string): Promise<WorkflowNodeI[]> {
+    const response = await page.request.get(`${WORKFLOWS_API_PATH}/${workflowId}`);
+
+    await expectOk(response, `reading workflow ${workflowId}`);
+
+    const workflow = (await response.json()) as {definition?: string};
+    const definition = JSON.parse(workflow.definition ?? '{}') as {tasks?: unknown[]; triggers?: unknown[]};
+    const workflowNodes: WorkflowNodeI[] = [];
+
+    collectWorkflowNodes([...(definition.triggers ?? []), ...(definition.tasks ?? [])], workflowNodes);
+
+    return workflowNodes;
+}
+
+export async function createDataTableThroughApi(
+    page: Page,
+    {
+        baseName,
+        columns,
+        environmentId,
+        workspaceId,
+    }: {baseName: string; columns: Array<{name: string; type: string}>; environmentId: number; workspaceId: number}
+): Promise<string> {
+    await postGraphQl(
+        page,
+        'mutation createDataTable($input: CreateDataTableInput!) { createDataTable(input: $input) }',
+        {
+            input: {baseName, columns, environmentId: String(environmentId), workspaceId: String(workspaceId)},
+        }
+    );
+
+    const data = await postGraphQl<{dataTables: Array<{baseName: string; id: string}>}>(
+        page,
+        'query dataTables($environmentId: ID!, $workspaceId: ID!) { dataTables(environmentId: $environmentId, workspaceId: $workspaceId) { id baseName } }',
+        {environmentId: String(environmentId), workspaceId: String(workspaceId)}
+    );
+
+    const dataTable = data.dataTables.find((candidate) => candidate.baseName === baseName);
+
+    expect(dataTable, `data table ${baseName} was not created`).toBeDefined();
+
+    return dataTable!.id;
+}
+
+export async function dropDataTableThroughApi(
+    page: Page,
+    {environmentId, tableId}: {environmentId: number; tableId: string}
+): Promise<void> {
+    const response = await page.request.post('/graphql', {
+        data: {
+            query: 'mutation dropDataTable($input: RemoveTableInput!) { dropDataTable(input: $input) }',
+            variables: {input: {environmentId: String(environmentId), tableId}},
+        },
+        headers: {'X-XSRF-TOKEN': await readXsrfToken(page)},
+    });
+
+    if (!response.ok()) {
+        console.warn(`Failed to drop data table ${tableId}: ${response.status()}`);
+    }
+}
+
+export async function listConnections(
+    page: Page,
+    {componentName, environmentId, workspaceId}: {componentName: string; environmentId: number; workspaceId: number}
+): Promise<Array<{id: number; name: string}>> {
+    const response = await page.request.get(
+        `/api/automation/internal/workspaces/${workspaceId}/connections?componentName=${componentName}&environmentId=${environmentId}`
+    );
+
+    await expectOk(response, `listing ${componentName} connections`);
+
+    return (await response.json()) as Array<{id: number; name: string}>;
+}
+
+const CARD_CHROME_BUTTON_NAMES = new Set([
+    'Copy',
+    'Dismiss',
+    'More',
+    'Next',
+    'Other…',
+    'Refresh',
+    'Retry',
+    'Submit all',
+]);
+
+const SUBMITTING_BUTTON_NAME = 'Submitting…';
+
+const MAX_CARD_ROUNDS = 5;
+
+const CONNECTIONS_LOADING_TEXT = /^Loading .+ connections\.\.\.$/;
+
+export interface InteractiveCardAnswerI {
+    answer: string;
+    cardText: string;
+}
+
+export async function answerInteractiveCards(
+    page: Page,
+    {
+        answerPickers = true,
+        chooseOption = (cardText, optionNames) => optionNames[0],
+        readLastMessage,
+        waitForTurnEnd,
+    }: {
+        answerPickers?: boolean;
+        chooseOption?: (cardText: string, optionNames: string[]) => string;
+        readLastMessage: () => Locator;
+        waitForTurnEnd: () => Promise<void>;
+    }
+): Promise<InteractiveCardAnswerI[]> {
+    const answers: InteractiveCardAnswerI[] = [];
+
+    for (let round = 0; round < MAX_CARD_ROUNDS; round++) {
+        const lastMessage = readLastMessage();
+
+        await expect(lastMessage.getByText(CONNECTIONS_LOADING_TEXT)).toHaveCount(0);
+
+        await expect(lastMessage.getByRole('button', {name: SUBMITTING_BUTTON_NAME})).toHaveCount(0, {
+            timeout: 60000,
+        });
+
+        const cardText = await lastMessage.innerText();
+        const picker = lastMessage.getByRole('combobox');
+
+        if ((await picker.count()) > 0 && (await picker.first().isEnabled())) {
+            if (!answerPickers) {
+                break;
+            }
+
+            await picker.first().click();
+
+            const firstOption = page.getByRole('option').first();
+            const optionName = (await firstOption.innerText()).trim();
+
+            await firstOption.click();
+
+            answers.push({answer: optionName, cardText});
+
+            await waitForTurnEnd();
+
+            continue;
+        }
+
+        const checkboxLabels = lastMessage.locator('label').filter({has: page.getByRole('checkbox')});
+
+        if ((await checkboxLabels.count()) > 0) {
+            const checkboxNames = (await checkboxLabels.allInnerTexts()).map(
+                (checkboxName) => checkboxName.trim().split('\n')[0]
+            );
+
+            const answer = chooseOption(cardText, checkboxNames);
+
+            answers.push({answer, cardText});
+
+            await checkboxLabels.nth(checkboxNames.indexOf(answer)).getByRole('checkbox').check();
+
+            await lastMessage.getByRole('button', {name: /^(Next|Submit all)$/}).click();
+
+            await waitForTurnEnd();
+
+            continue;
+        }
+
+        const optionNames = (await lastMessage.getByRole('button').allInnerTexts())
+            .map((optionName) => optionName.trim())
+            .filter(
+                (optionName) =>
+                    optionName && !CARD_CHROME_BUTTON_NAMES.has(optionName) && !optionName.startsWith('Connect ')
+            );
+
+        if (optionNames.length === 0) {
+            break;
+        }
+
+        const answer = chooseOption(cardText, optionNames);
+
+        answers.push({answer, cardText});
+
+        await lastMessage.getByRole('button', {exact: true, name: answer}).click();
+
+        await waitForTurnEnd();
+    }
+
+    return answers;
+}
+
+export async function createBearerTokenConnectionThroughApi(
+    page: Page,
+    {
+        componentName,
+        environmentId,
+        name,
+        token,
+        workspaceId,
+    }: {componentName: string; environmentId: number; name: string; token: string; workspaceId: number}
+): Promise<number> {
+    const response = await page.request.post(CONNECTIONS_API_PATH, {
+        data: {
+            authorizationType: 'BEARER_TOKEN',
+            componentName,
+            connectionVersion: 1,
+            environmentId,
+            name,
+            parameters: {token},
+            workspaceId,
+        },
+        headers: {'X-XSRF-TOKEN': await readXsrfToken(page)},
+    });
+
+    await expectOk(response, `creating connection ${name}`);
+
+    return Number(await response.text());
 }

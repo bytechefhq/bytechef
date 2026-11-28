@@ -43,12 +43,19 @@ import {
     readGraphQlOperationName,
 } from '../../utils/copilotUtils';
 import getRandomString from '../../utils/getRandomString';
-import {McpClient, type McpToolCallResultI, toolResultText} from '../../utils/mcpClient';
+import {
+    McpClient,
+    type McpToolCallResultI,
+    buildWorkflowAnsweringQuestions,
+    toolResultText,
+} from '../../utils/mcpClient';
 import workflowChatMemory from './fixtures/workflow-chat-memory.json';
 
 export const test = mergeTests(loginTest(), aiHubChatsTest, projectTest, workflowTest);
 
 const LIVE_TURN_TIMEOUT = 540000;
+
+const TURN_START_TIMEOUT = 15000;
 
 const MCP_SECRET_KEY = process.env.PLAYWRIGHT_MCP_SECRET_KEY ?? '';
 
@@ -758,7 +765,7 @@ test.describe('@live AI Hub', () => {
             expect(await readProject(page, Number(project.id))).toBeDefined();
         });
 
-        test('an EXEMPT rule lifts the deleteProject gate and a REQUIRE rule gates publishProject', async ({
+        test('an EXEMPT rule lifts the deleteProject gate and a REQUIRE rule gates createProject', async ({
             authenticatedPage: page,
             project,
         }) => {
@@ -769,12 +776,11 @@ test.describe('@live AI Hub', () => {
             const existingRules = await readToolApprovalRules(page, workspaceId);
 
             test.skip(
-                existingRules.some((rule) => rule.toolName === 'publishProject'),
-                'The workspace already holds a publishProject rule'
+                existingRules.some((rule) => rule.toolName === 'createProject'),
+                'The workspace already holds a createProject rule'
             );
 
-            const gatedProjectName = shortName('hub_live_gated');
-            const gatedProjectId = await createProjectThroughApi(page, {name: gatedProjectName, workspaceId});
+            const requiredProjectName = shortName('hub_live_required');
 
             const ruleIds: string[] = [];
 
@@ -789,7 +795,7 @@ test.describe('@live AI Hub', () => {
                 ruleIds.push(
                     await createToolApprovalRuleThroughApi(page, {
                         mode: 'REQUIRE',
-                        toolName: 'publishProject',
+                        toolName: 'createProject',
                         workspaceId,
                     })
                 );
@@ -802,14 +808,14 @@ test.describe('@live AI Hub', () => {
                     await expect.poll(() => readProject(page, Number(project.id))).toBeUndefined();
                 });
 
-                await test.step('Publish waits for an approval', async () => {
-                    await liveTurn(aiHubPage, `Publish the project ${gatedProjectName} (id ${gatedProjectId}).`);
+                await test.step('Creating a project waits for an approval', async () => {
+                    await liveTurn(aiHubPage, `Create a project named ${requiredProjectName}.`);
 
                     await expect(page.getByText('Tool approval required')).toBeVisible();
 
-                    await expect(page.getByText('publishProject', {exact: true})).toBeVisible();
+                    await expect(page.getByText('createProject', {exact: true})).toBeVisible();
 
-                    expect((await readProject(page, gatedProjectId))?.lastPublishedDate ?? null).toBeNull();
+                    expect(await findProjectByName(page, workspaceId, requiredProjectName)).toBeUndefined();
 
                     await page.getByRole('button', {name: 'Reject'}).click();
 
@@ -820,7 +826,11 @@ test.describe('@live AI Hub', () => {
                     await deleteToolApprovalRuleThroughApi(page, {ruleId, workspaceId});
                 }
 
-                await deleteProjectThroughApi(page, gatedProjectId);
+                const requiredProject = await findProjectByName(page, workspaceId, requiredProjectName);
+
+                if (requiredProject) {
+                    await deleteProjectThroughApi(page, Number(requiredProject.id));
+                }
             }
         });
     });
@@ -951,21 +961,16 @@ test.describe('@live AI Hub', () => {
 
                     projectIdsToDelete.push(mcpProject.id);
 
-                    const mcpWorkflow = readStructuredResult<{workflow_id: string}>(
-                        await mcpClient.callTool('createProjectWorkflow', {
-                            name: shortName('hub_parity_mcp_workflow'),
-                            projectId: mcpProject.id,
-                        })
-                    );
-
-                    const buildResult = await mcpClient.callTool('buildWorkflow', {
-                        request: `Update the existing workflow with workflowId ${mcpWorkflow.workflow_id}: ${PARITY_INSTRUCTION}`,
+                    const buildResult = await buildWorkflowAnsweringQuestions(mcpClient, {
+                        request: `Create a new workflow in project ${mcpProject.id} that, ${PARITY_INSTRUCTION}`,
                         workspaceId: workspaces[0].id,
                     });
 
                     expect(buildResult.isError ?? false, toolResultText(buildResult)).toBe(false);
 
-                    builtTypes.mcp = await readWorkflowComponentTypes(page, mcpWorkflow.workflow_id);
+                    const [mcpWorkflowId] = await listProjectWorkflowIds(page, mcpProject.id);
+
+                    builtTypes.mcp = await readWorkflowComponentTypes(page, mcpWorkflowId);
                 });
 
                 await test.step('Build through the workflow editor Copilot', async () => {
@@ -984,6 +989,10 @@ test.describe('@live AI Hub', () => {
                     await copilotPanel.setBuildMode(true);
 
                     await copilotPanel.send(`Build this workflow: ${PARITY_INSTRUCTION}`);
+
+                    await expect(copilotPanel.stopGeneratingButton)
+                        .toBeVisible({timeout: TURN_START_TIMEOUT})
+                        .catch(() => undefined);
 
                     await expect(copilotPanel.stopGeneratingButton).toBeHidden({timeout: LIVE_TURN_TIMEOUT});
 

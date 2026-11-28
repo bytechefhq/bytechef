@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -60,12 +61,14 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.LongConsumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -73,6 +76,8 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
 public class WebhookWorkflowExecutorTest {
+
+    private static final long JOB_ID = 42L;
 
     private final WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
         PlatformType.AUTOMATION, 1L, "workflow-uuid", "trigger_1");
@@ -287,7 +292,7 @@ public class WebhookWorkflowExecutorTest {
                         "approval/v1/requestApproval"));
 
             verify(webhookWorkflowSyncExecutor, never()).execute(any(), any());
-            verify(jobSyncExecutor, never()).execute(any(), any(), anyBoolean(), any(), any());
+            verify(jobSyncExecutor, never()).startJob(any(), any());
         }
 
         @Test
@@ -343,7 +348,7 @@ public class WebhookWorkflowExecutorTest {
                 .hasMessage(WebhookWorkflowExecutorImpl.suspendingTaskMessage("agent", "aiAgent/v1/chat"));
 
             verify(webhookWorkflowSyncExecutor, never()).execute(any(), any());
-            verify(jobSyncExecutor, never()).execute(any(), any(), anyBoolean(), any(), any());
+            verify(jobSyncExecutor, never()).startJob(any(), any());
         }
 
         @Test
@@ -394,6 +399,31 @@ public class WebhookWorkflowExecutorTest {
         private static WorkflowTask workflowTask(String name, String type) {
             return new WorkflowTask(Map.of("name", name, "type", type));
         }
+    }
+
+    @Test
+    public void testExecuteSyncReportsTheJobIdBeforeWaitingOnTheJob() {
+        stubSyncExecution(Map.of());
+
+        LongConsumer jobIdListener = mock(LongConsumer.class);
+
+        webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest, jobIdListener);
+
+        InOrder inOrder = inOrder(jobSyncExecutor, jobIdListener);
+
+        inOrder.verify(jobSyncExecutor)
+            .startJob(any(), any());
+        inOrder.verify(jobIdListener)
+            .accept(JOB_ID);
+        inOrder.verify(jobSyncExecutor)
+            .awaitJob(eq(JOB_ID), anyBoolean(), any(), any());
+    }
+
+    @Test
+    public void testStopSyncJobStopsTheJobOnTheSyncExecutor() {
+        webhookWorkflowExecutor.stopSyncJob(JOB_ID);
+
+        verify(jobSyncExecutor).stopJob(JOB_ID);
     }
 
     @Test
@@ -464,6 +494,18 @@ public class WebhookWorkflowExecutorTest {
     }
 
     private Duration executeSyncAndCaptureTimeout(Map<String, ?> triggerParameters) {
+        stubSyncExecution(triggerParameters);
+
+        webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest);
+
+        ArgumentCaptor<Duration> timeoutArgumentCaptor = ArgumentCaptor.forClass(Duration.class);
+
+        verify(jobSyncExecutor).awaitJob(eq(JOB_ID), anyBoolean(), any(), timeoutArgumentCaptor.capture());
+
+        return timeoutArgumentCaptor.getValue();
+    }
+
+    private void stubSyncExecution(Map<String, ?> triggerParameters) {
         Workflow workflow = mock(Workflow.class);
 
         when(workflow.getExtensions(any(), any(), any())).thenReturn(
@@ -474,14 +516,7 @@ public class WebhookWorkflowExecutorTest {
                         "parameters", triggerParameters))));
         when(workflowService.getWorkflow("workflow-id")).thenReturn(workflow);
         when(webhookWorkflowSyncExecutor.execute(any(), any())).thenReturn(new TriggerOutput(Map.of(), null, false));
-        when(jobSyncExecutor.execute(any(), any(), anyBoolean(), any(), any())).thenReturn(new Job());
-
-        webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest);
-
-        ArgumentCaptor<Duration> timeoutArgumentCaptor = ArgumentCaptor.forClass(Duration.class);
-
-        verify(jobSyncExecutor).execute(any(), any(), anyBoolean(), any(), timeoutArgumentCaptor.capture());
-
-        return timeoutArgumentCaptor.getValue();
+        when(jobSyncExecutor.startJob(any(), any())).thenReturn(JOB_ID);
+        when(jobSyncExecutor.awaitJob(anyLong(), anyBoolean(), any(), any())).thenReturn(new Job());
     }
 }

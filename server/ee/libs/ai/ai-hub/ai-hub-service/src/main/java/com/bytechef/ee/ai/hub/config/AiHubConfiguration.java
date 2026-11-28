@@ -17,11 +17,14 @@ import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.tool.DeploymentToolCallbacksFactory;
+import com.bytechef.automation.configuration.tool.PersistedWorkflowChecker;
 import com.bytechef.automation.configuration.tool.ProjectTools;
 import com.bytechef.automation.configuration.tool.ProjectWorkflowLifecycleTools;
 import com.bytechef.automation.configuration.tool.ReadProjectTools;
 import com.bytechef.automation.configuration.tool.ReadProjectWorkflowTools;
+import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionTools;
 import com.bytechef.component.ai.agent.chat.memory.builtin.util.BuiltInSessionRepositoryFactory;
 import com.bytechef.component.ai.agent.chat.memory.builtin.util.BuiltInSessionRepositoryFactory.BuiltInSessionStore;
 import com.bytechef.ee.ai.hub.agent.AiHubRoutingAgent;
@@ -34,31 +37,39 @@ import com.bytechef.ee.ai.hub.agent.WorkflowChatGuard;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
 import com.bytechef.ee.ai.hub.approval.AiHubGatedToolFilterAdvisor;
 import com.bytechef.ee.ai.hub.approval.AiHubPinnedToolCallbacks;
+import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
 import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
+import com.bytechef.ee.ai.hub.tool.CheckWorkflowTools;
 import com.bytechef.ee.ai.hub.tool.CreateWorkflowChatToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
+import com.bytechef.ee.ai.hub.tool.SearchDocsTools;
+import com.bytechef.ee.ai.hub.tool.UserRequestForwardingToolCallback;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.platform.ai.tool.SecurityContextRehydrator;
 import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
+import com.bytechef.platform.component.tool.ComponentTools;
+import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -71,6 +82,25 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
+ * Declares the AI Hub's two AG-UI {@link com.agui.server.LocalAgent}s, {@code ai_hub_ask} and {@code ai_hub_build}, and
+ * the session memory both read and write. Each is an {@link AiHubRoutingAgent} that sends workflow chat turns to the
+ * {@link WebhookBridgeAgent} and every other turn to its mode's {@link AiHubSpringAIAgent}.
+ *
+ * <p>
+ * Tool lists are built explicitly (spec D3), never by sweeping every {@link ToolCallback} bean. ASK holds the read
+ * views of the project, workflow and deployment tools, the read pickers, {@code openWorkflowTab} and
+ * {@code openWorkflowChatTab}. BUILD holds the full project tools, the workflow lifecycle tools (no tool that writes
+ * workflow content), the deployment write tools, every picker, {@code openWorkflowTab}, the workflow chat tools
+ * ({@code openWorkflowChatTab}, {@code listChatWorkflows}, {@code createWorkflowChat}), and the {@code buildWorkflow} /
+ * {@code importWorkflow} delegates, which are the only way it authors workflow content. The delegates' sub-agents never
+ * see a tool the approval gate gates, by default or by a workspace rule ({@link AiHubGatedToolFilterAdvisor}).
+ * </p>
+ *
+ * <p>
+ * Gated on {@code bytechef.ai.hub.enabled} AND {@code bytechef.ai.copilot.enabled}: the delegates come from the
+ * Copilot's sub-agents, so a hub without the Copilot cannot author workflows.
+ * </p>
+ *
  * @version ee
  *
  * @author Ivica Cardic
@@ -79,6 +109,7 @@ import tools.jackson.databind.json.JsonMapper;
 @ConditionalOnAiHub
 public class AiHubConfiguration {
 
+    static final Set<String> COMPONENT_DEFINITION_TOOL_NAMES = Set.of("getAction", "getClusterElement", "getTrigger");
     static final Set<String> INTELLIGENT_TOOL_NAMES = Set.of("buildWorkflow", "importWorkflow");
 
     private static final String BUILD_WORKFLOW_TOOL_NAME = "buildWorkflow";
@@ -104,18 +135,28 @@ public class AiHubConfiguration {
     @Bean(defaultCandidate = false)
     AiHubSpringAIAgent aiHubAskSpringAIAgent(
         AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
-        ReadProjectWorkflowTools readProjectWorkflowTools,
+        ReadProjectWorkflowTools readProjectWorkflowTools, WorkflowExecutionTools workflowExecutionTools,
+        ObjectProvider<ComponentTools> componentToolsProvider,
+        ObjectProvider<PersistedWorkflowChecker> persistedWorkflowCheckerProvider,
+        ObjectProvider<ProjectService> projectServiceProvider,
         ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, ProjectWorkflowFacade projectWorkflowFacade,
         AiHubChatService chatService, AiHubChatAccessPolicy chatAccessPolicy,
         SecurityContextRehydrator securityContextRehydrator, AiHubApprovalGate approvalGate,
         ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
-        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider)
+        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
+        ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
+        @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider)
         throws AGUIException {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
-            List.of(ToolCallbacks.from(readProjectTools, readProjectWorkflowTools)));
+            List.of(ToolCallbacks.from(readProjectTools, readProjectWorkflowTools, workflowExecutionTools)));
+
+        toolCallbacks.addAll(componentDefinitionToolCallbacks(componentToolsProvider));
+        toolCallbacks.addAll(checkWorkflowToolCallbacks(persistedWorkflowCheckerProvider, projectServiceProvider));
+        toolCallbacks.addAll(
+            searchDocsToolCallbacks(embeddingProviderStatusProviderProvider, copilotPgVectorStoreProvider));
 
         toolCallbacks.addAll(deploymentFlatCrudToolCallbacks(deploymentToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(interactivePickerToolCallbacks.read());
@@ -131,20 +172,31 @@ public class AiHubConfiguration {
     @Bean(defaultCandidate = false)
     AiHubSpringAIAgent aiHubBuildSpringAIAgent(
         AiHubSessionMemory aiHubSessionMemory, ChatModel chatModel, ProjectTools projectTools,
-        ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools,
+        ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools, WorkflowExecutionTools workflowExecutionTools,
+        ObjectProvider<ComponentTools> componentToolsProvider,
+        ObjectProvider<PersistedWorkflowChecker> persistedWorkflowCheckerProvider,
+        ObjectProvider<ProjectService> projectServiceProvider,
         ObjectProvider<DeploymentToolCallbacksFactory> deploymentToolCallbacksFactoryProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, IntelligentToolCatalog intelligentToolCatalog,
         WorkspaceFacade workspaceFacade, ProjectWorkflowFacade projectWorkflowFacade,
         ProjectDeploymentFacade projectDeploymentFacade, AiHubChatService chatService,
         AiHubChatAccessPolicy chatAccessPolicy, AiHubChatArtifactRecorder aiHubChatArtifactRecorder,
-        SecurityContextRehydrator securityContextRehydrator,
-        AiHubApprovalGate approvalGate, ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
+        SecurityContextRehydrator securityContextRehydrator, AiHubApprovalGate approvalGate,
+        AiHubToolApprovalPolicy toolApprovalPolicy,
+        ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
-        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider)
+        ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
+        ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
+        @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider)
         throws AGUIException {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
-            List.of(ToolCallbacks.from(projectTools, projectWorkflowLifecycleTools)));
+            List.of(ToolCallbacks.from(projectTools, projectWorkflowLifecycleTools, workflowExecutionTools)));
+
+        toolCallbacks.addAll(componentDefinitionToolCallbacks(componentToolsProvider));
+        toolCallbacks.addAll(checkWorkflowToolCallbacks(persistedWorkflowCheckerProvider, projectServiceProvider));
+        toolCallbacks.addAll(
+            searchDocsToolCallbacks(embeddingProviderStatusProviderProvider, copilotPgVectorStoreProvider));
 
         toolCallbacks.addAll(deploymentFlatCrudToolCallbacks(deploymentToolCallbacksFactoryProvider, true));
         toolCallbacks.addAll(interactivePickerToolCallbacks.write());
@@ -155,8 +207,9 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(
             intelligentToolCatalog.getByNames(
                 INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD,
-                (chatClient, definition) -> AiHubGatedToolFilterAdvisor.filter(chatClient),
-                (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(toolCallback, workspaceFacade)));
+                (chatClient, definition) -> AiHubGatedToolFilterAdvisor.filter(chatClient, toolApprovalPolicy),
+                (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(
+                    new UserRequestForwardingToolCallback(toolCallback), workspaceFacade)));
 
         requireBuildWorkflow(toolCallbacks);
 
@@ -225,6 +278,48 @@ public class AiHubConfiguration {
         return mode -> mode == Mode.BUILD
             ? aiHubBuildSpringAIAgent.pinnedToolCallbacks()
             : aiHubAskSpringAIAgent.pinnedToolCallbacks();
+    }
+
+    static List<ToolCallback> componentDefinitionToolCallbacks(ObjectProvider<ComponentTools> componentToolsProvider) {
+        ComponentTools componentTools = componentToolsProvider.getIfAvailable();
+
+        if (componentTools == null) {
+            return List.of();
+        }
+
+        return Arrays.stream(ToolCallbacks.from(componentTools))
+            .filter(toolCallback -> COMPONENT_DEFINITION_TOOL_NAMES.contains(toolCallback.getToolDefinition()
+                .name()))
+            .toList();
+    }
+
+    static List<ToolCallback> checkWorkflowToolCallbacks(
+        ObjectProvider<PersistedWorkflowChecker> persistedWorkflowCheckerProvider,
+        ObjectProvider<ProjectService> projectServiceProvider) {
+
+        PersistedWorkflowChecker persistedWorkflowChecker = persistedWorkflowCheckerProvider.getIfAvailable();
+        ProjectService projectService = projectServiceProvider.getIfAvailable();
+
+        if (persistedWorkflowChecker == null || projectService == null) {
+            return List.of();
+        }
+
+        return List.of(ToolCallbacks.from(new CheckWorkflowTools(persistedWorkflowChecker, projectService)));
+    }
+
+    static List<ToolCallback> searchDocsToolCallbacks(
+        ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
+        ObjectProvider<VectorStore> copilotPgVectorStoreProvider) {
+
+        EmbeddingProviderStatusProvider embeddingProviderStatusProvider =
+            embeddingProviderStatusProviderProvider.getIfAvailable();
+        VectorStore copilotPgVectorStore = copilotPgVectorStoreProvider.getIfAvailable();
+
+        if (embeddingProviderStatusProvider == null || copilotPgVectorStore == null) {
+            return List.of();
+        }
+
+        return List.of(ToolCallbacks.from(new SearchDocsTools(embeddingProviderStatusProvider, copilotPgVectorStore)));
     }
 
     static List<ToolCallback> deploymentFlatCrudToolCallbacks(

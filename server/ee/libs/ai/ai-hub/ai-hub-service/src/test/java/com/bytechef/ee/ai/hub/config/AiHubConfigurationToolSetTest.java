@@ -37,10 +37,12 @@ class AiHubConfigurationToolSetTest {
         assertThat(toolNames(askAgent))
             .contains(
                 "listProjects", "getWorkflow", "listProjectDeployments", "listConnectionsForComponent",
-                "askUserQuestion", "openWorkflowTab", "openWorkflowChatTab")
+                "askUserQuestion", "openWorkflowTab", "openWorkflowChatTab", "listWorkflowExecutions",
+                "getWorkflowExecution", "getAction", "getTrigger", "getClusterElement", "checkWorkflow",
+                "searchDocs")
             .doesNotContain(
                 "createProject", "deleteProject", "createProjectDeployment", "selectConnection", "buildWorkflow",
-                "updateWorkflow", "listChatWorkflows", "createWorkflowChat");
+                "updateWorkflow", "listChatWorkflows", "createWorkflowChat", "listComponents", "getActionDefinition");
     }
 
     @Test

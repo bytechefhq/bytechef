@@ -297,6 +297,53 @@ class ProjectWorkflowAgentToolCallbackTest {
     }
 
     @Test
+    void testCallNamesTheWarningsOfAWorkflowWithoutErrors() {
+        ChatClient chatClient = savingChatClient("built");
+
+        PersistedWorkflowChecker persistedWorkflowChecker = mock(PersistedWorkflowChecker.class);
+
+        when(persistedWorkflowChecker.checkWarnings("wf-1")).thenReturn(
+            List.of(
+                new PersistedWorkflowChecker.Issue(
+                    "send_1", "Property 'javascript_1.quote' might not exist in the output of 'script/v1/javascript'",
+                    false)));
+
+        ProjectWorkflowAgentToolCallback callback = new ProjectWorkflowAgentToolCallback(
+            chatModel -> chatClient, null, persistedWorkflowChecker);
+
+        String result = callback.call("{\"request\":\"build it\"}");
+
+        verify(chatClient, times(1)).prompt(anyString());
+
+        assertThat(result).contains(
+            "[WORKFLOW CHECK] The saved workflow has no errors.", "say a test run will confirm it",
+            "- send_1: Property 'javascript_1.quote' might not exist in the output of 'script/v1/javascript'")
+            .doesNotContain("passed the editor's validation");
+    }
+
+    @Test
+    void testCallNamesTheWarningsAfterTheStepsOnlyTheUserCanDo() {
+        ChatClient chatClient = savingChatClient("built");
+
+        PersistedWorkflowChecker persistedWorkflowChecker = mock(PersistedWorkflowChecker.class);
+
+        when(persistedWorkflowChecker.check("wf-1")).thenReturn(
+            List.of(new PersistedWorkflowChecker.Issue("send_1", "Missing required connection: Email", true)));
+        when(persistedWorkflowChecker.checkWarnings("wf-1")).thenReturn(
+            List.of(
+                new PersistedWorkflowChecker.Issue("send_1", "Property 'javascript_1.date' might not exist", false)));
+
+        ProjectWorkflowAgentToolCallback callback = new ProjectWorkflowAgentToolCallback(
+            chatModel -> chatClient, null, persistedWorkflowChecker);
+
+        String result = callback.call("{\"request\":\"build it\"}");
+
+        assertThat(result).contains(
+            "- send_1: Missing required connection: Email", "The editor also shows these warnings",
+            "- send_1: Property 'javascript_1.date' might not exist");
+    }
+
+    @Test
     void testCallKeepsTheResultWhenValidationFails() {
         ChatClient chatClient = savingChatClient("built");
 

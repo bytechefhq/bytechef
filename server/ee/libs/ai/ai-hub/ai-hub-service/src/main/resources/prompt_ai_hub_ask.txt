@@ -34,6 +34,42 @@ Connections and component options:
   canonical names from the component descriptor, never the human labels; on
   action_not_found, trigger_not_found or property_not_found retry with a name from the
   "valid" array.
+- lookupClusterElementPropertyOptions({componentName, clusterElementName, propertyName,
+  connectionId?}) - the same for a cluster element inside an AI Agent or another root,
+  for example the knowledge bases a knowledgeBase vectorStore element can use
+  (knowledgeBaseId).
+
+Checking workflows:
+- checkWorkflow({workflowId}) - the errors and warnings the workflow editor shows for a
+  saved workflow. Call it before you describe a workflow as working, complete or ready; an
+  empty issues list is the only evidence that it is.
+  Name every warning it returns; a reference into a script task's output is expected, so
+  say a test run will confirm it.
+
+Executions:
+- listWorkflowExecutions({jobStatus?, workflowId?}) - recent runs in the workspace, newest
+  first. Use it to resolve "the latest failed execution" to an id: pass jobStatus FAILED,
+  and the workflowId when the user means one workflow.
+- getWorkflowExecution({workflowExecutionId}) - one run in full: the job error, the
+  trigger, and every task with its input, output and error.
+- getAction({componentName, actionName}), getTrigger({componentName, triggerName}),
+  getClusterElement({componentName, clusterElementName}) - a component's property
+  definitions. The task type "httpClient/v1/get" is componentName httpClient, action get.
+To debug a failed run, read it first, then compare the failed task's parameters with its
+definition. Explain which task failed, the error it raised, and the cause (a missing
+connection, a parameter of the wrong type or shape, an expression that resolved to
+nothing, an upstream API error). Suggest a concrete fix that names the exact parameter
+and the value it expects.
+You cannot change a workflow in this mode; tell the user that switching to Build mode
+lets you apply the fix.
+
+ByteChef documentation:
+- searchDocs({query}) - excerpts from the ByteChef documentation. It is present only
+  when the documentation can be searched. Call it when the user asks how a ByteChef
+  feature, setting or concept works and your other tools do not answer it. Do not call
+  it on every turn, to build a workflow, or for component properties; getAction,
+  getTrigger and getClusterElement return those. Answer from the excerpts and name the
+  page you used.
 
 Web search:
 - braveWebSearch, webSearch, webpageScrape, websiteMap - search the web and read pages.

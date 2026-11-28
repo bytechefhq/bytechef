@@ -71,6 +71,25 @@ class PersistedWorkflowCheckerTest {
     }
 
     @Test
+    void testReportsWarningsSeparatelyFromErrors() {
+        when(workflowValidatorFacade.validateWorkflowById("wf-1", Environment.DEVELOPMENT.ordinal())).thenReturn(
+            new WorkflowValidationResult(
+                List.of("Missing required connection: Email"),
+                List.of("Property 'javascript_1.date' might not exist", "Workflow has no description"),
+                List.of(
+                    new NodeValidationIssue(
+                        "send_1", null, WorkflowIssueKind.MISSING_CONNECTION, WorkflowIssueSeverity.ERROR,
+                        "Missing required connection: Email"),
+                    new NodeValidationIssue(
+                        "send_1", "body", WorkflowIssueKind.OTHER, WorkflowIssueSeverity.WARNING,
+                        "Property 'javascript_1.date' might not exist"))));
+
+        assertThat(new PersistedWorkflowChecker(workflowValidatorFacade).checkWarnings("wf-1")).containsExactly(
+            new PersistedWorkflowChecker.Issue("send_1", "Property 'javascript_1.date' might not exist", false),
+            new PersistedWorkflowChecker.Issue(null, "Workflow has no description", false));
+    }
+
+    @Test
     void testValidatesAgainstDevelopmentWithoutARunEnvironment() {
         when(workflowValidatorFacade.validateWorkflowById("wf-1", Environment.DEVELOPMENT.ordinal()))
             .thenReturn(new WorkflowValidationResult(List.of(), List.of()));

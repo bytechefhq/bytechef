@@ -1,0 +1,24 @@
+{
+    "label": "Order Sync",
+    "description": "Receives an order and forwards it to the orders API",
+    "inputs": [],
+    "triggers": [
+        {
+            "label": "New Order",
+            "name": "trigger_1",
+            "type": "webhook/v1/autoRespondWithHTTP200",
+            "parameters": {}
+        }
+    ],
+    "tasks": [
+        {
+            "label": "Send Order",
+            "name": "httpClient_1",
+            "type": "httpClient/v1/post",
+            "parameters": {
+                "responseType": "JSON",
+                "uri": "https://api.example.com/orders"
+            }
+        }
+    ]
+}

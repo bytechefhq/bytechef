@@ -23,7 +23,7 @@ Two ways something here is hidden, and the tables below mark both:
 
 Both are reversible and neither deletes anything.
 
-**25 whole-page** (9 hidden) · **31 partial** pages (7 with a commented-out section)
+**26 whole-page** (9 hidden) · **31 partial** pages (7 with a commented-out section)
 
 ---
 
@@ -34,6 +34,7 @@ Both are reversible and neither deletes anything.
 | Page | Path | Edition | Sidebar |
 |---|---|---|---|
 | AI Copilot | [`/platform/automation/build/ai-copilot`](/platform/automation/build/ai-copilot) | EE | visible |
+| AI Building Examples | [`/platform/automation/build/ai-examples`](/platform/automation/build/ai-examples) | — | visible |
 | AI Hub | [`/platform/automation/build/hub`](/platform/automation/build/hub) | — | **hidden** |
 | Testing Voice In The Editor | [`/platform/automation/build/voice/editor-testing`](/platform/automation/build/voice/editor-testing) | — | **hidden** |
 | Voice Quickstart | [`/platform/automation/build/voice/quickstart`](/platform/automation/build/voice/quickstart) | — | **hidden** |

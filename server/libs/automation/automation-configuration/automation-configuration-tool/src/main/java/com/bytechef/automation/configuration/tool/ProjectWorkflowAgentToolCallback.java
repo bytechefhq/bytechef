@@ -234,7 +234,11 @@ public class ProjectWorkflowAgentToolCallback implements ToolCallback {
             issues = checkQuietly(workflowId);
         }
 
-        return issues == null ? "" : renderCheckReport(issues);
+        if (issues == null) {
+            return "";
+        }
+
+        return renderCheckReport(issues, checkWarningsQuietly(workflowId));
     }
 
     private @Nullable List<PersistedWorkflowChecker.Issue> checkQuietly(String workflowId) {
@@ -247,9 +251,25 @@ public class ProjectWorkflowAgentToolCallback implements ToolCallback {
         }
     }
 
-    static String renderCheckReport(List<PersistedWorkflowChecker.Issue> issues) {
-        if (issues.isEmpty()) {
+    private List<PersistedWorkflowChecker.Issue> checkWarningsQuietly(String workflowId) {
+        try {
+            return persistedWorkflowChecker == null ? List.of() : persistedWorkflowChecker.checkWarnings(workflowId);
+        } catch (RuntimeException exception) {
+            log.warn("Could not read the warnings of the workflow {} buildWorkflow saved", workflowId, exception);
+
+            return List.of();
+        }
+    }
+
+    static String renderCheckReport(
+        List<PersistedWorkflowChecker.Issue> issues, List<PersistedWorkflowChecker.Issue> warnings) {
+
+        if (issues.isEmpty() && warnings.isEmpty()) {
             return "\n\n[WORKFLOW CHECK] The saved workflow passed the editor's validation.";
+        }
+
+        if (issues.isEmpty()) {
+            return "\n\n[WORKFLOW CHECK] The saved workflow has no errors." + renderWarnings(warnings);
         }
 
         List<PersistedWorkflowChecker.Issue> remainingErrors = issues.stream()
@@ -273,7 +293,17 @@ public class ProjectWorkflowAgentToolCallback implements ToolCallback {
                 formatIssues(userActions);
         }
 
-        return report;
+        return report + renderWarnings(warnings);
+    }
+
+    private static String renderWarnings(List<PersistedWorkflowChecker.Issue> warnings) {
+        if (warnings.isEmpty()) {
+            return "";
+        }
+
+        return "\nThe editor also shows these warnings. Name each one to the user instead of saying the workflow " +
+            "is fully configured; a reference into a task whose output is only known after it runs, such as a " +
+            "script task, is expected, so say a test run will confirm it:\n" + formatIssues(warnings);
     }
 
     private static String formatIssues(List<PersistedWorkflowChecker.Issue> issues) {

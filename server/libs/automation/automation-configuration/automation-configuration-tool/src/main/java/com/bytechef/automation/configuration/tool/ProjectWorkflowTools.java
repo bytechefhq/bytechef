@@ -31,13 +31,17 @@ import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.tool.model.ProjectWorkflowInfo;
 import com.bytechef.automation.configuration.tool.model.WorkflowInfo;
+import com.bytechef.automation.configuration.tool.model.WorkflowSaveInfo;
 import com.bytechef.automation.configuration.tool.util.WorkflowPersistCaptureUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.ai.tool.util.ToolUtils;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
+import com.bytechef.platform.configuration.context.EnvironmentContext;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
@@ -81,6 +85,12 @@ public class ProjectWorkflowTools {
         }
         """;
 
+    static final String INPUTS_FORMAT =
+        " Each entry of 'inputs' has name, label, type (boolean, date, date_time, time, integer, number or string) " +
+            "and required. A Component property input, whose value the user picks from a component's own input " +
+            "such as a Slack channel, has no type and sets componentName, componentVersion and groupName (one of " +
+            "that component's input groups) instead.";
+
     private static final String AGENT_TOOL_ENVIRONMENT_ID_KEY = "bytechef.agentTool.environmentId";
     private static final String PERSISTED_WORKFLOW_CAPTURE_KEY = "bytechef.workflowEditor.persistedWorkflows";
     private static final String DEFAULT_WORKFLOW_NAME = "Workflow";
@@ -90,6 +100,7 @@ public class ProjectWorkflowTools {
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ScopedProjectGuard scopedProjectGuard;
     private final ObjectProvider<WorkflowArtifactRecorder> workflowArtifactRecorderProvider;
+    private final ObjectProvider<WorkflowValidatorFacade> workflowValidatorFacadeProvider;
     private final WorkspaceConnectionFacade workspaceConnectionFacade;
     private final WorkspaceFacade workspaceFacade;
 
@@ -98,6 +109,7 @@ public class ProjectWorkflowTools {
         ComponentDefinitionFacade componentDefinitionFacade, ProjectFacade projectFacade,
         ProjectWorkflowFacade projectWorkflowFacade, ScopedProjectGuard scopedProjectGuard,
         ObjectProvider<WorkflowArtifactRecorder> workflowArtifactRecorderProvider,
+        ObjectProvider<WorkflowValidatorFacade> workflowValidatorFacadeProvider,
         WorkspaceConnectionFacade workspaceConnectionFacade, WorkspaceFacade workspaceFacade) {
 
         this.componentDefinitionFacade = componentDefinitionFacade;
@@ -105,6 +117,7 @@ public class ProjectWorkflowTools {
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.scopedProjectGuard = scopedProjectGuard;
         this.workflowArtifactRecorderProvider = workflowArtifactRecorderProvider;
+        this.workflowValidatorFacadeProvider = workflowValidatorFacadeProvider;
         this.workspaceConnectionFacade = workspaceConnectionFacade;
         this.workspaceFacade = workspaceFacade;
     }
@@ -229,19 +242,21 @@ public class ProjectWorkflowTools {
     }
 
     @Tool(
-        description = "Create a new workflow in a ByteChef project. Returns the created workflow information including id, project id, workflow id, and reference code.")
+        description = "Create a new workflow in a ByteChef project. The definition is validated first: if it has errors, nothing is saved and the errors are returned, so fix them and call this again with the complete definition. Returns the created workflow information including id, project id, workflow id, reference code and the validation warnings of the saved definition; fix every warning with updateWorkflow before you tell the user the workflow is ready, except a reference into a task whose output is only known after it runs, such as a script task, which you keep and tell the user a test run will confirm.")
     public ProjectWorkflowInfo createProjectWorkflow(
         @ToolParam(description = "The ID of the project to add the workflow to") long projectId,
         @ToolParam(
             description = "The definition for the workflow. Needs to be in JSON format similar to " +
-                DEFAULT_DEFINITION) String definition,
+                DEFAULT_DEFINITION + INPUTS_FORMAT) String definition,
         ToolContext toolContext) {
 
         scopedProjectGuard.checkProject(projectId, ScopedProjectGuard.WORKFLOW_CREATE, toolContext,
             ProjectWorkflowErrorType.CREATE_WORKFLOW);
         checkAllowedComponents(definition, toolContext, ProjectWorkflowErrorType.CREATE_WORKFLOW);
+        List<String> warnings = validateBeforeSave(definition, null, ProjectWorkflowErrorType.CREATE_WORKFLOW);
 
-        ProjectWorkflowInfo filledProjectWorkflowInfo = fillEmptyTargetWorkflow(projectId, definition, toolContext);
+        ProjectWorkflowInfo filledProjectWorkflowInfo = fillEmptyTargetWorkflow(
+            projectId, definition, warnings, toolContext);
 
         if (filledProjectWorkflowInfo != null) {
             return filledProjectWorkflowInfo;
@@ -266,7 +281,8 @@ public class ProjectWorkflowTools {
                 projectWorkflow.getId(), projectWorkflow.getProjectId(), projectWorkflow.getProjectVersion(),
                 projectWorkflow.getWorkflowId(), projectWorkflow.getUuidAsString(),
                 projectWorkflow.getCreatedDate() != null ? projectWorkflow.getCreatedDate() : null,
-                projectWorkflow.getLastModifiedDate() != null ? projectWorkflow.getLastModifiedDate() : null);
+                projectWorkflow.getLastModifiedDate() != null ? projectWorkflow.getLastModifiedDate() : null,
+                warnings);
         } catch (Exception e) {
             log.error(
                 "createProjectWorkflow({}): Failed to create workflow for project {}", projectId, projectId, e);
@@ -281,7 +297,7 @@ public class ProjectWorkflowTools {
      * builder is creating a workflow in, so a build never leaves the caller's workflow empty next to a second one.
      */
     private @Nullable ProjectWorkflowInfo fillEmptyTargetWorkflow(
-        long projectId, String definition, @Nullable ToolContext toolContext) {
+        long projectId, String definition, List<String> warnings, @Nullable ToolContext toolContext) {
 
         String targetWorkflowId = toolContext == null
             ? null : WorkflowPersistCaptureUtils.fetchTargetWorkflowId(toolContext.getContext());
@@ -317,7 +333,35 @@ public class ProjectWorkflowTools {
         return new ProjectWorkflowInfo(
             updatedProjectWorkflowDTO.getProjectWorkflowId(), projectId, updatedProjectWorkflowDTO.getProjectVersion(),
             targetWorkflowId, updatedProjectWorkflowDTO.getWorkflowUuid(), updatedProjectWorkflowDTO.getCreatedDate(),
-            updatedProjectWorkflowDTO.getLastModifiedDate());
+            updatedProjectWorkflowDTO.getLastModifiedDate(), warnings);
+    }
+
+    private List<String> validateBeforeSave(
+        String definition, @Nullable String workflowId, ProjectWorkflowErrorType projectWorkflowErrorType) {
+
+        WorkflowValidatorFacade workflowValidatorFacade = workflowValidatorFacadeProvider.getIfAvailable();
+
+        if (workflowValidatorFacade == null) {
+            return List.of();
+        }
+
+        Environment environment = EnvironmentContext.fetchCurrentEnvironment();
+
+        WorkflowValidatorFacade.WorkflowValidationResult workflowValidationResult =
+            workflowValidatorFacade.validateWorkflow(
+                definition, workflowId,
+                environment == null ? Environment.DEVELOPMENT.ordinal() : environment.ordinal());
+
+        List<String> errors = workflowValidationResult.savingErrors();
+
+        if (!errors.isEmpty()) {
+            throw new ExecutionException(
+                "Nothing was saved: the workflow definition has " + errors.size() + " validation error(s). Fix " +
+                    "every one of them and save the complete definition again.\n- " + String.join("\n- ", errors),
+                projectWorkflowErrorType);
+        }
+
+        return workflowValidationResult.warnings();
     }
 
     private static boolean hasTasks(@Nullable String definition) {
@@ -357,12 +401,12 @@ public class ProjectWorkflowTools {
     }
 
     @Tool(
-        description = "Update the workflow definition. Pass the version returned by the getWorkflow call the new definition is based on; if the workflow changed since then the update is rejected and the workflow must be re-read with getWorkflow. Returns the updated workflow id, name, definition and new version.")
-    public WorkflowInfo updateWorkflow(
+        description = "Update the workflow definition. Pass the version returned by the getWorkflow or updateWorkflow call the new definition is based on; if the workflow changed since then the update is rejected and the workflow must be re-read with getWorkflow. The definition is validated first: if it has errors, nothing is saved and the errors are returned, so fix them and call this again with the same version. Returns the updated workflow id, name, new version and any validation warnings; the saved definition is the one you sent. Fix every warning with another updateWorkflow call before you tell the user the workflow is ready, except a reference into a task whose output is only known after it runs, such as a script task, which you keep and tell the user a test run will confirm.")
+    public WorkflowSaveInfo updateWorkflow(
         @ToolParam(description = "The ID of the workflow to update") String workflowId,
         @ToolParam(
             description = "The new definition of the workflow. Needs to be in JSON format similar to " +
-                DEFAULT_DEFINITION) String definition,
+                DEFAULT_DEFINITION + INPUTS_FORMAT) String definition,
         @ToolParam(
             description = "The version of the workflow, as returned by the getWorkflow call this definition is " +
                 "based on") int version,
@@ -384,6 +428,9 @@ public class ProjectWorkflowTools {
                     ProjectWorkflowErrorType.UPDATE_WORKFLOW);
             }
 
+            List<String> warnings = validateBeforeSave(
+                definition, workflowId, ProjectWorkflowErrorType.UPDATE_WORKFLOW);
+
             ProjectWorkflowDTO updatedProjectWorkflowDTO = projectWorkflowFacade.updateWorkflow(
                 projectWorkflowDTO.getId(), definition, version);
 
@@ -395,11 +442,9 @@ public class ProjectWorkflowTools {
 
             captureUpdatedWorkflow(toolContext, workflowId, updatedProjectWorkflowDTO, definition);
 
-            return new WorkflowInfo(
+            return new WorkflowSaveInfo(
                 updatedProjectWorkflowDTO.getId(), updatedProjectWorkflowDTO.getProjectWorkflowId(),
-                updatedProjectWorkflowDTO.getWorkflowUuid(), updatedProjectWorkflowDTO.getLabel(),
-                updatedProjectWorkflowDTO.getDescription(), definition, updatedProjectWorkflowDTO.getVersion(),
-                updatedProjectWorkflowDTO.getCreatedDate(), updatedProjectWorkflowDTO.getLastModifiedDate());
+                updatedProjectWorkflowDTO.getLabel(), updatedProjectWorkflowDTO.getVersion(), warnings);
         } catch (ExecutionException executionException) {
             throw executionException;
         } catch (Exception e) {

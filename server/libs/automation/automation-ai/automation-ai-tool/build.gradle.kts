@@ -46,6 +46,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
     implementation(libs.org.springaicommunity.spring.ai.agent.utils)
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-api"))
     implementation(rootProject.libs.com.google.auto.service.auto.service.annotations)
 
     testImplementation("org.assertj:assertj-core")

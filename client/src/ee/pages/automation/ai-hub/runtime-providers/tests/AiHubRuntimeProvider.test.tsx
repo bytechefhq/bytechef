@@ -140,6 +140,23 @@ const makeCustomEventParams = (name: string, value: unknown) =>
 
 const makeRunErrorParams = (message: string) => ({event: {message}}) as RunErrorParamsType;
 
+type TextMessageStartParamsType = Parameters<NonNullable<AgentSubscriber['onTextMessageStartEvent']>>[0];
+
+type TextMessageContentParamsType = Parameters<NonNullable<AgentSubscriber['onTextMessageContentEvent']>>[0];
+
+const makeTextMessageStartParams = () =>
+    ({
+        ...baseSubscriberParams,
+        event: {messageId: 'message-1', role: 'assistant', type: EventType.TEXT_MESSAGE_START},
+    }) as TextMessageStartParamsType;
+
+const makeTextMessageContentParams = (delta: string) =>
+    ({
+        ...baseSubscriberParams,
+        event: {delta, messageId: 'message-1', type: EventType.TEXT_MESSAGE_CONTENT},
+        textMessageBuffer: '',
+    }) as TextMessageContentParamsType;
+
 function deliverToolResult(subscriber: AgentSubscriber, toolCallId: string, toolCallName: string, content: string) {
     subscriber.onToolCallStartEvent!(makeToolCallStartParams({toolCallId, toolCallName}));
     subscriber.onToolCallResultEvent!(makeToolCallResultParams({content, toolCallId}));
@@ -480,6 +497,20 @@ describe('buildAiHubSubscriber', () => {
 
             expect(onWorkflowMutated).toHaveBeenCalledTimes(2);
             expect(onWorkflowMutated).toHaveBeenNthCalledWith(1, 'Workflow updated.');
+        });
+
+        it('notifies onWorkflowMutated when an approved call resumes in a continuation run', () => {
+            const onWorkflowMutated = vi.fn();
+
+            createSubscriber().onToolCallStartEvent!(
+                makeToolCallStartParams({toolCallId: 'call-gated', toolCallName: 'buildWorkflow'})
+            );
+
+            createSubscriber({onWorkflowMutated}).onToolCallResultEvent!(
+                makeToolCallResultParams({content: 'Workflow updated.', toolCallId: 'call-gated'})
+            );
+
+            expect(onWorkflowMutated).toHaveBeenCalledTimes(1);
         });
 
         it('does not warn about a prose tool result and keeps the prose as the result', () => {
@@ -1155,6 +1186,47 @@ describe('buildAiHubSubscriber', () => {
             expect(aiChatRetryableErrorStore.getState().currentError).toBeFalsy();
             expect(aiChatToolCallStore.getState().toolCalls['call-err']!.status).toBe('error');
             expect(aiChatToolCallStore.getState().toolCalls['call-retry']!.status).toBe('success');
+        });
+
+        it('does not raise the retry banner for a tool error the model then explains in text', () => {
+            const subscriber = createSubscriber({
+                getLastUserMessage: vi.fn().mockReturnValue('Post signups to Slack'),
+            });
+
+            deliverToolResult(
+                subscriber,
+                'call-lookup',
+                'lookupActionPropertyOptions',
+                JSON.stringify({error: 'lookupActionPropertyOptions failed (ConfigurationException)'})
+            );
+
+            subscriber.onTextMessageStartEvent!(makeTextMessageStartParams());
+            subscriber.onTextMessageContentEvent!(
+                makeTextMessageContentParams('The channel lookup failed. Which Slack channel should I use?')
+            );
+
+            subscriber.onRunFinishedEvent!(makeRunFinishedParams());
+
+            expect(aiChatRetryableErrorStore.getState().currentError).toBeFalsy();
+        });
+
+        it('does not raise the retry banner for a tool error followed by a question card', () => {
+            const subscriber = createSubscriber({
+                getLastUserMessage: vi.fn().mockReturnValue('Post signups to Slack'),
+            });
+
+            deliverToolResult(
+                subscriber,
+                'call-lookup',
+                'lookupActionPropertyOptions',
+                JSON.stringify({error: 'lookupActionPropertyOptions failed (ConfigurationException)'})
+            );
+            deliverToolResult(subscriber, 'call-ask', 'askUserQuestion', JSON.stringify(askUserQuestionPayload));
+
+            subscriber.onRunFinishedEvent!(makeRunFinishedParams());
+
+            expect(aiChatRetryableErrorStore.getState().currentError).toBeFalsy();
+            expect(aiChatToolCallStore.getState().toolCalls['call-lookup']!.status).toBe('error');
         });
 
         it('shows only the run error bubble, not the retry banner, when the run fails after a tool error', () => {

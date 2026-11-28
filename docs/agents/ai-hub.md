@@ -42,12 +42,22 @@ The client records `WORKFLOW_REFERENCED` through `useRecordReferencedArtifacts` 
 
 `AiHubConfiguration` builds two `AiHubSpringAIAgent` beans, `ai_hub_ask` and `ai_hub_build`, with explicit tool
 lists (never a sweep of every `ToolCallback` bean). ASK is read only: `ReadProjectTools`,
-`ReadProjectWorkflowTools`, deployment reads, read pickers, `openWorkflowTab`, `openWorkflowChatTab`. BUILD adds
+`ReadProjectWorkflowTools`, `WorkflowExecutionTools`, deployment reads, read pickers, `openWorkflowTab`,
+`openWorkflowChatTab`. BUILD adds
 `ProjectTools`, `ProjectWorkflowLifecycleTools`, deployment writes, write pickers, the workflow chat tools
 `listChatWorkflows` and `createWorkflowChat`, and `buildWorkflow` / `importWorkflow`.
 Both modes also get, per turn, the Brave and Firecrawl tools of the web search providers enabled for the verified
 environment (`WebSearchToolCallbackProvider` through `additionalToolCallbacks`). They are read only, skip the
 approval gate and are not pinned, so an approval never resumes one.
+`WorkflowExecutionTools` (`listWorkflowExecutions`, `getWorkflowExecution`) and three `ComponentTools` lookups
+(`getAction`, `getTrigger`, `getClusterElement`, filtered by `COMPONENT_DEFINITION_TOOL_NAMES`) are in both modes
+so the hub can explain a failed run against the task's definition. `CheckWorkflowTools.checkWorkflow` runs the
+Copilot's `PersistedWorkflowChecker` (the editor's validation) on a saved workflow of the conversation's workspace;
+a workflow of another workspace answers "not found". The prompts require it before calling a workflow ready.
+`SearchDocsTools.searchDocs` queries the Copilot's docs index (`copilotPgVectorStore`, `category == 'docs'`, top 4) in
+both modes, only when the agent asks for it, instead of a `QuestionAnswerAdvisor` that would add docs to every turn.
+It fails with a message when the verified environment has no default embedding model. The Copilot's `debugWorkflowExecution` specialist is not given to the hub: it holds raw
+`ProjectWorkflowTools`, which the parity contract below forbids. A fix goes through `buildWorkflow`.
 The controller needs workspace role VIEWER for ASK and EDITOR for BUILD. Embedded connected users
 (`ConnectedUserAuthentication`) are refused on the REST entry points and in `AiHubWorkspaceAccess` for GraphQL.
 
@@ -89,14 +99,16 @@ Every tool callback is wrapped in one place, `AiHubSpringAIAgent.Builder.build()
 registration does not nest the gate.
 
 Rules (`AiHubToolApprovalPolicy.Decision.isGated`):
-- Gated by default: `AiHubToolApprovalDefaults.DEFAULT_TOOL_NAMES` (`deleteProject`, `deleteWorkflow`,
-  `deleteProjectDeployment`, `rollbackProjectDeployment`, `promoteWorkflow`) and the prefixes `delete`, `drop`,
-  `rollback`, `promote` followed by an uppercase letter.
+- Gated by default: `AiHubToolApprovalDefaults.DEFAULT_TOOL_NAMES`, the destructive tools (`deleteProject`,
+  `deleteWorkflow`, `deleteProjectDeployment`, `rollbackProjectDeployment`, `promoteWorkflow`) and the go-live tools
+  (`publishProject`, `createProjectDeployment`, `updateProjectDeployment`, `toggleProjectDeployment`), plus the
+  prefixes `delete`, `drop`, `rollback`, `promote` followed by an uppercase letter.
 - A workspace rule (`AiHubToolApprovalRule`, mode `REQUIRE` or `EXEMPT`) adds to or lifts that. `EXEMPT` always wins.
 - If the rule lookup fails, only the built-in defaults gate.
-- The `buildWorkflow` / `importWorkflow` sub-agents never see a tool gated by default: the hub decorates their chat
-  client with `AiHubGatedToolFilterAdvisor`, so destructive calls stay on the hub's own gated tools. The Copilot's
-  use of the same sub-agents is unchanged.
+- The `buildWorkflow` / `importWorkflow` sub-agents never see a tool gated by default or by the workspace's
+  `REQUIRE` rules: the hub decorates their chat client with `AiHubGatedToolFilterAdvisor`, so gated calls stay on the
+  hub's own gated tools. An `EXEMPT` rule lifts a default for the hub's own calls only, never for a sub-agent. The
+  Copilot's use of the same sub-agents is unchanged.
 
 A gated call creates a `PENDING` `AiHubToolApproval` and returns a `tool-approval-request` envelope instead of
 running; a second gated call while one is pending gets a `deferred` result; a persistence failure returns a refusal
@@ -134,7 +146,8 @@ Client: `useTruncateChatMessages`.
 `RunStopAdvisor` ends the model stream with `takeUntilOther(stopRequested)`. The cancelled run still holds the thread
 (draining guard, `holdsThread`) until its agent reports it stopped or `DRAIN_TIMEOUT` (2 minutes) passes, so a new
 turn or a truncation never overlaps a stopped run that is still writing. The runId is tombstoned so a Stop that beats
-the turn's POST still stops it.
+the turn's POST still stops it, and a Stop with a runId cancels only the registered run with that id, so a delayed
+Stop never ends the next turn. A Stop without a runId cancels whatever run holds the thread.
 
 Deleting a chat registers its rollback hook, then retires its thread (`InFlightAiHubRunRegistry.retireThread`):
 queued continuations are dropped, later ones, new runs and turns (404) are refused, and the live run is cancelled

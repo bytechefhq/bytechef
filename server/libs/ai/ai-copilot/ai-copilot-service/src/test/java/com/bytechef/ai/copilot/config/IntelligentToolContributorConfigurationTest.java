@@ -606,7 +606,7 @@ class IntelligentToolContributorConfigurationTest {
                         "created", true, "workflowId", "wf-new", "projectId", 7L, "projectWorkflowId", 1L, "name",
                         "Imported workflow"));
 
-                return new ProjectWorkflowInfo(1L, 7L, 1, "wf-new", "uuid", null, null);
+                return new ProjectWorkflowInfo(1L, 7L, 1, "wf-new", "uuid", null, null, List.of());
             });
     }
 

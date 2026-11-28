@@ -111,6 +111,15 @@ describe('AiHubResourcePanel', () => {
         expect(aiHubTabsStore.getState().rightPanelOpen).toBe(false);
     });
 
+    it('shows the plain right-panel icon on its close control', () => {
+        renderPanel();
+
+        const closeButton = screen.getByRole('button', {name: 'Close resource panel'});
+
+        expect(closeButton.querySelector('svg.lucide-panel-right')).not.toBeNull();
+        expect(closeButton.querySelector('svg.lucide-panel-right-close')).toBeNull();
+    });
+
     it('opens a workflow picked from the resource picker as the active tab', () => {
         aiHubTabsStore.setState({activeTabId: 'tab-1', openTabs: [workflowTab('1', 'Invoices', 11)]});
 
