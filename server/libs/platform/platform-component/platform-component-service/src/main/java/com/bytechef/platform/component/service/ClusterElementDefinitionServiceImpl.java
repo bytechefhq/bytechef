@@ -54,6 +54,7 @@ import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.PropertyFactory;
+import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolCallbackProviderFunction;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
@@ -436,8 +437,19 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         com.bytechef.component.definition.ClusterElementDefinition<?> clusterElementDefinition, String componentName,
         int componentVersion, @Nullable String icon) {
 
-        return injectToolOverrideProperties(
-            new ClusterElementDefinition(clusterElementDefinition, componentName, componentVersion, icon));
+        ClusterElementDefinition platformClusterElementDefinition = new ClusterElementDefinition(
+            clusterElementDefinition, componentName, componentVersion, icon);
+
+        if (providesToolCallbacks(clusterElementDefinition.getElement())) {
+            return platformClusterElementDefinition;
+        }
+
+        return injectToolOverrideProperties(platformClusterElementDefinition);
+    }
+
+    private static boolean providesToolCallbacks(@Nullable Object clusterElement) {
+        return clusterElement instanceof ToolCallbackProviderFunction ||
+            clusterElement instanceof MultipleConnectionsToolCallbackProviderFunction;
     }
 
     private static ClusterElementDefinition injectToolOverrideProperties(

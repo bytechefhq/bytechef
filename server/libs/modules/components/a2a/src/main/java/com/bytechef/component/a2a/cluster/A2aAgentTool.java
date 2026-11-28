@@ -28,6 +28,7 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.ai.tool.constant.ToolConstants;
+import com.bytechef.platform.ai.tool.util.ToolPropertyUtils;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.a2a.A2A;
@@ -88,6 +89,8 @@ public class A2aAgentTool {
             .description("Delegate a task to a remote A2A (Agent2Agent) agent.")
             .type(TOOLS)
             .properties(
+                ToolPropertyUtils.toolName(DEFAULT_TOOL_NAME),
+                ToolPropertyUtils.toolDescription("tool"),
                 string(AGENT_URL)
                     .label("Agent URL")
                     .description(
