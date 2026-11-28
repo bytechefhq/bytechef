@@ -11,6 +11,7 @@ import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.file.storage.aws.AwsFileStorageService;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.domain.VersionedFileContent;
 import com.bytechef.file.storage.exception.FileStorageException;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -30,9 +31,16 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
+import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.exception.SdkException;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 /**
@@ -43,6 +51,8 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
     private static final Base64.Decoder MIME_DECODER = Base64.getMimeDecoder();
+    private static final int CONFLICT_STATUS_CODE = 409;
+    private static final int PRECONDITION_FAILED_STATUS_CODE = 412;
     private static final String URL_PREFIX = "s3://";
 
     private final S3Client s3Client;
@@ -245,6 +255,68 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
             throw new RuntimeException(
                 "Unable to store file %s in directory %s".formatted(filename, directory), e);
         }
+    }
+
+    @Override
+    public Optional<VersionedFileContent> readFileContentVersioned(String directory, String filename)
+        throws FileStorageException {
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+            .bucket(bucketName)
+            .key(combinePaths(directory, filename))
+            .build();
+
+        try {
+            ResponseBytes<GetObjectResponse> responseBytes = s3Client.getObjectAsBytes(getObjectRequest);
+
+            return Optional.of(
+                new VersionedFileContent(
+                    MIME_DECODER.decode(responseBytes.asByteArrayUnsafe()), responseBytes.response()
+                        .eTag()));
+        } catch (NoSuchKeyException noSuchKeyException) {
+            return Optional.empty();
+        } catch (SdkException | IllegalArgumentException exception) {
+            throw new FileStorageException(
+                "Unable to read file %s in directory %s".formatted(filename, directory), exception);
+        }
+    }
+
+    @Override
+    public boolean storeFileContentIfVersion(
+        String directory, String filename, byte[] data, @Nullable String expectedVersion)
+        throws FileStorageException {
+
+        PutObjectRequest.Builder putObjectRequestBuilder = PutObjectRequest.builder()
+            .bucket(bucketName)
+            .key(combinePaths(directory, filename));
+
+        if (expectedVersion == null) {
+            putObjectRequestBuilder.ifNoneMatch("*");
+        } else {
+            putObjectRequestBuilder.ifMatch(expectedVersion);
+        }
+
+        try {
+            s3Client.putObject(
+                putObjectRequestBuilder.build(), RequestBody.fromBytes(Base64.getEncoder()
+                    .encode(data)));
+
+            return true;
+        } catch (S3Exception s3Exception) {
+            if (isConditionNotMet(s3Exception)) {
+                return false;
+            }
+
+            throw new FileStorageException(
+                "Unable to store file %s in directory %s".formatted(filename, directory), s3Exception);
+        }
+    }
+
+    private static boolean isConditionNotMet(S3Exception s3Exception) {
+        int statusCode = s3Exception.statusCode();
+
+        return s3Exception instanceof NoSuchKeyException || statusCode == PRECONDITION_FAILED_STATUS_CODE ||
+            statusCode == CONFLICT_STATUS_CODE;
     }
 
     private FileEntry doStoreFileContent(String directory, String filename, byte[] data, boolean generateFilename) {
