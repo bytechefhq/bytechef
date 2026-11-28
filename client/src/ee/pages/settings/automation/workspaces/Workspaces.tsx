@@ -19,6 +19,7 @@ const Workspaces = () => {
                     <Header
                         centerTitle
                         description="Manage organization workspaces: create, edit, or delete workspaces and their members."
+                        position="main"
                         right={
                             workspaces &&
                             workspaces.length > 0 && <WorkspaceDialog triggerNode={<Button>New Workspace</Button>} />
