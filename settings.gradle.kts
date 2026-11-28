@@ -36,6 +36,7 @@ include("server:ee:libs:automation:automation-ai:automation-ai-gateway:automatio
 include("server:libs:ai:ai-api")
 include("server:libs:ai:ai-copilot:ai-copilot-agent-api")
 include("server:libs:ai:ai-copilot:ai-copilot-api")
+include("server:libs:ai:ai-copilot:ai-copilot-graphql")
 include("server:libs:ai:ai-copilot:ai-copilot-rest")
 include("server:libs:ai:ai-copilot:ai-copilot-service")
 include("server:libs:ai:ai-copilot:ai-copilot-tool-api")
@@ -620,7 +621,6 @@ include("server:ee:apps:worker-app")
 
 include("server:ee:libs:atlas:atlas-execution:atlas-execution-remote-rest")
 include("server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client")
-
 
 include("server:ee:libs:ai:ai-hub:ai-hub-api")
 include("server:ee:libs:ai:ai-hub:ai-hub-graphql")
