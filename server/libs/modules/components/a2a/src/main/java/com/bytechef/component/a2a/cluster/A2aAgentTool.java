@@ -97,6 +97,7 @@ public class A2aAgentTool {
                         "The URL of the remote A2A agent - for a ByteChef A2A Server, the endpoint URL from the " +
                             "server's Connect tab. The agent card is read from " +
                             "<Agent URL>/.well-known/agent-card.json. Private and loopback addresses are not allowed.")
+                    .expressionEnabled(false)
                     .required(true))
             .object(() -> this::apply);
     }
