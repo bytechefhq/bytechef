@@ -123,6 +123,7 @@ dependencies {
     implementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-tool"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-tool"))
     implementation(project(":server:libs:automation:automation-connection:automation-connection-tool"))
+    implementation(project(":server:libs:automation:automation-data-table:automation-data-table-tool"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-tool"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-tool"))
     implementation(project(":server:libs:platform:platform-component:platform-component-tool"))
@@ -145,6 +146,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-api"))
 
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool-api"))

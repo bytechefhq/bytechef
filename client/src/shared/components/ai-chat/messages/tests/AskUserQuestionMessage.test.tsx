@@ -309,6 +309,26 @@ describe('AskUserQuestionMessage', () => {
         expect(screen.getAllByText(/#general/i).length).toBeGreaterThan(0);
     });
 
+    it('shows only the answer, not the question, in the persisted summary of a single-question card', async () => {
+        await renderMessage(SINGLE_SELECT_DATA);
+
+        await userEvent.click(screen.getByRole('button', {name: 'slack'}));
+
+        const {default: AskUserQuestionMessage} = await import('../AskUserQuestionMessage');
+
+        render(
+            <AskUserQuestionMessage
+                data={SINGLE_SELECT_DATA}
+                name="ask-user-question"
+                status={{type: 'complete'}}
+                type="data"
+            />
+        );
+
+        expect(screen.getAllByText('slack', {selector: 'span.font-medium'}).length).toBeGreaterThan(0);
+        expect(screen.queryByText(/→/)).not.toBeInTheDocument();
+    });
+
     it('renders a searchable combobox (not stacked buttons) when single-select options exceed the threshold', async () => {
         await renderMessage(LARGE_SINGLE_SELECT_DATA);
 

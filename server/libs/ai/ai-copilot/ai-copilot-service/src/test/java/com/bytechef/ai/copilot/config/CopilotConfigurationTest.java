@@ -30,6 +30,7 @@ import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.automation.configuration.tool.ProjectWorkflowTools;
 import com.bytechef.automation.configuration.tool.ScriptTools;
+import com.bytechef.automation.data.table.tool.DataTableTools;
 import com.bytechef.platform.ai.tool.SecurityContextRehydrator;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -75,8 +76,9 @@ class CopilotConfigurationTest {
 
     private static final List<String> KNOWN_PICKER_AND_ASK_TOOL_NAMES = List.of(
         "askUserQuestion", "createConnection", "listConnectionsForComponent", "lookupActionPropertyOptions",
-        "lookupComponentPropertyOptions", "lookupTriggerPropertyOptions", "saveWorkflowTestConnection",
-        "selectConnection", "selectPropertyOption", "selectTriggerPropertyOption");
+        "lookupClusterElementPropertyOptions", "lookupComponentPropertyOptions", "lookupTriggerPropertyOptions",
+        "saveWorkflowTestConnection", "selectClusterElementPropertyOption", "selectConnection", "selectPropertyOption",
+        "selectTriggerPropertyOption");
 
     private static final String LOOKUP_PROPERTY_OPTIONS_TOOL_NAME = new LookupComponentPropertyOptionsToolCallback(
         mock(ActionDefinitionService.class), mock(ActionDefinitionFacade.class), mock(TriggerDefinitionService.class),
@@ -93,7 +95,7 @@ class CopilotConfigurationTest {
         mock(WorkflowValidatorTools.class), mock(WorkflowInstructionTools.class),
         mock(InteractivePickerToolCallbacks.class), mock(ActionDefinitionService.class),
         mock(ActionDefinitionFacade.class), mock(TriggerDefinitionService.class), mock(TriggerDefinitionFacade.class),
-        mock(PropertyOptionsResolver.class), mock(ScopedConnectionGuard.class));
+        mock(PropertyOptionsResolver.class), mock(ScopedConnectionGuard.class), emptyDataTableToolsProvider());
 
     @Test
     void testMcpServerBuildAgentIsRegisteredUnderTheMcpServerSourceId() throws AGUIException {
@@ -315,7 +317,7 @@ class CopilotConfigurationTest {
             mock(InteractivePickerToolCallbacks.class), mock(ActionDefinitionService.class),
             mock(ActionDefinitionFacade.class), mock(TriggerDefinitionService.class),
             mock(TriggerDefinitionFacade.class), mock(PropertyOptionsResolver.class),
-            mock(ScopedConnectionGuard.class));
+            mock(ScopedConnectionGuard.class), emptyDataTableToolsProvider());
     }
 
     private static String readResource(String name) {
@@ -355,6 +357,11 @@ class CopilotConfigurationTest {
 
     @SuppressWarnings("unchecked")
     private static <T> ObjectProvider<T> emptyProvider() {
+        return mock(ObjectProvider.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ObjectProvider<DataTableTools> emptyDataTableToolsProvider() {
         return mock(ObjectProvider.class);
     }
 }

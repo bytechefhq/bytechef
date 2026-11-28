@@ -51,7 +51,8 @@ public class WorkflowIntelligentToolContributorConfiguration {
         @Qualifier("converterBuildSubAgentChatClientFactory") //
         ObjectProvider<IntelligentToolChatClientFactory> converterBuildFactoryProvider,
         ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider,
-        ObjectProvider<ProjectWorkflowLifecycleTools> projectWorkflowLifecycleToolsProvider) {
+        ObjectProvider<ProjectWorkflowLifecycleTools> projectWorkflowLifecycleToolsProvider,
+        ObjectProvider<PersistedWorkflowChecker> persistedWorkflowCheckerProvider) {
 
         SubAgentChatModelResolver chatModelResolver = chatModelResolverProvider.getIfAvailable();
 
@@ -64,7 +65,8 @@ public class WorkflowIntelligentToolContributorConfiguration {
                 Set.of(IntelligentToolScope.PROJECT),
                 variant -> factoryForVariant(
                     variant, workflowEditorAskFactoryProvider, workflowEditorBuildFactoryProvider),
-                chatClientFactory -> new ProjectWorkflowAgentToolCallback(chatClientFactory, chatModelResolver)),
+                chatClientFactory -> new ProjectWorkflowAgentToolCallback(
+                    chatClientFactory, chatModelResolver, persistedWorkflowCheckerProvider.getIfAvailable())),
             new SimpleIntelligentToolDefinition(
                 "importWorkflow", AutomationConfigurationAgentType.IMPORT_WORKFLOW,
                 Set.of(IntelligentToolScope.PROJECT),

@@ -23,17 +23,21 @@ import com.bytechef.ai.copilot.tool.ToolStateVisibilityMetrics;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.connection.tool.WorkspaceCopilotConnectionLister;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.tool.CreateConnectionToolCallback;
 import com.bytechef.platform.component.tool.ListConnectionsForComponentToolCallback;
 import com.bytechef.platform.component.tool.LookupActionPropertyOptionsToolCallback;
+import com.bytechef.platform.component.tool.LookupClusterElementPropertyOptionsToolCallback;
 import com.bytechef.platform.component.tool.LookupTriggerPropertyOptionsToolCallback;
 import com.bytechef.platform.component.tool.PropertyOptionsResolver;
 import com.bytechef.platform.component.tool.ScopedConnectionGuard;
+import com.bytechef.platform.component.tool.SelectClusterElementPropertyOptionToolCallback;
 import com.bytechef.platform.component.tool.SelectConnectionToolCallback;
 import com.bytechef.platform.component.tool.SelectPropertyOptionToolCallback;
 import com.bytechef.platform.component.tool.SelectTriggerPropertyOptionToolCallback;
@@ -58,6 +62,8 @@ public class InteractivePickerToolCallbacksImpl implements InteractivePickerTool
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final TriggerDefinitionService triggerDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
+    private final ClusterElementDefinitionService clusterElementDefinitionService;
+    private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final PropertyOptionsResolver propertyOptionsResolver;
     private final ObjectProvider<CopilotConnectionLister> connectionListerProvider;
     private final ScopedConnectionGuard scopedConnectionGuard;
@@ -66,7 +72,9 @@ public class InteractivePickerToolCallbacksImpl implements InteractivePickerTool
         ConnectionDefinitionService connectionDefinitionService, WorkspaceConnectionFacade workspaceConnectionFacade,
         ComponentDefinitionService componentDefinitionService, ActionDefinitionService actionDefinitionService,
         ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
-        TriggerDefinitionFacade triggerDefinitionFacade, PropertyOptionsResolver propertyOptionsResolver,
+        TriggerDefinitionFacade triggerDefinitionFacade,
+        ClusterElementDefinitionService clusterElementDefinitionService,
+        ClusterElementDefinitionFacade clusterElementDefinitionFacade, PropertyOptionsResolver propertyOptionsResolver,
         ObjectProvider<CopilotConnectionLister> connectionListerProvider,
         ScopedConnectionGuard scopedConnectionGuard) {
 
@@ -77,6 +85,8 @@ public class InteractivePickerToolCallbacksImpl implements InteractivePickerTool
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.triggerDefinitionService = triggerDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
+        this.clusterElementDefinitionService = clusterElementDefinitionService;
+        this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.propertyOptionsResolver = propertyOptionsResolver;
         this.connectionListerProvider = connectionListerProvider;
         this.scopedConnectionGuard = scopedConnectionGuard;
@@ -88,6 +98,7 @@ public class InteractivePickerToolCallbacksImpl implements InteractivePickerTool
             listConnectionsForComponent(),
             lookupActionPropertyOptions(),
             lookupTriggerPropertyOptions(),
+            lookupClusterElementPropertyOptions(),
             new AskUserQuestionToolCallback(ToolStateVisibilityMetrics.NOOP));
     }
 
@@ -98,11 +109,15 @@ public class InteractivePickerToolCallbacksImpl implements InteractivePickerTool
             new SelectConnectionToolCallback(componentDefinitionService),
             lookupActionPropertyOptions(),
             lookupTriggerPropertyOptions(),
+            lookupClusterElementPropertyOptions(),
             new SelectPropertyOptionToolCallback(
                 actionDefinitionService, actionDefinitionFacade, propertyOptionsResolver,
                 ToolStateVisibilityMetrics.NOOP, scopedConnectionGuard),
             new SelectTriggerPropertyOptionToolCallback(
                 triggerDefinitionService, triggerDefinitionFacade, propertyOptionsResolver,
+                ToolStateVisibilityMetrics.NOOP, scopedConnectionGuard),
+            new SelectClusterElementPropertyOptionToolCallback(
+                clusterElementDefinitionService, clusterElementDefinitionFacade, propertyOptionsResolver,
                 ToolStateVisibilityMetrics.NOOP, scopedConnectionGuard),
             new AskUserQuestionToolCallback(ToolStateVisibilityMetrics.NOOP),
             new CreateConnectionToolCallback(componentDefinitionService));
@@ -127,6 +142,12 @@ public class InteractivePickerToolCallbacksImpl implements InteractivePickerTool
     private ToolCallback lookupActionPropertyOptions() {
         return new LookupActionPropertyOptionsToolCallback(
             actionDefinitionService, actionDefinitionFacade, propertyOptionsResolver,
+            ToolStateVisibilityMetrics.NOOP, scopedConnectionGuard);
+    }
+
+    private ToolCallback lookupClusterElementPropertyOptions() {
+        return new LookupClusterElementPropertyOptionsToolCallback(
+            clusterElementDefinitionService, clusterElementDefinitionFacade, propertyOptionsResolver,
             ToolStateVisibilityMetrics.NOOP, scopedConnectionGuard);
     }
 

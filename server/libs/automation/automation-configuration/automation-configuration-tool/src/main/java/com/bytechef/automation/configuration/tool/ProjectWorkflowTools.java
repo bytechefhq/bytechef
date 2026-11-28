@@ -30,6 +30,7 @@ import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.tool.model.ProjectWorkflowInfo;
 import com.bytechef.automation.configuration.tool.model.WorkflowInfo;
+import com.bytechef.automation.configuration.tool.util.WorkflowPersistCaptureUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
@@ -239,6 +240,12 @@ public class ProjectWorkflowTools {
             ProjectWorkflowErrorType.CREATE_WORKFLOW);
         checkAllowedComponents(definition, toolContext, ProjectWorkflowErrorType.CREATE_WORKFLOW);
 
+        ProjectWorkflowInfo filledProjectWorkflowInfo = fillEmptyTargetWorkflow(projectId, definition, toolContext);
+
+        if (filledProjectWorkflowInfo != null) {
+            return filledProjectWorkflowInfo;
+        }
+
         try {
             ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(projectId, definition);
 
@@ -267,6 +274,59 @@ public class ProjectWorkflowTools {
                 "Failed to create project workflow: " + e.getMessage(), e,
                 ProjectWorkflowErrorType.CREATE_WORKFLOW);
         }
+    }
+
+    /**
+     * Saves the definition into the still-empty workflow the build request named, when it belongs to the project the
+     * builder is creating a workflow in, so a build never leaves the caller's workflow empty next to a second one.
+     */
+    private @Nullable ProjectWorkflowInfo fillEmptyTargetWorkflow(
+        long projectId, String definition, @Nullable ToolContext toolContext) {
+
+        String targetWorkflowId = toolContext == null
+            ? null : WorkflowPersistCaptureUtils.fetchTargetWorkflowId(toolContext.getContext());
+
+        if (targetWorkflowId == null) {
+            return null;
+        }
+
+        ProjectWorkflowDTO targetProjectWorkflowDTO;
+
+        try {
+            if (projectWorkflowFacade.getWorkflowProjectId(targetWorkflowId) != projectId) {
+                return null;
+            }
+
+            targetProjectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(targetWorkflowId);
+        } catch (RuntimeException exception) {
+            log.debug("fillEmptyTargetWorkflow({}): the target workflow could not be read", targetWorkflowId,
+                exception);
+
+            return null;
+        }
+
+        if (hasTasks(targetProjectWorkflowDTO.getDefinition())) {
+            return null;
+        }
+
+        ProjectWorkflowDTO updatedProjectWorkflowDTO = projectWorkflowFacade.updateWorkflow(
+            targetProjectWorkflowDTO.getId(), definition, targetProjectWorkflowDTO.getVersion());
+
+        captureUpdatedWorkflow(toolContext, targetWorkflowId, updatedProjectWorkflowDTO, definition);
+
+        return new ProjectWorkflowInfo(
+            updatedProjectWorkflowDTO.getProjectWorkflowId(), projectId, updatedProjectWorkflowDTO.getProjectVersion(),
+            targetWorkflowId, updatedProjectWorkflowDTO.getWorkflowUuid(), updatedProjectWorkflowDTO.getCreatedDate(),
+            updatedProjectWorkflowDTO.getLastModifiedDate());
+    }
+
+    private static boolean hasTasks(@Nullable String definition) {
+        if (definition == null || definition.isBlank()) {
+            return false;
+        }
+
+        return JsonUtils.readMap(definition)
+            .get("tasks") instanceof List<?> tasks && !tasks.isEmpty();
     }
 
     @Tool(description = "Delete a workflow. Returns a confirmation message.")
@@ -364,9 +424,9 @@ public class ProjectWorkflowTools {
     public String saveWorkflowTestConnection(
         @ToolParam(description = "The id of the workflow the node belongs to") String workflowId,
         @ToolParam(
-            description = "The workflow node (task or trigger) name the connection is for, e.g. 'sendChannelMessage_1'") String workflowNodeName,
+            description = "The workflow node the connection is for: a task or trigger name, e.g. 'sendChannelMessage_1', or the name of a cluster element inside it, e.g. an AI Agent's model 'model_1'") String workflowNodeName,
         @ToolParam(
-            description = "The connection key declared in the node's 'connections' block — usually the component name, e.g. 'slack'") String connectionKey,
+            description = "The connection key declared in the node's 'connections' block, usually the component name, e.g. 'slack'. Ignored for a cluster element, whose own name is its key") String connectionKey,
         @ToolParam(description = "The id of the connection the user picked") long connectionId,
         ToolContext toolContext) {
 
@@ -414,10 +474,9 @@ public class ProjectWorkflowTools {
                 connectionKey, connectionId, e);
 
             throw new ExecutionException(
-                ("Could not bind connection %d to node '%s' (key '%s'): %s. This node was NOT connected — tell the "
-                    + "user and do not report it as done. If it is an AI model or other element inside an AI Agent, it "
-                    + "must be connected from the workflow editor. Otherwise verify the connection exists in the "
-                    + "current environment and that the connection key matches the node.")
+                ("Could not bind connection %d to node '%s' (key '%s'): %s. This node was NOT connected; tell the "
+                    + "user and do not report it as done. Verify the node name, that the connection exists in the "
+                    + "current environment, and that the connection key matches the node.")
                         .formatted(connectionId, workflowNodeName, connectionKey, e.getMessage()),
                 e, ProjectWorkflowErrorType.SAVE_TEST_CONNECTION);
         }

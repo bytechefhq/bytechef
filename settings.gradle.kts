@@ -92,6 +92,7 @@ include("server:libs:automation:automation-connection:automation-connection-tool
 include("server:libs:automation:automation-data-table:automation-data-table-api")
 include("server:libs:automation:automation-data-table:automation-data-table-graphql")
 include("server:libs:automation:automation-data-table:automation-data-table-service")
+include("server:libs:automation:automation-data-table:automation-data-table-tool")
 include("server:libs:automation:automation-getting-started:automation-getting-started-api")
 include("server:libs:automation:automation-getting-started:automation-getting-started-graphql")
 include("server:libs:automation:automation-getting-started:automation-getting-started-service")

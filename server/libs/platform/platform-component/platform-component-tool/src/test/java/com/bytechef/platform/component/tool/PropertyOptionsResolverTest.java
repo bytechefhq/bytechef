@@ -22,10 +22,13 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.ai.tool.SecurityContextRehydrator;
 import com.bytechef.platform.component.domain.ActionDefinition;
+import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.tool.PropertyOptionsResolver.OptionsLookupResult;
 import com.bytechef.platform.component.tool.PropertyOptionsResolver.OptionsLookupResult.Failure;
 import com.bytechef.platform.component.tool.PropertyOptionsResolver.OptionsLookupResult.Success;
@@ -229,5 +232,50 @@ class PropertyOptionsResolverTest {
         assertThat(result).isInstanceOf(Success.class);
         assertThat(((Success) result).options()).hasSize(25);
         assertThat(((Success) result).truncated()).isTrue();
+    }
+
+    @Test
+    void testResolveClusterElementPropertyOptionsReturnsClusterElementNotFound() {
+        ClusterElementDefinitionService service = mock(ClusterElementDefinitionService.class);
+
+        ClusterElementDefinition real = mock(ClusterElementDefinition.class);
+
+        when(real.getName()).thenReturn("vectorStore");
+        when(service.getClusterElementDefinitions("knowledgeBase", 1)).thenReturn(List.of(real));
+
+        OptionsLookupResult result = resolver.resolveClusterElementPropertyOptions(
+            service, mock(ClusterElementDefinitionFacade.class), null, "knowledgeBase", 1, "rag", "knowledgeBaseId",
+            null, null, null, 25);
+
+        assertThat(((Failure) result).metricTag()).isEqualTo("cluster_element_not_found");
+        assertThat(((Failure) result).envelope()).containsEntry("error", "cluster_element_not_found")
+            .containsEntry("valid", List.of("vectorStore"));
+    }
+
+    @Test
+    void testResolveClusterElementPropertyOptionsPassesNoClusterElementContextToTheFacade() {
+        ClusterElementDefinitionService service = mock(ClusterElementDefinitionService.class);
+        ClusterElementDefinitionFacade facade = mock(ClusterElementDefinitionFacade.class);
+
+        LookupClusterElementPropertyOptionsToolCallbackTest.stubValidClusterElement(
+            service, "knowledgeBase", 1, "vectorStore", "knowledgeBaseId");
+
+        when(service.propertyHasOptionsDataSource("knowledgeBase", 1, "vectorStore", "knowledgeBaseId"))
+            .thenReturn(true);
+        when(service.getPropertyLookupDependsOn("knowledgeBase", 1, "vectorStore", "knowledgeBaseId"))
+            .thenReturn(List.of());
+
+        Option option = mock(Option.class);
+
+        when(facade.executeOptions(
+            "knowledgeBase", 1, "vectorStore", "knowledgeBaseId", Map.of(), Map.of(), List.of(), "", null, Map.of(),
+            Map.of()))
+                .thenReturn(List.of(option));
+
+        OptionsLookupResult result = resolver.resolveClusterElementPropertyOptions(
+            service, facade, null, "knowledgeBase", 1, "vectorStore", "knowledgeBaseId", null, null, null, 25);
+
+        assertThat(((Success) result).options()).containsExactly(option);
+        assertThat(((Success) result).truncated()).isFalse();
     }
 }
