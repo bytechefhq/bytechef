@@ -742,6 +742,24 @@ describe('ConnectionDialog', () => {
 
         const getLastOAuth2ButtonProps = () => vi.mocked(OAuth2Button).mock.lastCall![0];
 
+        it('keeps the configuration footer while the OAuth step is loading', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            vi.mocked(useGetOAuth2AuthorizationParametersQuery).mockReturnValue({
+                data: undefined,
+                error: null,
+                isLoading: true,
+            } as never);
+
+            renderCreateDialog();
+
+            await user.click(await screen.findByRole('button', {name: 'Next'}));
+
+            expect(screen.queryByRole('button', {name: 'Previous'})).not.toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Cancel'})).toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Next'})).toBeDisabled();
+        });
+
         it('selects the scopes of the latest OAuth step after going back', async () => {
             const user = userEvent.setup({pointerEventsCheck: 0});
 

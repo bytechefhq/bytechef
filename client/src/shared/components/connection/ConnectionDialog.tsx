@@ -326,6 +326,8 @@ const ConnectionDialog = ({
 
     const showOAuth2Step = (isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) && isEnteringCredentials;
 
+    const showOAuthStepContent = wizardStep === 'oauth_step' && !oAuth2AuthorizationParametersLoading;
+
     const requiresManualOAuth2Endpoints =
         currentType === PlatformType.EMBEDDED &&
         selectedComponentName === MCP_CLIENT_COMPONENT_NAME &&
@@ -749,7 +751,7 @@ const ConnectionDialog = ({
                         <DialogBody className="flex min-w-0 flex-col">
                             {errors?.length > 0 && <Errors errors={errors} />}
 
-                            {(wizardStep === 'configuration_step' || oAuth2AuthorizationParametersLoading) && (
+                            {!showOAuthStepContent && (
                                 <>
                                     {isUpdatingCredentials && connection?.credentialStatus === 'INVALID' && (
                                         <Alert variant="destructive">
@@ -1102,7 +1104,7 @@ const ConnectionDialog = ({
                                 </>
                             )}
 
-                            {!oAuth2AuthorizationParametersLoading && wizardStep === 'oauth_step' && (
+                            {showOAuthStepContent && (
                                 <>
                                     <Alert className="border-surface-brand-secondary bg-surface-brand-secondary text-content-brand-primary">
                                         <RocketIcon className="size-4" />
@@ -1213,7 +1215,7 @@ const ConnectionDialog = ({
                                     </SelectContent>
                                 </Select>
 
-                                {wizardStep === 'oauth_step' && (
+                                {showOAuthStepContent && (
                                     <Button
                                         label="Previous"
                                         onClick={() => {
@@ -1229,15 +1231,16 @@ const ConnectionDialog = ({
                                     />
                                 )}
 
-                                {wizardStep === 'configuration_step' && (
+                                {!showOAuthStepContent && (
                                     <Button label="Cancel" onClick={closeDialog} type="button" variant="outline" />
                                 )}
 
                                 {showOAuth2Step && (
                                     <>
-                                        {wizardStep === 'configuration_step' && (
+                                        {!showOAuthStepContent && (
                                             <Button
                                                 disabled={
+                                                    wizardStep === 'oauth_step' ||
                                                     !formState.isValid ||
                                                     manualOAuth2EndpointsMissing ||
                                                     manualOAuth2ClientIdMissing
@@ -1250,7 +1253,7 @@ const ConnectionDialog = ({
                                             />
                                         )}
 
-                                        {wizardStep === 'oauth_step' &&
+                                        {showOAuthStepContent &&
                                             oAuth2AuthorizationParameters?.authorizationUrl &&
                                             oAuth2AuthorizationParameters?.clientId && (
                                                 <OAuth2Button
