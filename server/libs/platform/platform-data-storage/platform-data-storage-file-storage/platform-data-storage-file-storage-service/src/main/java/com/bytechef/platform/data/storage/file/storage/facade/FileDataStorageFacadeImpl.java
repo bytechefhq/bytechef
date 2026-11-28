@@ -19,13 +19,17 @@ package com.bytechef.platform.data.storage.file.storage.facade;
 import com.bytechef.commons.data.jdbc.wrapper.TypedValue;
 import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.domain.VersionedFileContent;
+import com.bytechef.file.storage.service.ConditionalFileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.IntStream;
@@ -40,6 +44,7 @@ public class FileDataStorageFacadeImpl implements FileDataStorageFacade {
     public static final String DATA_STORAGE_ROOT_DIR = "data_storage/";
 
     private static final int LOCK_STRIPES = 64;
+    private static final Duration TIME_BUDGET = Duration.ofSeconds(10);
     private static final ReentrantLock[] LOCKS = IntStream.range(0, LOCK_STRIPES)
         .mapToObj(index -> new ReentrantLock())
         .toArray(ReentrantLock[]::new);
@@ -178,6 +183,12 @@ public class FileDataStorageFacadeImpl implements FileDataStorageFacade {
         String componentName, DataStorageScope scope, String scopeId, String key, long environmentId,
         PlatformType type, Function<Optional<T>, T> updater) {
 
+        if (fileStorageService instanceof ConditionalFileStorageService conditionalFileStorageService) {
+            return updateConditionally(
+                conditionalFileStorageService, componentName, scope, scopeId, key, environmentId, type, updater,
+                TIME_BUDGET);
+        }
+
         ReentrantLock lock = getLock(
             getDirectoryPath(type, scope, scopeId, environmentId) + "/" + getFilename(componentName, key));
 
@@ -198,17 +209,85 @@ public class FileDataStorageFacadeImpl implements FileDataStorageFacade {
         }
     }
 
+    @SuppressFBWarnings(value = "PREDICTABLE_RANDOM", justification = "Retry wait time, not security sensitive")
+    private static void backOff(int attempt) {
+        long delay = ThreadLocalRandom.current()
+            .nextLong(1, Math.min(100, 5L * attempt) + 1);
+
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException interruptedException) {
+            Thread.currentThread()
+                .interrupt();
+
+            throw new IllegalStateException("Interrupted while updating a data storage value", interruptedException);
+        }
+    }
+
+    <T> T updateConditionally(
+        ConditionalFileStorageService conditionalFileStorageService, String componentName, DataStorageScope scope,
+        String scopeId, String key, long environmentId, PlatformType type, Function<Optional<T>, T> updater,
+        Duration timeBudget) {
+
+        String directoryPath = getDirectoryPath(type, scope, scopeId, environmentId);
+        String filename = getFilename(componentName, key);
+        long deadline = System.nanoTime() + timeBudget.toNanos();
+
+        for (int attempt = 1;; attempt++) {
+            Optional<VersionedFileContent> versionedFileContentOptional =
+                conditionalFileStorageService.readFileContentVersioned(directoryPath, filename);
+
+            Optional<T> currentValueOptional = versionedFileContentOptional.isPresent()
+                ? Optional.ofNullable(this.<T>read(versionedFileContentOptional.get()))
+                : fetch(componentName, scope, scopeId, key, environmentId, type);
+
+            T value = updater.apply(currentValueOptional);
+
+            if (value == null) {
+                throw new IllegalArgumentException("A data storage update must not return null");
+            }
+
+            String expectedVersion = versionedFileContentOptional.map(VersionedFileContent::version)
+                .orElse(null);
+
+            if (conditionalFileStorageService.storeFileContentIfVersion(
+                directoryPath, filename, CompressionUtils.compress(new TypedValue(value).write(objectMapper)),
+                expectedVersion)) {
+
+                deleteIfExists(
+                    getLegacyDirectoryPath(type, environmentId),
+                    getLegacyFilename(componentName, scope, scopeId, key));
+
+                return value;
+            }
+
+            if (System.nanoTime() - deadline >= 0) {
+                break;
+            }
+
+            backOff(attempt);
+        }
+
+        throw new IllegalStateException("Too many concurrent updates for data storage key '%s'".formatted(key));
+    }
+
     private void deleteIfExists(String directoryPath, String filename) {
         if (fileStorageService.fileExists(directoryPath, filename)) {
             fileStorageService.deleteFile(directoryPath, fileStorageService.getFileEntry(directoryPath, filename));
         }
     }
 
-    @SuppressWarnings("unchecked")
     private <T> T read(String directoryPath, FileEntry fileEntry) {
-        TypedValue typedValue = TypedValue.read(
-            objectMapper,
-            CompressionUtils.decompressToString(fileStorageService.readFileToBytes(directoryPath, fileEntry)));
+        return read(fileStorageService.readFileToBytes(directoryPath, fileEntry));
+    }
+
+    private <T> T read(VersionedFileContent versionedFileContent) {
+        return read(versionedFileContent.content());
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T read(byte[] compressedContent) {
+        TypedValue typedValue = TypedValue.read(objectMapper, CompressionUtils.decompressToString(compressedContent));
 
         return (T) typedValue.value();
     }

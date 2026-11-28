@@ -7,12 +7,12 @@
 
 package com.bytechef.ee.file.storage.aws;
 
-import com.bytechef.file.storage.service.FileStorageService;
+import com.bytechef.file.storage.service.ConditionalFileStorageService;
 
 /**
  * @version ee
  *
  * @author Marko Krikovic
  */
-public interface AwsFileStorageService extends FileStorageService {
+public interface AwsFileStorageService extends ConditionalFileStorageService {
 }
