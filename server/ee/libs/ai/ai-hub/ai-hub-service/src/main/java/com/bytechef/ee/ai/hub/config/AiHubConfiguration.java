@@ -69,6 +69,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,6 +114,7 @@ public class AiHubConfiguration {
     static final Set<String> INTELLIGENT_TOOL_NAMES = Set.of("buildWorkflow", "importWorkflow");
 
     private static final String BUILD_WORKFLOW_TOOL_NAME = "buildWorkflow";
+    private static final String UPDATE_WORKFLOW_TOOL_NAME = "updateWorkflow";
 
     private final Resource promptAiHubAskResource;
     private final Resource promptAiHubBuildResource;
@@ -191,7 +193,7 @@ public class AiHubConfiguration {
         throws AGUIException {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
-            List.of(ToolCallbacks.from(projectTools, projectWorkflowLifecycleTools, workflowExecutionTools)));
+            buildProjectToolCallbacks(projectTools, projectWorkflowLifecycleTools, workflowExecutionTools));
 
         toolCallbacks.addAll(componentDefinitionToolCallbacks(componentToolsProvider));
         toolCallbacks.addAll(checkWorkflowToolCallbacks(persistedWorkflowCheckerProvider, projectServiceProvider));
@@ -278,6 +280,18 @@ public class AiHubConfiguration {
         return mode -> mode == Mode.BUILD
             ? aiHubBuildSpringAIAgent.pinnedToolCallbacks()
             : aiHubAskSpringAIAgent.pinnedToolCallbacks();
+    }
+
+    static List<ToolCallback> buildProjectToolCallbacks(
+        ProjectTools projectTools, ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools,
+        WorkflowExecutionTools workflowExecutionTools) {
+
+        ToolCallback[] toolCallbacks = ToolCallbacks.from(
+            projectTools, projectWorkflowLifecycleTools, workflowExecutionTools);
+
+        return Arrays.stream(toolCallbacks)
+            .filter(toolCallback -> !isUpdateWorkflow(toolCallback))
+            .toList();
     }
 
     static List<ToolCallback> componentDefinitionToolCallbacks(ObjectProvider<ComponentTools> componentToolsProvider) {
@@ -389,5 +403,11 @@ public class AiHubConfiguration {
             throw new IllegalStateException(
                 "Failed to read system prompt resource: " + systemPromptResource.getDescription(), exception);
         }
+    }
+
+    private static boolean isUpdateWorkflow(ToolCallback toolCallback) {
+        ToolDefinition toolDefinition = toolCallback.getToolDefinition();
+
+        return UPDATE_WORKFLOW_TOOL_NAME.equals(toolDefinition.name());
     }
 }

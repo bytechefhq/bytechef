@@ -136,8 +136,8 @@ public class WorkspaceScopedSubAgentToolCallback implements ToolCallback {
         } catch (RuntimeException exception) {
             ToolDefinition toolDefinition = delegate.getToolDefinition();
 
-            return ToolErrors.runtimeFailure(WorkspaceScopedSubAgentToolCallback.class, toolDefinition.name(),
-                exception);
+            return DelegateToolErrors.toToolError(
+                WorkspaceScopedSubAgentToolCallback.class, toolDefinition.name(), exception);
         }
     }
 

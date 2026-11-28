@@ -20,6 +20,7 @@ dependencies {
     implementation(project(":server:libs:ai:ai-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool-api"))
+    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool-api"))
     implementation(project(":server:libs:ai:ai-mcp:ai-mcp-server-api"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))

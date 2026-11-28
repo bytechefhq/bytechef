@@ -136,7 +136,8 @@ public class WorkspaceScopedFlatToolCallback implements ToolCallback {
         } catch (RuntimeException exception) {
             ToolDefinition toolDefinition = delegate.getToolDefinition();
 
-            return ToolErrors.runtimeFailure(WorkspaceScopedFlatToolCallback.class, toolDefinition.name(), exception);
+            return DelegateToolErrors.toToolError(
+                WorkspaceScopedFlatToolCallback.class, toolDefinition.name(), exception);
         }
     }
 
