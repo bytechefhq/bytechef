@@ -29,14 +29,16 @@ import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolScope;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
-import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.tool.AutomationConfigurationAgentType;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
@@ -45,10 +47,12 @@ import org.springframework.beans.factory.ObjectProvider;
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class CopilotAgentMcpContributorConfigurationTest {
 
     private final CopilotAgentMcpContributorConfiguration configuration =
         new CopilotAgentMcpContributorConfiguration();
+    private final WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
 
     @Test
     void contributesAgentCallbacksWhenChatClientsPresent() {
@@ -58,7 +62,7 @@ class CopilotAgentMcpContributorConfigurationTest {
             intelligentDefinition("debugWorkflowExecution"), intelligentDefinition("importWorkflow"));
 
         McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
-            emptyProvider(), intelligentToolCatalog, mock(WorkspaceScopeResolver.class));
+            emptyProvider(), intelligentToolCatalog, workspaceFacade);
 
         assertThat(contributor.getToolCallbacks())
             .extracting(toolCallback -> toolCallback.getToolDefinition()
@@ -71,7 +75,7 @@ class CopilotAgentMcpContributorConfigurationTest {
     @Test
     void contributesNothingWhenAllAbsent() {
         McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
-            emptyProvider(), catalogOf(), mock(WorkspaceScopeResolver.class));
+            emptyProvider(), catalogOf(), workspaceFacade);
 
         assertThat(contributor.getToolCallbacks()).isEmpty();
     }
@@ -84,7 +88,7 @@ class CopilotAgentMcpContributorConfigurationTest {
             intelligentDefinition("debugWorkflowExecution"), intelligentDefinition("importWorkflow"));
 
         McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
-            emptyProvider(), intelligentToolCatalog, mock(WorkspaceScopeResolver.class));
+            emptyProvider(), intelligentToolCatalog, workspaceFacade);
 
         assertThat(contributor.getToolCallbacks())
             .allSatisfy(toolCallback -> assertThat(toolCallback.getToolDefinition()

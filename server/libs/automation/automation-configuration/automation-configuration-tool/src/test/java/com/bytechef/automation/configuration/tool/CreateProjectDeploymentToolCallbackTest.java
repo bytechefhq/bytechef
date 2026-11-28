@@ -27,7 +27,9 @@ import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ErrorType;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.databind.JsonNode;
@@ -36,6 +38,7 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class CreateProjectDeploymentToolCallbackTest {
 
     private final JsonMapper jsonMapper = new JsonMapper();

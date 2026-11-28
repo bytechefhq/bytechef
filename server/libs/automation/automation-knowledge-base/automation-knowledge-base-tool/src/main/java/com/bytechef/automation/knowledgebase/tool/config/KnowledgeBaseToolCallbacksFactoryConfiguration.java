@@ -20,7 +20,6 @@ import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade
 import com.bytechef.automation.knowledgebase.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
@@ -33,16 +32,13 @@ public class KnowledgeBaseToolCallbacksFactoryConfiguration {
 
     @Bean
     @ConditionalOnBean({
-        WorkspaceKnowledgeBaseFacade.class, KnowledgeBaseFacade.class, KnowledgeBaseDocumentFacade.class,
-        KnowledgeBaseDocumentService.class
+        WorkspaceKnowledgeBaseFacade.class, KnowledgeBaseFacade.class, KnowledgeBaseDocumentFacade.class
     })
     KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory(
         WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade, KnowledgeBaseFacade knowledgeBaseFacade,
-        KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService) {
+        KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade) {
 
         return new KnowledgeBaseToolCallbacksFactory(
-            workspaceKnowledgeBaseFacade, knowledgeBaseFacade, knowledgeBaseDocumentFacade,
-            knowledgeBaseDocumentService);
+            workspaceKnowledgeBaseFacade, knowledgeBaseFacade, knowledgeBaseDocumentFacade);
     }
 }

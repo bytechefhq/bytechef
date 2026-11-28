@@ -31,5 +31,6 @@ dependencies {
     testImplementation("org.springframework:spring-webflux")
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     testImplementation(project(":server:libs:test:test-support"))
+    testImplementation(testFixtures(project(":server:libs:automation:automation-ai:automation-ai-tool")))
     annotationProcessor(rootProject.libs.com.google.auto.service.auto.service)
 }

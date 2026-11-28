@@ -19,8 +19,8 @@ package com.bytechef.automation.ai.tool.config;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
-import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
 import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.platform.ai.skill.tool.SkillsTools;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +43,8 @@ public class CopilotAgentMcpContributorConfiguration {
 
     @Bean
     McpServerToolCallbackContributor copilotAgentToolCallbackContributor(
-        ObjectProvider<SkillsTools> skillsToolsProvider,
-        IntelligentToolCatalog intelligentToolCatalog, WorkspaceScopeResolver workspaceScopeResolver) {
+        ObjectProvider<SkillsTools> skillsToolsProvider, IntelligentToolCatalog intelligentToolCatalog,
+        WorkspaceFacade workspaceFacade) {
 
         return () -> {
             List<ToolCallback> toolCallbacks = new ArrayList<>();
@@ -55,8 +55,8 @@ public class CopilotAgentMcpContributorConfiguration {
             toolCallbacks.addAll(
                 intelligentToolCatalog.getByNames(
                     INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD, (chatClient, definition) -> chatClient,
-                    (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(
-                        toolCallback, workspaceScopeResolver)));
+                    (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(toolCallback,
+                        workspaceFacade)));
 
             return toolCallbacks;
         };

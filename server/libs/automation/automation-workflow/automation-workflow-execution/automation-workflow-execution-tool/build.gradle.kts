@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-tool"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:error:error-api"))
@@ -26,6 +27,8 @@ dependencies {
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("org.springframework:spring-webflux")
+    testImplementation(project(":server:libs:platform:platform-component:platform-component-tool"))
     testImplementation(project(":server:libs:test:test-support"))
+    testImplementation(testFixtures(project(":server:libs:automation:automation-ai:automation-ai-tool")))
     annotationProcessor(rootProject.libs.com.google.auto.service.auto.service)
 }

@@ -24,11 +24,8 @@ import com.bytechef.ai.agent.tool.CoreAgentType;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
-import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.service.UserService;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.model.ToolContext;
@@ -40,30 +37,18 @@ import org.springframework.ai.tool.definition.ToolDefinition;
  */
 class WorkspaceScopedSubAgentToolCallbackTest {
 
-    private static final long USER_ID = 1L;
-
     private ContextCapturingDelegate delegate;
-    private WorkspaceFacade workspaceFacade;
-    private WorkspaceScopeResolver workspaceScopeResolver;
     private WorkspaceScopedSubAgentToolCallback toolCallback;
+    private final WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
 
     @BeforeEach
     void beforeEach() {
+        when(workspaceFacade.getMyWorkspaces()).thenReturn(
+            List.of(new Workspace(42L, "Workspace 42"), new Workspace(43L, "Workspace 43")));
+
         delegate = new ContextCapturingDelegate();
-        workspaceFacade = mock(WorkspaceFacade.class);
 
-        UserService userService = mock(UserService.class);
-        User user = new User();
-
-        user.setId(USER_ID);
-
-        when(userService.fetchCurrentUser()).thenReturn(Optional.of(user));
-        when(workspaceFacade.getUserWorkspaces(USER_ID)).thenReturn(
-            List.of(workspace(42L, "Primary"), workspace(43L, "Secondary")));
-
-        workspaceScopeResolver = new WorkspaceScopeResolver(userService, workspaceFacade);
-
-        toolCallback = new WorkspaceScopedSubAgentToolCallback(delegate, workspaceScopeResolver);
+        toolCallback = new WorkspaceScopedSubAgentToolCallback(delegate, workspaceFacade);
     }
 
     @Test
@@ -147,24 +132,10 @@ class WorkspaceScopedSubAgentToolCallbackTest {
     }
 
     @Test
-    void testExplicitForeignWorkspaceIdIsRejectedBeforeReachingDelegate() {
-        String result = toolCallback.call("{\"request\": \"list servers\", \"workspaceId\": 99}");
-
-        assertThat(result).contains("error")
-            .contains("not accessible");
-        assertThat(delegate.capturedContext).isNull();
-    }
-
-    @Test
-    void testSingleWorkspaceIsAutoSelected() {
-        Workspace workspace = new Workspace();
-
-        workspace.setId(7L);
-        workspace.setName("Main");
-
-        when(workspaceFacade.getUserWorkspaces(USER_ID)).thenReturn(List.of(workspace));
-
-        String result = toolCallback.call("{\"request\": \"list servers\"}");
+    void testChatWorkspaceIsUsedWhenNoWorkspaceIdIsGiven() {
+        String result = toolCallback.call(
+            "{\"request\": \"list servers\"}",
+            new ToolContext(Map.of(AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 7L)));
 
         assertThat(result).isEqualTo("done");
         assertThat(delegate.capturedContext)
@@ -173,25 +144,45 @@ class WorkspaceScopedSubAgentToolCallbackTest {
     }
 
     @Test
-    void testMultipleWorkspacesReturnCandidateList() {
-        Workspace firstWorkspace = new Workspace();
+    void testExplicitWorkspaceIdOtherThanTheChatWorkspaceIsRejected() {
+        String result = toolCallback.call(
+            "{\"request\": \"list servers\", \"workspaceId\": 42}",
+            new ToolContext(Map.of(AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 7L)));
 
-        firstWorkspace.setId(1L);
-        firstWorkspace.setName("Alpha");
+        assertThat(result).contains("error")
+            .contains("Workspace 42 is not the workspace 7 this conversation is scoped to.");
+        assertThat(delegate.capturedContext).isNull();
+    }
 
-        Workspace secondWorkspace = new Workspace();
+    @Test
+    void testMalformedChatEnvironmentReturnsErrorInsteadOfDefaulting() {
+        String result = toolCallback.call(
+            "{\"request\": \"list servers\"}",
+            new ToolContext(
+                Map.of(
+                    AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 7L,
+                    AutomationToolInvocationContext.TOOL_CONTEXT_ENVIRONMENT_ID_KEY, "not-a-number")));
 
-        secondWorkspace.setId(2L);
-        secondWorkspace.setName("Beta");
+        assertThat(result).contains("error")
+            .contains("environment of this conversation could not be determined");
+        assertThat(delegate.capturedContext).isNull();
+    }
 
-        when(workspaceFacade.getUserWorkspaces(USER_ID)).thenReturn(List.of(firstWorkspace, secondWorkspace));
+    @Test
+    void testExplicitWorkspaceIdTheCallerIsNotAMemberOfIsRejected() {
+        String result = toolCallback.call("{\"request\": \"list servers\", \"workspaceId\": 99}");
 
+        assertThat(result).contains("error")
+            .contains("Workspace 99 is not accessible to the caller.");
+        assertThat(delegate.capturedContext).isNull();
+    }
+
+    @Test
+    void testMissingWorkspacePointsToListWorkspaces() {
         String result = toolCallback.call("{\"request\": \"list servers\"}");
 
-        assertThat(result)
-            .contains("workspace_required")
-            .contains("Alpha")
-            .contains("Beta");
+        assertThat(result).contains("error")
+            .contains("listWorkspaces");
         assertThat(delegate.capturedContext).isNull();
     }
 
@@ -200,7 +191,7 @@ class WorkspaceScopedSubAgentToolCallbackTest {
         PlainCopilotDelegate copilotDelegate = new PlainCopilotDelegate();
 
         WorkspaceScopedSubAgentToolCallback copilotToolCallback =
-            new WorkspaceScopedSubAgentToolCallback(copilotDelegate, workspaceScopeResolver);
+            new WorkspaceScopedSubAgentToolCallback(copilotDelegate, workspaceFacade);
 
         String result = copilotToolCallback.call("{\"request\": \"list tables\", \"workspaceId\": 43}");
 
@@ -212,15 +203,6 @@ class WorkspaceScopedSubAgentToolCallbackTest {
         assertThat(copilotDelegate.capturedContext)
             .containsEntry(AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 43L)
             .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, 43L);
-    }
-
-    private static Workspace workspace(long id, String name) {
-        Workspace workspace = new Workspace();
-
-        workspace.setId(id);
-        workspace.setName(name);
-
-        return workspace;
     }
 
     private static final class ContextCapturingDelegate implements ToolCallback {

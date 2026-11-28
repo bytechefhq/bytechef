@@ -17,6 +17,8 @@
 package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -24,7 +26,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -42,24 +43,23 @@ public class WorkspaceScopedSubAgentToolCallback implements ToolCallback {
                     },
                     "workspaceId": {
                         "type": "integer",
-                        "description": "Target workspace id. Optional when the account has exactly one workspace; otherwise required — an error response lists the candidates."
+                        "description": "Target workspace id. Optional inside a Copilot chat, which defaults to the chat's workspace; otherwise required - call listWorkspaces to find it."
                     },
                     "environment": {
                         "type": "string",
-                        "description": "Target environment: DEVELOPMENT, STAGING, or PRODUCTION. Optional — defaults to DEVELOPMENT when omitted."
+                        "description": "Target environment: DEVELOPMENT, STAGING, or PRODUCTION. Optional - defaults to the chat's environment, or DEVELOPMENT."
                     }
                 },
                 "required": ["request"]
             }""";
 
     private final ToolCallback delegate;
-    private final WorkspaceScopeResolver workspaceScopeResolver;
-    private final JsonMapper jsonMapper = new JsonMapper();
+    private final WorkspaceFacade workspaceFacade;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public WorkspaceScopedSubAgentToolCallback(ToolCallback delegate, WorkspaceScopeResolver workspaceScopeResolver) {
+    public WorkspaceScopedSubAgentToolCallback(ToolCallback delegate, WorkspaceFacade workspaceFacade) {
         this.delegate = delegate;
-        this.workspaceScopeResolver = workspaceScopeResolver;
+        this.workspaceFacade = workspaceFacade;
     }
 
     @Override
@@ -70,8 +70,8 @@ public class WorkspaceScopedSubAgentToolCallback implements ToolCallback {
             .name(delegateToolDefinition.name())
             .description(
                 delegateToolDefinition.description() +
-                    " Supply workspaceId when the account has more than one workspace. Supply environment" +
-                    " (DEVELOPMENT, STAGING, or PRODUCTION) to target something other than DEVELOPMENT.")
+                    " Supply workspaceId outside a Copilot chat (call listWorkspaces to find it). Supply environment" +
+                    " (DEVELOPMENT, STAGING, or PRODUCTION) to target another environment.")
             .inputSchema(INPUT_SCHEMA)
             .build();
     }
@@ -84,35 +84,49 @@ public class WorkspaceScopedSubAgentToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            WorkspaceScopedInput input = jsonMapper.readValue(toolInput, WorkspaceScopedInput.class);
+            WorkspaceScopedInput input = JsonUtils.read(toolInput, WorkspaceScopedInput.class);
 
             String request = input.request();
 
             if (request == null || request.isBlank()) {
-                return ToolErrors.toolError(jsonMapper, "request is required and must not be blank");
+                return ToolErrors.toolError("request is required and must not be blank");
             }
 
-            WorkspaceScopeResolver.WorkspaceScope workspaceScope =
-                workspaceScopeResolver.resolve(input.workspaceId(), input.environment());
+            Long workspaceId;
 
-            if (workspaceScope instanceof WorkspaceScopeResolver.Rejected rejected) {
-                return rejected.response();
+            try {
+                workspaceId = AutomationToolInvocationContext.resolveWorkspaceId(
+                    input.workspaceId(), toolContext, workspaceFacade);
+            } catch (WorkspaceNotAccessibleException exception) {
+                return ToolErrors.toolError(exception.getMessage());
             }
 
-            WorkspaceScopeResolver.Resolved resolved = (WorkspaceScopeResolver.Resolved) workspaceScope;
+            if (workspaceId == null) {
+                return ToolErrors.toolError("workspaceId is required - call listWorkspaces to find the workspace id.");
+            }
 
-            Map<String, Object> forwardedContext = resolved.toForwardedContext(toolContext);
+            long environmentId;
 
-            String delegateInput = jsonMapper.writeValueAsString(Map.of("request", request));
+            try {
+                environmentId = AutomationToolInvocationContext.resolveEnvironmentId(
+                    input.environment(), toolContext);
+            } catch (UnknownEnvironmentException exception) {
+                return ToolErrors.toolError(exception.getMessage());
+            }
+
+            Map<String, Object> forwardedContext = AutomationToolInvocationContext.toForwardedContext(
+                toolContext, workspaceId, environmentId);
+
+            String delegateInput = JsonUtils.write(Map.of("request", request));
 
             return delegate.call(delegateInput, new ToolContext(forwardedContext));
         } catch (JacksonException exception) {
-            return ToolErrors.toolError(jsonMapper, "Invalid tool input: " + exception.getMessage());
+            return ToolErrors.toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             ToolDefinition toolDefinition = delegate.getToolDefinition();
 
-            return ToolErrors.runtimeFailure(
-                jsonMapper, WorkspaceScopedSubAgentToolCallback.class, toolDefinition.name(), exception);
+            return ToolErrors.runtimeFailure(WorkspaceScopedSubAgentToolCallback.class, toolDefinition.name(),
+                exception);
         }
     }
 

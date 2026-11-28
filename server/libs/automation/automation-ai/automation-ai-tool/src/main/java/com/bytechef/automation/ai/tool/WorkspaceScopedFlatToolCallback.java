@@ -17,6 +17,8 @@
 package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashSet;
 import java.util.Map;
@@ -27,7 +29,6 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
 
 /**
@@ -39,13 +40,12 @@ public class WorkspaceScopedFlatToolCallback implements ToolCallback {
     private static final String ENVIRONMENT_FIELD = "environment";
 
     private final ToolCallback delegate;
-    private final WorkspaceScopeResolver workspaceScopeResolver;
-    private final JsonMapper jsonMapper = new JsonMapper();
+    private final WorkspaceFacade workspaceFacade;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public WorkspaceScopedFlatToolCallback(ToolCallback delegate, WorkspaceScopeResolver workspaceScopeResolver) {
+    public WorkspaceScopedFlatToolCallback(ToolCallback delegate, WorkspaceFacade workspaceFacade) {
         this.delegate = delegate;
-        this.workspaceScopeResolver = workspaceScopeResolver;
+        this.workspaceFacade = workspaceFacade;
     }
 
     @Override
@@ -57,13 +57,12 @@ public class WorkspaceScopedFlatToolCallback implements ToolCallback {
         StringBuilder description = new StringBuilder(delegateToolDefinition.description());
 
         if (!delegatePropertyNames.contains(WORKSPACE_ID_FIELD)) {
-            description.append(" Supply workspaceId when the account has more than one workspace.");
+            description.append(" Supply workspaceId outside a Copilot chat (call listWorkspaces to find it).");
         }
 
         if (!delegatePropertyNames.contains(ENVIRONMENT_FIELD)) {
             description.append(
-                " Supply environment (DEVELOPMENT, STAGING, or PRODUCTION) to target something other than" +
-                    " DEVELOPMENT.");
+                " Supply environment (DEVELOPMENT, STAGING, or PRODUCTION) to target another environment.");
         }
 
         return ToolDefinition.builder()
@@ -84,7 +83,7 @@ public class WorkspaceScopedFlatToolCallback implements ToolCallback {
             ObjectNode inputNode = readInputObject(toolInput);
 
             if (inputNode == null) {
-                return ToolErrors.toolError(jsonMapper, "Invalid tool input: expected a JSON object");
+                return ToolErrors.toolError("Invalid tool input: expected a JSON object");
             }
 
             ToolDefinition delegateToolDefinition = delegate.getToolDefinition();
@@ -100,41 +99,53 @@ public class WorkspaceScopedFlatToolCallback implements ToolCallback {
                 workspaceId = toLong(workspaceIdNode);
 
                 if (workspaceId == null) {
-                    return ToolErrors.toolError(
-                        jsonMapper, "workspaceId must be an integer workspace id, got: " + workspaceIdNode);
+                    return ToolErrors.toolError("workspaceId must be an integer workspace id, got: " + workspaceIdNode);
                 }
             }
 
             String requestedEnvironment = isPresent(environmentNode) ? environmentNode.asString() : null;
 
-            WorkspaceScopeResolver.WorkspaceScope workspaceScope =
-                workspaceScopeResolver.resolve(workspaceId, requestedEnvironment);
+            Long resolvedWorkspaceId;
 
-            if (workspaceScope instanceof WorkspaceScopeResolver.Rejected rejected) {
-                return rejected.response();
+            try {
+                resolvedWorkspaceId = AutomationToolInvocationContext.resolveWorkspaceId(
+                    workspaceId, toolContext, workspaceFacade);
+            } catch (WorkspaceNotAccessibleException exception) {
+                return ToolErrors.toolError(exception.getMessage());
             }
 
-            WorkspaceScopeResolver.Resolved resolved = (WorkspaceScopeResolver.Resolved) workspaceScope;
+            if (resolvedWorkspaceId == null) {
+                return ToolErrors.toolError("workspaceId is required - call listWorkspaces to find the workspace id.");
+            }
 
-            Map<String, Object> forwardedContext = resolved.toForwardedContext(toolContext);
+            long environmentId;
 
-            return delegate.call(jsonMapper.writeValueAsString(inputNode), new ToolContext(forwardedContext));
+            try {
+                environmentId = AutomationToolInvocationContext.resolveEnvironmentId(
+                    requestedEnvironment, toolContext);
+            } catch (UnknownEnvironmentException exception) {
+                return ToolErrors.toolError(exception.getMessage());
+            }
+
+            Map<String, Object> forwardedContext = AutomationToolInvocationContext.toForwardedContext(
+                toolContext, resolvedWorkspaceId, environmentId);
+
+            return delegate.call(JsonUtils.write(inputNode), new ToolContext(forwardedContext));
         } catch (JacksonException exception) {
-            return ToolErrors.toolError(jsonMapper, "Invalid tool input: " + exception.getMessage());
+            return ToolErrors.toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             ToolDefinition toolDefinition = delegate.getToolDefinition();
 
-            return ToolErrors.runtimeFailure(
-                jsonMapper, WorkspaceScopedFlatToolCallback.class, toolDefinition.name(), exception);
+            return ToolErrors.runtimeFailure(WorkspaceScopedFlatToolCallback.class, toolDefinition.name(), exception);
         }
     }
 
     private @Nullable ObjectNode readInputObject(@Nullable String toolInput) {
         if (toolInput == null || toolInput.isBlank()) {
-            return jsonMapper.createObjectNode();
+            return JsonUtils.createObjectNode();
         }
 
-        JsonNode node = jsonMapper.readTree(toolInput);
+        JsonNode node = JsonUtils.readTree(toolInput);
 
         return node.isObject() ? (ObjectNode) node : null;
     }
@@ -179,14 +190,14 @@ public class WorkspaceScopedFlatToolCallback implements ToolCallback {
     }
 
     private Set<String> getPropertyNames(String inputSchema) {
-        JsonNode propertiesNode = jsonMapper.readTree(inputSchema)
+        JsonNode propertiesNode = JsonUtils.readTree(inputSchema)
             .path("properties");
 
         return propertiesNode.isObject() ? new HashSet<>(propertiesNode.propertyNames()) : Set.of();
     }
 
     private String mergeSchema(String delegateInputSchema, Set<String> delegatePropertyNames) {
-        JsonNode schemaNode = jsonMapper.readTree(delegateInputSchema);
+        JsonNode schemaNode = JsonUtils.readTree(delegateInputSchema);
 
         if (!schemaNode.isObject()) {
             return delegateInputSchema;
@@ -204,8 +215,8 @@ public class WorkspaceScopedFlatToolCallback implements ToolCallback {
                 .put("type", "integer")
                 .put(
                     "description",
-                    "Target workspace id. Optional when the account has exactly one workspace; otherwise required "
-                        + "— an error response lists the candidates.");
+                    "Target workspace id. Optional inside a Copilot chat, which defaults to the chat's workspace; "
+                        + "otherwise required - call listWorkspaces to find it.");
         }
 
         if (!delegatePropertyNames.contains(ENVIRONMENT_FIELD)) {
@@ -213,10 +224,10 @@ public class WorkspaceScopedFlatToolCallback implements ToolCallback {
                 .put("type", "string")
                 .put(
                     "description",
-                    "Target environment: DEVELOPMENT, STAGING, or PRODUCTION. Optional — defaults to DEVELOPMENT "
-                        + "when omitted.");
+                    "Target environment: DEVELOPMENT, STAGING, or PRODUCTION. Optional - defaults to the chat's "
+                        + "environment, or DEVELOPMENT.");
         }
 
-        return jsonMapper.writeValueAsString(schemaObjectNode);
+        return JsonUtils.write(schemaObjectNode);
     }
 }

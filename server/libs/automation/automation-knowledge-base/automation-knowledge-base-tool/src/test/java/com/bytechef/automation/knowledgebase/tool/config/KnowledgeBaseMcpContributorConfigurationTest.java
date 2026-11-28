@@ -21,32 +21,34 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
-import com.bytechef.automation.ai.tool.WorkspaceScopeResolver;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.automation.knowledgebase.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class KnowledgeBaseMcpContributorConfigurationTest {
 
     private final KnowledgeBaseMcpContributorConfiguration configuration =
         new KnowledgeBaseMcpContributorConfiguration();
+    private final WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
 
     @Test
     void contributesTheSevenFlatKnowledgeBaseToolsWhenFactoryPresent() {
         KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory = new KnowledgeBaseToolCallbacksFactory(
             mock(WorkspaceKnowledgeBaseFacade.class), mock(KnowledgeBaseFacade.class),
-            mock(KnowledgeBaseDocumentFacade.class),
-            mock(KnowledgeBaseDocumentService.class));
+            mock(KnowledgeBaseDocumentFacade.class));
 
         McpServerToolCallbackContributor contributor = configuration.knowledgeBaseFlatCrudMcpContributor(
-            presentKnowledgeBaseFactory(knowledgeBaseToolCallbacksFactory), mock(WorkspaceScopeResolver.class));
+            presentKnowledgeBaseFactory(knowledgeBaseToolCallbacksFactory), workspaceFacade);
 
         assertThat(contributor.getToolCallbacks())
             .extracting(toolCallback -> toolCallback.getToolDefinition()
@@ -59,7 +61,7 @@ class KnowledgeBaseMcpContributorConfigurationTest {
     @Test
     void knowledgeBaseContributorSkipsWhenFactoryAbsent() {
         McpServerToolCallbackContributor contributor = configuration.knowledgeBaseFlatCrudMcpContributor(
-            absentKnowledgeBaseFactory(), mock(WorkspaceScopeResolver.class));
+            absentKnowledgeBaseFactory(), workspaceFacade);
 
         assertThat(contributor.getToolCallbacks()).isEmpty();
     }
@@ -68,11 +70,10 @@ class KnowledgeBaseMcpContributorConfigurationTest {
     void everyKnowledgeBaseToolAcceptsWorkspaceId() {
         KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory = new KnowledgeBaseToolCallbacksFactory(
             mock(WorkspaceKnowledgeBaseFacade.class), mock(KnowledgeBaseFacade.class),
-            mock(KnowledgeBaseDocumentFacade.class),
-            mock(KnowledgeBaseDocumentService.class));
+            mock(KnowledgeBaseDocumentFacade.class));
 
         McpServerToolCallbackContributor contributor = configuration.knowledgeBaseFlatCrudMcpContributor(
-            presentKnowledgeBaseFactory(knowledgeBaseToolCallbacksFactory), mock(WorkspaceScopeResolver.class));
+            presentKnowledgeBaseFactory(knowledgeBaseToolCallbacksFactory), workspaceFacade);
 
         assertThat(contributor.getToolCallbacks())
             .allSatisfy(toolCallback -> assertThat(toolCallback.getToolDefinition()

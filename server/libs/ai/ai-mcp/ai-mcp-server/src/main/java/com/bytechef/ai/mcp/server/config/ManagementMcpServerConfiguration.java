@@ -19,8 +19,9 @@ package com.bytechef.ai.mcp.server.config;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.configuration.tool.ClusterElementTools;
 import com.bytechef.automation.configuration.tool.ProjectTools;
-import com.bytechef.automation.configuration.tool.ProjectWorkflowTools;
+import com.bytechef.automation.configuration.tool.ProjectWorkflowLifecycleTools;
 import com.bytechef.automation.configuration.tool.ScriptTools;
+import com.bytechef.automation.configuration.tool.WorkspaceTools;
 import com.bytechef.platform.component.tool.ComponentTools;
 import com.bytechef.platform.component.tool.TaskTools;
 import com.bytechef.platform.workflow.tool.TaskDispatcherTools;
@@ -60,7 +61,10 @@ public class ManagementMcpServerConfiguration {
             writeScript, authorSkill, debugWorkflowExecution, configureMcpServer) run an inner AI agent and \
             may take minutes — call them for judgment work, not for CRUD.
             To build a workflow: createProject (if needed) → createProjectWorkflow → buildWorkflow with \
-            the workflowId and a plain-language instruction. To import an external workflow (n8n, Make, \
+            the workflowId and a plain-language instruction. createProjectWorkflow creates an EMPTY workflow \
+            (manual trigger, no tasks) from a name and description; no tool writes a whole workflow definition \
+            directly - buildWorkflow and importWorkflow are the only ways to author content. To import an \
+            external workflow (n8n, Make, \
             Zapier, Workato): createProject (if needed) → createProjectWorkflow → importWorkflow with the \
             workflowId and the source definition — it has no project/workflow-creation tools of its own. \
             Each intelligent-tool call is independent and re-reads current state (e.g. the workflow) rather \
@@ -80,43 +84,38 @@ public class ManagementMcpServerConfiguration {
             listMcpProjectWorkflows(mcpServerId) shows each attached workflow's current mapping state. \
             configureMcpServer never creates the server, attaches workflows to it, or enables it — those are \
             the flat tools above.
-            listMcpServers, createMcpServer and listMcpProjectWorkflows additionally accept an optional \
-            workspaceId (and environment) since MCP servers are workspace-scoped: omit it when the account \
-            has exactly one \
-            workspace, otherwise retry with an explicit workspaceId from the workspace_required error's \
-            'workspaces' field.
-            The project, workflow and script tools (listProjects, searchProjects, getProject, createProject, \
-            listWorkflows, searchWorkflows, getWorkflow, createProjectWorkflow, updateWorkflow, \
-            updateScriptComponentCode, updateWorkflowRootProperties, updateClusterElementTask and the rest) \
-            likewise act within a single workspace and accept an \
-            optional workspaceId: they only list projects and workflows of that workspace and reject a project \
-            or workflow id that belongs to another one.
-            Most tools require workspace context: if a tool returns a workspace_required error, retry with one \
-            of the workspaceId values listed in its 'workspaces' field.""";
+            Tools that work within a workspace (listProjects, searchProjects, createProject, \
+            searchWorkflows without a projectId, and the MCP server, deployment and knowledge-base tools) take \
+            a workspaceId, and several also take an environment (DEVELOPMENT, STAGING or PRODUCTION, default \
+            DEVELOPMENT). Call listWorkspaces first to find the workspace id. Tools that take a project or \
+            workflow id act on that object directly.""";
 
     private final ComponentTools componentTools;
     private final ProjectTools projectTools;
-    private final ProjectWorkflowTools projectWorkflowTools;
+    private final ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools;
     private final TaskTools taskTools;
     private final TaskDispatcherTools taskDispatcherTools;
     private final ScriptTools scriptTools;
     private final ClusterElementTools clusterElementTools;
+    private final WorkspaceTools workspaceTools;
     private final List<McpServerToolCallbackContributor> mcpServerToolCallbackContributors;
 
     @SuppressFBWarnings("EI")
     public ManagementMcpServerConfiguration(
-        ComponentTools componentTools, ProjectTools projectTools, ProjectWorkflowTools projectWorkflowTools,
+        ComponentTools componentTools, ProjectTools projectTools,
+        ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools,
         TaskTools taskTools, TaskDispatcherTools taskDispatcherTools, ScriptTools scriptTools,
-        ClusterElementTools clusterElementTools,
+        ClusterElementTools clusterElementTools, WorkspaceTools workspaceTools,
         List<McpServerToolCallbackContributor> mcpServerToolCallbackContributors) {
 
         this.componentTools = componentTools;
         this.projectTools = projectTools;
-        this.projectWorkflowTools = projectWorkflowTools;
+        this.projectWorkflowLifecycleTools = projectWorkflowLifecycleTools;
         this.taskTools = taskTools;
         this.taskDispatcherTools = taskDispatcherTools;
         this.scriptTools = scriptTools;
         this.clusterElementTools = clusterElementTools;
+        this.workspaceTools = workspaceTools;
         this.mcpServerToolCallbackContributors = mcpServerToolCallbackContributors;
     }
 
@@ -156,8 +155,8 @@ public class ManagementMcpServerConfiguration {
 
     ToolCallbackProvider toolCallbackProvider() {
         List<Object> tools = List.of(
-            projectTools, projectWorkflowTools, componentTools, taskTools, taskDispatcherTools, scriptTools,
-            clusterElementTools);
+            projectTools, projectWorkflowLifecycleTools, componentTools, taskTools, taskDispatcherTools, scriptTools,
+            clusterElementTools, workspaceTools);
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(List.of(ToolCallbacks.from(tools.toArray())));
 

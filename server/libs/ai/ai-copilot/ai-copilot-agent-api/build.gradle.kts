@@ -12,7 +12,6 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
-    implementation(project(":server:libs:platform:platform-component:platform-component-tool"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
 
     testImplementation("org.assertj:assertj-core")
@@ -22,5 +21,6 @@ dependencies {
     testImplementation(project(":server:libs:ai:ai-copilot:ai-copilot-service"))
     testImplementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    testImplementation(project(":server:libs:platform:platform-component:platform-component-tool"))
     testImplementation(project(":server:libs:test:test-support"))
 }

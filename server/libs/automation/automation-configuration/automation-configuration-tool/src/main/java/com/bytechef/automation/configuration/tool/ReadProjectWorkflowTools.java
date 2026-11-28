@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.configuration.tool;
 
+import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
 import com.bytechef.automation.configuration.tool.model.WorkflowInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -41,31 +42,26 @@ public class ReadProjectWorkflowTools {
     }
 
     @Tool(
-        description = "Get comprehensive information about a specific workflow. Returns detailed project information including id, name, description, version, definition, project workflow id, created date, last modified date.")
+        description = "Get comprehensive information about a specific workflow. Returns detailed workflow information including id, name, description, version, definition, project workflow id, created date, last modified date.")
     public WorkflowInfo getWorkflow(
-        @ToolParam(description = "The ID of the workflow to retrieve") String workflowId,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
-        ToolContext toolContext) {
-
-        return delegate.getWorkflow(workflowId, workspaceId, toolContext);
+        @ToolParam(description = "The ID of the workflow to retrieve") String workflowId, ToolContext toolContext) {
+        return delegate.getWorkflow(workflowId, toolContext);
     }
 
     @Tool(
         description = "List all workflows in a project. Returns a list of workflows with their basic information including id, name and description")
     public List<WorkflowInfo> listWorkflows(
-        @ToolParam(description = "The ID of the project") long projectId,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
-        ToolContext toolContext) {
-
-        return delegate.listWorkflows(projectId, workspaceId, toolContext);
+        @ToolParam(description = "The ID of the project") long projectId, ToolContext toolContext) {
+        return delegate.listWorkflows(projectId, toolContext);
     }
 
     @Tool(
-        description = "Full-text search across the workflows of a workspace's projects. Returns a list of workflows matching the search query in name or description.")
+        description = "Full-text search across the workflows of a project, or of every project in a workspace. Returns a list of workflows matching the search query in name or description. In an embedded chat confined to one project, only that project is searched, workspaceId is ignored, and any other projectId is an error.")
     public List<WorkflowInfo> searchWorkflows(
         @ToolParam(description = "The search query to match against workflow names and descriptions") String query,
         @ToolParam(required = false, description = "The ID of the project") Long projectId,
-        @ToolParam(required = false, description = ProjectWorkspaceScope.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
+        @ToolParam(
+            required = false, description = AutomationToolInvocationContext.WORKSPACE_ID_DESCRIPTION) Long workspaceId,
         ToolContext toolContext) {
 
         return delegate.searchWorkflows(query, projectId, workspaceId, toolContext);
