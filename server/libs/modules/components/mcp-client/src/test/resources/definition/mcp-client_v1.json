@@ -79,7 +79,7 @@
       "description": "Choose which tools you want to expose to the AI Agent.",
       "displayCondition": null,
       "exampleValue": null,
-      "expressionEnabled": true,
+      "expressionEnabled": false,
       "hidden": false,
       "label": "Tools",
       "languageId": null,
@@ -113,7 +113,7 @@
       "description": "Select the tools you want to expose to the AI Agent.",
       "displayCondition": "toolFilterType == 'include'",
       "exampleValue": null,
-      "expressionEnabled": true,
+      "expressionEnabled": false,
       "hidden": false,
       "items": [ {
         "advancedOption": false,
@@ -159,7 +159,7 @@
       "description": "Select the tools you want to exclude. The AI Agent will have access to all other tools.",
       "displayCondition": "toolFilterType == 'exclude'",
       "exampleValue": null,
-      "expressionEnabled": true,
+      "expressionEnabled": false,
       "hidden": false,
       "items": [ {
         "advancedOption": false,

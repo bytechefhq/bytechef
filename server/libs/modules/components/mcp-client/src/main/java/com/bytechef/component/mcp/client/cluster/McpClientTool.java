@@ -67,6 +67,7 @@ public class McpClientTool {
                         option("Include", INCLUDE),
                         option("Exclude", EXCLUDE))
                     .defaultValue(ALL)
+                    .expressionEnabled(false)
                     .required(true),
                 array(TOOLS_TO_INCLUDE)
                     .label("Tools to Include")
@@ -78,6 +79,7 @@ public class McpClientTool {
                                 connectionParameters, connectionDefinitionService, context))
                     .optionsLookupDependsOn(TOOL_FILTER_TYPE)
                     .items(string())
+                    .expressionEnabled(false)
                     .displayCondition("%s == '%s'".formatted(TOOL_FILTER_TYPE, INCLUDE)),
                 array(TOOLS_TO_EXCLUDE)
                     .label("Tools to Exclude")
@@ -90,6 +92,7 @@ public class McpClientTool {
                                 connectionParameters, connectionDefinitionService, context))
                     .items(string())
                     .optionsLookupDependsOn(TOOL_FILTER_TYPE)
+                    .expressionEnabled(false)
                     .displayCondition("%s == '%s'".formatted(TOOL_FILTER_TYPE, EXCLUDE)))
             .object(() -> this::apply);
     }
