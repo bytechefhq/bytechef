@@ -36,14 +36,23 @@ class ManagementMcpInstructionsTest {
         "getWorkflow");
 
     private static final Set<String> INTELLIGENT_TOOL_NAMES = Set.of(
-        "buildWorkflow", "importWorkflow", "authorSkill", "debugWorkflowExecution", "configureMcpServer");
+        "buildWorkflow", "importWorkflow", "authorSkill", "debugWorkflowExecution", "configureMcpServer",
+        "buildAiAgent");
+
+    private static final List<String> AI_AGENT_TOOL_NAMES = List.of(
+        "listAiAgents", "getAiAgent", "createAiAgent", "updateAiAgent", "addAiAgentElement", "updateAiAgentElement",
+        "deleteAiAgentElement", "addAiAgentChannel", "deleteAiAgentChannel", "updateAiAgentSettings",
+        "searchAiAgentTools", "searchAiAgentReferences");
 
     private static final List<String> KNOWN_OPTIONAL_TOOL_NAMES = List.of(
         "buildWorkflow", "importWorkflow", "authorSkill", "debugWorkflowExecution", "configureMcpServer",
         "updateWorkflow", "listConnections", "saveWorkflowTestConnection", "createProjectWorkflow", "getWorkflow",
         "getWorkflowBuildInstructions", "searchComponents", "getActionDefinition", "searchTriggers",
         "getTriggerDefinition", "publishProject", "createMcpServer", "createMcpProject", "updateMcpServer",
-        "listMcpServers", "updateMcpProjectWorkflowParameters", "lookupPropertyOptions");
+        "listMcpServers", "updateMcpProjectWorkflowParameters", "lookupPropertyOptions", "buildAiAgent",
+        "listAiAgents", "getAiAgent", "createAiAgent", "updateAiAgent", "addAiAgentElement", "updateAiAgentElement",
+        "deleteAiAgentElement", "addAiAgentChannel", "deleteAiAgentChannel", "updateAiAgentSettings",
+        "searchAiAgentTools", "searchAiAgentReferences");
 
     @Test
     void testOmitsIntelligentToolsWhenNotRegistered() {
@@ -142,6 +151,38 @@ class ManagementMcpInstructionsTest {
         assertNoAbsentToolNamed(OVERVIEW_AND_SEARCH_TOOL_NAMES);
         assertNoAbsentToolNamed(partialAuthoringToolNames());
         assertNoAbsentToolNamed(buildWorkflowWithoutUpdateWorkflowToolNames());
+        assertNoAbsentToolNamed(aiAgentToolNamesWithoutBuildAiAgent());
+        assertNoAbsentToolNamed(buildAiAgentWithoutAgentToolNames());
+    }
+
+    @Test
+    void testDescribesAgentToolsWhenRegistered() {
+        String instructions = ManagementMcpInstructions.build(allToolNames());
+
+        assertThat(instructions)
+            .contains("listAiAgents and createAiAgent take a workspaceId", "searchAiAgentTools",
+                "needs a connectionId; find one with listConnections")
+            .contains("createProject (if needed) → buildAiAgent with a plain-language instruction")
+            .contains("the projectId for a new agent or the aiAgentId for an existing one")
+            .contains("build the agent yourself with the agent tools");
+    }
+
+    @Test
+    void testOmitsBuildAiAgentWhenOnlyTheAgentToolsAreRegistered() {
+        String instructions = ManagementMcpInstructions.build(aiAgentToolNamesWithoutBuildAiAgent());
+
+        assertThat(instructions)
+            .contains("createAiAgent")
+            .doesNotContain("buildAiAgent");
+    }
+
+    @Test
+    void testBuildAiAgentDoesNotPointToTheAgentToolsWhenTheyAreNotRegistered() {
+        String instructions = ManagementMcpInstructions.build(buildAiAgentWithoutAgentToolNames());
+
+        assertThat(instructions)
+            .contains("buildAiAgent with a plain-language instruction")
+            .doesNotContain("build the agent yourself", "createAiAgent");
     }
 
     @Test
@@ -233,11 +274,28 @@ class ManagementMcpInstructionsTest {
         return toolNames;
     }
 
+    private static Set<String> aiAgentToolNamesWithoutBuildAiAgent() {
+        Set<String> toolNames = deterministicToolNames();
+
+        toolNames.addAll(AI_AGENT_TOOL_NAMES);
+
+        return toolNames;
+    }
+
+    private static Set<String> buildAiAgentWithoutAgentToolNames() {
+        Set<String> toolNames = new HashSet<>(OVERVIEW_AND_SEARCH_TOOL_NAMES);
+
+        toolNames.add("buildAiAgent");
+
+        return toolNames;
+    }
+
     private static Set<String> allToolNames() {
         Set<String> toolNames = deterministicToolNames();
 
         toolNames.addAll(INTELLIGENT_TOOL_NAMES);
         toolNames.add("lookupPropertyOptions");
+        toolNames.addAll(AI_AGENT_TOOL_NAMES);
 
         return toolNames;
     }

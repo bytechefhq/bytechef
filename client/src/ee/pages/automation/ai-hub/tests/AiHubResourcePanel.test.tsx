@@ -6,6 +6,10 @@ import {act, fireEvent, render, screen} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
+vi.mock('@/ee/pages/automation/ai-hub/AiHubAiAgentViewer', () => ({
+    default: ({aiAgentId}: {aiAgentId: string}) => <div data-testid="ai-agent-viewer">{`ai-agent:${aiAgentId}`}</div>,
+}));
+
 vi.mock('@/ee/pages/automation/ai-hub/AiHubWorkflowViewer', () => ({
     default: ({projectWorkflowId}: {projectWorkflowId: number}) => (
         <div data-testid="workflow-viewer">{`workflow:${projectWorkflowId}`}</div>
@@ -100,7 +104,7 @@ describe('AiHubResourcePanel', () => {
         fireEvent.click(screen.getByRole('button', {name: 'Close Invoices'}));
 
         expect(aiHubTabsStore.getState().openTabs).toHaveLength(0);
-        expect(screen.getByText('Workflows you or Basil open appear here.')).toBeInTheDocument();
+        expect(screen.getByText('Workflows and AI Agents you or Basil open appear here.')).toBeInTheDocument();
     });
 
     it('hides the panel from its close control', () => {
@@ -148,6 +152,24 @@ describe('AiHubResourcePanel', () => {
             workflowId: 'wf-2',
         });
         expect(screen.getByTestId('workflow-viewer')).toHaveTextContent('workflow:22');
+    });
+
+    it('opens an AI Agent picked from the resource picker as the active tab', () => {
+        renderPanel();
+
+        act(() => {
+            hoisted.pickerProps.current?.onSelect({id: 'agent-1', kind: 'aiAgent', name: 'Support Agent'});
+        });
+
+        const {activeTabId, openTabs} = aiHubTabsStore.getState();
+
+        expect(openTabs).toHaveLength(1);
+        expect(openTabs.find((tab) => tab.id === activeTabId)).toMatchObject({
+            aiAgentId: 'agent-1',
+            kind: 'aiAgent',
+            name: 'Support Agent',
+        });
+        expect(screen.getByTestId('ai-agent-viewer')).toHaveTextContent('ai-agent:agent-1');
     });
 
     it('ignores a workflow selection without its project', () => {

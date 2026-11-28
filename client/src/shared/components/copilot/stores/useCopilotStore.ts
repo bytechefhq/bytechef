@@ -49,6 +49,10 @@ export const isWorkflowEditorSource = (source: Source) =>
 
 export const isConnectedUserSource = (source: Source | undefined) => source === Source.WORKFLOW_BUILDER_EMBEDDED;
 
+export interface AiAgentCopilotParametersI {
+    aiAgentId?: string;
+}
+
 export interface CodeEditorCopilotParametersI {
     language: string;
 }
@@ -90,6 +94,7 @@ export interface WorkflowNodeCopilotParametersI {
 
 export type CopilotContextParametersType =
     | Record<string, never>
+    | AiAgentCopilotParametersI
     | CodeEditorCopilotParametersI
     | ClusterElementCopilotParametersI
     | IntentCopilotParametersI

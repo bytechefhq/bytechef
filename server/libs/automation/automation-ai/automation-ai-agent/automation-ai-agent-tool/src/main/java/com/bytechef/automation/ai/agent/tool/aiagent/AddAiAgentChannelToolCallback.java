@@ -21,6 +21,7 @@ import com.bytechef.automation.ai.agent.channel.AiAgentChannelType;
 import com.bytechef.automation.ai.agent.channel.ResolvedAgentChannel;
 import com.bytechef.automation.ai.agent.domain.AiAgentChannel;
 import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
+import com.bytechef.exception.ConfigurationException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -140,7 +141,7 @@ public class AddAiAgentChannelToolCallback implements ToolCallback {
                 Map.of("created", true, "id", channel.getId(), "channelType", channel.getChannelType()));
         } catch (JacksonException exception) {
             return ToolErrors.invalidInput(exception);
-        } catch (IllegalArgumentException exception) {
+        } catch (ConfigurationException | IllegalArgumentException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(jsonMapper, AddAiAgentChannelToolCallback.class, TOOL_NAME, exception);

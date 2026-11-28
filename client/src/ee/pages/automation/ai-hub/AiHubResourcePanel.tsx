@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
+import AiHubAiAgentViewer from '@/ee/pages/automation/ai-hub/AiHubAiAgentViewer';
 import AiHubWorkflowViewer from '@/ee/pages/automation/ai-hub/AiHubWorkflowViewer';
 import WorkflowTabLabel from '@/ee/pages/automation/ai-hub/WorkflowTabLabel';
 import ResourcePickerMenu, {
@@ -7,7 +8,7 @@ import ResourcePickerMenu, {
 } from '@/ee/pages/automation/ai-hub/resource-picker/ResourcePickerMenu';
 import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {PanelRightIcon, PlusIcon, XIcon} from 'lucide-react';
+import {BotIcon, PanelRightIcon, PlusIcon, XIcon} from 'lucide-react';
 import {useEffect, useRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -15,22 +16,30 @@ import {useShallow} from 'zustand/react/shallow';
 const AiHubResourcePanel = () => {
     const activeTabRef = useRef<HTMLDivElement | null>(null);
 
-    const {activeTabId, closeTab, openTabs, openWorkflowTab, setActiveTab, setRightPanelOpen} = useAiHubTabsStore(
-        useShallow((state) => ({
-            activeTabId: state.activeTabId,
-            closeTab: state.closeTab,
-            openTabs: state.openTabs,
-            openWorkflowTab: state.openWorkflowTab,
-            setActiveTab: state.setActiveTab,
-            setRightPanelOpen: state.setRightPanelOpen,
-        }))
-    );
+    const {activeTabId, closeTab, openAiAgentTab, openTabs, openWorkflowTab, setActiveTab, setRightPanelOpen} =
+        useAiHubTabsStore(
+            useShallow((state) => ({
+                activeTabId: state.activeTabId,
+                closeTab: state.closeTab,
+                openAiAgentTab: state.openAiAgentTab,
+                openTabs: state.openTabs,
+                openWorkflowTab: state.openWorkflowTab,
+                setActiveTab: state.setActiveTab,
+                setRightPanelOpen: state.setRightPanelOpen,
+            }))
+        );
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const activeTab = openTabs.find((tab) => tab.id === activeTabId);
 
     const handleResourceSelect = (selection: ResourcePickerSelectionI) => {
+        if (selection.kind === 'aiAgent') {
+            openAiAgentTab({aiAgentId: selection.id, name: selection.name});
+
+            return;
+        }
+
         if (selection.projectId == null || selection.projectWorkflowId == null) {
             return;
         }
@@ -65,11 +74,23 @@ const AiHubResourcePanel = () => {
                                     key={tab.id}
                                     ref={isActive ? activeTabRef : undefined}
                                 >
-                                    <WorkflowTabLabel
-                                        name={tab.name}
-                                        onClick={() => setActiveTab(tab.id)}
-                                        projectId={tab.projectId}
-                                    />
+                                    {tab.kind === 'workflow' ? (
+                                        <WorkflowTabLabel
+                                            name={tab.name}
+                                            onClick={() => setActiveTab(tab.id)}
+                                            projectId={tab.projectId}
+                                        />
+                                    ) : (
+                                        <button
+                                            className="flex max-w-40 items-center gap-1"
+                                            onClick={() => setActiveTab(tab.id)}
+                                            type="button"
+                                        >
+                                            <BotIcon className="size-3.5 shrink-0" />
+
+                                            <span className="truncate">{tab.name}</span>
+                                        </button>
+                                    )}
 
                                     <button
                                         aria-label={`Close ${tab.name}`}
@@ -123,14 +144,22 @@ const AiHubResourcePanel = () => {
 
                 {activeTab ? (
                     <div className="min-h-0 flex-1">
-                        <AiHubWorkflowViewer
-                            projectId={activeTab.projectId}
-                            projectWorkflowId={activeTab.projectWorkflowId}
-                        />
+                        {activeTab.kind === 'workflow' ? (
+                            <AiHubWorkflowViewer
+                                projectId={activeTab.projectId}
+                                projectWorkflowId={activeTab.projectWorkflowId}
+                            />
+                        ) : (
+                            <AiHubAiAgentViewer
+                                aiAgentId={activeTab.aiAgentId}
+                                key={activeTab.aiAgentId}
+                                name={activeTab.name}
+                            />
+                        )}
                     </div>
                 ) : (
                     <div className="flex flex-1 items-center justify-center px-4 text-center text-sm text-muted-foreground">
-                        Workflows you or Basil open appear here.
+                        Workflows and AI Agents you or Basil open appear here.
                     </div>
                 )}
             </div>

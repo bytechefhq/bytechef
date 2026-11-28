@@ -35,8 +35,9 @@ class AiHubConfigurationToolSetTest {
             .askAgent();
 
         assertThat(toolNames(askAgent)).containsExactlyInAnyOrder(
-            "askUserQuestion", "checkWorkflow", "getWorkflow", "listProjects", "listWorkflows", "openWorkflowChatTab",
-            "openWorkflowTab", "searchProjects", "searchWorkflows");
+            "askUserQuestion", "checkWorkflow", "getAiAgent", "getWorkflow", "listAiAgents", "listProjects",
+            "listWorkflows", "openAiAgentTab", "openWorkflowChatTab", "openWorkflowTab", "searchAiAgentReferences",
+            "searchAiAgentTools", "searchProjects", "searchWorkflows");
     }
 
     @Test
@@ -57,7 +58,8 @@ class AiHubConfigurationToolSetTest {
 
         assertThat(toolNames(askToolCallbacks.toolCallbacks())).doesNotContain(
             "createProject", "deleteProject", "createProjectDeployment", "selectConnection", "buildWorkflow",
-            "updateWorkflow", "listChatWorkflows", "createWorkflowChat", "listComponents", "getActionDefinition");
+            "updateWorkflow", "listChatWorkflows", "createWorkflowChat", "listComponents", "getActionDefinition",
+            "createAiAgent", "addAiAgentElement", "deleteAiAgentChannel");
     }
 
     @Test
@@ -66,11 +68,13 @@ class AiHubConfigurationToolSetTest {
             .buildAgent();
 
         assertThat(toolNames(buildAgent)).containsExactlyInAnyOrder(
-            "askUserQuestion", "buildWorkflow", "checkWorkflow", "createConnection", "createProject",
-            "createProjectWorkflow", "getWorkflow", "importWorkflow", "listConnectionsForComponent", "listProjects",
-            "listWorkflows", "openWorkflowChatTab", "openWorkflowTab", "saveWorkflowTestConnection", "searchProjects",
-            "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection", "selectPropertyOption",
-            "selectTriggerPropertyOption");
+            "addAiAgentChannel", "addAiAgentElement", "askUserQuestion", "buildWorkflow", "checkWorkflow",
+            "createAiAgent", "createConnection", "createProject", "createProjectWorkflow", "getAiAgent", "getWorkflow",
+            "importWorkflow", "listAiAgents", "listConnectionsForComponent", "listProjects", "listWorkflows",
+            "openAiAgentTab", "openWorkflowChatTab", "openWorkflowTab", "saveWorkflowTestConnection",
+            "searchAiAgentReferences", "searchAiAgentTools", "searchProjects", "searchWorkflows",
+            "selectClusterElementPropertyOption", "selectConnection", "selectPropertyOption",
+            "selectTriggerPropertyOption", "updateAiAgent", "updateAiAgentElement", "updateAiAgentSettings");
     }
 
     @Test
@@ -84,7 +88,7 @@ class AiHubConfigurationToolSetTest {
             "searchDocs", "listProjectDeployments", "createProjectDeployment", "updateProjectDeployment",
             "deleteProjectDeployment", "rollbackProjectDeployment", "toggleProjectDeployment", "promoteWorkflow",
             "lookupActionPropertyOptions", "lookupTriggerPropertyOptions", "lookupClusterElementPropertyOptions",
-            "listChatWorkflows", "createWorkflowChat");
+            "listChatWorkflows", "createWorkflowChat", "deleteAiAgentChannel", "deleteAiAgentElement");
     }
 
     @Test

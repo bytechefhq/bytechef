@@ -39,7 +39,19 @@ const AiHubComposer = () => {
         });
     };
 
+    const handleSelectAiAgent = (id: string, name: string) => {
+        const {ownsTab, tabId} = attachTab(() => aiHubTabsStore.getState().openAiAgentTab({aiAgentId: id, name}));
+
+        aiHubComposerStore.getState().addReference({id, kind: 'aiAgent', name, ownsTab, tabId});
+    };
+
     const handleResourceSelect = (selection: ResourcePickerSelectionI) => {
+        if (selection.kind === 'aiAgent') {
+            handleSelectAiAgent(selection.id, selection.name);
+
+            return;
+        }
+
         if (selection.projectId == null || selection.projectWorkflowId == null) {
             return;
         }

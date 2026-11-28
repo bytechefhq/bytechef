@@ -1,4 +1,8 @@
-import {isWorkflowArtifactKind, parseArtifactMetadata} from '@/ee/pages/automation/ai-hub/artifacts/artifactOpen';
+import {
+    isAiAgentArtifactKind,
+    isWorkflowArtifactKind,
+    parseArtifactMetadata,
+} from '@/ee/pages/automation/ai-hub/artifacts/artifactOpen';
 import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {aiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import {ARTIFACT_OPEN_TOOL_NAMES} from '@/ee/pages/automation/ai-hub/messages/AiHubToolCallRenderer';
@@ -36,6 +40,7 @@ interface OpenToolCallI {
 }
 
 const ARTIFACT_OPEN_ID_ARGUMENTS: Record<string, string> = {
+    openAiAgentTab: 'aiAgentId',
     openWorkflowTab: 'workflowId',
 };
 
@@ -430,6 +435,10 @@ function applyToolApprovalStatuses(
 }
 
 function artifactToOpenToolCall(artifact: AiHubChatArtifactI): OpenToolCallI | null {
+    if (isAiAgentArtifactKind(artifact.kind)) {
+        return {args: {aiAgentId: artifact.artifactId, name: artifact.artifactName}, toolName: 'openAiAgentTab'};
+    }
+
     if (!isWorkflowArtifactKind(artifact.kind)) {
         return null;
     }

@@ -395,7 +395,9 @@ describe('buildAiHubSubscriber', () => {
 
             const state = aiHubTabsStore.getState();
 
-            expect(state.openTabs.filter((tab) => tab.workflowId === 'wf-1')).toHaveLength(1);
+            expect(state.openTabs.filter((tab) => tab.kind === 'workflow' && tab.workflowId === 'wf-1')).toHaveLength(
+                1
+            );
             expect(state.activeTabId).toBe(firstTabId);
         });
 
@@ -483,6 +485,61 @@ describe('buildAiHubSubscriber', () => {
             deliverToolResult(createSubscriber(), 'call-other', 'someOtherTool', openWorkflowTabResult);
 
             expect(aiHubTabsStore.getState().openTabs).toHaveLength(0);
+        });
+    });
+
+    describe('openAiAgentTab', () => {
+        it('opens an AI Agent tab when the openAiAgentTab tool result arrives', () => {
+            deliverToolResult(
+                createSubscriber(),
+                'call-agent',
+                'openAiAgentTab',
+                JSON.stringify({aiAgentId: '42', name: 'Support Agent', opened: true})
+            );
+
+            const state = aiHubTabsStore.getState();
+
+            expect(state.openTabs).toHaveLength(1);
+            expect(state.openTabs[0]).toMatchObject({aiAgentId: '42', kind: 'aiAgent', name: 'Support Agent'});
+            expect(state.activeTabId).toBe(state.openTabs[0]!.id);
+        });
+
+        it('opens no tab when the tool reports opened:false', () => {
+            deliverToolResult(
+                createSubscriber(),
+                'call-agent',
+                'openAiAgentTab',
+                JSON.stringify({error: 'AI Agent 13 was not found.', opened: false})
+            );
+
+            expect(aiHubTabsStore.getState().openTabs).toHaveLength(0);
+        });
+    });
+
+    describe('AI Agent-mutating tools', () => {
+        it('notifies onAiAgentMutated for the agent builder mutations only', () => {
+            const onAiAgentMutated = vi.fn();
+            const subscriber = createSubscriber({onAiAgentMutated});
+
+            deliverToolResult(subscriber, 'call-create', 'createAiAgent', '{"id":"42"}');
+            deliverToolResult(subscriber, 'call-element', 'addAiAgentElement', '{"id":"7"}');
+            deliverToolResult(subscriber, 'call-list', 'listAiAgents', '[]');
+
+            expect(onAiAgentMutated).toHaveBeenCalledTimes(2);
+        });
+
+        it('notifies onAiAgentMutated when an approved call resumes in a continuation run', () => {
+            const onAiAgentMutated = vi.fn();
+
+            createSubscriber().onToolCallStartEvent!(
+                makeToolCallStartParams({toolCallId: 'call-gated', toolCallName: 'deleteAiAgentElement'})
+            );
+
+            createSubscriber({onAiAgentMutated}).onToolCallResultEvent!(
+                makeToolCallResultParams({content: '{"deleted":true}', toolCallId: 'call-gated'})
+            );
+
+            expect(onAiAgentMutated).toHaveBeenCalledTimes(1);
         });
     });
 

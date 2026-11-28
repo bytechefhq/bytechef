@@ -39,7 +39,8 @@ import org.springframework.context.annotation.Configuration;
 public class CopilotAgentMcpContributorConfiguration {
 
     public static final Set<String> INTELLIGENT_TOOL_NAMES = Set.of(
-        "buildWorkflow", "importWorkflow", "authorSkill", "debugWorkflowExecution", "configureMcpServer");
+        "buildWorkflow", "importWorkflow", "authorSkill", "debugWorkflowExecution", "configureMcpServer",
+        "buildAiAgent");
 
     @Bean
     McpServerToolCallbackContributor copilotAgentToolCallbackContributor(
