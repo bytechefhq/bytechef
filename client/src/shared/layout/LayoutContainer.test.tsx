@@ -134,6 +134,66 @@ describe('LayoutContainer', () => {
     });
 
     // With the sidebar hidden, the main header carries the page title the sidebar header would have shown.
+    it('floats an overlay sidebar over the content without reserving space for it', () => {
+        const onMouseLeave = vi.fn();
+
+        render(
+            <TooltipProvider>
+                <LayoutContainer
+                    header={<Header position="main" title="Projects" />}
+                    leftSidebarAnimate={false}
+                    leftSidebarBody={<div>Categories</div>}
+                    leftSidebarOnMouseLeave={onMouseLeave}
+                    leftSidebarOpen={false}
+                    leftSidebarOverlay
+                >
+                    <div>Content</div>
+                </LayoutContainer>
+            </TooltipProvider>
+        );
+
+        const aside = screen.getByText('Categories').closest('aside');
+
+        expect(aside).toHaveClass('lg:translate-x-0', 'z-40', 'shadow-lg');
+        expect(aside).not.toHaveClass('transition-transform');
+        expect(screen.getByText('Content').closest('.size-full.overflow-auto > div')).not.toHaveClass('lg:pl-64');
+
+        fireEvent.mouseLeave(aside!);
+
+        expect(onMouseLeave).toHaveBeenCalledTimes(1);
+    });
+
+    it('slides an overlay sidebar out once the overlay ends', () => {
+        const renderPeek = (leftSidebarOverlay: boolean) => (
+            <TooltipProvider>
+                <LayoutContainer
+                    header={<Header position="main" title="Projects" />}
+                    leftSidebarAnimate={!leftSidebarOverlay}
+                    leftSidebarBody={<div>Categories</div>}
+                    leftSidebarOpen={false}
+                    leftSidebarOverlay={leftSidebarOverlay}
+                >
+                    <div>Content</div>
+                </LayoutContainer>
+            </TooltipProvider>
+        );
+
+        const {rerender} = render(renderPeek(true));
+
+        rerender(renderPeek(false));
+
+        expect(screen.getByText('Categories').closest('aside')).toHaveClass(
+            'lg:-translate-x-full',
+            'transition-transform'
+        );
+
+        act(() => {
+            vi.advanceTimersByTime(300);
+        });
+
+        expect(screen.queryByText('Categories')).not.toBeInTheDocument();
+    });
+
     it('styles the main header title like the sidebar header while the sidebar is hidden', () => {
         render(
             <TooltipProvider>

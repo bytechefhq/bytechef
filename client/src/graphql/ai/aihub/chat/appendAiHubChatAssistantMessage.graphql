@@ -1,0 +1,3 @@
+mutation appendAiHubChatAssistantMessage($workspaceId: ID!, $id: ID!, $content: String!) {
+    appendAiHubChatAssistantMessage(workspaceId: $workspaceId, id: $id, content: $content)
+}

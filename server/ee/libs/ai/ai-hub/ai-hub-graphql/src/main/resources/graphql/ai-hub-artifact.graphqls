@@ -1,0 +1,92 @@
+"""
+Audit/undo log row for a AI Hub mutation. Mirrors {@link AiHubChatArtifact}: id is the primary
+key, chatId pins the row to a chat, kind/status are ordinal-pinned enums, environmentId is
+denormalised from the parent chat at write time so analytics queries do not need a join.
+"""
+type AiHubChatArtifact {
+    id: ID!
+    chatId: ID!
+    kind: AiHubChatArtifactKind!
+    status: AiHubChatArtifactStatus!
+    artifactId: String!
+    artifactName: String!
+    metadataJson: String
+    environmentId: Long!
+    createdAt: Long
+    statusChangedAt: Long
+}
+
+enum AiHubChatArtifactKind {
+    FILE_CREATED
+    BINARY_FILE_CREATED
+    WORKFLOW_CREATED
+    WORKFLOW_UPDATED
+    DATA_TABLE_ROW_ADDED
+    DATA_TABLE_ROW_UPDATED
+    DATA_TABLE_ROW_DELETED
+    DATA_TABLE_COLUMN_ADDED
+    KB_DOCUMENT_ADDED
+    KB_DOCUMENT_DELETED
+    WORKFLOW_EXECUTION_STARTED
+    MEMORY_CREATED
+    MEMORY_UPDATED
+    MEMORY_DELETED
+    MEMORY_RENAMED
+    FILE_REFERENCED
+    WORKFLOW_REFERENCED
+    DATA_TABLE_REFERENCED
+    KB_REFERENCED
+    MCP_SERVER_REFERENCED
+    API_COLLECTION_REFERENCED
+    WORKFLOW_EXECUTION_REFERENCED
+    CHAT_REFERENCED
+    SKILL_REFERENCED
+    CUSTOM_COMPONENT_REFERENCED
+    CODE_WORKFLOW_REFERENCED
+    FILE_UPDATED
+    AI_AGENT_REFERENCED
+}
+
+enum AiHubChatArtifactStatus {
+    APPLIED
+    EXPIRED
+    IRREVERSIBLE
+}
+
+extend type Mutation {
+    """
+    Records a user-attached reference (file / workflow / data table / knowledge base) as a chat
+    artifact so it appears in the sidebar artifact list. Idempotent - re-attaching the same resource hits
+    the existing row instead of creating a duplicate. Used by the composer plus-button menu when the user
+    references an artifact in a chat.
+    """
+    recordReferencedAiHubChatArtifact(input: RecordReferencedAiHubChatArtifactInput!): AiHubChatArtifact!
+
+    """
+    Removes a user-attached reference artifact (FILE_REFERENCED / WORKFLOW_REFERENCED /
+    DATA_TABLE_REFERENCED / KB_REFERENCED) from a chat. Returns `true` on success or when the row was
+    already gone (idempotent). Throws on ownership / workspace mismatch and on any non-reference kind -
+    those are agent-driven audit rows that the user cannot delete via this surface.
+    """
+    deleteAiHubChatArtifact(input: DeleteAiHubChatArtifactInput!): Boolean!
+}
+
+input RecordReferencedAiHubChatArtifactInput {
+    workspaceId: ID!
+    chatId: ID!
+    kind: AiHubChatArtifactKind!
+    artifactId: String!
+    artifactName: String!
+    """
+    Optional JSON map of side-channel context the artifact needs to be quick-openable from the sidebar.
+    For WORKFLOW_REFERENCED this carries `projectId` and `projectWorkflowId` so the sidebar row can open
+    the workflow tab (which routes by parent project); for other kinds it's currently unused but
+    schema-symmetric with the agent-driven `record(...)` path. Persisted as-is in `metadata_json`.
+    """
+    metadataJson: String
+}
+
+input DeleteAiHubChatArtifactInput {
+    workspaceId: ID!
+    artifactId: ID!
+}

@@ -13,6 +13,9 @@ export interface ApplicationInfoI {
         copilot: {
             enabled: boolean;
         };
+        hub: {
+            enabled: boolean;
+        };
         knowledgeBase: {
             enabled: boolean;
         };
@@ -120,6 +123,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                             copilot: {
                                 enabled: json.ai.copilot.enabled === 'true',
                             },
+                            hub: {
+                                enabled: json.ai.hub?.enabled === 'true' && json.ai.copilot.enabled === 'true',
+                            },
                             knowledgeBase: {
                                 enabled: json.ai.knowledgeBase?.enabled === 'true',
                             },
@@ -188,6 +194,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
             return {
                 ai: {
                     copilot: {
+                        enabled: false,
+                    },
+                    hub: {
                         enabled: false,
                     },
                     knowledgeBase: {

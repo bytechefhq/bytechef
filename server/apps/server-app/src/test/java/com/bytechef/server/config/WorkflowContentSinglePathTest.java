@@ -24,6 +24,7 @@ import com.bytechef.automation.ai.tool.config.CopilotAgentMcpContributorConfigur
 import com.bytechef.automation.configuration.tool.ProjectWorkflowTools;
 import com.bytechef.automation.configuration.tool.config.DeploymentMcpContributorConfiguration;
 import com.bytechef.automation.knowledgebase.tool.config.KnowledgeBaseMcpContributorConfiguration;
+import com.bytechef.ee.ai.hub.config.AiHubConfiguration;
 import java.lang.reflect.Executable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -35,6 +36,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 
 /**
+ * Guards the one-path-per-capability rule for workflow content across every surface that registers the
+ * {@code buildWorkflow} intelligent tool: the management MCP server, the Copilot tool contributors that feed it, and
+ * the AI Hub BUILD agent.
+ *
+ * <p>
+ * {@link ProjectWorkflowTools} exposes {@code updateWorkflow} and a {@code createProjectWorkflow} that accepts a
+ * complete definition, so a surface injecting it could write workflow content without {@code buildWorkflow}'s procedure
+ * behind the write. Those surfaces take {@code ProjectWorkflowLifecycleTools} instead; only the workflow-authoring
+ * subagents register {@link ProjectWorkflowTools} whole. The check spans several modules, which is why it lives here,
+ * where all of them share one classpath.
+ * </p>
+ *
  * @author Ivica Cardic
  */
 class WorkflowContentSinglePathTest {
@@ -42,7 +55,7 @@ class WorkflowContentSinglePathTest {
     private static final List<Class<?>> BUILD_WORKFLOW_SURFACES = List.of(
         ManagementMcpServerConfiguration.class, CopilotAgentMcpContributorConfiguration.class,
         McpServerMcpContributorConfiguration.class, DeploymentMcpContributorConfiguration.class,
-        KnowledgeBaseMcpContributorConfiguration.class);
+        KnowledgeBaseMcpContributorConfiguration.class, AiHubConfiguration.class);
 
     @Test
     void testNoBuildWorkflowSurfaceInjectsProjectWorkflowTools() {

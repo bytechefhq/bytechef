@@ -6,6 +6,8 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import Settings, {SettingsNavItemI} from '../Settings';
 
 const hoisted = vi.hoisted(() => ({
+    aiHubEnabled: false,
+    edition: 'EE' as 'CE' | 'EE',
     enabledFeatureFlags: [] as string[],
 }));
 
@@ -18,7 +20,13 @@ vi.mock('@/shared/layout/LayoutContainer', () => ({
 }));
 
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
-    useApplicationInfoStore: () => false,
+    EditionType: {CE: 'CE', EE: 'EE'},
+    useApplicationInfoStore: (selector: (state: unknown) => unknown) =>
+        selector({
+            ai: {hub: {enabled: hoisted.aiHubEnabled}},
+            application: {edition: hoisted.edition},
+            billing: {enabled: false},
+        }),
 }));
 
 vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
@@ -42,6 +50,8 @@ const aiNavGroup: SettingsNavItemI = {
 
 describe('Settings', () => {
     beforeEach(() => {
+        hoisted.aiHubEnabled = false;
+        hoisted.edition = 'EE';
         hoisted.enabledFeatureFlags = [];
     });
 
@@ -179,6 +189,42 @@ describe('Settings', () => {
 
         expect(screen.getByRole('link', {name: 'API Keys'})).not.toHaveAttribute('aria-current');
         expect(screen.getByRole('link', {name: 'Admin API Keys'})).toHaveAttribute('aria-current', 'page');
+    });
+
+    describe('AI Hub settings entry', () => {
+        const workspaceAiNavGroup: SettingsNavItemI = {
+            items: [
+                {href: '/automation/settings/ai/memories', title: 'Memories'},
+                {href: '/automation/settings/ai/hub', title: 'Hub'},
+            ],
+            title: 'AI',
+        };
+
+        it('shows the entry in the AI group on the EE edition with the AI Hub enabled', () => {
+            hoisted.aiHubEnabled = true;
+
+            renderSettings([{title: 'Current Workspace'}, workspaceAiNavGroup], '/automation/settings/ai/hub');
+
+            expect(screen.getByRole('link', {name: 'Memories'})).toBeInTheDocument();
+            expect(screen.getByRole('link', {name: 'Hub'})).toBeInTheDocument();
+        });
+
+        it('hides only the entry and keeps the AI group when the AI Hub is disabled', () => {
+            renderSettings([{title: 'Current Workspace'}, workspaceAiNavGroup], '/automation/settings/ai/memories');
+
+            expect(screen.getByRole('link', {name: 'Memories'})).toBeInTheDocument();
+            expect(screen.queryByText('Hub')).not.toBeInTheDocument();
+        });
+
+        it('hides only the entry on the CE edition even when the AI Hub is enabled', () => {
+            hoisted.aiHubEnabled = true;
+            hoisted.edition = 'CE';
+
+            renderSettings([{title: 'Current Workspace'}, workspaceAiNavGroup], '/automation/settings/ai/memories');
+
+            expect(screen.getByRole('link', {name: 'Memories'})).toBeInTheDocument();
+            expect(screen.queryByText('Hub')).not.toBeInTheDocument();
+        });
     });
 
     it('names the browser tab after the current settings page', () => {
