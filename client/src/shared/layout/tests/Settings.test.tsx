@@ -69,6 +69,17 @@ describe('Settings', () => {
         expect(screen.getByText('Users')).toBeInTheDocument();
     });
 
+    it('shows the badge of a nav item next to its title', () => {
+        renderSettings([
+            {title: 'Organization'},
+            {badge: 'Beta', href: 'notifications', title: 'Notifications'},
+            {href: 'users', title: 'Users'},
+        ]);
+
+        expect(screen.getByRole('link', {name: 'Notifications Beta'})).toBeInTheDocument();
+        expect(screen.getByRole('link', {name: 'Users'})).toBeInTheDocument();
+    });
+
     it('shows the workspace API Keys page without any feature flag', () => {
         renderSettings([
             {title: 'Current Workspace'},

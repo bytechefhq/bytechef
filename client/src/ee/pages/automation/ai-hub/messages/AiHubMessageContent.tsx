@@ -1,5 +1,5 @@
 import {MarkdownText} from '@/components/assistant-ui/markdown-text';
-import {AiHubToolCallFallback} from '@/ee/pages/automation/ai-hub/messages/AiHubToolCallRenderer';
+import {AiHubToolCallFallback, AiHubToolGroup} from '@/ee/pages/automation/ai-hub/messages/AiHubToolCallRenderer';
 import {aiChatDataComponents} from '@/shared/components/ai-chat/messages/aiChatDataComponents';
 import {MessagePrimitive, type SourceMessagePartComponent} from '@assistant-ui/react';
 import {ExternalLinkIcon} from 'lucide-react';
@@ -31,6 +31,7 @@ const AiHubMessageContent = () => {
             components={{
                 Source: SourceComponent,
                 Text: MarkdownText,
+                ToolGroup: AiHubToolGroup,
                 data: {
                     by_name: aiChatDataComponents,
                 },

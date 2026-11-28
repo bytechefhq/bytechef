@@ -12,13 +12,14 @@ import {MemoryRouter} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const {
+    artifactsCardStateRef,
     launcherSelectMock,
     mockArchivedChatsDataRef,
     mockChatsDataRef,
     modelPickerPropsRef,
     threadPropsRef,
-    unarchiveMutateMock,
 } = vi.hoisted(() => ({
+    artifactsCardStateRef: {current: {available: false, visible: false}},
     launcherSelectMock: vi.fn(),
     mockArchivedChatsDataRef: {current: [] as AiHubChatI[]},
     mockChatsDataRef: {current: [] as AiHubChatI[]},
@@ -33,7 +34,6 @@ const {
             | undefined,
     },
     threadPropsRef: {current: undefined as {showSuggestions?: boolean} | undefined},
-    unarchiveMutateMock: vi.fn(),
 }));
 
 vi.mock('@/ee/pages/automation/ai-hub/messages/AiHubThread', () => ({
@@ -53,7 +53,7 @@ vi.mock('@/ee/pages/automation/ai-hub/artifacts/AiHubArtifactsCard', () => ({
 }));
 
 vi.mock('@/ee/pages/automation/ai-hub/artifacts/useAiHubArtifactsCard', () => ({
-    default: () => ({artifacts: [], visible: false, workspaceId: 1}),
+    default: () => ({artifacts: [], ...artifactsCardStateRef.current, workspaceId: 1}),
 }));
 
 vi.mock('@/ee/pages/automation/ai-hub/hooks/useAiHubChatLaunchers', () => ({
@@ -81,8 +81,6 @@ vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useChats', () => ({
         data: status === 'ARCHIVED' ? mockArchivedChatsDataRef.current : mockChatsDataRef.current,
         isLoading: false,
     }),
-    useDeleteAiHubChatMutation: () => ({mutate: vi.fn()}),
-    usePatchAiHubChatMutation: () => ({mutate: unarchiveMutateMock}),
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
@@ -148,13 +146,13 @@ const renderPanel = () =>
 
 beforeEach(() => {
     aiHubTabsStore.setState({rightPanelOpen: false});
-    useAiHubSettingsStore.setState({showToolCalls: false});
 });
 
 afterEach(() => {
     mockArchivedChatsDataRef.current = [];
     mockChatsDataRef.current = [];
-    unarchiveMutateMock.mockReset();
+    artifactsCardStateRef.current = {available: false, visible: false};
+    useAiHubSettingsStore.setState({artifactsCardHidden: false});
     aiHubChatsStore.getState().reset();
 });
 
@@ -267,79 +265,64 @@ describe('AiHubPanel', () => {
     });
 });
 
-describe('AiHubPanel chat options menu', () => {
-    const openMenu = async () => {
+describe('AiHubPanel header', () => {
+    it('has no chat options menu for a chat the caller owns', () => {
+        mockChatsDataRef.current = [buildChat({id: 41, title: 'Some chat'})];
+        aiHubChatsStore.getState().setCurrentChatId(41);
+
+        renderPanel();
+
+        expect(screen.getByRole('heading', {name: 'Some chat'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Chat options'})).toBeNull();
+    });
+
+    it('shows an open archived chat with its title', () => {
+        mockArchivedChatsDataRef.current = [buildChat({id: 43, status: 'ARCHIVED', title: 'Archived chat'})];
+        aiHubChatsStore.getState().setCurrentChatId(43);
+
+        renderPanel();
+
+        expect(screen.getByRole('heading', {name: 'Archived chat'})).toBeInTheDocument();
+    });
+});
+
+describe('AiHubPanel artifacts toggle', () => {
+    it('has no artifacts toggle while the chat has no artifacts', () => {
+        renderPanel();
+
+        expect(screen.queryByRole('button', {name: /artifacts/})).toBeNull();
+    });
+
+    it('hides the visible artifacts card', async () => {
+        artifactsCardStateRef.current = {available: true, visible: true};
+
         const user = userEvent.setup();
 
         renderPanel();
 
-        await user.click(screen.getByRole('button', {name: 'Chat options'}));
+        const toggle = screen.getByRole('button', {name: 'Hide artifacts'});
 
-        return user;
-    };
+        expect(toggle).toHaveAttribute('aria-pressed', 'true');
 
-    it('offers rename, archive and delete for a chat the caller owns, and no Share item', async () => {
-        mockChatsDataRef.current = [buildChat({id: 41, title: 'Some chat'})];
-        aiHubChatsStore.getState().setCurrentChatId(41);
+        await user.click(toggle);
 
-        await openMenu();
-
-        expect(await screen.findByRole('menuitem', {name: 'Rename'})).toBeInTheDocument();
-        expect(screen.getByRole('menuitem', {name: 'Archive'})).toBeInTheDocument();
-        expect(screen.getByRole('menuitem', {name: 'Delete'})).toBeInTheDocument();
-        expect(screen.queryByRole('menuitem', {name: /Share/})).toBeNull();
+        expect(useAiHubSettingsStore.getState().artifactsCardHidden).toBe(true);
     });
 
-    it('shows an open archived chat with its title and offers unarchive, rename and delete', async () => {
-        mockArchivedChatsDataRef.current = [buildChat({id: 43, status: 'ARCHIVED', title: 'Archived chat'})];
-        aiHubChatsStore.getState().setCurrentChatId(43);
+    it('shows the hidden artifacts card', async () => {
+        artifactsCardStateRef.current = {available: true, visible: false};
+        useAiHubSettingsStore.setState({artifactsCardHidden: true});
 
-        const user = await openMenu();
+        const user = userEvent.setup();
 
-        expect(screen.getByRole('heading', {hidden: true, name: 'Archived chat'})).toBeInTheDocument();
-        expect(await screen.findByRole('menuitem', {name: 'Rename'})).toBeInTheDocument();
-        expect(screen.getByRole('menuitem', {name: 'Delete'})).toBeInTheDocument();
-        expect(screen.queryByRole('menuitem', {name: 'Archive'})).toBeNull();
+        renderPanel();
 
-        await user.click(screen.getByRole('menuitem', {name: 'Unarchive'}));
+        const toggle = screen.getByRole('button', {name: 'Show artifacts'});
 
-        expect(unarchiveMutateMock).toHaveBeenCalledWith({chatId: 43, patch: {status: 'ACTIVE'}, workspaceId: 1});
-    });
+        expect(toggle).toHaveAttribute('aria-pressed', 'false');
 
-    it('offers none of rename/archive/delete for a chat the caller does not own', async () => {
-        mockChatsDataRef.current = [buildChat({id: 42, isOwner: false, title: 'Other chat'})];
-        aiHubChatsStore.getState().setCurrentChatId(42);
+        await user.click(toggle);
 
-        await openMenu();
-
-        expect(await screen.findByRole('menuitem', {name: 'Show tool calls'})).toBeInTheDocument();
-        expect(screen.queryByRole('menuitem', {name: 'Rename'})).not.toBeInTheDocument();
-        expect(screen.queryByRole('menuitem', {name: 'Delete'})).not.toBeInTheDocument();
-    });
-
-    it('offers only the tool-call toggle when no chat is current', async () => {
-        await openMenu();
-
-        expect(await screen.findByRole('menuitem', {name: 'Show tool calls'})).toBeInTheDocument();
-        expect(screen.queryByRole('menuitem', {name: 'Rename'})).not.toBeInTheDocument();
-    });
-
-    it('toggles the tool-call cards', async () => {
-        const user = await openMenu();
-
-        await user.click(await screen.findByRole('menuitem', {name: 'Show tool calls'}));
-
-        expect(useAiHubSettingsStore.getState().showToolCalls).toBe(true);
-    });
-
-    it('opens the rename dialog seeded with the title', async () => {
-        mockChatsDataRef.current = [buildChat({id: 41, title: 'Some chat'})];
-        aiHubChatsStore.getState().setCurrentChatId(41);
-
-        const user = await openMenu();
-
-        await user.click(await screen.findByRole('menuitem', {name: 'Rename'}));
-
-        expect(await screen.findByDisplayValue('Some chat')).toBeInTheDocument();
+        expect(useAiHubSettingsStore.getState().artifactsCardHidden).toBe(false);
     });
 });

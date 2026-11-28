@@ -1,13 +1,24 @@
 import AiHubToolCallRenderer, {
     ARTIFACT_OPEN_TOOL_NAMES,
     AiHubToolCallFallback,
+    AiHubToolGroup,
+    AiHubToolGroupHeader,
 } from '@/ee/pages/automation/ai-hub/messages/AiHubToolCallRenderer';
-import useAiHubSettingsStore from '@/ee/pages/automation/ai-hub/stores/useAiHubSettingsStore';
 import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {aiChatToolCallStore} from '@/shared/components/ai-chat/stores/useAiChatToolCallStore';
 import {type ToolCallMessagePartProps} from '@assistant-ui/react';
 import {act, fireEvent, render, screen} from '@testing-library/react';
-import {beforeEach, describe, expect, it} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+
+const hoisted = vi.hoisted(() => ({
+    messageContentRef: {current: [] as Array<Record<string, unknown>>},
+}));
+
+vi.mock('@assistant-ui/react', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@assistant-ui/react')>()),
+    useAuiState: (selector: (state: {message: {content: unknown}}) => unknown) =>
+        selector({message: {content: hoisted.messageContentRef.current}}),
+}));
 
 const WORKFLOW_ARGS = {name: 'Lead Scoring', projectId: '5', projectWorkflowId: 12, workflowId: 'wf-1'};
 
@@ -21,7 +32,6 @@ describe('AiHubToolCallRenderer', () => {
             rightPanelOpen: false,
             snapshotsByChatId: {},
         });
-        useAiHubSettingsStore.setState({showToolCalls: false});
     });
 
     it('renders the tool name in the header', () => {
@@ -153,19 +163,7 @@ describe('AiHubToolCallFallback', () => {
             />
         );
 
-    beforeEach(() => {
-        useAiHubSettingsStore.setState({showToolCalls: false});
-    });
-
-    it('hides ordinary tool cards while tool calls are hidden', () => {
-        const {container} = renderFallback('listWorkflows');
-
-        expect(container).toBeEmptyDOMElement();
-    });
-
-    it('shows ordinary tool cards once tool calls are shown', () => {
-        useAiHubSettingsStore.setState({showToolCalls: true});
-
+    it('renders an ordinary tool row outside a tool group', () => {
         renderFallback('listWorkflows');
 
         expect(screen.getByText('listWorkflows')).toBeInTheDocument();
@@ -176,83 +174,129 @@ describe('AiHubToolCallFallback', () => {
 
         expect(screen.getByText('Lead Scoring')).toBeInTheDocument();
     });
+});
 
-    describe('running indicator while tool calls are hidden', () => {
-        const renderInFlight = (toolName: string) =>
-            render(
-                <AiHubToolCallFallback
-                    {...({args: {}, toolCallId: 'call-1', toolName} as unknown as ToolCallMessagePartProps)}
-                />
-            );
+describe('AiHubToolGroupHeader', () => {
+    const renderHeader = (toolParts: Array<{toolCallId: string; toolName: string}>) =>
+        render(<AiHubToolGroupHeader expanded={false} onToggle={() => {}} toolParts={toolParts} />);
 
-        beforeEach(() => {
-            aiChatToolCallStore.setState({order: [], toolCalls: {}});
+    beforeEach(() => {
+        aiChatToolCallStore.setState({order: [], toolCalls: {}});
+    });
+
+    it('labels a running buildWorkflow call', () => {
+        aiChatToolCallStore.getState().startToolCall('call-1', 'buildWorkflow', 0);
+
+        renderHeader([{toolCallId: 'call-1', toolName: 'buildWorkflow'}]);
+
+        expect(screen.getByRole('status')).toHaveTextContent('Building workflow...');
+    });
+
+    it('labels a running importWorkflow call', () => {
+        aiChatToolCallStore.getState().startToolCall('call-1', 'importWorkflow', 0);
+
+        renderHeader([{toolCallId: 'call-1', toolName: 'importWorkflow'}]);
+
+        expect(screen.getByRole('status')).toHaveTextContent('Importing workflow...');
+    });
+
+    it('labels any other running call generically', () => {
+        aiChatToolCallStore.getState().startToolCall('call-1', 'listWorkflows', 0);
+
+        renderHeader([{toolCallId: 'call-1', toolName: 'listWorkflows'}]);
+
+        expect(screen.getByRole('status')).toHaveTextContent('Running listWorkflows...');
+    });
+
+    it('counts the calls once none is running', () => {
+        aiChatToolCallStore.getState().startToolCall('call-1', 'buildWorkflow', 0);
+
+        renderHeader([
+            {toolCallId: 'call-1', toolName: 'buildWorkflow'},
+            {toolCallId: 'call-2', toolName: 'listWorkflows'},
+        ]);
+
+        act(() => {
+            aiChatToolCallStore.getState().completeToolCall('call-1', 'done', false);
         });
 
-        it('shows a building row for a running buildWorkflow call', () => {
-            aiChatToolCallStore.getState().startToolCall('call-1', 'buildWorkflow', 0);
+        expect(screen.queryByRole('status')).toBeNull();
+        expect(screen.getByRole('button', {expanded: false})).toHaveTextContent('Ran 2 tools');
+    });
 
-            renderInFlight('buildWorkflow');
+    it('drops the running label once the call is aborted', () => {
+        aiChatToolCallStore.getState().startToolCall('call-1', 'buildWorkflow', 0);
 
-            expect(screen.getByRole('status')).toHaveTextContent('Building workflow...');
+        renderHeader([{toolCallId: 'call-1', toolName: 'buildWorkflow'}]);
+
+        act(() => {
+            aiChatToolCallStore.getState().failAllRunning({reason: 'Cancelled by user'}, 'aborted');
         });
 
-        it('shows an importing row for a running importWorkflow call', () => {
-            aiChatToolCallStore.getState().startToolCall('call-1', 'importWorkflow', 0);
+        expect(screen.queryByRole('status')).toBeNull();
+        expect(screen.getByRole('button')).toHaveTextContent('Ran 1 tool');
+    });
+});
 
-            renderInFlight('importWorkflow');
+describe('AiHubToolGroup', () => {
+    const renderGroup = (toolNames: string[]) => {
+        hoisted.messageContentRef.current = toolNames.map((toolName, index) => ({
+            args: toolName === 'openWorkflowTab' ? WORKFLOW_ARGS : {},
+            result: {ok: true},
+            toolCallId: `call-${index}`,
+            toolName,
+            type: 'tool-call',
+        }));
 
-            expect(screen.getByRole('status')).toHaveTextContent('Importing workflow...');
-        });
+        return render(
+            <AiHubToolGroup endIndex={toolNames.length - 1} startIndex={0}>
+                {toolNames.map((toolName, index) => (
+                    <AiHubToolCallFallback
+                        key={toolName}
+                        {...({
+                            args: toolName === 'openWorkflowTab' ? WORKFLOW_ARGS : {},
+                            result: {ok: true},
+                            toolCallId: `call-${index}`,
+                            toolName,
+                        } as unknown as ToolCallMessagePartProps)}
+                    />
+                ))}
+            </AiHubToolGroup>
+        );
+    };
 
-        it('shows a generic running row for any other running call', () => {
-            aiChatToolCallStore.getState().startToolCall('call-1', 'listWorkflows', 0);
+    beforeEach(() => {
+        aiChatToolCallStore.setState({order: [], toolCalls: {}});
+    });
 
-            renderInFlight('listWorkflows');
+    it('collapses its calls into a single marker', () => {
+        renderGroup(['listWorkflows', 'getWorkflow']);
 
-            expect(screen.getByRole('status')).toHaveTextContent('Running listWorkflows...');
-        });
+        expect(screen.getByRole('button', {expanded: false})).toHaveTextContent('Ran 2 tools');
+        expect(screen.queryByText('listWorkflows')).toBeNull();
+        expect(screen.queryByText('getWorkflow')).toBeNull();
+    });
 
-        it('removes the row once the call completes', () => {
-            aiChatToolCallStore.getState().startToolCall('call-1', 'buildWorkflow', 0);
+    it('lists its calls once the marker is clicked', () => {
+        renderGroup(['listWorkflows', 'getWorkflow']);
 
-            const {container} = renderInFlight('buildWorkflow');
+        fireEvent.click(screen.getByRole('button', {expanded: false}));
 
-            act(() => {
-                aiChatToolCallStore.getState().completeToolCall('call-1', 'done', false);
-            });
+        expect(screen.getByText('listWorkflows')).toBeInTheDocument();
+        expect(screen.getByText('getWorkflow')).toBeInTheDocument();
+    });
 
-            expect(container).toBeEmptyDOMElement();
-        });
+    it('keeps the workflow link visible and leaves it out of the count', () => {
+        renderGroup(['listWorkflows', 'openWorkflowTab']);
 
-        it('removes the row once the call fails', () => {
-            aiChatToolCallStore.getState().startToolCall('call-1', 'buildWorkflow', 0);
+        expect(screen.getByText('Lead Scoring')).toBeInTheDocument();
+        expect(screen.getByRole('button', {expanded: false})).toHaveTextContent('Ran 1 tool');
+    });
 
-            const {container} = renderInFlight('buildWorkflow');
+    it('renders no marker for a group of workflow links only', () => {
+        renderGroup(['openWorkflowTab']);
 
-            act(() => {
-                aiChatToolCallStore.getState().completeToolCall('call-1', {error: 'boom'}, true);
-            });
-
-            expect(container).toBeEmptyDOMElement();
-        });
-
-        it('removes the row once the call is aborted', () => {
-            aiChatToolCallStore.getState().startToolCall('call-1', 'buildWorkflow', 0);
-
-            const {container} = renderInFlight('buildWorkflow');
-
-            act(() => {
-                aiChatToolCallStore.getState().failAllRunning({reason: 'Cancelled by user'}, 'aborted');
-            });
-
-            expect(container).toBeEmptyDOMElement();
-        });
-
-        it('shows nothing for a restored call that has no live entry', () => {
-            const {container} = renderInFlight('buildWorkflow');
-
-            expect(container).toBeEmptyDOMElement();
-        });
+        expect(screen.getByText('Lead Scoring')).toBeInTheDocument();
+        expect(screen.queryByText(/Ran \d/)).toBeNull();
     });
 });

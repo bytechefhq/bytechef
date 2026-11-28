@@ -228,9 +228,7 @@ test.describe('@live AI Hub', () => {
 
             await expect.poll(() => aiHubPage.chatTitle.textContent(), {timeout: 120000}).not.toBe('New Chat');
 
-            await aiHubPage.chatOptionsButton.click();
-
-            await page.getByRole('menuitem', {name: 'Show tool calls'}).click();
+            await aiHubPage.expandToolCalls();
 
             const listProjectsCard = page.getByRole('button', {name: /^listProjects/});
 
@@ -238,7 +236,11 @@ test.describe('@live AI Hub', () => {
 
             await page.reload();
 
-            await expect(listProjectsCard.first()).toBeVisible({timeout: 30000});
+            await expect(page.getByRole('button', {name: /^Ran \d+ tools?/}).first()).toBeVisible({timeout: 30000});
+
+            await aiHubPage.expandToolCalls();
+
+            await expect(listProjectsCard.first()).toBeVisible();
         });
     });
 

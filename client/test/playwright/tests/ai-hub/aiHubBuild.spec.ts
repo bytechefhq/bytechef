@@ -87,10 +87,8 @@ test.describe('AI Hub building a workflow', () => {
             await new WorkflowPage(page).waitForCanvasReady();
         });
 
-        await test.step('Assert the tool calls when shown', async () => {
-            await aiHubPage.chatOptionsButton.click();
-
-            await page.getByRole('menuitem', {name: 'Show tool calls'}).click();
+        await test.step('Assert the tool calls once expanded', async () => {
+            await aiHubPage.expandToolCalls();
 
             for (const toolName of ['createProject', 'createProjectWorkflow', 'buildWorkflow']) {
                 await expect(page.getByRole('button', {name: new RegExp(`^${toolName}\\b`)})).toBeVisible();

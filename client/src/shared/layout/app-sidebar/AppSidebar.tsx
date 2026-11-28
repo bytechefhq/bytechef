@@ -1,3 +1,4 @@
+import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/Tooltip/Tooltip';
 import {
@@ -32,6 +33,7 @@ export interface AppSidebarNavGroupI {
 }
 
 export interface AppSidebarNavItemI {
+    badge?: string;
     group?: AppSidebarNavGroupI;
     href: string;
     icon: LucideIcon;
@@ -203,10 +205,19 @@ export function AppSidebar({navigation}: AppSidebarProps) {
                                                             isActive={isActive(item.href)}
                                                             tooltip={item.name}
                                                         >
-                                                            <Link to={item.href}>
+                                                            <Link className="relative" to={item.href}>
                                                                 <item.icon aria-hidden="true" />
 
-                                                                <span>{item.name}</span>
+                                                                <span className="truncate">{item.name}</span>
+
+                                                                {item.badge && (
+                                                                    <Badge
+                                                                        className="ml-auto px-1.5 py-0 text-[10px] leading-4 group-data-[collapsible=icon]:absolute group-data-[collapsible=icon]:top-0.5 group-data-[collapsible=icon]:right-0 group-data-[collapsible=icon]:ml-0 group-data-[collapsible=icon]:px-[3px] group-data-[collapsible=icon]:text-[7px] group-data-[collapsible=icon]:leading-[9px]"
+                                                                        label={item.badge}
+                                                                        styleType="primary-outline"
+                                                                        weight="semibold"
+                                                                    />
+                                                                )}
                                                             </Link>
                                                         </SidebarMenuButton>
                                                     </SidebarMenuItem>

@@ -8,6 +8,7 @@ import {useEffect, useMemo} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
 
 export interface SettingsNavItemI {
+    badge?: string;
     href?: string;
     items?: SettingsNavItemI[];
     title: string;
@@ -120,6 +121,7 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
                         if (navItem.href) {
                             return (
                                 <LeftSidebarNavItem
+                                    badge={navItem.badge}
                                     item={{
                                         current: navItem.href === currentNavItem?.href,
                                         name: navItem.title,

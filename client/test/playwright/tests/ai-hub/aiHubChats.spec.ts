@@ -171,14 +171,12 @@ test.describe('AI Hub chats', () => {
         }));
 
         try {
-            await test.step('Open the chat and show the tool calls', async () => {
+            await test.step('Open the chat and expand the tool calls', async () => {
                 await aiHubPage.gotoChat(chat.id);
 
                 await expect(page.getByText('You have one project, Demo.')).toBeVisible();
 
-                await aiHubPage.chatOptionsButton.click();
-
-                await page.getByRole('menuitem', {name: 'Show tool calls'}).click();
+                await aiHubPage.expandToolCalls();
 
                 await expect(page.getByRole('button', {name: /listProjects/})).toBeVisible();
             });
@@ -189,6 +187,8 @@ test.describe('AI Hub chats', () => {
                 await expect(aiHubPage.userMessage('Which projects do I have?')).toBeVisible();
 
                 await expect(page.getByText('You have one project, Demo.')).toBeVisible();
+
+                await aiHubPage.expandToolCalls();
 
                 await expect(page.getByRole('button', {name: /listProjects/})).toBeVisible();
             });

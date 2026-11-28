@@ -90,6 +90,7 @@ const organizationNavItems: SettingsNavItemI[] = [
         title: 'AI',
     },
     {
+        badge: 'Beta',
         href: `${ORGANIZATION_SETTINGS_PATH}/mcp-server`,
         title: 'MCP Server',
     },

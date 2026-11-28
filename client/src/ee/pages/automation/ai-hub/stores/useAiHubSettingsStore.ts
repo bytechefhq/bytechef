@@ -3,9 +3,9 @@ import {devtools, persist} from 'zustand/middleware';
 
 interface AiHubSettingsStateI {
     artifactsCardCollapsed: boolean;
+    artifactsCardHidden: boolean;
     setArtifactsCardCollapsed: (artifactsCardCollapsed: boolean) => void;
-    setShowToolCalls: (showToolCalls: boolean) => void;
-    showToolCalls: boolean;
+    setArtifactsCardHidden: (artifactsCardHidden: boolean) => void;
 }
 
 const useAiHubSettingsStore = create<AiHubSettingsStateI>()(
@@ -13,12 +13,11 @@ const useAiHubSettingsStore = create<AiHubSettingsStateI>()(
         persist(
             (set) => ({
                 artifactsCardCollapsed: false,
+                artifactsCardHidden: false,
 
                 setArtifactsCardCollapsed: (artifactsCardCollapsed) => set({artifactsCardCollapsed}),
 
-                setShowToolCalls: (showToolCalls) => set({showToolCalls}),
-
-                showToolCalls: false,
+                setArtifactsCardHidden: (artifactsCardHidden) => set({artifactsCardHidden}),
             }),
             {
                 name: 'bytechef.ai-hub-settings',

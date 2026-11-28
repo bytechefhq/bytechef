@@ -13,7 +13,7 @@ import {
 import {MemoryRouter, useLocation} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {AppSidebar} from './AppSidebar';
+import {AppSidebar, type AppSidebarNavItemI} from './AppSidebar';
 
 const hoisted = vi.hoisted(() => ({currentEnvironmentId: 0}));
 
@@ -47,7 +47,7 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
         selector({currentEnvironmentId: hoisted.currentEnvironmentId}),
 }));
 
-const navigation = [
+const navigation: AppSidebarNavItemI[] = [
     {href: '/automation/ai-hub', icon: MessagesSquareIcon, name: 'AI Hub'},
     {href: '/automation/projects', icon: FolderIcon, name: 'Projects'},
     {href: '/automation/workflow-executions', icon: ActivityIcon, name: 'Workflow Executions'},
@@ -89,6 +89,19 @@ describe('AppSidebar', () => {
 
         expect(screen.getByRole('link', {name: 'AI Hub'})).toBeInTheDocument();
         expect(screen.getByRole('link', {name: 'Projects'})).toBeInTheDocument();
+    });
+
+    it('shows the badge of a navigation entry next to its name', () => {
+        renderSidebar(true, '/automation/projects', [{...navigation[0], badge: 'Beta'}, ...navigation.slice(1)]);
+
+        expect(screen.getByRole('link', {name: 'AI Hub Beta'})).toHaveAttribute('href', '/automation/ai-hub');
+        expect(screen.getByRole('link', {name: 'Projects'})).toBeInTheDocument();
+    });
+
+    it('keeps the badge on the icon when the sidebar is collapsed', () => {
+        renderSidebar(false, '/automation/projects', [{...navigation[0], badge: 'Beta'}, ...navigation.slice(1)]);
+
+        expect(screen.getByRole('link', {name: 'AI Hub Beta'})).toContainElement(screen.getByText('Beta'));
     });
 
     it('links each item to its href', () => {

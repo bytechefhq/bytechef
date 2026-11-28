@@ -167,7 +167,7 @@ test.describe('@live Copilot cards', () => {
                 const dialog = page.getByRole('dialog', {name: 'Create Connection'});
 
                 await dialog.getByRole('textbox', {name: 'Name'}).fill(connectionName);
-                await dialog.getByRole('textbox', {name: 'Token *'}).fill(`mistral-playwright-${getRandomString()}`);
+                await dialog.getByRole('textbox', {name: /^Token/}).fill(`mistral-playwright-${getRandomString()}`);
                 await dialog.getByRole('button', {name: 'Save'}).click();
 
                 await expect(copilotPanel.root.getByText(/Connection ready/).last()).toBeVisible({timeout: 60000});
