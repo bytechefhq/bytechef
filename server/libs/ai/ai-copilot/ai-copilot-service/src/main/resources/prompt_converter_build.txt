@@ -125,3 +125,7 @@ fromAi(...) expressions must NEVER appear in any standalone workflow task parame
 - dataStorage component can be used to store data between tasks and retrieve it later. Scopes CURRENT_EXECUTION and WORKFLOW work in test mode.
 - httpClient component can be used for actions that ByteChef doesn't support. Always prioritize searching for ByteChef actions over using httpClient
 - script component can be used to run arbitrary code. Always prioritize searching for ByteChef actions over using script. Always call getScriptCodeInstructions() tool, before using script
+
+## Web search
+
+braveWebSearch, webSearch, webpageScrape and websiteMap search the web and read pages. They are present only when an admin enabled a web search provider, so use whichever ones you have and never mention the ones you lack. Use them only when the ByteChef tools lack something the workflow needs, such as the endpoint and payload an httpClient task must send to a service ByteChef has no component for. Never use them instead of searching for a ByteChef component.

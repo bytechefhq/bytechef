@@ -23,9 +23,12 @@ import com.bytechef.ai.copilot.tool.catalog.IntelligentToolScope;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.copilot.tool.catalog.SimpleIntelligentToolDefinition;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
+import com.bytechef.automation.configuration.tool.ConverterAgentToolCallback.TargetWorkflowManager;
+import com.bytechef.automation.configuration.tool.model.ProjectWorkflowInfo;
 import java.util.List;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -37,6 +40,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class WorkflowIntelligentToolContributorConfiguration {
 
+    private static final String IMPORTED_WORKFLOW_NAME = "Imported workflow";
+
     @Bean
     public IntelligentToolContributor workflowIntelligentToolContributor(
         @Qualifier("workflowEditorAskSubAgentChatClientFactory") //
@@ -45,9 +50,13 @@ public class WorkflowIntelligentToolContributorConfiguration {
         ObjectProvider<IntelligentToolChatClientFactory> workflowEditorBuildFactoryProvider,
         @Qualifier("converterBuildSubAgentChatClientFactory") //
         ObjectProvider<IntelligentToolChatClientFactory> converterBuildFactoryProvider,
-        ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider) {
+        ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider,
+        ObjectProvider<ProjectWorkflowLifecycleTools> projectWorkflowLifecycleToolsProvider) {
 
         SubAgentChatModelResolver chatModelResolver = chatModelResolverProvider.getIfAvailable();
+
+        TargetWorkflowManager targetWorkflowManager = getTargetWorkflowManager(
+            projectWorkflowLifecycleToolsProvider.getIfAvailable());
 
         List<IntelligentToolDefinition> definitions = List.of(
             new SimpleIntelligentToolDefinition(
@@ -61,9 +70,36 @@ public class WorkflowIntelligentToolContributorConfiguration {
                 Set.of(IntelligentToolScope.PROJECT),
                 variant -> variant == IntelligentToolVariant.BUILD
                     ? converterBuildFactoryProvider.getIfAvailable() : null,
-                chatClientFactory -> new ConverterAgentToolCallback(chatClientFactory, chatModelResolver), false));
+                chatClientFactory -> new ConverterAgentToolCallback(
+                    chatClientFactory, chatModelResolver, targetWorkflowManager),
+                false));
 
         return () -> definitions;
+    }
+
+    @Nullable
+    private static TargetWorkflowManager getTargetWorkflowManager(
+        @Nullable ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools) {
+
+        if (projectWorkflowLifecycleTools == null) {
+            return null;
+        }
+
+        return new TargetWorkflowManager() {
+
+            @Override
+            public String createWorkflow(long projectId, ToolContext toolContext) {
+                ProjectWorkflowInfo projectWorkflowInfo = projectWorkflowLifecycleTools.createProjectWorkflow(
+                    projectId, IMPORTED_WORKFLOW_NAME, null, toolContext);
+
+                return projectWorkflowInfo.workflowId();
+            }
+
+            @Override
+            public void deleteWorkflow(String workflowId, ToolContext toolContext) {
+                projectWorkflowLifecycleTools.deleteWorkflow(workflowId, toolContext);
+            }
+        };
     }
 
     @Nullable

@@ -34,12 +34,12 @@ class ReadProjectToolsTest {
 
     @Test
     void testEveryToolPassesTheToolContextThrough() {
-        readProjectTools.listProjects(1L, toolContext);
+        readProjectTools.listProjects(1L, "alp", toolContext);
         readProjectTools.getProject(7L, toolContext);
         readProjectTools.searchProjects("alpha", 1L, toolContext);
         readProjectTools.getProjectStatus(7L, toolContext);
 
-        verify(projectTools).listProjects(1L, toolContext);
+        verify(projectTools).listProjects(1L, "alp", toolContext);
         verify(projectTools).getProject(7L, toolContext);
         verify(projectTools).searchProjects("alpha", 1L, toolContext);
         verify(projectTools).getProjectStatus(7L, toolContext);

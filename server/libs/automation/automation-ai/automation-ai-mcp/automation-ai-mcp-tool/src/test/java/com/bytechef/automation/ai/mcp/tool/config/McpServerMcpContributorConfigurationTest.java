@@ -30,6 +30,7 @@ import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,31 +50,48 @@ class McpServerMcpContributorConfigurationTest {
     @Nested
     class McpServerCrudContributorTest {
 
-        private final McpProjectWorkflowFacade mcpProjectWorkflowFacade = mock(McpProjectWorkflowFacade.class);
+        private final WorkspaceMcpServerFacade workspaceMcpServerFacade = mock(WorkspaceMcpServerFacade.class);
 
         @Test
-        void testListMcpProjectWorkflowsAcceptsWorkspaceId() {
-            ToolCallback listMcpProjectWorkflowsToolCallback = getListMcpProjectWorkflowsToolCallback();
-
-            assertThat(listMcpProjectWorkflowsToolCallback.getToolDefinition()
-                .inputSchema()).contains("workspaceId");
+        void testContributesOnlyTheMcpServerToolsConfigureMcpServerCannotReplace() {
+            assertThat(getToolCallbacks())
+                .extracting(toolCallback -> toolCallback.getToolDefinition()
+                    .name())
+                .containsExactlyInAnyOrder("listMcpServers", "createMcpServer", "updateMcpServer", "createMcpProject")
+                .doesNotContain(
+                    "cloneMcpProject", "listMcpProjectWorkflows", "updateMcpProjectWorkflowParameters");
         }
 
         @Test
-        void testListMcpProjectWorkflowsListsThroughTheFacadeWithTheGivenWorkspace() {
-            when(workspaceFacade.getMyWorkspaces()).thenReturn(List.of(new Workspace(7L, "Workspace")));
-            when(mcpProjectWorkflowFacade.getMcpServerMcpProjectWorkflows(5L)).thenReturn(List.of());
+        void testListAndCreateMcpServerAcceptWorkspaceId() {
+            assertThat(getToolCallbacks())
+                .filteredOn(toolCallback -> Set.of("listMcpServers", "createMcpServer")
+                    .contains(toolCallback.getToolDefinition()
+                        .name()))
+                .hasSize(2)
+                .allSatisfy(toolCallback -> assertThat(toolCallback.getToolDefinition()
+                    .inputSchema()).contains("workspaceId"));
+        }
 
-            String result = getListMcpProjectWorkflowsToolCallback().call("{\"mcpServerId\": 5, \"workspaceId\": 7}");
+        @Test
+        void testListMcpServersListsThroughTheFacadeWithTheGivenWorkspace() {
+            when(workspaceFacade.getMyWorkspaces()).thenReturn(List.of(new Workspace(7L, "Workspace")));
+
+            String result = getToolCallbacks().stream()
+                .filter(toolCallback -> "listMcpServers".equals(toolCallback.getToolDefinition()
+                    .name()))
+                .findFirst()
+                .orElseThrow()
+                .call("{\"workspaceId\": 7}");
 
             assertThat(result).isEqualTo("[]");
-            verify(mcpProjectWorkflowFacade).getMcpServerMcpProjectWorkflows(5L);
+            verify(workspaceMcpServerFacade).getWorkspaceMcpServers(7L);
         }
 
         @SuppressWarnings("unchecked")
-        private ToolCallback getListMcpProjectWorkflowsToolCallback() {
+        private List<ToolCallback> getToolCallbacks() {
             McpServerToolCallbacksFactory mcpServerToolCallbacksFactory = new McpServerToolCallbacksFactory(
-                mock(McpProjectFacade.class), mcpProjectWorkflowFacade, mock(WorkspaceMcpServerFacade.class));
+                mock(McpProjectFacade.class), mock(McpProjectWorkflowFacade.class), workspaceMcpServerFacade);
 
             ObjectProvider<McpServerToolCallbacksFactory> provider = mock(ObjectProvider.class);
 
@@ -82,13 +100,7 @@ class McpServerMcpContributorConfigurationTest {
             McpServerToolCallbackContributor contributor = configuration.mcpServerCrudMcpContributor(
                 provider, workspaceFacade);
 
-            return contributor.getToolCallbacks()
-                .stream()
-                .filter(toolCallback -> "listMcpProjectWorkflows".equals(
-                    toolCallback.getToolDefinition()
-                        .name()))
-                .findFirst()
-                .orElseThrow();
+            return contributor.getToolCallbacks();
         }
     }
 }

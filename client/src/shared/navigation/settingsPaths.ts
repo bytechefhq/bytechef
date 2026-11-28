@@ -5,6 +5,7 @@ export const ORGANIZATION_SETTINGS_PAGES: readonly string[] = [
     'billing',
     'ai-providers',
     'ai/skills',
+    'ai/web-search',
     'mcp-server',
     'custom-components',
     'api-connectors',
@@ -24,6 +25,8 @@ export const API_CONNECTORS_SETTINGS_PATH = `${ORGANIZATION_SETTINGS_PATH}/api-c
 export const BILLING_SETTINGS_PATH = `${ORGANIZATION_SETTINGS_PATH}/billing`;
 
 export const EMBEDDED_MEMORIES_SETTINGS_PATH = '/embedded/settings/ai/memories';
+
+export const WEB_SEARCH_SETTINGS_PATH = `${ORGANIZATION_SETTINGS_PATH}/ai/web-search`;
 
 export const MEMORIES_SETTINGS_PATH = '/automation/settings/ai/memories';
 

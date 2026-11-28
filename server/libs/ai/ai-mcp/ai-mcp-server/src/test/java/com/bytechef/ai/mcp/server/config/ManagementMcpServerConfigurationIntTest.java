@@ -21,14 +21,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
-import com.bytechef.automation.configuration.tool.ClusterElementTools;
 import com.bytechef.automation.configuration.tool.ProjectTools;
 import com.bytechef.automation.configuration.tool.ProjectWorkflowLifecycleTools;
-import com.bytechef.automation.configuration.tool.ScriptTools;
 import com.bytechef.automation.configuration.tool.WorkspaceTools;
-import com.bytechef.platform.component.tool.ComponentTools;
-import com.bytechef.platform.component.tool.TaskTools;
-import com.bytechef.platform.workflow.tool.TaskDispatcherTools;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import java.util.Arrays;
 import java.util.List;
@@ -46,16 +41,11 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 class ManagementMcpServerConfigurationIntTest {
 
     private static final List<String> WORKSPACE_SCOPED_TOOL_NAMES = List.of(
-        "listProjects", "searchProjects", "createProject", "searchWorkflows");
+        "listProjects", "createProject", "searchWorkflows");
 
     private final ApplicationContextRunner applicationContextRunner = new ApplicationContextRunner()
-        .withBean(ComponentTools.class, () -> mock(ComponentTools.class))
         .withBean(ProjectTools.class, () -> mock(ProjectTools.class))
         .withBean(ProjectWorkflowLifecycleTools.class, () -> mock(ProjectWorkflowLifecycleTools.class))
-        .withBean(TaskTools.class, () -> mock(TaskTools.class))
-        .withBean(TaskDispatcherTools.class, () -> mock(TaskDispatcherTools.class))
-        .withBean(ScriptTools.class, () -> mock(ScriptTools.class))
-        .withBean(ClusterElementTools.class, () -> mock(ClusterElementTools.class))
         .withBean(WorkspaceTools.class, () -> mock(WorkspaceTools.class))
         .withUserConfiguration(ManagementMcpServerConfiguration.class);
 
@@ -117,37 +107,64 @@ class ManagementMcpServerConfigurationIntTest {
         applicationContextRunner.run(context -> {
             assertThat(context).hasNotFailed();
 
-            ManagementMcpServerConfiguration configuration = context.getBean(ManagementMcpServerConfiguration.class);
-
-            List<String> toolNames = Arrays.stream(configuration.toolCallbackProvider()
-                .getToolCallbacks())
-                .map(toolCallback -> toolCallback.getToolDefinition()
-                    .name())
-                .toList();
-
-            assertThat(toolNames)
-                .contains("createProjectWorkflow", "deleteWorkflow", "saveWorkflowTestConnection")
-                .doesNotContain("updateWorkflow");
+            assertThat(getToolNames(context.getBean(ManagementMcpServerConfiguration.class)))
+                .contains("deleteWorkflow", "saveWorkflowTestConnection")
+                .doesNotContain(
+                    "updateWorkflow", "getActionDefinition", "listComponents", "getTaskProperties",
+                    "listTaskDispatchers", "updateScriptComponentCode", "updateClusterElementTask",
+                    "updateWorkflowRootProperties");
         });
     }
 
     @Test
-    void testCreateProjectWorkflowTakesNameNotDefinition() {
+    void testToolCallbackProviderExposesOneToolPerProjectAndWorkflowRead() {
+        applicationContextRunner.run(context -> {
+            assertThat(context).hasNotFailed();
+
+            assertThat(getToolNames(context.getBean(ManagementMcpServerConfiguration.class)))
+                .containsExactlyInAnyOrder(
+                    "listWorkspaces", "listProjects", "getProject", "createProject", "updateProject",
+                    "deleteProject", "publishProject", "getWorkflow", "listWorkflows", "searchWorkflows",
+                    "deleteWorkflow",
+                    "saveWorkflowTestConnection");
+        });
+    }
+
+    @Test
+    void testToolCallbackProviderDropsTheNearDuplicateAndWorkflowCreationTools() {
+        applicationContextRunner.run(context -> {
+            assertThat(context).hasNotFailed();
+
+            assertThat(getToolNames(context.getBean(ManagementMcpServerConfiguration.class)))
+                .doesNotContain("createProjectWorkflow", "searchProjects", "getProjectStatus");
+        });
+    }
+
+    @Test
+    void testListToolsTakeAnOptionalQuery() {
         applicationContextRunner.run(context -> {
             assertThat(context).hasNotFailed();
 
             ManagementMcpServerConfiguration configuration = context.getBean(ManagementMcpServerConfiguration.class);
 
-            ToolDefinition toolDefinition = Arrays.stream(configuration.toolCallbackProvider()
+            assertThat(Arrays.stream(configuration.toolCallbackProvider()
                 .getToolCallbacks())
                 .map(ToolCallback::getToolDefinition)
-                .filter(definition -> "createProjectWorkflow".equals(definition.name()))
-                .findFirst()
-                .orElseThrow();
-
-            assertThat(toolDefinition.inputSchema()).contains("\"name\"");
-            assertThat(toolDefinition.inputSchema()).doesNotContain("definition");
+                .filter(definition -> List.of("listProjects", "listWorkflows")
+                    .contains(definition.name())))
+                        .hasSize(2)
+                        .allSatisfy(definition -> assertThat(definition.inputSchema()).contains("\"query\""));
         });
+    }
+
+    @Test
+    void testInstructionsDescribeImportWorkflowWithAProjectIdOrAWorkflowId() {
+        assertThat(ManagementMcpServerConfiguration.INSTRUCTIONS)
+            .contains("createProject (if needed) → importWorkflow with the source")
+            .contains("the projectId for a new workflow or the workflowId for an existing one")
+            .doesNotContain(
+                "createProjectWorkflow", "searchProjects", "getProjectStatus", "cloneMcpProject",
+                "listMcpProjectWorkflows", "—");
     }
 
     @Test
@@ -162,6 +179,14 @@ class ManagementMcpServerConfigurationIntTest {
 
             assertThat(toolCallbackProvider.getToolCallbacks()).isNotNull();
         });
+    }
+
+    private static List<String> getToolNames(ManagementMcpServerConfiguration configuration) {
+        return Arrays.stream(configuration.toolCallbackProvider()
+            .getToolCallbacks())
+            .map(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .toList();
     }
 
     @Nested

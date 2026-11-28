@@ -1,0 +1,3 @@
+mutation deleteWebSearchProvider($environment: ID!, $name: String!) {
+    deleteWebSearchProvider(environment: $environment, name: $name)
+}
