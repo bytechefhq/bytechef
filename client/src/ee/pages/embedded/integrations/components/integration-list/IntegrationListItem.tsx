@@ -328,7 +328,7 @@ const IntegrationListItem = ({
                                 <div className="flex items-center">
                                     <Badge
                                         className="border-transparent"
-                                        label="Actions, tools & MCP"
+                                        label="No workflows"
                                         styleType="secondary-filled"
                                         weight="semibold"
                                     />

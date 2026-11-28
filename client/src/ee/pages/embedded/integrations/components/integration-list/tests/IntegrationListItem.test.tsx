@@ -503,10 +503,10 @@ describe('IntegrationListItem', () => {
             expect(screen.queryByText('PUBLISHED')).not.toBeInTheDocument();
         });
 
-        it('should replace the version with a usage badge for a connection-only integration', () => {
+        it('should replace the version with a No workflows badge for a connection-only integration', () => {
             renderItem({integrationWorkflowIds: [], lastIntegrationVersion: 2, unpublishedChanges: false});
 
-            expect(screen.getByText('Actions, tools & MCP')).toBeInTheDocument();
+            expect(screen.getByText('No workflows')).toBeInTheDocument();
             expect(screen.queryByText('PUBLISHED')).not.toBeInTheDocument();
             expect(screen.queryByText(/^Published at/)).not.toBeInTheDocument();
         });
@@ -520,7 +520,7 @@ describe('IntegrationListItem', () => {
             });
 
             expect(screen.getByText('DRAFT').parentElement).toHaveTextContent('V2DRAFT');
-            expect(screen.queryByText('Actions, tools & MCP')).not.toBeInTheDocument();
+            expect(screen.queryByText('No workflows')).not.toBeInTheDocument();
         });
     });
 });
