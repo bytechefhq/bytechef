@@ -102,7 +102,7 @@ For such an integration:
 
 - The card shows **No workflows** and **No publishing needed** in place of the version badge and publish date, and the three-dot menu has no **Publish**.
 - Expanding it opens the **Actions** tab.
-- **New Configuration** skips the **Version** field and the **Workflows** step. The first configuration publishes version 1 for you.
+- **New Configuration** skips the **Version** field and the **Workflows** step. If the integration has never been published, saving the first configuration publishes version 1 and pins the configuration to it.
 
 Adding a workflow turns the integration into a regular one at once: the version badge and **Publish** come back, and you publish and upgrade configurations as usual.
 
