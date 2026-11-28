@@ -27,6 +27,8 @@ public enum AutomationConfigurationAgentType implements AgentType {
 
     WORKFLOW_EDITOR_ASK(Source.WORKFLOW_EDITOR, Mode.ASK),
     WORKFLOW_EDITOR_BUILD(Source.WORKFLOW_EDITOR, Mode.BUILD),
+    WORKFLOW_CODE_EDITOR_ASK(Source.WORKFLOW_CODE_EDITOR, Mode.ASK),
+    WORKFLOW_CODE_EDITOR_BUILD(Source.WORKFLOW_CODE_EDITOR, Mode.BUILD),
     CONVERTER_BUILD(Source.CONVERTER, Mode.BUILD),
     BUILD_WORKFLOW("buildWorkflow"),
     IMPORT_WORKFLOW("importWorkflow");
