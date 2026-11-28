@@ -68,6 +68,19 @@ const McpToolFormFields = ({displayConditions, form, loadOptions, properties, va
         [advancedPropertiesOpen, hiddenPaths, loadOptions, properties, values]
     );
 
+    const hasAiFillableFields = useMemo(() => {
+        const aiFillableSummary = summarizeAiFillCandidates({
+            hiddenPaths,
+            includeAdvanced: true,
+            includeConditional: true,
+            optionsLoadable: !!loadOptions,
+            properties,
+            values: {},
+        });
+
+        return aiFillableSummary.hasStaticCandidates || aiFillableSummary.optionsCandidatesKey !== '';
+    }, [hiddenPaths, loadOptions, properties]);
+
     const hasEligibleFields =
         hasStaticCandidates ||
         (optionsCandidatesKey !== '' &&
@@ -139,7 +152,7 @@ const McpToolFormFields = ({displayConditions, form, loadOptions, properties, va
                 />
             )}
 
-            {bodyProperties.length > 0 && (
+            {bodyProperties.length > 0 && hasAiFillableFields && (
                 <LetAiFillRequiredButton disabled={!hasEligibleFields || isFilling} onClick={handleClick} />
             )}
 
